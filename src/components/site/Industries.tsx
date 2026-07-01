@@ -1,3 +1,6 @@
+import { Section, SectionHeader } from "@/components/site/primitives";
+import { GridBoard, BoardCell } from "@/components/site/cards";
+
 const INDUSTRIES = [
   { name: "Cold Storage", note: "Low-temperature PIR envelopes" },
   { name: "Food Processing", note: "Hygienic wall & ceiling systems" },
@@ -11,32 +14,29 @@ const INDUSTRIES = [
 
 export function Industries() {
   return (
-    <section className="border-b border-border bg-background">
-      <div className="container-wide py-20 lg:py-28">
-        <div className="mb-14 max-w-2xl">
-          <div className="eyebrow mb-4">Industries served</div>
-          <h2 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            Sandwich panel systems engineered for demanding environments.
-          </h2>
-        </div>
+    <Section tone="default">
+      <SectionHeader
+        eyebrow="Industries served"
+        title="Sandwich panel systems engineered for demanding environments."
+      />
 
-        <ul className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
-          {INDUSTRIES.map((i) => (
-            <li
-              key={i.name}
-              className="group flex flex-col justify-between gap-6 bg-background p-6 transition-colors hover:bg-surface"
-            >
-              <div className="h-px w-8 bg-border transition-all group-hover:bg-accent" />
-              <div>
-                <div className="text-base font-semibold tracking-tight text-foreground">
-                  {i.name}
-                </div>
-                <div className="mt-1 text-xs text-muted-foreground">{i.note}</div>
+      <GridBoard className="sm:grid-cols-2 lg:grid-cols-4">
+        {INDUSTRIES.map((i) => (
+          <BoardCell
+            key={i.name}
+            interactive
+            className="card-accent-line justify-between gap-6"
+          >
+            <div className="h-px w-8 bg-border transition-all group-hover:bg-accent" />
+            <div>
+              <div className="text-base font-semibold tracking-tight text-foreground">
+                {i.name}
               </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+              <div className="mt-1 text-xs text-muted-foreground">{i.note}</div>
+            </div>
+          </BoardCell>
+        ))}
+      </GridBoard>
+    </Section>
   );
 }

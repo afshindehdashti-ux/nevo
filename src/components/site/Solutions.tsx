@@ -1,3 +1,6 @@
+import { Section, SectionHeader } from "@/components/site/primitives";
+import { GridBoard, BoardCell } from "@/components/site/cards";
+
 const SOLUTIONS = [
   {
     n: "01",
@@ -33,43 +36,34 @@ const SOLUTIONS = [
 
 export function Solutions() {
   return (
-    <section className="border-b border-border bg-background">
-      <div className="container-wide py-20 lg:py-28">
-        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-          <div className="max-w-2xl">
-            <div className="eyebrow mb-4">Six engineering pillars</div>
-            <h2 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              A complete industrial partner for the sandwich panel industry.
-            </h2>
-          </div>
+    <Section tone="default">
+      <SectionHeader
+        eyebrow="Six engineering pillars"
+        title="A complete industrial partner for the sandwich panel industry."
+        aside={
           <a
             href="#"
-            className="text-xs font-medium uppercase tracking-widest text-foreground underline underline-offset-4 hover:text-accent"
+            className="text-xs font-medium uppercase tracking-widest text-foreground underline decoration-border decoration-1 underline-offset-4 hover:decoration-accent"
           >
-            View all solutions →
+            Explore Solutions →
           </a>
-        </div>
+        }
+      />
 
-        <div className="mt-14 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
-          {SOLUTIONS.map((s) => (
-            <article
-              key={s.n}
-              className="group relative flex flex-col gap-4 bg-background p-6 transition-colors hover:bg-surface sm:p-8"
-            >
-              <div className="flex items-baseline justify-between">
-                <span className="font-mono text-[11px] tracking-widest text-muted-foreground">
-                  {s.n}
-                </span>
-                <span className="h-px w-8 bg-border transition-all group-hover:w-16 group-hover:bg-accent" />
-              </div>
-              <h3 className="text-lg font-semibold tracking-tight text-foreground">
-                {s.title}
-              </h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
+      <GridBoard className="sm:grid-cols-2 lg:grid-cols-3">
+        {SOLUTIONS.map((s) => (
+          <BoardCell key={s.n} interactive className="card-accent-line gap-4">
+            <div className="flex items-baseline justify-between">
+              <span className="font-mono text-[11px] tracking-widest text-muted-foreground">
+                {s.n}
+              </span>
+              <span className="h-px w-8 bg-border transition-all group-hover:w-16 group-hover:bg-accent" />
+            </div>
+            <h3 className="text-h3 mt-4 text-foreground">{s.title}</h3>
+            <p className="text-body mt-2">{s.desc}</p>
+          </BoardCell>
+        ))}
+      </GridBoard>
+    </Section>
   );
 }
