@@ -3,19 +3,34 @@ import { Section, SectionHeader } from "@/components/site/primitives";
 
 const ARTICLES = [
   {
-    tag: "Guide",
-    title: "Planning a sandwich panel factory: the investor's technical checklist",
-    read: "12 min read",
+    tag: "Raw materials",
+    title: "What is PIR? Chemistry, properties and where it's used.",
+    read: "6 min read",
   },
   {
-    tag: "Technical",
-    title: "PIR vs PUR: how to select the right chemistry for your panel line",
+    tag: "Comparison",
+    title: "PIR vs PUR: how to select the right chemistry for your panel line.",
     read: "8 min read",
   },
   {
-    tag: "Case study",
-    title: "Modernizing a discontinuous PU line for continuous PIR output",
-    read: "6 min read",
+    tag: "Process",
+    title: "How sandwich panels are manufactured — line by line.",
+    read: "10 min read",
+  },
+  {
+    tag: "Investment",
+    title: "How much does a sandwich panel factory cost?",
+    read: "12 min read",
+  },
+  {
+    tag: "Raw materials",
+    title: "Rock wool guide: density, fire behaviour and specification.",
+    read: "7 min read",
+  },
+  {
+    tag: "Guide",
+    title: "Factory planning checklist for new panel manufacturers.",
+    read: "9 min read",
   },
 ];
 
@@ -24,7 +39,8 @@ export function KnowledgeHub() {
     <Section tone="surface">
       <SectionHeader
         eyebrow="Knowledge hub"
-        title="Education before sales. Practical, technical, useful."
+        title="Engineering knowledge that creates better decisions."
+        lede="Practical, technical, useful. Written for engineers, procurement leads and factory investors."
         aside={
           <a
             href="#"
@@ -35,7 +51,7 @@ export function KnowledgeHub() {
         }
       />
 
-      <div className="grid gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-3">
+      <div className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
         {ARTICLES.map((a) => (
           <a
             key={a.title}

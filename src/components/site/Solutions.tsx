@@ -1,34 +1,49 @@
+import {
+  ArrowUpRight,
+  Building2,
+  ClipboardList,
+  Wrench,
+  Layers,
+  PackageCheck,
+  LifeBuoy,
+} from "lucide-react";
 import { Section, SectionHeader } from "@/components/site/primitives";
 import { GridBoard, BoardCell } from "@/components/site/cards";
 
 const SOLUTIONS = [
   {
     n: "01",
+    icon: Building2,
     title: "Factory Development",
-    desc: "Turnkey guidance for investors building new sandwich panel factories — feasibility, layout, procurement and commissioning.",
+    desc: "Turnkey guidance for new sandwich panel factories — feasibility, layout, procurement and commissioning.",
   },
   {
     n: "02",
+    icon: ClipboardList,
     title: "Engineering Consultancy",
-    desc: "Factory layout, process design, production optimization, technical consulting and commissioning support.",
+    desc: "Process design, layout, production optimization, modernization and commissioning support.",
   },
   {
     n: "03",
-    title: "Raw Material Solutions",
-    desc: "PIR / PUR systems, PPGI, GI and Aluzinc coils, rock wool, adhesives and qualified consumables.",
+    icon: Wrench,
+    title: "Production Lines",
+    desc: "Continuous & discontinuous lines, roll forming, PU/PIR foaming systems and automation.",
   },
   {
     n: "04",
-    title: "Production Line Solutions",
-    desc: "Complete continuous & discontinuous lines, roll forming, PU/PIR foaming systems, automation and modernization.",
+    icon: Layers,
+    title: "Raw Materials",
+    desc: "PIR / PUR systems, PPGI, GI and Aluzinc coils, rock wool, adhesives and consumables.",
   },
   {
     n: "05",
-    title: "Finished Panel Solutions",
-    desc: "Supply of finished sandwich panels across selected regional markets in the Middle East, Africa and Eurasia.",
+    icon: PackageCheck,
+    title: "Finished Panels",
+    desc: "Supply of finished sandwich panels across selected regional markets.",
   },
   {
     n: "06",
+    icon: LifeBuoy,
     title: "Technical Support",
     desc: "Training, spare parts, factory audits, troubleshooting and long-term operational support.",
   },
@@ -38,7 +53,7 @@ export function Solutions() {
   return (
     <Section tone="default">
       <SectionHeader
-        eyebrow="Six engineering pillars"
+        eyebrow="Solutions"
         title="A complete industrial partner for the sandwich panel industry."
         aside={
           <a
@@ -52,15 +67,31 @@ export function Solutions() {
 
       <GridBoard className="sm:grid-cols-2 lg:grid-cols-3">
         {SOLUTIONS.map((s) => (
-          <BoardCell key={s.n} interactive className="card-accent-line gap-4">
+          <BoardCell
+            key={s.n}
+            as="a"
+            // @ts-expect-error href on anchor
+            href="#contact"
+            interactive
+            className="card-accent-line flex flex-col gap-6 min-h-[240px]"
+          >
             <div className="flex items-baseline justify-between">
               <span className="font-mono text-[11px] tracking-widest text-muted-foreground">
                 {s.n}
               </span>
-              <span className="h-px w-8 bg-border transition-all group-hover:w-16 group-hover:bg-accent" />
+              <s.icon
+                className="size-5 text-muted-foreground transition-colors group-hover:text-foreground"
+                strokeWidth={1.5}
+              />
             </div>
-            <h3 className="text-h3 mt-4 text-foreground">{s.title}</h3>
-            <p className="text-body mt-2">{s.desc}</p>
+            <div className="flex-1">
+              <h3 className="text-h3 text-foreground">{s.title}</h3>
+              <p className="text-body mt-2">{s.desc}</p>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-widest text-foreground">
+              Learn more
+              <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </div>
           </BoardCell>
         ))}
       </GridBoard>
