@@ -92,19 +92,19 @@ export function SiteHeader() {
           : "border-b border-transparent bg-transparent",
       )}
     >
-      <div className="container-wide flex h-20 items-center justify-between gap-6 md:h-24">
+      <div className="container-wide flex h-24 items-center justify-between gap-6 px-5 sm:px-6 md:h-28 md:px-6 lg:px-8">
         <Link
           to="/"
           className="relative flex items-center py-2"
           aria-label="NEVO Industrial home"
         >
-          {/* Both logos stacked; cross-fade on scroll for a smooth transition */}
-          <span className="relative block h-12 w-auto md:h-14">
+          {/* Locked widths per spec: 165px mobile · 180px tablet · 200px desktop */}
+          <span className="relative block w-[165px] md:w-[180px] lg:w-[200px]">
             <img
               src={nevoLogoDark}
               alt="NEVO Industrial"
               className={cn(
-                "block h-full w-auto transition-opacity duration-300",
+                "block h-auto w-full transition-opacity duration-300",
                 solid ? "opacity-100" : "opacity-0",
               )}
               loading="eager"
@@ -115,7 +115,7 @@ export function SiteHeader() {
               alt=""
               aria-hidden="true"
               className={cn(
-                "absolute inset-0 block h-full w-auto transition-opacity duration-300",
+                "absolute inset-0 block h-auto w-full transition-opacity duration-300",
                 solid ? "opacity-0" : "opacity-100",
               )}
               loading="eager"
@@ -153,12 +153,12 @@ export function SiteHeader() {
           <button
             aria-label={open ? "Close menu" : "Open menu"}
             className={cn(
-              "inline-flex size-10 items-center justify-center rounded-md transition-colors lg:hidden",
-              solid ? "text-foreground" : "text-white",
+              "inline-flex size-12 items-center justify-center rounded-md transition-colors lg:hidden",
+              solid ? "text-foreground hover:bg-surface" : "text-white hover:bg-white/10",
             )}
             onClick={() => setOpen((v) => !v)}
           >
-            {open ? <X className="size-5" /> : <Menu className="size-5" />}
+            {open ? <X className="size-6" strokeWidth={1.75} /> : <Menu className="size-6" strokeWidth={1.75} />}
           </button>
         </div>
       </div>
