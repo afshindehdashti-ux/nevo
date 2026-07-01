@@ -19,23 +19,33 @@ export function Hero() {
           src={heroImg}
           alt="NEVO continuous double-belt laminator producing a PIR sandwich panel with PPGI facings"
           className="h-full w-full object-cover"
-          style={{ objectPosition: "70% center" }}
+          style={{ objectPosition: "82% center" }}
           fetchPriority="high"
         />
-        {/* Left-weighted dark gradient — hides baked left-side artwork,
-            keeps machinery + callouts visible. ~35% overall dim on the right. */}
+        {/* Fully opaque left column masks baked-in artwork so our headline
+            reads over clean black; fades to a soft ~35% dim on the right so
+            machinery and engineering callouts stay visible. */}
         <div
           aria-hidden="true"
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(90deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.80) 30%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.35) 100%)",
+              "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 32%, rgba(0,0,0,0.75) 48%, rgba(0,0,0,0.45) 65%, rgba(0,0,0,0.35) 100%)",
+          }}
+        />
+        {/* Extra bottom-left mask over the baked NEVO wordmark corner */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(60% 55% at 0% 100%, rgba(0,0,0,0.9), transparent 70%)",
           }}
         />
         {/* Soft bottom fade for the scroll strip legibility */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 to-transparent"
+          className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent"
         />
       </div>
 
