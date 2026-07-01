@@ -1,21 +1,43 @@
+import {
+  Compass,
+  MapPin,
+  Globe2,
+  BookOpenCheck,
+  Layers3,
+  HandshakeIcon,
+} from "lucide-react";
 import { Section, SectionHeader } from "@/components/site/primitives";
 
 const PROOFS = [
   {
-    title: "Engineering-led approach",
-    desc: "Every project begins with technical understanding — not sales. Our engineers scope, specify and validate before any commercial step.",
+    icon: Compass,
+    title: "Engineering Expertise",
+    desc: "Senior engineers lead every scope — from PIR chemistry to line automation and coil metallurgy.",
   },
   {
-    title: "Dubai advantage",
-    desc: "A strategic base connecting the Middle East, Africa, Eurasia and Asia — with efficient logistics and multilingual technical teams.",
+    icon: MapPin,
+    title: "Dubai-Based Project Management",
+    desc: "A strategic base for the Middle East, Africa, Eurasia and Asia — with responsive local coordination.",
   },
   {
-    title: "Full industry coverage",
-    desc: "From factory setup to raw materials, production lines and finished panels — one accountable partner across the value chain.",
+    icon: Globe2,
+    title: "Global Supply Network",
+    desc: "Qualified partners across Europe, Turkey, Asia and the GCC for materials, equipment and logistics.",
   },
   {
-    title: "Long-term partnership",
-    desc: "Ongoing audits, training, spare parts and troubleshooting — designed for factories that operate for decades, not quarters.",
+    icon: BookOpenCheck,
+    title: "Technical Consultancy",
+    desc: "Independent advice on feasibility, process design, production optimization and modernization.",
+  },
+  {
+    icon: Layers3,
+    title: "Integrated Industrial Solutions",
+    desc: "Factory setup, raw materials, production lines and finished panels — one accountable partner.",
+  },
+  {
+    icon: HandshakeIcon,
+    title: "Long-Term Partnership",
+    desc: "Audits, training, spare parts and troubleshooting — for factories that operate for decades.",
   },
 ];
 
@@ -27,16 +49,25 @@ export function WhyNevo() {
           <SectionHeader
             eyebrow="Why NEVO"
             onTone="primary"
-            title="Industrial credibility, engineered from the ground up."
-            lede="NEVO exists because the sandwich panel industry deserves a partner that speaks its technical language — from PIR chemistry to line automation and coil metallurgy."
+            title="Engineering-Led. Globally Connected."
+            lede="NEVO exists because the sandwich panel industry deserves a partner that speaks its technical language — end to end."
           />
         </div>
 
         <div className="grid gap-px overflow-hidden rounded-lg bg-white/10 sm:grid-cols-2 lg:col-span-7">
           {PROOFS.map((p, i) => (
-            <div key={p.title} className="bg-primary p-6 sm:p-8">
-              <div className="mb-6 font-mono text-[11px] tracking-widest text-accent">
-                {String(i + 1).padStart(2, "0")}
+            <div
+              key={p.title}
+              className="group relative bg-primary p-6 transition-colors hover:bg-white/[0.04] sm:p-8"
+            >
+              <div className="mb-6 flex items-center justify-between">
+                <p.icon
+                  className="size-5 text-accent"
+                  strokeWidth={1.5}
+                />
+                <span className="font-mono text-[10px] tracking-widest text-white/40">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
               </div>
               <h3 className="text-h3 text-primary-foreground">{p.title}</h3>
               <p className="text-body mt-3 text-primary-foreground/65">{p.desc}</p>

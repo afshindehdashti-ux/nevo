@@ -7,28 +7,28 @@ const PATHS = [
     n: "01",
     icon: Factory,
     title: "Build a Factory",
-    desc: "For investors and industrial companies planning a new sandwich panel factory. Feasibility, layout, engineering and commissioning.",
+    desc: "Complete factory development from concept to commissioning.",
     cta: "Explore Factory Development",
   },
   {
     n: "02",
     icon: Cog,
     title: "Improve Production",
-    desc: "For existing manufacturers who need optimization, engineering support, modernization or better line performance.",
+    desc: "Engineering optimization, modernization and technical support.",
     cta: "Engineering Consultancy",
   },
   {
     n: "03",
     icon: Layers,
     title: "Source Raw Materials",
-    desc: "PIR & PUR systems, PPGI / GI / Aluzinc coils, rock wool, adhesives and consumables — sourced and qualified for panel manufacturing.",
+    desc: "Reliable global sourcing of premium manufacturing materials.",
     cta: "Raw Material Solutions",
   },
   {
     n: "04",
     icon: PackageCheck,
     title: "Buy Sandwich Panels",
-    desc: "For contractors, developers and distributors sourcing finished panels across selected regional markets.",
+    desc: "High-performance sandwich panels for industrial and commercial applications.",
     cta: "Finished Panel Solutions",
   },
 ];
@@ -39,9 +39,9 @@ export function Pathways() {
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-4">
           <SectionHeader
-            eyebrow="Start here"
-            title="What are you trying to achieve?"
-            lede="Every NEVO engagement begins with your goal — not a product list. Choose a pathway to see how our engineering team supports each stage of the sandwich panel industry."
+            eyebrow="Customer journey"
+            title="How can we help you?"
+            lede="Every NEVO engagement begins with your goal — not a product list. Choose a pathway to see how our engineering team can support you."
           />
         </div>
 
@@ -53,7 +53,7 @@ export function Pathways() {
               // @ts-expect-error href is valid on anchor
               href="#contact"
               interactive
-              className="flex flex-col justify-between gap-8 card-accent-line"
+              className="flex flex-col justify-between gap-8 card-accent-line min-h-[240px]"
             >
               <div>
                 <div className="flex items-center justify-between">
@@ -61,7 +61,7 @@ export function Pathways() {
                     {p.n} /04
                   </span>
                   <p.icon
-                    className="size-5 text-muted-foreground transition-colors group-hover:text-foreground"
+                    className="size-5 text-muted-foreground transition-all duration-300 group-hover:text-foreground group-hover:-translate-y-0.5"
                     strokeWidth={1.5}
                   />
                 </div>
