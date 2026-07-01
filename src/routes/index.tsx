@@ -1,24 +1,81 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AnnouncementBar } from "@/components/site/AnnouncementBar";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { Hero } from "@/components/site/Hero";
+import { Pathways } from "@/components/site/Pathways";
+import { Solutions } from "@/components/site/Solutions";
+import { WhyNevo } from "@/components/site/WhyNevo";
+import { Industries } from "@/components/site/Industries";
+import { Process } from "@/components/site/Process";
+import { Markets } from "@/components/site/Markets";
+import { KnowledgeHub } from "@/components/site/KnowledgeHub";
+import { CTABanner } from "@/components/site/CTABanner";
+import { SiteFooter } from "@/components/site/SiteFooter";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+const TITLE =
+  "NEVO Industrial — Sandwich Panel Engineering, Raw Materials & Production Lines";
+const DESCRIPTION =
+  "Dubai-based industrial engineering & supply company for the sandwich panel industry — factory development, engineering consultancy, PIR/PUR raw materials, production lines and finished panels.";
+
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: TITLE },
+      { name: "description", content: DESCRIPTION },
+      { property: "og:title", content: TITLE },
+      { property: "og:description", content: DESCRIPTION },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "/" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "NEVO Industrial",
+          url: "https://nevoindustrial.com",
+          description: DESCRIPTION,
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Dubai",
+            addressCountry: "AE",
+          },
+          areaServed: [
+            "Saudi Arabia",
+            "Oman",
+            "United Arab Emirates",
+            "Turkey",
+            "Iraq",
+            "Kenya",
+            "Cameroon",
+            "Russia",
+          ],
+        }),
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-background text-foreground">
+      <AnnouncementBar />
+      <SiteHeader />
+      <main>
+        <Hero />
+        <Pathways />
+        <Solutions />
+        <WhyNevo />
+        <Industries />
+        <Process />
+        <Markets />
+        <KnowledgeHub />
+        <CTABanner />
+      </main>
+      <SiteFooter />
     </div>
   );
 }
