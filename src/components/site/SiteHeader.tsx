@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Menu, X, ArrowUpRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import nevoLogoDark from "@/assets/nevo-logo-dark.png";
 
 type MenuGroup = {
   label: string;
@@ -100,13 +101,14 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
       <div className="container-wide flex h-16 items-center justify-between gap-6">
-        <Link to="/" className="flex items-center gap-2" aria-label="NEVO Industrial home">
-          <span className="text-lg font-semibold tracking-tighter text-foreground">
-            NEVO
-          </span>
-          <span className="hidden text-[10px] font-medium uppercase tracking-widest text-muted-foreground sm:inline">
-            Industrial
-          </span>
+        <Link to="/" className="flex items-center" aria-label="NEVO Industrial home">
+          <img
+            src={nevoLogoDark}
+            alt="NEVO Industrial"
+            className="h-9 w-auto md:h-10"
+            loading="eager"
+            decoding="async"
+          />
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
