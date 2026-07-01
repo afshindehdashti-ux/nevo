@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, MessageCircle, Linkedin, MapPin } from "lucide-react";
+import { Mail, MessageCircle, Linkedin, MapPin, ArrowUpRight } from "lucide-react";
 
 const COLUMNS = [
   {
@@ -11,6 +11,17 @@ const COLUMNS = [
       "Production Lines",
       "Finished Panels",
       "Technical Support",
+    ],
+  },
+  {
+    title: "Industries",
+    links: [
+      "Cold Storage",
+      "Food Processing",
+      "Pharmaceutical",
+      "Clean Rooms",
+      "Warehousing",
+      "Modular Buildings",
     ],
   },
   {
@@ -38,19 +49,18 @@ const COLUMNS = [
 
 export function SiteFooter() {
   return (
-    <footer id="contact" className="border-t border-border bg-surface">
-      <div className="container-wide py-16 lg:py-20">
-        <div className="grid gap-12 lg:grid-cols-12">
+    <footer className="bg-primary text-primary-foreground">
+      <div className="container-wide section-y">
+        <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
+          {/* Company + contact */}
           <div className="lg:col-span-4">
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-lg font-semibold tracking-tighter text-foreground">
-                NEVO
-              </span>
-              <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+              <span className="text-xl font-semibold tracking-tighter">NEVO</span>
+              <span className="text-[10px] font-medium uppercase tracking-widest text-primary-foreground/60">
                 Industrial
               </span>
             </Link>
-            <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-6 max-w-sm text-sm leading-relaxed text-primary-foreground/70">
               NEVO is a Dubai-based Industrial Engineering &amp; Supply company
               specialized in sandwich panel solutions.
             </p>
@@ -58,45 +68,65 @@ export function SiteFooter() {
             <div className="mt-8 space-y-3 text-sm">
               <a
                 href="mailto:solutions@nevoindustrial.com"
-                className="flex items-center gap-2.5 text-foreground/80 hover:text-foreground"
+                className="flex items-center gap-3 text-primary-foreground/85 hover:text-primary-foreground"
               >
-                <Mail className="size-4 text-muted-foreground" strokeWidth={1.75} />
+                <Mail
+                  className="size-4 text-primary-foreground/50"
+                  strokeWidth={1.75}
+                />
                 solutions@nevoindustrial.com
               </a>
               <a
                 href="https://wa.me/9710000000000"
-                className="flex items-center gap-2.5 text-foreground/80 hover:text-foreground"
+                className="flex items-center gap-3 text-primary-foreground/85 hover:text-primary-foreground"
               >
                 <MessageCircle
-                  className="size-4 text-muted-foreground"
+                  className="size-4 text-primary-foreground/50"
                   strokeWidth={1.75}
                 />
                 WhatsApp Engineering Desk
               </a>
               <a
                 href="#"
-                className="flex items-center gap-2.5 text-foreground/80 hover:text-foreground"
+                className="flex items-center gap-3 text-primary-foreground/85 hover:text-primary-foreground"
               >
-                <Linkedin className="size-4 text-muted-foreground" strokeWidth={1.75} />
+                <Linkedin
+                  className="size-4 text-primary-foreground/50"
+                  strokeWidth={1.75}
+                />
                 LinkedIn
               </a>
-              <div className="flex items-center gap-2.5 text-foreground/80">
-                <MapPin className="size-4 text-muted-foreground" strokeWidth={1.75} />
+              <div className="flex items-center gap-3 text-primary-foreground/85">
+                <MapPin
+                  className="size-4 text-primary-foreground/50"
+                  strokeWidth={1.75}
+                />
                 Dubai, United Arab Emirates
               </div>
             </div>
+
+            <a
+              href="#contact"
+              className="mt-8 inline-flex items-center gap-1.5 rounded-md border border-primary-foreground/25 px-4 py-2.5 text-xs font-medium uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary-foreground/10"
+            >
+              Start Your Project
+              <ArrowUpRight className="size-3.5" />
+            </a>
           </div>
 
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-8">
+          {/* Columns */}
+          <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:col-span-8 lg:grid-cols-5">
             {COLUMNS.map((col) => (
               <div key={col.title}>
-                <div className="eyebrow mb-4">{col.title}</div>
+                <div className="mb-4 font-mono text-[10px] uppercase tracking-widest text-primary-foreground/50">
+                  {col.title}
+                </div>
                 <ul className="space-y-2.5">
                   {col.links.map((l) => (
                     <li key={l}>
                       <a
                         href="#"
-                        className="text-sm text-foreground/70 transition-colors hover:text-foreground"
+                        className="text-sm text-primary-foreground/75 transition-colors hover:text-primary-foreground"
                       >
                         {l}
                       </a>
@@ -108,9 +138,11 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col gap-3 border-t border-border pt-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <div>&copy; {new Date().getFullYear()} NEVO Industrial. All rights reserved.</div>
-          <div className="font-mono tracking-wider">
+        <div className="mt-16 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-t border-primary-foreground/10 pt-8 text-xs text-primary-foreground/50 sm:flex sm:flex-wrap sm:justify-between">
+          <div className="min-w-0 truncate">
+            © {new Date().getFullYear()} NEVO Industrial. All rights reserved.
+          </div>
+          <div className="shrink-0 font-mono tracking-widest">
             NEVOINDUSTRIAL.COM · DUBAI · UAE
           </div>
         </div>

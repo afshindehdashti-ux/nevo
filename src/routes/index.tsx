@@ -9,7 +9,9 @@ import { Industries } from "@/components/site/Industries";
 import { Process } from "@/components/site/Process";
 import { Markets } from "@/components/site/Markets";
 import { KnowledgeHub } from "@/components/site/KnowledgeHub";
+import { FAQ } from "@/components/site/FAQ";
 import { CTABanner } from "@/components/site/CTABanner";
+import { ContactSection } from "@/components/site/ContactSection";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
 const TITLE =
@@ -73,7 +75,9 @@ function Index() {
         <Process />
         <Markets />
         <KnowledgeHub />
+        <FAQ />
         <CTABanner />
+        <ContactSection />
       </main>
       <SiteFooter />
     </div>
