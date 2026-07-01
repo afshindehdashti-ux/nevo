@@ -3,19 +3,20 @@ import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { Hero } from "@/components/site/Hero";
 import { Pathways } from "@/components/site/Pathways";
-import { Solutions } from "@/components/site/Solutions";
 import { WhyNevo } from "@/components/site/WhyNevo";
+import { Solutions } from "@/components/site/Solutions";
 import { Industries } from "@/components/site/Industries";
-import { Process } from "@/components/site/Process";
-import { Markets } from "@/components/site/Markets";
+import { FeaturedFactory } from "@/components/site/FeaturedFactory";
 import { KnowledgeHub } from "@/components/site/KnowledgeHub";
-import { FAQ } from "@/components/site/FAQ";
+import { Markets } from "@/components/site/Markets";
+import { Stats } from "@/components/site/Stats";
+import { Testimonials } from "@/components/site/Testimonials";
 import { CTABanner } from "@/components/site/CTABanner";
 import { ContactSection } from "@/components/site/ContactSection";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
 const TITLE =
-  "NEVO Industrial — Sandwich Panel Engineering, Raw Materials & Production Lines";
+  "NEVO Industrial — Sandwich Panel Engineering, Factory Development & Raw Materials";
 const DESCRIPTION =
   "Dubai-based industrial engineering & supply company for the sandwich panel industry — factory development, engineering consultancy, PIR/PUR raw materials, production lines and finished panels.";
 
@@ -69,13 +70,14 @@ function Index() {
       <main>
         <Hero />
         <Pathways />
-        <Solutions />
         <WhyNevo />
+        <Solutions />
         <Industries />
-        <Process />
-        <Markets />
+        <FeaturedFactory />
         <KnowledgeHub />
-        <FAQ />
+        <Markets />
+        <Stats />
+        <Testimonials />
         <CTABanner />
         <ContactSection />
       </main>
