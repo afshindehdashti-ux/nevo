@@ -31,7 +31,7 @@ import {
   LineChart,
   ScrollText,
   Calculator,
-  Users,
+  
   Handshake,
   Briefcase,
   Mail,
