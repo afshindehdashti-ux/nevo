@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X, ArrowUpRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import nevoLogoDark from "@/assets/nevo-logo-dark.png";
+import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
 type MenuGroup = {
   label: string;
@@ -16,30 +17,12 @@ const NAV: MenuGroup[] = [
     label: "Solutions",
     cols: 2,
     items: [
-      {
-        label: "Factory Development",
-        desc: "Feasibility, layout, commissioning for new factories.",
-      },
-      {
-        label: "Engineering Consultancy",
-        desc: "Process design, optimization, technical consulting.",
-      },
-      {
-        label: "Raw Material Solutions",
-        desc: "PIR, PUR, PPGI, GI, Aluzinc, rock wool, adhesives.",
-      },
-      {
-        label: "Production Line Solutions",
-        desc: "Continuous & discontinuous lines, roll forming, automation.",
-      },
-      {
-        label: "Finished Panel Solutions",
-        desc: "Supply of finished panels across regional markets.",
-      },
-      {
-        label: "Technical Support",
-        desc: "Training, spare parts, audits, troubleshooting.",
-      },
+      { label: "Factory Development", desc: "Feasibility, layout, commissioning for new factories." },
+      { label: "Engineering Consultancy", desc: "Process design, optimization, technical consulting." },
+      { label: "Raw Material Solutions", desc: "PIR, PUR, PPGI, GI, Aluzinc, rock wool, adhesives." },
+      { label: "Production Line Solutions", desc: "Continuous & discontinuous lines, roll forming, automation." },
+      { label: "Finished Panel Solutions", desc: "Supply of finished panels across regional markets." },
+      { label: "Technical Support", desc: "Training, spare parts, audits, troubleshooting." },
     ],
   },
   {
@@ -71,58 +54,96 @@ const NAV: MenuGroup[] = [
     label: "Markets",
     cols: 2,
     items: [
-      { label: "Saudi Arabia" },
-      { label: "Oman" },
-      { label: "UAE" },
-      { label: "Turkey" },
-      { label: "Iraq" },
-      { label: "Kenya" },
-      { label: "Cameroon" },
-      { label: "Russia" },
-      { label: "Africa" },
+      { label: "Saudi Arabia" }, { label: "Oman" }, { label: "UAE" },
+      { label: "Turkey" }, { label: "Iraq" }, { label: "Kenya" },
+      { label: "Cameroon" }, { label: "Russia" }, { label: "Africa" },
     ],
   },
   {
     label: "Company",
     cols: 1,
     items: [
-      { label: "About NEVO" },
-      { label: "Why NEVO" },
-      { label: "Dubai Advantage" },
-      { label: "Global Network" },
-      { label: "Contact" },
+      { label: "About NEVO" }, { label: "Why NEVO" },
+      { label: "Dubai Advantage" }, { label: "Global Network" }, { label: "Contact" },
     ],
   },
 ];
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // When menu is open on mobile, force the solid state for legibility.
+  const solid = scrolled || open;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
-      <div className="container-wide flex h-16 items-center justify-between gap-6">
-        <Link to="/" className="flex items-center" aria-label="NEVO Industrial home">
-          <img
-            src={nevoLogoDark}
-            alt="NEVO Industrial"
-            className="h-9 w-auto md:h-10"
-            loading="eager"
-            decoding="async"
-          />
+    <header
+      className={cn(
+        "sticky top-0 z-50 transition-[background-color,border-color,box-shadow] duration-300 ease-[var(--ease-out-quart)]",
+        solid
+          ? "border-b border-border bg-background/90 backdrop-blur-md"
+          : "border-b border-transparent bg-transparent",
+      )}
+    >
+      <div className="container-wide flex h-20 items-center justify-between gap-6 md:h-24">
+        <Link
+          to="/"
+          className="relative flex items-center py-2"
+          aria-label="NEVO Industrial home"
+        >
+          {/* Both logos stacked; cross-fade on scroll for a smooth transition */}
+          <span className="relative block h-12 w-auto md:h-14">
+            <img
+              src={nevoLogoDark}
+              alt="NEVO Industrial"
+              className={cn(
+                "block h-full w-auto transition-opacity duration-300",
+                solid ? "opacity-100" : "opacity-0",
+              )}
+              loading="eager"
+              decoding="async"
+            />
+            <img
+              src={nevoLogoLight}
+              alt=""
+              aria-hidden="true"
+              className={cn(
+                "absolute inset-0 block h-full w-auto transition-opacity duration-300",
+                solid ? "opacity-0" : "opacity-100",
+              )}
+              loading="eager"
+              decoding="async"
+            />
+          </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+        <nav
+          className="hidden items-center gap-1 lg:flex"
+          aria-label="Primary"
+          data-tone={solid ? "dark" : "light"}
+        >
           {NAV.map((group) => (
-            <MegaMenu key={group.label} group={group} />
+            <MegaMenu key={group.label} group={group} onLight={!solid} />
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
           <Button
             asChild
-            variant="primary"
             size="sm"
-            className="hidden sm:inline-flex"
+            className={cn(
+              "hidden transition-colors sm:inline-flex",
+              solid
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-white text-primary hover:bg-white/90",
+            )}
           >
             <a href="#contact">
               Start Your Project
@@ -131,7 +152,10 @@ export function SiteHeader() {
           </Button>
           <button
             aria-label={open ? "Close menu" : "Open menu"}
-            className="inline-flex size-10 items-center justify-center rounded-md text-foreground lg:hidden"
+            className={cn(
+              "inline-flex size-10 items-center justify-center rounded-md transition-colors lg:hidden",
+              solid ? "text-foreground" : "text-white",
+            )}
             onClick={() => setOpen((v) => !v)}
           >
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -144,12 +168,18 @@ export function SiteHeader() {
   );
 }
 
-function MegaMenu({ group }: { group: MenuGroup }) {
-  const panelWidth =
-    group.cols === 2 ? "min-w-[560px]" : "min-w-[280px]";
+function MegaMenu({ group, onLight }: { group: MenuGroup; onLight: boolean }) {
+  const panelWidth = group.cols === 2 ? "min-w-[560px]" : "min-w-[280px]";
   return (
     <div className="group relative">
-      <button className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-surface hover:text-foreground">
+      <button
+        className={cn(
+          "flex items-center gap-1 rounded-md px-3.5 py-2 text-[13px] font-medium tracking-tight transition-colors",
+          onLight
+            ? "text-white/85 hover:bg-white/10 hover:text-white"
+            : "text-foreground/80 hover:bg-surface hover:text-foreground",
+        )}
+      >
         {group.label}
         <ChevronDown
           className="size-3.5 opacity-60 transition-transform group-hover:rotate-180"
