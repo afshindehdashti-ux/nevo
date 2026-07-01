@@ -153,12 +153,12 @@ export function SiteHeader() {
           <button
             aria-label={open ? "Close menu" : "Open menu"}
             className={cn(
-              "inline-flex size-10 items-center justify-center rounded-md transition-colors lg:hidden",
-              solid ? "text-foreground" : "text-white",
+              "inline-flex size-12 items-center justify-center rounded-md transition-colors lg:hidden",
+              solid ? "text-foreground hover:bg-surface" : "text-white hover:bg-white/10",
             )}
             onClick={() => setOpen((v) => !v)}
           >
-            {open ? <X className="size-5" /> : <Menu className="size-5" />}
+            {open ? <X className="size-6" strokeWidth={1.75} /> : <Menu className="size-6" strokeWidth={1.75} />}
           </button>
         </div>
       </div>
