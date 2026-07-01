@@ -14,38 +14,32 @@ export function Hero() {
     <section className="relative isolate -mt-20 overflow-hidden bg-black text-white md:-mt-24">
       {/* Background image — cropped to the right so the machinery + PIR panel
           + baked-in engineering callouts stay centered on all sizes. */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 -z-10 overflow-hidden">
         <img
           src={heroImg}
           alt="NEVO continuous double-belt laminator producing a PIR sandwich panel with PPGI facings"
           className="h-full w-full object-cover"
-          style={{ objectPosition: "82% center" }}
+          style={{ objectPosition: "88% center", transform: "scale(1.05)" }}
           fetchPriority="high"
         />
-        {/* Fully opaque left column masks baked-in artwork so our headline
-            reads over clean black; fades to a soft ~35% dim on the right so
-            machinery and engineering callouts stay visible. */}
+        {/* Solid black wash on the far left — fully masks baked-in artwork
+            (headline, icons, wordmark) that would collide with our copy. */}
+        <div aria-hidden="true" className="absolute inset-y-0 left-0 w-[52%] bg-black" />
+        {/* Feathered edge from the solid wash into the visible machinery */}
         <div
           aria-hidden="true"
-          className="absolute inset-0"
+          className="absolute inset-y-0 left-[52%] w-[18%]"
           style={{
             background:
-              "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 32%, rgba(0,0,0,0.75) 48%, rgba(0,0,0,0.45) 65%, rgba(0,0,0,0.35) 100%)",
+              "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.35) 100%)",
           }}
         />
-        {/* Extra bottom-left mask over the baked NEVO wordmark corner */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(60% 55% at 0% 100%, rgba(0,0,0,0.9), transparent 70%)",
-          }}
-        />
+        {/* Right-side subtle 30–35% dim to keep engineering callouts legible without hiding them */}
+        <div aria-hidden="true" className="absolute inset-y-0 right-0 w-[30%] bg-black/30" />
         {/* Soft bottom fade for the scroll strip legibility */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent"
+          className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 to-transparent"
         />
       </div>
 
