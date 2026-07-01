@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Mail, MessageCircle, Linkedin, MapPin, ArrowUpRight } from "lucide-react";
+import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
 const COLUMNS = [
   {
@@ -54,11 +55,14 @@ export function SiteFooter() {
         <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
           {/* Company + contact */}
           <div className="lg:col-span-4">
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-xl font-semibold tracking-tighter">NEVO</span>
-              <span className="text-[10px] font-medium uppercase tracking-widest text-primary-foreground/60">
-                Industrial
-              </span>
+            <Link to="/" className="inline-flex items-center" aria-label="NEVO Industrial home">
+              <img
+                src={nevoLogoLight}
+                alt="NEVO Industrial"
+                className="h-14 w-auto"
+                loading="lazy"
+                decoding="async"
+              />
             </Link>
             <p className="mt-6 max-w-sm text-sm leading-relaxed text-primary-foreground/70">
               NEVO is a Dubai-based Industrial Engineering &amp; Supply company
