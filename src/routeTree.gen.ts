@@ -17,6 +17,7 @@ import { Route as PanelThicknessCalculatorRouteImport } from './routes/panel-thi
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as InvestmentCalculatorRouteImport } from './routes/investment-calculator'
 import { Route as IndustriesRouteImport } from './routes/industries'
+import { Route as FactoryLayoutGeneratorRouteImport } from './routes/factory-layout-generator'
 import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -66,6 +67,11 @@ const InvestmentCalculatorRoute = InvestmentCalculatorRouteImport.update({
 const IndustriesRoute = IndustriesRouteImport.update({
   id: '/industries',
   path: '/industries',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FactoryLayoutGeneratorRoute = FactoryLayoutGeneratorRouteImport.update({
+  id: '/factory-layout-generator',
+  path: '/factory-layout-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AiAssistantRoute = AiAssistantRouteImport.update({
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
+  '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/industries': typeof IndustriesRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
+  '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/industries': typeof IndustriesRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
+  '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/industries': typeof IndustriesRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-assistant'
+    | '/factory-layout-generator'
     | '/industries'
     | '/investment-calculator'
     | '/knowledge'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-assistant'
+    | '/factory-layout-generator'
     | '/industries'
     | '/investment-calculator'
     | '/knowledge'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-assistant'
+    | '/factory-layout-generator'
     | '/industries'
     | '/investment-calculator'
     | '/knowledge'
@@ -239,6 +251,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AiAssistantRoute: typeof AiAssistantRoute
+  FactoryLayoutGeneratorRoute: typeof FactoryLayoutGeneratorRoute
   IndustriesRoute: typeof IndustriesRoute
   InvestmentCalculatorRoute: typeof InvestmentCalculatorRoute
   KnowledgeRoute: typeof KnowledgeRoute
@@ -313,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndustriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/factory-layout-generator': {
+      id: '/factory-layout-generator'
+      path: '/factory-layout-generator'
+      fullPath: '/factory-layout-generator'
+      preLoaderRoute: typeof FactoryLayoutGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai-assistant': {
       id: '/ai-assistant'
       path: '/ai-assistant'
@@ -383,6 +403,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AiAssistantRoute: AiAssistantRoute,
+  FactoryLayoutGeneratorRoute: FactoryLayoutGeneratorRoute,
   IndustriesRoute: IndustriesRoute,
   InvestmentCalculatorRoute: InvestmentCalculatorRoute,
   KnowledgeRoute: KnowledgeRoute,
