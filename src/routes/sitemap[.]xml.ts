@@ -28,6 +28,7 @@ const ROUTES: SitemapEntry[] = [
   { path: "/pir-vs-rock-wool", changefreq: "monthly", priority: "0.9" },
   { path: "/factory-layout-generator", changefreq: "monthly", priority: "0.9" },
   { path: "/download-center", changefreq: "weekly", priority: "0.9" },
+  { path: "/customer-portal", changefreq: "monthly", priority: "0.8" },
 ];
 
 const ACTIVE_LOCALES = ["en", "ar"] as const;
