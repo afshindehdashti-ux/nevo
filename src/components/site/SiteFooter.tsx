@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Mail, MessageCircle, Linkedin, MapPin, ArrowUpRight, Phone } from "lucide-react";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
+import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 
 const COLUMNS = [
   {
@@ -75,7 +77,16 @@ const COLUMNS = [
 
 
 export function SiteFooter() {
+  const { t } = useTranslation();
   const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
+
+  const columnKeys: Record<string, string> = {
+    Solutions: "footer.solutions",
+    Industries: "footer.industries",
+    Resources: "footer.resources",
+    Markets: "footer.markets",
+    Company: "footer.company",
+  };
 
   return (
     <footer className="bg-primary text-primary-foreground">
@@ -93,8 +104,7 @@ export function SiteFooter() {
               />
             </Link>
             <p className="mt-6 max-w-sm text-sm leading-relaxed text-primary-foreground/70">
-              NEVO is a Dubai-based Industrial Engineering &amp; Supply company
-              specialized in sandwich panel solutions.
+              {t("footer.description")}
             </p>
 
             <div className="mt-8 space-y-3 text-sm">
@@ -148,7 +158,7 @@ export function SiteFooter() {
               href="/project-inquiry"
               className="mt-8 inline-flex items-center gap-1.5 rounded-md border border-primary-foreground/25 px-4 py-2.5 text-xs font-medium uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary-foreground/10"
             >
-              Start Your Project
+              {t("cta.startProject")}
               <ArrowUpRight className="size-3.5" />
             </a>
           </div>
@@ -158,7 +168,7 @@ export function SiteFooter() {
             {COLUMNS.map((col) => (
               <div key={col.title}>
                 <div className="mb-4 font-mono text-[10px] uppercase tracking-widest text-primary-foreground/50">
-                  {col.title}
+                  {t(columnKeys[col.title] ?? "", col.title)}
                 </div>
                 <ul className="space-y-2.5">
                 {col.links.map((l) => (
@@ -177,10 +187,11 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-16 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-t border-primary-foreground/10 pt-8 text-xs text-primary-foreground/50 sm:flex sm:flex-wrap sm:justify-between">
+        <div className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-primary-foreground/10 pt-8 text-xs text-primary-foreground/50">
           <div className="min-w-0 truncate">
-            © {new Date().getFullYear()} NEVO Industrial. All rights reserved.
+            © {new Date().getFullYear()} NEVO Industrial. {t("footer.rights")}
           </div>
+          <LanguageSwitcher variant="footer" />
           <div className="shrink-0 font-mono tracking-widest">
             NEVOINDUSTRIAL.COM · DUBAI · UAE
           </div>

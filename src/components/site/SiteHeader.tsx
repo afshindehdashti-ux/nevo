@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Menu,
   X,
@@ -44,6 +45,7 @@ import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
+import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 import nevoLogoDark from "@/assets/nevo-logo-dark.png";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
@@ -181,7 +183,16 @@ const NAV: MenuGroup[] = [SOLUTIONS, INDUSTRIES, KNOWLEDGE, MARKETS, COMPANY];
    Header
    ───────────────────────────────────────────────────────────── */
 
+const NAV_KEY: Record<string, string> = {
+  Solutions: "nav.solutions",
+  Industries: "nav.industries",
+  Knowledge: "nav.knowledge",
+  Markets: "nav.markets",
+  Company: "nav.company",
+};
+
 export function SiteHeader() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -268,11 +279,12 @@ export function SiteHeader() {
               aria-label="Primary"
               onMouseLeave={() => setActiveMenu(null)}
             >
-              <TopLink label="Home" href="/" onLight={!solid} onEnter={() => setActiveMenu(null)} />
+              <TopLink label={t("nav.home")} href="/" onLight={!solid} onEnter={() => setActiveMenu(null)} />
               {NAV.map((group) => (
                 <MegaTrigger
                   key={group.label}
                   group={group}
+                  displayLabel={t(NAV_KEY[group.label] ?? group.label, group.label)}
                   onLight={!solid}
                   active={activeMenu === group.label}
                   onEnter={() => setActiveMenu(group.label)}
@@ -282,7 +294,7 @@ export function SiteHeader() {
 
             <div className="flex items-center gap-1.5 sm:gap-2">
               <button
-                aria-label="Search"
+                aria-label={t("nav.search")}
                 onClick={() => setSearchOpen(true)}
                 className={cn(
                   "hidden size-10 items-center justify-center rounded-full transition-colors md:inline-flex",
@@ -295,7 +307,7 @@ export function SiteHeader() {
               <PrimaryCTA solid={solid} />
 
               <button
-                aria-label={open ? "Close menu" : "Open menu"}
+                aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")}
                 className={cn(
                   "inline-flex size-11 items-center justify-center rounded-md transition-colors lg:hidden",
                   solid ? "text-foreground hover:bg-surface" : "text-white hover:bg-white/10",
@@ -337,6 +349,7 @@ export function SiteHeader() {
    ───────────────────────────────────────────────────────────── */
 
 function UtilityBar({ solid }: { solid: boolean }) {
+  const { t } = useTranslation();
   const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
 
   return (
@@ -350,14 +363,14 @@ function UtilityBar({ solid }: { solid: boolean }) {
         <div className="flex items-center gap-5">
           <span className="inline-flex items-center gap-1.5">
             <MapPin className="size-3.5 opacity-80" strokeWidth={1.75} />
-            Dubai, UAE
+            {t("brand.location")}
           </span>
           <span className={cn("hidden h-3 w-px", solid ? "bg-border" : "bg-white/20")} aria-hidden />
-          <span className="hidden lg:inline">Engineering &amp; Industrial Supply</span>
+          <span className="hidden lg:inline">{t("brand.sector")}</span>
           <span className={cn("hidden h-3 w-px lg:block", solid ? "bg-border" : "bg-white/20")} aria-hidden />
           <span className="hidden lg:inline-flex items-center gap-1.5">
             <Globe2 className="size-3.5 opacity-80" strokeWidth={1.75} />
-            Worldwide Projects
+            {t("brand.worldwide")}
           </span>
         </div>
         <div className="flex items-center gap-4">
@@ -369,17 +382,9 @@ function UtilityBar({ solid }: { solid: boolean }) {
             )}
           >
             <MessageCircle className="size-3.5" strokeWidth={1.75} />
-            {SITE.contact.whatsapp ? "WhatsApp" : "Engineering Desk"}
+            {SITE.contact.whatsapp ? t("nav.whatsapp") : t("nav.engineeringDesk")}
           </a>
-          <button
-            className={cn(
-              "inline-flex items-center gap-1.5 transition-colors",
-              solid ? "hover:text-foreground" : "hover:text-white",
-            )}
-          >
-            EN
-            <ChevronRight className="size-3 rotate-90 opacity-60" strokeWidth={2} />
-          </button>
+          <LanguageSwitcher variant="header" onLight={!solid} />
         </div>
       </div>
     </div>
@@ -420,11 +425,13 @@ function TopLink({
 
 function MegaTrigger({
   group,
+  displayLabel,
   onLight,
   active,
   onEnter,
 }: {
   group: MenuGroup;
+  displayLabel?: string;
   onLight: boolean;
   active: boolean;
   onEnter: () => void;
@@ -438,12 +445,13 @@ function MegaTrigger({
       onMouseEnter={onEnter}
       onFocus={onEnter}
     >
-      {group.label}
+      {displayLabel ?? group.label}
     </button>
   );
 }
 
 function PrimaryCTA({ solid }: { solid: boolean }) {
+  const { t } = useTranslation();
   return (
     <a
       href="/project-inquiry"
@@ -454,7 +462,7 @@ function PrimaryCTA({ solid }: { solid: boolean }) {
           : "bg-white text-primary hover:-translate-y-0.5 hover:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]",
       )}
     >
-      <span className="relative z-10">Start Your Project</span>
+      <span className="relative z-10">{t("cta.startProject")}</span>
       <ArrowUpRight className="relative z-10 size-3.5 transition-transform duration-[220ms] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" strokeWidth={2} />
       <span
         aria-hidden
@@ -870,13 +878,14 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
    ───────────────────────────────────────────────────────────── */
 
 function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSearch: () => void }) {
+  const { t } = useTranslation();
   const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
-  const sections: { label: string; items: NavItem[] }[] = [
-    { label: "Solutions", items: SOLUTIONS.items },
-    { label: "Industries", items: INDUSTRIES.items },
-    { label: "Knowledge", items: KNOWLEDGE.items.slice(0, 6) },
-    { label: "Markets", items: MARKETS.items },
-    { label: "Company", items: COMPANY.items },
+  const sections: { label: string; i18nKey: string; items: NavItem[] }[] = [
+    { label: "Solutions",  i18nKey: "nav.solutions",  items: SOLUTIONS.items },
+    { label: "Industries", i18nKey: "nav.industries", items: INDUSTRIES.items },
+    { label: "Knowledge",  i18nKey: "nav.knowledge",  items: KNOWLEDGE.items.slice(0, 6) },
+    { label: "Markets",    i18nKey: "nav.markets",    items: MARKETS.items },
+    { label: "Company",    i18nKey: "nav.company",    items: COMPANY.items },
   ];
 
   return (
@@ -921,7 +930,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
             className="group border-b border-border py-2"
           >
             <summary className="flex cursor-pointer list-none items-center justify-between py-3 text-[18px] font-semibold tracking-tight text-foreground">
-              {section.label}
+              {t(section.i18nKey, section.label)}
               <ChevronRight className="size-5 transition-transform group-open:rotate-90" strokeWidth={1.75} />
             </summary>
             <ul className="grid gap-0.5 pb-3">
@@ -970,10 +979,12 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
 
         <Button asChild variant="primary" size="lg" className="mt-6 h-14 w-full text-[15px]">
           <a href="/project-inquiry" onClick={onClose}>
-            Start Your Project
+            {t("cta.startProject")}
             <ArrowUpRight className="!size-4" />
           </a>
         </Button>
+
+        <LanguageSwitcher variant="mobile" />
 
         <div className="mt-6 flex items-center justify-between text-[12px] text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
@@ -982,7 +993,6 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
           <a href={whatsappHref} className="inline-flex items-center gap-1.5" onClick={onClose}>
             <MessageCircle className="size-3.5" strokeWidth={1.75} /> {SITE.contact.whatsapp ? "WhatsApp" : "Engineering Desk"}
           </a>
-          <span>EN</span>
         </div>
       </div>
     </div>

@@ -25,9 +25,14 @@ import { Analytics } from "../components/site/Analytics";
 import { CookieConsent } from "../components/site/CookieConsent";
 import { StickyMobileCTA } from "../components/site/StickyMobileCTA";
 import { Toaster } from "../components/ui/sonner";
-import { orgJsonLd, websiteJsonLd, ldScript } from "../lib/seo";
+import { orgJsonLd, websiteJsonLd, ldScript, hreflangLinks } from "../lib/seo";
+import { LanguageProvider } from "../i18n/LanguageProvider";
+import "../i18n/config";
+
+import { useTranslation } from "react-i18next";
 
 function NotFoundComponent() {
+  const { t } = useTranslation();
   return (
     <div className="relative flex min-h-screen flex-col bg-background">
       {/* Engineering grid background */}
@@ -65,11 +70,10 @@ function NotFoundComponent() {
       <main className="relative z-10 flex flex-1 items-center">
         <div className="container-wide w-full py-16 md:py-24">
           <div className="mx-auto max-w-4xl text-center">
-            <div className="eyebrow mb-4 text-accent">Error 404</div>
-            <h1 className="text-display mb-5">Page not found</h1>
+            <div className="eyebrow mb-4 text-accent">{t("errors.notFoundEyebrow")}</div>
+            <h1 className="text-display mb-5">{t("errors.notFoundTitle")}</h1>
             <p className="text-body-lg mx-auto max-w-2xl">
-              The resource you requested could not be located. It may have
-              moved, been renamed, or is no longer available.
+              {t("errors.notFoundBody")}
             </p>
 
             {/* Direct link cards */}
@@ -81,7 +85,7 @@ function NotFoundComponent() {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
                   <BookOpen className="h-5 w-5" />
                 </div>
-                <h3 className="text-h3 mb-1">Knowledge Hub</h3>
+                <h3 className="text-h3 mb-1">{t("knowledge.articles")}</h3>
                 <p className="text-small">
                   Technical guides, FAQs, and academy courses.
                 </p>
@@ -98,7 +102,7 @@ function NotFoundComponent() {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
                   <Calculator className="h-5 w-5" />
                 </div>
-                <h3 className="text-h3 mb-1">Engineering Tools</h3>
+                <h3 className="text-h3 mb-1">{t("knowledge.tools")}</h3>
                 <p className="text-small">
                   20+ calculators for panels, loads, and energy.
                 </p>
@@ -115,7 +119,7 @@ function NotFoundComponent() {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
                   <ClipboardList className="h-5 w-5" />
                 </div>
-                <h3 className="text-h3 mb-1">Request Quotation</h3>
+                <h3 className="text-h3 mb-1">{t("cta.requestQuotation")}</h3>
                 <p className="text-small">
                   Get a tailored project estimate in 24 hours.
                 </p>
@@ -133,7 +137,7 @@ function NotFoundComponent() {
                 className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 <Home className="mr-2 h-4 w-4" />
-                Return to homepage
+                {t("cta.returnHome")}
               </Link>
             </div>
           </div>
@@ -146,6 +150,7 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  const { t } = useTranslation();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
@@ -153,12 +158,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
       <div className="max-w-md text-center">
-        <div className="eyebrow mb-4">System notice</div>
+        <div className="eyebrow mb-4">{t("errors.systemEyebrow")}</div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+          {t("errors.systemTitle")}
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          {t("errors.systemBody")}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -168,13 +173,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Try again
+            {t("cta.tryAgain")}
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface"
           >
-            Go home
+            {t("errors.goHome")}
           </a>
         </div>
       </div>
@@ -216,8 +221,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "dns-prefetch", href: "https://www.clarity.ms" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap",
       },
+      ...hreflangLinks("/"),
     ],
     scripts: [
       ldScript(orgJsonLd()),
@@ -249,13 +255,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <AIAssistantLauncher />
-      <StickyMobileCTA />
-      <CookieConsent />
-      <Analytics />
-      <Toaster position="top-right" richColors closeButton />
+      <LanguageProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <AIAssistantLauncher />
+        <StickyMobileCTA />
+        <CookieConsent />
+        <Analytics />
+        <Toaster position="top-right" richColors closeButton />
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }
