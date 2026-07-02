@@ -6,7 +6,7 @@ import {
   Layers, Factory, Cog, PackageSearch, Snowflake, ShieldCheck,
   Flame, Zap, Building2, Wrench, Sparkles, BookOpen, ClipboardCheck,
   Ruler, MessageSquare, PhoneCall, Boxes, LineChart, ScrollText,
-  CheckCircle2, Star, TrendingUp, Clock, Globe2,
+  CheckCircle2, Star, TrendingUp, Clock, Globe2, Box, Award, HardHat,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -43,13 +43,17 @@ type Category =
   | "PIR Technology" | "Rock Wool Technology" | "Automation"
   | "Installation" | "Maintenance" | "Quality Control"
   | "Energy Efficiency" | "Fire Performance" | "Cold Storage"
-  | "Clean Rooms" | "Industrial Buildings";
+  | "Clean Rooms" | "Industrial Buildings"
+  | "CAD & BIM" | "Certifications";
 
 type DocType =
   | "Engineering Guide" | "Technical Catalog" | "Product Brochure"
   | "Factory Planning Book" | "Technical Datasheet" | "Calculation Sheet"
   | "Engineering Checklist" | "Maintenance Manual" | "Installation Guide"
-  | "Case Study" | "White Paper" | "Project Template";
+  | "Case Study" | "White Paper" | "Project Template"
+  | "CAD File" | "BIM File" | "Certificate" | "Test Report"
+  | "Operation Manual" | "Commissioning Guide" | "Safety Manual"
+  | "Troubleshooting Guide";
 
 interface Doc {
   id: string;
@@ -94,6 +98,27 @@ const DOCS: Doc[] = [
   { id: "project-inquiry-playbook", title: "Project Inquiry Playbook", desc: "What data your engineers must prepare before submitting a factory or panel inquiry — checklists and templates.", cover: projectInquiry, category: "Engineering Consultancy", type: "Project Template", pages: 28, size: "3.9 MB", lang: "EN · AR", downloads: 1120, updated: "2026-05", toc: ["Site Data", "Capacity Targets", "Utility Assumptions", "Budget Range", "Timeline"], keywords: ["inquiry","project","template"] },
   { id: "capex-calculation-sheet", title: "CAPEX Calculation Sheet (Excel)", desc: "Editable CAPEX model with land, building, line, utilities, MHE and commissioning line items.", cover: factoryInvestment, category: "Factory Investment", type: "Calculation Sheet", pages: 6, size: "1.2 MB", lang: "EN", downloads: 5820, updated: "2026-06", toc: ["Land", "Building", "Line", "Utilities", "MHE", "Commissioning"], keywords: ["capex","excel","budget"] },
   { id: "brand-guidelines", title: "NEVO Industrial — Brand Guidelines", desc: "Logo system, color palette, typography, imagery and application guidelines for partners.", cover: brandGuidelines, category: "Factory Development", type: "Product Brochure", pages: 34, size: "4.8 MB", lang: "EN", downloads: 890, updated: "2026-01", toc: ["Logo System", "Color Palette", "Typography", "Imagery", "Applications"], keywords: ["brand","identity"] },
+
+  // CAD & BIM
+  { id: "cad-panel-library-dwg", title: "Sandwich Panel CAD Library (DWG)", desc: "AutoCAD DWG library of standard PIR and rock wool panel sections, joints, corners, flashings and details.", cover: panelThickness, category: "CAD & BIM", type: "CAD File", pages: 0, size: "42.6 MB", lang: "EN", downloads: 6120, updated: "2026-06", featured: true, toc: ["Panel Sections","Joints & Overlaps","Corner Details","Flashings","Openings"], keywords: ["cad","dwg","autocad","details"] },
+  { id: "cad-panel-library-dxf", title: "Panel Detail Pack (DXF)", desc: "DXF exports of standard panel joints, thermal breaks and fastening details for laser and CNC workflows.", cover: productConfigurator, category: "CAD & BIM", type: "CAD File", pages: 0, size: "18.9 MB", lang: "EN", downloads: 2410, updated: "2026-05", toc: ["Joints","Thermal Breaks","Fastenings"], keywords: ["dxf","cnc","laser"] },
+  { id: "cad-machine-step", title: "Production Line 3D Models (STEP / IGES)", desc: "3D STEP and IGES models of laminator, mixing station, cutting saw and stacker for plant integration studies.", cover: productionLines, category: "CAD & BIM", type: "CAD File", pages: 0, size: "126.4 MB", lang: "EN", downloads: 1680, updated: "2026-05", toc: ["Laminator","Mixing Head","Cutting Saw","Stacker"], keywords: ["step","iges","solidworks","3d"] },
+  { id: "bim-revit-families", title: "Revit Families — Panels & Systems (RVT)", desc: "Parametric Revit families for wall and roof sandwich panels — LOD 300, with thermal and acoustic parameters.", cover: factoryLayout, category: "CAD & BIM", type: "BIM File", pages: 0, size: "58.2 MB", lang: "EN", downloads: 3480, updated: "2026-06", featured: true, toc: ["Wall Panels","Roof Panels","Cold Storage","Parameters"], keywords: ["bim","revit","families","lod300"] },
+  { id: "bim-3d-pdf", title: "Factory 3D PDF (Interactive)", desc: "Interactive 3D PDF of a reference sandwich panel factory — rotate, section and inspect line layout.", cover: factoryLayout, category: "CAD & BIM", type: "BIM File", pages: 4, size: "22.1 MB", lang: "EN", downloads: 1290, updated: "2026-04", toc: ["Line Layout","Warehouse","Utilities","Office"], keywords: ["3d pdf","interactive","factory"] },
+
+  // Certifications
+  { id: "cert-iso-9001", title: "ISO 9001:2015 — Quality Management", desc: "NEVO Industrial ISO 9001 quality management system certificate — issued by an accredited body.", cover: performanceAnalytics, category: "Certifications", type: "Certificate", pages: 2, size: "0.9 MB", lang: "EN", downloads: 3120, updated: "2026-02", toc: ["Scope","Standard","Validity"], keywords: ["iso","9001","quality"] },
+  { id: "cert-iso-14001", title: "ISO 14001:2015 — Environmental Management", desc: "Environmental management system certification covering panel production and factory operations.", cover: performanceAnalytics, category: "Certifications", type: "Certificate", pages: 2, size: "0.8 MB", lang: "EN", downloads: 1980, updated: "2026-02", toc: ["Scope","Standard","Validity"], keywords: ["iso","14001","environment"] },
+  { id: "cert-ce-panels", title: "CE Marking — Sandwich Panels (EN 14509)", desc: "Declaration of Performance and CE marking documentation per EN 14509 for insulated sandwich panels.", cover: pirVsRockwool, category: "Certifications", type: "Certificate", pages: 6, size: "1.4 MB", lang: "EN", downloads: 2760, updated: "2026-03", toc: ["DoP","EN 14509","Performance Table"], keywords: ["ce","en14509","dop"] },
+  { id: "report-fire-en13501", title: "Fire Test Report — EN 13501-1", desc: "Reaction-to-fire classification report for PIR and rock wool sandwich panels per EN 13501-1.", cover: pirVsRockwool, category: "Certifications", type: "Test Report", pages: 18, size: "3.6 MB", lang: "EN", downloads: 2340, updated: "2026-04", toc: ["Test Method","Classification","B-s1,d0","A2-s1,d0"], keywords: ["fire","en13501","test report"] },
+  { id: "report-thermal", title: "Thermal Performance Report (U-Value)", desc: "Guarded hot-plate test results and calculated U-values across thickness range for PIR and rock wool.", cover: performanceAnalytics, category: "Certifications", type: "Test Report", pages: 22, size: "4.1 MB", lang: "EN", downloads: 2010, updated: "2026-05", toc: ["Test Setup","Thermal Conductivity","U-Value Table"], keywords: ["thermal","u-value","test report"] },
+  { id: "report-load", title: "Structural Load Test Report", desc: "Panel span, deflection and wind load test data per EN 14509 Annex A for design engineers.", cover: performanceAnalytics, category: "Certifications", type: "Test Report", pages: 26, size: "5.2 MB", lang: "EN", downloads: 1540, updated: "2026-05", toc: ["Bending","Wind Load","Point Load","Span Tables"], keywords: ["load","structural","span"] },
+
+  // Manuals
+  { id: "manual-line-operation", title: "Production Line — Operation Manual", desc: "Complete operator manual for continuous sandwich panel lines: startup, recipes, changeover, shutdown.", cover: continuousPir, category: "Maintenance", type: "Operation Manual", pages: 148, size: "22.4 MB", lang: "EN · AR", downloads: 2680, updated: "2026-06", toc: ["Startup","Recipes","Changeover","Shutdown","Alarms"], keywords: ["operation","operator","line"] },
+  { id: "manual-commissioning", title: "Commissioning Guide — Sandwich Panel Line", desc: "Step-by-step commissioning protocol: mechanical, electrical, PLC/SCADA, FAT and SAT sign-off.", cover: productionOverview, category: "Installation", type: "Commissioning Guide", pages: 74, size: "11.8 MB", lang: "EN", downloads: 1420, updated: "2026-05", toc: ["Mechanical","Electrical","PLC/SCADA","FAT","SAT"], keywords: ["commissioning","fat","sat"] },
+  { id: "manual-troubleshoot", title: "Troubleshooting Guide — Line & Panels", desc: "Systematic troubleshooting for line stoppages, quality deviations, chemical mixing and cutting issues.", cover: engineeringSolutions, category: "Maintenance", type: "Troubleshooting Guide", pages: 62, size: "9.4 MB", lang: "EN", downloads: 1830, updated: "2026-05", toc: ["Line Stops","Quality Deviations","Mixing Issues","Cutting Defects"], keywords: ["troubleshoot","defects","issues"] },
+  { id: "manual-safety", title: "Safety Manual — Factory Operations", desc: "HSE manual covering LOTO, PPE, chemical handling, hot work and emergency procedures for panel factories.", cover: engineeringConsultancy, category: "Quality Control", type: "Safety Manual", pages: 88, size: "13.2 MB", lang: "EN · AR", downloads: 2110, updated: "2026-04", toc: ["LOTO","PPE","Chemicals","Hot Work","Emergency"], keywords: ["safety","hse","loto","ppe"] },
 ];
 
 const CATEGORIES: Category[] = [
@@ -101,12 +126,15 @@ const CATEGORIES: Category[] = [
   "Raw Materials","Finished Sandwich Panels","PIR Technology","Rock Wool Technology",
   "Automation","Installation","Maintenance","Quality Control","Energy Efficiency",
   "Fire Performance","Cold Storage","Clean Rooms","Industrial Buildings",
+  "CAD & BIM","Certifications",
 ];
 
 const DOC_TYPES: DocType[] = [
   "Engineering Guide","Technical Catalog","Product Brochure","Factory Planning Book",
   "Technical Datasheet","Calculation Sheet","Engineering Checklist","Maintenance Manual",
   "Installation Guide","Case Study","White Paper","Project Template",
+  "CAD File","BIM File","Certificate","Test Report",
+  "Operation Manual","Commissioning Guide","Safety Manual","Troubleshooting Guide",
 ];
 
 const CATEGORY_ICONS: Record<Category, typeof Factory> = {
@@ -116,6 +144,7 @@ const CATEGORY_ICONS: Record<Category, typeof Factory> = {
   "Installation": Building2, "Maintenance": Wrench, "Quality Control": ClipboardCheck,
   "Energy Efficiency": Zap, "Fire Performance": Flame, "Cold Storage": Snowflake,
   "Clean Rooms": ShieldCheck, "Industrial Buildings": Boxes,
+  "CAD & BIM": Box, "Certifications": Award,
 };
 
 const FAQ = [
@@ -310,10 +339,97 @@ function DownloadCenterPage() {
         </div>
       </section>
 
+      {/* FORMAT HUBS — CAD · CERTIFICATIONS · MANUALS */}
+      <section className="border-b border-white/5 py-20">
+        <div className="mx-auto max-w-7xl px-6">
+          <SectionHead
+            eyebrow="Engineering Format Hubs"
+            title="CAD, Certifications & Manuals"
+            desc="Three specialised libraries — engineered drawings, formal certificates and operational manuals — the same standard investors expect from Siemens, ABB or Bosch Rexroth."
+          />
+          <div className="mt-12 grid md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: Box,
+                title: "CAD & BIM Library",
+                desc: "DWG, DXF, STEP, IGES, SolidWorks and Revit families for panels, joints and complete production lines.",
+                formats: ["DWG","DXF","STEP","IGES","RVT","3D PDF"],
+                filter: "CAD & BIM" as Category,
+              },
+              {
+                icon: Award,
+                title: "Certification Center",
+                desc: "ISO 9001, ISO 14001, CE / EN 14509, fire, thermal and structural load test reports — accredited & downloadable.",
+                formats: ["ISO 9001","ISO 14001","CE","EN 13501","EN 14509"],
+                filter: "Certifications" as Category,
+              },
+              {
+                icon: HardHat,
+                title: "Operational Manuals",
+                desc: "Installation, operation, maintenance, troubleshooting, commissioning and safety manuals for every line we deliver.",
+                formats: ["Installation","Operation","Maintenance","Commissioning","Safety"],
+                filter: null,
+              },
+            ].map((h) => {
+              const Icon = h.icon;
+              const count = h.filter
+                ? DOCS.filter((d) => d.category === h.filter).length
+                : DOCS.filter((d) => ["Installation Guide","Operation Manual","Maintenance Manual","Commissioning Guide","Safety Manual","Troubleshooting Guide"].includes(d.type)).length;
+              return (
+                <button
+                  key={h.title}
+                  onClick={() => {
+                    if (h.filter) {
+                      setActiveCategory(h.filter);
+                      setActiveType("All");
+                    } else {
+                      setActiveCategory("All");
+                      setActiveType("Operation Manual");
+                    }
+                    setTab("Newest");
+                    setTimeout(() => {
+                      document.getElementById("library")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }, 60);
+                  }}
+                  className="group text-left relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-8 hover:border-emerald-500/40 hover:from-emerald-500/[0.06] transition"
+                >
+                  <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_60%)] opacity-0 group-hover:opacity-100 transition" />
+                  <div className="flex items-center justify-between">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-white/40">
+                      {count} files
+                    </span>
+                  </div>
+                  <h3 className="mt-6 text-2xl font-semibold tracking-tight group-hover:text-emerald-300 transition">
+                    {h.title}
+                  </h3>
+                  <p className="mt-3 text-sm text-white/60 leading-relaxed">{h.desc}</p>
+                  <div className="mt-5 flex flex-wrap gap-1.5">
+                    {h.formats.map((f) => (
+                      <span
+                        key={f}
+                        className="rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-white/60"
+                      >
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-6 inline-flex items-center gap-1 text-xs font-medium text-emerald-400">
+                    Open library <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* CATEGORIES */}
       <section className="border-b border-white/5 py-16">
         <div className="mx-auto max-w-7xl px-6">
-          <SectionHead eyebrow="Resource categories" title="Explore the engineering library" desc="17 categories covering every stage of factory development, production and operation." />
+          <SectionHead eyebrow="Resource categories" title="Explore the engineering library" desc={`${CATEGORIES.length} categories covering every stage of factory development, production and operation.`} />
           <div className="mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             <CategoryCard label="All resources" icon={Library} active={activeCategory === "All"} onClick={() => setActiveCategory("All")} count={DOCS.length} />
             {CATEGORIES.map((c) => {
