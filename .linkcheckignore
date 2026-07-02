@@ -8,5 +8,25 @@
 # /blog/**             # entire blog subtree (e.g. drafts not yet built)
 # /docs/coming-soon
 #
-# For advanced options (ignore by source file, sitemap-only ignores,
-# custom redirects), use link-check.config.json instead.
+# EXTERNAL URLs (http/https) and advanced options go in link-check.config.json:
+#   {
+#     "ignoreExternal": [
+#       "https://fonts.googleapis.com/**",       // preconnect origin — no GET target
+#       "https://fonts.gstatic.com/**",
+#       "https://www.googletagmanager.com/**",   // GTM base URL is composed at runtime
+#       "https://www.clarity.ms/**",
+#       "https://ai.gateway.lovable.dev/**"      // auth-gated API root
+#     ],
+#     "ignoreFiles":          ["src/experimental/**"],
+#     "ignoreSitemapMissing": ["/internal-tool"],
+#     "ignoreSitemapExtra":   ["/legacy-redirect"],
+#     "redirects":            { "/old": "/new" },
+#     "redirectPrefixes":     { "/old/": "/new/" },
+#     "external": {
+#       "timeoutMs":      10000,
+#       "retries":        2,
+#       "concurrency":    8,
+#       "userAgent":      "NEVO-LinkCheck/1.0",
+#       "acceptStatuses": [200,201,202,203,204,206,301,302,303,307,308]
+#     }
+#   }
