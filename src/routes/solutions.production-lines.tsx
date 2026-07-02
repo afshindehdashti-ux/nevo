@@ -820,6 +820,26 @@ const FIELD =
 const LABEL = "mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground";
 
 function ProjectInquiry() {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    const ok = await submitLeadForm(e.currentTarget, {
+      source: "production-lines-inquiry",
+      rules: [
+        { field: "company", label: "Company" },
+        { field: "email", label: "Email", type: "email" },
+      ],
+      successTitle: "Proposal request received",
+      successDescription: "Our production-line team will follow up within one business day.",
+    });
+    setBusy(false);
+    if (ok) formRef.current?.reset();
+  }
+
   return (
     <Section id="inquiry" tone="surface">
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
@@ -840,8 +860,10 @@ function ProjectInquiry() {
         </div>
 
         <form
+          ref={formRef}
           className="lg:col-span-7 rounded-2xl border border-border bg-background p-6 sm:p-10"
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={onSubmit}
+          noValidate
         >
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
