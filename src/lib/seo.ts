@@ -158,12 +158,25 @@ export const websiteJsonLd = () => ({
   "@type": "WebSite",
   name: SITE.name,
   url: SITE.url,
+  inLanguage: LOCALES.map((l) => l.hreflang),
   potentialAction: {
     "@type": "SearchAction",
     target: `${SITE.url}/knowledge?q={search_term_string}`,
     "query-input": "required name=search_term_string",
   },
 });
+
+/** Build hreflang <link rel="alternate"> entries for a given path. Path should start with "/". */
+export const hreflangLinks = (path: string) => {
+  const clean = path.startsWith("/") ? path : `/${path}`;
+  const links: Array<Record<string, string>> = LOCALES.filter((l) => l.status === "active").map((l) => ({
+    rel: "alternate",
+    hreflang: l.hreflang,
+    href: `${SITE.url}${clean}?lang=${l.code}`,
+  }));
+  links.push({ rel: "alternate", hreflang: "x-default", href: `${SITE.url}${clean}` });
+  return links;
+};
 
 export const breadcrumbJsonLd = (items: { name: string; path: string }[]) => ({
   "@context": "https://schema.org",
