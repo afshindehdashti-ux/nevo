@@ -23,6 +23,7 @@ import { Route as InstallationCommissioningRouteImport } from './routes/installa
 import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as FactoryLayoutsRouteImport } from './routes/factory-layouts'
 import { Route as FactoryLayoutGeneratorRouteImport } from './routes/factory-layout-generator'
+import { Route as EngineeringToolsRouteImport } from './routes/engineering-tools'
 import { Route as DownloadCenterRouteImport } from './routes/download-center'
 import { Route as CustomerPortalRouteImport } from './routes/customer-portal'
 import { Route as AiProjectEstimatorRouteImport } from './routes/ai-project-estimator'
@@ -108,6 +109,11 @@ const FactoryLayoutGeneratorRoute = FactoryLayoutGeneratorRouteImport.update({
   path: '/factory-layout-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EngineeringToolsRoute = EngineeringToolsRouteImport.update({
+  id: '/engineering-tools',
+  path: '/engineering-tools',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DownloadCenterRoute = DownloadCenterRouteImport.update({
   id: '/download-center',
   path: '/download-center',
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/ai-project-estimator': typeof AiProjectEstimatorRoute
   '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
+  '/engineering-tools': typeof EngineeringToolsRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/factory-layouts': typeof FactoryLayoutsRoute
   '/industries': typeof IndustriesRoute
@@ -207,6 +214,7 @@ export interface FileRoutesByTo {
   '/ai-project-estimator': typeof AiProjectEstimatorRoute
   '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
+  '/engineering-tools': typeof EngineeringToolsRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/factory-layouts': typeof FactoryLayoutsRoute
   '/industries': typeof IndustriesRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/ai-project-estimator': typeof AiProjectEstimatorRoute
   '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
+  '/engineering-tools': typeof EngineeringToolsRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/factory-layouts': typeof FactoryLayoutsRoute
   '/industries': typeof IndustriesRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/ai-project-estimator'
     | '/customer-portal'
     | '/download-center'
+    | '/engineering-tools'
     | '/factory-layout-generator'
     | '/factory-layouts'
     | '/industries'
@@ -294,6 +304,7 @@ export interface FileRouteTypes {
     | '/ai-project-estimator'
     | '/customer-portal'
     | '/download-center'
+    | '/engineering-tools'
     | '/factory-layout-generator'
     | '/factory-layouts'
     | '/industries'
@@ -322,6 +333,7 @@ export interface FileRouteTypes {
     | '/ai-project-estimator'
     | '/customer-portal'
     | '/download-center'
+    | '/engineering-tools'
     | '/factory-layout-generator'
     | '/factory-layouts'
     | '/industries'
@@ -351,6 +363,7 @@ export interface RootRouteChildren {
   AiProjectEstimatorRoute: typeof AiProjectEstimatorRoute
   CustomerPortalRoute: typeof CustomerPortalRoute
   DownloadCenterRoute: typeof DownloadCenterRoute
+  EngineeringToolsRoute: typeof EngineeringToolsRoute
   FactoryLayoutGeneratorRoute: typeof FactoryLayoutGeneratorRoute
   FactoryLayoutsRoute: typeof FactoryLayoutsRoute
   IndustriesRoute: typeof IndustriesRoute
@@ -473,6 +486,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FactoryLayoutGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/engineering-tools': {
+      id: '/engineering-tools'
+      path: '/engineering-tools'
+      fullPath: '/engineering-tools'
+      preLoaderRoute: typeof EngineeringToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/download-center': {
       id: '/download-center'
       path: '/download-center'
@@ -567,6 +587,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiProjectEstimatorRoute: AiProjectEstimatorRoute,
   CustomerPortalRoute: CustomerPortalRoute,
   DownloadCenterRoute: DownloadCenterRoute,
+  EngineeringToolsRoute: EngineeringToolsRoute,
   FactoryLayoutGeneratorRoute: FactoryLayoutGeneratorRoute,
   FactoryLayoutsRoute: FactoryLayoutsRoute,
   IndustriesRoute: IndustriesRoute,
