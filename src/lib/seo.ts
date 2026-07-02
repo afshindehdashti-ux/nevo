@@ -54,7 +54,8 @@ export type LocaleCode = (typeof LOCALES)[number]["code"];
 export interface SeoInput {
   title: string;
   description: string;
-  path: string; // e.g. "/solutions/production-lines"
+  path: string; // e.g. "/solutions/production-lines" — WITHOUT the /{lang} prefix
+  lang: LocaleCode; // required — canonical + og:url are built per locale
   image?: string; // absolute or relative
   type?: "website" | "article" | "product" | "profile";
   noindex?: boolean;
@@ -63,9 +64,11 @@ export interface SeoInput {
 
 /** Build a head() config object (meta + links) for a route. */
 export function buildSeo(input: SeoInput) {
+  const cleanPath = input.path === "/" ? "" : input.path;
+  const localizedPath = `/${input.lang}${cleanPath}`;
   const absolutePath = input.path.startsWith("http")
     ? input.path
-    : `${SITE.url}${input.path}`;
+    : `${SITE.url}${localizedPath}`;
   const fullTitle = input.title.includes(SITE.titleSuffix)
     ? input.title
     : `${input.title} — ${SITE.titleSuffix}`;
@@ -104,18 +107,23 @@ export function buildSeo(input: SeoInput) {
     { rel: "canonical", href: absolutePath },
   ];
 
-  // hreflang scaffolding — active locales only (default routes serve en)
+  // hreflang — every active locale uses a /{code} prefix; x-default → /en
   for (const l of LOCALES.filter((l) => l.status === "active")) {
     links.push({
       rel: "alternate",
       hrefLang: l.hreflang,
-      href: l.code === "en" ? absolutePath : `${SITE.url}/${l.code}${input.path}`,
+      href: `${SITE.url}/${l.code}${cleanPath}`,
     });
   }
-  links.push({ rel: "alternate", hrefLang: "x-default", href: absolutePath });
+  links.push({
+    rel: "alternate",
+    hrefLang: "x-default",
+    href: `${SITE.url}/en${cleanPath}`,
+  });
 
   return { meta, links };
 }
+
 
 /* -------------------- JSON-LD builders -------------------- */
 
