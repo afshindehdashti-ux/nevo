@@ -19,6 +19,7 @@
     "check:seo:warn": "node scripts/check-seo-metadata.mjs --warn-only",
     "check:seo:json": "node scripts/check-seo-metadata.mjs --json",
     "check:all": "npm run check:i18n && npm run check:seo",
+    "verify:publish": "node scripts/verify-publish.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {
