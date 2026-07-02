@@ -203,6 +203,8 @@ function Breadcrumbs() {
       <div className="container-wide flex items-center gap-2 py-4 text-xs text-muted-foreground">
         <Link to="/" className="hover:text-foreground">Home</Link>
         <ArrowRight className="size-3" />
+        <Link to="/solutions" className="hover:text-foreground">Solutions</Link>
+        <ArrowRight className="size-3" />
         <span className="text-foreground">Factory Development</span>
       </div>
     </nav>
