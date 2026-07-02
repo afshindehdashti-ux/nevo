@@ -127,6 +127,7 @@ const KNOWLEDGE: MenuGroup = {
     { label: "PIR vs Rock Wool", desc: "Complete side-by-side comparison guide.", icon: Layers, href: "/pir-vs-rock-wool" },
     { label: "White Papers", desc: "Peer-reviewed engineering perspectives.", icon: ScrollText, href: "/knowledge" },
     { label: "Engineering Tools", desc: "Calculators, selectors, references.", icon: Calculator, href: "/ai-assistant" },
+    { label: "Customer Portal", desc: "Secure client dashboard: projects, tracking, documents.", icon: ShieldCheck, href: "/customer-portal" },
   ],
   featured: {
     eyebrow: "Latest article",
