@@ -333,9 +333,7 @@ export function SiteHeader() {
    ───────────────────────────────────────────────────────────── */
 
 function UtilityBar({ solid }: { solid: boolean }) {
-  const whatsappHref = SITE.contact.whatsapp
-    ? `https://wa.me/${SITE.contact.whatsapp}`
-    : "/project-inquiry";
+  const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
 
   return (
     <div
