@@ -69,7 +69,7 @@ function HeroDesktop() {
         >
           <div className="eyebrow mb-6 flex items-center gap-2 text-white/70">
             <span className="inline-flex size-1.5 rounded-full bg-accent" />
-            Dubai · Industrial Engineering &amp; Supply
+            Dubai · Factory Development · Production Lines · Raw Materials
           </div>
 
           <motion.p
@@ -104,7 +104,7 @@ function HeroDesktop() {
               size="lg"
               className="bg-white text-primary transition-colors duration-200 hover:bg-white/90"
             >
-              <a href="#contact">
+              <a href="/project-inquiry">
                 Start Your Project
                 <ArrowRight className="!size-4" />
               </a>
@@ -115,8 +115,8 @@ function HeroDesktop() {
               variant="secondary"
               className="border-white/30 bg-transparent text-white transition-colors duration-200 hover:border-white hover:bg-white/10"
             >
-              <a href="#contact">
-                Talk to an Engineer
+              <a href="/ai-assistant">
+                Ask the AI Engineer
                 <ArrowUpRight className="!size-4" />
               </a>
             </Button>
@@ -183,13 +183,13 @@ function HeroMobile() {
       {/* Interactive tap targets aligned to the baked CTAs (percentages of
           the asset height/width). Kept invisible — visuals live in the image. */}
       <a
-        href="#contact"
+        href="/project-inquiry"
         aria-label="Start your project"
         className="absolute left-[6%] right-[6%] rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/70"
         style={{ top: "71.4%", height: "8.2%" }}
       />
       <a
-        href="#contact"
+        href="/ai-assistant"
         aria-label="Talk to an engineer"
         className="absolute left-[6%] right-[6%] rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/70"
         style={{ top: "81.6%", height: "6.8%" }}

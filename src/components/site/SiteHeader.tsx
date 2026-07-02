@@ -43,6 +43,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { SITE } from "@/lib/seo";
 import nevoLogoDark from "@/assets/nevo-logo-dark.png";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
@@ -77,18 +78,18 @@ const SOLUTIONS: MenuGroup = {
   layout: "cards",
   width: "xl",
   items: [
-    { label: "Factory Development", desc: "Feasibility, layout, commissioning.", icon: Factory },
-    { label: "Engineering Consultancy", desc: "Process design & optimization.", icon: Cog },
-    { label: "Production Lines", desc: "Continuous, discontinuous, roll forming.", icon: Wrench },
-    { label: "Raw Materials", desc: "PIR, PUR, PPGI, GI, rock wool, adhesives.", icon: PackageSearch },
-    { label: "Finished Panels", desc: "Premium sandwich panels, delivered.", icon: Layers },
-    { label: "Technical Support", desc: "Training, spare parts, audits.", icon: LifeBuoy },
+    { label: "Factory Development", desc: "Feasibility, layout, commissioning.", icon: Factory, href: "/solutions/factory-development" },
+    { label: "Engineering Consultancy", desc: "Process design & optimization.", icon: Cog, href: "/solutions/engineering-consultancy" },
+    { label: "Production Lines", desc: "Continuous, discontinuous, roll forming.", icon: Wrench, href: "/solutions/production-lines" },
+    { label: "Raw Materials", desc: "PIR, PUR, PPGI, GI, rock wool, adhesives.", icon: PackageSearch, href: "/solutions/raw-materials" },
+    { label: "Finished Panels", desc: "Premium sandwich panels, delivered.", icon: Layers, href: "/solutions/sandwich-panels" },
+    { label: "AI Engineering Assistant", desc: "Calculators, estimators and guided scoping.", icon: LifeBuoy, href: "/ai-assistant" },
   ],
   featured: {
     eyebrow: "Featured service",
     title: "Turnkey Factory Development",
     desc: "From feasibility study to first production run — engineered end-to-end.",
-    href: "#contact",
+    href: "/solutions/factory-development",
   },
 };
 
@@ -97,14 +98,14 @@ const INDUSTRIES: MenuGroup = {
   layout: "grid",
   width: "lg",
   items: [
-    { label: "Cold Storage", icon: Snowflake },
-    { label: "Food Processing", icon: UtensilsCrossed },
-    { label: "Industrial Buildings", icon: Building2 },
-    { label: "Clean Rooms", icon: ShieldCheck },
-    { label: "Warehousing", icon: Warehouse },
-    { label: "Commercial Buildings", icon: Building },
-    { label: "Modular Buildings", icon: Boxes },
-    { label: "Agriculture", icon: Sprout },
+    { label: "Cold Storage", icon: Snowflake, href: "/industries" },
+    { label: "Food Processing", icon: UtensilsCrossed, href: "/industries" },
+    { label: "Industrial Buildings", icon: Building2, href: "/industries" },
+    { label: "Clean Rooms", icon: ShieldCheck, href: "/industries" },
+    { label: "Warehousing", icon: Warehouse, href: "/industries" },
+    { label: "Commercial Buildings", icon: Building, href: "/industries" },
+    { label: "Modular Buildings", icon: Boxes, href: "/industries" },
+    { label: "Agriculture", icon: Sprout, href: "/industries" },
   ],
 };
 
@@ -113,20 +114,20 @@ const KNOWLEDGE: MenuGroup = {
   layout: "list",
   width: "xl",
   items: [
-    { label: "Engineering Articles", desc: "Deep technical writing from our engineers.", icon: BookOpen },
-    { label: "Technical Library", desc: "Specs, datasheets, drawings.", icon: Library },
-    { label: "Downloads", desc: "Brochures, catalogues, PDFs.", icon: Download },
-    { label: "Case Studies", desc: "Factories built with NEVO.", icon: FileText },
-    { label: "FAQ", desc: "Common industrial questions.", icon: HelpCircle },
-    { label: "Investment Guides", desc: "Feasibility and CAPEX planning.", icon: LineChart },
-    { label: "White Papers", desc: "Peer-reviewed engineering perspectives.", icon: ScrollText },
-    { label: "Engineering Tools", desc: "Calculators, selectors, references.", icon: Calculator },
+    { label: "Engineering Articles", desc: "Deep technical writing from our engineers.", icon: BookOpen, href: "/knowledge" },
+    { label: "Technical Library", desc: "Specs, datasheets, drawings.", icon: Library, href: "/knowledge" },
+    { label: "Downloads", desc: "Brochures, catalogues, PDFs.", icon: Download, href: "/knowledge" },
+    { label: "Case Studies", desc: "Factories built with NEVO.", icon: FileText, href: "/knowledge" },
+    { label: "FAQ", desc: "Common industrial questions.", icon: HelpCircle, href: "/knowledge" },
+    { label: "Investment Guides", desc: "Feasibility and CAPEX planning.", icon: LineChart, href: "/knowledge" },
+    { label: "White Papers", desc: "Peer-reviewed engineering perspectives.", icon: ScrollText, href: "/knowledge" },
+    { label: "Engineering Tools", desc: "Calculators, selectors, references.", icon: Calculator, href: "/ai-assistant" },
   ],
   featured: {
     eyebrow: "Latest article",
     title: "PIR vs PUR: choosing the right core in 2026",
     desc: "A structural, thermal and fire-performance comparison for cold storage.",
-    href: "#knowledge",
+    href: "/knowledge",
   },
 };
 
@@ -135,15 +136,15 @@ const MARKETS: MenuGroup = {
   layout: "markets",
   width: "lg",
   items: [
-    { label: "Saudi Arabia" },
-    { label: "UAE" },
-    { label: "Oman" },
-    { label: "Turkey" },
-    { label: "Iraq" },
-    { label: "Russia" },
-    { label: "Kenya" },
-    { label: "Cameroon" },
-    { label: "Africa" },
+    { label: "Saudi Arabia", href: "/industries" },
+    { label: "UAE", href: "/industries" },
+    { label: "Oman", href: "/industries" },
+    { label: "Turkey", href: "/industries" },
+    { label: "Iraq", href: "/industries" },
+    { label: "Russia", href: "/industries" },
+    { label: "Kenya", href: "/industries" },
+    { label: "Cameroon", href: "/industries" },
+    { label: "Africa", href: "/industries" },
   ],
 };
 
@@ -152,13 +153,13 @@ const COMPANY: MenuGroup = {
   layout: "list",
   width: "md",
   items: [
-    { label: "About NEVO", icon: Compass },
-    { label: "Why NEVO", icon: Sparkles },
-    { label: "Engineering Process", icon: Cog },
-    { label: "Global Network", icon: Network },
-    { label: "Partners", icon: Handshake },
-    { label: "Careers", icon: Briefcase },
-    { label: "Contact", icon: Mail },
+    { label: "About NEVO", icon: Compass, href: "/about" },
+    { label: "Why NEVO", icon: Sparkles, href: "/about" },
+    { label: "Engineering Process", icon: Cog, href: "/solutions/engineering-consultancy" },
+    { label: "Global Network", icon: Network, href: "/industries" },
+    { label: "Project Inquiry", icon: Handshake, href: "/project-inquiry" },
+    { label: "AI Engineering Assistant", icon: Briefcase, href: "/ai-assistant" },
+    { label: "Contact", icon: Mail, href: "/project-inquiry" },
   ],
 };
 
@@ -324,6 +325,10 @@ export function SiteHeader() {
    ───────────────────────────────────────────────────────────── */
 
 function UtilityBar({ solid }: { solid: boolean }) {
+  const whatsappHref = SITE.contact.whatsapp
+    ? `https://wa.me/${SITE.contact.whatsapp}`
+    : "/project-inquiry";
+
   return (
     <div
       className={cn(
@@ -347,14 +352,14 @@ function UtilityBar({ solid }: { solid: boolean }) {
         </div>
         <div className="flex items-center gap-4">
           <a
-            href="https://wa.me/"
+            href={whatsappHref}
             className={cn(
               "inline-flex items-center gap-1.5 transition-colors",
               solid ? "hover:text-foreground" : "hover:text-white",
             )}
           >
             <MessageCircle className="size-3.5" strokeWidth={1.75} />
-            WhatsApp
+            {SITE.contact.whatsapp ? "WhatsApp" : "Engineering Desk"}
           </a>
           <button
             className={cn(
@@ -431,7 +436,7 @@ function MegaTrigger({
 function PrimaryCTA({ solid }: { solid: boolean }) {
   return (
     <a
-      href="#contact"
+      href="/project-inquiry"
       className={cn(
         "group relative hidden overflow-hidden rounded-lg px-4 py-2.5 text-[13px] font-medium tracking-tight transition-all duration-[220ms] sm:inline-flex sm:items-center sm:gap-1.5",
         solid
@@ -500,7 +505,7 @@ function CardsLayout({ group }: { group: MenuGroup }) {
           {group.items.map((item) => (
             <li key={item.label}>
               <a
-                href={item.href ?? "#"}
+                href={item.href ?? "/project-inquiry"}
                 className="group flex items-start gap-3 rounded-xl border border-transparent p-3.5 transition-all hover:border-border hover:bg-surface/60"
               >
                 <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-white text-foreground transition-colors group-hover:border-[color:var(--accent)] group-hover:text-[color:var(--accent)]">
@@ -535,7 +540,7 @@ function GridLayout({ group }: { group: MenuGroup }) {
         {group.items.map((item) => (
           <li key={item.label}>
             <a
-              href="#"
+              href={item.href ?? "/industries"}
               className="group flex flex-col items-start gap-3 rounded-xl border border-transparent p-4 transition-all hover:border-border hover:bg-surface/60"
             >
               <span className="grid size-10 place-items-center rounded-lg border border-border bg-white transition-colors group-hover:border-[color:var(--accent)] group-hover:text-[color:var(--accent)]">
@@ -567,7 +572,7 @@ function ListLayout({ group }: { group: MenuGroup }) {
           {group.items.map((item) => (
             <li key={item.label}>
               <a
-                href="#"
+                href={item.href ?? "/industries"}
                 className="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-surface/70"
               >
                 {item.icon && (
@@ -605,7 +610,7 @@ function MarketsLayout({ group }: { group: MenuGroup }) {
           {group.items.map((item) => (
             <li key={item.label}>
               <a
-                href="#"
+                href={item.href ?? "/knowledge"}
                 className="group flex items-center justify-between rounded-lg px-3 py-2.5 transition-colors hover:bg-surface/70"
               >
                 <span className="inline-flex items-center gap-2 text-[13.5px] font-medium tracking-tight text-foreground">
@@ -794,6 +799,9 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
    ───────────────────────────────────────────────────────────── */
 
 function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSearch: () => void }) {
+  const whatsappHref = SITE.contact.whatsapp
+    ? `https://wa.me/${SITE.contact.whatsapp}`
+    : "/project-inquiry";
   const sections: { label: string; items: NavItem[] }[] = [
     { label: "Solutions", items: SOLUTIONS.items },
     { label: "Industries", items: INDUSTRIES.items },
@@ -820,14 +828,19 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
             Popular solutions
           </div>
           <div className="flex flex-wrap gap-2">
-            {["Factory Development", "Production Lines", "Sandwich Panels", "Cold Storage"].map((t) => (
+            {[
+              { label: "Factory Development", href: "/solutions/factory-development" },
+              { label: "Production Lines", href: "/solutions/production-lines" },
+              { label: "Sandwich Panels", href: "/solutions/sandwich-panels" },
+              { label: "Cold Storage", href: "/industries" },
+            ].map((t) => (
               <a
-                key={t}
-                href="#"
+                key={t.label}
+                href={t.href}
                 className="rounded-full border border-border px-3 py-1.5 text-[12.5px] font-medium text-foreground"
                 onClick={onClose}
               >
-                {t}
+                {t.label}
               </a>
             ))}
           </div>
@@ -846,7 +859,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
               {section.items.map((item) => (
                 <li key={item.label}>
                   <a
-                    href="#"
+                    href={item.href ?? "/knowledge"}
                     className="flex items-center gap-3 rounded-lg px-2 py-3 text-[15px] text-foreground/85"
                     onClick={onClose}
                   >
@@ -869,11 +882,15 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
             Recent resources
           </div>
           <ul className="mt-3 grid gap-2">
-            {["PIR vs PUR: choosing the right core", "CAPEX guide for a 50k m² factory", "Continuous line commissioning checklist"].map(
+            {[
+              { label: "PIR vs PUR: choosing the right core", href: "/knowledge" },
+              { label: "CAPEX guide for a 50k m² factory", href: "/solutions/factory-development" },
+              { label: "Continuous line commissioning checklist", href: "/solutions/production-lines" },
+            ].map(
               (t) => (
-                <li key={t}>
-                  <a href="#" className="flex items-start justify-between gap-3 py-1.5 text-[14px] text-foreground" onClick={onClose}>
-                    <span className="min-w-0 flex-1">{t}</span>
+                <li key={t.label}>
+                  <a href={t.href} className="flex items-start justify-between gap-3 py-1.5 text-[14px] text-foreground" onClick={onClose}>
+                    <span className="min-w-0 flex-1">{t.label}</span>
                     <ArrowUpRight className="mt-0.5 size-4 text-muted-foreground" strokeWidth={1.75} />
                   </a>
                 </li>
@@ -883,7 +900,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
         </div>
 
         <Button asChild variant="primary" size="lg" className="mt-6 h-14 w-full text-[15px]">
-          <a href="#contact" onClick={onClose}>
+          <a href="/project-inquiry" onClick={onClose}>
             Start Your Project
             <ArrowUpRight className="!size-4" />
           </a>
@@ -893,8 +910,8 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
           <span className="inline-flex items-center gap-1.5">
             <MapPin className="size-3.5" strokeWidth={1.75} /> Dubai, UAE
           </span>
-          <a href="https://wa.me/" className="inline-flex items-center gap-1.5">
-            <MessageCircle className="size-3.5" strokeWidth={1.75} /> WhatsApp
+          <a href={whatsappHref} className="inline-flex items-center gap-1.5" onClick={onClose}>
+            <MessageCircle className="size-3.5" strokeWidth={1.75} /> {SITE.contact.whatsapp ? "WhatsApp" : "Engineering Desk"}
           </a>
           <span>EN</span>
         </div>

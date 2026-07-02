@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SolutionsSandwichPanelsRouteImport } from './routes/solutions.sandwich-panels'
 import { Route as SolutionsRawMaterialsRouteImport } from './routes/solutions.raw-materials'
 import { Route as SolutionsProductionLinesRouteImport } from './routes/solutions.production-lines'
+import { Route as SolutionsFactoryDevelopmentRouteImport } from './routes/solutions.factory-development'
 import { Route as SolutionsEngineeringConsultancyRouteImport } from './routes/solutions.engineering-consultancy'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
@@ -73,6 +74,12 @@ const SolutionsProductionLinesRoute =
     path: '/solutions/production-lines',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SolutionsFactoryDevelopmentRoute =
+  SolutionsFactoryDevelopmentRouteImport.update({
+    id: '/solutions/factory-development',
+    path: '/solutions/factory-development',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SolutionsEngineeringConsultancyRoute =
   SolutionsEngineeringConsultancyRouteImport.update({
     id: '/solutions/engineering-consultancy',
@@ -95,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
+  '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
   '/solutions/sandwich-panels': typeof SolutionsSandwichPanelsRoute
@@ -109,6 +117,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
+  '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
   '/solutions/sandwich-panels': typeof SolutionsSandwichPanelsRoute
@@ -124,6 +133,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
+  '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
   '/solutions/sandwich-panels': typeof SolutionsSandwichPanelsRoute
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/api/chat'
     | '/solutions/engineering-consultancy'
+    | '/solutions/factory-development'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
     | '/solutions/sandwich-panels'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/api/chat'
     | '/solutions/engineering-consultancy'
+    | '/solutions/factory-development'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
     | '/solutions/sandwich-panels'
@@ -168,6 +180,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/api/chat'
     | '/solutions/engineering-consultancy'
+    | '/solutions/factory-development'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
     | '/solutions/sandwich-panels'
@@ -183,6 +196,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
   SolutionsEngineeringConsultancyRoute: typeof SolutionsEngineeringConsultancyRoute
+  SolutionsFactoryDevelopmentRoute: typeof SolutionsFactoryDevelopmentRoute
   SolutionsProductionLinesRoute: typeof SolutionsProductionLinesRoute
   SolutionsRawMaterialsRoute: typeof SolutionsRawMaterialsRoute
   SolutionsSandwichPanelsRoute: typeof SolutionsSandwichPanelsRoute
@@ -260,6 +274,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolutionsProductionLinesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/solutions/factory-development': {
+      id: '/solutions/factory-development'
+      path: '/solutions/factory-development'
+      fullPath: '/solutions/factory-development'
+      preLoaderRoute: typeof SolutionsFactoryDevelopmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/solutions/engineering-consultancy': {
       id: '/solutions/engineering-consultancy'
       path: '/solutions/engineering-consultancy'
@@ -287,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,
   SolutionsEngineeringConsultancyRoute: SolutionsEngineeringConsultancyRoute,
+  SolutionsFactoryDevelopmentRoute: SolutionsFactoryDevelopmentRoute,
   SolutionsProductionLinesRoute: SolutionsProductionLinesRoute,
   SolutionsRawMaterialsRoute: SolutionsRawMaterialsRoute,
   SolutionsSandwichPanelsRoute: SolutionsSandwichPanelsRoute,
@@ -294,3 +316,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -9,6 +9,7 @@ const PATHS = [
     title: "Build a Factory",
     desc: "Complete factory development from concept to commissioning.",
     cta: "Explore Factory Development",
+    href: "/solutions/factory-development",
   },
   {
     n: "02",
@@ -16,6 +17,7 @@ const PATHS = [
     title: "Improve Production",
     desc: "Engineering optimization, modernization and technical support.",
     cta: "Engineering Consultancy",
+    href: "/solutions/engineering-consultancy",
   },
   {
     n: "03",
@@ -23,6 +25,7 @@ const PATHS = [
     title: "Source Raw Materials",
     desc: "Reliable global sourcing of premium manufacturing materials.",
     cta: "Raw Material Solutions",
+    href: "/solutions/raw-materials",
   },
   {
     n: "04",
@@ -30,6 +33,7 @@ const PATHS = [
     title: "Buy Sandwich Panels",
     desc: "High-performance sandwich panels for industrial and commercial applications.",
     cta: "Finished Panel Solutions",
+    href: "/solutions/sandwich-panels",
   },
 ];
 
@@ -51,7 +55,7 @@ export function Pathways() {
               key={p.n}
               as="a"
               // @ts-expect-error href is valid on anchor
-              href="#contact"
+              href={p.href}
               interactive
               className="flex flex-col justify-between gap-8 card-accent-line min-h-[240px]"
             >

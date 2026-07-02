@@ -16,36 +16,42 @@ const SOLUTIONS = [
     icon: Building2,
     title: "Factory Development",
     desc: "Turnkey guidance for new sandwich panel factories — feasibility, layout, procurement and commissioning.",
+    href: "/solutions/factory-development",
   },
   {
     n: "02",
     icon: ClipboardList,
     title: "Engineering Consultancy",
     desc: "Process design, layout, production optimization, modernization and commissioning support.",
+    href: "/solutions/engineering-consultancy",
   },
   {
     n: "03",
     icon: Wrench,
     title: "Production Lines",
     desc: "Continuous & discontinuous lines, roll forming, PU/PIR foaming systems and automation.",
+    href: "/solutions/production-lines",
   },
   {
     n: "04",
     icon: Layers,
     title: "Raw Materials",
     desc: "PIR / PUR systems, PPGI, GI and Aluzinc coils, rock wool, adhesives and consumables.",
+    href: "/solutions/raw-materials",
   },
   {
     n: "05",
     icon: PackageCheck,
     title: "Finished Panels",
     desc: "Supply of finished sandwich panels across selected regional markets.",
+    href: "/solutions/sandwich-panels",
   },
   {
     n: "06",
     icon: LifeBuoy,
-    title: "Technical Support",
-    desc: "Training, spare parts, factory audits, troubleshooting and long-term operational support.",
+    title: "AI Engineering Assistant",
+    desc: "Capacity calculators, panel recommendations and guided project scoping for faster decisions.",
+    href: "/ai-assistant",
   },
 ];
 
@@ -57,10 +63,10 @@ export function Solutions() {
         title="A complete industrial partner for the sandwich panel industry."
         aside={
           <a
-            href="#"
+            href="/solutions/factory-development"
             className="text-xs font-medium uppercase tracking-widest text-foreground underline decoration-border decoration-1 underline-offset-4 hover:decoration-accent"
           >
-            Explore Solutions →
+            Explore Factory Development →
           </a>
         }
       />
@@ -71,7 +77,7 @@ export function Solutions() {
             key={s.n}
             as="a"
             // @ts-expect-error href on anchor
-            href="#contact"
+            href={s.href}
             interactive
             className="card-accent-line flex flex-col gap-6 min-h-[240px]"
           >

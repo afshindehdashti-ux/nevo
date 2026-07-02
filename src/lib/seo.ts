@@ -9,16 +9,16 @@ export const SITE = {
   titleSuffix: "NEVO Industrial",
   defaultDescription:
     "Dubai-based industrial engineering. Factory development, sandwich panel production lines, PIR/PUR raw materials, engineering consultancy & finished panels for global markets.",
-  url: "", // relative until a production domain is set
+  url: "https://nevoindustrial.com",
   logo: "/favicon.ico",
   sameAs: [
     "https://www.linkedin.com/company/nevo-industrial",
     "https://www.youtube.com/@nevoindustrial",
   ],
   contact: {
-    email: "engineering@nevoindustrial.com",
-    phone: "+971-4-000-0000",
-    whatsapp: "971500000000",
+    email: "solutions@nevoindustrial.com",
+    phone: "",
+    whatsapp: "",
     address: {
       streetAddress: "Business Bay",
       addressLocality: "Dubai",
@@ -49,6 +49,9 @@ export interface SeoInput {
 
 /** Build a head() config object (meta + links) for a route. */
 export function buildSeo(input: SeoInput) {
+  const absolutePath = input.path.startsWith("http")
+    ? input.path
+    : `${SITE.url}${input.path}`;
   const fullTitle = input.title.includes(SITE.titleSuffix)
     ? input.title
     : `${input.title} — ${SITE.titleSuffix}`;
@@ -59,7 +62,7 @@ export function buildSeo(input: SeoInput) {
     { property: "og:title", content: fullTitle },
     { property: "og:description", content: input.description },
     { property: "og:type", content: input.type ?? "website" },
-    { property: "og:url", content: input.path },
+    { property: "og:url", content: absolutePath },
     { property: "og:site_name", content: SITE.name },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: fullTitle },
@@ -84,7 +87,7 @@ export function buildSeo(input: SeoInput) {
   }
 
   const links: Array<Record<string, string>> = [
-    { rel: "canonical", href: input.path },
+    { rel: "canonical", href: absolutePath },
   ];
 
   // hreflang scaffolding — active locales only (default routes serve en)
@@ -92,10 +95,10 @@ export function buildSeo(input: SeoInput) {
     links.push({
       rel: "alternate",
       hreflang: l.hreflang,
-      href: l.code === "en" ? input.path : `/${l.code}${input.path}`,
+      href: l.code === "en" ? absolutePath : `${SITE.url}/${l.code}${input.path}`,
     });
   }
-  links.push({ rel: "alternate", hreflang: "x-default", href: input.path });
+  links.push({ rel: "alternate", hreflang: "x-default", href: absolutePath });
 
   return { meta, links };
 }
@@ -107,7 +110,7 @@ export const orgJsonLd = () => ({
   "@type": "Organization",
   name: SITE.name,
   legalName: SITE.legalName,
-  url: SITE.url || "/",
+  url: SITE.url,
   logo: SITE.logo,
   sameAs: SITE.sameAs,
   contactPoint: [
@@ -115,7 +118,7 @@ export const orgJsonLd = () => ({
       "@type": "ContactPoint",
       contactType: "sales",
       email: SITE.contact.email,
-      telephone: SITE.contact.phone,
+      ...(SITE.contact.phone ? { telephone: SITE.contact.phone } : {}),
       areaServed: ["AE", "GCC", "MENA", "EU", "CIS"],
       availableLanguage: ["English", "Arabic"],
     },
@@ -130,10 +133,10 @@ export const websiteJsonLd = () => ({
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: SITE.name,
-  url: SITE.url || "/",
+  url: SITE.url,
   potentialAction: {
     "@type": "SearchAction",
-    target: "/knowledge?q={search_term_string}",
+    target: `${SITE.url}/knowledge?q={search_term_string}`,
     "query-input": "required name=search_term_string",
   },
 });

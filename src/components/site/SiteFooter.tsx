@@ -1,54 +1,71 @@
 import { Link } from "@tanstack/react-router";
 import { Mail, MessageCircle, Linkedin, MapPin, ArrowUpRight } from "lucide-react";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
+import { SITE } from "@/lib/seo";
 
 const COLUMNS = [
   {
     title: "Solutions",
     links: [
-      "Factory Development",
-      "Engineering Consultancy",
-      "Raw Materials",
-      "Production Lines",
-      "Finished Panels",
-      "Technical Support",
+      { label: "Factory Development", href: "/solutions/factory-development" },
+      { label: "Engineering Consultancy", href: "/solutions/engineering-consultancy" },
+      { label: "Raw Materials", href: "/solutions/raw-materials" },
+      { label: "Production Lines", href: "/solutions/production-lines" },
+      { label: "Finished Panels", href: "/solutions/sandwich-panels" },
+      { label: "AI Engineering Assistant", href: "/ai-assistant" },
     ],
   },
   {
     title: "Industries",
     links: [
-      "Cold Storage",
-      "Food Processing",
-      "Pharmaceutical",
-      "Clean Rooms",
-      "Warehousing",
-      "Modular Buildings",
+      { label: "Cold Storage", href: "/industries" },
+      { label: "Food Processing", href: "/industries" },
+      { label: "Pharmaceutical", href: "/industries" },
+      { label: "Clean Rooms", href: "/industries" },
+      { label: "Warehousing", href: "/industries" },
+      { label: "Modular Buildings", href: "/industries" },
     ],
   },
   {
     title: "Resources",
-    links: ["Knowledge Hub", "Technical Library", "Downloads", "Case Studies", "FAQ"],
+    links: [
+      { label: "Knowledge Hub", href: "/knowledge" },
+      { label: "Technical Library", href: "/knowledge" },
+      { label: "Downloads", href: "/knowledge" },
+      { label: "Case Studies", href: "/knowledge" },
+      { label: "Project Inquiry", href: "/project-inquiry" },
+    ],
   },
   {
     title: "Markets",
     links: [
-      "Saudi Arabia",
-      "UAE",
-      "Oman",
-      "Turkey",
-      "Iraq",
-      "Kenya",
-      "Cameroon",
-      "Russia",
+      { label: "Saudi Arabia", href: "/industries" },
+      { label: "UAE", href: "/industries" },
+      { label: "Oman", href: "/industries" },
+      { label: "Turkey", href: "/industries" },
+      { label: "Iraq", href: "/industries" },
+      { label: "Kenya", href: "/industries" },
+      { label: "Cameroon", href: "/industries" },
+      { label: "Russia", href: "/industries" },
     ],
   },
   {
     title: "Company",
-    links: ["About NEVO", "Why NEVO", "Dubai Advantage", "Global Network", "Contact"],
+    links: [
+      { label: "About NEVO", href: "/about" },
+      { label: "Why NEVO", href: "/about" },
+      { label: "Dubai Advantage", href: "/about" },
+      { label: "Global Network", href: "/industries" },
+      { label: "Contact", href: "/project-inquiry" },
+    ],
   },
 ];
 
 export function SiteFooter() {
+  const whatsappHref = SITE.contact.whatsapp
+    ? `https://wa.me/${SITE.contact.whatsapp}`
+    : "/project-inquiry";
+
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-wide section-y">
@@ -81,17 +98,17 @@ export function SiteFooter() {
                 solutions@nevoindustrial.com
               </a>
               <a
-                href="https://wa.me/9710000000000"
+                href={whatsappHref}
                 className="flex items-center gap-3 text-primary-foreground/85 hover:text-primary-foreground"
               >
                 <MessageCircle
                   className="size-4 text-primary-foreground/50"
                   strokeWidth={1.75}
                 />
-                WhatsApp Engineering Desk
+                {SITE.contact.whatsapp ? "WhatsApp Engineering Desk" : "Project Inquiry Center"}
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/company/nevo-industrial"
                 className="flex items-center gap-3 text-primary-foreground/85 hover:text-primary-foreground"
               >
                 <Linkedin
@@ -110,7 +127,7 @@ export function SiteFooter() {
             </div>
 
             <a
-              href="#contact"
+              href="/project-inquiry"
               className="mt-8 inline-flex items-center gap-1.5 rounded-md border border-primary-foreground/25 px-4 py-2.5 text-xs font-medium uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary-foreground/10"
             >
               Start Your Project
@@ -126,13 +143,13 @@ export function SiteFooter() {
                   {col.title}
                 </div>
                 <ul className="space-y-2.5">
-                  {col.links.map((l) => (
-                    <li key={l}>
+                {col.links.map((l) => (
+                    <li key={l.label}>
                       <a
-                        href="#"
+                        href={l.href}
                         className="text-sm text-primary-foreground/75 transition-colors hover:text-primary-foreground"
                       >
-                        {l}
+                        {l.label}
                       </a>
                     </li>
                   ))}

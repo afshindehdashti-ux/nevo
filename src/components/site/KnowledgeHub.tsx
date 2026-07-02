@@ -43,7 +43,7 @@ export function KnowledgeHub() {
         lede="Practical, technical, useful. Written for engineers, procurement leads and factory investors."
         aside={
           <a
-            href="#"
+            href="/knowledge"
             className="text-xs font-medium uppercase tracking-widest text-foreground underline decoration-border decoration-1 underline-offset-4 hover:decoration-accent"
           >
             Browse the library →
@@ -55,7 +55,7 @@ export function KnowledgeHub() {
         {ARTICLES.map((a) => (
           <a
             key={a.title}
-            href="#"
+            href="/knowledge"
             className="group flex min-h-[220px] flex-col justify-between gap-6 bg-background p-6 transition-colors hover:bg-surface-muted sm:p-8"
           >
             <div className="flex items-center justify-between">

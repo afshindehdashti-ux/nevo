@@ -45,7 +45,7 @@ export function FeaturedFactory() {
 
           <div className="mt-10">
             <Button asChild variant="primary" size="lg">
-              <a href="#contact">
+              <a href="/solutions/factory-development">
                 Explore Factory Development
                 <ArrowRight className="!size-4" />
               </a>
