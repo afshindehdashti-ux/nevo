@@ -111,7 +111,14 @@ export function SiteFooter() {
                   className="size-4 text-primary-foreground/50"
                   strokeWidth={1.75}
                 />
-                {SITE.contact.whatsapp ? "WhatsApp Engineering Desk" : "Project Inquiry Center"}
+                {SITE.contact.whatsapp ? `WhatsApp · ${SITE.contact.whatsappDisplay}` : "Project Inquiry Center"}
+              </a>
+              <a
+                href={SITE.contact.phoneHref}
+                className="flex items-center gap-3 text-primary-foreground/85 hover:text-primary-foreground"
+              >
+                <Phone className="size-4 text-primary-foreground/50" strokeWidth={1.75} />
+                {SITE.contact.phone}
               </a>
               <a
                 href="https://www.linkedin.com/company/nevo-industrial"
