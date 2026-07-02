@@ -77,7 +77,16 @@ const COLUMNS = [
 
 
 export function SiteFooter() {
+  const { t } = useTranslation();
   const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
+
+  const columnKeys: Record<string, string> = {
+    Solutions: "footer.solutions",
+    Industries: "footer.industries",
+    Resources: "footer.resources",
+    Markets: "footer.markets",
+    Company: "footer.company",
+  };
 
   return (
     <footer className="bg-primary text-primary-foreground">
@@ -95,8 +104,7 @@ export function SiteFooter() {
               />
             </Link>
             <p className="mt-6 max-w-sm text-sm leading-relaxed text-primary-foreground/70">
-              NEVO is a Dubai-based Industrial Engineering &amp; Supply company
-              specialized in sandwich panel solutions.
+              {t("footer.description")}
             </p>
 
             <div className="mt-8 space-y-3 text-sm">
