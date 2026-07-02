@@ -43,7 +43,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { SITE } from "@/lib/seo";
+import { SITE, WHATSAPP_URL } from "@/lib/seo";
 import nevoLogoDark from "@/assets/nevo-logo-dark.png";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
