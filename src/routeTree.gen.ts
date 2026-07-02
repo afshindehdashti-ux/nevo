@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ProjectInquiryRouteImport } from './routes/project-inquiry'
+import { Route as ProductConfiguratorRouteImport } from './routes/product-configurator'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
@@ -31,6 +32,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ProjectInquiryRoute = ProjectInquiryRouteImport.update({
   id: '/project-inquiry',
   path: '/project-inquiry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductConfiguratorRoute = ProductConfiguratorRouteImport.update({
+  id: '/product-configurator',
+  path: '/product-configurator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KnowledgeRoute = KnowledgeRouteImport.update({
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/ai-assistant': typeof AiAssistantRoute
   '/industries': typeof IndustriesRoute
   '/knowledge': typeof KnowledgeRoute
+  '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/ai-assistant': typeof AiAssistantRoute
   '/industries': typeof IndustriesRoute
   '/knowledge': typeof KnowledgeRoute
+  '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/ai-assistant': typeof AiAssistantRoute
   '/industries': typeof IndustriesRoute
   '/knowledge': typeof KnowledgeRoute
+  '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/ai-assistant'
     | '/industries'
     | '/knowledge'
+    | '/product-configurator'
     | '/project-inquiry'
     | '/sitemap.xml'
     | '/api/chat'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/ai-assistant'
     | '/industries'
     | '/knowledge'
+    | '/product-configurator'
     | '/project-inquiry'
     | '/sitemap.xml'
     | '/api/chat'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/ai-assistant'
     | '/industries'
     | '/knowledge'
+    | '/product-configurator'
     | '/project-inquiry'
     | '/sitemap.xml'
     | '/api/chat'
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   AiAssistantRoute: typeof AiAssistantRoute
   IndustriesRoute: typeof IndustriesRoute
   KnowledgeRoute: typeof KnowledgeRoute
+  ProductConfiguratorRoute: typeof ProductConfiguratorRoute
   ProjectInquiryRoute: typeof ProjectInquiryRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -216,6 +229,13 @@ declare module '@tanstack/react-router' {
       path: '/project-inquiry'
       fullPath: '/project-inquiry'
       preLoaderRoute: typeof ProjectInquiryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product-configurator': {
+      id: '/product-configurator'
+      path: '/product-configurator'
+      fullPath: '/product-configurator'
+      preLoaderRoute: typeof ProductConfiguratorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/knowledge': {
@@ -304,6 +324,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiAssistantRoute: AiAssistantRoute,
   IndustriesRoute: IndustriesRoute,
   KnowledgeRoute: KnowledgeRoute,
+  ProductConfiguratorRoute: ProductConfiguratorRoute,
   ProjectInquiryRoute: ProjectInquiryRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,
@@ -316,3 +337,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
