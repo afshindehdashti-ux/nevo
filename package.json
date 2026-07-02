@@ -15,6 +15,10 @@
     "check:i18n": "node scripts/i18n-coverage.mjs",
     "check:i18n:warn": "node scripts/i18n-coverage.mjs --warn-only",
     "check:i18n:json": "node scripts/i18n-coverage.mjs --json",
+    "check:seo": "node scripts/check-seo-metadata.mjs",
+    "check:seo:warn": "node scripts/check-seo-metadata.mjs --warn-only",
+    "check:seo:json": "node scripts/check-seo-metadata.mjs --json",
+    "check:all": "npm run check:i18n && npm run check:seo",
     "format": "prettier --write ."
   },
   "dependencies": {
