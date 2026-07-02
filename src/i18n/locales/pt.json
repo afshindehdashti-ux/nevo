@@ -1342,7 +1342,7 @@
         "required": "O campo {field} é obrigatório.",
         "minLength": "O campo {field} deve ter pelo menos {min} caracteres.",
         "invalidEmail": "Introduza um endereço de e-mail válido.",
-        "invalidPhone": "Introduza um número de telefone válido."
+        "invalidPhone": "Insira um telefone válido, ex.: {example}."
       },
       "errors": {
         "serverErrorTitle": "Falha no envio",

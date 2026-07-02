@@ -1342,7 +1342,7 @@
         "required": "حقل {field} مطلوب.",
         "minLength": "يجب ألا يقل {field} عن {min} أحرف.",
         "invalidEmail": "يرجى إدخال بريد إلكتروني صالح.",
-        "invalidPhone": "يرجى إدخال رقم هاتف صالح."
+        "invalidPhone": "يُرجى إدخال رقم هاتف صحيح، مثال: {example}."
       },
       "errors": {
         "serverErrorTitle": "تعذّر إرسال الطلب",

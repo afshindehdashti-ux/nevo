@@ -1342,7 +1342,7 @@
         "required": "{field} ist ein Pflichtfeld.",
         "minLength": "{field} muss mindestens {min} Zeichen lang sein.",
         "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
-        "invalidPhone": "Bitte geben Sie eine gültige Telefonnummer ein."
+        "invalidPhone": "Bitte geben Sie eine gültige Telefonnummer ein, z. B. {example}."
       },
       "errors": {
         "serverErrorTitle": "Übermittlung fehlgeschlagen",
