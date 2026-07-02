@@ -155,7 +155,10 @@ function lineOf(text, index) {
   return line;
 }
 
+let ignoredLinkCount = 0;
 for (const file of srcFiles) {
+  const relFile = relative(ROOT, file);
+  if (isIgnoredFile(relFile)) continue;
   const text = readFileSync(file, "utf8");
   for (const pattern of LINK_PATTERNS) {
     pattern.lastIndex = 0;
@@ -166,8 +169,8 @@ for (const file of srcFiles) {
       if (raw.startsWith("/api/")) continue;
       if (raw.match(/\.(png|jpg|jpeg|svg|webp|pdf|xml|txt|ico|json|mp4|webm)$/i))
         continue;
+      if (isIgnoredLink(raw)) { ignoredLinkCount++; continue; }
       const result = resolveLink(raw);
-      const relFile = relative(ROOT, file);
       const line = lineOf(text, m.index);
       if (!result.ok) {
         errors.push({ link: raw, file: relFile, line, kind: "dead" });
