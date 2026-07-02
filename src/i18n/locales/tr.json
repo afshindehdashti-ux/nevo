@@ -61,15 +61,416 @@
     "featuredDesc": "Fizibiliteden ilk üretime kadar uçtan uca mühendislik."
   },
   "industries": {
-    "coldStorage": "Soğuk Depo",
-    "foodProcessing": "Gıda İşleme",
-    "industrialBuildings": "Endüstriyel Yapılar",
-    "cleanRooms": "Temiz Odalar",
-    "warehousing": "Depolama",
-    "commercialBuildings": "Ticari Yapılar",
-    "modularBuildings": "Modüler Yapılar",
-    "agriculture": "Tarım",
-    "pharmaceutical": "İlaç"
+    "meta": {
+      "title": "Mühendislik Yaptığımız Endüstriler — Soğuk Depo, Temiz Odalar, Gıda, Lojistik | NEVO Industrial",
+      "description": "12+ endüstri için mühendislik odaklı sandviç panel ve fabrika çözümleri: soğuk depo, temiz odalar, gıda ve farma, endüstri, depo, ticari, tarım, modüler, veri merkezleri, perakende, spor ve ulaşım. NEVO Industrial, Dubai."
+    },
+    "hero": {
+      "eyebrow": "Endüstriler",
+      "titleA": "Mühendislik Yaptığımız",
+      "titleB": "Endüstriler.",
+      "lede": "Hizmet verdiğimiz her endüstriye özel — komple mühendislik, premium malzemeler, üretim teknolojileri ve sandviç panel çözümleri.",
+      "ctaExplore": "Endüstrileri Keşfedin",
+      "ctaTalk": "Bir Endüstri Uzmanıyla Konuşun",
+      "stats": [
+        {
+          "k": "Kalite",
+          "v": "Sertifikalı paneller"
+        },
+        {
+          "k": "Performans",
+          "v": "Mühendislik yapısı"
+        },
+        {
+          "k": "Güvenilirlik",
+          "v": "Küresel tedarik zinciri"
+        },
+        {
+          "k": "Sürdürülebilirlik",
+          "v": "Çevre dostu malzemeler"
+        }
+      ]
+    },
+    "overview": {
+      "eyebrow": "Endüstri Genel Bakışı",
+      "title": "Her endüstri kendi mühendislik brifingini gerektirir.",
+      "lede": "Soğuk depo bir fırın değildir. Farma tesisi bir hangar değildir. NEVO; kabuğu, paneli ve fabrikayı hizmet ettiği endüstrinin etrafında tasarlar — tersinden değil.",
+      "items": [
+        {
+          "t": "Farklı yalıtım",
+          "d": "Termal, akustik ve buhar gereksinimleri endüstriye göre değişir."
+        },
+        {
+          "t": "Farklı yangın sınıfları",
+          "d": "Endüstriyel B-s2,d0'den veri merkezleri ve hangarlar için A2-s1,d0'e."
+        },
+        {
+          "t": "Farklı hijyen",
+          "d": "Gıda, farma ve hastane kabukları sertifikalı temizlenebilirlik gerektirir."
+        },
+        {
+          "t": "Farklı üretim",
+          "d": "Her endüstri kendi bina fiziği ve yerleşimini gerektirir."
+        },
+        {
+          "t": "Farklı düzenlemeler",
+          "d": "Sivil savunma, HACCP, GMP, ISO ve yerel kodlar pazara göre değişir."
+        }
+      ]
+    },
+    "grid": {
+      "eyebrow": "Endüstriler",
+      "title": "On iki endüstri. Tek bir mühendislik disiplini.",
+      "typicalLabel": "Tipik uygulamalar",
+      "panelLabel": "Önerilen panel",
+      "discuss": "Bu endüstriyi görüşün",
+      "items": [
+        {
+          "t": "Soğuk Depo Tesisleri",
+          "d": "Lojistik merkezleri, dağıtım merkezleri ve −40 °C dondurucu depolar için hava sızdırmaz düşük sıcaklık kabukları.",
+          "apps": [
+            "Dondurulmuş dağıtım",
+            "Soğuk lojistik",
+            "Şok dondurucular"
+          ],
+          "panel": "PIR — 100–200 mm, cam-lock joints"
+        },
+        {
+          "t": "Temiz Odalar ve Farma Tesisleri",
+          "d": "Hijyenik düz yüzeyli paneller ve kontrollü hava sızdırmazlık ile ISO sınıflandırılmış ortamlar.",
+          "apps": [
+            "Farmasötik tesisler",
+            "Yarı iletken fabrikaları",
+            "Hastane ameliyathanesi"
+          ],
+          "panel": "Clean Room Panel — flush face, PIR/Rock Wool core"
+        },
+        {
+          "t": "Gıda İşleme Tesisleri",
+          "d": "Gıda sınıfı kaplamalar ve sızdırmaz sıhhi derzler ile HACCP uyumlu hijyenik kabuklar.",
+          "apps": [
+            "Et ve kümes",
+            "Süt ürünleri",
+            "Fırın",
+            "İçecek"
+          ],
+          "panel": "PIR / Rock Wool — HDP food-grade facing"
+        },
+        {
+          "t": "Endüstriyel Binalar",
+          "d": "Mühendislik yapısı yangın ve yapısal performansa sahip üretim salonları, atölyeler ve ağır sanayi kabukları.",
+          "apps": [
+            "Üretim",
+            "Ağır sanayi",
+            "Montaj tesisleri"
+          ],
+          "panel": "PIR / Rock Wool — 80–150 mm structural"
+        },
+        {
+          "t": "Depolar ve Lojistik Merkezleri",
+          "d": "Dağıtım, e-ticaret ve kargo merkezleri için geniş açıklıklı kabuklar — hızlı montaj, düşük yaşam döngüsü maliyeti.",
+          "apps": [
+            "Dağıtım",
+            "E-ticaret sipariş karşılama",
+            "Kargo terminalleri"
+          ],
+          "panel": "PIR wall + PIR/Rock Wool roof"
+        },
+        {
+          "t": "Ticari Binalar",
+          "d": "Mimari tasarım ile mühendislik performansını birleştiren showroomlar, perakende ve ofis cepheleri.",
+          "apps": [
+            "Showroomlar",
+            "Ofisler",
+            "Perakende"
+          ],
+          "panel": "Hidden-fix PIR facade + insulated glass"
+        },
+        {
+          "t": "Tarımsal Binalar",
+          "d": "Nem, amonyak ve uzun açıklıklar için tasarlanmış çiftlik hayvanı, depolama ve agro-endüstriyel kabuklar.",
+          "apps": [
+            "Çiftlik hayvanı",
+            "Tahıl depolama",
+            "Tarımsal işleme"
+          ],
+          "panel": "PIR — corrosion-resistant PVDF facing"
+        },
+        {
+          "t": "Modüler Binalar",
+          "d": "Ofisler, kamplar ve şantiye konaklaması için önceden üretilmiş modüler sistemler — fabrikada üretilir, sahada montaj yapılır.",
+          "apps": [
+            "Şantiye ofisleri",
+            "İşçi konaklaması",
+            "Prefabrik klinikler"
+          ],
+          "panel": "PIR — 50–80 mm lightweight"
+        },
+        {
+          "t": "Veri Merkezleri",
+          "d": "EMI korumalı yüzeyler ve sıkı yangın bölümlendirmesi ile yanmaz kabuklar.",
+          "apps": [
+            "Hyperscale salonlar",
+            "Edge veri merkezleri",
+            "Modüler kapsüller"
+          ],
+          "panel": "Rock Wool — 120–150 mm A2 fire class"
+        },
+        {
+          "t": "Perakende ve Süpermarketler",
+          "d": "Termal konfor, hızlı yapım ve entegre soğuk depo arka mekanlarını birleştiren perakende kabukları.",
+          "apps": [
+            "Süpermarketler",
+            "Büyük perakende",
+            "Yapı marketler"
+          ],
+          "panel": "PIR facade + integrated cold rooms"
+        },
+        {
+          "t": "Spor ve Rekreasyon Tesisleri",
+          "d": "Mühendislik yapısı akustik ve termal kabuklara sahip uzun açıklıklı spor salonları, arenalar ve buz pistleri.",
+          "apps": [
+            "Spor salonları",
+            "Buz pistleri",
+            "Kapalı arenalar"
+          ],
+          "panel": "Rock Wool — acoustic Rw 32+ dB"
+        },
+        {
+          "t": "Havalimanı ve Ulaşım Tesisleri",
+          "d": "Yangın, güvenlik ve uzun açıklıklı çatı yapıları için tasarlanmış terminaller, hangarlar ve MRO tesisleri.",
+          "apps": [
+            "Terminaller",
+            "Hangarlar",
+            "MRO tesisleri"
+          ],
+          "panel": "Rock Wool + PIR — certified fire/thermal"
+        }
+      ]
+    },
+    "applications": {
+      "eyebrow": "Uygulama Örnekleri",
+      "title": "Mühendisliğimizin üretimde ortaya çıktığı yer.",
+      "lede": "Aşağıdaki her uygulamanın kendi bina fiziği vardır — farklı buhar, sıcaklık, hijyen ve yangın brifingi. Her birini işletir kılan mühendisliktir.",
+      "items": [
+        {
+          "t": "Soğutmalı Depolar",
+          "n": "PIR paneller ve buhar sızdırmaz derzlerle sürekli soğuk zincir."
+        },
+        {
+          "t": "Dondurucu Odalar",
+          "n": "−25 ila −40 °C kabuklar, kam-kilit derzler ve ısıtmalı kapı çerçeveleri."
+        },
+        {
+          "t": "Et ve Kümes Hayvanı İşleme",
+          "n": "Gıda sınıfı kaplamalar, sızdırmaz sıhhi derzler, yıkamaya dayanıklı yüzeyler."
+        },
+        {
+          "t": "Süt ve İçecek Tesisleri",
+          "n": "CIP, nem ve termal şok için tasarlanmış hijyenik kabuklar."
+        },
+        {
+          "t": "Fırın ve Gıda Üretimi",
+          "n": "Fırınların yakınında yangın sınıflı paneller, süreç hatlarında hijyenik paneller."
+        },
+        {
+          "t": "Farmasötik Üretim",
+          "n": "Düz yüzeyli paneller ve kontrollü sızıntıya sahip ISO 5–8 temiz odalar."
+        }
+      ]
+    },
+    "panels": {
+      "eyebrow": "Panel Çözümleri",
+      "title": "Doğru endüstri için doğru panel.",
+      "lede": "Beş mühendislik panel ailesi NEVO'nun hizmet verdiği her endüstriyi kapsar — yangın, termal, hijyen ve yapısal brifinglere uygun.",
+      "all": "Tüm panel sistemleri",
+      "items": [
+        {
+          "t": "PIR Duvar Paneli",
+          "w": "Endüstri, soğuk depo, gıda, lojistik."
+        },
+        {
+          "t": "PIR Çatı Paneli",
+          "w": "Uzun açıklıklı çatılar — lojistik, endüstri, ticari."
+        },
+        {
+          "t": "Taş Yünü Duvar Paneli",
+          "w": "Yangın kritik kabuklar — veri merkezleri, ulaşım, endüstri."
+        },
+        {
+          "t": "Taş Yünü Çatı Paneli",
+          "w": "Akustik ve yangın kritik çatı kaplama."
+        },
+        {
+          "t": "Temiz Oda Paneli",
+          "w": "Farma, hastane, yarı iletken, gıda proses odaları."
+        }
+      ]
+    },
+    "engineering": {
+      "eyebrow": "Mühendislik Çözümleri",
+      "title": "NEVO her endüstriyi nasıl destekler.",
+      "consultancy": "Mühendislik Danışmanlığı",
+      "items": [
+        {
+          "t": "Fizibilite Çalışması ve Konsept Tasarım",
+          "d": "Endüstri ihtiyaçlarınıza özel çözümler."
+        },
+        {
+          "t": "Fabrika Planlama ve Yerleşim",
+          "d": "Maksimum verim için optimize yerleşimler."
+        },
+        {
+          "t": "Malzeme Seçimi ve Mühendislik",
+          "d": "Uzun vadeli performans için doğru malzemeler."
+        },
+        {
+          "t": "Üretim Hattı Entegrasyonu",
+          "d": "Üretim sistemleriyle sorunsuz entegrasyon."
+        },
+        {
+          "t": "Otomasyon ve Akıllı Kontrol",
+          "d": "Daha yüksek üretkenlik için gelişmiş otomasyon."
+        },
+        {
+          "t": "Devreye Alma ve Satış Sonrası",
+          "d": "Tüm yaşam döngüsü boyunca eksiksiz destek."
+        },
+        {
+          "t": "Uzun Vadeli Teknik Destek",
+          "d": "Teslim sonrası mühendislik ortaklığı."
+        }
+      ]
+    },
+    "whyChoose": {
+      "eyebrow": "Neden NEVO",
+      "title": "Mühendislik odaklı. Endüstriye özel. Küresel.",
+      "lede": "NEVO; endüstri mühendisliğini, premium malzemeleri ve disiplinli proje teslimini birleştirir — fizibiliteden uzun vadeli desteğe kadar sorumlu tek bir ortak.",
+      "items": [
+        "Endüstriye özel mühendislik uzmanlığı",
+        "Optimize teknik çözümler",
+        "Premium malzemeler ve küresel tedarik",
+        "Uçtan uca proje yönetimi",
+        "Küresel standartlar ve sertifikalar",
+        "Her partide kalite güvencesi",
+        "Teknik danışmanlık dahil",
+        "Uzun vadeli ortaklık yaklaşımı"
+      ]
+    },
+    "caseStudies": {
+      "eyebrow": "Vaka Çalışmaları",
+      "title": "Endüstriler genelinde mühendislik projeleri.",
+      "note": "Proje fotoğrafları ve tam vaka çalışmaları yakında Bilgi Merkezi'nde.",
+      "items": [
+        {
+          "t": "Soğuk Depo — 25,000 m²",
+          "l": "KİK",
+          "i": "Soğuk Depo"
+        },
+        {
+          "t": "Et İşleme Tesisi",
+          "l": "Doğu Afrika",
+          "i": "Gıda İşleme"
+        },
+        {
+          "t": "E-ticaret Deposu",
+          "l": "Levant",
+          "i": "Depo"
+        },
+        {
+          "t": "Otomotiv Montaj",
+          "l": "Kuzey Afrika",
+          "i": "Endüstri Tesisi"
+        },
+        {
+          "t": "Kurumsal Merkez Cephesi",
+          "l": "BAE",
+          "i": "Ticari"
+        },
+        {
+          "t": "Farma Temiz Oda Süiti",
+          "l": "Güney Asya",
+          "i": "Temiz Oda"
+        }
+      ]
+    },
+    "downloads": {
+      "eyebrow": "İndirilebilir Belgeler",
+      "title": "Endüstriye özel teknik kılavuzlar.",
+      "request": "İndirme talep et",
+      "items": [
+        {
+          "t": "Endüstri Yetkinlik Broşürü",
+          "d": "NEVO'nun endüstri bazında tam mühendislik yetenekleri."
+        },
+        {
+          "t": "Soğuk Depo Tasarım Kılavuzu",
+          "d": "Panel seçimi, kalınlık, derzler ve buhar kontrolü."
+        },
+        {
+          "t": "Temiz Oda Kılavuzu",
+          "d": "ISO sınıfı seçimi, panel sistemleri ve hava sızdırmazlık."
+        },
+        {
+          "t": "Gıda İşleme Kılavuzu",
+          "d": "HACCP uyumlu kabuklar ve hijyenik detaylandırma."
+        },
+        {
+          "t": "Depo ve Lojistik Kılavuzu",
+          "d": "Uzun açıklıklı çatılar, duvar sistemleri ve yaşam döngüsü ekonomisi."
+        },
+        {
+          "t": "Panel Seçim Kılavuzu",
+          "d": "Endüstriye göre PIR, Taş Yünü veya Temiz Oda paneli seçimi."
+        }
+      ]
+    },
+    "faq": {
+      "eyebrow": "SSS",
+      "title": "Endüstriye özel mühendislik yanıtları.",
+      "links": {
+        "production": "Üretim Hatları",
+        "consultancy": "Mühendislik Danışmanlığı",
+        "materials": "Hammaddeler",
+        "panels": "Bitmiş Sandviç Paneller",
+        "factory": "Fabrika Geliştirme",
+        "hub": "Bilgi Merkezi"
+      }
+    },
+    "consultation": {
+      "eyebrow": "Endüstri Danışmanlığı",
+      "title": "Bir endüstri uzmanıyla konuşun.",
+      "lede": "Proje brifinginizi paylaşın, bir NEVO endüstri mühendisi bir iş günü içinde mühendislik yapılmış teknik bir teklifle yanıt verecektir.",
+      "bullets": [
+        "Endüstriye özel mühendislik tavsiyesi",
+        "Sürdürülebilir malzeme önerileri",
+        "Küresel teslimat — seçili pazarlarda DDP"
+      ],
+      "company": "Şirket",
+      "industry": "Endüstri",
+      "industryPh": "Soğuk depo / Farma / …",
+      "country": "Ülke",
+      "projectType": "Proje Türü",
+      "projectTypePh": "Yeni yapı / Genişleme",
+      "size": "Bina Büyüklüğü (m²)",
+      "sizePh": "örn. 8,000",
+      "panel": "Panel Türü",
+      "panelPh": "PIR / Taş Yünü / Temiz Oda",
+      "fire": "Yangın Sınıfı Gerekliliği",
+      "firePh": "EI 30 / 60 / 120",
+      "timeline": "Zaman Çizelgesi",
+      "timelinePh": "3. Çeyrek 2026",
+      "message": "Mesaj",
+      "submit": "Talebi Gönder",
+      "successMsg": "Teşekkürler. Bir NEVO endüstri uzmanı bir iş günü içinde yanıt verecektir."
+    },
+    "cta": {
+      "eyebrow": "Mühendisleştirmeye Hazır",
+      "title": "Her endüstri, mühendislik yapılmış bir çözümü hak eder.",
+      "lede": "Soğuk depo, gıda fabrikası, farmasötik tesis veya endüstri tesisi inşa ediyor olun; NEVO, uzun vadeli performans için tasarlanmış mühendislik odaklı çözümler sunar.",
+      "primary": "Mühendislik Danışmanlığı Randevusu Alın",
+      "secondary": "Teknik Teklif Talep Edin"
+    }
   },
   "knowledge": {
     "articles": "Mühendislik Makaleleri",
@@ -523,6 +924,419 @@
       "pBefore": "NEVO Industrial — Dubai, Birleşik Arap Emirlikleri. ",
       "link": "İletişime geçin",
       "pAfter": " — bu politika hakkındaki sorularınız için."
+    }
+  },
+  "about": {
+    "meta": {
+      "title": "NEVO Industrial Hakkında — Sandviç Panel Üretiminin Geleceğini Mühendisleştiriyoruz | Dubai",
+      "description": "NEVO Industrial, Dubai merkezli bir mühendislik ve endüstriyel çözüm şirketidir. Mühendisliği, fabrika geliştirmeyi, üretim teknolojilerini, hammadde tedarikini ve sandviç panel arzını tek bir eksiksiz endüstriyel iş ortağında birleştiriyoruz."
+    },
+    "hero": {
+      "eyebrow": "NEVO Industrial Hakkında",
+      "titleA": "Geleceği Mühendisleştiriyoruz.",
+      "titleB": "Endüstriyel Mükemmelliği İnşa Ediyoruz.",
+      "lede": "NEVO Industrial; sandviç panel fabrikaları, üretim teknolojileri, hammaddeler ve komple endüstriyel proje geliştirme konusunda uzmanlaşmış Dubai merkezli bir mühendislik ve endüstriyel çözümler şirketidir.",
+      "ctaProject": "Projenizi Başlatın",
+      "ctaTeam": "Mühendislik Ekibimizle Tanışın",
+      "stats": {
+        "hqK": "Dubai",
+        "hqV": "Küresel Merkez",
+        "ctK": "8+",
+        "ctV": "Hizmet verilen ülke",
+        "prK": "40+",
+        "prV": "Mühendislik projesi",
+        "pnK": "1",
+        "pnV": "Entegre iş ortağı"
+      }
+    },
+    "story": {
+      "eyebrow": "Hikayemiz",
+      "title": "Tasarım ile endüstri arasındaki boşluğu kapatmak için kurulmuş bir mühendislik şirketi.",
+      "p1": "NEVO Industrial, basit bir gözlem üzerine kuruldu: sandviç panel endüstrisine makine tedarikçileri, kimya tüccarları ve panel üreticileri hizmet verir — ancak nadiren üçünü de anlayan mühendisler tarafından.",
+      "p2": "Yatırımcılar, her biri kendi kapsamını optimize eden birbirinden kopuk tedarikçilerden bir fabrika oluşturmak zorunda kalıyordu. Sonuç: uzun devreye alma döngüleri, tutarsız kalite ve etiket kapasitesine hiç ulaşamayan fabrikalar.",
+      "p3": "NEVO, mühendisliği, endüstriyel tedariği ve proje uygulamasını tek bir marka altında birleştirmek için kuruldu. Fizibiliteden devreye almaya — ve çok sonrasına — kadar sonucun sorumluluğunu tek bir mühendislik odaklı iş ortağı üstlenir.",
+      "p4": "Dubai merkezli olup sekiz ülkede faaliyet gösteriyoruz; soğuk zincir, gıda, farma, lojistik ve ağır sanayi için yeni nesil üretim kapasitesi kuran hırslı sanayicilerle çalışıyoruz."
+    },
+    "mission": {
+      "eyebrow": "Misyonumuz",
+      "title": "Her projeyi şekillendiren altı taahhüt.",
+      "lede": "Bir misyon ifadesi değil — bir misyon mimarisi.",
+      "items": [
+        {
+          "t": "Mühendislik Mükemmelliği",
+          "b": "Her proje titiz mühendislikle başlar — asla bir katalogla değil."
+        },
+        {
+          "t": "Endüstriyel Yenilik",
+          "b": "Kanıtlanmış teknolojileri daha hızlı benimser ve geleneksel tedarikçilerden daha derinlemesine entegre ederiz."
+        },
+        {
+          "t": "Küresel Ortaklıklar",
+          "b": "Dünyanın en iyi makine, kimya ve çelik ortaklarından oluşan seçkin bir ağ."
+        },
+        {
+          "t": "Uzun Vadeli Değer",
+          "b": "20 yıllık performans için tasarlandı — en düşük teklif ya da en kısa teslim süresi için değil."
+        },
+        {
+          "t": "Müşteri Başarısı",
+          "b": "Kendi ölçütlerimizle değil, müşterilerimizin tesis çalışma süresi, kalite verimi ve marjıyla ölçülürüz."
+        },
+        {
+          "t": "Sürdürülebilir Büyüme",
+          "b": "Enerji verimli üretim, sorumlu tedarik ve her tasarımda yaşam döngüsü düşüncesi."
+        }
+      ]
+    },
+    "vision": {
+      "eyebrow": "Vizyonumuz",
+      "titleA": "Dünyanın en güvenilir",
+      "titleB": "mühendislik ortağını inşa etmek.",
+      "p1": "Küresel sandviç panel endüstrisi için referans mühendislik ortağı olmak — derin teknik uzmanlığı, seçilmiş teknolojiyi ve premium tedarikçi ağını tek bir entegre teklifte birleştirmek.",
+      "p2": "Vizyonumuzu sevk edilen birimlerle değil, devreye alınan fabrikalar, eğitilen mühendisler ve kurulan uzun vadeli ortaklıklarla ölçeriz.",
+      "labels": [
+        "Mühendislik",
+        "Teknoloji",
+        "Küresel Üretim",
+        "Yenilik",
+        "Bilgi",
+        "Endüstriyel Büyüme"
+      ]
+    },
+    "whatWeDo": {
+      "eyebrow": "Ne Yapıyoruz",
+      "title": "Sekiz disiplin. Tek bir entegre mühendislik ortağı.",
+      "lede": "Aşağıdaki her hizmet uçtan uca NEVO'ya aittir — asla taşerona verilmez, mühendislik olmadan yeniden satılmaz.",
+      "items": [
+        {
+          "t": "Fabrika Geliştirme",
+          "b": "Yeşil alan ve mevcut sandviç panel tesisleri — fizibiliteden devreye almaya."
+        },
+        {
+          "t": "Mühendislik Danışmanlığı",
+          "b": "Süreç, yerleşim, altyapı, otomasyon ve kalite mühendisliği."
+        },
+        {
+          "t": "Üretim Hatları",
+          "b": "Sürekli çift bantlı hatlar, rulo şekillendiriciler, uçan testereler, istifleyiciler."
+        },
+        {
+          "t": "Hammaddeler",
+          "b": "PPGI, GI, Aluzinc, PIR kimyası (poliol/MDI), Taş Yünü."
+        },
+        {
+          "t": "Bitmiş Sandviç Paneller",
+          "b": "PIR, Taş Yünü, çatı, duvar ve soğuk oda sistemleri."
+        },
+        {
+          "t": "Teknik Destek",
+          "b": "Devreye alma, eğitim, yedek parça, süreç optimizasyonu."
+        },
+        {
+          "t": "Otomasyon",
+          "b": "PLC, HMI, SCADA, MES entegrasyonu ve Endüstri 4.0 modülleri."
+        },
+        {
+          "t": "Proje Yönetimi",
+          "b": "Sipariş emrinden üretim rampasına kadar tek sorumluluk noktası."
+        }
+      ]
+    },
+    "approach": {
+      "eyebrow": "Yaklaşımımız",
+      "title": "Dokuz mühendislik adımı, tek sürekli bir ortaklık.",
+      "steps": [
+        "Anlama",
+        "Mühendislik",
+        "Tasarım",
+        "Tedarik",
+        "İnşa",
+        "Kurulum",
+        "Devreye Alma",
+        "Destek",
+        "Optimizasyon"
+      ]
+    },
+    "why": {
+      "eyebrow": "Neden NEVO",
+      "title": "Sanayicilerin bizi seçmesinin sekiz nedeni.",
+      "items": [
+        {
+          "t": "Ürünlerden Önce Mühendislik",
+          "b": "Ekipmanı fiyatlamadan önce problemi çözeriz."
+        },
+        {
+          "t": "Teknoloji Bağımsız",
+          "b": "Satmakla yükümlü olduğumuzu değil, uygun olanı belirleriz."
+        },
+        {
+          "t": "Küresel Tedarikçi Ağı",
+          "b": "Coğrafyadan bağımsız olarak en iyi makine, kimya ve çelik."
+        },
+        {
+          "t": "Premium Kalite",
+          "b": "Yalnızca doğrulanmış test verileri ve izlenebilirlik sağlayan onaylı tedarikçiler."
+        },
+        {
+          "t": "Teknik Uzmanlık",
+          "b": "Mühendisler, kimyagerler, süreç uzmanları ve kurulum liderleri."
+        },
+        {
+          "t": "Uzun Vadeli Ortaklık",
+          "b": "Devreye almadan uzun süre sonra da süren destek."
+        },
+        {
+          "t": "Dünya Çapında Destek",
+          "b": "Uzaktan tanı, sahada müdahale, yedek parça lojistiği."
+        },
+        {
+          "t": "Dubai Merkez",
+          "b": "Küresel erişim için Avrupa, Asya ve Afrika arasında konumlanmış."
+        }
+      ]
+    },
+    "presence": {
+      "eyebrow": "Küresel Varlık",
+      "titleA": "Merkezi Dubai'de.",
+      "titleB": "Tasarım gereği küresel.",
+      "lede": "NEVO; Orta Doğu, Afrika, BDT ve ötesinde mühendislik, malzeme ve üretim teknolojileri sunar — her projeyi takip eden seçkin bir ortak ağıyla.",
+      "serving": "8+ ülkede hizmet",
+      "countries": [
+        {
+          "n": "Birleşik Arap Emirlikleri",
+          "g": "MERKEZ"
+        },
+        {
+          "n": "Suudi Arabistan",
+          "g": "AKTİF"
+        },
+        {
+          "n": "Umman",
+          "g": "AKTİF"
+        },
+        {
+          "n": "Türkiye",
+          "g": "ORTAK"
+        },
+        {
+          "n": "Irak",
+          "g": "AKTİF"
+        },
+        {
+          "n": "Rusya",
+          "g": "ORTAK"
+        },
+        {
+          "n": "Kenya",
+          "g": "AKTİF"
+        },
+        {
+          "n": "Kamerun",
+          "g": "AKTİF"
+        },
+        {
+          "n": "Gelecek Küresel Genişleme",
+          "g": "SIRADAKİ"
+        }
+      ]
+    },
+    "values": {
+      "eyebrow": "Değerlerimiz",
+      "title": "İşe alım, mühendislik ve ortaklık ilkelerimiz.",
+      "items": [
+        "Dürüstlük",
+        "Mühendislik Hassasiyeti",
+        "Yenilik",
+        "Kalite",
+        "Güvenilirlik",
+        "Sürekli İyileştirme",
+        "Müşteri Ortaklığı",
+        "Sürdürülebilirlik"
+      ]
+    },
+    "difference": {
+      "eyebrow": "Farkımız",
+      "title": "NEVO nedir — ve NEVO ne değildir.",
+      "notLabel": "NEVO DEĞİLDİR",
+      "notItems": [
+        "Yalnızca bir makine tedarikçisi.",
+        "Yalnızca bir hammadde tüccarı.",
+        "Yalnızca bir sandviç panel tedarikçisi."
+      ],
+      "isLabel": "NEVO ŞUDUR",
+      "isText": "Mühendislik, teknoloji, endüstriyel tedarik ve proje uygulamayı tek bir tam çözümde birleştiren, mühendislik odaklı bir endüstriyel ortak — bir sandviç panel fabrikasının tüm yaşam döngüsü için."
+    },
+    "process": {
+      "eyebrow": "Sürecimiz",
+      "title": "İlk görüşmeden uzun vadeli optimizasyona.",
+      "stepLabel": "Adım",
+      "items": [
+        {
+          "t": "Keşif",
+          "b": "Gereksinimler, saha, kapasite, pazar — mühendislik terimleriyle haritalandı."
+        },
+        {
+          "t": "Mühendislik",
+          "b": "Süreç tasarımı, kütle dengesi, altyapı boyutlandırma, yerleşim, DFMEA."
+        },
+        {
+          "t": "Planlama",
+          "b": "CAPEX modeli, program, tedarik planı, risk kaydı."
+        },
+        {
+          "t": "Tedarik",
+          "b": "Onaylı makine, kimya, çelik ve yardımcı tedarikçiler."
+        },
+        {
+          "t": "Uygulama",
+          "b": "Üretim denetimi, FAT'ler, lojistik, saha koordinasyonu."
+        },
+        {
+          "t": "Devreye Alma",
+          "b": "Kurulum, soğuk ve sıcak devreye alma, performans testleri."
+        },
+        {
+          "t": "Optimizasyon",
+          "b": "Verim, enerji, çevrim süresi ve kalite iyileştirme programları."
+        },
+        {
+          "t": "Uzun Vadeli Destek",
+          "b": "Yedek parça, eğitim, uzaktan tanı, yükseltmeler."
+        }
+      ]
+    },
+    "commitment": {
+      "eyebrow": "Taahhüdümüz",
+      "title": "Her NEVO ortaklığının arkasındaki söz.",
+      "lede": "NEVO ile bir ilişki, tek bir satın alma emrinin süresi için değil, fabrikanızın tüm yaşam döngüsü için tasarlanmıştır.",
+      "items": [
+        "Şeffaf iletişim.",
+        "Mühendislik odaklı düşünce.",
+        "Premium kalite.",
+        "Uzun vadeli ortaklık.",
+        "Teknik destek.",
+        "Sürekli iyileştirme."
+      ]
+    },
+    "cta": {
+      "eyebrow": "İnşa Edelim",
+      "titleA": "Birlikte olağanüstü bir şey",
+      "titleB": "inşa edelim.",
+      "lede": "Fabrika hedefinizi, soğuk zincir projenizi ya da panel programınızı, yalnızca ekipmanı değil sonucu da mühendisleştiren bir ekibe getirin.",
+      "primary": "Bir Mühendisle Konuşun",
+      "secondary": "Danışmanlık Talep Edin"
+    }
+  },
+  "contact": {
+    "meta": {
+      "title": "Küresel Ofisler ve İletişim — NEVO Industrial | Dubai · Almanya · Türkiye · Umman",
+      "description": "NEVO Industrial mühendislik ekiplerine dünya çapında ulaşın. Dubai merkez, Almanya, Türkiye ve Umman ofisleri. Mühendislik yardım hattı, uluslararası satış, proje departmanı, WhatsApp ve randevulu toplantılar."
+    },
+    "hero": {
+      "eyebrow": "Küresel Varlık",
+      "titleA": "Küresel Mühendislik.",
+      "titleB": "Yerel Varlık.",
+      "lede": "Dubai merkezimizden Avrupa mühendislik merkezlerine ve KİK proje ofislerine kadar NEVO, projenizin bulunduğu her yerde kıdemli uzmanlıkla endüstriyel mühendislik sunar.",
+      "ctaOffices": "Ofisleri Keşfedin",
+      "ctaCallback": "Geri Arama Talep Edin",
+      "statOffices": "Ofisler",
+      "statCountries": "Hizmet Verilen Ülke",
+      "statEngineers": "Kadrolu Mühendis"
+    },
+    "offices": {
+      "eyebrow": "Etkileşimli Harita",
+      "title": "NEVO'nun faaliyet gösterdiği yerler",
+      "lede": "İletişim bilgileri ve yerel mühendislik kapasitesi için herhangi bir ofisi tıklayın.",
+      "list": [
+        {
+          "city": "Dubai",
+          "country": "Birleşik Arap Emirlikleri",
+          "role": "Global Headquarters",
+          "address": "Business Bay, Dubai, UAE",
+          "hours": "Sun–Thu · 08:30–18:00 GST"
+        },
+        {
+          "city": "Düsseldorf",
+          "country": "Germany",
+          "role": "European Engineering Hub",
+          "address": "Königsallee, Düsseldorf",
+          "hours": "Mon–Fri · 09:00–18:00 CET"
+        },
+        {
+          "city": "Istanbul",
+          "country": "Türkiye",
+          "role": "Manufacturing & Sourcing",
+          "address": "Levent, Istanbul",
+          "hours": "Mon–Fri · 09:00–18:00 TRT"
+        },
+        {
+          "city": "Muscat",
+          "country": "Sultanate of Oman",
+          "role": "GCC Projects Office",
+          "address": "Al Khuwair, Muscat",
+          "hours": "Sun–Thu · 08:30–17:30 GST"
+        },
+        {
+          "city": "Riyadh · Cairo · Nairobi",
+          "country": "Opening 2026",
+          "role": "Future Offices",
+          "address": "Under establishment",
+          "hours": "Announced Q2 2026"
+        }
+      ]
+    },
+    "cards": {
+      "eyebrow": "Doğrudan Kanallar",
+      "title": "Doğru ekiple hızlıca konuşun",
+      "lede": "Her talep bir iş günü içinde kıdemli bir mühendise veya müşteri direktörüne yönlendirilir.",
+      "items": [
+        {
+          "t": "Mühendislik Yardım Hattı",
+          "d": "Aktif proje sahaları için 7/24 nöbetçi kıdemli mühendis."
+        },
+        {
+          "t": "Uluslararası Satış",
+          "d": "Panel arzı, fabrika ekipmanı ve ihracat talepleri."
+        },
+        {
+          "t": "Mühendislik Desteği",
+          "d": "Teknik çizimler, U-değeri ve yangın uyumluluğu desteği."
+        },
+        {
+          "t": "Proje Departmanı",
+          "d": "Anahtar teslim fabrikalar, EPC ve danışmanlık programları."
+        },
+        {
+          "t": "WhatsApp",
+          "d": "KİK mühendislik masamızdan hızlı yanıt."
+        },
+        {
+          "t": "Çevrimiçi Toplantı Rezervasyonu",
+          "d": "Kıdemli mühendisle 30 dakikalık görüntülü danışmanlık.",
+          "v": "Randevu ayırtın"
+        }
+      ]
+    },
+    "callback": {
+      "mapTitle": "NEVO Dubai Merkez",
+      "eyebrow": "Geri Arama Talep",
+      "title": "Bir kıdemli mühendisle konuşun",
+      "lede": "Birkaç ayrıntı paylaşın, bir iş günü içinde arayacağız.",
+      "name": "Ad Soyad",
+      "company": "Şirket",
+      "email": "E-posta",
+      "phone": "Telefon / WhatsApp",
+      "interestPlaceholder": "İlgi alanı seçin…",
+      "interest1": "Fabrika Geliştirme",
+      "interest2": "Sandviç Paneller",
+      "interest3": "Üretim Hatları",
+      "interest4": "Mühendislik Danışmanlığı",
+      "message": "Proje özeti (kapasite, konum, zaman çizelgesi)",
+      "submit": "Geri Arama Talep",
+      "sending": "Gönderiliyor…",
+      "successTitle": "Geri arama talep edildi",
+      "successDesc": "Bir kıdemli mühendis bir iş günü içinde sizi arayacaktır.",
+      "whatsapp": "WhatsApp'ta Sohbet"
     }
   }
 }
