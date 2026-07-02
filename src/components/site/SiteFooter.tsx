@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Mail, MessageCircle, Linkedin, MapPin, ArrowUpRight } from "lucide-react";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
+import { SITE } from "@/lib/seo";
 
 const COLUMNS = [
   {
@@ -61,6 +62,10 @@ const COLUMNS = [
 ];
 
 export function SiteFooter() {
+  const whatsappHref = SITE.contact.whatsapp
+    ? `https://wa.me/${SITE.contact.whatsapp}`
+    : "/project-inquiry";
+
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-wide section-y">
@@ -93,7 +98,7 @@ export function SiteFooter() {
                 solutions@nevoindustrial.com
               </a>
               <a
-                href="https://wa.me/9710000000000"
+                href={whatsappHref}
                 className="flex items-center gap-3 text-primary-foreground/85 hover:text-primary-foreground"
               >
                 <MessageCircle
