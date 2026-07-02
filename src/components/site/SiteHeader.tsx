@@ -891,7 +891,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
           </div>
           <ul className="mt-3 grid gap-2">
             {[
-              { label: "PIR vs PUR: choosing the right core", href: "/knowledge" },
+              { label: "PIR vs Rock Wool: choosing the right core", href: "/pir-vs-rock-wool" },
               { label: "CAPEX guide for a 50k m² factory", href: "/solutions/factory-development" },
               { label: "Continuous line commissioning checklist", href: "/solutions/production-lines" },
             ].map(
