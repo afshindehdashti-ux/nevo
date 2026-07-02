@@ -1,8 +1,9 @@
 import { toast } from "sonner";
+import { isValidPhone, getPhoneExample } from "./phone-validation";
 
 const STORAGE_KEY = "nevo:leads";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const PHONE_RE = /^[+()\d\s-]{7,}$/;
+
 
 export type LeadPayload = Record<string, FormDataEntryValue | string>;
 
