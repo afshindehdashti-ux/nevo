@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { SITE } from "@/lib/seo";
+import { ARTICLES } from "@/lib/knowledge-articles";
 
 const BASE_URL = SITE.url;
 
@@ -42,6 +43,11 @@ const ROUTES: SitemapEntry[] = [
   { path: "/customer-portal", changefreq: "monthly", priority: "0.8" },
   { path: "/partner-portal", changefreq: "monthly", priority: "0.8" },
   { path: "/ai-project-estimator", changefreq: "monthly", priority: "0.9" },
+  ...ARTICLES.map<SitemapEntry>((a) => ({
+    path: `/knowledge-hub/${a.slug}`,
+    changefreq: "monthly" as const,
+    priority: "0.7",
+  })),
 ];
 
 const ACTIVE_LOCALES = ["en", "ar"] as const;
