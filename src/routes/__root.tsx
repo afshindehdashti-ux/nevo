@@ -23,6 +23,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AIAssistantLauncher } from "../components/site/AIAssistantLauncher";
 import { Analytics } from "../components/site/Analytics";
 import { ClientMonitor } from "../components/site/ClientMonitor";
+import { MaintenanceBanner } from "../components/site/MaintenanceBanner";
 import { CookieConsent } from "../components/site/CookieConsent";
 import { StickyMobileCTA } from "../components/site/StickyMobileCTA";
 import { Toaster } from "../components/ui/sonner";
@@ -36,6 +37,7 @@ function NotFoundComponent() {
   const { t } = useTranslation();
   return (
     <div className="relative flex min-h-screen flex-col bg-background">
+      <MaintenanceBanner />
       {/* Engineering grid background */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03]"
