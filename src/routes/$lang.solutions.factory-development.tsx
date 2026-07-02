@@ -82,7 +82,7 @@ const SYSTEMS = [
 ];
 
 export const Route = createFileRoute("/$lang/solutions/factory-development")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },

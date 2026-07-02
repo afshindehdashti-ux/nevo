@@ -40,7 +40,7 @@ const FAQS = [
 
 /* ─── SEO ─── */
 export const Route = createFileRoute("/$lang/ai-project-estimator")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: buildSeo({
       lang: params.lang,
       title: "AI Project Estimator — Sandwich Panel Factory",

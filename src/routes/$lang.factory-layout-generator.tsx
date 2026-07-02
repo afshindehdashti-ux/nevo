@@ -115,7 +115,7 @@ const VIEW_MODES: { id: ViewMode; label: string; img: string; icon: any }[] = [
 // ---------------- SEO ----------------
 export const Route = createFileRoute("/$lang/factory-layout-generator")({
   component: FactoryLayoutPage,
-  head: () => {
+  head: ({ params }) => {
     const seo = buildSeo({
       lang: params.lang,
       title: "Factory Layout Generator — Sandwich Panel Factory Design | NEVO",

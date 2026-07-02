@@ -245,7 +245,7 @@ function CareersPage() {
 }
 
 export const Route = createFileRoute("/$lang/careers")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },

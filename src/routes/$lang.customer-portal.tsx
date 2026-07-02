@@ -42,7 +42,7 @@ const ASSETS = [p01,p02,p03,p04,p05,p06,p07,p08,p09,p10,p11,p12,p13,p14,p15,p16,
 
 /* ─── SEO ─── */
 export const Route = createFileRoute("/$lang/customer-portal")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: buildSeo({
       lang: params.lang,
       title: "Customer Engineering Portal",

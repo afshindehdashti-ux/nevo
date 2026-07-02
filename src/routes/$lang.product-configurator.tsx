@@ -43,7 +43,7 @@ import panelEPS from "@/assets/configurator/panel-eps.jpg";
 import heroImg from "@/assets/configurator/hero-configurator.jpg";
 
 export const Route = createFileRoute("/$lang/product-configurator")({
-  head: () => ({
+  head: ({ params }) => ({
     ...buildSeo({
       lang: params.lang,
       title: "Product Configurator — Design Your Sandwich Panel",

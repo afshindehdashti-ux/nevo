@@ -52,7 +52,7 @@ import { downloadInvestmentReport } from "@/lib/investment-pdf";
 // ---------------- SEO ----------------
 export const Route = createFileRoute("/$lang/investment-calculator")({
   component: InvestmentCalculatorPage,
-  head: () => {
+  head: ({ params }) => {
     const seo = buildSeo({
       lang: params.lang,
       title: "Factory Investment Calculator — Sandwich Panel Plant CAPEX & ROI",

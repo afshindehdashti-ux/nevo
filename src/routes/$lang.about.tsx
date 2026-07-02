@@ -141,7 +141,7 @@ const COMMITMENTS = [
 /* ----------------------------- ROUTE ---------------------------- */
 
 export const Route = createFileRoute("/$lang/about")({
-  head: () => {
+  head: ({ params }) => {
     const orgLd = {
       "@context": "https://schema.org",
       "@type": "Organization",

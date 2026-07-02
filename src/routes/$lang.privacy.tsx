@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SITE } from "@/lib/seo";
 
 export const Route = createFileRoute("/$lang/privacy")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: "Privacy Policy — NEVO Industrial" },
       {

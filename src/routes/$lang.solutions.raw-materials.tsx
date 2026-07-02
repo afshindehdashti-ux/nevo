@@ -92,7 +92,7 @@ const FAQS: { q: string; a: string }[] = [
 ];
 
 export const Route = createFileRoute("/$lang/solutions/raw-materials")({
-  head: () => {
+  head: ({ params }) => {
     const faqLd = {
       "@context": "https://schema.org",
       "@type": "FAQPage",

@@ -60,7 +60,7 @@ import thermalCam from "@/assets/thickness/thermal-cam.png.asset.json";
 // ---------------- SEO ----------------
 export const Route = createFileRoute("/$lang/panel-thickness-calculator")({
   component: PanelThicknessPage,
-  head: () => {
+  head: ({ params }) => {
     const seo = buildSeo({
       lang: params.lang,
       title: "Panel Thickness Calculator — Sandwich Panel Sizing Tool | NEVO",

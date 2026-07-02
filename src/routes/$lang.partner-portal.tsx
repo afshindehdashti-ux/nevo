@@ -41,7 +41,7 @@ const A = [p01,p02,p03,p04,p05,p06,p07,p08,p09,p10,p11,p12,p13,p14,p15,p16,p17,p
 
 /* ─── SEO ─── */
 export const Route = createFileRoute("/$lang/partner-portal")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: buildSeo({
       lang: params.lang,
       title: "Global Partner Portal",

@@ -43,7 +43,7 @@ const DESCRIPTION =
 const URL_PATH = "/ai-assistant";
 
 export const Route = createFileRoute("/$lang/ai-assistant")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },

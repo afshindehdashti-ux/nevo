@@ -102,7 +102,7 @@ const PILLARS = [
 
 export const Route = createFileRoute("/$lang/research-innovation")({
   component: ResearchInnovationPage,
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },

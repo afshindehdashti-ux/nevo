@@ -58,7 +58,7 @@ import appCommercial from "@/assets/pir-vs-rockwool/app-commercial-building.png"
 // ---------------- SEO ----------------
 export const Route = createFileRoute("/$lang/pir-vs-rock-wool")({
   component: PirVsRockWoolPage,
-  head: () => {
+  head: ({ params }) => {
     const seo = buildSeo({
       lang: params.lang,
       title: "PIR vs Rock Wool — Sandwich Panel Comparison Guide | NEVO",

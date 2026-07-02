@@ -105,7 +105,7 @@ const FAQS: { q: string; a: string }[] = [
 ];
 
 export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
-  head: () => {
+  head: ({ params }) => {
     const faqLd = {
       "@context": "https://schema.org",
       "@type": "FAQPage",

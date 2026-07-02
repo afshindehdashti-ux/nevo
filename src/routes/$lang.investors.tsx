@@ -208,7 +208,7 @@ function InvestorsPage() {
 }
 
 export const Route = createFileRoute("/$lang/investors")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },

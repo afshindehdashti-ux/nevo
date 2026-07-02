@@ -208,7 +208,7 @@ function SustainabilityPage() {
 }
 
 export const Route = createFileRoute("/$lang/sustainability")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },

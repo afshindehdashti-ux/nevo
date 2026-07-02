@@ -288,7 +288,7 @@ const FAQS: { q: string; a: string }[] = [
 ];
 
 export const Route = createFileRoute("/$lang/industries")({
-  head: () => {
+  head: ({ params }) => {
     const faqLd = {
       "@context": "https://schema.org",
       "@type": "FAQPage",

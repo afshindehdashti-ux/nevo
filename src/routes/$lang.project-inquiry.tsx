@@ -819,7 +819,7 @@ const BREADCRUMB_JSONLD = {
 
 export const Route = createFileRoute("/$lang/project-inquiry")({
   component: ProjectInquiryPage,
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },

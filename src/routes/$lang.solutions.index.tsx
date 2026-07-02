@@ -112,7 +112,7 @@ function SolutionsIndex() {
 }
 
 export const Route = createFileRoute("/$lang/solutions/")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },

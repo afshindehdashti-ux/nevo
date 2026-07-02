@@ -92,7 +92,7 @@ const FAQS = [
 ];
 
 export const Route = createFileRoute("/$lang/solutions/production-lines")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },

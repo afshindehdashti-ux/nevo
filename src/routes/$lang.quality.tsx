@@ -102,7 +102,7 @@ const CERTS = [
 
 export const Route = createFileRoute("/$lang/quality")({
   component: QualityPage,
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },

@@ -27,7 +27,7 @@ import k40 from "@/assets/knowledge/40_material_guide.jpg";
 
 export const Route = createFileRoute("/$lang/knowledge-hub")({
   component: KnowledgeHub,
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: "Knowledge Hub — Sandwich Panel Engineering Library | NEVO" },
       { name: "description", content: "The world's most comprehensive sandwich panel knowledge hub — technical articles, engineering guides, courses, videos, FAQs and downloads on PIR, PUR, rock wool panels, cold rooms, clean rooms, factory design and production." },

@@ -110,7 +110,7 @@ const FAQS: { q: string; a: string }[] = [
 /* ------------------------------------------------------------------ */
 
 export const Route = createFileRoute("/$lang/solutions/engineering-consultancy")({
-  head: () => {
+  head: ({ params }) => {
     const faqLd = {
       "@context": "https://schema.org",
       "@type": "FAQPage",

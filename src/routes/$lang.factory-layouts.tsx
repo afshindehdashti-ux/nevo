@@ -102,7 +102,7 @@ const CAPABILITIES = [
 
 export const Route = createFileRoute("/$lang/factory-layouts")({
   component: FactoryLayoutsPage,
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },
