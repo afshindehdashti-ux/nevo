@@ -197,7 +197,7 @@ function KnowledgeHub() {
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-white/5">
         <div className="absolute inset-0">
-          <img src={heroImg} alt="" className="h-full w-full object-cover opacity-45" width={1920} height={1088} />
+          <img loading="lazy" decoding="async" src={heroImg} alt="" className="h-full w-full object-cover opacity-45" width={1920} height={1088} />
           <div className="absolute inset-0 bg-gradient-to-b from-[#05070a] via-[#05070a]/60 to-[#05070a]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.18),transparent_55%)]" />
         </div>

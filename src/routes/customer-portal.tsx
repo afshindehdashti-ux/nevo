@@ -140,7 +140,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const [remember, setRemember] = useState(true);
   return (
     <section className="relative min-h-[calc(100vh-80px)] overflow-hidden">
-      <img src={p01.url} alt="NEVO customer portal" className="absolute inset-0 h-full w-full object-cover opacity-45" />
+      <img loading="lazy" decoding="async" src={p01.url} alt="NEVO customer portal" className="absolute inset-0 h-full w-full object-cover opacity-45" />
       <div className="absolute inset-0 bg-gradient-to-br from-[#0B0F13] via-[#0B0F13]/85 to-emerald-950/60" />
       <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-20 lg:grid-cols-2 lg:py-28">
         <div className="flex flex-col justify-center">
@@ -350,7 +350,7 @@ function DashboardSection() {
     <div className="space-y-6">
       {/* Welcome card */}
       <GlassCard className="relative overflow-hidden">
-        <img src={p02.url} alt="Project overview" className="absolute inset-0 h-full w-full object-cover opacity-30"/>
+        <img loading="lazy" decoding="async" src={p02.url} alt="Project overview" className="absolute inset-0 h-full w-full object-cover opacity-30"/>
         <div className="absolute inset-0 bg-gradient-to-r from-[#0B0F13] via-[#0B0F13]/80 to-transparent"/>
         <div className="relative grid grid-cols-1 gap-6 p-6 md:grid-cols-[1.4fr_1fr] md:p-8">
           <div>
@@ -521,7 +521,7 @@ function ProjectsSection() {
         {filtered.map(p=>(
           <GlassCard key={p.id} className="overflow-hidden">
             <div className="relative h-40">
-              <img src={p.img} alt={p.name} className="absolute inset-0 h-full w-full object-cover"/>
+              <img loading="lazy" decoding="async" src={p.img} alt={p.name} className="absolute inset-0 h-full w-full object-cover"/>
               <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F13] via-[#0B0F13]/40 to-transparent"/>
               <span className="absolute left-3 top-3 rounded-full border border-white/20 bg-black/50 px-2 py-0.5 text-[10px] uppercase tracking-widest text-white/80">{p.type}</span>
               <span className="absolute right-3 top-3 rounded-full border border-emerald-400/30 bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-200">{p.status}</span>
@@ -557,7 +557,7 @@ function TimelineSection() {
         sub="11-stage engineering lifecycle. Every stage carries drawings, checklists, sign-offs and photos."/>
 
       <GlassCard className="relative overflow-hidden p-6 md:p-8">
-        <img src={p03.url} alt="Timeline" className="absolute inset-0 h-full w-full object-cover opacity-15"/>
+        <img loading="lazy" decoding="async" src={p03.url} alt="Timeline" className="absolute inset-0 h-full w-full object-cover opacity-15"/>
         <div className="relative">
           <ol className="relative border-l border-white/10 pl-6 md:pl-8">
             {TIMELINE_STAGES.map((s,i)=>{
@@ -616,7 +616,7 @@ function DocumentsSection() {
           return (
             <GlassCard key={c.name} className="group overflow-hidden">
               <div className="relative h-24">
-                <img src={c.img} alt={c.name} className="absolute inset-0 h-full w-full object-cover opacity-70"/>
+                <img loading="lazy" decoding="async" src={c.img} alt={c.name} className="absolute inset-0 h-full w-full object-cover opacity-70"/>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F13] via-[#0B0F13]/50 to-transparent"/>
                 <Icon className="absolute right-3 top-3 h-5 w-5 text-emerald-300"/>
               </div>
@@ -644,7 +644,7 @@ function TrackingSection() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.6fr_1fr]">
         <GlassCard className="relative overflow-hidden">
-          <img src={p04.url} alt="Shipping tracker" className="h-72 w-full object-cover opacity-60 md:h-96"/>
+          <img loading="lazy" decoding="async" src={p04.url} alt="Shipping tracker" className="h-72 w-full object-cover opacity-60 md:h-96"/>
           <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F13] via-transparent to-transparent"/>
           <div className="absolute bottom-0 left-0 right-0 p-6">
             <div className="text-xs uppercase tracking-widest text-emerald-300">Vessel MSC Aurora · NVO-2412</div>
@@ -725,7 +725,7 @@ function CommunicationSection() {
 
       <GlassCard className="mt-6 grid grid-cols-1 gap-6 overflow-hidden p-0 md:grid-cols-[1fr_1.2fr]">
         <div className="relative">
-          <img src={p05.url} alt="Engineering support" className="h-full w-full object-cover"/>
+          <img loading="lazy" decoding="async" src={p05.url} alt="Engineering support" className="h-full w-full object-cover"/>
           <div className="absolute inset-0 bg-gradient-to-r from-[#0B0F13]/40 to-transparent"/>
         </div>
         <div className="p-6 md:p-8">
@@ -761,7 +761,7 @@ function DownloadsSection() {
           return (
             <GlassCard key={i} className="overflow-hidden">
               <div className="relative h-28">
-                <img src={g.img} alt={g.t} className="absolute inset-0 h-full w-full object-cover opacity-70"/>
+                <img loading="lazy" decoding="async" src={g.img} alt={g.t} className="absolute inset-0 h-full w-full object-cover opacity-70"/>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F13] to-transparent"/>
                 <Icon className="absolute right-3 top-3 h-5 w-5 text-emerald-300"/>
               </div>
@@ -834,7 +834,7 @@ function QualitySection() {
           <div className="grid grid-cols-3 gap-2">
             {[p06,p07,p11,p12,p14,p16].map((im,i)=>(
               <div key={i} className="relative aspect-square overflow-hidden rounded-lg border border-white/10">
-                <img src={im.url} alt="QA photo" className="h-full w-full object-cover"/>
+                <img loading="lazy" decoding="async" src={im.url} alt="QA photo" className="h-full w-full object-cover"/>
               </div>
             ))}
           </div>
@@ -930,7 +930,7 @@ function AnalyticsSection() {
 function FinalCTA() {
   return (
     <GlassCard className="relative mt-10 overflow-hidden">
-      <img src={p21.url} alt="Engineering assistance" className="absolute inset-0 h-full w-full object-cover opacity-30"/>
+      <img loading="lazy" decoding="async" src={p21.url} alt="Engineering assistance" className="absolute inset-0 h-full w-full object-cover opacity-30"/>
       <div className="absolute inset-0 bg-gradient-to-r from-[#0B0F13] via-[#0B0F13]/70 to-transparent"/>
       <div className="relative grid grid-cols-1 gap-6 p-8 md:grid-cols-[1.4fr_1fr] md:p-10">
         <div>

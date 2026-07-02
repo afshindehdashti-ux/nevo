@@ -329,7 +329,7 @@ function OurStory() {
             transition={{ duration: 0.5, delay: i * 0.05 }}
             className="aspect-[4/5] overflow-hidden rounded-2xl bg-black"
           >
-            <img src={img} alt="" className="h-full w-full object-cover" />
+            <img loading="lazy" decoding="async" src={img} alt="" className="h-full w-full object-cover" />
           </motion.div>
         ))}
       </div>
@@ -404,7 +404,7 @@ function OurVision() {
             ))}
           </div>
           <div className="mt-6 overflow-hidden rounded-2xl ring-1 ring-white/10">
-            <img src={k31} alt="NEVO material flow illustration" className="h-full w-full object-cover" />
+            <img loading="lazy" decoding="async" src={k31} alt="NEVO material flow illustration" className="h-full w-full object-cover" />
           </div>
         </div>
       </div>
@@ -432,7 +432,7 @@ function WhatWeDo() {
             className="group overflow-hidden rounded-2xl bg-black text-white ring-1 ring-black/5 transition hover:ring-accent/40"
           >
             <div className="aspect-[4/3] overflow-hidden">
-              <img src={w.img} alt={w.title} className="h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-105 group-hover:opacity-100" />
+              <img loading="lazy" decoding="async" src={w.img} alt={w.title} className="h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-105 group-hover:opacity-100" />
             </div>
             <div className="p-6">
               <w.icon className="size-5 text-accent" />
@@ -626,7 +626,7 @@ function OurProcess() {
             className="group overflow-hidden rounded-2xl bg-[#f6f6f4] ring-1 ring-black/5 transition hover:shadow-xl"
           >
             <div className="aspect-[4/3] overflow-hidden bg-black">
-              <img src={p.img} alt={p.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]" />
+              <img loading="lazy" decoding="async" src={p.img} alt={p.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]" />
             </div>
             <div className="p-6">
               <div className="text-[10px] font-mono uppercase tracking-widest text-accent">

@@ -157,7 +157,7 @@ function AIAssistantPage() {
           <div className="relative">
             <div className="absolute -inset-6 rounded-3xl bg-[color:var(--color-accent)]/10 blur-2xl" />
             <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/40">
-              <img src={heroEngineer} alt="NEVO AI Engineer — engineer reviewing holographic factory model" className="h-full w-full object-cover" />
+              <img loading="lazy" decoding="async" src={heroEngineer} alt="NEVO AI Engineer — engineer reviewing holographic factory model" className="h-full w-full object-cover" />
             </div>
           </div>
         </div>
@@ -310,7 +310,7 @@ function AIAssistantPage() {
       <section className="bg-[#0B0F14] text-white">
         <div className="container-wide grid gap-10 py-20 lg:grid-cols-2 lg:items-center">
           <div className="overflow-hidden rounded-3xl border border-white/10">
-            <img src={collab} alt="NEVO engineering team reviewing a project" className="h-full w-full object-cover" />
+            <img loading="lazy" decoding="async" src={collab} alt="NEVO engineering team reviewing a project" className="h-full w-full object-cover" />
           </div>
           <div>
             <Eyebrow className="text-[color:var(--color-accent)]">When AI isn't enough</Eyebrow>

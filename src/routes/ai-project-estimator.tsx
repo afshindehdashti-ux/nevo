@@ -232,7 +232,7 @@ function EstimatorPage() {
           </div>
           <div className="hidden md:block">
             <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-2">
-              <img src={panelHero.url} alt="Panel cross-section" className="w-full rounded-xl object-cover" />
+              <img loading="lazy" decoding="async" src={panelHero.url} alt="Panel cross-section" className="w-full rounded-xl object-cover" />
             </div>
           </div>
         </div>
@@ -656,7 +656,7 @@ function EquipmentRow() {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {EQUIPMENT.map(e => (
           <div key={e.title} className="overflow-hidden rounded-xl border border-white/5 bg-black/40">
-            <div className="aspect-square overflow-hidden"><img src={e.img.url} alt={e.title} className="h-full w-full object-cover" /></div>
+            <div className="aspect-square overflow-hidden"><img loading="lazy" decoding="async" src={e.img.url} alt={e.title} className="h-full w-full object-cover" /></div>
             <div className="p-3">
               <div className="text-xs font-semibold text-white">{e.title}</div>
               <div className="text-[11px] text-emerald-300">{e.units}</div>
@@ -696,7 +696,7 @@ function LayoutAndRecommend({ panel, auto, ftype, r }: any) {
         </div>
         <div className="grid gap-3 md:grid-cols-[1.4fr_1fr]">
           <div className="relative overflow-hidden rounded-xl border border-white/10">
-            <img src={layoutImg.url} alt="Factory Layout" className="h-full w-full object-cover" />
+            <img loading="lazy" decoding="async" src={layoutImg.url} alt="Factory Layout" className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <span className="absolute bottom-2 left-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-semibold text-emerald-300 ring-1 ring-emerald-500/30">{view} VIEW</span>
           </div>
@@ -717,7 +717,7 @@ function LayoutAndRecommend({ panel, auto, ftype, r }: any) {
         <div className="mt-2 text-xl font-semibold text-white">
           {panel} with {auto === "Fully Automatic" ? "Fully Automatic" : auto === "Automatic" ? "Automatic" : "Semi-Automatic"} Line is the optimal choice for your project.
         </div>
-        <img src={panelHero.url} alt="Recommended panel" className="mt-4 w-full rounded-xl border border-white/10" />
+        <img loading="lazy" decoding="async" src={panelHero.url} alt="Recommended panel" className="mt-4 w-full rounded-xl border border-white/10" />
         <ul className="mt-4 space-y-2 text-sm">
           {bullets.map((b, i) => (
             <li key={i} className="flex items-start gap-2 text-white/80"><CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-emerald-300" />{b}</li>
@@ -818,7 +818,7 @@ function ReportPreview() {
           <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-300 ring-1 ring-emerald-500/30">Ready</span>
         </div>
         <div className="relative overflow-hidden rounded-xl border border-white/10">
-          <img src={reportImg.url} alt="Report Preview" className="w-full object-cover" />
+          <img loading="lazy" decoding="async" src={reportImg.url} alt="Report Preview" className="w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         </div>
         <button className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-black hover:bg-emerald-400">

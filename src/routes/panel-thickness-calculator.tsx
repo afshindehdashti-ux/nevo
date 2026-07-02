@@ -489,7 +489,7 @@ function PanelThicknessPage() {
                   ))}
                 </div>
                 <div className="relative overflow-hidden rounded-lg border border-white/10 bg-black">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={crossSection.url}
                     alt={`Sandwich panel ${recommended}mm ${core} cross section`}
                     className={`w-full object-cover transition duration-500 ${
@@ -549,7 +549,7 @@ function PanelThicknessPage() {
                       <div className="border-b border-white/10 px-2 py-1 text-center text-[11px] font-semibold text-emerald-300">
                         {t} mm
                       </div>
-                      <img src={THICK_IMG[t].url} alt={`${t} mm panel`} className="h-16 w-full object-cover" />
+                      <img loading="lazy" decoding="async" src={THICK_IMG[t].url} alt={`${t} mm panel`} className="h-16 w-full object-cover" />
                       <div className="px-2 py-1 text-[10px] text-white/50 group-hover:text-white/70">
                         Tap to compare
                       </div>
@@ -621,7 +621,7 @@ function PanelThicknessPage() {
               }`}
             >
               <div className="mb-2 text-[13px] font-semibold text-white">{m.c}</div>
-              <img src={m.img} alt={`${m.c} core`} className="h-24 w-full rounded object-cover" />
+              <img loading="lazy" decoding="async" src={m.img} alt={`${m.c} core`} className="h-24 w-full rounded object-cover" />
               <ul className="mt-2 space-y-0.5 text-[11px] text-white/60">
                 {m.bullets.map((b) => (
                   <li key={b} className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-emerald-400/70" /> {b}</li>
@@ -651,7 +651,7 @@ function PanelThicknessPage() {
                 app === a.target ? "border-emerald-400/60" : "border-white/10 hover:border-white/25"
               }`}
             >
-              <img src={a.img} alt={a.label} className="h-24 w-full object-cover transition group-hover:scale-105" />
+              <img loading="lazy" decoding="async" src={a.img} alt={a.label} className="h-24 w-full object-cover transition group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 px-2 py-1.5 text-left text-[11px] font-semibold uppercase tracking-wider text-white">
                 {a.label}
@@ -673,7 +673,7 @@ function PanelThicknessPage() {
                 { l: "Steel Surface", i: matSteel.url },
               ].map((m) => (
                 <div key={m.l} className="overflow-hidden rounded-md border border-white/10 bg-black/30">
-                  <img src={m.i} alt={m.l} className="h-20 w-full object-cover" />
+                  <img loading="lazy" decoding="async" src={m.i} alt={m.l} className="h-20 w-full object-cover" />
                   <div className="px-2 py-1 text-[11px] text-white/70">{m.l}</div>
                 </div>
               ))}
@@ -681,7 +681,7 @@ function PanelThicknessPage() {
           </Card>
 
           <Card title="Thermal Inspection" icon={ThermometerSun}>
-            <img src={thermalCam.url} alt="Thermal inspection camera" className="mb-3 h-32 w-full rounded object-contain" />
+            <img loading="lazy" decoding="async" src={thermalCam.url} alt="Thermal inspection camera" className="mb-3 h-32 w-full rounded object-contain" />
             <ul className="space-y-1.5 text-[12px] text-white/70">
               {["Identify Heat Loss", "Improve Efficiency", "Ensure Quality", "Save Energy"].map((b) => (
                 <li key={b} className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400/80" /> {b}</li>

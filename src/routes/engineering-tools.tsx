@@ -109,7 +109,7 @@ function EngineeringToolsCenter() {
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-white/5">
         <div className="absolute inset-0">
-          <img src={heroCockpit} alt="" className="h-full w-full object-cover opacity-40" width={1920} height={1088} />
+          <img loading="lazy" decoding="async" src={heroCockpit} alt="" className="h-full w-full object-cover opacity-40" width={1920} height={1088} />
           <div className="absolute inset-0 bg-gradient-to-b from-[#05070a] via-[#05070a]/60 to-[#05070a]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(16,185,129,0.18),transparent_55%)]" />
         </div>
