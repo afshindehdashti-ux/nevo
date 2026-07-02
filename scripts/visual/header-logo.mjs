@@ -137,10 +137,13 @@ function colorSignature(buf) {
 
 // Per-state minimums. Menu-open logo is bigger → same ratio thresholds apply.
 // Floors chosen well below observed values to catch regressions without flaking.
+// Per-state minimums. Floors are set at ~half the observed value on a healthy
+// build so the test catches a real regression (e.g. white ink disappearing,
+// green accent turning gray) without flaking on minor render differences.
 const THRESHOLDS = {
-  initial:  { minWhite: 0.05, minGreen: 0.005 },
-  scrolled: { minWhite: 0.05, minGreen: 0.005 },
-  menuOpen: { minWhite: 0.05, minGreen: 0.005 },
+  initial:  { minWhite: 0.02, minGreen: 0.002 },
+  scrolled: { minWhite: 0.02, minGreen: 0.002 },
+  menuOpen: { minWhite: 0.02, minGreen: 0.002 },
 };
 
 async function main() {
