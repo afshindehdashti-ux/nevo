@@ -56,7 +56,7 @@ export const Route = createFileRoute("/knowledge-hub/$slug")({
         { property: "article:published_time", content: a.date },
         { property: "article:section", content: a.section },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: `${SITE.url}/knowledge-hub/${a.slug}` }],
       scripts: [
         {
           type: "application/ld+json",
