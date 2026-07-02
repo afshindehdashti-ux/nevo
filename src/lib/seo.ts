@@ -110,7 +110,7 @@ export const orgJsonLd = () => ({
   "@type": "Organization",
   name: SITE.name,
   legalName: SITE.legalName,
-  url: SITE.url || "/",
+  url: SITE.url,
   logo: SITE.logo,
   sameAs: SITE.sameAs,
   contactPoint: [
@@ -118,7 +118,7 @@ export const orgJsonLd = () => ({
       "@type": "ContactPoint",
       contactType: "sales",
       email: SITE.contact.email,
-      telephone: SITE.contact.phone,
+      ...(SITE.contact.phone ? { telephone: SITE.contact.phone } : {}),
       areaServed: ["AE", "GCC", "MENA", "EU", "CIS"],
       availableLanguage: ["English", "Arabic"],
     },
@@ -133,10 +133,10 @@ export const websiteJsonLd = () => ({
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: SITE.name,
-  url: SITE.url || "/",
+  url: SITE.url,
   potentialAction: {
     "@type": "SearchAction",
-    target: "/knowledge?q={search_term_string}",
+    target: `${SITE.url}/knowledge?q={search_term_string}`,
     "query-input": "required name=search_term_string",
   },
 });
