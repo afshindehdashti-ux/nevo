@@ -19,6 +19,7 @@ import { Route as PartnerPortalRouteImport } from './routes/partner-portal'
 import { Route as PanelThicknessCalculatorRouteImport } from './routes/panel-thickness-calculator'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as InvestmentCalculatorRouteImport } from './routes/investment-calculator'
+import { Route as InstallationCommissioningRouteImport } from './routes/installation-commissioning'
 import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as FactoryLayoutsRouteImport } from './routes/factory-layouts'
 import { Route as FactoryLayoutGeneratorRouteImport } from './routes/factory-layout-generator'
@@ -86,6 +87,12 @@ const InvestmentCalculatorRoute = InvestmentCalculatorRouteImport.update({
   path: '/investment-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InstallationCommissioningRoute =
+  InstallationCommissioningRouteImport.update({
+    id: '/installation-commissioning',
+    path: '/installation-commissioning',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const IndustriesRoute = IndustriesRouteImport.update({
   id: '/industries',
   path: '/industries',
@@ -175,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/factory-layouts': typeof FactoryLayoutsRoute
   '/industries': typeof IndustriesRoute
+  '/installation-commissioning': typeof InstallationCommissioningRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
@@ -202,6 +210,7 @@ export interface FileRoutesByTo {
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/factory-layouts': typeof FactoryLayoutsRoute
   '/industries': typeof IndustriesRoute
+  '/installation-commissioning': typeof InstallationCommissioningRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
@@ -230,6 +239,7 @@ export interface FileRoutesById {
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/factory-layouts': typeof FactoryLayoutsRoute
   '/industries': typeof IndustriesRoute
+  '/installation-commissioning': typeof InstallationCommissioningRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/factory-layout-generator'
     | '/factory-layouts'
     | '/industries'
+    | '/installation-commissioning'
     | '/investment-calculator'
     | '/knowledge'
     | '/panel-thickness-calculator'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/factory-layout-generator'
     | '/factory-layouts'
     | '/industries'
+    | '/installation-commissioning'
     | '/investment-calculator'
     | '/knowledge'
     | '/panel-thickness-calculator'
@@ -313,6 +325,7 @@ export interface FileRouteTypes {
     | '/factory-layout-generator'
     | '/factory-layouts'
     | '/industries'
+    | '/installation-commissioning'
     | '/investment-calculator'
     | '/knowledge'
     | '/panel-thickness-calculator'
@@ -341,6 +354,7 @@ export interface RootRouteChildren {
   FactoryLayoutGeneratorRoute: typeof FactoryLayoutGeneratorRoute
   FactoryLayoutsRoute: typeof FactoryLayoutsRoute
   IndustriesRoute: typeof IndustriesRoute
+  InstallationCommissioningRoute: typeof InstallationCommissioningRoute
   InvestmentCalculatorRoute: typeof InvestmentCalculatorRoute
   KnowledgeRoute: typeof KnowledgeRoute
   PanelThicknessCalculatorRoute: typeof PanelThicknessCalculatorRoute
@@ -429,6 +443,13 @@ declare module '@tanstack/react-router' {
       path: '/investment-calculator'
       fullPath: '/investment-calculator'
       preLoaderRoute: typeof InvestmentCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/installation-commissioning': {
+      id: '/installation-commissioning'
+      path: '/installation-commissioning'
+      fullPath: '/installation-commissioning'
+      preLoaderRoute: typeof InstallationCommissioningRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/industries': {
@@ -549,6 +570,7 @@ const rootRouteChildren: RootRouteChildren = {
   FactoryLayoutGeneratorRoute: FactoryLayoutGeneratorRoute,
   FactoryLayoutsRoute: FactoryLayoutsRoute,
   IndustriesRoute: IndustriesRoute,
+  InstallationCommissioningRoute: InstallationCommissioningRoute,
   InvestmentCalculatorRoute: InvestmentCalculatorRoute,
   KnowledgeRoute: KnowledgeRoute,
   PanelThicknessCalculatorRoute: PanelThicknessCalculatorRoute,
