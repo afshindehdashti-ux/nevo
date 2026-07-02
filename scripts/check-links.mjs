@@ -21,20 +21,18 @@ const SRC_DIR = join(ROOT, "src");
 
 // -------- Route discovery (mirrors TanStack file-based routing) ----------
 function fileToRoute(file) {
-  // strip extension
   let name = file.replace(/\.(tsx?|jsx?)$/, "");
-  // "[.]" segment escapes a literal dot in filenames like sitemap[.]xml
-  name = name.replace(/\[\.\]/g, ".");
   if (name === "__root") return null;
   if (name === "index") return "/";
-  // ".index" leaf → parent path
+  // Protect "[.]" escaped literal dots before dot→slash conversion.
+  const DOT = "\u0000DOT\u0000";
+  name = name.replace(/\[\.\]/g, DOT);
   name = name.replace(/\.index$/, "");
-  // splat / catch-all → wildcard pattern
   if (name.endsWith(".$") || name === "$") {
     const base = name === "$" ? "" : name.slice(0, -2);
-    return "/" + base.replace(/\./g, "/") + "/*";
+    return ("/" + base.replace(/\./g, "/") + "/*").replaceAll(DOT, ".");
   }
-  return "/" + name.replace(/\./g, "/");
+  return ("/" + name.replace(/\./g, "/")).replaceAll(DOT, ".");
 }
 
 function walk(dir) {
