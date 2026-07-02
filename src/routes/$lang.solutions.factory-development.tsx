@@ -36,6 +36,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
+import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE =
   "Factory Development — Turnkey Sandwich Panel Factory Engineering | NEVO Industrial";
@@ -91,6 +92,7 @@ export const Route = createFileRoute("/$lang/solutions/factory-development")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
       { name: "twitter:card", content: "summary_large_image" },
+        ...ogImageMeta("/solutions/factory-development"),
     ],
     links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
     scripts: [

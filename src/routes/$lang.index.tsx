@@ -15,6 +15,7 @@ import { CTABanner } from "@/components/site/CTABanner";
 import { ContactSection } from "@/components/site/ContactSection";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SITE } from "@/lib/seo";
+import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE =
   "NEVO Industrial — Sandwich Panel Engineering, Factory Development & Raw Materials";
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/$lang/")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
+        ...ogImageMeta("/"),
       { property: "og:url", content: `${SITE.url}/${params.lang}` },
     ],
     links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}` }],

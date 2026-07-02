@@ -14,6 +14,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
 import { submitLeadForm } from "@/lib/lead-submit";
+import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE = "Careers — Build the Future With NEVO Industrial | Dubai · Germany · Türkiye";
 const DESCRIPTION =
@@ -254,6 +255,7 @@ export const Route = createFileRoute("/$lang/careers")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
       { name: "twitter:card", content: "summary_large_image" },
+        ...ogImageMeta("/careers"),
     ],
     links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
   }),

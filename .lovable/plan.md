@@ -1,45 +1,79 @@
+
 ## Goal
 
-Every page must declare a **self-referencing canonical URL that includes its locale prefix** (`https://nevoindustrial.com/{lang}{path}`), and the matching `og:url` must agree. Today all 300 pages canonicalize to `https://nevoindustrial.com/<path>` with no locale, causing Google to collapse the 10 locales into one and drop 9 translations.
+Every leaf route emits an absolute, self-hosted `og:image` (and matching `twitter:image`) that renders identically on every locale. No route falls back to the hosting-injected screenshot.
 
-## Changes
+## Approach
 
-### 1. `src/lib/seo.ts` — teach `buildSeo` about locale
+`og:image` is language-agnostic — the same image works for `/en/about` and `/ar/about`. The URL still needs to be absolute (`https://nevoindustrial.com/...`) and self-referencing per route, but the *asset* is shared across locales.
 
-- Add a required `lang: LocaleCode` field to `SeoInput`.
-- Build `absolutePath` as `${SITE.url}/${lang}${path}` (path `"/"` becomes just `/${lang}`).
-- Use that absolute URL for both `og:url` and `<link rel="canonical">` — guaranteeing they self-reference.
-- Rewrite the hreflang loop so every locale (including `en`) uses the `/{code}` prefix; `x-default` points to `/en{path}`. This matches the actual URL structure and fixes the current inconsistency where `en` had no prefix.
+Two-tier strategy:
 
-### 2. Every route's `head()` — pass `params.lang` through
+1. **Reuse existing hero art wherever a route already has one.** `src/assets/` already contains route-specific hero photography (`hero-nevo-line.jpg`, `hero-production-line.jpg`, `engineering-philosophy.jpg`, plus the `industries/`, `panels/`, `factory-layout/`, `pir-vs-rockwool/`, `raw-materials/` folders, etc.). Map each route to its most representative existing image.
+2. **Generate a small set of category defaults** (5 images at 1200×630, DSLR industrial style, on-brand) for routes that don't have a clear hero yet: `brand-default`, `solutions-default`, `industries-default`, `knowledge-default`, `corporate-default`. Every remaining route falls back to one of these — never to the generic hosting screenshot.
 
-TanStack Router already provides `{ params }` to `head()`. For each of the ~31 route files under `src/routes/$lang.*.tsx`:
+## Implementation
 
-- Change `head: () => ({ ... })` (or `head: ({ loaderData }) => ...`) to `head: ({ params }) => ...`.
-- Pass `lang: params.lang` into every `buildSeo({ ... })` call.
-- Routes that call `buildSeo` twice (`partner-portal`, `ai-project-estimator`, `customer-portal`) get `lang` on both calls.
+### 1. Centralize the mapping (`src/lib/og-images.ts`)
 
-### 3. `src/routes/$lang.solutions.index.tsx` — fix the hand-rolled head
+```ts
+import { SITE } from "./seo";
+import heroLine from "@/assets/hero-nevo-line.jpg";
+// ...other imports
 
-This route bypasses `buildSeo` and puts a `{ rel: "canonical", ... }` object inside the `meta` array (invalid — canonicals belong in `links`), which is why it emitted no canonical at all in the audit. Replace with a standard `buildSeo({ title, description, path: "/solutions", lang: params.lang })` call so it gets the same locale-prefixed canonical + full hreflang set as every other route.
+export const OG_DEFAULT = `${SITE.url}${brandDefault}`;
 
-### 4. Dynamic knowledge-hub route
+export const OG_IMAGES: Record<string, string> = {
+  "/":                       `${SITE.url}${heroLine}`,
+  "/about":                  `${SITE.url}${engineeringPhilosophy}`,
+  "/solutions":              `${SITE.url}${solutionsDefault}`,
+  "/solutions/sandwich-panels": `${SITE.url}${panelsHero}`,
+  "/solutions/production-lines": `${SITE.url}${heroProductionLine}`,
+  // ...one entry per route
+};
 
-`src/routes/$lang.knowledge-hub.$slug.tsx`'s `head({ params, loaderData })` needs the same treatment — pass `lang: params.lang` and let `path` continue to include the slug.
+export function ogImageFor(path: string) {
+  return OG_IMAGES[path] ?? OG_DEFAULT;
+}
+```
 
-## Verification
+Vite fingerprints the imports, so URLs stay cache-busted.
 
-After the edits:
-- `bun run build` must succeed.
-- Re-run the SEO scan script (`/tmp/seo_report.py`) and confirm:
-  - Every canonical of the form `https://nevoindustrial.com/{lang}{path}` (300/310, plus /solutions now covered → 310/310).
-  - `og:url` matches canonical on every page.
-  - hreflang set unchanged (still 10 locales + x-default, all locale-prefixed).
+### 2. Extend `buildSeo` (`src/lib/seo.ts`)
 
-## Out of scope
+Add an optional `image` field. When provided (or when a route-path lookup hits), emit:
 
-Not touching translations, the missing `og:image` on 27 routes, or any UI. Pure metadata correction.
+```ts
+{ property: "og:image", content: absoluteImage },
+{ property: "og:image:width", content: "1200" },
+{ property: "og:image:height", content: "630" },
+{ property: "og:image:alt", content: title },
+{ name: "twitter:image", content: absoluteImage },
+```
 
-## Note for the user
+Because these live in `meta` (deduped by property), it's safe to also set a sitewide `og:image` fallback in `__root.tsx` — but we won't, to respect the "leaf only" rule. Instead, every leaf route calls `buildSeo({ ..., image: ogImageFor(URL_PATH) })`, guaranteeing coverage without root pollution.
 
-Search engines and social platforms cache metadata. After deploy, the new canonicals will only take effect as crawlers re-fetch each URL. Google Search Console's URL Inspection tool can force a recrawl per URL; Facebook/LinkedIn have link preview debuggers that do the same.
+### 3. Update all 31 leaf route files
+
+Small mechanical change per file — one added argument to the existing `buildSeo(...)` call. No route logic changes.
+
+### 4. Generate the 5 category default images
+
+Ultra-photorealistic DSLR industrial photography at 1200×630 (OG-optimal), saved to `src/assets/og/`:
+- `og-brand-default.jpg` — NEVO factory floor wide shot
+- `og-solutions-default.jpg` — sandwich panel line close-up
+- `og-industries-default.jpg` — cold-storage warehouse exterior
+- `og-knowledge-default.jpg` — engineering blueprints + panel cross-section
+- `og-corporate-default.jpg` — modern industrial HQ facade
+
+### 5. Verify
+
+- `bun run build` (typecheck)
+- `curl` a sampling of routes across 3 locales, grep for `og:image` and confirm absolute URL + matching `twitter:image`
+- Re-run the Playwright SEO audit; expect 31/31 og:image coverage per locale
+
+## Notes for you
+
+- **Crawler caches:** Facebook, LinkedIn, X, and Slack cache previews. New images won't appear in already-shared links until each platform re-fetches — force refresh via their link-preview debuggers.
+- **No locale-specific images:** using the same asset for all 10 locales is standard practice; the surrounding OG text is already localized via `t()`.
+- **Approval:** Generating 5 images incurs image-gen cost. If you'd rather I skip #4 and point every uncovered route at a single existing brand image (e.g. `hero-nevo-line.jpg`), say so and I'll drop that step.

@@ -8,6 +8,7 @@ import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
 import { SITE } from "@/lib/seo";
+import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE = "Solutions — Factory Development, Production Lines, Consultancy & Raw Materials | NEVO Industrial";
 const DESCRIPTION =
@@ -121,6 +122,7 @@ export const Route = createFileRoute("/$lang/solutions/")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
       { name: "twitter:card", content: "summary_large_image" },
+        ...ogImageMeta("/solutions"),
     ],
     links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
   }),

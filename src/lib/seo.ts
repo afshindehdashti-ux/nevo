@@ -2,6 +2,8 @@
  * NEVO SEO helpers — centralized metadata + JSON-LD builders.
  * Use buildSeo() in every route's head() for consistent titles/OG/canonical.
  */
+import { OG_IMAGES, OG_DEFAULT } from "./og-images";
+
 
 export const SITE = {
   name: "NEVO Industrial",
@@ -86,10 +88,21 @@ export function buildSeo(input: SeoInput) {
     { name: "twitter:description", content: input.description },
   ];
 
-  if (input.image) {
-    meta.push({ property: "og:image", content: input.image });
-    meta.push({ name: "twitter:image", content: input.image });
-  }
+  // Resolve OG image: explicit input.image wins, otherwise per-route mapping,
+  // otherwise site-wide brand default. Guarantees every leaf route emits a
+  // real social preview instead of a hosting-injected screenshot.
+  const mapped = OG_IMAGES[input.path] ?? OG_DEFAULT;
+  const resolvedImage = input.image ?? mapped;
+  const absoluteImage = resolvedImage.startsWith("http")
+    ? resolvedImage
+    : `${SITE.url}${resolvedImage}`;
+  meta.push({ property: "og:image", content: absoluteImage });
+  meta.push({ property: "og:image:secure_url", content: absoluteImage });
+  meta.push({ property: "og:image:width", content: "1200" });
+  meta.push({ property: "og:image:height", content: "630" });
+  meta.push({ property: "og:image:alt", content: fullTitle });
+  meta.push({ name: "twitter:image", content: absoluteImage });
+
   if (input.keywords?.length) {
     meta.push({ name: "keywords", content: input.keywords.join(", ") });
   }

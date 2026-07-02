@@ -49,6 +49,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { GridBoard, BoardCell, SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
+import { ogImageMeta } from "@/lib/og-images";
 import {
   Accordion,
   AccordionContent,
@@ -99,6 +100,7 @@ export const Route = createFileRoute("/$lang/solutions/production-lines")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
+        ...ogImageMeta("/solutions/production-lines"),
       { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
     ],
     links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
