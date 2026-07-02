@@ -46,6 +46,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import { downloadInvestmentReport } from "@/lib/investment-pdf";
 
 // ---------------- SEO ----------------
 export const Route = createFileRoute("/investment-calculator")({
@@ -1046,25 +1047,25 @@ function InvestmentCalculatorPage() {
 
                 <Card title="Download Report" icon={FileText}>
                   <ul className="grid gap-2 text-[12px]">
-                    {[
-                      "Investment Summary (PDF)",
-                      "Detailed Cost Breakdown (PDF)",
-                      "Cash Flow Analysis (PDF)",
-                      "ROI & Payback Report (PDF)",
-                      "Technical Specification (PDF)",
-                      "3D Factory Layout (PDF)",
-                    ].map((r) => (
-                      <li key={r}>
-                        <Link
-                          to="/project-inquiry"
-                          className="flex items-center justify-between rounded-md border border-white/10 bg-white/[0.02] px-3 py-2 text-white/70 transition hover:border-emerald-400/40 hover:text-white"
+                    {([
+                      ["investment", "Investment Report (PDF)"],
+                      ["roi", "ROI Report (PDF)"],
+                      ["cashflow", "Cash Flow Report (PDF)"],
+                      ["specification", "Factory Specification (PDF)"],
+                      ["summary", "Project Summary (PDF)"],
+                    ] as const).map(([kind, label]) => (
+                      <li key={kind}>
+                        <button
+                          type="button"
+                          onClick={() => downloadInvestmentReport(kind, i, m)}
+                          className="flex w-full items-center justify-between rounded-md border border-white/10 bg-white/[0.02] px-3 py-2 text-left text-white/70 transition hover:border-emerald-400/40 hover:text-white"
                         >
                           <span className="flex items-center gap-2">
                             <FileText className="h-3.5 w-3.5 text-emerald-400/80" />
-                            {r}
+                            {label}
                           </span>
                           <Download className="h-3.5 w-3.5" />
-                        </Link>
+                        </button>
                       </li>
                     ))}
                   </ul>
