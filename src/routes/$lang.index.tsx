@@ -29,9 +29,10 @@ export const Route = createFileRoute("/$lang/")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}/` },
+      { property: "og:url", content: `${SITE.url}/${params.lang}` },
     ],
-    links: [{ rel: "canonical", href: `${SITE.url}/` }],
+    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}` }],
+
     scripts: [
       {
         type: "application/ld+json",
