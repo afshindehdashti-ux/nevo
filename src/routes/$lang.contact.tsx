@@ -232,7 +232,10 @@ function ContactPage() {
                 <input name="name" placeholder={t("contact.callback.name")} required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
                 <input name="company" placeholder={t("contact.callback.company")} className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
                 <input name="email" placeholder={t("contact.callback.email")} type="email" required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
-                <input name="phone" placeholder={t("contact.callback.phone")} required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
+                <input name="phone" type="tel" inputMode="tel" autoComplete="tel"
+                       placeholder={getPhoneExample(i18n.language)}
+                       aria-label={t("contact.callback.phone")}
+                       required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
               </div>
               <select name="interest" defaultValue="" className="rounded-md border border-input bg-background px-4 py-3 text-sm">
                 <option value="" disabled>{t("contact.callback.interestPlaceholder")}</option>
