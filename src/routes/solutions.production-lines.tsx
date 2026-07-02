@@ -25,8 +25,8 @@ import {
   FileText,
   Download,
 } from "lucide-react";
-import heroImgAsset from "@/assets/premium/02-production-line.jpg.asset.json";
-import philosophyImgAsset from "@/assets/premium/12-engineer-bim.jpg.asset.json";
+import heroImgAsset from "@/assets/premium/25-prodline-hero.jpg.asset.json";
+import philosophyImgAsset from "@/assets/premium/26-prodline-detail.jpg.asset.json";
 const heroImg = heroImgAsset.url;
 const philosophyImg = philosophyImgAsset.url;
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
