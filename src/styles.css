@@ -98,10 +98,10 @@
   --popover: oklch(0.16 0.004 260);
   --popover-foreground: oklch(0.985 0 0);
 
-  /* Primary — white on graphite. Used for chrome, tooltips, banners.
-     NOT the green CTA (green lives on --accent, wired into Button primary variant). */
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.15 0.004 260);
+  /* Primary — dark card / section surface. Legacy hero + card pattern.
+     Green CTA lives on --accent (wired into Button primary variant). */
+  --primary: oklch(0.17 0.004 260);
+  --primary-foreground: oklch(0.985 0 0);
 
   --secondary: oklch(0.22 0.004 260);
   --secondary-foreground: oklch(0.985 0 0);
@@ -133,8 +133,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.16 0.004 260);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.15 0.004 260);
+  --primary: oklch(0.17 0.004 260);
+  --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.22 0.004 260);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.22 0.004 260);
