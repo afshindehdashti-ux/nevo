@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Menu,
@@ -736,68 +736,129 @@ function FeaturedCard({ featured, tone }: { featured: Featured; tone: "dark" | "
    Search overlay
    ───────────────────────────────────────────────────────────── */
 
+const SEARCH_INDEX: { title: string; desc: string; href: string; group: string; keywords: string }[] = [
+  // Solutions
+  { title: "Sandwich Panels", desc: "PIR, PUR, rock wool wall and roof panels.", href: "/solutions/sandwich-panels", group: "Solutions", keywords: "pir pur rockwool rock wool wall roof panel insulation" },
+  { title: "Production Lines", desc: "Continuous and discontinuous PIR / rock wool lines.", href: "/solutions/production-lines", group: "Solutions", keywords: "line laminator continuous discontinuous factory equipment" },
+  { title: "Engineering Consultancy", desc: "Feasibility, layout, commissioning, operations.", href: "/solutions/engineering-consultancy", group: "Solutions", keywords: "consultancy feasibility engineering advisory" },
+  { title: "Raw Materials", desc: "PPGI, GI coils, PIR chemicals, adhesives, rock wool.", href: "/solutions/raw-materials", group: "Solutions", keywords: "ppgi gi steel coil chemicals polyol mdi adhesive rockwool" },
+  { title: "Installation & Commissioning", desc: "Site installation, start-up, after-sales support.", href: "/installation-commissioning", group: "Solutions", keywords: "installation commissioning start-up support after sales" },
+  // Tools
+  { title: "Engineering Tools Center", desc: "20 calculators — thickness, U-value, ROI, layout.", href: "/engineering-tools", group: "Tools", keywords: "tools calculator engineering thickness u-value roi layout" },
+  { title: "Panel Thickness Calculator", desc: "Recommend thickness by climate, fire, application.", href: "/panel-thickness-calculator", group: "Tools", keywords: "thickness u-value climate fire panel calculator" },
+  { title: "Product Configurator", desc: "Configure panel type, core, dimensions, coating.", href: "/product-configurator", group: "Tools", keywords: "configurator panel type core dimensions coating quotation" },
+  { title: "Investment Calculator", desc: "CAPEX, OPEX, ROI, IRR, NPV, payback.", href: "/investment-calculator", group: "Tools", keywords: "investment capex opex roi irr npv payback financial" },
+  { title: "Factory Layout Generator", desc: "Interactive plant layout — line, warehouse, utilities.", href: "/factory-layout-generator", group: "Tools", keywords: "factory layout plant warehouse utilities floor plan" },
+  { title: "AI Project Estimator", desc: "AI feasibility for full factory investment.", href: "/ai-project-estimator", group: "Tools", keywords: "ai project estimator feasibility factory investment" },
+  { title: "AI Engineering Assistant", desc: "Ask any engineering question — 24/7.", href: "/ai-assistant", group: "Tools", keywords: "ai assistant chat engineer help question" },
+  { title: "PIR vs Rock Wool", desc: "Full comparison — thermal, fire, TCO.", href: "/pir-vs-rock-wool", group: "Tools", keywords: "pir rockwool comparison fire thermal tco" },
+  // Knowledge
+  { title: "Knowledge Hub", desc: "Articles, guides, courses, videos, FAQ.", href: "/knowledge-hub", group: "Knowledge", keywords: "knowledge articles guides courses videos faq library" },
+  { title: "Download Center", desc: "Datasheets, brochures, CAD/BIM, certifications.", href: "/download-center", group: "Knowledge", keywords: "downloads datasheet brochure cad bim certification pdf" },
+  { title: "Factory Layouts Library", desc: "Reference plant layouts and case studies.", href: "/factory-layouts", group: "Knowledge", keywords: "factory layouts case studies plant reference" },
+  { title: "Research & Innovation", desc: "R&D roadmap, prototypes, applied testing.", href: "/research-innovation", group: "Knowledge", keywords: "research innovation r&d rd prototypes testing" },
+  { title: "Quality Assurance", desc: "EN 14509 QC, testing, certifications.", href: "/quality", group: "Knowledge", keywords: "quality qc en 14509 testing certification" },
+  // Company
+  { title: "About NEVO", desc: "Engineering-led industrial group, Dubai.", href: "/about", group: "Company", keywords: "about company nevo dubai group" },
+  { title: "Sustainability & ESG", desc: "Environment, social and governance strategy.", href: "/sustainability", group: "Company", keywords: "sustainability esg environment governance carbon" },
+  { title: "Careers", desc: "Engineering, production and commercial roles.", href: "/careers", group: "Company", keywords: "careers jobs hiring engineer production" },
+  { title: "Investor Relations", desc: "Reports, governance, strategy.", href: "/investors", group: "Company", keywords: "investor relations reports governance" },
+  { title: "Contact & Global Offices", desc: "Dubai HQ, WhatsApp, sales, engineering.", href: "/contact", group: "Company", keywords: "contact offices whatsapp phone sales engineering dubai" },
+  { title: "Customer Portal", desc: "Project timeline, documents, logistics.", href: "/customer-portal", group: "Company", keywords: "customer portal project timeline documents" },
+  { title: "Partner Portal", desc: "Distributors, EPCs, marketing, training.", href: "/partner-portal", group: "Company", keywords: "partner distributor epc portal marketing training" },
+  { title: "Request a Quotation", desc: "7-stage engineering intake wizard.", href: "/project-inquiry", group: "Company", keywords: "quotation quote inquiry rfq request price" },
+];
+
 function SearchOverlay({ onClose }: { onClose: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [q, setQ] = useState("");
+  const [activeIdx, setActiveIdx] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  const suggestions = [
-    "PIR sandwich panel specifications",
-    "Cold storage factory feasibility",
-    "Continuous production line commissioning",
-    "PPGI coil sourcing — GCC",
-    "Clean room panel jointing details",
-  ];
+  const results = useMemo(() => {
+    const query = q.trim().toLowerCase();
+    if (!query) return SEARCH_INDEX.slice(0, 8);
+    const tokens = query.split(/\s+/).filter(Boolean);
+    return SEARCH_INDEX
+      .map((item) => {
+        const hay = `${item.title} ${item.desc} ${item.keywords} ${item.group}`.toLowerCase();
+        const score = tokens.reduce((s, t) => (hay.includes(t) ? s + 1 : s), 0);
+        return { item, score };
+      })
+      .filter((r) => r.score === tokens.length)
+      .map((r) => r.item)
+      .slice(0, 12);
+  }, [q]);
+
+  useEffect(() => { setActiveIdx(0); }, [q]);
+
+  const go = (href: string) => { onClose(); navigate({ to: href }); };
+
+  const groups = useMemo(() => {
+    const m: Record<string, typeof SEARCH_INDEX> = {};
+    results.forEach((r) => { (m[r.group] ||= []).push(r); });
+    return m;
+  }, [results]);
 
   return (
     <div className="fixed inset-0 z-[70] flex items-start justify-center bg-black/50 backdrop-blur-sm">
       <button className="absolute inset-0" aria-label="Close search" onClick={onClose} />
-      <div className="relative mt-24 w-full max-w-2xl rounded-2xl border border-border bg-background shadow-panel-lg">
+      <div className="relative mt-24 w-full max-w-2xl mx-4 rounded-2xl border border-border bg-background shadow-panel-lg">
         <div className="flex items-center gap-3 border-b border-border px-5 py-4">
           <Search className="size-[18px] text-muted-foreground" strokeWidth={1.75} />
           <input
             ref={inputRef}
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search engineering knowledge..."
+            onKeyDown={(e) => {
+              if (e.key === "ArrowDown") { e.preventDefault(); setActiveIdx((i) => Math.min(i + 1, results.length - 1)); }
+              else if (e.key === "ArrowUp") { e.preventDefault(); setActiveIdx((i) => Math.max(i - 1, 0)); }
+              else if (e.key === "Enter" && results[activeIdx]) { e.preventDefault(); go(results[activeIdx].href); }
+            }}
+            placeholder="Search pages, tools, downloads, articles…"
             className="flex-1 bg-transparent text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none"
           />
           <kbd className="hidden rounded-md border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline">
             ESC
           </kbd>
         </div>
-        <div className="px-5 py-4">
-          <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-            Suggested
-          </div>
-          <ul className="grid gap-0.5">
-            {suggestions
-              .filter((s) => (q ? s.toLowerCase().includes(q.toLowerCase()) : true))
-              .map((s) => (
-                <li key={s}>
-                  <button className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-[13.5px] text-foreground hover:bg-surface/70">
-                    <span className="inline-flex items-center gap-2">
-                      <Search className="size-3.5 text-muted-foreground" strokeWidth={1.75} />
-                      {s}
-                    </span>
-                    <ArrowRight className="size-3.5 text-muted-foreground" strokeWidth={2} />
-                  </button>
-                </li>
-              ))}
-          </ul>
-          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
-            {["Articles", "Downloads", "Products", "Services", "Markets", "Case Studies", "FAQ"].map((t) => (
-              <span
-                key={t}
-                className="rounded-full border border-border px-2.5 py-1 text-[11px] font-medium text-foreground/70"
-              >
-                {t}
-              </span>
-            ))}
-          </div>
+        <div className="max-h-[60vh] overflow-y-auto px-5 py-4">
+          {results.length === 0 ? (
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              No results for "{q}". Try "PIR", "ROI", "layout" or "quotation".
+            </div>
+          ) : (
+            Object.entries(groups).map(([group, items]) => (
+              <div key={group} className="mb-4 last:mb-0">
+                <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{group}</div>
+                <ul className="grid gap-0.5">
+                  {items.map((r) => {
+                    const idx = results.indexOf(r);
+                    const active = idx === activeIdx;
+                    return (
+                      <li key={r.href}>
+                        <button
+                          onMouseEnter={() => setActiveIdx(idx)}
+                          onClick={() => go(r.href)}
+                          className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition ${active ? "bg-surface" : "hover:bg-surface/70"}`}
+                        >
+                          <span className="min-w-0">
+                            <span className="block text-[13.5px] text-foreground truncate">{r.title}</span>
+                            <span className="block text-[11.5px] text-muted-foreground truncate">{r.desc}</span>
+                          </span>
+                          <ArrowRight className="size-3.5 text-muted-foreground shrink-0" strokeWidth={2} />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

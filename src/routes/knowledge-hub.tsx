@@ -212,11 +212,14 @@ function KnowledgeHub() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let list = ARTICLES.filter((a) =>
-      (cat === "All" || a.category === cat) &&
-      (level === "All" || a.level === level) &&
-      (q === "" || a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q))
-    );
+    const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
+    let list = ARTICLES.filter((a) => {
+      if (cat !== "All" && a.category !== cat) return false;
+      if (level !== "All" && a.level !== level) return false;
+      if (tokens.length === 0) return true;
+      const hay = `${a.title} ${a.excerpt} ${a.category} ${a.section} ${a.level}`.toLowerCase();
+      return tokens.every((t) => hay.includes(t));
+    });
     if (tab === "Latest") list = [...list].sort((a, b) => b.date.localeCompare(a.date));
     else if (tab === "Most Popular") list = list.filter((a) => a.popular).concat(list.filter((a) => !a.popular));
     else list = list.filter((a) => a.featured).concat(list.filter((a) => !a.featured));

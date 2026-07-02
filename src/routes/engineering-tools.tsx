@@ -94,7 +94,13 @@ function EngineeringToolsCenter() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return TOOLS.filter((t) => (cat === "All" || t.category === cat) && (q === "" || t.title.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q)));
+    const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
+    return TOOLS.filter((t) => {
+      if (cat !== "All" && t.category !== cat) return false;
+      if (tokens.length === 0) return true;
+      const hay = `${t.title} ${t.desc} ${t.category} ${t.slug}`.toLowerCase();
+      return tokens.every((tok) => hay.includes(tok));
+    });
   }, [query, cat]);
 
   return (
