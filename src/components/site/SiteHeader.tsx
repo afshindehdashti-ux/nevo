@@ -424,11 +424,13 @@ function TopLink({
 
 function MegaTrigger({
   group,
+  displayLabel,
   onLight,
   active,
   onEnter,
 }: {
   group: MenuGroup;
+  displayLabel?: string;
   onLight: boolean;
   active: boolean;
   onEnter: () => void;
@@ -442,7 +444,7 @@ function MegaTrigger({
       onMouseEnter={onEnter}
       onFocus={onEnter}
     >
-      {group.label}
+      {displayLabel ?? group.label}
     </button>
   );
 }
