@@ -586,18 +586,24 @@ if (warnings.length) {
       `  ⚠ Link "${w.link}" in ${w.file}:${w.line} hits 301 → prefer "${w.redirectedTo}"`,
     );
 }
-if (errors.length || sitemapErrors.length) {
+if (errors.length || sitemapErrors.length || externalFailures.length) {
   console.log("\nErrors:");
   for (const e of errors)
     console.log(`  ✗ Dead internal link "${e.link}" in ${e.file}:${e.line}`);
   for (const s of sitemapErrors) console.log(`  ✗ ${s.path} — ${s.reason}`);
+  for (const f of externalFailures) {
+    const first = f.occurrences[0];
+    console.log(
+      `  ✗ External ${f.url} → ${f.status ?? "no response"}${f.error ? ` (${f.error})` : ""} — first seen ${first?.file}:${first?.line}${f.occurrences.length > 1 ? ` (+${f.occurrences.length - 1} more)` : ""}`,
+    );
+  }
   console.log(
-    `\n✗ Link check failed: ${totalErrors} error(s), ${warnings.length} warning(s), ${ignoredLinkCount} ignored.`,
+    `\n✗ Link check failed: ${totalErrors} error(s), ${warnings.length} warning(s), ${ignoredLinkCount + ignoredExternalCount} ignored.`,
   );
   console.log(`Reports written to ${relative(ROOT, OUT_DIR)}/`);
   process.exit(1);
 }
 console.log(
-  `\n✓ Link check passed: ${knownRoutes.size} routes, ${sitemapPaths.size} sitemap entries, ${warnings.length} warning(s), ${ignoredLinkCount} ignored.`,
+  `\n✓ Link check passed: ${knownRoutes.size} routes, ${sitemapPaths.size} sitemap entries, ${externalOkCount}/${externalUrls.size} external OK, ${warnings.length} warning(s), ${ignoredLinkCount + ignoredExternalCount} ignored.`,
 );
 console.log(`Reports written to ${relative(ROOT, OUT_DIR)}/`);
