@@ -234,15 +234,13 @@ function DownloadCenterPage() {
 
   const filtered = useMemo(() => {
     let list = DOCS.slice();
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      list = list.filter((d) =>
-        d.title.toLowerCase().includes(q) ||
-        d.desc.toLowerCase().includes(q) ||
-        d.category.toLowerCase().includes(q) ||
-        d.type.toLowerCase().includes(q) ||
-        d.keywords.some((k) => k.includes(q)),
-      );
+    const q = query.trim().toLowerCase();
+    const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
+    if (tokens.length) {
+      list = list.filter((d) => {
+        const hay = `${d.title} ${d.desc} ${d.category} ${d.type} ${(d.keywords || []).join(" ")}`.toLowerCase();
+        return tokens.every((t) => hay.includes(t));
+      });
     }
     if (activeCategory !== "All") list = list.filter((d) => d.category === activeCategory);
     if (activeType !== "All") list = list.filter((d) => d.type === activeType);
