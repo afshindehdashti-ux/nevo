@@ -154,6 +154,7 @@ function RootComponent() {
       <StickyMobileCTA />
       <CookieConsent />
       <Analytics />
+      <Toaster position="top-right" richColors closeButton />
     </QueryClientProvider>
   );
 }
