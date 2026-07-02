@@ -169,8 +169,16 @@
     overflow-x: clip;
   }
   ::selection {
-    background: var(--color-accent);
-    color: var(--color-accent-foreground);
+    background: color-mix(in oklab, var(--color-accent) 40%, transparent);
+    color: var(--color-foreground);
+  }
+  /* Global link default — inherits color, green on hover. Components can override. */
+  a {
+    color: inherit;
+    transition: color var(--duration-fast) var(--ease-out-quart);
+  }
+  a:hover {
+    color: var(--color-accent);
   }
   /* Locked heading defaults — components can override sizes but keep tracking */
   h1, h2, h3, h4 {
