@@ -1342,7 +1342,7 @@
         "required": "{field} is required.",
         "minLength": "{field} must be at least {min} characters.",
         "invalidEmail": "Please enter a valid email address.",
-        "invalidPhone": "Please enter a valid phone number."
+        "invalidPhone": "Please enter a valid phone number, e.g. {example}."
       },
       "errors": {
         "serverErrorTitle": "Submission failed",

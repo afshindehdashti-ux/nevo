@@ -1,8 +1,9 @@
 import { toast } from "sonner";
+import { isValidPhone, getPhoneExample } from "./phone-validation";
 
 const STORAGE_KEY = "nevo:leads";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const PHONE_RE = /^[+()\d\s-]{7,}$/;
+
 
 export type LeadPayload = Record<string, FormDataEntryValue | string>;
 
@@ -37,6 +38,8 @@ export interface LeadOptions {
   successTitle?: string;
   successDescription?: string;
   messages?: LeadMessages;
+  /** BCP47 locale (e.g. "en", "ar", "fr") — enables locale-aware phone rules. */
+  phoneLocale?: string;
   /**
    * Optional delivery hook. When provided, its result decides the toast:
    * - resolves with `{ ok: true }` or a `Response` with status < 400 → success
@@ -80,6 +83,7 @@ export function validateLead(
   payload: LeadPayload,
   rules: ValidateRule[] = [],
   messages: LeadMessages = {},
+  phoneLocale?: string,
 ): string | null {
   const m = { ...DEFAULT_MESSAGES, ...messages };
   for (const r of rules) {
@@ -88,10 +92,13 @@ export function validateLead(
     if (!v) return fmt(m.required, { field: r.label });
     if (r.min && v.length < r.min) return fmt(m.minLength, { field: r.label, min: r.min });
     if (r.type === "email" && !EMAIL_RE.test(v)) return m.invalidEmail;
-    if (r.type === "phone" && !PHONE_RE.test(v)) return m.invalidPhone;
+    if (r.type === "phone" && !isValidPhone(v, phoneLocale)) {
+      return fmt(m.invalidPhone, { example: getPhoneExample(phoneLocale) });
+    }
   }
   return null;
 }
+
 
 function persist(source: string, payload: LeadPayload) {
   if (typeof window === "undefined") return;
@@ -115,7 +122,7 @@ export async function submitLeadForm(
 ): Promise<boolean> {
   const m = { ...DEFAULT_MESSAGES, ...(opts.messages ?? {}) };
   const payload = collectFormData(form);
-  const error = validateLead(payload, opts.rules, m);
+  const error = validateLead(payload, opts.rules, m, opts.phoneLocale);
   if (error) {
     toast.error(m.reviewTitle, { description: error });
     return false;

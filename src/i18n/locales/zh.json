@@ -1342,7 +1342,7 @@
         "required": "{field}为必填项。",
         "minLength": "{field}至少需要 {min} 个字符。",
         "invalidEmail": "请输入有效的电子邮箱地址。",
-        "invalidPhone": "请输入有效的电话号码。"
+        "invalidPhone": "请输入有效的电话号码，例如 {example}。"
       },
       "errors": {
         "serverErrorTitle": "提交失败",

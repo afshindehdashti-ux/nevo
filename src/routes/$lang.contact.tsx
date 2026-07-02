@@ -14,6 +14,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
 import { submitLeadForm } from "@/lib/lead-submit";
+import { getPhoneExample } from "@/lib/phone-validation";
 import { SITE, WHATSAPP_URL, buildSeo } from "@/lib/seo";
 import { localizedMeta } from "@/lib/seo-meta";
 
@@ -61,7 +62,7 @@ function useCounter(target: number, duration = 1400) {
 }
 
 function ContactPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const formRef = useRef<HTMLFormElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -79,6 +80,7 @@ function ContactPage() {
     setBusy(true);
     const ok = await submitLeadForm(e.currentTarget, {
       source: "contact-callback",
+      phoneLocale: i18n.language,
       rules: [
         { field: "name",  label: t("contact.callback.name") },
         { field: "email", label: t("contact.callback.email"), type: "email" },
@@ -231,7 +233,10 @@ function ContactPage() {
                 <input name="name" placeholder={t("contact.callback.name")} required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
                 <input name="company" placeholder={t("contact.callback.company")} className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
                 <input name="email" placeholder={t("contact.callback.email")} type="email" required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
-                <input name="phone" placeholder={t("contact.callback.phone")} required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
+                <input name="phone" type="tel" inputMode="tel" autoComplete="tel"
+                       placeholder={getPhoneExample(i18n.language)}
+                       aria-label={t("contact.callback.phone")}
+                       required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
               </div>
               <select name="interest" defaultValue="" className="rounded-md border border-input bg-background px-4 py-3 text-sm">
                 <option value="" disabled>{t("contact.callback.interestPlaceholder")}</option>
