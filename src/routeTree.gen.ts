@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ProjectInquiryRouteImport } from './routes/project-inquiry'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as AboutRouteImport } from './routes/about'
@@ -22,6 +23,11 @@ import { Route as SolutionsEngineeringConsultancyRouteImport } from './routes/so
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectInquiryRoute = ProjectInquiryRouteImport.update({
+  id: '/project-inquiry',
+  path: '/project-inquiry',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KnowledgeRoute = KnowledgeRouteImport.update({
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/industries': typeof IndustriesRoute
   '/knowledge': typeof KnowledgeRoute
+  '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/industries': typeof IndustriesRoute
   '/knowledge': typeof KnowledgeRoute
+  '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/industries': typeof IndustriesRoute
   '/knowledge': typeof KnowledgeRoute
+  '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/industries'
     | '/knowledge'
+    | '/project-inquiry'
     | '/sitemap.xml'
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/industries'
     | '/knowledge'
+    | '/project-inquiry'
     | '/sitemap.xml'
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/industries'
     | '/knowledge'
+    | '/project-inquiry'
     | '/sitemap.xml'
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   IndustriesRoute: typeof IndustriesRoute
   KnowledgeRoute: typeof KnowledgeRoute
+  ProjectInquiryRoute: typeof ProjectInquiryRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SolutionsEngineeringConsultancyRoute: typeof SolutionsEngineeringConsultancyRoute
   SolutionsProductionLinesRoute: typeof SolutionsProductionLinesRoute
@@ -156,6 +169,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/project-inquiry': {
+      id: '/project-inquiry'
+      path: '/project-inquiry'
+      fullPath: '/project-inquiry'
+      preLoaderRoute: typeof ProjectInquiryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/knowledge': {
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   IndustriesRoute: IndustriesRoute,
   KnowledgeRoute: KnowledgeRoute,
+  ProjectInquiryRoute: ProjectInquiryRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SolutionsEngineeringConsultancyRoute: SolutionsEngineeringConsultancyRoute,
   SolutionsProductionLinesRoute: SolutionsProductionLinesRoute,
