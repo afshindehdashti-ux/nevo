@@ -121,6 +121,7 @@ const KNOWLEDGE: MenuGroup = {
     { label: "Case Studies", desc: "Factories built with NEVO.", icon: FileText, href: "/knowledge" },
     { label: "FAQ", desc: "Common industrial questions.", icon: HelpCircle, href: "/knowledge" },
     { label: "Investment Guides", desc: "Feasibility and CAPEX planning.", icon: LineChart, href: "/knowledge" },
+    { label: "Investment Calculator", desc: "Model CAPEX, OPEX, ROI, IRR & payback.", icon: Calculator, href: "/investment-calculator" },
     { label: "White Papers", desc: "Peer-reviewed engineering perspectives.", icon: ScrollText, href: "/knowledge" },
     { label: "Engineering Tools", desc: "Calculators, selectors, references.", icon: Calculator, href: "/ai-assistant" },
   ],
