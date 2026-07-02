@@ -47,12 +47,12 @@ function NotFoundComponent() {
             to="/"
             className="flex items-center gap-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <img
+            <img loading="lazy" decoding="async"
               src={nevoLogoDark}
               alt="NEVO Industrial"
               className="h-7 w-auto dark:hidden"
             />
-            <img
+            <img loading="lazy" decoding="async"
               src={nevoLogoLight}
               alt="NEVO Industrial"
               className="hidden h-7 w-auto dark:block"

@@ -268,7 +268,7 @@ function DownloadCenterPage() {
       {/* HERO */}
       <section className="relative overflow-hidden pt-40 pb-24 border-b border-white/5">
         <div className="absolute inset-0 -z-10">
-          <img src={heroImg.url} alt="" className="h-full w-full object-cover opacity-25" />
+          <img loading="lazy" decoding="async" src={heroImg.url} alt="" className="h-full w-full object-cover opacity-25" />
           <div className="absolute inset-0 bg-gradient-to-br from-[#0a0d10] via-[#0a0d10]/70 to-[#0a0d10]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.15),transparent_50%)]" />
         </div>
@@ -549,7 +549,7 @@ function DownloadCenterPage() {
       {/* FINAL CTA */}
       <section className="relative py-28 overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <img src={futureHero.url} alt="" className="h-full w-full object-cover opacity-30" />
+          <img loading="lazy" decoding="async" src={futureHero.url} alt="" className="h-full w-full object-cover opacity-30" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d10] via-[#0a0d10]/70 to-[#0a0d10]/40" />
         </div>
         <div className="mx-auto max-w-4xl px-6 text-center">
@@ -636,7 +636,7 @@ function FeaturedCard({ doc, onPreview, onDownload }: { doc: Doc; onPreview: () 
     <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
       className="group relative rounded-2xl overflow-hidden border border-white/10 bg-white/[0.02] hover:border-emerald-500/40 transition">
       <div className="relative aspect-[16/10] overflow-hidden">
-        <img src={doc.cover.url} alt={doc.title} className="h-full w-full object-cover group-hover:scale-105 transition duration-700" />
+        <img loading="lazy" decoding="async" src={doc.cover.url} alt={doc.title} className="h-full w-full object-cover group-hover:scale-105 transition duration-700" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d10] via-[#0a0d10]/40 to-transparent" />
         <div className="absolute top-4 left-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-500/15 backdrop-blur px-3 py-1 text-[10px] font-mono uppercase tracking-widest text-emerald-300">
           <Star className="h-3 w-3" /> Featured
@@ -673,7 +673,7 @@ function DocCard({ doc, onPreview, onDownload }: { doc: Doc; onPreview: () => vo
   return (
     <div className="group flex flex-col rounded-xl overflow-hidden border border-white/10 bg-white/[0.02] hover:border-emerald-500/40 hover:bg-white/[0.04] transition">
       <button onClick={onPreview} className="relative aspect-[16/10] overflow-hidden text-left">
-        <img src={doc.cover.url} alt={doc.title} className="h-full w-full object-cover group-hover:scale-105 transition duration-700" />
+        <img loading="lazy" decoding="async" src={doc.cover.url} alt={doc.title} className="h-full w-full object-cover group-hover:scale-105 transition duration-700" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d10]/90 via-[#0a0d10]/20 to-transparent" />
         <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded border border-white/15 bg-black/50 backdrop-blur px-2 py-0.5 text-[10px] font-mono text-white/80">
           <Icon className="h-3 w-3 text-emerald-400" /> {doc.category}
@@ -750,7 +750,7 @@ function PreviewModal({ doc, onClose, onDownload }: { doc: Doc; onClose: () => v
         className="my-8 w-full max-w-5xl rounded-2xl border border-white/10 bg-[#0d1114] overflow-hidden">
         <div className="grid md:grid-cols-2">
           <div className="relative aspect-[4/5] md:aspect-auto md:min-h-[600px]">
-            <img src={doc.cover.url} alt={doc.title} className="h-full w-full object-cover" />
+            <img loading="lazy" decoding="async" src={doc.cover.url} alt={doc.title} className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0d1114] via-transparent to-transparent" />
             <div className="absolute top-4 left-4 inline-flex items-center gap-2 rounded border border-emerald-500/40 bg-emerald-500/15 backdrop-blur px-3 py-1 text-[11px] font-mono uppercase tracking-widest text-emerald-300">
               <Icon className="h-3.5 w-3.5" /> {doc.category}
@@ -793,7 +793,7 @@ function PreviewModal({ doc, onClose, onDownload }: { doc: Doc; onClose: () => v
                 <div className="mt-3 space-y-2">
                   {related.map((r) => (
                     <div key={r.id} className="flex items-center gap-3 rounded-lg border border-white/10 p-3 bg-white/[0.02]">
-                      <img src={r.cover.url} alt="" className="h-12 w-12 rounded object-cover" />
+                      <img loading="lazy" decoding="async" src={r.cover.url} alt="" className="h-12 w-12 rounded object-cover" />
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium truncate">{r.title}</div>
                         <div className="text-[11px] text-white/50 font-mono">{r.type} · {r.pages}p</div>
@@ -831,7 +831,7 @@ function DownloadModal({ doc, onClose }: { doc: Doc; onClose: () => void }) {
         onClick={(e) => e.stopPropagation()}
         className="my-8 w-full max-w-2xl rounded-2xl border border-white/10 bg-[#0d1114] overflow-hidden">
         <div className="p-6 flex items-start gap-4 border-b border-white/10">
-          <img src={doc.cover.url} alt="" className="h-20 w-16 rounded object-cover flex-shrink-0" />
+          <img loading="lazy" decoding="async" src={doc.cover.url} alt="" className="h-20 w-16 rounded object-cover flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <div className="text-[11px] font-mono uppercase tracking-widest text-emerald-400">{doc.type}</div>
             <div className="mt-1 font-semibold leading-snug">{doc.title}</div>

@@ -85,7 +85,7 @@ function ContactPage() {
 
       {/* HERO */}
       <section className="relative isolate overflow-hidden bg-[#0a0d0c] text-white">
-        <img src={heroImg} alt="Dubai skyline at night" width={1920} height={1088}
+        <img loading="lazy" decoding="async" src={heroImg} alt="Dubai skyline at night" width={1920} height={1088}
              className="absolute inset-0 h-full w-full object-cover opacity-55" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0d0c]/85 via-[#0a0d0c]/60 to-[#0a0d0c]" />
         <div className="container-wide relative py-32 md:py-40">

@@ -306,7 +306,7 @@ function ProjectInquiryPage() {
       {/* HERO */}
       <section className="relative min-h-[80vh] w-full overflow-hidden bg-[#0B0D10] text-white">
         <div className="absolute inset-0">
-          <img src={heroImg} alt="NEVO engineering — 3D factory render" className="h-full w-full object-cover opacity-70" />
+          <img loading="lazy" decoding="async" src={heroImg} alt="NEVO engineering — 3D factory render" className="h-full w-full object-cover opacity-70" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#0B0D10]/70 via-[#0B0D10]/50 to-[#0B0D10]" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0B0D10]/80 via-transparent to-transparent" />
         </div>
@@ -355,7 +355,7 @@ function ProjectInquiryPage() {
                 className={`group relative overflow-hidden rounded-2xl border text-left transition-all ${active ? "border-emerald-500 ring-2 ring-emerald-500/40" : "border-border hover:border-foreground/30"}`}
               >
                 <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                  <img src={t.img} alt={t.label} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <img loading="lazy" decoding="async" src={t.img} alt={t.label} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D10] via-[#0B0D10]/40 to-transparent" />
                   <div className="absolute left-4 top-4 rounded-md bg-black/40 p-2 backdrop-blur">
                     <Icon className="h-4 w-4 text-emerald-400" />
@@ -642,7 +642,7 @@ function ProjectInquiryPage() {
             <ContactCard icon={Calendar} label="Schedule Online Meeting" value="Book a 30-min engineering call" href="#wizard" className="sm:col-span-2" />
           </div>
           <div className="relative overflow-hidden rounded-2xl border border-border lg:col-span-2">
-            <img src={dubaiImg} alt="NEVO Industrial — Dubai headquarters" className="h-full w-full object-cover" />
+            <img loading="lazy" decoding="async" src={dubaiImg} alt="NEVO Industrial — Dubai headquarters" className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D10] via-[#0B0D10]/40 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-6 text-white">
               <div className="text-xs uppercase tracking-widest text-emerald-400">Global Presence</div>
@@ -690,7 +690,7 @@ function ProjectInquiryPage() {
       {/* FINAL CTA */}
       <section className="relative overflow-hidden bg-[#0B0D10] py-28 text-white md:py-36">
         <div className="absolute inset-0 opacity-40">
-          <img src={tile17} alt="" className="h-full w-full object-cover" />
+          <img loading="lazy" decoding="async" src={tile17} alt="" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D10] via-[#0B0D10]/70 to-[#0B0D10]/40" />
         </div>
         <div className="relative mx-auto max-w-4xl px-6 text-center">

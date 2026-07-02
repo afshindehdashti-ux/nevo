@@ -100,7 +100,7 @@ function ArticlePage() {
       {/* HERO */}
       <header className="relative overflow-hidden border-b border-white/5">
         <div className="absolute inset-0">
-          <img src={article.cover} alt="" className="h-full w-full object-cover opacity-35" />
+          <img loading="lazy" decoding="async" src={article.cover} alt="" className="h-full w-full object-cover opacity-35" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#05070a]/40 via-[#05070a]/70 to-[#05070a]" />
         </div>
         <div className="relative mx-auto max-w-4xl px-6 pt-24 pb-14">

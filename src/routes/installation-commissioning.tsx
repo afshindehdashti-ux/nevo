@@ -123,7 +123,7 @@ function InstallationCommissioningPage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-graphite text-white">
         <div className="absolute inset-0 opacity-40">
-          <img
+          <img loading="lazy" decoding="async"
             src={inst01}
             alt=""
             className="h-full w-full object-cover"

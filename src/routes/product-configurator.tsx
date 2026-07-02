@@ -311,7 +311,7 @@ function ProductConfiguratorPage() {
               transition={{ duration: 0.9, delay: 0.15 }}
               className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-white p-8 shadow-[0_40px_120px_-40px_rgba(16,185,129,0.35)] md:p-12"
             >
-              <img
+              <img loading="lazy" decoding="async"
                 src={heroImg}
                 alt="NEVO sandwich panel — engineering render"
                 className="relative z-10 max-h-full max-w-full object-contain"

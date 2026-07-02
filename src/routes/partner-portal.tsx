@@ -192,7 +192,7 @@ function PartnerPortalPage() {
       {/* Hero band using board hero */}
       <section className="relative overflow-hidden border-b border-white/5">
         <div className="absolute inset-0">
-          <img src={A[6].url} alt="" className="h-full w-full object-cover opacity-30" />
+          <img loading="lazy" decoding="async" src={A[6].url} alt="" className="h-full w-full object-cover opacity-30" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a0d0c]/70 via-[#0a0d0c]/85 to-[#0a0d0c]" />
         </div>
         <div className="relative mx-auto max-w-[1440px] px-6 py-14 md:py-20">
@@ -307,7 +307,7 @@ function PartnerPortalPage() {
       {/* Final CTA */}
       <section className="relative border-t border-white/5 bg-gradient-to-b from-[#0a0d0c] to-[#0d1210]">
         <div className="absolute inset-0 opacity-20">
-          <img src={A[20].url} alt="" className="h-full w-full object-cover" />
+          <img loading="lazy" decoding="async" src={A[20].url} alt="" className="h-full w-full object-cover" />
         </div>
         <div className="relative mx-auto max-w-[1440px] px-6 py-16 md:py-20">
           <div className="grid gap-8 md:grid-cols-[1.4fr_1fr] md:items-center">
@@ -360,7 +360,7 @@ function LoginGate({ onSignIn, showPw, setShowPw }: { onSignIn: () => void; show
       <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
         <Card className="overflow-hidden">
           <div className="relative aspect-[16/10] w-full">
-            <img src={A[6].url} alt="Global partner network map" className="h-full w-full object-cover opacity-90" />
+            <img loading="lazy" decoding="async" src={A[6].url} alt="Global partner network map" className="h-full w-full object-cover opacity-90" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d0c] via-transparent to-transparent" />
             <div className="absolute bottom-5 left-5 right-5">
               <div className="text-[11px] uppercase tracking-[0.2em] text-emerald-300/90">Our Global Partner Network</div>
@@ -550,7 +550,7 @@ function Dashboard() {
             </ul>
           </div>
           <div className="relative min-h-[220px]">
-            <img src={A[9].url} alt="Top production lines" className="h-full w-full object-cover" />
+            <img loading="lazy" decoding="async" src={A[9].url} alt="Top production lines" className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#0a0d0c] via-transparent to-transparent md:from-[#0a0d0c]/90" />
           </div>
         </div>
@@ -645,7 +645,7 @@ function ProductCenter() {
         {PRODUCTS.map(p => (
           <Card key={p.title} className="group overflow-hidden">
             <div className="relative aspect-[4/3]">
-              <img src={p.img.url} alt={p.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+              <img loading="lazy" decoding="async" src={p.img.url} alt={p.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
               <div className="absolute bottom-3 left-3"><Chip>{p.cat}</Chip></div>
             </div>
@@ -698,7 +698,7 @@ function MarketingCenter() {
     <div className="space-y-4">
       <Card className="overflow-hidden">
         <div className="grid gap-0 md:grid-cols-[1fr_1.1fr]">
-          <div className="relative aspect-[4/3] md:aspect-auto"><img src={A[0].url} alt="Marketing Center" className="h-full w-full object-cover" /></div>
+          <div className="relative aspect-[4/3] md:aspect-auto"><img loading="lazy" decoding="async" src={A[0].url} alt="Marketing Center" className="h-full w-full object-cover" /></div>
           <div className="p-6">
             <div className="text-xs uppercase tracking-[0.2em] text-emerald-300/90">Marketing Center</div>
             <h3 className="mt-2 text-2xl font-semibold">Everything you need to sell NEVO.</h3>
@@ -727,7 +727,7 @@ function TrainingCenter() {
     <div className="space-y-4">
       <Card className="overflow-hidden">
         <div className="relative aspect-[21/8]">
-          <img src={A[8].url} alt="Training Center" className="h-full w-full object-cover" />
+          <img loading="lazy" decoding="async" src={A[8].url} alt="Training Center" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d0c] via-transparent to-transparent" />
           <div className="absolute bottom-5 left-6 right-6">
             <div className="text-xs uppercase tracking-[0.2em] text-emerald-300/90">Training Center</div>
@@ -766,7 +766,7 @@ function DownloadCenter() {
             <h3 className="mt-2 text-2xl font-semibold">Technical documents & engineering files.</h3>
             <p className="mt-2 text-sm text-white/60">CAD, BIM, drawings, datasheets, installation manuals and engineering guides.</p>
           </div>
-          <div className="relative aspect-[4/3] md:aspect-auto"><img src={A[13].url} alt="Downloads" className="h-full w-full object-cover" /></div>
+          <div className="relative aspect-[4/3] md:aspect-auto"><img loading="lazy" decoding="async" src={A[13].url} alt="Downloads" className="h-full w-full object-cover" /></div>
         </div>
       </Card>
       <Card className="overflow-hidden">
@@ -800,7 +800,7 @@ function CommunicationCenter() {
     <div className="space-y-4">
       <Card className="overflow-hidden">
         <div className="relative aspect-[21/7]">
-          <img src={A[7].url} alt="Communication Center" className="h-full w-full object-cover" />
+          <img loading="lazy" decoding="async" src={A[7].url} alt="Communication Center" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d0c] via-[#0a0d0c]/40 to-transparent" />
           <div className="absolute bottom-5 left-6 right-6">
             <div className="text-xs uppercase tracking-[0.2em] text-emerald-300/90">Communication Center</div>
@@ -895,7 +895,7 @@ function AiAssistant() {
     <div className="space-y-4">
       <Card className="overflow-hidden">
         <div className="grid gap-0 md:grid-cols-[1fr_1.1fr]">
-          <div className="relative aspect-[4/3] md:aspect-auto"><img src={A[11].url} alt="AI Sales Assistant" className="h-full w-full object-cover" /></div>
+          <div className="relative aspect-[4/3] md:aspect-auto"><img loading="lazy" decoding="async" src={A[11].url} alt="AI Sales Assistant" className="h-full w-full object-cover" /></div>
           <div className="p-6">
             <div className="text-xs uppercase tracking-[0.2em] text-emerald-300/90">AI Sales Assistant</div>
             <h3 className="mt-2 text-2xl font-semibold">Your smart selling co-pilot.</h3>
@@ -932,7 +932,7 @@ function MobileApp() {
   return (
     <Card className="overflow-hidden">
       <div className="grid gap-0 md:grid-cols-[1.2fr_1fr]">
-        <div className="relative aspect-[4/3] md:aspect-auto"><img src={A[17].url} alt="Mobile Partner App" className="h-full w-full object-cover" /></div>
+        <div className="relative aspect-[4/3] md:aspect-auto"><img loading="lazy" decoding="async" src={A[17].url} alt="Mobile Partner App" className="h-full w-full object-cover" /></div>
         <div className="p-6">
           <div className="text-xs uppercase tracking-[0.2em] text-emerald-300/90">Mobile Partner App</div>
           <h3 className="mt-2 text-2xl font-semibold">Manage your business on the go.</h3>
