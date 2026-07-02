@@ -21,6 +21,14 @@ export interface LeadMessages {
   minLength?: string;
   invalidEmail?: string;
   invalidPhone?: string;
+  // Server / delivery failures
+  serverErrorTitle?: string;
+  serverErrorDesc?: string;
+  rateLimitTitle?: string;
+  rateLimitDesc?: string;
+  networkErrorTitle?: string;
+  networkErrorDesc?: string;
+  retry?: string;
 }
 
 export interface LeadOptions {
@@ -29,6 +37,13 @@ export interface LeadOptions {
   successTitle?: string;
   successDescription?: string;
   messages?: LeadMessages;
+  /**
+   * Optional delivery hook. When provided, its result decides the toast:
+   * - resolves with `{ ok: true }` or a `Response` with status < 400 → success
+   * - resolves with status 429 → rate-limited toast
+   * - resolves with status >= 500 or throws → server / network error toast
+   */
+  deliver?: (payload: LeadPayload) => Promise<Response | { ok: boolean; status?: number } | void>;
 }
 
 const DEFAULT_MESSAGES: Required<LeadMessages> = {
@@ -37,7 +52,15 @@ const DEFAULT_MESSAGES: Required<LeadMessages> = {
   minLength: "{field} must be at least {min} characters.",
   invalidEmail: "Please enter a valid email address.",
   invalidPhone: "Please enter a valid phone number.",
+  serverErrorTitle: "Submission failed",
+  serverErrorDesc: "We couldn't deliver your request. Please try again in a moment.",
+  rateLimitTitle: "Too many requests",
+  rateLimitDesc: "You've sent several requests in a short time. Please wait a moment and retry.",
+  networkErrorTitle: "Network error",
+  networkErrorDesc: "Check your connection and try again. Your details were not sent.",
+  retry: "Retry",
 };
+
 
 function fmt(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
@@ -99,8 +122,51 @@ export async function submitLeadForm(
   }
 
   persist(opts.source, payload);
-  // Simulate async delivery so the UX matches a real backend call.
-  await new Promise((r) => setTimeout(r, 350));
+
+  // Delivery step — localized failure toasts with retry action.
+  const showRetry = (title: string, description: string) => {
+    toast.error(title, {
+      description,
+      action: {
+        label: m.retry,
+        onClick: () => {
+          void submitLeadForm(form, opts);
+        },
+      },
+    });
+  };
+
+  try {
+    let status = 200;
+    if (opts.deliver) {
+      const res = await opts.deliver(payload);
+      if (res && typeof (res as Response).status === "number") {
+        status = (res as Response).status;
+      } else if (res && typeof (res as { ok: boolean }).ok === "boolean") {
+        status = (res as { ok: boolean; status?: number }).status ?? ((res as { ok: boolean }).ok ? 200 : 500);
+      }
+    } else {
+      // Simulate async delivery so the UX matches a real backend call.
+      await new Promise((r) => setTimeout(r, 350));
+    }
+
+    if (status === 429) {
+      showRetry(m.rateLimitTitle, m.rateLimitDesc);
+      return false;
+    }
+    if (status >= 500 || status >= 400) {
+      showRetry(m.serverErrorTitle, m.serverErrorDesc);
+      return false;
+    }
+  } catch (err) {
+    const offline = typeof navigator !== "undefined" && navigator.onLine === false;
+    if (offline || (err instanceof TypeError && /fetch|network/i.test(err.message))) {
+      showRetry(m.networkErrorTitle, m.networkErrorDesc);
+    } else {
+      showRetry(m.serverErrorTitle, m.serverErrorDesc);
+    }
+    return false;
+  }
 
   toast.success(opts.successTitle ?? "Request received", {
     description:
@@ -109,3 +175,4 @@ export async function submitLeadForm(
   });
   return true;
 }
+

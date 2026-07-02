@@ -1343,6 +1343,15 @@
         "minLength": "{field}至少需要 {min} 个字符。",
         "invalidEmail": "请输入有效的电子邮箱地址。",
         "invalidPhone": "请输入有效的电话号码。"
+      },
+      "errors": {
+        "serverErrorTitle": "提交失败",
+        "serverErrorDesc": "暂时无法提交您的请求，请稍后再试。",
+        "rateLimitTitle": "请求过于频繁",
+        "rateLimitDesc": "您在短时间内发送了多次请求，请稍候再试。",
+        "networkErrorTitle": "网络错误",
+        "networkErrorDesc": "请检查网络连接后重试，您的信息尚未发送。",
+        "retry": "重试"
       }
     }
   }

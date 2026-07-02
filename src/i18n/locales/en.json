@@ -1343,6 +1343,15 @@
         "minLength": "{field} must be at least {min} characters.",
         "invalidEmail": "Please enter a valid email address.",
         "invalidPhone": "Please enter a valid phone number."
+      },
+      "errors": {
+        "serverErrorTitle": "Submission failed",
+        "serverErrorDesc": "We couldn't deliver your request right now. Please try again in a moment.",
+        "rateLimitTitle": "Too many requests",
+        "rateLimitDesc": "You've sent several requests in a short time. Please wait a moment before retrying.",
+        "networkErrorTitle": "Network error",
+        "networkErrorDesc": "Check your connection and try again. Your details were not sent.",
+        "retry": "Retry"
       }
     }
   }

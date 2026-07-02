@@ -1343,6 +1343,15 @@
         "minLength": "{field} deve contenere almeno {min} caratteri.",
         "invalidEmail": "Inserisci un indirizzo e-mail valido.",
         "invalidPhone": "Inserisci un numero di telefono valido."
+      },
+      "errors": {
+        "serverErrorTitle": "Invio non riuscito",
+        "serverErrorDesc": "Non siamo riusciti a inoltrare la tua richiesta. Riprova tra qualche istante.",
+        "rateLimitTitle": "Troppe richieste",
+        "rateLimitDesc": "Hai inviato più richieste in poco tempo. Attendi un momento prima di riprovare.",
+        "networkErrorTitle": "Errore di rete",
+        "networkErrorDesc": "Verifica la connessione e riprova. I tuoi dati non sono stati inviati.",
+        "retry": "Riprova"
       }
     }
   }

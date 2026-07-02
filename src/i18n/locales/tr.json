@@ -1343,6 +1343,15 @@
         "minLength": "{field} en az {min} karakter olmalıdır.",
         "invalidEmail": "Lütfen geçerli bir e-posta adresi girin.",
         "invalidPhone": "Lütfen geçerli bir telefon numarası girin."
+      },
+      "errors": {
+        "serverErrorTitle": "Gönderim başarısız",
+        "serverErrorDesc": "Talebiniz şu anda iletilemedi. Lütfen kısa süre sonra tekrar deneyin.",
+        "rateLimitTitle": "Çok fazla istek",
+        "rateLimitDesc": "Kısa sürede birden fazla talep gönderdiniz. Lütfen bir süre bekleyip tekrar deneyin.",
+        "networkErrorTitle": "Ağ hatası",
+        "networkErrorDesc": "Bağlantınızı kontrol edip tekrar deneyin. Bilgileriniz gönderilmedi.",
+        "retry": "Yeniden dene"
       }
     }
   }
