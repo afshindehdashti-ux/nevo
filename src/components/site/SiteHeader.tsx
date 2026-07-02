@@ -799,6 +799,9 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
    ───────────────────────────────────────────────────────────── */
 
 function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSearch: () => void }) {
+  const whatsappHref = SITE.contact.whatsapp
+    ? `https://wa.me/${SITE.contact.whatsapp}`
+    : "/project-inquiry";
   const sections: { label: string; items: NavItem[] }[] = [
     { label: "Solutions", items: SOLUTIONS.items },
     { label: "Industries", items: INDUSTRIES.items },
@@ -907,8 +910,8 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
           <span className="inline-flex items-center gap-1.5">
             <MapPin className="size-3.5" strokeWidth={1.75} /> Dubai, UAE
           </span>
-          <a href="https://wa.me/" className="inline-flex items-center gap-1.5">
-            <MessageCircle className="size-3.5" strokeWidth={1.75} /> WhatsApp
+          <a href={whatsappHref} className="inline-flex items-center gap-1.5" onClick={onClose}>
+            <MessageCircle className="size-3.5" strokeWidth={1.75} /> {SITE.contact.whatsapp ? "WhatsApp" : "Engineering Desk"}
           </a>
           <span>EN</span>
         </div>
