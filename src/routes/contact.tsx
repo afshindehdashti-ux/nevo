@@ -28,11 +28,11 @@ const OFFICES = [
 ];
 
 const CONTACT_CARDS = [
-  { icon: Headphones, title: "Engineering Hotline", desc: "24/7 senior engineer on call for active project sites.", value: "+971 4 000 0100", href: "tel:+97140000100" },
-  { icon: Globe2,     title: "International Sales", desc: "Panel supply, factory equipment and export enquiries.", value: "sales@nevo-industrial.com", href: "mailto:sales@nevo-industrial.com" },
-  { icon: Wrench,     title: "Engineering Support", desc: "Technical drawings, U-value & fire compliance help.", value: "engineering@nevo-industrial.com", href: "mailto:engineering@nevo-industrial.com" },
-  { icon: Briefcase,  title: "Project Department", desc: "Turn-key factories, EPC and consulting programs.", value: "projects@nevo-industrial.com", href: "mailto:projects@nevo-industrial.com" },
-  { icon: MessageCircle, title: "WhatsApp", desc: "Fast response from our GCC engineering desk.", value: "+971 50 000 0000", href: "https://wa.me/971500000000" },
+  { icon: Headphones, title: "Engineering Hotline", desc: "24/7 senior engineer on call for active project sites.", value: SITE.contact.phone, href: SITE.contact.phoneHref },
+  { icon: Globe2,     title: "International Sales", desc: "Panel supply, factory equipment and export enquiries.", value: "solutions@nevoindustrial.com", href: "mailto:solutions@nevoindustrial.com" },
+  { icon: Wrench,     title: "Engineering Support", desc: "Technical drawings, U-value & fire compliance help.", value: "engineering@nevoindustrial.com", href: "mailto:engineering@nevoindustrial.com" },
+  { icon: Briefcase,  title: "Project Department", desc: "Turn-key factories, EPC and consulting programs.", value: "projects@nevoindustrial.com", href: "mailto:projects@nevoindustrial.com" },
+  { icon: MessageCircle, title: "WhatsApp", desc: "Fast response from our GCC engineering desk.", value: SITE.contact.whatsappDisplay, href: WHATSAPP_URL },
   { icon: Calendar,   title: "Book Online Meeting", desc: "30-minute video consultation with a senior engineer.", value: "Reserve a slot", href: "#request-callback" },
 ];
 
