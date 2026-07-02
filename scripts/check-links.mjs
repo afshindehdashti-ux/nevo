@@ -17,13 +17,69 @@
  *
  * Usage: node scripts/check-links.mjs
  */
-import { readdirSync, readFileSync, statSync, mkdirSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { join, relative, dirname } from "node:path";
 
 const ROOT = process.cwd();
 const ROUTES_DIR = join(ROOT, "src/routes");
 const SRC_DIR = join(ROOT, "src");
 const OUT_DIR = join(ROOT, "reports/link-check");
+const IGNORE_FILE = join(ROOT, ".linkcheckignore");
+const CONFIG_FILE = join(ROOT, "link-check.config.json");
+
+// -------- Allowlist / ignore loading ----------
+// Two sources are merged:
+//   1. `.linkcheckignore` — plain text, one link pattern per line, `#` comments.
+//   2. `link-check.config.json` — structured overrides:
+//        {
+//          "ignoreLinks":          ["/preview/*", "/blog/**"],
+//          "ignoreFiles":          ["src/experimental/**"],
+//          "ignoreSitemapMissing": ["/internal-tool"],
+//          "ignoreSitemapExtra":   ["/legacy-redirect"],
+//          "redirects":            { "/old": "/new" },
+//          "redirectPrefixes":     { "/old/": "/new/" }
+//        }
+// Patterns are glob-ish: `*` matches within a segment, `**` matches across.
+function globToRegExp(glob) {
+  let src = "";
+  for (let i = 0; i < glob.length; i++) {
+    const c = glob[i];
+    if (c === "*") {
+      if (glob[i + 1] === "*") { src += ".*"; i++; }
+      else src += "[^/]*";
+    } else if (/[.+?^${}()|[\]\\]/.test(c)) src += "\\" + c;
+    else src += c;
+  }
+  return new RegExp("^" + src + "$");
+}
+function loadIgnoreFile(path) {
+  if (!existsSync(path)) return [];
+  return readFileSync(path, "utf8")
+    .split(/\r?\n/)
+    .map((l) => l.replace(/#.*$/, "").trim())
+    .filter(Boolean);
+}
+function loadConfig(path) {
+  if (!existsSync(path)) return {};
+  try { return JSON.parse(readFileSync(path, "utf8")); }
+  catch (e) {
+    console.error(`✗ Failed to parse ${relative(ROOT, path)}: ${e.message}`);
+    process.exit(2);
+  }
+}
+const fileIgnorePatterns = loadIgnoreFile(IGNORE_FILE);
+const config = loadConfig(CONFIG_FILE);
+const ignoreLinkREs = [...fileIgnorePatterns, ...(config.ignoreLinks ?? [])].map(globToRegExp);
+const ignoreFileREs = (config.ignoreFiles ?? []).map(globToRegExp);
+const ignoreSitemapMissing = new Set(config.ignoreSitemapMissing ?? []);
+const ignoreSitemapExtra = new Set(config.ignoreSitemapExtra ?? []);
+const usedPatterns = new Set();
+function matchAny(res, value) {
+  for (const re of res) if (re.test(value)) { usedPatterns.add(re.source); return true; }
+  return false;
+}
+const isIgnoredLink = (l) => matchAny(ignoreLinkREs, l);
+const isIgnoredFile = (f) => matchAny(ignoreFileREs, f);
 
 // -------- Route discovery (mirrors TanStack file-based routing) ----------
 function fileToRoute(file) {
@@ -64,8 +120,8 @@ for (const { rel } of routeFiles) {
   else knownRoutes.add(r);
 }
 
-const REDIRECTS = { "/knowledge": "/knowledge-hub" };
-const REDIRECT_PREFIXES = { "/knowledge/": "/knowledge-hub/" };
+const REDIRECTS = { "/knowledge": "/knowledge-hub", ...(config.redirects ?? {}) };
+const REDIRECT_PREFIXES = { "/knowledge/": "/knowledge-hub/", ...(config.redirectPrefixes ?? {}) };
 
 function resolveLink(path) {
   const clean = path.split("#")[0].split("?")[0] || "/";
@@ -99,7 +155,10 @@ function lineOf(text, index) {
   return line;
 }
 
+let ignoredLinkCount = 0;
 for (const file of srcFiles) {
+  const relFile = relative(ROOT, file);
+  if (isIgnoredFile(relFile)) continue;
   const text = readFileSync(file, "utf8");
   for (const pattern of LINK_PATTERNS) {
     pattern.lastIndex = 0;
@@ -110,8 +169,8 @@ for (const file of srcFiles) {
       if (raw.startsWith("/api/")) continue;
       if (raw.match(/\.(png|jpg|jpeg|svg|webp|pdf|xml|txt|ico|json|mp4|webm)$/i))
         continue;
+      if (isIgnoredLink(raw)) { ignoredLinkCount++; continue; }
       const result = resolveLink(raw);
-      const relFile = relative(ROOT, file);
       const line = lineOf(text, m.index);
       if (!result.ok) {
         errors.push({ link: raw, file: relFile, line, kind: "dead" });
@@ -140,14 +199,26 @@ const SITEMAP_EXCLUDE = new Set(["/*", "/knowledge", "/knowledge/*", "/sitemap.x
 /** @type {{path:string, reason:string}[]} */
 const sitemapErrors = [];
 for (const p of sitemapPaths) {
+  if (ignoreSitemapExtra.has(p)) continue;
   if (!knownRoutes.has(p))
     sitemapErrors.push({ path: p, reason: "listed in sitemap but no matching route file" });
 }
 for (const r of knownRoutes) {
   if (SITEMAP_EXCLUDE.has(r)) continue;
+  if (ignoreSitemapMissing.has(r)) continue;
   if (!sitemapPaths.has(r))
     sitemapErrors.push({ path: r, reason: "route exists but is missing from sitemap" });
 }
+
+// Warn about ignore patterns that never matched anything (stale entries).
+const allDeclared = [
+  ...fileIgnorePatterns,
+  ...(config.ignoreLinks ?? []),
+  ...(config.ignoreFiles ?? []),
+];
+const staleIgnorePatterns = allDeclared.filter(
+  (p) => !usedPatterns.has(globToRegExp(p).source),
+);
 
 // -------- Reports --------
 const totalErrors = errors.length + sitemapErrors.length;
@@ -167,10 +238,18 @@ const report = {
     deadLinks: errors.length,
     redirectWarnings: warnings.length,
     sitemapErrors: sitemapErrors.length,
+    ignoredLinks: ignoredLinkCount,
   },
   deadLinks: errors,
   redirectWarnings: warnings,
   sitemapErrors,
+  ignore: {
+    linkPatterns: [...fileIgnorePatterns, ...(config.ignoreLinks ?? [])],
+    filePatterns: config.ignoreFiles ?? [],
+    sitemapMissing: [...ignoreSitemapMissing],
+    sitemapExtra: [...ignoreSitemapExtra],
+    stalePatterns: staleIgnorePatterns,
+  },
 };
 
 function ensureDir(p) {
@@ -295,6 +374,18 @@ function mdSummary(r) {
     lines.push(`</details>`);
     lines.push("");
   }
+  if (r.counts.ignoredLinks || r.ignore.stalePatterns.length) {
+    lines.push(
+      `_${r.counts.ignoredLinks} link occurrence(s) allowlisted via \`.linkcheckignore\` / \`link-check.config.json\`._`,
+    );
+    if (r.ignore.stalePatterns.length) {
+      lines.push("");
+      lines.push(
+        `> ⚠️ Stale ignore pattern(s) never matched — consider removing: ${r.ignore.stalePatterns.map((p) => `\`${p}\``).join(", ")}`,
+      );
+    }
+    lines.push("");
+  }
   lines.push(`_Full HTML + JSON reports are attached as workflow artifacts._`);
   return lines.join("\n");
 }
@@ -308,6 +399,13 @@ writeFileSync(htmlPath, htmlReport(report));
 writeFileSync(mdPath, mdSummary(report));
 
 // -------- Console output --------
+if (ignoredLinkCount) {
+  console.log(`\nAllowlisted ${ignoredLinkCount} link occurrence(s) via ignore config.`);
+}
+if (staleIgnorePatterns.length) {
+  console.log("\nStale ignore patterns (never matched — consider removing):");
+  for (const p of staleIgnorePatterns) console.log(`  • ${p}`);
+}
 if (warnings.length) {
   console.log("\nWarnings:");
   for (const w of warnings)
@@ -321,12 +419,12 @@ if (errors.length || sitemapErrors.length) {
     console.log(`  ✗ Dead internal link "${e.link}" in ${e.file}:${e.line}`);
   for (const s of sitemapErrors) console.log(`  ✗ ${s.path} — ${s.reason}`);
   console.log(
-    `\n✗ Link check failed: ${totalErrors} error(s), ${warnings.length} warning(s).`,
+    `\n✗ Link check failed: ${totalErrors} error(s), ${warnings.length} warning(s), ${ignoredLinkCount} ignored.`,
   );
   console.log(`Reports written to ${relative(ROOT, OUT_DIR)}/`);
   process.exit(1);
 }
 console.log(
-  `\n✓ Link check passed: ${knownRoutes.size} routes, ${sitemapPaths.size} sitemap entries, ${warnings.length} warning(s).`,
+  `\n✓ Link check passed: ${knownRoutes.size} routes, ${sitemapPaths.size} sitemap entries, ${warnings.length} warning(s), ${ignoredLinkCount} ignored.`,
 );
 console.log(`Reports written to ${relative(ROOT, OUT_DIR)}/`);
