@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
-import { SITE } from "@/lib/seo";
+import { SITE, buildSeo } from "@/lib/seo";
 import { motion } from "motion/react";
 import { ArrowRight, ShieldCheck, Award, FlaskConical } from "lucide-react";
 
@@ -103,18 +103,8 @@ const CERTS = [
 
 export const Route = createFileRoute("/$lang/quality")({
   component: QualityPage,
-  head: ({ params }) => ({
-    meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
-      { property: "og:type", content: "website" },
-        ...ogImageMeta("/quality"),
-      { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
-    ],
-    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
-  }),
+  head: ({ params }) =>
+    buildSeo({ title: TITLE, description: DESCRIPTION, path: URL_PATH, lang: params.lang }),
 });
 
 function QualityPage() {

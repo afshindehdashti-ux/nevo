@@ -35,7 +35,7 @@ import liveConsult from "@/assets/ai/live-consultation.jpg";
 import techProposal from "@/assets/ai/technical-proposal.jpg";
 import whatsappSupport from "@/assets/ai/whatsapp-support.jpg";
 import collab from "@/assets/ai/collab.jpg";
-import { SITE } from "@/lib/seo";
+import { SITE, buildSeo } from "@/lib/seo";
 import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE = "NEVO AI Engineer — AI Engineering Assistant for the Sandwich Panel Industry";
@@ -44,21 +44,8 @@ const DESCRIPTION =
 const URL_PATH = "/ai-assistant";
 
 export const Route = createFileRoute("/$lang/ai-assistant")({
-  head: ({ params }) => ({
-    meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
-      { name: "twitter:card", content: "summary_large_image" },
-        ...ogImageMeta("/ai-assistant"),
-      { name: "twitter:title", content: TITLE },
-      { name: "twitter:description", content: DESCRIPTION },
-    ],
-    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
-  }),
+  head: ({ params }) =>
+    buildSeo({ title: TITLE, description: DESCRIPTION, path: URL_PATH, lang: params.lang }),
   component: AIAssistantPage,
 });
 

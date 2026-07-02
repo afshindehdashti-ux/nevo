@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
-import { SITE } from "@/lib/seo";
+import { SITE, buildSeo } from "@/lib/seo";
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -83,44 +83,37 @@ const SYSTEMS = [
 ];
 
 export const Route = createFileRoute("/$lang/solutions/factory-development")({
-  head: ({ params }) => ({
-    meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
-      { name: "twitter:card", content: "summary_large_image" },
-        ...ogImageMeta("/solutions/factory-development"),
-    ],
-    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Service",
-          name: "Sandwich Panel Factory Development",
-          provider: { "@type": "Organization", name: "NEVO Industrial" },
-          areaServed: ["AE", "SA", "OM", "TR", "IQ", "KE", "CM", "RU"],
-          description: DESCRIPTION,
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-            { "@type": "ListItem", position: 2, name: "Solutions", item: "/solutions" },
-            { "@type": "ListItem", position: 3, name: "Factory Development", item: URL_PATH },
-          ],
-        }),
-      },
-    ],
-  }),
+  head: ({ params }) => {
+    const seo = buildSeo({ title: TITLE, description: DESCRIPTION, path: URL_PATH, lang: params.lang });
+    return {
+      ...seo,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            name: "Sandwich Panel Factory Development",
+            provider: { "@type": "Organization", name: "NEVO Industrial" },
+            areaServed: ["AE", "SA", "OM", "TR", "IQ", "KE", "CM", "RU"],
+            description: DESCRIPTION,
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+              { "@type": "ListItem", position: 2, name: "Solutions", item: "/solutions" },
+              { "@type": "ListItem", position: 3, name: "Factory Development", item: URL_PATH },
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: FactoryDevelopmentPage,
 });
 

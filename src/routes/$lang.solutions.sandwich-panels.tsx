@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SITE } from "@/lib/seo";
+import { SITE, buildSeo } from "@/lib/seo";
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -125,18 +125,9 @@ export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
         { "@type": "ListItem", position: 3, name: "Finished Sandwich Panels", item: URL_PATH },
       ],
     };
+    const seo = buildSeo({ title: TITLE, description: DESCRIPTION, path: URL_PATH, lang: params.lang });
     return {
-      meta: [
-        { title: TITLE },
-        { name: "description", content: DESCRIPTION },
-        { property: "og:title", content: TITLE },
-        { property: "og:description", content: DESCRIPTION },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
-        { name: "twitter:card", content: "summary_large_image" },
-        ...ogImageMeta("/solutions/sandwich-panels"),
-      ],
-      links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
+      ...seo,
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(faqLd) },
         { type: "application/ld+json", children: JSON.stringify(crumbsLd) },

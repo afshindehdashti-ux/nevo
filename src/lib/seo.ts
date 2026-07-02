@@ -3,6 +3,7 @@
  * Use buildSeo() in every route's head() for consistent titles/OG/canonical.
  */
 import { OG_IMAGES, OG_DEFAULT } from "./og-images";
+import { SEO_META } from "./seo-meta";
 
 
 export const SITE = {
@@ -71,21 +72,31 @@ export function buildSeo(input: SeoInput) {
   const absolutePath = input.path.startsWith("http")
     ? input.path
     : `${SITE.url}${localizedPath}`;
-  const fullTitle = input.title.includes(SITE.titleSuffix)
-    ? input.title
-    : `${input.title} — ${SITE.titleSuffix}`;
+
+  // Auto-localize: if SEO_META has an entry for this path+locale, override the
+  // caller's title/description. Callers pass an English fallback, and the
+  // dictionary swaps in native-register copy for every supported language.
+  const perLocale = SEO_META[input.path];
+  const localized = perLocale?.[input.lang as LocaleCode] ?? perLocale?.en;
+  const effectiveTitle = localized?.title ?? input.title;
+  const effectiveDescription = localized?.description ?? input.description;
+
+  const fullTitle = effectiveTitle.includes(SITE.titleSuffix)
+    ? effectiveTitle
+    : `${effectiveTitle} — ${SITE.titleSuffix}`;
 
   const meta: Array<Record<string, string>> = [
     { title: fullTitle },
-    { name: "description", content: input.description },
+    { name: "description", content: effectiveDescription },
     { property: "og:title", content: fullTitle },
-    { property: "og:description", content: input.description },
+    { property: "og:description", content: effectiveDescription },
     { property: "og:type", content: input.type ?? "website" },
     { property: "og:url", content: absolutePath },
     { property: "og:site_name", content: SITE.name },
+    { property: "og:locale", content: (String(input.lang) === "ar" ? "ar_AE" : String(input.lang) === "zh" ? "zh_CN" : `${String(input.lang)}_${String(input.lang).toUpperCase()}`) },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: fullTitle },
-    { name: "twitter:description", content: input.description },
+    { name: "twitter:description", content: effectiveDescription },
   ];
 
   // Resolve OG image: explicit input.image wins, otherwise per-route mapping,

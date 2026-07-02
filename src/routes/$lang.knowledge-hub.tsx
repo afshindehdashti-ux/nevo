@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/knowledge/hub-hero.jpg";
-import { SITE } from "@/lib/seo";
+import { SITE, buildSeo } from "@/lib/seo";
 import { ARTICLES, type Category } from "@/lib/knowledge-articles";
 
 // Reuse existing knowledge photography for cards outside the article list
@@ -27,22 +27,17 @@ import k40 from "@/assets/knowledge/40_material_guide.jpg";
 
 export const Route = createFileRoute("/$lang/knowledge-hub")({
   component: KnowledgeHub,
-  head: ({ params }) => ({
-    meta: [
-      { title: "Knowledge Hub — Sandwich Panel Engineering Library | NEVO" },
-      { name: "description", content: "The world's most comprehensive sandwich panel knowledge hub — technical articles, engineering guides, courses, videos, FAQs and downloads on PIR, PUR, rock wool panels, cold rooms, clean rooms, factory design and production." },
-      { property: "og:title", content: "NEVO Knowledge Hub — The Sandwich Panel Engineering Library" },
-      { property: "og:description", content: "Technical articles, engineering guides, courses and FAQs for investors, engineers, architects and factory owners." },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}/${params.lang}/knowledge-hub` },
-      { property: "og:image", content: `${SITE.url}${heroImg}` },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "NEVO Knowledge Hub" },
-      { name: "twitter:image", content: `${SITE.url}${heroImg}` },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}/knowledge-hub` }],
+  head: ({ params }) => {
+    const seo = buildSeo({
+      title: "Knowledge Hub — Sandwich Panel Engineering Library",
+      description:
+        "The world's most comprehensive sandwich panel knowledge hub — technical articles, engineering guides, courses, videos, FAQs and downloads on PIR, PUR, rock wool panels, cold rooms, clean rooms, factory design and production.",
+      path: "/knowledge-hub",
+      lang: params.lang,
+      image: heroImg,
+    });
+    return {
+      ...seo,
     scripts: [
       {
         type: "application/ld+json",
@@ -78,7 +73,8 @@ export const Route = createFileRoute("/$lang/knowledge-hub")({
         }),
       },
     ],
-  }),
+    };
+  },
 });
 
 /* ---------- Data ---------- */
