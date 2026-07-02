@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Section, SectionHeader } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { SITE, WHATSAPP_URL } from "@/lib/seo";
 
 const FIELD =
   "block w-full rounded-md border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/40";
@@ -41,7 +42,17 @@ export function ContactSection() {
                 WhatsApp
               </dt>
               <dd className="mt-1 text-sm text-foreground">
-                +971 4 000 0000
+                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  {SITE.contact.whatsappDisplay}
+                </a>
+              </dd>
+            </div>
+            <div>
+              <dt className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Phone
+              </dt>
+              <dd className="mt-1 text-sm text-foreground">
+                <a href={SITE.contact.phoneHref} className="hover:underline">{SITE.contact.phone}</a>
               </dd>
             </div>
             <div>

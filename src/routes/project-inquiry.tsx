@@ -73,6 +73,7 @@ import tile20 from "@/assets/project/tile-20.jpg"; // NDA
 import tile21 from "@/assets/project/tile-21.jpg"; // technical drawings
 import tile22 from "@/assets/project/tile-22.jpg"; // data sheets
 import dubaiImg from "@/assets/project/dubai.jpg";
+import { SITE, WHATSAPP_URL } from "@/lib/seo";
 
 const TITLE = "Project Inquiry Center — Start Your Industrial Project | NEVO Industrial";
 const DESCRIPTION =
@@ -604,8 +605,8 @@ function ProjectInquiryPage() {
         <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-5">
           <div className="lg:col-span-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <ContactCard icon={Mail} label="Engineering Email" value="engineering@nevoindustrial.com" href="mailto:engineering@nevoindustrial.com" />
-            <ContactCard icon={MessageCircle} label="WhatsApp" value="+971 50 123 4567" href="https://wa.me/971501234567" />
-            <ContactCard icon={Phone} label="Phone" value="+971 50 123 4567" href="tel:+971501234567" />
+            <ContactCard icon={MessageCircle} label="WhatsApp" value={SITE.contact.whatsappDisplay} href={WHATSAPP_URL} />
+            <ContactCard icon={Phone} label="Phone" value={SITE.contact.phone} href={SITE.contact.phoneHref} />
             <ContactCard icon={MapPin} label="Dubai Head Office" value="Business Bay, Dubai, UAE" />
             <ContactCard icon={Calendar} label="Schedule Online Meeting" value="Book a 30-min engineering call" href="#wizard" className="sm:col-span-2" />
           </div>
@@ -756,7 +757,7 @@ function SubmittedCard() {
         <a href="mailto:engineering@nevoindustrial.com" className="rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm hover:bg-white/10">
           <Mail className="mr-2 inline h-4 w-4" /> Email an engineer
         </a>
-        <a href="https://wa.me/971501234567" className="rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-white hover:bg-emerald-400">
+        <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-white hover:bg-emerald-400">
           <MessageCircle className="mr-2 inline h-4 w-4" /> WhatsApp us
         </a>
       </div>

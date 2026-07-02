@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { SITE, WHATSAPP_URL } from "@/lib/seo";
 
 const TITLE = "Global Offices & Contact — NEVO Industrial | Dubai · Germany · Turkey · Oman";
 const DESCRIPTION =
@@ -19,19 +20,19 @@ const DESCRIPTION =
 const URL_PATH = "/contact";
 
 const OFFICES = [
-  { code: "DXB", city: "Dubai", country: "United Arab Emirates", role: "Global Headquarters", address: "Business Bay, Dubai, UAE", phone: "+971 4 000 0000", email: "dubai@nevo-industrial.com", hours: "Sun–Thu · 08:30–18:00 GST", x: "62%", y: "52%" },
-  { code: "DE",  city: "Düsseldorf", country: "Germany", role: "European Engineering Hub", address: "Königsallee, Düsseldorf", phone: "+49 211 000 000", email: "europe@nevo-industrial.com", hours: "Mon–Fri · 09:00–18:00 CET", x: "48%", y: "34%" },
-  { code: "TR",  city: "Istanbul", country: "Türkiye", role: "Manufacturing & Sourcing", address: "Levent, Istanbul", phone: "+90 212 000 0000", email: "turkey@nevo-industrial.com", hours: "Mon–Fri · 09:00–18:00 TRT", x: "55%", y: "40%" },
-  { code: "OM",  city: "Muscat", country: "Sultanate of Oman", role: "GCC Projects Office", address: "Al Khuwair, Muscat", phone: "+968 24 000 000", email: "oman@nevo-industrial.com", hours: "Sun–Thu · 08:30–17:30 GST", x: "66%", y: "55%" },
-  { code: "…",   city: "Riyadh · Cairo · Nairobi", country: "Opening 2026", role: "Future Offices", address: "Under establishment", phone: "—", email: "expansion@nevo-industrial.com", hours: "Announced Q2 2026", x: "60%", y: "48%" },
+  { code: "DXB", city: "Dubai", country: "United Arab Emirates", role: "Global Headquarters", address: "Business Bay, Dubai, UAE", phone: SITE.contact.phone, email: "solutions@nevoindustrial.com", hours: "Sun–Thu · 08:30–18:00 GST", x: "62%", y: "52%" },
+  { code: "DE",  city: "Düsseldorf", country: "Germany", role: "European Engineering Hub", address: "Königsallee, Düsseldorf", phone: SITE.contact.phone, email: "europe@nevoindustrial.com", hours: "Mon–Fri · 09:00–18:00 CET", x: "48%", y: "34%" },
+  { code: "TR",  city: "Istanbul", country: "Türkiye", role: "Manufacturing & Sourcing", address: "Levent, Istanbul", phone: SITE.contact.phone, email: "turkey@nevoindustrial.com", hours: "Mon–Fri · 09:00–18:00 TRT", x: "55%", y: "40%" },
+  { code: "OM",  city: "Muscat", country: "Sultanate of Oman", role: "GCC Projects Office", address: "Al Khuwair, Muscat", phone: SITE.contact.phone, email: "oman@nevoindustrial.com", hours: "Sun–Thu · 08:30–17:30 GST", x: "66%", y: "55%" },
+  { code: "…",   city: "Riyadh · Cairo · Nairobi", country: "Opening 2026", role: "Future Offices", address: "Under establishment", phone: SITE.contact.phone, email: "expansion@nevoindustrial.com", hours: "Announced Q2 2026", x: "60%", y: "48%" },
 ];
 
 const CONTACT_CARDS = [
-  { icon: Headphones, title: "Engineering Hotline", desc: "24/7 senior engineer on call for active project sites.", value: "+971 4 000 0100", href: "tel:+97140000100" },
-  { icon: Globe2,     title: "International Sales", desc: "Panel supply, factory equipment and export enquiries.", value: "sales@nevo-industrial.com", href: "mailto:sales@nevo-industrial.com" },
-  { icon: Wrench,     title: "Engineering Support", desc: "Technical drawings, U-value & fire compliance help.", value: "engineering@nevo-industrial.com", href: "mailto:engineering@nevo-industrial.com" },
-  { icon: Briefcase,  title: "Project Department", desc: "Turn-key factories, EPC and consulting programs.", value: "projects@nevo-industrial.com", href: "mailto:projects@nevo-industrial.com" },
-  { icon: MessageCircle, title: "WhatsApp", desc: "Fast response from our GCC engineering desk.", value: "+971 50 000 0000", href: "https://wa.me/971500000000" },
+  { icon: Headphones, title: "Engineering Hotline", desc: "24/7 senior engineer on call for active project sites.", value: SITE.contact.phone, href: SITE.contact.phoneHref },
+  { icon: Globe2,     title: "International Sales", desc: "Panel supply, factory equipment and export enquiries.", value: "solutions@nevoindustrial.com", href: "mailto:solutions@nevoindustrial.com" },
+  { icon: Wrench,     title: "Engineering Support", desc: "Technical drawings, U-value & fire compliance help.", value: "engineering@nevoindustrial.com", href: "mailto:engineering@nevoindustrial.com" },
+  { icon: Briefcase,  title: "Project Department", desc: "Turn-key factories, EPC and consulting programs.", value: "projects@nevoindustrial.com", href: "mailto:projects@nevoindustrial.com" },
+  { icon: MessageCircle, title: "WhatsApp", desc: "Fast response from our GCC engineering desk.", value: SITE.contact.whatsappDisplay, href: WHATSAPP_URL },
   { icon: Calendar,   title: "Book Online Meeting", desc: "30-minute video consultation with a senior engineer.", value: "Reserve a slot", href: "#request-callback" },
 ];
 
@@ -199,7 +200,7 @@ function ContactPage() {
 
       {/* STICKY CTA */}
       <div className="pointer-events-none fixed bottom-6 right-6 z-40">
-        <a href="https://wa.me/971500000000" target="_blank" rel="noopener noreferrer"
+        <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer"
            className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-2xl transition hover:bg-emerald-600">
           <MessageCircle className="h-4 w-4" /> Chat on WhatsApp
         </a>

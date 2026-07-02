@@ -1,17 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { MessageCircle, ClipboardList } from "lucide-react";
-import { SITE } from "@/lib/seo";
+import { SITE, WHATSAPP_URL } from "@/lib/seo";
 
 /**
  * Sticky mobile CTA bar — WhatsApp + Project Inquiry.
  * Hidden on desktop (md+) where the header CTA is visible.
  */
 export function StickyMobileCTA() {
-  const wa = SITE.contact.whatsapp
-    ? `https://wa.me/${SITE.contact.whatsapp}?text=${encodeURIComponent(
-        "Hello NEVO Engineering — I'd like to discuss a project.",
-      )}`
-    : "/project-inquiry";
+  const wa = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[60] flex gap-2 border-t border-border/60 bg-background/95 p-2 backdrop-blur md:hidden">

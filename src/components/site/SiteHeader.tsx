@@ -43,7 +43,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { SITE } from "@/lib/seo";
+import { SITE, WHATSAPP_URL } from "@/lib/seo";
 import nevoLogoDark from "@/assets/nevo-logo-dark.png";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
@@ -333,9 +333,7 @@ export function SiteHeader() {
    ───────────────────────────────────────────────────────────── */
 
 function UtilityBar({ solid }: { solid: boolean }) {
-  const whatsappHref = SITE.contact.whatsapp
-    ? `https://wa.me/${SITE.contact.whatsapp}`
-    : "/project-inquiry";
+  const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
 
   return (
     <div
@@ -807,9 +805,7 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
    ───────────────────────────────────────────────────────────── */
 
 function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSearch: () => void }) {
-  const whatsappHref = SITE.contact.whatsapp
-    ? `https://wa.me/${SITE.contact.whatsapp}`
-    : "/project-inquiry";
+  const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
   const sections: { label: string; items: NavItem[] }[] = [
     { label: "Solutions", items: SOLUTIONS.items },
     { label: "Industries", items: INDUSTRIES.items },
