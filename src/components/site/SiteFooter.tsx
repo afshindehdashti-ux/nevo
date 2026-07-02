@@ -6,45 +6,57 @@ const COLUMNS = [
   {
     title: "Solutions",
     links: [
-      "Factory Development",
-      "Engineering Consultancy",
-      "Raw Materials",
-      "Production Lines",
-      "Finished Panels",
-      "Technical Support",
+      { label: "Factory Development", href: "/solutions/factory-development" },
+      { label: "Engineering Consultancy", href: "/solutions/engineering-consultancy" },
+      { label: "Raw Materials", href: "/solutions/raw-materials" },
+      { label: "Production Lines", href: "/solutions/production-lines" },
+      { label: "Finished Panels", href: "/solutions/sandwich-panels" },
+      { label: "AI Engineering Assistant", href: "/ai-assistant" },
     ],
   },
   {
     title: "Industries",
     links: [
-      "Cold Storage",
-      "Food Processing",
-      "Pharmaceutical",
-      "Clean Rooms",
-      "Warehousing",
-      "Modular Buildings",
+      { label: "Cold Storage", href: "/industries" },
+      { label: "Food Processing", href: "/industries" },
+      { label: "Pharmaceutical", href: "/industries" },
+      { label: "Clean Rooms", href: "/industries" },
+      { label: "Warehousing", href: "/industries" },
+      { label: "Modular Buildings", href: "/industries" },
     ],
   },
   {
     title: "Resources",
-    links: ["Knowledge Hub", "Technical Library", "Downloads", "Case Studies", "FAQ"],
+    links: [
+      { label: "Knowledge Hub", href: "/knowledge" },
+      { label: "Technical Library", href: "/knowledge" },
+      { label: "Downloads", href: "/knowledge" },
+      { label: "Case Studies", href: "/knowledge" },
+      { label: "Project Inquiry", href: "/project-inquiry" },
+    ],
   },
   {
     title: "Markets",
     links: [
-      "Saudi Arabia",
-      "UAE",
-      "Oman",
-      "Turkey",
-      "Iraq",
-      "Kenya",
-      "Cameroon",
-      "Russia",
+      { label: "Saudi Arabia", href: "/industries" },
+      { label: "UAE", href: "/industries" },
+      { label: "Oman", href: "/industries" },
+      { label: "Turkey", href: "/industries" },
+      { label: "Iraq", href: "/industries" },
+      { label: "Kenya", href: "/industries" },
+      { label: "Cameroon", href: "/industries" },
+      { label: "Russia", href: "/industries" },
     ],
   },
   {
     title: "Company",
-    links: ["About NEVO", "Why NEVO", "Dubai Advantage", "Global Network", "Contact"],
+    links: [
+      { label: "About NEVO", href: "/about" },
+      { label: "Why NEVO", href: "/about" },
+      { label: "Dubai Advantage", href: "/about" },
+      { label: "Global Network", href: "/industries" },
+      { label: "Contact", href: "/project-inquiry" },
+    ],
   },
 ];
 
@@ -126,13 +138,13 @@ export function SiteFooter() {
                   {col.title}
                 </div>
                 <ul className="space-y-2.5">
-                  {col.links.map((l) => (
-                    <li key={l}>
+                {col.links.map((l) => (
+                    <li key={l.label}>
                       <a
-                        href="#"
+                        href={l.href}
                         className="text-sm text-primary-foreground/75 transition-colors hover:text-primary-foreground"
                       >
-                        {l}
+                        {l.label}
                       </a>
                     </li>
                   ))}
