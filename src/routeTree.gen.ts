@@ -13,12 +13,14 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ProjectInquiryRouteImport } from './routes/project-inquiry'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as IndustriesRouteImport } from './routes/industries'
+import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SolutionsSandwichPanelsRouteImport } from './routes/solutions.sandwich-panels'
 import { Route as SolutionsRawMaterialsRouteImport } from './routes/solutions.raw-materials'
 import { Route as SolutionsProductionLinesRouteImport } from './routes/solutions.production-lines'
 import { Route as SolutionsEngineeringConsultancyRouteImport } from './routes/solutions.engineering-consultancy'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -38,6 +40,11 @@ const KnowledgeRoute = KnowledgeRouteImport.update({
 const IndustriesRoute = IndustriesRouteImport.update({
   id: '/industries',
   path: '/industries',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiAssistantRoute = AiAssistantRouteImport.update({
+  id: '/ai-assistant',
+  path: '/ai-assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -72,14 +79,21 @@ const SolutionsEngineeringConsultancyRoute =
     path: '/solutions/engineering-consultancy',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/ai-assistant': typeof AiAssistantRoute
   '/industries': typeof IndustriesRoute
   '/knowledge': typeof KnowledgeRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
@@ -88,10 +102,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/ai-assistant': typeof AiAssistantRoute
   '/industries': typeof IndustriesRoute
   '/knowledge': typeof KnowledgeRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
@@ -101,10 +117,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/ai-assistant': typeof AiAssistantRoute
   '/industries': typeof IndustriesRoute
   '/knowledge': typeof KnowledgeRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
@@ -115,10 +133,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/ai-assistant'
     | '/industries'
     | '/knowledge'
     | '/project-inquiry'
     | '/sitemap.xml'
+    | '/api/chat'
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
@@ -127,10 +147,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/ai-assistant'
     | '/industries'
     | '/knowledge'
     | '/project-inquiry'
     | '/sitemap.xml'
+    | '/api/chat'
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
@@ -139,10 +161,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/ai-assistant'
     | '/industries'
     | '/knowledge'
     | '/project-inquiry'
     | '/sitemap.xml'
+    | '/api/chat'
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
@@ -152,10 +176,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AiAssistantRoute: typeof AiAssistantRoute
   IndustriesRoute: typeof IndustriesRoute
   KnowledgeRoute: typeof KnowledgeRoute
   ProjectInquiryRoute: typeof ProjectInquiryRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiChatRoute: typeof ApiChatRoute
   SolutionsEngineeringConsultancyRoute: typeof SolutionsEngineeringConsultancyRoute
   SolutionsProductionLinesRoute: typeof SolutionsProductionLinesRoute
   SolutionsRawMaterialsRoute: typeof SolutionsRawMaterialsRoute
@@ -190,6 +216,13 @@ declare module '@tanstack/react-router' {
       path: '/industries'
       fullPath: '/industries'
       preLoaderRoute: typeof IndustriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-assistant': {
+      id: '/ai-assistant'
+      path: '/ai-assistant'
+      fullPath: '/ai-assistant'
+      preLoaderRoute: typeof AiAssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -234,16 +267,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolutionsEngineeringConsultancyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AiAssistantRoute: AiAssistantRoute,
   IndustriesRoute: IndustriesRoute,
   KnowledgeRoute: KnowledgeRoute,
   ProjectInquiryRoute: ProjectInquiryRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiChatRoute: ApiChatRoute,
   SolutionsEngineeringConsultancyRoute: SolutionsEngineeringConsultancyRoute,
   SolutionsProductionLinesRoute: SolutionsProductionLinesRoute,
   SolutionsRawMaterialsRoute: SolutionsRawMaterialsRoute,
