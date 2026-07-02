@@ -36,11 +36,13 @@ import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SolutionsIndexRouteImport } from './routes/solutions.index'
+import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as SolutionsSandwichPanelsRouteImport } from './routes/solutions.sandwich-panels'
 import { Route as SolutionsRawMaterialsRouteImport } from './routes/solutions.raw-materials'
 import { Route as SolutionsProductionLinesRouteImport } from './routes/solutions.production-lines'
 import { Route as SolutionsFactoryDevelopmentRouteImport } from './routes/solutions.factory-development'
 import { Route as SolutionsEngineeringConsultancyRouteImport } from './routes/solutions.engineering-consultancy'
+import { Route as KnowledgeSplatRouteImport } from './routes/knowledge.$'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
 const SustainabilityRoute = SustainabilityRouteImport.update({
@@ -180,6 +182,11 @@ const SolutionsIndexRoute = SolutionsIndexRouteImport.update({
   path: '/solutions/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KnowledgeIndexRoute = KnowledgeIndexRouteImport.update({
+  id: '/knowledge/',
+  path: '/knowledge/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SolutionsSandwichPanelsRoute = SolutionsSandwichPanelsRouteImport.update({
   id: '/solutions/sandwich-panels',
   path: '/solutions/sandwich-panels',
@@ -208,6 +215,11 @@ const SolutionsEngineeringConsultancyRoute =
     path: '/solutions/engineering-consultancy',
     getParentRoute: () => rootRouteImport,
   } as any)
+const KnowledgeSplatRoute = KnowledgeSplatRouteImport.update({
+  id: '/knowledge/$',
+  path: '/knowledge/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -242,11 +254,13 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sustainability': typeof SustainabilityRoute
   '/api/chat': typeof ApiChatRoute
+  '/knowledge/$': typeof KnowledgeSplatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
   '/solutions/sandwich-panels': typeof SolutionsSandwichPanelsRoute
+  '/knowledge/': typeof KnowledgeIndexRoute
   '/solutions/': typeof SolutionsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -277,11 +291,13 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sustainability': typeof SustainabilityRoute
   '/api/chat': typeof ApiChatRoute
+  '/knowledge/$': typeof KnowledgeSplatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
   '/solutions/sandwich-panels': typeof SolutionsSandwichPanelsRoute
+  '/knowledge': typeof KnowledgeIndexRoute
   '/solutions': typeof SolutionsIndexRoute
 }
 export interface FileRoutesById {
@@ -313,11 +329,13 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sustainability': typeof SustainabilityRoute
   '/api/chat': typeof ApiChatRoute
+  '/knowledge/$': typeof KnowledgeSplatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
   '/solutions/sandwich-panels': typeof SolutionsSandwichPanelsRoute
+  '/knowledge/': typeof KnowledgeIndexRoute
   '/solutions/': typeof SolutionsIndexRoute
 }
 export interface FileRouteTypes {
@@ -350,11 +368,13 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sustainability'
     | '/api/chat'
+    | '/knowledge/$'
     | '/solutions/engineering-consultancy'
     | '/solutions/factory-development'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
     | '/solutions/sandwich-panels'
+    | '/knowledge/'
     | '/solutions/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -385,11 +405,13 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sustainability'
     | '/api/chat'
+    | '/knowledge/$'
     | '/solutions/engineering-consultancy'
     | '/solutions/factory-development'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
     | '/solutions/sandwich-panels'
+    | '/knowledge'
     | '/solutions'
   id:
     | '__root__'
@@ -420,11 +442,13 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sustainability'
     | '/api/chat'
+    | '/knowledge/$'
     | '/solutions/engineering-consultancy'
     | '/solutions/factory-development'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
     | '/solutions/sandwich-panels'
+    | '/knowledge/'
     | '/solutions/'
   fileRoutesById: FileRoutesById
 }
@@ -456,11 +480,13 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SustainabilityRoute: typeof SustainabilityRoute
   ApiChatRoute: typeof ApiChatRoute
+  KnowledgeSplatRoute: typeof KnowledgeSplatRoute
   SolutionsEngineeringConsultancyRoute: typeof SolutionsEngineeringConsultancyRoute
   SolutionsFactoryDevelopmentRoute: typeof SolutionsFactoryDevelopmentRoute
   SolutionsProductionLinesRoute: typeof SolutionsProductionLinesRoute
   SolutionsRawMaterialsRoute: typeof SolutionsRawMaterialsRoute
   SolutionsSandwichPanelsRoute: typeof SolutionsSandwichPanelsRoute
+  KnowledgeIndexRoute: typeof KnowledgeIndexRoute
   SolutionsIndexRoute: typeof SolutionsIndexRoute
 }
 
@@ -655,6 +681,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolutionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/knowledge/': {
+      id: '/knowledge/'
+      path: '/knowledge'
+      fullPath: '/knowledge/'
+      preLoaderRoute: typeof KnowledgeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/solutions/sandwich-panels': {
       id: '/solutions/sandwich-panels'
       path: '/solutions/sandwich-panels'
@@ -688,6 +721,13 @@ declare module '@tanstack/react-router' {
       path: '/solutions/engineering-consultancy'
       fullPath: '/solutions/engineering-consultancy'
       preLoaderRoute: typeof SolutionsEngineeringConsultancyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge/$': {
+      id: '/knowledge/$'
+      path: '/knowledge/$'
+      fullPath: '/knowledge/$'
+      preLoaderRoute: typeof KnowledgeSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -728,23 +768,15 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SustainabilityRoute: SustainabilityRoute,
   ApiChatRoute: ApiChatRoute,
+  KnowledgeSplatRoute: KnowledgeSplatRoute,
   SolutionsEngineeringConsultancyRoute: SolutionsEngineeringConsultancyRoute,
   SolutionsFactoryDevelopmentRoute: SolutionsFactoryDevelopmentRoute,
   SolutionsProductionLinesRoute: SolutionsProductionLinesRoute,
   SolutionsRawMaterialsRoute: SolutionsRawMaterialsRoute,
   SolutionsSandwichPanelsRoute: SolutionsSandwichPanelsRoute,
+  KnowledgeIndexRoute: KnowledgeIndexRoute,
   SolutionsIndexRoute: SolutionsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
