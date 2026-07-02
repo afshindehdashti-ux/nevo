@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { buildSeo, orgJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
+import { buildSeo, orgJsonLd, breadcrumbJsonLd, faqJsonLd, SITE, WHATSAPP_URL } from "@/lib/seo";
 
 import panelHero from "@/assets/estimator/est-panel-hero.png.asset.json";
 import layoutImg from "@/assets/estimator/est-layout.png.asset.json";
