@@ -33,10 +33,6 @@ import { useTranslation } from "react-i18next";
 
 function NotFoundComponent() {
   const { t } = useTranslation();
-  return null as unknown as JSX.Element; // will be replaced immediately below
-}
-
-function _NotFoundComponent() {
   return (
     <div className="relative flex min-h-screen flex-col bg-background">
       {/* Engineering grid background */}
