@@ -81,6 +81,7 @@ export function validateLead(
   payload: LeadPayload,
   rules: ValidateRule[] = [],
   messages: LeadMessages = {},
+  phoneLocale?: string,
 ): string | null {
   const m = { ...DEFAULT_MESSAGES, ...messages };
   for (const r of rules) {
@@ -89,10 +90,13 @@ export function validateLead(
     if (!v) return fmt(m.required, { field: r.label });
     if (r.min && v.length < r.min) return fmt(m.minLength, { field: r.label, min: r.min });
     if (r.type === "email" && !EMAIL_RE.test(v)) return m.invalidEmail;
-    if (r.type === "phone" && !PHONE_RE.test(v)) return m.invalidPhone;
+    if (r.type === "phone" && !isValidPhone(v, phoneLocale)) {
+      return fmt(m.invalidPhone, { example: getPhoneExample(phoneLocale) });
+    }
   }
   return null;
 }
+
 
 function persist(source: string, payload: LeadPayload) {
   if (typeof window === "undefined") return;
