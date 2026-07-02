@@ -47,7 +47,11 @@ const LOGO_SELECTOR = 'img[alt="NEVO Industrial"]';
 
 async function captureStates() {
   const launcher = ENGINE === "webkit" ? webkit : chromium;
-  const browser = await launcher.launch({ headless: true });
+  const launchOpts = { headless: true };
+  if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH) {
+    launchOpts.executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+  }
+  const browser = await launcher.launch(launchOpts);
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 2,
