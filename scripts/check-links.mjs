@@ -519,6 +519,19 @@ function mdSummary(r) {
     for (const e of r.sitemapErrors) lines.push(`| \`${e.path}\` | ${e.reason} |`);
     lines.push("");
   }
+  if (r.externalFailures.length) {
+    lines.push(`### 🌐 External URL failures (${r.externalFailures.length})`);
+    lines.push("");
+    lines.push(`| URL | Status | Error | First seen | Refs |`);
+    lines.push(`| --- | ---: | --- | --- | ---: |`);
+    for (const f of r.externalFailures.slice(0, 50))
+      lines.push(
+        `| ${f.url} | ${f.status ?? "—"} | ${f.error ?? ""} | \`${f.firstFile}:${f.firstLine}\` | ${f.occurrenceCount} |`,
+      );
+    if (r.externalFailures.length > 50)
+      lines.push(`| … | | | | _${r.externalFailures.length - 50} more_ |`);
+    lines.push("");
+  }
   if (r.redirectWarnings.length) {
     lines.push(
       `<details><summary>⚠️ ${r.redirectWarnings.length} redirect warning(s)</summary>`,
