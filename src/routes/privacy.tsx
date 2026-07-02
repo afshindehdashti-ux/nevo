@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SITE } from "@/lib/seo";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
@@ -15,8 +16,9 @@ export const Route = createFileRoute("/privacy")({
         content:
           "How NEVO Industrial handles personal data, cookies, and inquiries submitted through our platform.",
       },
+      { property: "og:url", content: `${SITE.url}/privacy` },
     ],
-    links: [{ rel: "canonical", href: "/privacy" }],
+    links: [{ rel: "canonical", href: `${SITE.url}/privacy` }],
   }),
   component: PrivacyPage,
 });

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/knowledge/hub-hero.jpg";
+import { SITE } from "@/lib/seo";
 
 // Reuse existing knowledge photography (no cropping, full images)
 import k01 from "@/assets/knowledge/01_blueprint.jpg";
@@ -35,10 +36,10 @@ export const Route = createFileRoute("/knowledge-hub")({
       { property: "og:title", content: "NEVO Knowledge Hub — The Sandwich Panel Engineering Library" },
       { property: "og:description", content: "Technical articles, engineering guides, courses and FAQs for investors, engineers, architects and factory owners." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "/knowledge-hub" },
+      { property: "og:url", content: `${SITE.url}/knowledge-hub` },
       { property: "og:image", content: heroImg },
     ],
-    links: [{ rel: "canonical", href: "/knowledge-hub" }],
+    links: [{ rel: "canonical", href: `${SITE.url}/knowledge-hub` }],
     scripts: [
       {
         type: "application/ld+json",
