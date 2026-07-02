@@ -111,3 +111,20 @@ export const OG_IMAGES: Record<string, string> = {
 export function ogImageFor(path: string): string {
   return OG_IMAGES[path] ?? OG_DEFAULT;
 }
+
+/**
+ * Build the OG/Twitter image meta entries for a route (spread into a route's meta array).
+ * Use in routes that construct their head() config manually rather than via buildSeo().
+ */
+export function ogImageMeta(path: string, alt?: string): Array<Record<string, string>> {
+  const rel = OG_IMAGES[path] ?? OG_DEFAULT;
+  const abs = rel.startsWith("http") ? rel : `https://nevoindustrial.com${rel}`;
+  return [
+    { property: "og:image", content: abs },
+    { property: "og:image:secure_url", content: abs },
+    { property: "og:image:width", content: "1200" },
+    { property: "og:image:height", content: "630" },
+    { property: "og:image:alt", content: alt ?? "NEVO Industrial" },
+    { name: "twitter:image", content: abs },
+  ];
+}
