@@ -200,7 +200,7 @@ function ContactPage() {
 
       {/* STICKY CTA */}
       <div className="pointer-events-none fixed bottom-6 right-6 z-40">
-        <a href="https://wa.me/971500000000" target="_blank" rel="noopener noreferrer"
+        <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer"
            className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-2xl transition hover:bg-emerald-600">
           <MessageCircle className="h-4 w-4" /> Chat on WhatsApp
         </a>
