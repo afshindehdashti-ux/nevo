@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { SITE, WHATSAPP_URL } from "@/lib/seo";
 
 const TITLE = "Global Offices & Contact — NEVO Industrial | Dubai · Germany · Turkey · Oman";
 const DESCRIPTION =
