@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-rout
 import { ArrowRight, ArrowLeft, ChevronRight, Clock, User, Calendar, Sparkles, Download, Mail, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SITE } from "@/lib/seo";
-import { ARTICLES, ARTICLES_BY_SLUG } from "@/lib/knowledge-articles";
+import { ARTICLES, ARTICLES_BY_SLUG, type Article } from "@/lib/knowledge-articles";
 
 export const Route = createFileRoute("/knowledge-hub/$slug")({
   component: ArticlePage,
@@ -90,7 +90,7 @@ export const Route = createFileRoute("/knowledge-hub/$slug")({
 });
 
 function ArticlePage() {
-  const { article } = Route.useLoaderData();
+  const { article } = Route.useLoaderData() as { article: Article };
   const related = ARTICLES.filter((x) => x.slug !== article.slug && x.category === article.category).slice(0, 3);
   const fallback = ARTICLES.filter((x) => x.slug !== article.slug).slice(0, 3);
   const rel = related.length ? related : fallback;

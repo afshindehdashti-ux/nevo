@@ -43,6 +43,7 @@ import { Route as SolutionsProductionLinesRouteImport } from './routes/solutions
 import { Route as SolutionsFactoryDevelopmentRouteImport } from './routes/solutions.factory-development'
 import { Route as SolutionsEngineeringConsultancyRouteImport } from './routes/solutions.engineering-consultancy'
 import { Route as KnowledgeSplatRouteImport } from './routes/knowledge.$'
+import { Route as KnowledgeHubSlugRouteImport } from './routes/knowledge-hub.$slug'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
 const SustainabilityRoute = SustainabilityRouteImport.update({
@@ -220,6 +221,11 @@ const KnowledgeSplatRoute = KnowledgeSplatRouteImport.update({
   path: '/knowledge/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KnowledgeHubSlugRoute = KnowledgeHubSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => KnowledgeHubRoute,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -242,7 +248,7 @@ export interface FileRoutesByFullPath {
   '/installation-commissioning': typeof InstallationCommissioningRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/investors': typeof InvestorsRoute
-  '/knowledge-hub': typeof KnowledgeHubRoute
+  '/knowledge-hub': typeof KnowledgeHubRouteWithChildren
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
   '/partner-portal': typeof PartnerPortalRoute
   '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
@@ -254,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sustainability': typeof SustainabilityRoute
   '/api/chat': typeof ApiChatRoute
+  '/knowledge-hub/$slug': typeof KnowledgeHubSlugRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
@@ -279,7 +286,7 @@ export interface FileRoutesByTo {
   '/installation-commissioning': typeof InstallationCommissioningRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/investors': typeof InvestorsRoute
-  '/knowledge-hub': typeof KnowledgeHubRoute
+  '/knowledge-hub': typeof KnowledgeHubRouteWithChildren
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
   '/partner-portal': typeof PartnerPortalRoute
   '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
@@ -291,6 +298,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sustainability': typeof SustainabilityRoute
   '/api/chat': typeof ApiChatRoute
+  '/knowledge-hub/$slug': typeof KnowledgeHubSlugRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
@@ -317,7 +325,7 @@ export interface FileRoutesById {
   '/installation-commissioning': typeof InstallationCommissioningRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/investors': typeof InvestorsRoute
-  '/knowledge-hub': typeof KnowledgeHubRoute
+  '/knowledge-hub': typeof KnowledgeHubRouteWithChildren
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
   '/partner-portal': typeof PartnerPortalRoute
   '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
@@ -329,6 +337,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sustainability': typeof SustainabilityRoute
   '/api/chat': typeof ApiChatRoute
+  '/knowledge-hub/$slug': typeof KnowledgeHubSlugRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
@@ -368,6 +377,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sustainability'
     | '/api/chat'
+    | '/knowledge-hub/$slug'
     | '/knowledge/$'
     | '/solutions/engineering-consultancy'
     | '/solutions/factory-development'
@@ -405,6 +415,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sustainability'
     | '/api/chat'
+    | '/knowledge-hub/$slug'
     | '/knowledge/$'
     | '/solutions/engineering-consultancy'
     | '/solutions/factory-development'
@@ -442,6 +453,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sustainability'
     | '/api/chat'
+    | '/knowledge-hub/$slug'
     | '/knowledge/$'
     | '/solutions/engineering-consultancy'
     | '/solutions/factory-development'
@@ -468,7 +480,7 @@ export interface RootRouteChildren {
   InstallationCommissioningRoute: typeof InstallationCommissioningRoute
   InvestmentCalculatorRoute: typeof InvestmentCalculatorRoute
   InvestorsRoute: typeof InvestorsRoute
-  KnowledgeHubRoute: typeof KnowledgeHubRoute
+  KnowledgeHubRoute: typeof KnowledgeHubRouteWithChildren
   PanelThicknessCalculatorRoute: typeof PanelThicknessCalculatorRoute
   PartnerPortalRoute: typeof PartnerPortalRoute
   PirVsRockWoolRoute: typeof PirVsRockWoolRoute
@@ -730,6 +742,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/knowledge-hub/$slug': {
+      id: '/knowledge-hub/$slug'
+      path: '/$slug'
+      fullPath: '/knowledge-hub/$slug'
+      preLoaderRoute: typeof KnowledgeHubSlugRouteImport
+      parentRoute: typeof KnowledgeHubRoute
+    }
     '/api/chat': {
       id: '/api/chat'
       path: '/api/chat'
@@ -739,6 +758,18 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface KnowledgeHubRouteChildren {
+  KnowledgeHubSlugRoute: typeof KnowledgeHubSlugRoute
+}
+
+const KnowledgeHubRouteChildren: KnowledgeHubRouteChildren = {
+  KnowledgeHubSlugRoute: KnowledgeHubSlugRoute,
+}
+
+const KnowledgeHubRouteWithChildren = KnowledgeHubRoute._addFileChildren(
+  KnowledgeHubRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -756,7 +787,7 @@ const rootRouteChildren: RootRouteChildren = {
   InstallationCommissioningRoute: InstallationCommissioningRoute,
   InvestmentCalculatorRoute: InvestmentCalculatorRoute,
   InvestorsRoute: InvestorsRoute,
-  KnowledgeHubRoute: KnowledgeHubRoute,
+  KnowledgeHubRoute: KnowledgeHubRouteWithChildren,
   PanelThicknessCalculatorRoute: PanelThicknessCalculatorRoute,
   PartnerPortalRoute: PartnerPortalRoute,
   PirVsRockWoolRoute: PirVsRockWoolRoute,
@@ -780,13 +811,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
