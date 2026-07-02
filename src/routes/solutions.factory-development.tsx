@@ -55,10 +55,10 @@ const PILLARS = [
 ];
 
 const SCOPE = [
-  { title: "01 / Site & Market Definition", image: blueprintImg, body: "Location, utilities, logistics, climate, labour model and target customer segments." },
-  { title: "02 / Process Layout", image: layoutImg, body: "Coil storage, chemical room, line hall, QC lab, finished goods and loading circulation." },
-  { title: "03 / Production System", image: productionImg, body: "Line sizing, equipment specifications, automation levels and future upgrade envelopes." },
-  { title: "04 / Material Flow", image: materialsImg, body: "Incoming materials, FIFO control, safety stock, packaging, dispatch and traceability." },
+  { title: "01 / Site & Market Definition", image: surveyAsset.url, body: "Location, utilities, logistics, climate, labour model and target customer segments." },
+  { title: "02 / Process Layout", image: bimAsset.url, body: "Coil storage, chemical room, line hall, QC lab, finished goods and loading circulation." },
+  { title: "03 / Production System", image: commissioningAsset.url, body: "Line sizing, equipment specifications, automation levels and future upgrade envelopes." },
+  { title: "04 / Material Flow", image: warehouseAsset.url, body: "Incoming materials, FIFO control, safety stock, packaging, dispatch and traceability." },
 ];
 
 const PROCESS = [
