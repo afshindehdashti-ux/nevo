@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LangRouteImport } from './routes/$lang'
 import { Route as IndexRouteImport } from './routes/index'
@@ -50,6 +51,11 @@ import { Route as LangSolutionsFactoryDevelopmentRouteImport } from './routes/$l
 import { Route as LangSolutionsEngineeringConsultancyRouteImport } from './routes/$lang.solutions.engineering-consultancy'
 import { Route as LangKnowledgeHubSlugRouteImport } from './routes/$lang.knowledge-hub.$slug'
 
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -264,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/status': typeof StatusRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/ai-assistant': typeof LangAiAssistantRoute
   '/$lang/ai-project-estimator': typeof LangAiProjectEstimatorRoute
@@ -305,6 +312,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/status': typeof StatusRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/ai-assistant': typeof LangAiAssistantRoute
   '/$lang/ai-project-estimator': typeof LangAiProjectEstimatorRoute
@@ -348,6 +356,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/status': typeof StatusRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/ai-assistant': typeof LangAiAssistantRoute
   '/$lang/ai-project-estimator': typeof LangAiProjectEstimatorRoute
@@ -392,6 +401,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$lang'
     | '/sitemap.xml'
+    | '/status'
     | '/$lang/about'
     | '/$lang/ai-assistant'
     | '/$lang/ai-project-estimator'
@@ -433,6 +443,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/sitemap.xml'
+    | '/status'
     | '/$lang/about'
     | '/$lang/ai-assistant'
     | '/$lang/ai-project-estimator'
@@ -475,6 +486,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$lang'
     | '/sitemap.xml'
+    | '/status'
     | '/$lang/about'
     | '/$lang/ai-assistant'
     | '/$lang/ai-project-estimator'
@@ -518,6 +530,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LangRoute: typeof LangRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  StatusRoute: typeof StatusRoute
   ApiChatRoute: typeof ApiChatRoute
   KnowledgeSplatRoute: typeof KnowledgeSplatRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
@@ -527,6 +540,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -896,6 +916,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LangRoute: LangRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StatusRoute: StatusRoute,
   ApiChatRoute: ApiChatRoute,
   KnowledgeSplatRoute: KnowledgeSplatRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
