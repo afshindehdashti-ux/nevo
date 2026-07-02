@@ -122,8 +122,51 @@ export async function submitLeadForm(
   }
 
   persist(opts.source, payload);
-  // Simulate async delivery so the UX matches a real backend call.
-  await new Promise((r) => setTimeout(r, 350));
+
+  // Delivery step — localized failure toasts with retry action.
+  const showRetry = (title: string, description: string) => {
+    toast.error(title, {
+      description,
+      action: {
+        label: m.retry,
+        onClick: () => {
+          void submitLeadForm(form, opts);
+        },
+      },
+    });
+  };
+
+  try {
+    let status = 200;
+    if (opts.deliver) {
+      const res = await opts.deliver(payload);
+      if (res && typeof (res as Response).status === "number") {
+        status = (res as Response).status;
+      } else if (res && typeof (res as { ok: boolean }).ok === "boolean") {
+        status = (res as { ok: boolean; status?: number }).status ?? ((res as { ok: boolean }).ok ? 200 : 500);
+      }
+    } else {
+      // Simulate async delivery so the UX matches a real backend call.
+      await new Promise((r) => setTimeout(r, 350));
+    }
+
+    if (status === 429) {
+      showRetry(m.rateLimitTitle, m.rateLimitDesc);
+      return false;
+    }
+    if (status >= 500 || status >= 400) {
+      showRetry(m.serverErrorTitle, m.serverErrorDesc);
+      return false;
+    }
+  } catch (err) {
+    const offline = typeof navigator !== "undefined" && navigator.onLine === false;
+    if (offline || (err instanceof TypeError && /fetch|network/i.test(err.message))) {
+      showRetry(m.networkErrorTitle, m.networkErrorDesc);
+    } else {
+      showRetry(m.serverErrorTitle, m.serverErrorDesc);
+    }
+    return false;
+  }
 
   toast.success(opts.successTitle ?? "Request received", {
     description:
@@ -132,3 +175,4 @@ export async function submitLeadForm(
   });
   return true;
 }
+
