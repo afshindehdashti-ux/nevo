@@ -130,8 +130,8 @@ while ((sm = pathRe.exec(sitemapSrc))) sitemapPaths.add(sm[1]);
 
 // Routes intentionally excluded from the public sitemap
 const SITEMAP_EXCLUDE = new Set([
-  "/*", // splat / 404
-  "/knowledge", // redirect source
+  "/*",
+  "/knowledge",
   "/knowledge/*",
   "/sitemap.xml",
 ]);
