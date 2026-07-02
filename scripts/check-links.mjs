@@ -449,6 +449,8 @@ function htmlReport(r) {
   <div class="card"><b>${r.counts.deadLinks}</b>dead links</div>
   <div class="card"><b>${r.counts.redirectWarnings}</b>redirect warnings</div>
   <div class="card"><b>${r.counts.sitemapErrors}</b>sitemap issues</div>
+  <div class="card"><b>${r.counts.externalChecked}</b>external checked</div>
+  <div class="card"><b>${r.counts.externalFailed}</b>external failed</div>
 </div>
 <h2>Dead internal links (${r.deadLinks.length})</h2>
 ${rows(r.deadLinks, [
