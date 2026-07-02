@@ -757,7 +757,7 @@ function SubmittedCard() {
         <a href="mailto:engineering@nevoindustrial.com" className="rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm hover:bg-white/10">
           <Mail className="mr-2 inline h-4 w-4" /> Email an engineer
         </a>
-        <a href="https://wa.me/971501234567" className="rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-white hover:bg-emerald-400">
+        <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-white hover:bg-emerald-400">
           <MessageCircle className="mr-2 inline h-4 w-4" /> WhatsApp us
         </a>
       </div>
