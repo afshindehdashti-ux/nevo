@@ -14,8 +14,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
 import { submitLeadForm } from "@/lib/lead-submit";
-import { SITE, WHATSAPP_URL } from "@/lib/seo";
-import { ogImageMeta } from "@/lib/og-images";
+import { SITE, WHATSAPP_URL, buildSeo } from "@/lib/seo";
+import { localizedMeta } from "@/lib/seo-meta";
 
 const URL_PATH = "/contact";
 
