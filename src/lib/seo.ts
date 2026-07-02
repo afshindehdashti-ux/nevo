@@ -37,11 +37,16 @@ export const WHATSAPP_URL = `https://wa.me/971502426167?text=${encodeURIComponen
 )}`;
 
 export const LOCALES = [
-  { code: "en", label: "English", hreflang: "en", status: "active" },
-  { code: "ar", label: "العربية", hreflang: "ar", status: "active" },
-  { code: "de", label: "Deutsch", hreflang: "de", status: "future" },
-  { code: "tr", label: "Türkçe", hreflang: "tr", status: "future" },
-  { code: "ru", label: "Русский", hreflang: "ru", status: "future" },
+  { code: "en", label: "English",    hreflang: "en", status: "active" },
+  { code: "ar", label: "العربية",    hreflang: "ar", status: "active" },
+  { code: "tr", label: "Türkçe",     hreflang: "tr", status: "active" },
+  { code: "ru", label: "Русский",    hreflang: "ru", status: "active" },
+  { code: "pt", label: "Português",  hreflang: "pt", status: "active" },
+  { code: "de", label: "Deutsch",    hreflang: "de", status: "active" },
+  { code: "es", label: "Español",    hreflang: "es", status: "active" },
+  { code: "fr", label: "Français",   hreflang: "fr", status: "active" },
+  { code: "it", label: "Italiano",   hreflang: "it", status: "active" },
+  { code: "zh", label: "简体中文",     hreflang: "zh-Hans", status: "active" },
 ] as const;
 
 export type LocaleCode = (typeof LOCALES)[number]["code"];
@@ -128,9 +133,19 @@ export const orgJsonLd = () => ({
       contactType: "sales",
       email: SITE.contact.email,
       ...(SITE.contact.phone ? { telephone: SITE.contact.phone } : {}),
-      areaServed: ["AE", "GCC", "MENA", "EU", "CIS"],
-      availableLanguage: ["English", "Arabic"],
+      areaServed: ["AE", "GCC", "MENA", "EU", "CIS", "LATAM", "APAC", "Africa"],
+      availableLanguage: [
+        "English", "Arabic", "Turkish", "Russian", "Portuguese",
+        "German", "Spanish", "French", "Italian", "Chinese",
+      ],
     },
+  ],
+  knowsAbout: [
+    "Sandwich panels", "PIR panels", "PUR panels", "Rock wool panels",
+    "Continuous laminators", "Discontinuous production lines",
+    "Roll forming", "Cold storage engineering", "Clean room construction",
+    "Industrial building envelopes", "Factory feasibility studies",
+    "PPGI", "Galvanized steel coils",
   ],
   address: {
     "@type": "PostalAddress",
