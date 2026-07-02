@@ -777,6 +777,28 @@ function FAQ() {
 /* ------------------------------------------------------------------ */
 
 function InquiryForm() {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    const ok = await submitLeadForm(e.currentTarget, {
+      source: "raw-materials-inquiry",
+      rules: [
+        { field: "company", label: "Company" },
+        { field: "country", label: "Country" },
+        { field: "email", label: "Email", type: "email" },
+        { field: "category", label: "Material category" },
+      ],
+      successTitle: "Quotation request received",
+      successDescription: "A NEVO material specialist will respond within one business day.",
+    });
+    setBusy(false);
+    if (ok) formRef.current?.reset();
+  }
+
   return (
     <Section id="inquiry" tone="default">
       <SectionHeader
@@ -785,11 +807,15 @@ function InquiryForm() {
         lede="A NEVO material specialist responds within one business day with a proposal, specification sheet and indicative pricing."
       />
       <form
+        ref={formRef}
         className="grid gap-5 md:grid-cols-2"
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={onSubmit}
+        noValidate
       >
         <Field label="Company" name="company" required />
         <Field label="Country" name="country" required />
+        <Field label="Email" name="email" type="email" placeholder="you@company.com" required />
+        <Field label="Phone" name="phone" placeholder="+971 …" />
         <Field label="Material category" name="category" placeholder="Steel · Chemistry · Insulation · Panels · Adhesives" required />
         <Field label="Annual demand" name="demand" placeholder="e.g. 2,500 tons steel + 400 t chemistry" />
         <Field label="Panel type" name="paneltype" placeholder="PIR · PUR · Rock wool · Custom" />
@@ -809,9 +835,8 @@ function InquiryForm() {
           />
         </div>
         <div className="md:col-span-2">
-          <Button size="lg" variant="primary" type="submit">
-            Submit Inquiry
-            <ArrowRight className="!size-4" />
+          <Button size="lg" variant="primary" type="submit" disabled={busy}>
+            {busy ? (<><Loader2 className="mr-2 !size-4 animate-spin" /> Sending…</>) : (<>Submit Inquiry <ArrowRight className="!size-4" /></>)}
           </Button>
           <p className="mt-3 text-xs text-muted-foreground">
             Your details are used only to respond to your inquiry.
