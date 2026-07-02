@@ -1336,7 +1336,14 @@
       "sending": "Wird gesendet…",
       "successTitle": "Callback requested",
       "successDesc": "A senior engineer will call you within one business day.",
-      "whatsapp": "Auf WhatsApp chatten"
+      "whatsapp": "Auf WhatsApp chatten",
+      "validation": {
+        "reviewTitle": "Bitte überprüfen Sie das Formular",
+        "required": "{field} ist ein Pflichtfeld.",
+        "minLength": "{field} muss mindestens {min} Zeichen lang sein.",
+        "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+        "invalidPhone": "Bitte geben Sie eine gültige Telefonnummer ein."
+      }
     }
   }
 }
