@@ -15,6 +15,7 @@ import { AIAssistantLauncher } from "../components/site/AIAssistantLauncher";
 import { Analytics } from "../components/site/Analytics";
 import { CookieConsent } from "../components/site/CookieConsent";
 import { StickyMobileCTA } from "../components/site/StickyMobileCTA";
+import { Toaster } from "../components/ui/sonner";
 import { orgJsonLd, websiteJsonLd, ldScript } from "../lib/seo";
 
 function NotFoundComponent() {
