@@ -105,12 +105,15 @@ const CATEGORIES: Category[] = [
   "Raw Materials","Finished Sandwich Panels","PIR Technology","Rock Wool Technology",
   "Automation","Installation","Maintenance","Quality Control","Energy Efficiency",
   "Fire Performance","Cold Storage","Clean Rooms","Industrial Buildings",
+  "CAD & BIM","Certifications",
 ];
 
 const DOC_TYPES: DocType[] = [
   "Engineering Guide","Technical Catalog","Product Brochure","Factory Planning Book",
   "Technical Datasheet","Calculation Sheet","Engineering Checklist","Maintenance Manual",
   "Installation Guide","Case Study","White Paper","Project Template",
+  "CAD File","BIM File","Certificate","Test Report",
+  "Operation Manual","Commissioning Guide","Safety Manual","Troubleshooting Guide",
 ];
 
 const CATEGORY_ICONS: Record<Category, typeof Factory> = {
