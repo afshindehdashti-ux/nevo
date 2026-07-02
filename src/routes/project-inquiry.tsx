@@ -314,7 +314,7 @@ function ProjectInquiryPage() {
         <SectionHeader
           eyebrow="Choose Your Project Type"
           title="What are you building?"
-          description="Select one or more scopes. This routes your inquiry to the right engineering lead from the start."
+          lede="Select one or more scopes. This routes your inquiry to the right engineering lead from the start."
         />
         <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PROJECT_TYPES.map((t) => {
@@ -547,7 +547,7 @@ function ProjectInquiryPage() {
 
       {/* WHY NEVO */}
       <Section className="bg-background">
-        <SectionHeader eyebrow="Why NEVO" title="A serious partner for a serious project." description="Six reasons investors, contractors and OEMs choose NEVO from the first inquiry." />
+        <SectionHeader eyebrow="Why NEVO" title="A serious partner for a serious project." lede="Six reasons investors, contractors and OEMs choose NEVO from the first inquiry." />
         <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {WHY_NEVO.map((w) => {
             const Icon = w.icon;
@@ -568,8 +568,8 @@ function ProjectInquiryPage() {
           <SectionHeader
             eyebrow="What Happens Next"
             title="A structured path from inquiry to kick-off."
-            description="No black box. Every step is scheduled, documented and owned by an engineer."
-            invert
+            lede="No black box. Every step is scheduled, documented and owned by an engineer."
+
           />
           <div className="relative mt-16">
             <div className="absolute left-6 top-0 h-full w-px bg-emerald-500/30 md:left-1/2 md:-translate-x-1/2" />
@@ -600,7 +600,7 @@ function ProjectInquiryPage() {
 
       {/* CONTACT OPTIONS */}
       <Section id="contact-options" className="bg-background">
-        <SectionHeader eyebrow="Contact Options" title="Prefer to talk first?" description="Reach the engineering team directly on any channel." />
+        <SectionHeader eyebrow="Contact Options" title="Prefer to talk first?" lede="Reach the engineering team directly on any channel." />
         <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-5">
           <div className="lg:col-span-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <ContactCard icon={Mail} label="Engineering Email" value="engineering@nevoindustrial.com" href="mailto:engineering@nevoindustrial.com" />
@@ -622,7 +622,7 @@ function ProjectInquiryPage() {
 
       {/* DOWNLOADS */}
       <Section className="bg-muted/40">
-        <SectionHeader eyebrow="Downloads" title="Prepare offline." description="Four documents to structure your project before the first call." />
+        <SectionHeader eyebrow="Downloads" title="Prepare offline." lede="Four documents to structure your project before the first call." />
         <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {DOWNLOADS.map((d) => {
             const Icon = d.icon;
@@ -642,7 +642,7 @@ function ProjectInquiryPage() {
 
       {/* FAQ */}
       <Section className="bg-background">
-        <SectionHeader eyebrow="FAQ" title="Answers before you ask." description="Twenty-one of the most common questions from investors, contractors and engineers." />
+        <SectionHeader eyebrow="FAQ" title="Answers before you ask." lede="Twenty-one of the most common questions from investors, contractors and engineers." />
         <div className="mx-auto mt-12 max-w-4xl">
           <Accordion type="single" collapsible className="w-full">
             {FAQS.map((f, i) => (
