@@ -238,7 +238,9 @@ function FactoryLayoutPage() {
         <div className="mx-auto flex max-w-[1440px] items-center gap-2 px-6 py-3 text-xs text-white/50">
           <Link to="/" className="hover:text-white">Home</Link>
           <ChevronRight className="h-3 w-3" />
-          <Link to="/solutions/factory-development" className="hover:text-white">Solutions</Link>
+          <Link to="/solutions" className="hover:text-white">Solutions</Link>
+          <ChevronRight className="h-3 w-3" />
+          <Link to="/solutions/factory-development" className="hover:text-white">Factory Development</Link>
           <ChevronRight className="h-3 w-3" />
           <span className="text-white">Factory Layout Generator</span>
         </div>

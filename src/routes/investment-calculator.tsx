@@ -455,8 +455,12 @@ function InvestmentCalculatorPage() {
                 Home
               </Link>
               <ChevronRight className="h-3 w-3" />
-              <Link to="/solutions/factory-development" className="hover:text-white/80">
+              <Link to="/solutions" className="hover:text-white/80">
                 Solutions
+              </Link>
+              <ChevronRight className="h-3 w-3" />
+              <Link to="/solutions/factory-development" className="hover:text-white/80">
+                Factory Development
               </Link>
               <ChevronRight className="h-3 w-3" />
               <span className="text-white/80">Investment Calculator</span>

@@ -110,7 +110,7 @@ export const Route = createFileRoute("/solutions/factory-development")({
           "@type": "BreadcrumbList",
           itemListElement: [
             { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-            { "@type": "ListItem", position: 2, name: "Solutions", item: "/solutions/factory-development" },
+            { "@type": "ListItem", position: 2, name: "Solutions", item: "/solutions" },
             { "@type": "ListItem", position: 3, name: "Factory Development", item: URL_PATH },
           ],
         }),
@@ -202,6 +202,8 @@ function Breadcrumbs() {
     <nav aria-label="Breadcrumb" className="border-b border-border bg-background">
       <div className="container-wide flex items-center gap-2 py-4 text-xs text-muted-foreground">
         <Link to="/" className="hover:text-foreground">Home</Link>
+        <ArrowRight className="size-3" />
+        <Link to="/solutions" className="hover:text-foreground">Solutions</Link>
         <ArrowRight className="size-3" />
         <span className="text-foreground">Factory Development</span>
       </div>
