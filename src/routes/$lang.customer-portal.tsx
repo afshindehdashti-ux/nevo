@@ -44,6 +44,7 @@ const ASSETS = [p01,p02,p03,p04,p05,p06,p07,p08,p09,p10,p11,p12,p13,p14,p15,p16,
 export const Route = createFileRoute("/$lang/customer-portal")({
   head: () => ({
     meta: buildSeo({
+      lang: params.lang,
       title: "Customer Engineering Portal",
       description:
         "Secure customer portal for NEVO Industrial clients — monitor factory builds, production lines and panel projects with live tracking, documents, quality and analytics.",
@@ -52,6 +53,7 @@ export const Route = createFileRoute("/$lang/customer-portal")({
       keywords: ["customer portal","project dashboard","engineering portal","factory tracking","nevo"],
     }).meta,
     links: buildSeo({
+      lang: params.lang,
       title: "Customer Engineering Portal",
       description: "Secure customer portal for NEVO Industrial clients.",
       path: "/customer-portal",

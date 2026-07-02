@@ -167,6 +167,7 @@ export const Route = createFileRoute("/$lang/download-center")({
   component: DownloadCenterPage,
   head: () => {
     const seo = buildSeo({
+      lang: params.lang,
       title: "Download Center — Engineering Resources & Technical Library | NEVO",
       description:
         "Download professional engineering guides, factory planning books, technical catalogs, datasheets and calculation sheets for sandwich panel factories, production lines and raw materials.",

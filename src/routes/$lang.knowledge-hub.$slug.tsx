@@ -40,7 +40,7 @@ export const Route = createFileRoute("/$lang/knowledge-hub/$slug")({
     if (!article) throw notFound();
     return { article };
   },
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     const a = loaderData?.article;
     if (!a) return { meta: [{ title: "Article — NEVO Knowledge Hub" }] };
     const url = `${SITE.url}/knowledge-hub/${a.slug}`;
@@ -80,7 +80,7 @@ export const Route = createFileRoute("/$lang/knowledge-hub/$slug")({
             "@type": "BreadcrumbList",
             itemListElement: [
               { "@type": "ListItem", position: 1, name: "Home", item: SITE.url },
-              { "@type": "ListItem", position: 2, name: "Knowledge Hub", item: `${SITE.url}/knowledge-hub` },
+              { "@type": "ListItem", position: 2, name: "Knowledge Hub", item: `${SITE.url}/${params.lang}/knowledge-hub` },
               { "@type": "ListItem", position: 3, name: a.title, item: url },
             ],
           }),

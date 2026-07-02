@@ -34,10 +34,10 @@ export const Route = createFileRoute("/$lang/knowledge-hub")({
       { property: "og:title", content: "NEVO Knowledge Hub — The Sandwich Panel Engineering Library" },
       { property: "og:description", content: "Technical articles, engineering guides, courses and FAQs for investors, engineers, architects and factory owners." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}/knowledge-hub` },
+      { property: "og:url", content: `${SITE.url}/${params.lang}/knowledge-hub` },
       { property: "og:image", content: heroImg },
     ],
-    links: [{ rel: "canonical", href: `${SITE.url}/knowledge-hub` }],
+    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}/knowledge-hub` }],
     scripts: [
       {
         type: "application/ld+json",

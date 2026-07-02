@@ -45,6 +45,7 @@ import heroImg from "@/assets/configurator/hero-configurator.jpg";
 export const Route = createFileRoute("/$lang/product-configurator")({
   head: () => ({
     ...buildSeo({
+      lang: params.lang,
       title: "Product Configurator — Design Your Sandwich Panel",
       description:
         "Configure NEVO sandwich panels to your exact specification. Real-time thermal, fire and structural results with instant datasheets and quotation.",

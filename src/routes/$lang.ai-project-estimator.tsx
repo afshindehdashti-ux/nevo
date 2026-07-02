@@ -42,6 +42,7 @@ const FAQS = [
 export const Route = createFileRoute("/$lang/ai-project-estimator")({
   head: () => ({
     meta: buildSeo({
+      lang: params.lang,
       title: "AI Project Estimator — Sandwich Panel Factory",
       description:
         "Get instant AI-powered feasibility for your sandwich panel factory. Estimate investment, utilities, capacity, ROI, IRR and payback in seconds — trained on 1,500+ NEVO Industrial projects.",
@@ -50,6 +51,7 @@ export const Route = createFileRoute("/$lang/ai-project-estimator")({
       keywords: ["sandwich panel factory","project estimator","AI feasibility","factory investment","ROI IRR","PIR PUR rock wool"],
     }).meta,
     links: buildSeo({
+      lang: params.lang,
       title: "AI Project Estimator — Sandwich Panel Factory",
       description: "Instant AI feasibility for sandwich panel factories.",
       path: "/ai-project-estimator",

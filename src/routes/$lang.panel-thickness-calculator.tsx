@@ -62,6 +62,7 @@ export const Route = createFileRoute("/$lang/panel-thickness-calculator")({
   component: PanelThicknessPage,
   head: () => {
     const seo = buildSeo({
+      lang: params.lang,
       title: "Panel Thickness Calculator — Sandwich Panel Sizing Tool | NEVO",
       description:
         "Choose the correct sandwich panel thickness. Live U-value, fire rating, weight, heat loss and cost. Engineered by NEVO Industrial for cold storage, food, clean rooms and industrial buildings.",

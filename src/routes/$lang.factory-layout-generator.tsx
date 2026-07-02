@@ -117,6 +117,7 @@ export const Route = createFileRoute("/$lang/factory-layout-generator")({
   component: FactoryLayoutPage,
   head: () => {
     const seo = buildSeo({
+      lang: params.lang,
       title: "Factory Layout Generator — Sandwich Panel Factory Design | NEVO",
       description:
         "Visualize your future sandwich panel factory. Choose capacity, core, automation and building type — get instant land, building, utility and manpower requirements.",

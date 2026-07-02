@@ -60,6 +60,7 @@ export const Route = createFileRoute("/$lang/pir-vs-rock-wool")({
   component: PirVsRockWoolPage,
   head: () => {
     const seo = buildSeo({
+      lang: params.lang,
       title: "PIR vs Rock Wool — Sandwich Panel Comparison Guide | NEVO",
       description:
         "The most complete PIR vs Rock Wool comparison. Thermal U-value, fire rating, weight, sound, moisture, installation speed, cost and lifecycle — engineered by NEVO Industrial.",
