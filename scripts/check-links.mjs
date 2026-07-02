@@ -257,6 +257,9 @@ if (internalEnabled) {
   const pathRe = /path:\s*["'`](\/[^"'`]*)["'`]/g;
   let sm;
   while ((sm = pathRe.exec(sitemapSrc))) {
+    // Skip template literals with unresolved ${...} interpolations —
+    // those expand at runtime (e.g. per-article sitemap entries).
+    if (sm[1].includes("${")) continue;
     sitemapPaths.add(sm[1]);
     sitemapPathCounts.set(sm[1], (sitemapPathCounts.get(sm[1]) ?? 0) + 1);
   }
@@ -273,6 +276,9 @@ if (internalEnabled) {
   for (const r of knownRoutes) {
     if (SITEMAP_EXCLUDE.has(r)) continue;
     if (ignoreSitemapMissing.has(r)) continue;
+    // Dynamic routes ($param, splat) are indexed by their concrete instances
+    // in the sitemap (e.g. /knowledge-hub/$slug → per-article entries).
+    if (r.includes("$") || r.endsWith("/*")) continue;
     if (!sitemapPaths.has(r))
       sitemapErrors.push({ path: r, reason: "route exists but is missing from sitemap" });
   }
@@ -305,7 +311,12 @@ if (internalEnabled) {
     let cm;
     while ((cm = CANONICAL_RE.exec(text))) hrefs.push(cm[1] ?? cm[2]);
 
+    // buildSeo() from '@/lib/seo' emits a self-referencing canonical automatically.
+    // Treat any route that calls buildSeo(...) with a `path:` as canonical-correct.
+    const usesBuildSeo = /\bbuildSeo\s*\(/.test(text) && /\bpath\s*:/.test(text);
+
     if (hrefs.length === 0) {
+      if (usesBuildSeo) continue;
       canonicalErrors.push({ route: routePath, file: relFile, reason: "missing <link rel=\"canonical\"> in head()" });
       continue;
     }

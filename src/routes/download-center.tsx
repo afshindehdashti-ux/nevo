@@ -877,10 +877,10 @@ function DownloadModal({ doc, onClose }: { doc: Doc; onClose: () => void }) {
               A NEVO engineer will reach out within one working day.
             </p>
             <div className="mt-6 flex justify-center gap-3">
-              <a href="#" onClick={(e) => { e.preventDefault(); onClose(); }}
+              <button type="button" onClick={onClose}
                 className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-5 py-2.5 text-sm font-medium text-[#0a0d10] transition">
                 <Download className="h-4 w-4" /> Download now
-              </a>
+              </button>
               <button onClick={onClose} className="rounded-lg border border-white/15 px-5 py-2.5 text-sm">Close</button>
             </div>
           </div>

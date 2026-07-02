@@ -9,18 +9,15 @@ import {
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/knowledge/hub-hero.jpg";
 import { SITE } from "@/lib/seo";
+import { ARTICLES, type Category } from "@/lib/knowledge-articles";
 
-// Reuse existing knowledge photography (no cropping, full images)
+// Reuse existing knowledge photography for cards outside the article list
 import k01 from "@/assets/knowledge/01_blueprint.jpg";
 import k03 from "@/assets/knowledge/03_3d_factory.jpg";
 import k06 from "@/assets/knowledge/06_production_line.jpg";
 import k07 from "@/assets/knowledge/07_laminator.jpg";
-import k14 from "@/assets/knowledge/14_polyol.jpg";
-import k16 from "@/assets/knowledge/16_rockwool.jpg";
 import k17 from "@/assets/knowledge/17_pir_panel.jpg";
 import k21 from "@/assets/knowledge/21_coldroom_panel.jpg";
-import k23 from "@/assets/knowledge/23_cleanroom.jpg";
-import k26 from "@/assets/knowledge/26_industrial_bldg.jpg";
 import k28 from "@/assets/knowledge/28_fire_rating.jpg";
 import k33 from "@/assets/knowledge/33_layout.jpg";
 import k36 from "@/assets/knowledge/36_investment_report.jpg";
@@ -79,40 +76,8 @@ export const Route = createFileRoute("/knowledge-hub")({
 });
 
 /* ---------- Data ---------- */
+// ARTICLES + types are imported from '@/lib/knowledge-articles'
 
-type Category =
-  | "PIR" | "PUR" | "Rock Wool" | "EPS" | "Cold Rooms" | "Clean Rooms"
-  | "Fire" | "Thermal" | "Production Lines" | "Factory Design"
-  | "Steel Coils" | "Chemicals" | "Automation" | "Quality" | "Project Management";
-
-type Article = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  cover: string;
-  category: Category;
-  section: string;
-  readMin: number;
-  level: "Beginner" | "Professional" | "Expert";
-  featured?: boolean;
-  popular?: boolean;
-  date: string;
-};
-
-const ARTICLES: Article[] = [
-  { slug: "pir-vs-rockwool", title: "PIR vs Rock Wool — the complete engineering comparison", excerpt: "Thermal, fire, mechanical and TCO comparison across 11 criteria with test data.", cover: k17, category: "PIR", section: "Technical Articles", readMin: 14, level: "Professional", featured: true, popular: true, date: "2026-05-18" },
-  { slug: "u-value-thickness", title: "How to size panel thickness for any climate", excerpt: "A step-by-step method using U-value targets, degree days and hygrothermal safety.", cover: k28, category: "Thermal", section: "Engineering Guides", readMin: 11, level: "Professional", featured: true, date: "2026-05-02" },
-  { slug: "continuous-line-101", title: "Continuous sandwich panel line — 101", excerpt: "How a continuous PIR line works: coil, roll-forming, chemical mixing, laminator, saw.", cover: k07, category: "Production Lines", section: "Production Technology", readMin: 12, level: "Beginner", featured: true, popular: true, date: "2026-04-10" },
-  { slug: "cold-room-design", title: "Cold room panel design for −25 °C freezers", excerpt: "Thickness, vapor barriers, cam-locks, floor buildup and door engineering.", cover: k21, category: "Cold Rooms", section: "Industry Applications", readMin: 10, level: "Professional", date: "2026-04-22", popular: true },
-  { slug: "cleanroom-gmp", title: "GMP clean rooms — the panel selection guide", excerpt: "Choosing flush panels, HPL finishes and coving for pharma-grade cleanrooms.", cover: k23, category: "Clean Rooms", section: "Industry Applications", readMin: 9, level: "Professional", date: "2026-03-30" },
-  { slug: "fire-en13501", title: "Fire performance explained — EN 13501-1", excerpt: "Reading fire classifications A2-s1,d0 vs B-s1,d0 and what they mean on site.", cover: k28, category: "Fire", section: "Design Standards", readMin: 8, level: "Beginner", date: "2026-03-11" },
-  { slug: "factory-layout", title: "Sandwich panel factory layout — the master template", excerpt: "Optimal building shape, line orientation, warehouse and utilities placement.", cover: k33, category: "Factory Design", section: "Factory Development", readMin: 15, level: "Expert", featured: true, date: "2026-02-28" },
-  { slug: "investment-model", title: "The factory investment model, decoded", excerpt: "CAPEX line items, OPEX per m², IRR, NPV and phased expansion economics.", cover: k36, category: "Project Management", section: "Factory Development", readMin: 18, level: "Expert", popular: true, date: "2026-02-15" },
-  { slug: "polyol-mdi", title: "PIR chemistry — polyol and MDI in production", excerpt: "Formulation, mixing, safety and how chemistry drives foam quality.", cover: k14, category: "Chemicals", section: "Raw Materials", readMin: 11, level: "Expert", date: "2026-01-22" },
-  { slug: "rockwool-lamella", title: "Rock wool lamella — orientation, density, quality", excerpt: "Why lamella orientation matters for fire, shear and thermal performance.", cover: k16, category: "Rock Wool", section: "Raw Materials", readMin: 9, level: "Professional", date: "2026-01-14" },
-  { slug: "industrial-buildings", title: "Panel selection for industrial buildings", excerpt: "Wall and roof panel systems for warehouses, plants and logistic hubs.", cover: k26, category: "Thermal", section: "Industry Applications", readMin: 8, level: "Beginner", date: "2025-12-19" },
-  { slug: "qc-en14509", title: "Quality control per EN 14509 — the checklist", excerpt: "In-line and off-line QC methods, sample intervals and acceptance criteria.", cover: k01, category: "Quality", section: "Installation Guides", readMin: 12, level: "Professional", date: "2025-12-04" },
-];
 
 const SECTIONS = [
   { name: "Technical Articles",      icon: FileText,        count: 128, href: "#articles" },
@@ -337,7 +302,7 @@ function KnowledgeHub() {
           {/* Grid */}
           <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((a) => (
-              <article key={a.slug} className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] hover:border-emerald-500/30 transition">
+              <Link key={a.slug} to="/knowledge-hub/$slug" params={{ slug: a.slug }} className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] hover:border-emerald-500/30 transition block">
                 <div className="relative aspect-[16/10] overflow-hidden bg-black/40">
                   <img src={a.cover} alt="" loading="lazy" className="h-full w-full object-cover opacity-90 group-hover:scale-[1.03] transition duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -353,7 +318,7 @@ function KnowledgeHub() {
                     <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">Read more <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" /></span>
                   </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
 
@@ -374,7 +339,7 @@ function KnowledgeHub() {
 
           <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {COURSES.map((c) => (
-              <div key={c.title} className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] hover:border-emerald-500/30 transition">
+              <Link to="/download-center" key={c.title} className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] hover:border-emerald-500/30 transition block">
                 <div className="relative aspect-[16/10] overflow-hidden">
                   <img src={c.cover} alt="" loading="lazy" className="h-full w-full object-cover opacity-90" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
@@ -390,7 +355,7 @@ function KnowledgeHub() {
                     <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">Watch training <ArrowRight className="h-3.5 w-3.5" /></span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 
@@ -402,7 +367,7 @@ function KnowledgeHub() {
               </div>
               <div className="mt-5 space-y-3">
                 {VIDEOS.map((v) => (
-                  <div key={v.title} className="group flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-3 hover:border-emerald-500/30 transition">
+                  <Link to="/download-center" key={v.title} className="group flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-3 hover:border-emerald-500/30 transition">
                     <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg">
                       <img src={v.cover} alt="" loading="lazy" className="h-full w-full object-cover" />
                       <div className="absolute inset-0 grid place-items-center bg-black/40"><PlayCircle className="h-6 w-6 text-emerald-400" /></div>
@@ -412,7 +377,7 @@ function KnowledgeHub() {
                       <div className="text-[11px] text-white/40 mt-1">{v.min} min</div>
                     </div>
                     <ArrowRight className="h-4 w-4 text-white/40 group-hover:text-emerald-400 transition" />
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
