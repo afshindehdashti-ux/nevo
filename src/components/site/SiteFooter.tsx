@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, MessageCircle, Linkedin, MapPin, ArrowUpRight } from "lucide-react";
+import { Mail, MessageCircle, Linkedin, MapPin, ArrowUpRight, Phone } from "lucide-react";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
-import { SITE } from "@/lib/seo";
+import { SITE, WHATSAPP_URL } from "@/lib/seo";
 
 const COLUMNS = [
   {
