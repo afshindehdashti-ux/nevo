@@ -291,7 +291,7 @@ function ProductRange() {
       <SectionHeader
         eyebrow="Product Range"
         title="Three engineered panel systems."
-        subtitle="Every NEVO panel is designed around a single engineering brief — deliver certified performance in the harshest industrial environments, at scale."
+        lede="Every NEVO panel is designed around a single engineering brief — deliver certified performance in the harshest industrial environments, at scale."
       />
       <div className="grid gap-8 md:grid-cols-3">
         {PRODUCTS.map((p, i) => (
@@ -428,7 +428,7 @@ function CoreEngineering() {
       <SectionHeader
         eyebrow="Core Engineering"
         title="What's inside the panel is what defines its performance."
-        subtitle="Every NEVO panel is engineered layer by layer — facing, core, adhesive and joint geometry — to deliver certified thermal, fire and structural behaviour over decades."
+        lede="Every NEVO panel is engineered layer by layer — facing, core, adhesive and joint geometry — to deliver certified thermal, fire and structural behaviour over decades."
       />
       <div className="grid gap-8 md:grid-cols-3">
         {items.map((it) => (
@@ -521,7 +521,7 @@ function Performance() {
       <SectionHeader
         eyebrow="Certified Performance"
         title="Tested. Certified. Traceable."
-        subtitle="Every NEVO panel specification is backed by third-party fire, thermal, acoustic and watertightness testing — with certificates issued per production batch."
+        lede="Every NEVO panel specification is backed by third-party fire, thermal, acoustic and watertightness testing — with certificates issued per production batch."
       />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {items.map(({ tag, img, icon: Icon, title, desc }, i) => (
@@ -606,7 +606,7 @@ function ConstructionDetails() {
       <SectionHeader
         eyebrow="Construction Details"
         title="Every joint. Every edge. Engineered."
-        subtitle="A high-performance envelope is only as reliable as its details. NEVO delivers a certified detail library for corners, openings, base fixings and every fastener."
+        lede="A high-performance envelope is only as reliable as its details. NEVO delivers a certified detail library for corners, openings, base fixings and every fastener."
       />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {items.map((it) => (
