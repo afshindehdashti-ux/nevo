@@ -29,24 +29,116 @@ import { orgJsonLd, websiteJsonLd, ldScript } from "../lib/seo";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
-      <div className="max-w-md text-center">
-        <div className="eyebrow mb-4">Error 404</div>
-        <h1 className="text-6xl font-semibold tracking-tightest text-foreground">
-          Page not found
-        </h1>
-        <p className="mt-4 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="mt-8">
+    <div className="relative flex min-h-screen flex-col bg-background">
+      {/* Engineering grid background */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage:
+            "linear-gradient(var(--color-foreground) 1px, transparent 1px), linear-gradient(90deg, var(--color-foreground) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
+
+      {/* Logo bar */}
+      <header className="relative z-10 border-b border-border/60">
+        <div className="container-wide flex h-16 items-center md:h-20">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="flex items-center gap-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            Return home
+            <img
+              src={nevoLogoDark}
+              alt="NEVO Industrial"
+              className="h-7 w-auto dark:hidden"
+            />
+            <img
+              src={nevoLogoLight}
+              alt="NEVO Industrial"
+              className="hidden h-7 w-auto dark:block"
+            />
           </Link>
         </div>
-      </div>
+      </header>
+
+      {/* Main content */}
+      <main className="relative z-10 flex flex-1 items-center">
+        <div className="container-wide w-full py-16 md:py-24">
+          <div className="mx-auto max-w-4xl text-center">
+            <div className="eyebrow mb-4 text-accent">Error 404</div>
+            <h1 className="text-display mb-5">Page not found</h1>
+            <p className="text-body-lg mx-auto max-w-2xl">
+              The resource you requested could not be located. It may have
+              moved, been renamed, or is no longer available.
+            </p>
+
+            {/* Direct link cards */}
+            <div className="mt-14 grid gap-4 sm:grid-cols-3">
+              <Link
+                to="/knowledge-hub"
+                className="group card-accent-line flex flex-col items-center rounded-xl border border-border bg-card p-6 text-center shadow-panel transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-panel-lg"
+              >
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
+                  <BookOpen className="h-5 w-5" />
+                </div>
+                <h3 className="text-h3 mb-1">Knowledge Hub</h3>
+                <p className="text-small">
+                  Technical guides, FAQs, and academy courses.
+                </p>
+                <span className="mt-4 inline-flex items-center text-sm font-medium text-accent">
+                  Explore
+                  <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </Link>
+
+              <Link
+                to="/engineering-tools"
+                className="group card-accent-line flex flex-col items-center rounded-xl border border-border bg-card p-6 text-center shadow-panel transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-panel-lg"
+              >
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
+                  <Calculator className="h-5 w-5" />
+                </div>
+                <h3 className="text-h3 mb-1">Engineering Tools</h3>
+                <p className="text-small">
+                  20+ calculators for panels, loads, and energy.
+                </p>
+                <span className="mt-4 inline-flex items-center text-sm font-medium text-accent">
+                  Calculate
+                  <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </Link>
+
+              <Link
+                to="/project-inquiry"
+                className="group card-accent-line flex flex-col items-center rounded-xl border border-border bg-card p-6 text-center shadow-panel transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-panel-lg"
+              >
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
+                  <ClipboardList className="h-5 w-5" />
+                </div>
+                <h3 className="text-h3 mb-1">Request Quotation</h3>
+                <p className="text-small">
+                  Get a tailored project estimate in 24 hours.
+                </p>
+                <span className="mt-4 inline-flex items-center text-sm font-medium text-accent">
+                  Start inquiry
+                  <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </Link>
+            </div>
+
+            {/* Home CTA */}
+            <div className="mt-12">
+              <Link
+                to="/"
+                className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                <Home className="mr-2 h-4 w-4" />
+                Return to homepage
+              </Link>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
