@@ -72,9 +72,18 @@ export function buildSeo(input: SeoInput) {
   const absolutePath = input.path.startsWith("http")
     ? input.path
     : `${SITE.url}${localizedPath}`;
-  const fullTitle = input.title.includes(SITE.titleSuffix)
-    ? input.title
-    : `${input.title} — ${SITE.titleSuffix}`;
+
+  // Auto-localize: if SEO_META has an entry for this path+locale, override the
+  // caller's title/description. Callers pass an English fallback, and the
+  // dictionary swaps in native-register copy for every supported language.
+  const perLocale = SEO_META[input.path];
+  const localized = perLocale?.[input.lang as LocaleCode] ?? perLocale?.en;
+  const effectiveTitle = localized?.title ?? input.title;
+  const effectiveDescription = localized?.description ?? input.description;
+
+  const fullTitle = effectiveTitle.includes(SITE.titleSuffix)
+    ? effectiveTitle
+    : `${effectiveTitle} — ${SITE.titleSuffix}`;
 
   const meta: Array<Record<string, string>> = [
     { title: fullTitle },
