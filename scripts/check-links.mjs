@@ -374,6 +374,18 @@ function mdSummary(r) {
     lines.push(`</details>`);
     lines.push("");
   }
+  if (r.counts.ignoredLinks || r.ignore.stalePatterns.length) {
+    lines.push(
+      `_${r.counts.ignoredLinks} link occurrence(s) allowlisted via \`.linkcheckignore\` / \`link-check.config.json\`._`,
+    );
+    if (r.ignore.stalePatterns.length) {
+      lines.push("");
+      lines.push(
+        `> ⚠️ Stale ignore pattern(s) never matched — consider removing: ${r.ignore.stalePatterns.map((p) => `\`${p}\``).join(", ")}`,
+      );
+    }
+    lines.push("");
+  }
   lines.push(`_Full HTML + JSON reports are attached as workflow artifacts._`);
   return lines.join("\n");
 }
