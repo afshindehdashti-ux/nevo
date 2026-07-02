@@ -161,6 +161,7 @@ function HeroDesktop() {
 /* ------------------------------------------------------------------ */
 
 function HeroMobile() {
+  const { t } = useTranslation();
   return (
     <div className="relative block min-h-[100svh] overflow-hidden md:hidden">
       <img
@@ -189,15 +190,13 @@ function HeroMobile() {
         >
           <div className="eyebrow mb-5 flex items-center gap-2 text-white/70">
             <span className="inline-flex size-1.5 rounded-full bg-accent" />
-            Dubai · Industrial Engineering &amp; Supply
+            {t("brand.location")} · {t("brand.sector")}
           </div>
           <p aria-hidden className="text-4xl font-semibold leading-[1.05] tracking-tight text-white">
-            Engineering the Future of{" "}
-            <span className="text-accent">Sandwich Panel Manufacturing.</span>
+            {t("home.heroTitle")}
           </p>
           <p className="mt-6 max-w-md text-base leading-relaxed text-white/75">
-            Engineering consultancy, factory development, production lines, raw
-            materials and premium sandwich panel solutions.
+            {t("home.heroSubtitle")}
           </p>
         </motion.div>
 
@@ -213,7 +212,7 @@ function HeroMobile() {
             className="w-full bg-white text-primary transition-colors duration-200 hover:bg-white/90"
           >
             <a href="/project-inquiry">
-              Start Your Project
+              {t("home.heroCtaPrimary")}
               <ArrowRight className="!size-4" />
             </a>
           </Button>
@@ -224,7 +223,7 @@ function HeroMobile() {
             className="w-full border-white/30 bg-transparent text-white transition-colors duration-200 hover:border-white hover:bg-white/10"
           >
             <a href="/ai-assistant">
-              Talk to an Engineer
+              {t("home.heroCtaSecondary")}
               <ArrowUpRight className="!size-4" />
             </a>
           </Button>
