@@ -103,8 +103,10 @@ function findDuplicateKeys(raw) {
 
 // Extract static t("key") / i18n.t("key") / t('key') usages. Dynamic t(var)
 // calls are recorded as "prefix.*" so the checker skips descendants.
-const T_CALL = /(?<![A-Za-z0-9_$])(?:i18n\.)?t\(\s*(["'`])([^"'`]+)\1/g;
-const DYNAMIC_T = /(?<![A-Za-z0-9_$])(?:i18n\.)?t\(\s*[^"'`)\s]/g;
+const T_CALL = /(?<![A-Za-z0-9_$])(?:i18n\.)?t\(\s*(["'])([^"'\n]+)\1/g;
+// Template-literal call: t(`prefix.${x}.suffix`) — treat as dynamic prefix.
+const T_TEMPLATE = /(?<![A-Za-z0-9_$])(?:i18n\.)?t\(\s*`([^`]*)`/g;
+const DYNAMIC_T = /(?<![A-Za-z0-9_$])(?:i18n\.)?t\(\s*(?!["'`])[A-Za-z_$]/g;
 
 function extractUsages(files) {
   const staticKeys = new Set();
