@@ -1,8 +1,9 @@
 import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
 import { motion } from "motion/react";
-import heroDesktopAsset from "@/assets/premium/02-production-line.jpg.asset.json";
-import heroMobile from "@/assets/hero-nevo-mobile.jpg";
+import heroDesktopAsset from "@/assets/hero-homepage.png.asset.json";
+import heroMobileAsset from "@/assets/hero-homepage.png.asset.json";
 const heroDesktop = heroDesktopAsset.url;
+const heroMobile = heroMobileAsset.url;
 import { Button } from "@/components/ui/button";
 
 /**
