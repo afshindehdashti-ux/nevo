@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Mail, MessageCircle, Linkedin, MapPin, ArrowUpRight, Phone } from "lucide-react";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
+import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 
 const COLUMNS = [
   {
