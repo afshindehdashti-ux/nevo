@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroCockpit from "@/assets/tools/hero-cockpit.jpg";
+import { SITE } from "@/lib/seo";
 
 export const Route = createFileRoute("/engineering-tools")({
   component: EngineeringToolsCenter,
@@ -18,9 +19,9 @@ export const Route = createFileRoute("/engineering-tools")({
       { property: "og:title", content: "Engineering Tools Center — NEVO Industrial" },
       { property: "og:description", content: "Professional engineering software — 20 real-time calculators, AI recommendations and PDF reports for sandwich panel projects." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "/engineering-tools" },
+      { property: "og:url", content: `${SITE.url}/engineering-tools` },
     ],
-    links: [{ rel: "canonical", href: "/engineering-tools" }],
+    links: [{ rel: "canonical", href: `${SITE.url}/engineering-tools` }],
     scripts: [
       {
         type: "application/ld+json",

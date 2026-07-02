@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SITE } from "@/lib/seo";
 import { motion } from "motion/react";
 import { ArrowRight, Wrench, LifeBuoy, ShieldCheck } from "lucide-react";
 
@@ -107,9 +108,9 @@ export const Route = createFileRoute("/installation-commissioning")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: URL_PATH },
+      { property: "og:url", content: `${SITE.url}${URL_PATH}` },
     ],
-    links: [{ rel: "canonical", href: URL_PATH }],
+    links: [{ rel: "canonical", href: `${SITE.url}${URL_PATH}` }],
   }),
 });
 
