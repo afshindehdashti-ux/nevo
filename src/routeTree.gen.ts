@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SolutionsSandwichPanelsRouteImport } from './routes/solutions.sandwich-panels'
 import { Route as SolutionsRawMaterialsRouteImport } from './routes/solutions.raw-materials'
 import { Route as SolutionsProductionLinesRouteImport } from './routes/solutions.production-lines'
 import { Route as SolutionsEngineeringConsultancyRouteImport } from './routes/solutions.engineering-consultancy'
@@ -23,6 +24,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsSandwichPanelsRoute = SolutionsSandwichPanelsRouteImport.update({
+  id: '/solutions/sandwich-panels',
+  path: '/solutions/sandwich-panels',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SolutionsRawMaterialsRoute = SolutionsRawMaterialsRouteImport.update({
@@ -49,6 +55,7 @@ export interface FileRoutesByFullPath {
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
+  '/solutions/sandwich-panels': typeof SolutionsSandwichPanelsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -56,6 +63,7 @@ export interface FileRoutesByTo {
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
+  '/solutions/sandwich-panels': typeof SolutionsSandwichPanelsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -64,6 +72,7 @@ export interface FileRoutesById {
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
+  '/solutions/sandwich-panels': typeof SolutionsSandwichPanelsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -73,6 +82,7 @@ export interface FileRouteTypes {
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
+    | '/solutions/sandwich-panels'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -80,6 +90,7 @@ export interface FileRouteTypes {
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
+    | '/solutions/sandwich-panels'
   id:
     | '__root__'
     | '/'
@@ -87,6 +98,7 @@ export interface FileRouteTypes {
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
+    | '/solutions/sandwich-panels'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,6 +107,7 @@ export interface RootRouteChildren {
   SolutionsEngineeringConsultancyRoute: typeof SolutionsEngineeringConsultancyRoute
   SolutionsProductionLinesRoute: typeof SolutionsProductionLinesRoute
   SolutionsRawMaterialsRoute: typeof SolutionsRawMaterialsRoute
+  SolutionsSandwichPanelsRoute: typeof SolutionsSandwichPanelsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -111,6 +124,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/sandwich-panels': {
+      id: '/solutions/sandwich-panels'
+      path: '/solutions/sandwich-panels'
+      fullPath: '/solutions/sandwich-panels'
+      preLoaderRoute: typeof SolutionsSandwichPanelsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/solutions/raw-materials': {
@@ -143,17 +163,8 @@ const rootRouteChildren: RootRouteChildren = {
   SolutionsEngineeringConsultancyRoute: SolutionsEngineeringConsultancyRoute,
   SolutionsProductionLinesRoute: SolutionsProductionLinesRoute,
   SolutionsRawMaterialsRoute: SolutionsRawMaterialsRoute,
+  SolutionsSandwichPanelsRoute: SolutionsSandwichPanelsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
