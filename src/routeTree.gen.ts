@@ -19,6 +19,7 @@ import { Route as InvestmentCalculatorRouteImport } from './routes/investment-ca
 import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as FactoryLayoutGeneratorRouteImport } from './routes/factory-layout-generator'
 import { Route as DownloadCenterRouteImport } from './routes/download-center'
+import { Route as CustomerPortalRouteImport } from './routes/customer-portal'
 import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -80,6 +81,11 @@ const DownloadCenterRoute = DownloadCenterRouteImport.update({
   path: '/download-center',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CustomerPortalRoute = CustomerPortalRouteImport.update({
+  id: '/customer-portal',
+  path: '/customer-portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AiAssistantRoute = AiAssistantRouteImport.update({
   id: '/ai-assistant',
   path: '/ai-assistant',
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
+  '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/industries': typeof IndustriesRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
+  '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/industries': typeof IndustriesRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
+  '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/industries': typeof IndustriesRoute
@@ -199,6 +208,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-assistant'
+    | '/customer-portal'
     | '/download-center'
     | '/factory-layout-generator'
     | '/industries'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-assistant'
+    | '/customer-portal'
     | '/download-center'
     | '/factory-layout-generator'
     | '/industries'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-assistant'
+    | '/customer-portal'
     | '/download-center'
     | '/factory-layout-generator'
     | '/industries'
@@ -263,6 +275,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AiAssistantRoute: typeof AiAssistantRoute
+  CustomerPortalRoute: typeof CustomerPortalRoute
   DownloadCenterRoute: typeof DownloadCenterRoute
   FactoryLayoutGeneratorRoute: typeof FactoryLayoutGeneratorRoute
   IndustriesRoute: typeof IndustriesRoute
@@ -353,6 +366,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DownloadCenterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/customer-portal': {
+      id: '/customer-portal'
+      path: '/customer-portal'
+      fullPath: '/customer-portal'
+      preLoaderRoute: typeof CustomerPortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai-assistant': {
       id: '/ai-assistant'
       path: '/ai-assistant'
@@ -423,6 +443,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AiAssistantRoute: AiAssistantRoute,
+  CustomerPortalRoute: CustomerPortalRoute,
   DownloadCenterRoute: DownloadCenterRoute,
   FactoryLayoutGeneratorRoute: FactoryLayoutGeneratorRoute,
   IndustriesRoute: IndustriesRoute,
