@@ -196,7 +196,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                   className="h-4 w-4 rounded border-white/20 bg-black/40 accent-emerald-500"/>
                 Remember me
               </label>
-              <button type="button" className="text-emerald-400 hover:text-emerald-300">Forgot password?</button>
+              <Link to="/contact" className="text-emerald-400 hover:text-emerald-300">Forgot password?</Link>
             </div>
 
             <button type="submit"

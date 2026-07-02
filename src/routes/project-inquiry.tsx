@@ -561,9 +561,14 @@ function ProjectInquiryPage() {
                 ) : (
                   <button
                     onClick={submit}
-                    className="flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-white transition hover:bg-emerald-400"
+                    disabled={submitting}
+                    className="flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-white transition hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Submit Project <ArrowRight className="h-4 w-4" />
+                    {submitting ? (
+                      <><Loader2 className="h-4 w-4 animate-spin" /> Submitting…</>
+                    ) : (
+                      <>Submit Project <ArrowRight className="h-4 w-4" /></>
+                    )}
                   </button>
                 )}
               </div>
