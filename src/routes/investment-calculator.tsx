@@ -69,9 +69,9 @@ export const Route = createFileRoute("/investment-calculator")({
           type: "application/ld+json",
           children: JSON.stringify(
             breadcrumbJsonLd([
-              { name: "Home", url: "/" },
-              { name: "Solutions", url: "/solutions/factory-development" },
-              { name: "Investment Calculator", url: "/investment-calculator" },
+              { name: "Home", path: "/" },
+              { name: "Solutions", path: "/solutions/factory-development" },
+              { name: "Investment Calculator", path: "/investment-calculator" },
             ]),
           ),
         },
