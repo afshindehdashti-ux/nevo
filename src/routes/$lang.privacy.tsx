@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE } from "@/lib/seo";
+import { ogImageMeta } from "@/lib/og-images";
 
 export const Route = createFileRoute("/$lang/privacy")({
   head: ({ params }) => ({
@@ -17,9 +18,11 @@ export const Route = createFileRoute("/$lang/privacy")({
           "How NEVO Industrial handles personal data, cookies, and inquiries submitted through our platform.",
       },
       { property: "og:url", content: `${SITE.url}/${params.lang}/privacy` },
+      ...ogImageMeta("/privacy", "NEVO Industrial — Privacy Policy"),
     ],
     links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}/privacy` }],
   }),
+
   component: PrivacyPage,
 });
 
