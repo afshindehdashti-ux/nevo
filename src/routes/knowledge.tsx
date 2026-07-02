@@ -550,7 +550,7 @@ function EngineeringLibrary() {
         eyebrow="Engineering Library"
         title="Blueprints, models, calculations, drawings."
         lede="The visual and technical foundation behind every NEVO project — organised as an open engineering reference."
-        invert
+        
       />
       <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {LIBRARY.map((l, i) => (
@@ -693,7 +693,7 @@ function ApplicationKnowledge() {
         eyebrow="Application Knowledge"
         title="Engineering requirements per sector."
         lede="Every industry has its own envelope, hygiene, thermal and fire logic. Here's how we engineer for each."
-        invert
+        
       />
       <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {APPLICATIONS.map((a, i) => (
