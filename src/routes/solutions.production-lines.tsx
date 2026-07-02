@@ -867,16 +867,20 @@ function ProjectInquiry() {
         >
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <label htmlFor="pl-company" className={LABEL}>Company</label>
-              <input id="pl-company" required className={FIELD} placeholder="Company name" />
+              <label htmlFor="pl-company" className={LABEL}>Company *</label>
+              <input id="pl-company" name="company" required className={FIELD} placeholder="Company name" />
+            </div>
+            <div>
+              <label htmlFor="pl-email" className={LABEL}>Email *</label>
+              <input id="pl-email" name="email" type="email" required className={FIELD} placeholder="you@company.com" />
             </div>
             <div>
               <label htmlFor="pl-country" className={LABEL}>Country</label>
-              <input id="pl-country" className={FIELD} placeholder="e.g. Saudi Arabia" />
+              <input id="pl-country" name="country" className={FIELD} placeholder="e.g. Saudi Arabia" />
             </div>
             <div>
               <label htmlFor="pl-capacity" className={LABEL}>Production Capacity</label>
-              <select id="pl-capacity" className={FIELD}>
+              <select id="pl-capacity" name="capacity" defaultValue="" className={FIELD}>
                 <option value="">Select target capacity…</option>
                 <option>Up to 300,000 m²/yr</option>
                 <option>300,000 – 700,000 m²/yr</option>
@@ -886,11 +890,11 @@ function ProjectInquiry() {
             </div>
             <div>
               <label htmlFor="pl-thickness" className={LABEL}>Panel Thickness</label>
-              <input id="pl-thickness" className={FIELD} placeholder="e.g. 40–200 mm" />
+              <input id="pl-thickness" name="thickness" className={FIELD} placeholder="e.g. 40–200 mm" />
             </div>
             <div>
               <label htmlFor="pl-core" className={LABEL}>Core Type</label>
-              <select id="pl-core" className={FIELD}>
+              <select id="pl-core" name="core" defaultValue="" className={FIELD}>
                 <option value="">Select core…</option>
                 <option>PIR</option>
                 <option>PUR</option>
@@ -900,11 +904,11 @@ function ProjectInquiry() {
             </div>
             <div>
               <label htmlFor="pl-factory" className={LABEL}>Factory Size</label>
-              <input id="pl-factory" className={FIELD} placeholder="e.g. 150 × 30 m" />
+              <input id="pl-factory" name="factorySize" className={FIELD} placeholder="e.g. 150 × 30 m" />
             </div>
             <div>
               <label htmlFor="pl-auto" className={LABEL}>Automation Preference</label>
-              <select id="pl-auto" className={FIELD}>
+              <select id="pl-auto" name="automation" defaultValue="" className={FIELD}>
                 <option value="">Select automation…</option>
                 <option>Manual</option>
                 <option>Semi-automatic</option>
@@ -913,11 +917,11 @@ function ProjectInquiry() {
             </div>
             <div>
               <label htmlFor="pl-market" className={LABEL}>Target Market</label>
-              <input id="pl-market" className={FIELD} placeholder="e.g. GCC, Africa, CIS" />
+              <input id="pl-market" name="market" className={FIELD} placeholder="e.g. GCC, Africa, CIS" />
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="pl-timeline" className={LABEL}>Project Timeline</label>
-              <select id="pl-timeline" className={FIELD}>
+              <select id="pl-timeline" name="timeline" defaultValue="" className={FIELD}>
                 <option value="">Select timeline…</option>
                 <option>Immediate</option>
                 <option>3–6 months</option>
@@ -927,7 +931,7 @@ function ProjectInquiry() {
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="pl-message" className={LABEL}>Message</label>
-              <textarea id="pl-message" rows={5} className={FIELD} placeholder="Briefly describe your project, existing site conditions and any technical constraints." />
+              <textarea id="pl-message" name="message" rows={5} className={FIELD} placeholder="Briefly describe your project, existing site conditions and any technical constraints." />
             </div>
           </div>
 
@@ -935,9 +939,8 @@ function ProjectInquiry() {
             <p className="text-xs text-muted-foreground">
               Confidential. Used only to prepare your technical proposal.
             </p>
-            <Button type="submit" variant="primary" size="lg">
-              Submit Project Inquiry
-              <ArrowRight className="!size-4" />
+            <Button type="submit" variant="primary" size="lg" disabled={busy}>
+              {busy ? (<><Loader2 className="mr-2 !size-4 animate-spin" /> Sending…</>) : (<>Submit Project Inquiry <ArrowRight className="!size-4" /></>)}
             </Button>
           </div>
         </form>
