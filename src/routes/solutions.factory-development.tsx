@@ -21,11 +21,7 @@ import {
 import heroAsset from "@/assets/premium/24-masterplan.jpg.asset.json";
 import surveyAsset from "@/assets/premium/22-site-survey.jpg.asset.json";
 import bimAsset from "@/assets/premium/12-engineer-bim.jpg.asset.json";
-import foundationAsset from "@/assets/premium/21-foundation-works.jpg.asset.json";
-import steelAsset from "@/assets/premium/14-steel-erection.jpg.asset.json";
-import utilitiesAsset from "@/assets/premium/11-utilities.jpg.asset.json";
 import commissioningAsset from "@/assets/premium/23-commissioning.jpg.asset.json";
-import completedAsset from "@/assets/premium/06-hq-building.jpg.asset.json";
 import boardroomAsset from "@/assets/premium/18-boardroom.jpg.asset.json";
 import warehouseAsset from "@/assets/premium/04-warehouse-racking.jpg.asset.json";
 
