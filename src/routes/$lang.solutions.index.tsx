@@ -121,8 +121,9 @@ export const Route = createFileRoute("/$lang/solutions/")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
       { name: "twitter:card", content: "summary_large_image" },
-      { rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` },
     ],
+    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
   }),
+
   component: SolutionsIndex,
 });
