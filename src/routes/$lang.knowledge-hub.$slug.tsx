@@ -2,7 +2,7 @@ import { createFileRoute, notFound, useRouter } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { ArrowRight, ArrowLeft, ChevronRight, Clock, User, Calendar, Sparkles, Download, Mail, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SITE } from "@/lib/seo";
+import { SITE, buildSeo } from "@/lib/seo";
 import { ARTICLES, ARTICLES_BY_SLUG, type Article } from "@/lib/knowledge-articles";
 
 export const Route = createFileRoute("/$lang/knowledge-hub/$slug")({
@@ -43,21 +43,24 @@ export const Route = createFileRoute("/$lang/knowledge-hub/$slug")({
   head: ({ params, loaderData }) => {
     const a = loaderData?.article;
     if (!a) return { meta: [{ title: "Article — NEVO Knowledge Hub" }] };
-    const url = `${SITE.url}/knowledge-hub/${a.slug}`;
+    const path = `/knowledge-hub/${a.slug}`;
+    const url = `${SITE.url}/${params.lang}${path}`;
+    const seo = buildSeo({
+      title: a.title,
+      description: a.excerpt,
+      path,
+      lang: params.lang,
+      image: a.cover,
+      type: "article",
+    });
     return {
+      ...seo,
       meta: [
-        { title: `${a.title} — NEVO Knowledge Hub` },
-        { name: "description", content: a.excerpt },
-        { property: "og:title", content: a.title },
-        { property: "og:description", content: a.excerpt },
-        { property: "og:type", content: "article" },
-        { property: "og:url", content: url },
-        { property: "og:image", content: a.cover },
+        ...seo.meta,
         { property: "article:author", content: a.author },
         { property: "article:published_time", content: a.date },
         { property: "article:section", content: a.section },
       ],
-      links: [{ rel: "canonical", href: `${SITE.url}/knowledge-hub/${a.slug}` }],
       scripts: [
         {
           type: "application/ld+json",
