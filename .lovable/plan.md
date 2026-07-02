@@ -1,62 +1,54 @@
+## Current State (verified this turn)
 
-## Goal
+- URL routing, RTL, hreflang, canonical, OG images, language switcher and the global locale-link guard are already **complete and working** across all 10 locales.
+- Locale JSONs currently hold **~333 keys per language** — enough for the site chrome (header, footer, hero, contact, project inquiry) but nothing else.
+- **32 of 32 route bodies contain zero `useTranslation` calls.** Roughly **20,000 lines of hardcoded English** live inside route files, plus configurators, calculators, AI Assistant, Knowledge Hub, and downloads.
+- Realistic scope: **~3,500–4,500 unique strings**, each needing 10 native translations = **35k–45k professional engineering translations**.
 
-Add a CI-runnable script that crawls every route × every locale and fails with a non-zero exit code if any page is missing `<title>`, `<meta name="description">`, `<link rel="canonical">`, `og:image`, or `twitter:image`. Wire it into `package.json` so CI (and the local build gate) can invoke it.
+This cannot honestly be completed in a single turn. Doing it in one shot would either (a) blow the context window mid-file and leave the app broken, or (b) produce shallow machine-tone translations that violate the "native engineering copywriter" quality bar you set. I want your sign-off on scope + sequencing before I start.
 
-## New file: `scripts/check-seo-metadata.mjs`
+## Recommended Phased Execution
 
-Node script (no new dependencies — uses built-in `fetch` + a tiny regex extractor, matching the style of the existing `check-links.mjs` and `i18n-coverage.mjs`).
+Each phase leaves the site fully building, fully bilingual for what's shipped, and independently reviewable.
 
-Behavior:
-1. Boot the dev server if `SEO_CHECK_BASE_URL` isn't provided:
-   - Spawn `vite dev --port 4321 --host 127.0.0.1` as a child process, poll `/` until 200, then run checks. Kill on exit.
-   - If `SEO_CHECK_BASE_URL` is set (CI can point at a pre-built preview server), skip the spawn.
-2. Enumerate routes from a single source of truth: a constant `ROUTES` array in the script (31 canonical paths — same set already validated in the OG-image audit) and `LOCALES = ["en","ar","tr","ru","pt","de","es","fr","it","zh"]`.
-3. For each `${locale}/${path}`:
-   - `fetch` the HTML.
-   - Extract with regex (case-insensitive):
-     - `<title>...</title>` — non-empty, not equal to a known fallback set (`"Lovable"`, `"NEVO Industrial"` bare root, etc. — configurable).
-     - `<meta name="description" content="...">` — non-empty.
-     - `<link rel="canonical" href="...">` — must exist AND must contain `/${locale}/` (or equal site root for `/` → `/${locale}`).
-     - `<meta property="og:image" content="...">` — must exist, absolute `https://` URL.
-     - `<meta name="twitter:image" content="...">` — must exist.
-4. Collect failures into `{ locale, path, missing: [...], canonicalMismatch?: string }`.
-5. Print a grouped report:
-   ```text
-   ✗ /ar/knowledge-hub          missing: og:image, twitter:image
-   ✗ /zh/solutions              canonical mismatch: expected /zh/ prefix, got /solutions
-   ```
-   Followed by a per-locale summary line (`ar: 30/31 pass`).
-6. Exit code:
-   - `0` if zero failures.
-   - `1` if any failure.
-   - `--warn-only` flag prints report but exits `0` (matches `check:i18n:warn` convention).
-   - `--json` flag emits machine-readable JSON for CI artifact upload.
+**Phase 1 — Global chrome & shared surfaces** *(already ~80% done)*
+Verify + finish: `SiteHeader` mega-menu items, `SiteFooter` columns, `AnnouncementBar`, cookie banner, 404, toasts, form validation messages, loading/empty states, pagination, common Button labels. Add `common` namespace with shared verbs (Learn more, Download, Get quote, Read article, Back, Next, Submit, Loading, Error…).
 
-## `package.json` script additions
+**Phase 2 — Top revenue routes** (highest traffic, highest conversion)
+`index`, `about`, `contact`, `project-inquiry`, `solutions/index`, `solutions/factory-development`, `solutions/production-lines`, `solutions/sandwich-panels`, `solutions/raw-materials`, `solutions/engineering-consultancy`, `industries`.
 
-Add under `scripts`:
-```json
-"check:seo": "node scripts/check-seo-metadata.mjs",
-"check:seo:warn": "node scripts/check-seo-metadata.mjs --warn-only",
-"check:seo:json": "node scripts/check-seo-metadata.mjs --json"
-```
+**Phase 3 — Tools & configurators**
+`product-configurator` (1,380 lines — every option, material, thickness, tooltip, generated report line), `panel-thickness-calculator`, `investment-calculator`, `factory-layout-generator`, `engineering-tools` index, `ai-project-estimator`. Includes result-report copy and PDF-export strings.
 
-Optionally chain into a combined gate:
-```json
-"check:all": "npm run check:i18n && npm run check:seo"
-```
+**Phase 4 — Knowledge & AI surfaces**
+`knowledge-hub` index, `knowledge-hub/$slug` article template + all article JSON content, `ai-assistant` (UI shell + system prompt localization so the model answers in the active language), `download-center` (categories, filters, metadata), `pir-vs-rock-wool`, `factory-layouts`.
 
-## Technical details
+**Phase 5 — Corporate & legal**
+`careers`, `investors`, `sustainability`, `research-innovation`, `quality`, `installation-commissioning`, `customer-portal`, `partner-portal`, `privacy`, plus new `terms` and `cookies` pages.
 
-- No new dependencies. Uses Node ≥ 18 built-in `fetch`, `node:child_process`, `node:net` for the port probe.
-- Route list lives at the top of the script as a plain array so contributors adding a new route add one line — the script auto-multiplies by 10 locales.
-- Regex extractor deliberately tolerates attribute reordering (`content` before `name`, single vs double quotes) — mirrors the Playwright-based audit already run manually against 310 pages.
-- Runtime: ~5–8 s for 310 requests against a warm dev server; suitable for a pre-push hook or CI job.
-- No changes to route files or `seo.ts` — this is purely a verification layer.
+**Phase 6 — Sitewide QA sweep**
+Playwright audit across 10 locales × all routes, flag any residual English tokens, tighten register per language (Arabic MSA, Simplified Chinese engineering register, German compound nouns, Turkish suffix agreement, French/Italian/Spanish/Portuguese EPC vocabulary), verify RTL mirroring on every route, regenerate localized sitemap entries.
 
-## Out of scope
+## Technical Approach
 
-- Wiring into a GitHub Actions / Cloudflare Pages workflow file (the project has no `.github/workflows/` yet; the npm script is the CI-agnostic contract).
-- Validating `hreflang` completeness (already covered by the earlier audit; can be a follow-up `check:seo:hreflang`).
-- Rescanning the seo_chat findings — separate tool surface.
+- Extend `src/i18n/locales/{lang}.json` with one namespace per route (`about`, `productConfigurator`, `knowledgeHub`, …). Keeps diffs reviewable and lazy-loadable later.
+- Refactor route by route: extract every literal → `t("ns.key")`, seed English, then generate the other 9 languages using professional industrial-engineering register (not literal MT).
+- For AI Assistant: pass the active locale into the server route's system prompt (`Respond in ${localeName}. Use native industrial engineering terminology.`) so streamed answers match the UI language.
+- For configurator/calculator generated reports: build strings from templated keys with ICU interpolation so numbers/units render correctly per locale (Arabic-Indic digits optional, Chinese unit spacing, French non-breaking spaces, etc.).
+- Expand `scripts/i18n-coverage.mjs` to also flag **hardcoded literals inside JSX** (not just missing keys), so CI catches regressions.
+- Update `scripts/check-seo-metadata.mjs` after each phase.
+
+## Deliverable Per Phase
+
+Every phase ends with: build green, `check:all` green, Playwright spot-check across `en/ar/zh/de` for the phase's routes, and a short written status report.
+
+## What I Need From You
+
+Please confirm one of:
+
+1. **Approve the phased plan** and I start Phase 1 verification + Phase 2 (top revenue routes) this turn, then continue phase-by-phase in follow-up turns.
+2. **Compress to fewer phases** (e.g. combine 2+3, or 4+5) — faster but larger single turns.
+3. **Change priority order** (e.g. do AI Assistant + configurators before corporate pages, or vice versa).
+4. **Different quality bar** — if "professional native engineering copywriter" tone across 10 languages is not required and high-quality machine translation is acceptable, the work compresses roughly 3×.
+
+Reply with a number (or a custom variant) and I'll execute.
