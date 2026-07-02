@@ -76,40 +76,8 @@ export const Route = createFileRoute("/knowledge-hub")({
 });
 
 /* ---------- Data ---------- */
+// ARTICLES + types are imported from '@/lib/knowledge-articles'
 
-type Category =
-  | "PIR" | "PUR" | "Rock Wool" | "EPS" | "Cold Rooms" | "Clean Rooms"
-  | "Fire" | "Thermal" | "Production Lines" | "Factory Design"
-  | "Steel Coils" | "Chemicals" | "Automation" | "Quality" | "Project Management";
-
-type Article = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  cover: string;
-  category: Category;
-  section: string;
-  readMin: number;
-  level: "Beginner" | "Professional" | "Expert";
-  featured?: boolean;
-  popular?: boolean;
-  date: string;
-};
-
-const ARTICLES: Article[] = [
-  { slug: "pir-vs-rockwool", title: "PIR vs Rock Wool — the complete engineering comparison", excerpt: "Thermal, fire, mechanical and TCO comparison across 11 criteria with test data.", cover: k17, category: "PIR", section: "Technical Articles", readMin: 14, level: "Professional", featured: true, popular: true, date: "2026-05-18" },
-  { slug: "u-value-thickness", title: "How to size panel thickness for any climate", excerpt: "A step-by-step method using U-value targets, degree days and hygrothermal safety.", cover: k28, category: "Thermal", section: "Engineering Guides", readMin: 11, level: "Professional", featured: true, date: "2026-05-02" },
-  { slug: "continuous-line-101", title: "Continuous sandwich panel line — 101", excerpt: "How a continuous PIR line works: coil, roll-forming, chemical mixing, laminator, saw.", cover: k07, category: "Production Lines", section: "Production Technology", readMin: 12, level: "Beginner", featured: true, popular: true, date: "2026-04-10" },
-  { slug: "cold-room-design", title: "Cold room panel design for −25 °C freezers", excerpt: "Thickness, vapor barriers, cam-locks, floor buildup and door engineering.", cover: k21, category: "Cold Rooms", section: "Industry Applications", readMin: 10, level: "Professional", date: "2026-04-22", popular: true },
-  { slug: "cleanroom-gmp", title: "GMP clean rooms — the panel selection guide", excerpt: "Choosing flush panels, HPL finishes and coving for pharma-grade cleanrooms.", cover: k23, category: "Clean Rooms", section: "Industry Applications", readMin: 9, level: "Professional", date: "2026-03-30" },
-  { slug: "fire-en13501", title: "Fire performance explained — EN 13501-1", excerpt: "Reading fire classifications A2-s1,d0 vs B-s1,d0 and what they mean on site.", cover: k28, category: "Fire", section: "Design Standards", readMin: 8, level: "Beginner", date: "2026-03-11" },
-  { slug: "factory-layout", title: "Sandwich panel factory layout — the master template", excerpt: "Optimal building shape, line orientation, warehouse and utilities placement.", cover: k33, category: "Factory Design", section: "Factory Development", readMin: 15, level: "Expert", featured: true, date: "2026-02-28" },
-  { slug: "investment-model", title: "The factory investment model, decoded", excerpt: "CAPEX line items, OPEX per m², IRR, NPV and phased expansion economics.", cover: k36, category: "Project Management", section: "Factory Development", readMin: 18, level: "Expert", popular: true, date: "2026-02-15" },
-  { slug: "polyol-mdi", title: "PIR chemistry — polyol and MDI in production", excerpt: "Formulation, mixing, safety and how chemistry drives foam quality.", cover: k14, category: "Chemicals", section: "Raw Materials", readMin: 11, level: "Expert", date: "2026-01-22" },
-  { slug: "rockwool-lamella", title: "Rock wool lamella — orientation, density, quality", excerpt: "Why lamella orientation matters for fire, shear and thermal performance.", cover: k16, category: "Rock Wool", section: "Raw Materials", readMin: 9, level: "Professional", date: "2026-01-14" },
-  { slug: "industrial-buildings", title: "Panel selection for industrial buildings", excerpt: "Wall and roof panel systems for warehouses, plants and logistic hubs.", cover: k26, category: "Thermal", section: "Industry Applications", readMin: 8, level: "Beginner", date: "2025-12-19" },
-  { slug: "qc-en14509", title: "Quality control per EN 14509 — the checklist", excerpt: "In-line and off-line QC methods, sample intervals and acceptance criteria.", cover: k01, category: "Quality", section: "Installation Guides", readMin: 12, level: "Professional", date: "2025-12-04" },
-];
 
 const SECTIONS = [
   { name: "Technical Articles",      icon: FileText,        count: 128, href: "#articles" },
