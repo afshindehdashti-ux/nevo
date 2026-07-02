@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SolutionsSandwichPanelsRouteImport } from './routes/solutions.sandwich-panels'
@@ -20,6 +21,11 @@ import { Route as SolutionsEngineeringConsultancyRouteImport } from './routes/so
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KnowledgeRoute = KnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndustriesRoute = IndustriesRouteImport.update({
@@ -58,6 +64,7 @@ const SolutionsEngineeringConsultancyRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/industries': typeof IndustriesRoute
+  '/knowledge': typeof KnowledgeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/industries': typeof IndustriesRoute
+  '/knowledge': typeof KnowledgeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/industries': typeof IndustriesRoute
+  '/knowledge': typeof KnowledgeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/industries'
+    | '/knowledge'
     | '/sitemap.xml'
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/industries'
+    | '/knowledge'
     | '/sitemap.xml'
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/industries'
+    | '/knowledge'
     | '/sitemap.xml'
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
@@ -116,6 +128,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   IndustriesRoute: typeof IndustriesRoute
+  KnowledgeRoute: typeof KnowledgeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SolutionsEngineeringConsultancyRoute: typeof SolutionsEngineeringConsultancyRoute
   SolutionsProductionLinesRoute: typeof SolutionsProductionLinesRoute
@@ -130,6 +143,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge': {
+      id: '/knowledge'
+      path: '/knowledge'
+      fullPath: '/knowledge'
+      preLoaderRoute: typeof KnowledgeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/industries': {
@@ -180,6 +200,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   IndustriesRoute: IndustriesRoute,
+  KnowledgeRoute: KnowledgeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SolutionsEngineeringConsultancyRoute: SolutionsEngineeringConsultancyRoute,
   SolutionsProductionLinesRoute: SolutionsProductionLinesRoute,
