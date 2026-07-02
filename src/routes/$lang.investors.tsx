@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SITE } from "@/lib/seo";
+import { SITE, buildSeo } from "@/lib/seo";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import {
@@ -209,18 +209,7 @@ function InvestorsPage() {
 }
 
 export const Route = createFileRoute("/$lang/investors")({
-  head: ({ params }) => ({
-    meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
-      { name: "twitter:card", content: "summary_large_image" },
-        ...ogImageMeta("/investors"),
-    ],
-    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
-  }),
+  head: ({ params }) =>
+    buildSeo({ title: TITLE, description: DESCRIPTION, path: URL_PATH, lang: params.lang }),
   component: InvestorsPage,
 });
