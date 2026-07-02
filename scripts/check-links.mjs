@@ -492,9 +492,12 @@ function mdSummary(r) {
   lines.push(
     `| Routes | Sitemap | Dead links | Redirect warnings | Sitemap issues |`,
   );
-  lines.push(`| ---: | ---: | ---: | ---: | ---: |`);
   lines.push(
-    `| ${r.counts.routes} | ${r.counts.sitemapEntries} | **${r.counts.deadLinks}** | ${r.counts.redirectWarnings} | **${r.counts.sitemapErrors}** |`,
+    `| Routes | Sitemap | Dead links | Redirects | Sitemap issues | External ok/fail |`,
+  );
+  lines.push(`| ---: | ---: | ---: | ---: | ---: | ---: |`);
+  lines.push(
+    `| ${r.counts.routes} | ${r.counts.sitemapEntries} | **${r.counts.deadLinks}** | ${r.counts.redirectWarnings} | **${r.counts.sitemapErrors}** | ${r.counts.externalOk}/**${r.counts.externalFailed}** |`,
   );
   lines.push("");
   if (r.deadLinks.length) {
