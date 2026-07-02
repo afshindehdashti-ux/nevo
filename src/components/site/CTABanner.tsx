@@ -42,18 +42,13 @@ export function CTABanner() {
             </p>
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-              <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
+              <Button asChild size="lg">
                 <Link to="/project-inquiry">
                   {t("home.ctaBanner.primary")}
                   <ArrowRight className="!size-4" />
                 </Link>
               </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="secondary"
-                className="border-white/30 bg-transparent text-white hover:border-white hover:bg-white/10"
-              >
+              <Button asChild size="lg" variant="secondary">
                 <Link to="/ai-assistant">
                   {t("home.ctaBanner.secondary")}
                   <ArrowUpRight className="!size-4" />

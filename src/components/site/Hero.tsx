@@ -98,22 +98,13 @@ function HeroDesktop() {
             transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1], delay: 0.25 }}
             className="mt-10 flex flex-row items-center gap-3"
           >
-            <Button
-              asChild
-              size="lg"
-              className="bg-white text-primary transition-colors duration-200 hover:bg-white/90"
-            >
+            <Button asChild size="lg">
               <a href="/project-inquiry">
                 {t("home.heroCtaPrimary")}
                 <ArrowRight className="!size-4" />
               </a>
             </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="secondary"
-              className="border-white/30 bg-transparent text-white transition-colors duration-200 hover:border-white hover:bg-white/10"
-            >
+            <Button asChild size="lg" variant="secondary">
               <a href="/ai-assistant">
                 {t("home.heroCtaSecondary")}
                 <ArrowUpRight className="!size-4" />
@@ -206,22 +197,13 @@ function HeroMobile() {
           transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1], delay: 0.2 }}
           className="flex flex-col gap-3"
         >
-          <Button
-            asChild
-            size="lg"
-            className="w-full bg-white text-primary transition-colors duration-200 hover:bg-white/90"
-          >
+          <Button asChild size="lg" className="w-full">
             <a href="/project-inquiry">
               {t("home.heroCtaPrimary")}
               <ArrowRight className="!size-4" />
             </a>
           </Button>
-          <Button
-            asChild
-            size="lg"
-            variant="secondary"
-            className="w-full border-white/30 bg-transparent text-white transition-colors duration-200 hover:border-white hover:bg-white/10"
-          >
+          <Button asChild size="lg" variant="secondary" className="w-full">
             <a href="/ai-assistant">
               {t("home.heroCtaSecondary")}
               <ArrowUpRight className="!size-4" />
