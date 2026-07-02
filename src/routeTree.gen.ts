@@ -20,6 +20,7 @@ import { Route as PanelThicknessCalculatorRouteImport } from './routes/panel-thi
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as InvestmentCalculatorRouteImport } from './routes/investment-calculator'
 import { Route as IndustriesRouteImport } from './routes/industries'
+import { Route as FactoryLayoutsRouteImport } from './routes/factory-layouts'
 import { Route as FactoryLayoutGeneratorRouteImport } from './routes/factory-layout-generator'
 import { Route as DownloadCenterRouteImport } from './routes/download-center'
 import { Route as CustomerPortalRouteImport } from './routes/customer-portal'
@@ -88,6 +89,11 @@ const InvestmentCalculatorRoute = InvestmentCalculatorRouteImport.update({
 const IndustriesRoute = IndustriesRouteImport.update({
   id: '/industries',
   path: '/industries',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FactoryLayoutsRoute = FactoryLayoutsRouteImport.update({
+  id: '/factory-layouts',
+  path: '/factory-layouts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FactoryLayoutGeneratorRoute = FactoryLayoutGeneratorRouteImport.update({
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
+  '/factory-layouts': typeof FactoryLayoutsRoute
   '/industries': typeof IndustriesRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
+  '/factory-layouts': typeof FactoryLayoutsRoute
   '/industries': typeof IndustriesRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
+  '/factory-layouts': typeof FactoryLayoutsRoute
   '/industries': typeof IndustriesRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
@@ -248,6 +257,7 @@ export interface FileRouteTypes {
     | '/customer-portal'
     | '/download-center'
     | '/factory-layout-generator'
+    | '/factory-layouts'
     | '/industries'
     | '/investment-calculator'
     | '/knowledge'
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
     | '/customer-portal'
     | '/download-center'
     | '/factory-layout-generator'
+    | '/factory-layouts'
     | '/industries'
     | '/investment-calculator'
     | '/knowledge'
@@ -300,6 +311,7 @@ export interface FileRouteTypes {
     | '/customer-portal'
     | '/download-center'
     | '/factory-layout-generator'
+    | '/factory-layouts'
     | '/industries'
     | '/investment-calculator'
     | '/knowledge'
@@ -327,6 +339,7 @@ export interface RootRouteChildren {
   CustomerPortalRoute: typeof CustomerPortalRoute
   DownloadCenterRoute: typeof DownloadCenterRoute
   FactoryLayoutGeneratorRoute: typeof FactoryLayoutGeneratorRoute
+  FactoryLayoutsRoute: typeof FactoryLayoutsRoute
   IndustriesRoute: typeof IndustriesRoute
   InvestmentCalculatorRoute: typeof InvestmentCalculatorRoute
   KnowledgeRoute: typeof KnowledgeRoute
@@ -423,6 +436,13 @@ declare module '@tanstack/react-router' {
       path: '/industries'
       fullPath: '/industries'
       preLoaderRoute: typeof IndustriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/factory-layouts': {
+      id: '/factory-layouts'
+      path: '/factory-layouts'
+      fullPath: '/factory-layouts'
+      preLoaderRoute: typeof FactoryLayoutsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/factory-layout-generator': {
@@ -527,6 +547,7 @@ const rootRouteChildren: RootRouteChildren = {
   CustomerPortalRoute: CustomerPortalRoute,
   DownloadCenterRoute: DownloadCenterRoute,
   FactoryLayoutGeneratorRoute: FactoryLayoutGeneratorRoute,
+  FactoryLayoutsRoute: FactoryLayoutsRoute,
   IndustriesRoute: IndustriesRoute,
   InvestmentCalculatorRoute: InvestmentCalculatorRoute,
   KnowledgeRoute: KnowledgeRoute,
