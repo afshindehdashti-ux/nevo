@@ -391,7 +391,7 @@ function KnowledgeHub() {
           </div>
 
           {/* Videos + Downloads split */}
-          <div className="mt-16 grid lg:grid-cols-2 gap-6">
+          <div className="mt-16 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
             <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
               <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-emerald-400">
                 <Video className="h-3.5 w-3.5" /> Engineering Videos
