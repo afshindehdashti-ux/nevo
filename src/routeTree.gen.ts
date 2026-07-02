@@ -21,6 +21,7 @@ import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as FactoryLayoutGeneratorRouteImport } from './routes/factory-layout-generator'
 import { Route as DownloadCenterRouteImport } from './routes/download-center'
 import { Route as CustomerPortalRouteImport } from './routes/customer-portal'
+import { Route as AiProjectEstimatorRouteImport } from './routes/ai-project-estimator'
 import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -92,6 +93,11 @@ const CustomerPortalRoute = CustomerPortalRouteImport.update({
   path: '/customer-portal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiProjectEstimatorRoute = AiProjectEstimatorRouteImport.update({
+  id: '/ai-project-estimator',
+  path: '/ai-project-estimator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AiAssistantRoute = AiAssistantRouteImport.update({
   id: '/ai-assistant',
   path: '/ai-assistant',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
+  '/ai-project-estimator': typeof AiProjectEstimatorRoute
   '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
+  '/ai-project-estimator': typeof AiProjectEstimatorRoute
   '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
@@ -192,6 +200,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
+  '/ai-project-estimator': typeof AiProjectEstimatorRoute
   '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-assistant'
+    | '/ai-project-estimator'
     | '/customer-portal'
     | '/download-center'
     | '/factory-layout-generator'
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-assistant'
+    | '/ai-project-estimator'
     | '/customer-portal'
     | '/download-center'
     | '/factory-layout-generator'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-assistant'
+    | '/ai-project-estimator'
     | '/customer-portal'
     | '/download-center'
     | '/factory-layout-generator'
@@ -287,6 +299,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AiAssistantRoute: typeof AiAssistantRoute
+  AiProjectEstimatorRoute: typeof AiProjectEstimatorRoute
   CustomerPortalRoute: typeof CustomerPortalRoute
   DownloadCenterRoute: typeof DownloadCenterRoute
   FactoryLayoutGeneratorRoute: typeof FactoryLayoutGeneratorRoute
@@ -393,6 +406,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CustomerPortalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-project-estimator': {
+      id: '/ai-project-estimator'
+      path: '/ai-project-estimator'
+      fullPath: '/ai-project-estimator'
+      preLoaderRoute: typeof AiProjectEstimatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai-assistant': {
       id: '/ai-assistant'
       path: '/ai-assistant'
@@ -463,6 +483,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AiAssistantRoute: AiAssistantRoute,
+  AiProjectEstimatorRoute: AiProjectEstimatorRoute,
   CustomerPortalRoute: CustomerPortalRoute,
   DownloadCenterRoute: DownloadCenterRoute,
   FactoryLayoutGeneratorRoute: FactoryLayoutGeneratorRoute,

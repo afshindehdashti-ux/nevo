@@ -41,6 +41,7 @@ const COLUMNS = [
       { label: "Project Inquiry", href: "/project-inquiry" },
       { label: "Customer Portal", href: "/customer-portal" },
       { label: "Partner Portal", href: "/partner-portal" },
+      { label: "AI Project Estimator", href: "/ai-project-estimator" },
     ],
   },
   {
