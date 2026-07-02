@@ -25,7 +25,9 @@ import { Analytics } from "../components/site/Analytics";
 import { CookieConsent } from "../components/site/CookieConsent";
 import { StickyMobileCTA } from "../components/site/StickyMobileCTA";
 import { Toaster } from "../components/ui/sonner";
-import { orgJsonLd, websiteJsonLd, ldScript } from "../lib/seo";
+import { orgJsonLd, websiteJsonLd, ldScript, hreflangLinks } from "../lib/seo";
+import { LanguageProvider } from "../i18n/LanguageProvider";
+import "../i18n/config";
 
 function NotFoundComponent() {
   return (
@@ -216,8 +218,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "dns-prefetch", href: "https://www.clarity.ms" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap",
       },
+      ...hreflangLinks("/"),
     ],
     scripts: [
       ldScript(orgJsonLd()),
@@ -249,13 +252,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <AIAssistantLauncher />
-      <StickyMobileCTA />
-      <CookieConsent />
-      <Analytics />
-      <Toaster position="top-right" richColors closeButton />
+      <LanguageProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <AIAssistantLauncher />
+        <StickyMobileCTA />
+        <CookieConsent />
+        <Analytics />
+        <Toaster position="top-right" richColors closeButton />
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }
