@@ -413,7 +413,7 @@ function LoginGate({ onSignIn, showPw, setShowPw }: { onSignIn: () => void; show
               <label className="flex items-center gap-2 text-white/60">
                 <input type="checkbox" className="accent-emerald-500" /> Remember me
               </label>
-              <a href="#" className="text-emerald-300 hover:text-emerald-200">Forgot password?</a>
+              <Link to="/contact" className="text-emerald-300 hover:text-emerald-200">Forgot password?</Link>
             </div>
             <button type="submit" className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-black hover:bg-emerald-400">
               <LogIn className="h-4 w-4" /> Sign in to Portal
