@@ -150,6 +150,9 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <AIAssistantLauncher />
+      <StickyMobileCTA />
+      <CookieConsent />
+      <Analytics />
     </QueryClientProvider>
   );
 }
