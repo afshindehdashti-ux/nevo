@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SustainabilityRouteImport } from './routes/sustainability'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResearchInnovationRouteImport } from './routes/research-innovation'
 import { Route as QualityRouteImport } from './routes/quality'
@@ -19,6 +20,7 @@ import { Route as PartnerPortalRouteImport } from './routes/partner-portal'
 import { Route as PanelThicknessCalculatorRouteImport } from './routes/panel-thickness-calculator'
 import { Route as KnowledgeHubRouteImport } from './routes/knowledge-hub'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
+import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as InvestmentCalculatorRouteImport } from './routes/investment-calculator'
 import { Route as InstallationCommissioningRouteImport } from './routes/installation-commissioning'
 import { Route as IndustriesRouteImport } from './routes/industries'
@@ -27,6 +29,8 @@ import { Route as FactoryLayoutGeneratorRouteImport } from './routes/factory-lay
 import { Route as EngineeringToolsRouteImport } from './routes/engineering-tools'
 import { Route as DownloadCenterRouteImport } from './routes/download-center'
 import { Route as CustomerPortalRouteImport } from './routes/customer-portal'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CareersRouteImport } from './routes/careers'
 import { Route as AiProjectEstimatorRouteImport } from './routes/ai-project-estimator'
 import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as AboutRouteImport } from './routes/about'
@@ -38,6 +42,11 @@ import { Route as SolutionsFactoryDevelopmentRouteImport } from './routes/soluti
 import { Route as SolutionsEngineeringConsultancyRouteImport } from './routes/solutions.engineering-consultancy'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
+const SustainabilityRoute = SustainabilityRouteImport.update({
+  id: '/sustainability',
+  path: '/sustainability',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -89,6 +98,11 @@ const KnowledgeRoute = KnowledgeRouteImport.update({
   path: '/knowledge',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvestorsRoute = InvestorsRouteImport.update({
+  id: '/investors',
+  path: '/investors',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvestmentCalculatorRoute = InvestmentCalculatorRouteImport.update({
   id: '/investment-calculator',
   path: '/investment-calculator',
@@ -128,6 +142,16 @@ const DownloadCenterRoute = DownloadCenterRouteImport.update({
 const CustomerPortalRoute = CustomerPortalRouteImport.update({
   id: '/customer-portal',
   path: '/customer-portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AiProjectEstimatorRoute = AiProjectEstimatorRouteImport.update({
@@ -189,6 +213,8 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
   '/ai-project-estimator': typeof AiProjectEstimatorRoute
+  '/careers': typeof CareersRoute
+  '/contact': typeof ContactRoute
   '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
   '/engineering-tools': typeof EngineeringToolsRoute
@@ -197,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/industries': typeof IndustriesRoute
   '/installation-commissioning': typeof InstallationCommissioningRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
+  '/investors': typeof InvestorsRoute
   '/knowledge': typeof KnowledgeRoute
   '/knowledge-hub': typeof KnowledgeHubRoute
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
@@ -207,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/quality': typeof QualityRoute
   '/research-innovation': typeof ResearchInnovationRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sustainability': typeof SustainabilityRoute
   '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
@@ -219,6 +247,8 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
   '/ai-project-estimator': typeof AiProjectEstimatorRoute
+  '/careers': typeof CareersRoute
+  '/contact': typeof ContactRoute
   '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
   '/engineering-tools': typeof EngineeringToolsRoute
@@ -227,6 +257,7 @@ export interface FileRoutesByTo {
   '/industries': typeof IndustriesRoute
   '/installation-commissioning': typeof InstallationCommissioningRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
+  '/investors': typeof InvestorsRoute
   '/knowledge': typeof KnowledgeRoute
   '/knowledge-hub': typeof KnowledgeHubRoute
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
@@ -237,6 +268,7 @@ export interface FileRoutesByTo {
   '/quality': typeof QualityRoute
   '/research-innovation': typeof ResearchInnovationRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sustainability': typeof SustainabilityRoute
   '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
@@ -250,6 +282,8 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
   '/ai-project-estimator': typeof AiProjectEstimatorRoute
+  '/careers': typeof CareersRoute
+  '/contact': typeof ContactRoute
   '/customer-portal': typeof CustomerPortalRoute
   '/download-center': typeof DownloadCenterRoute
   '/engineering-tools': typeof EngineeringToolsRoute
@@ -258,6 +292,7 @@ export interface FileRoutesById {
   '/industries': typeof IndustriesRoute
   '/installation-commissioning': typeof InstallationCommissioningRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
+  '/investors': typeof InvestorsRoute
   '/knowledge': typeof KnowledgeRoute
   '/knowledge-hub': typeof KnowledgeHubRoute
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
@@ -268,6 +303,7 @@ export interface FileRoutesById {
   '/quality': typeof QualityRoute
   '/research-innovation': typeof ResearchInnovationRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sustainability': typeof SustainabilityRoute
   '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
@@ -282,6 +318,8 @@ export interface FileRouteTypes {
     | '/about'
     | '/ai-assistant'
     | '/ai-project-estimator'
+    | '/careers'
+    | '/contact'
     | '/customer-portal'
     | '/download-center'
     | '/engineering-tools'
@@ -290,6 +328,7 @@ export interface FileRouteTypes {
     | '/industries'
     | '/installation-commissioning'
     | '/investment-calculator'
+    | '/investors'
     | '/knowledge'
     | '/knowledge-hub'
     | '/panel-thickness-calculator'
@@ -300,6 +339,7 @@ export interface FileRouteTypes {
     | '/quality'
     | '/research-innovation'
     | '/sitemap.xml'
+    | '/sustainability'
     | '/api/chat'
     | '/solutions/engineering-consultancy'
     | '/solutions/factory-development'
@@ -312,6 +352,8 @@ export interface FileRouteTypes {
     | '/about'
     | '/ai-assistant'
     | '/ai-project-estimator'
+    | '/careers'
+    | '/contact'
     | '/customer-portal'
     | '/download-center'
     | '/engineering-tools'
@@ -320,6 +362,7 @@ export interface FileRouteTypes {
     | '/industries'
     | '/installation-commissioning'
     | '/investment-calculator'
+    | '/investors'
     | '/knowledge'
     | '/knowledge-hub'
     | '/panel-thickness-calculator'
@@ -330,6 +373,7 @@ export interface FileRouteTypes {
     | '/quality'
     | '/research-innovation'
     | '/sitemap.xml'
+    | '/sustainability'
     | '/api/chat'
     | '/solutions/engineering-consultancy'
     | '/solutions/factory-development'
@@ -342,6 +386,8 @@ export interface FileRouteTypes {
     | '/about'
     | '/ai-assistant'
     | '/ai-project-estimator'
+    | '/careers'
+    | '/contact'
     | '/customer-portal'
     | '/download-center'
     | '/engineering-tools'
@@ -350,6 +396,7 @@ export interface FileRouteTypes {
     | '/industries'
     | '/installation-commissioning'
     | '/investment-calculator'
+    | '/investors'
     | '/knowledge'
     | '/knowledge-hub'
     | '/panel-thickness-calculator'
@@ -360,6 +407,7 @@ export interface FileRouteTypes {
     | '/quality'
     | '/research-innovation'
     | '/sitemap.xml'
+    | '/sustainability'
     | '/api/chat'
     | '/solutions/engineering-consultancy'
     | '/solutions/factory-development'
@@ -373,6 +421,8 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AiAssistantRoute: typeof AiAssistantRoute
   AiProjectEstimatorRoute: typeof AiProjectEstimatorRoute
+  CareersRoute: typeof CareersRoute
+  ContactRoute: typeof ContactRoute
   CustomerPortalRoute: typeof CustomerPortalRoute
   DownloadCenterRoute: typeof DownloadCenterRoute
   EngineeringToolsRoute: typeof EngineeringToolsRoute
@@ -381,6 +431,7 @@ export interface RootRouteChildren {
   IndustriesRoute: typeof IndustriesRoute
   InstallationCommissioningRoute: typeof InstallationCommissioningRoute
   InvestmentCalculatorRoute: typeof InvestmentCalculatorRoute
+  InvestorsRoute: typeof InvestorsRoute
   KnowledgeRoute: typeof KnowledgeRoute
   KnowledgeHubRoute: typeof KnowledgeHubRoute
   PanelThicknessCalculatorRoute: typeof PanelThicknessCalculatorRoute
@@ -391,6 +442,7 @@ export interface RootRouteChildren {
   QualityRoute: typeof QualityRoute
   ResearchInnovationRoute: typeof ResearchInnovationRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SustainabilityRoute: typeof SustainabilityRoute
   ApiChatRoute: typeof ApiChatRoute
   SolutionsEngineeringConsultancyRoute: typeof SolutionsEngineeringConsultancyRoute
   SolutionsFactoryDevelopmentRoute: typeof SolutionsFactoryDevelopmentRoute
@@ -401,6 +453,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sustainability': {
+      id: '/sustainability'
+      path: '/sustainability'
+      fullPath: '/sustainability'
+      preLoaderRoute: typeof SustainabilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -471,6 +530,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/investors': {
+      id: '/investors'
+      path: '/investors'
+      fullPath: '/investors'
+      preLoaderRoute: typeof InvestorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/investment-calculator': {
       id: '/investment-calculator'
       path: '/investment-calculator'
@@ -525,6 +591,20 @@ declare module '@tanstack/react-router' {
       path: '/customer-portal'
       fullPath: '/customer-portal'
       preLoaderRoute: typeof CustomerPortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ai-project-estimator': {
@@ -605,6 +685,8 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AiAssistantRoute: AiAssistantRoute,
   AiProjectEstimatorRoute: AiProjectEstimatorRoute,
+  CareersRoute: CareersRoute,
+  ContactRoute: ContactRoute,
   CustomerPortalRoute: CustomerPortalRoute,
   DownloadCenterRoute: DownloadCenterRoute,
   EngineeringToolsRoute: EngineeringToolsRoute,
@@ -613,6 +695,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndustriesRoute: IndustriesRoute,
   InstallationCommissioningRoute: InstallationCommissioningRoute,
   InvestmentCalculatorRoute: InvestmentCalculatorRoute,
+  InvestorsRoute: InvestorsRoute,
   KnowledgeRoute: KnowledgeRoute,
   KnowledgeHubRoute: KnowledgeHubRoute,
   PanelThicknessCalculatorRoute: PanelThicknessCalculatorRoute,
@@ -623,6 +706,7 @@ const rootRouteChildren: RootRouteChildren = {
   QualityRoute: QualityRoute,
   ResearchInnovationRoute: ResearchInnovationRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SustainabilityRoute: SustainabilityRoute,
   ApiChatRoute: ApiChatRoute,
   SolutionsEngineeringConsultancyRoute: SolutionsEngineeringConsultancyRoute,
   SolutionsFactoryDevelopmentRoute: SolutionsFactoryDevelopmentRoute,
