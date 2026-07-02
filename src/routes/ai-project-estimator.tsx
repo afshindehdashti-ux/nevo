@@ -835,9 +835,9 @@ function ReportPreview() {
           ))}
         </ul>
         <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
-          <a href="#" className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-white/70 hover:bg-white/5"><PhoneCall className="h-3 w-3" /> Call</a>
-          <a href="#" className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-white/70 hover:bg-white/5"><MessageCircle className="h-3 w-3" /> WhatsApp</a>
-          <a href="#" className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-white/70 hover:bg-white/5"><Mail className="h-3 w-3" /> Email</a>
+          <a href={SITE.contact.phoneHref} className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-white/70 hover:bg-white/5"><PhoneCall className="h-3 w-3" /> Call</a>
+          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-white/70 hover:bg-white/5"><MessageCircle className="h-3 w-3" /> WhatsApp</a>
+          <a href="mailto:solutions@nevoindustrial.com" className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-white/70 hover:bg-white/5"><Mail className="h-3 w-3" /> Email</a>
           <Link to="/project-inquiry" className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/15 px-3 py-1.5 font-semibold text-emerald-300 ring-1 ring-emerald-500/30 hover:bg-emerald-500/25"><Rocket className="h-3 w-3" /> Book Engineering Meeting</Link>
         </div>
       </div>
