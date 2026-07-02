@@ -15,6 +15,7 @@ const COLUMNS = [
       { label: "Panel Configurator", href: "/product-configurator" },
       { label: "Investment Calculator", href: "/investment-calculator" },
       { label: "Panel Thickness Calculator", href: "/panel-thickness-calculator" },
+      { label: "PIR vs Rock Wool", href: "/pir-vs-rock-wool" },
       { label: "AI Engineering Assistant", href: "/ai-assistant" },
     ],
   },
