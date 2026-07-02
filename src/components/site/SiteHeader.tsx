@@ -85,6 +85,7 @@ const SOLUTIONS: MenuGroup = {
     { label: "Finished Panels", desc: "Premium sandwich panels, delivered.", icon: Layers, href: "/solutions/sandwich-panels" },
     { label: "Panel Configurator", desc: "Configure panels in 3D with live engineering results.", icon: Boxes, href: "/product-configurator" },
     { label: "Panel Thickness Calculator", desc: "Recommend the correct panel thickness by application, climate & fire.", icon: Calculator, href: "/panel-thickness-calculator" },
+    { label: "Factory Layout Generator", desc: "Design your sandwich panel factory — capacity, core, automation, utilities.", icon: Factory, href: "/factory-layout-generator" },
     { label: "AI Engineering Assistant", desc: "Calculators, estimators and guided scoping.", icon: LifeBuoy, href: "/ai-assistant" },
   ],
   featured: {
