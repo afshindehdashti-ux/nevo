@@ -48,7 +48,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
-import nevoLogoDark from "@/assets/nevo-logo-dark.png";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
 /* ─────────────────────────────────────────────────────────────
@@ -252,29 +251,31 @@ export function SiteHeader() {
           <div className="container-wide flex h-[72px] items-center justify-between gap-6 px-5 sm:px-6 md:h-20 md:px-6 lg:h-[88px] lg:px-8">
             <Link to="/" className="relative flex items-center py-2" aria-label="NEVO Industrial home">
               <span className="relative block w-[165px] md:w-[180px] lg:w-[200px]">
-                <img
-                  src={nevoLogoDark}
-                  alt="NEVO Industrial"
-                  className={cn(
-                    "block h-auto w-full transition-opacity duration-[250ms]",
-                    solid ? "opacity-100" : "opacity-0",
-                  )}
-                  loading="eager"
-                  decoding="async"
-                />
+                {/*
+                  Header background is dark in both scroll states (transparent
+                  over dark hero, or solid dark surface when scrolled). Always
+                  render the LIGHT logo variant so the wordmark stays visible.
+                  Do NOT apply CSS filters, opacity, mix-blend-mode, invert, or
+                  brightness — they destroy the white ink.
+                */}
                 <img
                   src={nevoLogoLight}
-                  alt=""
-                  aria-hidden="true"
-                  className={cn(
-                    "absolute inset-0 block h-auto w-full transition-opacity duration-[250ms]",
-                    solid ? "opacity-0" : "opacity-100",
-                  )}
+                  alt="NEVO Industrial"
+                  className="relative z-10 block h-auto w-full"
+                  style={{
+                    objectFit: "contain",
+                    opacity: 1,
+                    mixBlendMode: "normal",
+                    filter: "none",
+                    visibility: "visible",
+                  }}
                   loading="eager"
                   decoding="async"
+                  draggable={false}
                 />
               </span>
             </Link>
+
 
             <nav
               className="hidden items-center gap-0.5 lg:flex"
