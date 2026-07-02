@@ -114,16 +114,16 @@ function extractUsages(files) {
   for (const f of files) {
     const src = readFileSync(f, "utf8");
     for (const m of src.matchAll(T_CALL)) staticKeys.add(m[2]);
-    // Detect `t(variable...)` — we can't statically know the key, so we can't
-    // safely report unused keys in that namespace. Capture nearby "prefix." hints.
-    if (DYNAMIC_T.test(src)) {
-      // Heuristic: any `"prefix.${...}"` literal near a t() call marks that prefix as dynamic.
-      for (const m of src.matchAll(/["'`]([a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*)\.\$\{/g)) {
-        dynamicPrefixes.add(m[1]);
-      }
-      // Also treat bare `t(someVar)` as "we don't know" → suppress all-unused via wildcard.
-      dynamicPrefixes.add("*");
+    // t(`prefix.${x}.suffix`) — record longest static prefix as dynamic.
+    for (const m of src.matchAll(T_TEMPLATE)) {
+      const tpl = m[1];
+      const idx = tpl.indexOf("${");
+      const prefix = (idx === -1 ? tpl : tpl.slice(0, idx)).replace(/\.$/, "");
+      if (prefix) dynamicPrefixes.add(prefix);
+      else dynamicPrefixes.add("*");
     }
+    // t(someVariable) — completely dynamic; widen to wildcard.
+    if (DYNAMIC_T.test(src)) dynamicPrefixes.add("*");
   }
   return { staticKeys, dynamicPrefixes };
 }
