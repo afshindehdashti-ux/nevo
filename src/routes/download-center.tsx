@@ -120,6 +120,7 @@ const CATEGORY_ICONS: Record<Category, typeof Factory> = {
   "Installation": Building2, "Maintenance": Wrench, "Quality Control": ClipboardCheck,
   "Energy Efficiency": Zap, "Fire Performance": Flame, "Cold Storage": Snowflake,
   "Clean Rooms": ShieldCheck, "Industrial Buildings": Boxes,
+  "CAD & BIM": Box, "Certifications": Award,
 };
 
 const FAQ = [
