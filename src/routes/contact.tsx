@@ -74,6 +74,7 @@ function ContactPage() {
     if (ok) formRef.current?.reset();
   }
 
+  const offices = useCounter(4);
   const countries = useCounter(38);
   const engineers = useCounter(120);
 
