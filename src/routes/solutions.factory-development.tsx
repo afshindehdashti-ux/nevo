@@ -18,14 +18,15 @@ import {
   Zap,
 } from "lucide-react";
 
-import heroImg from "@/assets/project/hero-factory.jpg";
-import blueprintImg from "@/assets/project/hero-blueprint.jpg";
-import layoutImg from "@/assets/engineering/05-layout.jpg";
-import processImg from "@/assets/engineering/06-flow.jpg";
-import productionImg from "@/assets/engineering/02-factory.jpg";
-import commissioningImg from "@/assets/engineering/13-commissioning.jpg";
-import investmentImg from "@/assets/engineering/23-roi.jpg";
-import materialsImg from "@/assets/raw-materials/warehouse-raw.jpg";
+import heroAsset from "@/assets/premium/24-masterplan.jpg.asset.json";
+import surveyAsset from "@/assets/premium/22-site-survey.jpg.asset.json";
+import bimAsset from "@/assets/premium/12-engineer-bim.jpg.asset.json";
+import commissioningAsset from "@/assets/premium/23-commissioning.jpg.asset.json";
+import boardroomAsset from "@/assets/premium/18-boardroom.jpg.asset.json";
+import warehouseAsset from "@/assets/premium/04-warehouse-racking.jpg.asset.json";
+
+const heroImg = heroAsset.url;
+const investmentImg = boardroomAsset.url;
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -50,10 +51,10 @@ const PILLARS = [
 ];
 
 const SCOPE = [
-  { title: "01 / Site & Market Definition", image: blueprintImg, body: "Location, utilities, logistics, climate, labour model and target customer segments." },
-  { title: "02 / Process Layout", image: layoutImg, body: "Coil storage, chemical room, line hall, QC lab, finished goods and loading circulation." },
-  { title: "03 / Production System", image: productionImg, body: "Line sizing, equipment specifications, automation levels and future upgrade envelopes." },
-  { title: "04 / Material Flow", image: materialsImg, body: "Incoming materials, FIFO control, safety stock, packaging, dispatch and traceability." },
+  { title: "01 / Site & Market Definition", image: surveyAsset.url, body: "Location, utilities, logistics, climate, labour model and target customer segments." },
+  { title: "02 / Process Layout", image: bimAsset.url, body: "Coil storage, chemical room, line hall, QC lab, finished goods and loading circulation." },
+  { title: "03 / Production System", image: commissioningAsset.url, body: "Line sizing, equipment specifications, automation levels and future upgrade envelopes." },
+  { title: "04 / Material Flow", image: warehouseAsset.url, body: "Incoming materials, FIFO control, safety stock, packaging, dispatch and traceability." },
 ];
 
 const PROCESS = [
