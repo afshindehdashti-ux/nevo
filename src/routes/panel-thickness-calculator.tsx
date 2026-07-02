@@ -450,8 +450,7 @@ function PanelThicknessPage() {
                   ].map(([Icon, k, v]) => (
                     <li key={k as string} className="flex items-center justify-between border-b border-white/5 pb-2">
                       <span className="flex items-center gap-2 text-white/60">
-                        {/* @ts-expect-error - tuple type */}
-                        <Icon className="h-3.5 w-3.5 text-emerald-300/80" />
+                        {(() => { const I = Icon as React.ComponentType<{ className?: string }>; return <I className="h-3.5 w-3.5 text-emerald-300/80" />; })()}
                         {k as string}
                       </span>
                       <span className="font-medium text-white">{v as string}</span>

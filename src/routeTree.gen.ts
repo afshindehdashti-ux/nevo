@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ProjectInquiryRouteImport } from './routes/project-inquiry'
 import { Route as ProductConfiguratorRouteImport } from './routes/product-configurator'
+import { Route as PanelThicknessCalculatorRouteImport } from './routes/panel-thickness-calculator'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as InvestmentCalculatorRouteImport } from './routes/investment-calculator'
 import { Route as IndustriesRouteImport } from './routes/industries'
@@ -40,6 +41,12 @@ const ProductConfiguratorRoute = ProductConfiguratorRouteImport.update({
   path: '/product-configurator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PanelThicknessCalculatorRoute =
+  PanelThicknessCalculatorRouteImport.update({
+    id: '/panel-thickness-calculator',
+    path: '/panel-thickness-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const KnowledgeRoute = KnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
@@ -111,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/industries': typeof IndustriesRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
+  '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -128,6 +136,7 @@ export interface FileRoutesByTo {
   '/industries': typeof IndustriesRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
+  '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -146,6 +155,7 @@ export interface FileRoutesById {
   '/industries': typeof IndustriesRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
+  '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
     | '/industries'
     | '/investment-calculator'
     | '/knowledge'
+    | '/panel-thickness-calculator'
     | '/product-configurator'
     | '/project-inquiry'
     | '/sitemap.xml'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/industries'
     | '/investment-calculator'
     | '/knowledge'
+    | '/panel-thickness-calculator'
     | '/product-configurator'
     | '/project-inquiry'
     | '/sitemap.xml'
@@ -199,6 +211,7 @@ export interface FileRouteTypes {
     | '/industries'
     | '/investment-calculator'
     | '/knowledge'
+    | '/panel-thickness-calculator'
     | '/product-configurator'
     | '/project-inquiry'
     | '/sitemap.xml'
@@ -217,6 +230,7 @@ export interface RootRouteChildren {
   IndustriesRoute: typeof IndustriesRoute
   InvestmentCalculatorRoute: typeof InvestmentCalculatorRoute
   KnowledgeRoute: typeof KnowledgeRoute
+  PanelThicknessCalculatorRoute: typeof PanelThicknessCalculatorRoute
   ProductConfiguratorRoute: typeof ProductConfiguratorRoute
   ProjectInquiryRoute: typeof ProjectInquiryRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -249,6 +263,13 @@ declare module '@tanstack/react-router' {
       path: '/product-configurator'
       fullPath: '/product-configurator'
       preLoaderRoute: typeof ProductConfiguratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/panel-thickness-calculator': {
+      id: '/panel-thickness-calculator'
+      path: '/panel-thickness-calculator'
+      fullPath: '/panel-thickness-calculator'
+      preLoaderRoute: typeof PanelThicknessCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/knowledge': {
@@ -345,6 +366,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndustriesRoute: IndustriesRoute,
   InvestmentCalculatorRoute: InvestmentCalculatorRoute,
   KnowledgeRoute: KnowledgeRoute,
+  PanelThicknessCalculatorRoute: PanelThicknessCalculatorRoute,
   ProductConfiguratorRoute: ProductConfiguratorRoute,
   ProjectInquiryRoute: ProjectInquiryRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
