@@ -257,6 +257,9 @@ if (internalEnabled) {
   const pathRe = /path:\s*["'`](\/[^"'`]*)["'`]/g;
   let sm;
   while ((sm = pathRe.exec(sitemapSrc))) {
+    // Skip template literals with unresolved ${...} interpolations —
+    // those expand at runtime (e.g. per-article sitemap entries).
+    if (sm[1].includes("${")) continue;
     sitemapPaths.add(sm[1]);
     sitemapPathCounts.set(sm[1], (sitemapPathCounts.get(sm[1]) ?? 0) + 1);
   }
