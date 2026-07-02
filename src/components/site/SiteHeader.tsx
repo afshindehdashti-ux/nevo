@@ -451,6 +451,7 @@ function MegaTrigger({
 }
 
 function PrimaryCTA({ solid }: { solid: boolean }) {
+  const { t } = useTranslation();
   return (
     <a
       href="/project-inquiry"
@@ -461,7 +462,7 @@ function PrimaryCTA({ solid }: { solid: boolean }) {
           : "bg-white text-primary hover:-translate-y-0.5 hover:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]",
       )}
     >
-      <span className="relative z-10">Start Your Project</span>
+      <span className="relative z-10">{t("cta.startProject")}</span>
       <ArrowUpRight className="relative z-10 size-3.5 transition-transform duration-[220ms] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" strokeWidth={2} />
       <span
         aria-hidden
