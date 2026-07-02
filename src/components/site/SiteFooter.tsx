@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+
+import { Link } from "@/components/site/LocalizedLink";
 import { useTranslation } from "react-i18next";
 import { Mail, MessageCircle, Linkedin, MapPin, ArrowUpRight, Phone } from "lucide-react";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";

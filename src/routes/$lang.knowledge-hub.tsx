@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@/components/site/LocalizedLink";
 import { useMemo, useState } from "react";
 import {
   Search, ArrowRight, ChevronRight, BookOpen, GraduationCap, Video,

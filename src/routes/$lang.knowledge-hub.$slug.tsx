@@ -1,4 +1,5 @@
-import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
+import { createFileRoute, notFound, useRouter } from "@tanstack/react-router";
+import { Link } from "@/components/site/LocalizedLink";
 import { ArrowRight, ArrowLeft, ChevronRight, Clock, User, Calendar, Sparkles, Download, Mail, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SITE } from "@/lib/seo";
