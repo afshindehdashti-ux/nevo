@@ -79,6 +79,7 @@ function ContactPage() {
     setBusy(true);
     const ok = await submitLeadForm(e.currentTarget, {
       source: "contact-callback",
+      phoneLocale: i18n.language,
       rules: [
         { field: "name",  label: t("contact.callback.name") },
         { field: "email", label: t("contact.callback.email"), type: "email" },
