@@ -110,7 +110,7 @@ export const Route = createFileRoute("/solutions/factory-development")({
           "@type": "BreadcrumbList",
           itemListElement: [
             { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-            { "@type": "ListItem", position: 2, name: "Solutions", item: "/solutions/factory-development" },
+            { "@type": "ListItem", position: 2, name: "Solutions", item: "/solutions" },
             { "@type": "ListItem", position: 3, name: "Factory Development", item: URL_PATH },
           ],
         }),
