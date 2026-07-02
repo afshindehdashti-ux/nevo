@@ -21,6 +21,28 @@ const SOLUTIONS = [
 const TIMELINES = ["Immediate", "1–3 months", "3–6 months", "6–12 months", "12+ months"];
 
 export function ContactSection() {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    const ok = await submitLeadForm(e.currentTarget, {
+      source: "homepage-contact",
+      rules: [
+        { field: "name", label: "Full name" },
+        { field: "email", label: "Email", type: "email" },
+        { field: "message", label: "Project details", min: 10 },
+      ],
+      successTitle: "Inquiry submitted",
+      successDescription:
+        "Your project is with our engineering desk — expect a reply within one business day.",
+    });
+    setBusy(false);
+    if (ok) formRef.current?.reset();
+  }
+
   return (
     <Section id="contact" tone="default">
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
