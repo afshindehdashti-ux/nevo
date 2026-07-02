@@ -805,7 +805,7 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
 
   useEffect(() => { setActiveIdx(0); }, [q]);
 
-  const go = (href: string) => { onClose(); navigate({ to: href }); };
+  const go = (href: string) => { onClose(); navigate({ to: href.startsWith("/$lang") ? href : `/$lang${href}` as never, params: { lang } as never }); };
 
   const groups = useMemo(() => {
     const m: Record<string, typeof SEARCH_INDEX> = {};
