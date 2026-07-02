@@ -164,6 +164,292 @@
     "heroTitle": "Sandwichpaneele — durchgängig engineered.",
     "heroSubtitle": "Schlüsselfertige Werksentwicklung, Engineering-Beratung, Rohstoffe und Produktionslinien — aus Dubai für industrielle Projekte weltweit.",
     "heroCtaPrimary": "Projekt starten",
-    "heroCtaSecondary": "Lösungen entdecken"
+    "heroCtaSecondary": "Lösungen entdecken",
+    "announcement": {
+      "location": "NEVO Industrial · Dubai, VAE",
+      "deskOpen": "Engineering-Desk geöffnet →"
+    },
+    "pathways": {
+      "eyebrow": "Kundenreise",
+      "title": "Wie können wir Ihnen helfen?",
+      "lede": "Jede NEVO-Zusammenarbeit beginnt mit Ihrem Ziel – nicht mit einer Produktliste. Wählen Sie einen Weg, um zu sehen, wie unser Engineering-Team Sie unterstützen kann.",
+      "build": {
+        "title": "Fabrik errichten",
+        "desc": "Komplette Fabrikentwicklung vom Konzept bis zur Inbetriebnahme.",
+        "cta": "Fabrikentwicklung entdecken"
+      },
+      "improve": {
+        "title": "Produktion verbessern",
+        "desc": "Engineering-Optimierung, Modernisierung und technischer Support.",
+        "cta": "Engineering-Beratung"
+      },
+      "source": {
+        "title": "Rohstoffe beschaffen",
+        "desc": "Zuverlässige globale Beschaffung erstklassiger Fertigungsmaterialien.",
+        "cta": "Rohstofflösungen"
+      },
+      "buy": {
+        "title": "Sandwichpaneele kaufen",
+        "desc": "Leistungsstarke Sandwichpaneele für industrielle und gewerbliche Anwendungen.",
+        "cta": "Fertigpaneel-Lösungen"
+      }
+    },
+    "whyNevo": {
+      "eyebrow": "Warum NEVO",
+      "title": "Engineering-getrieben. Global vernetzt.",
+      "lede": "NEVO existiert, weil die Sandwichpaneel-Industrie einen Partner verdient, der ihre technische Sprache spricht – von Anfang bis Ende.",
+      "engineering": {
+        "title": "Engineering-Expertise",
+        "desc": "Erfahrene Ingenieure leiten jeden Umfang – von PIR-Chemie bis Linienautomatisierung und Coil-Metallurgie."
+      },
+      "dubai": {
+        "title": "Projektmanagement aus Dubai",
+        "desc": "Ein strategischer Standort für den Nahen Osten, Afrika, Eurasien und Asien – mit reaktionsschneller lokaler Koordination."
+      },
+      "network": {
+        "title": "Globales Liefernetzwerk",
+        "desc": "Qualifizierte Partner in Europa, der Türkei, Asien und dem GCC für Materialien, Anlagen und Logistik."
+      },
+      "consultancy": {
+        "title": "Technische Beratung",
+        "desc": "Unabhängige Beratung zu Machbarkeit, Prozessdesign, Produktionsoptimierung und Modernisierung."
+      },
+      "integrated": {
+        "title": "Integrierte Industrielösungen",
+        "desc": "Fabrikaufbau, Rohstoffe, Produktionslinien und Fertigpaneele – ein verantwortlicher Partner."
+      },
+      "partnership": {
+        "title": "Langfristige Partnerschaft",
+        "desc": "Audits, Schulungen, Ersatzteile und Troubleshooting – für Fabriken, die jahrzehntelang laufen."
+      }
+    },
+    "solutionsSection": {
+      "eyebrow": "Lösungen",
+      "title": "Ein vollständiger Industriepartner für die Sandwichpaneel-Branche.",
+      "asideCta": "Fabrikentwicklung entdecken →",
+      "learnMore": "Mehr erfahren",
+      "factory": {
+        "title": "Fabrikentwicklung",
+        "desc": "Schlüsselfertige Begleitung neuer Sandwichpaneel-Fabriken – Machbarkeit, Layout, Beschaffung und Inbetriebnahme."
+      },
+      "consultancy": {
+        "title": "Engineering-Beratung",
+        "desc": "Prozessdesign, Layout, Produktionsoptimierung, Modernisierung und Inbetriebnahme-Unterstützung."
+      },
+      "productionLines": {
+        "title": "Produktionslinien",
+        "desc": "Kontinuierliche und diskontinuierliche Linien, Rollformung, PU/PIR-Schäumanlagen und Automatisierung."
+      },
+      "rawMaterials": {
+        "title": "Rohstoffe",
+        "desc": "PIR-/PUR-Systeme, PPGI-, GI- und Aluzinc-Bänder, Steinwolle, Klebstoffe und Verbrauchsmaterialien."
+      },
+      "finishedPanels": {
+        "title": "Fertigpaneele",
+        "desc": "Lieferung fertiger Sandwichpaneele in ausgewählten regionalen Märkten."
+      },
+      "aiAssistant": {
+        "title": "KI-Engineering-Assistent",
+        "desc": "Kapazitätsrechner, Paneelempfehlungen und geführte Projektdefinition für schnellere Entscheidungen."
+      }
+    },
+    "industriesSection": {
+      "eyebrow": "Bediente Branchen",
+      "title": "Sandwichpaneel-Systeme, entwickelt für anspruchsvolle Umgebungen.",
+      "coldStorage": {
+        "name": "Kühlhäuser",
+        "note": "PIR-Hüllen für Tieftemperaturen"
+      },
+      "food": {
+        "name": "Lebensmittelverarbeitung",
+        "note": "Hygienische Wand- und Deckensysteme"
+      },
+      "industrial": {
+        "name": "Industriegebäude",
+        "note": "Strukturell gedämmte Gebäudehüllen"
+      },
+      "cleanRooms": {
+        "name": "Reinräume",
+        "note": "ISO-klassifizierte Umschließungen"
+      },
+      "warehousing": {
+        "name": "Lagerhäuser",
+        "note": "Weitgespannte Industriedächer"
+      },
+      "modular": {
+        "name": "Modulbauten",
+        "note": "Vorgefertigte & montagefertige Einheiten"
+      },
+      "commercial": {
+        "name": "Gewerbebauten",
+        "note": "Architektonische Paneelfassaden"
+      },
+      "agriculture": {
+        "name": "Landwirtschaft",
+        "note": "Gedämmte agrarindustrielle Gebäude"
+      }
+    },
+    "featured": {
+      "eyebrow": "Engineering-Philosophie",
+      "title": "Engineering beginnt lange vor der Produktion.",
+      "body1": "Eine Sandwichpaneel-Fabrik ist ein System, keine Anschaffung. Bevor auch nur ein Coil bestellt wird, definieren unsere Ingenieure Zielausstoß, Paneelspektrum, Werksfläche, Versorgung und Logistik – und konzipieren die Linie um diese Realität.",
+      "body2": "Das Ergebnis ist eine Fabrik, die ihre angegebene Kapazität ab Tag eins erreicht, jahrzehntelang planbar läuft und sich mit Ihrem Markt weiterentwickelt.",
+      "cta": "Fabrikentwicklung entdecken",
+      "figCaption": "ABB. 02 · KONTINUIERLICHE PIR-LINIE",
+      "reference": "Referenzprojekt",
+      "imgAlt": "Kontinuierliche Sandwichpaneel-Produktionslinie in einer NEVO-Referenzfabrik"
+    },
+    "knowledgeSection": {
+      "eyebrow": "Wissens-Hub",
+      "title": "Engineering-Wissen für bessere Entscheidungen.",
+      "lede": "Praktisch, technisch, nützlich. Geschrieben für Ingenieure, Einkaufsleiter und Fabrikinvestoren.",
+      "browse": "Bibliothek durchsuchen →",
+      "a1": {
+        "tag": "Rohstoffe",
+        "title": "Was ist PIR? Chemie, Eigenschaften und Anwendungen.",
+        "read": "6 Min. Lesezeit"
+      },
+      "a2": {
+        "tag": "Vergleich",
+        "title": "PIR vs. PUR: die richtige Chemie für Ihre Paneellinie wählen.",
+        "read": "8 Min. Lesezeit"
+      },
+      "a3": {
+        "tag": "Prozess",
+        "title": "Wie Sandwichpaneele hergestellt werden – Linie für Linie.",
+        "read": "10 Min. Lesezeit"
+      },
+      "a4": {
+        "tag": "Investition",
+        "title": "Was kostet eine Sandwichpaneel-Fabrik?",
+        "read": "12 Min. Lesezeit"
+      },
+      "a5": {
+        "tag": "Rohstoffe",
+        "title": "Steinwolle-Leitfaden: Dichte, Brandverhalten und Spezifikation.",
+        "read": "7 Min. Lesezeit"
+      },
+      "a6": {
+        "tag": "Leitfaden",
+        "title": "Fabrikplanungs-Checkliste für neue Paneelhersteller.",
+        "read": "9 Min. Lesezeit"
+      }
+    },
+    "marketsSection": {
+      "eyebrow": "Globale Märkte",
+      "title": "Engineering weltweit geliefert.",
+      "lede": "Engineering, Beratung, Rohstoffe und Produktionslinien werden weltweit ausgeliefert. Die Belieferung mit Fertigpaneelen erfolgt in ausgewählten regionalen Märkten im Nahen Osten, Afrika und Eurasien.",
+      "mapLabel": "NEVO · Globale Reichweitenkarte",
+      "activeMarkets": "Aktive Märkte",
+      "sa": "Saudi-Arabien",
+      "ae": "VAE",
+      "om": "Oman",
+      "tr": "Türkei",
+      "iq": "Irak",
+      "ru": "Russland",
+      "ke": "Kenia",
+      "cm": "Kamerun"
+    },
+    "stats": {
+      "yearsSuffix": "+",
+      "yearsLabel": "Jahre Branchenerfahrung",
+      "projectsSuffix": "+",
+      "projectsLabel": "Industrieprojekte",
+      "worldwide": "Weltweit",
+      "worldwideLabel": "Engineering-Support",
+      "multiple": "Zahlreiche",
+      "multipleLabel": "Internationale Liefer­partner"
+    },
+    "testimonials": {
+      "eyebrow": "Stimmen der Branche",
+      "title": "Vertraut von Ingenieuren, Betreibern und Industrieinvestoren.",
+      "lede": "Ausgewählte Zitate von Fabrikbesitzern, Werksleitern und Einkaufsleitern, mit denen NEVO zusammenarbeitet. Identitäten werden aus Gründen der Projektvertraulichkeit zurückgehalten.",
+      "q1": {
+        "quote": "Das Engineering-Team von NEVO hat unser Linien-Upgrade mit einer technischen Ehrlichkeit skizziert, die wir bei Lieferanten selten sehen. Der Durchsatz entsprach dem Modell bereits in der ersten Inbetriebnahmewoche.",
+        "author": "Werksleiter",
+        "org": "Paneelhersteller, GCC"
+      },
+      "q2": {
+        "quote": "Sie behandelten unsere Fabrik-Machbarkeit als Engineering-Problem, bevor sie kommerziell wurde. Layout und Versorgungsplan verhinderten spätere Nacharbeiten im siebenstelligen Bereich.",
+        "author": "Industrieinvestor",
+        "org": "Greenfield-Fabrik, Ostafrika"
+      },
+      "q3": {
+        "quote": "Konstante PIR-Qualität, transparente Lieferzeiten und ein technischer Ansprechpartner, der unsere Linie tatsächlich versteht. Diese Kombination war der Grund, warum wir unsere Beschaffung konsolidiert haben.",
+        "author": "Einkaufsleiter",
+        "org": "Sandwichpaneel-Hersteller, Eurasien"
+      }
+    },
+    "ctaBanner": {
+      "eyebrow": "Lassen Sie uns gemeinsam bauen",
+      "titlePart1": "Realisieren wir Ihr nächstes",
+      "titlePart2": "Industrieprojekt.",
+      "lede": "Ob Sie eine neue Fabrik planen, die Produktion modernisieren oder erstklassige Materialien beschaffen – unser Engineering-Team ist bereit, Sie zu unterstützen.",
+      "primary": "Projekt starten",
+      "secondary": "Engineering-Beratung buchen",
+      "b1": "Engineering-geführte Definition – nicht vertriebsgetrieben",
+      "b2": "Technische Antwort innerhalb 1 Werktag",
+      "b3": "Vertrauliche Behandlung Ihrer Projektdetails",
+      "b4": "Verfügbar in Englisch, Arabisch, Russisch, Türkisch"
+    },
+    "contactSection": {
+      "eyebrow": "Projektanfrage",
+      "title": "Sprechen Sie mit einem NEVO-Ingenieur.",
+      "lede": "Erzählen Sie uns von Ihrem Projekt. Ein Senior-Ingenieur meldet sich innerhalb eines Werktages mit einem definierten technischen Vorschlag.",
+      "engineeringDesk": "Engineering-Desk",
+      "whatsapp": "WhatsApp",
+      "phone": "Telefon",
+      "office": "Büro",
+      "officeCity": "Dubai, Vereinigte Arabische Emirate",
+      "fullName": "Vollständiger Name",
+      "fullNamePlaceholder": "Ihr Name",
+      "company": "Unternehmen",
+      "companyPlaceholder": "Firmenname",
+      "email": "E-Mail",
+      "emailPlaceholder": "sie@unternehmen.com",
+      "phoneField": "Telefon / WhatsApp",
+      "phonePlaceholder": "+971 …",
+      "country": "Land",
+      "countryPlaceholder": "z. B. Saudi-Arabien",
+      "solution": "Gewünschte Lösung",
+      "solutionPlaceholder": "Lösung auswählen …",
+      "timeline": "Geschätzter Zeitrahmen",
+      "timelinePlaceholder": "Zeitrahmen auswählen …",
+      "message": "Projektdetails",
+      "messagePlaceholder": "Beschreiben Sie kurz Ihr Projekt, Zielausstoß, Markt und etwaige technische Rahmenbedingungen.",
+      "confidentiality": "Ihre Angaben werden vertraulich behandelt und ausschließlich zur Beantwortung Ihrer Anfrage verwendet.",
+      "submit": "Projektanfrage senden",
+      "sending": "Wird gesendet …",
+      "successTitle": "Anfrage eingereicht",
+      "successDesc": "Ihr Projekt liegt bei unserem Engineering-Desk – mit einer Antwort innerhalb eines Werktages.",
+      "s1": "Fabrikentwicklung",
+      "s2": "Engineering-Beratung",
+      "s3": "Rohstofflösungen",
+      "s4": "Produktionslinien-Lösungen",
+      "s5": "Fertigpaneel-Lösungen",
+      "s6": "Technischer Support",
+      "t1": "Sofort",
+      "t2": "1–3 Monate",
+      "t3": "3–6 Monate",
+      "t4": "6–12 Monate",
+      "t5": "12+ Monate"
+    },
+    "sticky": {
+      "getQuote": "Angebot anfordern",
+      "whatsapp": "WhatsApp",
+      "inquiry": "Anfrage"
+    },
+    "aiLauncher": {
+      "askEngineer": "NEVO KI-Ingenieur fragen",
+      "aiEngineer": "KI-Ingenieur",
+      "openWorkspace": "KI-Ingenieur-Arbeitsbereich öffnen",
+      "close": "Schließen"
+    },
+    "cookies": {
+      "text": "Wir verwenden essenzielle Cookies für den Betrieb dieser Website und optionale Analyse-Cookies zur Verbesserung Ihrer Nutzung. Siehe unsere",
+      "privacyLink": "Datenschutzerklärung",
+      "accept": "Akzeptieren",
+      "decline": "Ablehnen"
+    }
   }
 }

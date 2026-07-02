@@ -164,6 +164,292 @@
     "heroTitle": "夹芯板,端到端工程。",
     "heroSubtitle": "交钥匙工厂开发、工程咨询、原材料与生产线——从迪拜服务全球工业项目。",
     "heroCtaPrimary": "启动您的项目",
-    "heroCtaSecondary": "探索解决方案"
+    "heroCtaSecondary": "探索解决方案",
+    "announcement": {
+      "location": "NEVO Industrial · 迪拜，阿联酋",
+      "deskOpen": "工程服务台已开通 →"
+    },
+    "pathways": {
+      "eyebrow": "客户旅程",
+      "title": "我们能为您做什么？",
+      "lede": "与 NEVO 的每一次合作都始于您的目标，而非产品清单。选择路径，了解我们的工程团队如何提供支持。",
+      "build": {
+        "title": "建设工厂",
+        "desc": "从概念到调试的完整工厂开发。",
+        "cta": "了解工厂开发"
+      },
+      "improve": {
+        "title": "改进生产",
+        "desc": "工程优化、升级改造与技术支持。",
+        "cta": "工程咨询"
+      },
+      "source": {
+        "title": "采购原材料",
+        "desc": "可靠的高品质制造原料全球采购。",
+        "cta": "原材料解决方案"
+      },
+      "buy": {
+        "title": "采购夹芯板",
+        "desc": "面向工业与商业应用的高性能夹芯板。",
+        "cta": "成品面板解决方案"
+      }
+    },
+    "whyNevo": {
+      "eyebrow": "为何选择 NEVO",
+      "title": "以工程驱动，全球连接。",
+      "lede": "NEVO 之所以存在，是因为夹芯板行业需要一家能从头到尾讲同一种技术语言的合作伙伴。",
+      "engineering": {
+        "title": "工程专业",
+        "desc": "资深工程师负责每一个范围——从 PIR 化学到产线自动化与卷材冶金。"
+      },
+      "dubai": {
+        "title": "迪拜项目管理",
+        "desc": "面向中东、非洲、欧亚与亚洲的战略基地——本地协同响应迅速。"
+      },
+      "network": {
+        "title": "全球供应网络",
+        "desc": "在欧洲、土耳其、亚洲与海湾地区拥有材料、设备与物流的合格合作伙伴。"
+      },
+      "consultancy": {
+        "title": "技术咨询",
+        "desc": "针对可行性、工艺设计、生产优化与升级改造的独立建议。"
+      },
+      "integrated": {
+        "title": "集成化工业解决方案",
+        "desc": "工厂建设、原材料、生产线与成品面板——一位负责到底的合作伙伴。"
+      },
+      "partnership": {
+        "title": "长期合作关系",
+        "desc": "审核、培训、备件与故障处理——为可运行数十年的工厂而设计。"
+      }
+    },
+    "solutionsSection": {
+      "eyebrow": "解决方案",
+      "title": "夹芯板行业的完整工业合作伙伴。",
+      "asideCta": "了解工厂开发 →",
+      "learnMore": "了解更多",
+      "factory": {
+        "title": "工厂开发",
+        "desc": "为新建夹芯板工厂提供交钥匙式指导——可行性、布局、采购与调试。"
+      },
+      "consultancy": {
+        "title": "工程咨询",
+        "desc": "工艺设计、布局、生产优化、升级与调试支持。"
+      },
+      "productionLines": {
+        "title": "生产线",
+        "desc": "连续与非连续生产线、辊压成型、PU/PIR 发泡系统与自动化。"
+      },
+      "rawMaterials": {
+        "title": "原材料",
+        "desc": "PIR / PUR 系统、PPGI、GI 与 Aluzinc 卷材、岩棉、胶粘剂与耗材。"
+      },
+      "finishedPanels": {
+        "title": "成品面板",
+        "desc": "在选定区域市场供应成品夹芯板。"
+      },
+      "aiAssistant": {
+        "title": "AI 工程助手",
+        "desc": "产能计算器、面板推荐与引导式项目范围界定，助力更快决策。"
+      }
+    },
+    "industriesSection": {
+      "eyebrow": "服务行业",
+      "title": "面向严苛环境的夹芯板系统。",
+      "coldStorage": {
+        "name": "冷库",
+        "note": "低温 PIR 外围护"
+      },
+      "food": {
+        "name": "食品加工",
+        "note": "洁净墙面与天花系统"
+      },
+      "industrial": {
+        "name": "工业建筑",
+        "note": "结构型保温外围护"
+      },
+      "cleanRooms": {
+        "name": "洁净室",
+        "note": "ISO 分级密闭空间"
+      },
+      "warehousing": {
+        "name": "仓储物流",
+        "note": "大跨度工业屋面"
+      },
+      "modular": {
+        "name": "模块化建筑",
+        "note": "预制与现场装配单元"
+      },
+      "commercial": {
+        "name": "商业建筑",
+        "note": "建筑外墙面板立面"
+      },
+      "agriculture": {
+        "name": "农业",
+        "note": "保温型农工建筑"
+      }
+    },
+    "featured": {
+      "eyebrow": "工程理念",
+      "title": "工程远在生产开始之前就已启动。",
+      "body1": "夹芯板工厂是一套系统，不是一次采购。在订购任何一卷卷材之前，我们的工程师就已确定目标产能、面板谱系、厂区占地、公用工程与物流——并围绕这一现实设计产线。",
+      "body2": "结果是一座工厂：第一天就达到既定产能，可预期地运行数十年，并随市场变化持续演进。",
+      "cta": "了解工厂开发",
+      "figCaption": "图 02 · 连续 PIR 生产线",
+      "reference": "参考项目",
+      "imgAlt": "NEVO 参考工厂内的连续夹芯板生产线"
+    },
+    "knowledgeSection": {
+      "eyebrow": "知识中心",
+      "title": "让决策更好的工程知识。",
+      "lede": "实用、专业、有用。为工程师、采购负责人与工厂投资人而写。",
+      "browse": "浏览资料库 →",
+      "a1": {
+        "tag": "原材料",
+        "title": "什么是 PIR？化学、特性与应用。",
+        "read": "阅读 6 分钟"
+      },
+      "a2": {
+        "tag": "对比",
+        "title": "PIR vs PUR：如何为您的面板产线选择正确的化学体系。",
+        "read": "阅读 8 分钟"
+      },
+      "a3": {
+        "tag": "工艺",
+        "title": "夹芯板是如何生产的——逐线解析。",
+        "read": "阅读 10 分钟"
+      },
+      "a4": {
+        "tag": "投资",
+        "title": "一座夹芯板工厂投资多少？",
+        "read": "阅读 12 分钟"
+      },
+      "a5": {
+        "tag": "原材料",
+        "title": "岩棉指南：密度、防火性能与规格。",
+        "read": "阅读 7 分钟"
+      },
+      "a6": {
+        "tag": "指南",
+        "title": "新建面板厂的规划清单。",
+        "read": "阅读 9 分钟"
+      }
+    },
+    "marketsSection": {
+      "eyebrow": "全球市场",
+      "title": "工程服务，交付全球。",
+      "lede": "工程、咨询、原材料与生产线面向全球交付。成品面板供应覆盖中东、非洲与欧亚的选定区域市场。",
+      "mapLabel": "NEVO · 全球覆盖地图",
+      "activeMarkets": "活跃市场",
+      "sa": "沙特阿拉伯",
+      "ae": "阿联酋",
+      "om": "阿曼",
+      "tr": "土耳其",
+      "iq": "伊拉克",
+      "ru": "俄罗斯",
+      "ke": "肯尼亚",
+      "cm": "喀麦隆"
+    },
+    "stats": {
+      "yearsSuffix": "+",
+      "yearsLabel": "年行业经验",
+      "projectsSuffix": "+",
+      "projectsLabel": "个工业项目",
+      "worldwide": "全球",
+      "worldwideLabel": "工程支持",
+      "multiple": "多家",
+      "multipleLabel": "国际供应合作伙伴"
+    },
+    "testimonials": {
+      "eyebrow": "行业声音",
+      "title": "工程师、运营者与工业投资人的信任之选。",
+      "lede": "来自 NEVO 合作的工厂业主、厂长与采购负责人的精选评语。出于项目保密，隐去具体身份。",
+      "q1": {
+        "quote": "NEVO 的工程团队用少见于供应商的技术诚实感界定了我们的产线升级。首个调试周内，产能就与模型一致。",
+        "author": "厂长",
+        "org": "海湾地区面板制造商"
+      },
+      "q2": {
+        "quote": "他们在把它当作商业问题之前，先把工厂可行性当作工程问题。布局与公用工程方案避免了后期七位数的返工。",
+        "author": "工业投资人",
+        "org": "东非绿地工厂"
+      },
+      "q3": {
+        "quote": "稳定的 PIR 品质、透明的交期，以及一位真正懂我们产线的技术对接人。这就是我们整合供应的原因。",
+        "author": "采购经理",
+        "org": "欧亚夹芯板生产商"
+      }
+    },
+    "ctaBanner": {
+      "eyebrow": "让我们共同建设",
+      "titlePart1": "开启您的下一个",
+      "titlePart2": "工业项目。",
+      "lede": "无论您是在规划新工厂、升级生产还是采购高端材料，我们的工程团队都随时提供支持。",
+      "primary": "启动您的项目",
+      "secondary": "预约工程咨询",
+      "b1": "由工程主导的范围界定——而非销售主导",
+      "b2": "1 个工作日内的技术回复",
+      "b3": "对项目细节的保密处理",
+      "b4": "提供英语、阿拉伯语、俄语、土耳其语服务"
+    },
+    "contactSection": {
+      "eyebrow": "项目咨询",
+      "title": "与 NEVO 工程师沟通。",
+      "lede": "告诉我们您的项目。资深工程师将在一个工作日内提供有明确范围的技术方案。",
+      "engineeringDesk": "工程服务台",
+      "whatsapp": "WhatsApp",
+      "phone": "电话",
+      "office": "办公室",
+      "officeCity": "阿联酋 迪拜",
+      "fullName": "姓名",
+      "fullNamePlaceholder": "您的姓名",
+      "company": "公司",
+      "companyPlaceholder": "公司名称",
+      "email": "电子邮箱",
+      "emailPlaceholder": "you@company.com",
+      "phoneField": "电话 / WhatsApp",
+      "phonePlaceholder": "+971 …",
+      "country": "国家",
+      "countryPlaceholder": "如：沙特阿拉伯",
+      "solution": "感兴趣的解决方案",
+      "solutionPlaceholder": "请选择解决方案…",
+      "timeline": "预计时间",
+      "timelinePlaceholder": "请选择时间…",
+      "message": "项目详情",
+      "messagePlaceholder": "请简要描述项目、目标产能、市场和技术限制。",
+      "confidentiality": "您的信息将被保密处理，仅用于回复您的咨询。",
+      "submit": "提交项目咨询",
+      "sending": "发送中…",
+      "successTitle": "咨询已提交",
+      "successDesc": "您的项目已到达工程服务台——将在一个工作日内回复。",
+      "s1": "工厂开发",
+      "s2": "工程咨询",
+      "s3": "原材料解决方案",
+      "s4": "生产线解决方案",
+      "s5": "成品面板解决方案",
+      "s6": "技术支持",
+      "t1": "立即",
+      "t2": "1–3 个月",
+      "t3": "3–6 个月",
+      "t4": "6–12 个月",
+      "t5": "12+ 个月"
+    },
+    "sticky": {
+      "getQuote": "获取报价",
+      "whatsapp": "WhatsApp",
+      "inquiry": "咨询"
+    },
+    "aiLauncher": {
+      "askEngineer": "咨询 NEVO AI 工程师",
+      "aiEngineer": "AI 工程师",
+      "openWorkspace": "打开完整 AI 工程师工作区",
+      "close": "关闭"
+    },
+    "cookies": {
+      "text": "我们使用必要 Cookie 以运行本网站，并使用可选的分析 Cookie 以改善体验。请参阅我们的",
+      "privacyLink": "隐私政策",
+      "accept": "接受",
+      "decline": "拒绝"
+    }
   }
 }

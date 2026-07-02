@@ -1,10 +1,13 @@
+import { useTranslation } from "react-i18next";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/components/site/LocalizedLink";
 
 export function CTABanner() {
+  const { t } = useTranslation();
+  const BULLETS = ["b1", "b2", "b3", "b4"] as const;
   return (
     <section className="relative isolate overflow-hidden bg-primary text-primary-foreground">
-      {/* Ambient accent glow */}
       <div
         aria-hidden="true"
         className="absolute inset-0 -z-10 opacity-70"
@@ -28,24 +31,22 @@ export function CTABanner() {
           <div className="lg:col-span-8">
             <div className="eyebrow mb-6 flex items-center gap-2 text-accent">
               <span className="inline-flex size-1.5 rounded-full bg-accent" />
-              Let's build together
+              {t("home.ctaBanner.eyebrow")}
             </div>
             <h2 className="text-display text-balance text-primary-foreground">
-              Let's build your next{" "}
-              <span className="text-primary-foreground/55">industrial project.</span>
+              {t("home.ctaBanner.titlePart1")}{" "}
+              <span className="text-primary-foreground/55">{t("home.ctaBanner.titlePart2")}</span>
             </h2>
             <p className="text-body-lg mt-8 max-w-2xl text-primary-foreground/70">
-              Whether you are planning a new factory, upgrading production or
-              sourcing premium materials, our engineering team is ready to support
-              you.
+              {t("home.ctaBanner.lede")}
             </p>
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                <a href="/project-inquiry">
-                  Start Your Project
+                <Link to="/project-inquiry">
+                  {t("home.ctaBanner.primary")}
                   <ArrowRight className="!size-4" />
-                </a>
+                </Link>
               </Button>
               <Button
                 asChild
@@ -53,28 +54,23 @@ export function CTABanner() {
                 variant="secondary"
                 className="border-white/30 bg-transparent text-white hover:border-white hover:bg-white/10"
               >
-                <a href="/ai-assistant">
-                  Book Engineering Consultation
+                <Link to="/ai-assistant">
+                  {t("home.ctaBanner.secondary")}
                   <ArrowUpRight className="!size-4" />
-                </a>
+                </Link>
               </Button>
             </div>
           </div>
 
           <div className="lg:col-span-4">
             <ul className="grid gap-3">
-              {[
-                "Engineering-led scoping — not sales-led",
-                "Technical response within 1 business day",
-                "Confidential handling of project details",
-                "Available in English, Arabic, Russian, Turkish",
-              ].map((item) => (
+              {BULLETS.map((k) => (
                 <li
-                  key={item}
+                  key={k}
                   className="flex items-start gap-3 rounded-md border border-white/10 bg-white/[0.03] p-4 text-sm text-primary-foreground/85 backdrop-blur-sm"
                 >
                   <span className="mt-1.5 inline-flex size-1.5 shrink-0 rounded-full bg-accent" />
-                  {item}
+                  {t(`home.ctaBanner.${k}`)}
                 </li>
               ))}
             </ul>

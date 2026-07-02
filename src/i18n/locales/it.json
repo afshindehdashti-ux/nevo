@@ -164,6 +164,292 @@
     "heroTitle": "Pannelli Sandwich, Ingegneria Integrale.",
     "heroSubtitle": "Sviluppo chiavi in mano di stabilimenti, consulenza ingegneristica, materie prime e linee di produzione — da Dubai per progetti industriali globali.",
     "heroCtaPrimary": "Avvia il Tuo Progetto",
-    "heroCtaSecondary": "Esplora le Soluzioni"
+    "heroCtaSecondary": "Esplora le Soluzioni",
+    "announcement": {
+      "location": "NEVO Industrial · Dubai, EAU",
+      "deskOpen": "Sportello ingegneristico attivo →"
+    },
+    "pathways": {
+      "eyebrow": "Percorso cliente",
+      "title": "Come possiamo aiutarti?",
+      "lede": "Ogni collaborazione con NEVO parte dal tuo obiettivo, non da un catalogo. Scegli un percorso per scoprire come il nostro team di ingegneria può supportarti.",
+      "build": {
+        "title": "Costruire una fabbrica",
+        "desc": "Sviluppo completo dello stabilimento dal concept al commissioning.",
+        "cta": "Scopri lo sviluppo fabbrica"
+      },
+      "improve": {
+        "title": "Migliorare la produzione",
+        "desc": "Ottimizzazione ingegneristica, ammodernamento e supporto tecnico.",
+        "cta": "Consulenza ingegneristica"
+      },
+      "source": {
+        "title": "Approvvigionare materie prime",
+        "desc": "Sourcing globale affidabile di materiali produttivi di alta qualità.",
+        "cta": "Soluzioni materie prime"
+      },
+      "buy": {
+        "title": "Acquistare pannelli sandwich",
+        "desc": "Pannelli sandwich ad alte prestazioni per applicazioni industriali e commerciali.",
+        "cta": "Soluzioni pannelli finiti"
+      }
+    },
+    "whyNevo": {
+      "eyebrow": "Perché NEVO",
+      "title": "Guidati dall'ingegneria. Connessi a livello globale.",
+      "lede": "NEVO nasce perché l'industria del pannello sandwich merita un partner che ne parli il linguaggio tecnico dall'inizio alla fine.",
+      "engineering": {
+        "title": "Competenza ingegneristica",
+        "desc": "Ingegneri senior guidano ogni ambito – dalla chimica PIR all'automazione di linea e alla metallurgia dei coil."
+      },
+      "dubai": {
+        "title": "Project management da Dubai",
+        "desc": "Una base strategica per Medio Oriente, Africa, Eurasia e Asia – con coordinamento locale reattivo."
+      },
+      "network": {
+        "title": "Rete globale di fornitura",
+        "desc": "Partner qualificati in Europa, Turchia, Asia e GCC per materiali, impianti e logistica."
+      },
+      "consultancy": {
+        "title": "Consulenza tecnica",
+        "desc": "Pareri indipendenti su fattibilità, progettazione di processo, ottimizzazione produttiva e ammodernamento."
+      },
+      "integrated": {
+        "title": "Soluzioni industriali integrate",
+        "desc": "Allestimento di fabbrica, materie prime, linee di produzione e pannelli finiti – un unico partner responsabile."
+      },
+      "partnership": {
+        "title": "Partnership di lungo periodo",
+        "desc": "Audit, formazione, ricambi e troubleshooting – per fabbriche operative per decenni."
+      }
+    },
+    "solutionsSection": {
+      "eyebrow": "Soluzioni",
+      "title": "Un partner industriale completo per il settore dei pannelli sandwich.",
+      "asideCta": "Scopri lo sviluppo fabbrica →",
+      "learnMore": "Scopri di più",
+      "factory": {
+        "title": "Sviluppo fabbrica",
+        "desc": "Accompagnamento chiavi in mano per nuove fabbriche di pannelli sandwich – fattibilità, layout, procurement e commissioning."
+      },
+      "consultancy": {
+        "title": "Consulenza ingegneristica",
+        "desc": "Progettazione di processo, layout, ottimizzazione produttiva, ammodernamento e supporto al commissioning."
+      },
+      "productionLines": {
+        "title": "Linee di produzione",
+        "desc": "Linee continue e discontinue, roll forming, sistemi di schiumatura PU/PIR e automazione."
+      },
+      "rawMaterials": {
+        "title": "Materie prime",
+        "desc": "Sistemi PIR / PUR, coil PPGI, GI e Aluzinc, lana di roccia, adesivi e consumabili."
+      },
+      "finishedPanels": {
+        "title": "Pannelli finiti",
+        "desc": "Fornitura di pannelli sandwich finiti su mercati regionali selezionati."
+      },
+      "aiAssistant": {
+        "title": "Assistente ingegneristico AI",
+        "desc": "Calcolatori di capacità, raccomandazioni sui pannelli e scoping guidato per decisioni più rapide."
+      }
+    },
+    "industriesSection": {
+      "eyebrow": "Settori serviti",
+      "title": "Sistemi in pannello sandwich progettati per ambienti impegnativi.",
+      "coldStorage": {
+        "name": "Celle frigorifere",
+        "note": "Involucri PIR per basse temperature"
+      },
+      "food": {
+        "name": "Trasformazione alimentare",
+        "note": "Sistemi igienici a parete e soffitto"
+      },
+      "industrial": {
+        "name": "Edifici industriali",
+        "note": "Involucri isolanti strutturali"
+      },
+      "cleanRooms": {
+        "name": "Camere bianche",
+        "note": "Ambienti classificati ISO"
+      },
+      "warehousing": {
+        "name": "Logistica e magazzini",
+        "note": "Coperture industriali a grande luce"
+      },
+      "modular": {
+        "name": "Edifici modulari",
+        "note": "Unità prefabbricate e montate in sito"
+      },
+      "commercial": {
+        "name": "Edifici commerciali",
+        "note": "Facciate architettoniche in pannello"
+      },
+      "agriculture": {
+        "name": "Agricoltura",
+        "note": "Edifici agroindustriali coibentati"
+      }
+    },
+    "featured": {
+      "eyebrow": "Filosofia di ingegneria",
+      "title": "L'ingegneria comincia molto prima della produzione.",
+      "body1": "Una fabbrica di pannelli sandwich è un sistema, non un acquisto. Prima ancora di ordinare un coil, i nostri ingegneri definiscono capacità obiettivo, gamma di pannelli, impronta di stabilimento, utilities e logistica – e ingegnerizzano la linea attorno a quella realtà.",
+      "body2": "Il risultato è una fabbrica che raggiunge la capacità dichiarata dal primo giorno, opera in modo prevedibile per decenni e si adatta al mutare del mercato.",
+      "cta": "Scopri lo sviluppo fabbrica",
+      "figCaption": "FIG. 02 · LINEA PIR CONTINUA",
+      "reference": "Progetto di riferimento",
+      "imgAlt": "Linea di produzione continua di pannelli sandwich in una fabbrica di riferimento NEVO"
+    },
+    "knowledgeSection": {
+      "eyebrow": "Centro conoscenza",
+      "title": "Sapere ingegneristico che genera decisioni migliori.",
+      "lede": "Pratico, tecnico, utile. Scritto per ingegneri, responsabili acquisti e investitori industriali.",
+      "browse": "Sfoglia la biblioteca →",
+      "a1": {
+        "tag": "Materie prime",
+        "title": "Che cos'è il PIR? Chimica, proprietà e applicazioni.",
+        "read": "6 min di lettura"
+      },
+      "a2": {
+        "tag": "Confronto",
+        "title": "PIR vs PUR: come scegliere la chimica giusta per la tua linea pannelli.",
+        "read": "8 min di lettura"
+      },
+      "a3": {
+        "tag": "Processo",
+        "title": "Come vengono prodotti i pannelli sandwich – linea per linea.",
+        "read": "10 min di lettura"
+      },
+      "a4": {
+        "tag": "Investimento",
+        "title": "Quanto costa una fabbrica di pannelli sandwich?",
+        "read": "12 min di lettura"
+      },
+      "a5": {
+        "tag": "Materie prime",
+        "title": "Guida alla lana di roccia: densità, comportamento al fuoco e specifica.",
+        "read": "7 min di lettura"
+      },
+      "a6": {
+        "tag": "Guida",
+        "title": "Checklist di pianificazione fabbrica per nuovi produttori di pannelli.",
+        "read": "9 min di lettura"
+      }
+    },
+    "marketsSection": {
+      "eyebrow": "Mercati globali",
+      "title": "Ingegneria consegnata in tutto il mondo.",
+      "lede": "Ingegneria, consulenza, materie prime e linee di produzione spediti a livello globale. La fornitura di pannelli finiti opera su mercati regionali selezionati in Medio Oriente, Africa ed Eurasia.",
+      "mapLabel": "NEVO · Mappa di portata globale",
+      "activeMarkets": "Mercati attivi",
+      "sa": "Arabia Saudita",
+      "ae": "EAU",
+      "om": "Oman",
+      "tr": "Turchia",
+      "iq": "Iraq",
+      "ru": "Russia",
+      "ke": "Kenya",
+      "cm": "Camerun"
+    },
+    "stats": {
+      "yearsSuffix": "+",
+      "yearsLabel": "Anni di esperienza nel settore",
+      "projectsSuffix": "+",
+      "projectsLabel": "Progetti industriali",
+      "worldwide": "Mondiale",
+      "worldwideLabel": "Supporto ingegneristico",
+      "multiple": "Molteplici",
+      "multipleLabel": "Partner internazionali di fornitura"
+    },
+    "testimonials": {
+      "eyebrow": "Voci del settore",
+      "title": "Scelto da ingegneri, gestori e investitori industriali.",
+      "lede": "Citazioni selezionate di proprietari di fabbriche, direttori di stabilimento e responsabili acquisti con cui NEVO collabora. Le identità sono riservate per riservatezza di progetto.",
+      "q1": {
+        "quote": "Il team di ingegneria NEVO ha impostato l'upgrade della nostra linea con un livello di onestà tecnica raro tra i fornitori. Il throughput ha raggiunto il modello già nella prima settimana di commissioning.",
+        "author": "Direttore di stabilimento",
+        "org": "Produttore di pannelli, GCC"
+      },
+      "q2": {
+        "quote": "Hanno trattato la fattibilità della nostra fabbrica come un problema ingegneristico prima che commerciale. Il piano layout e utilities ha evitato una revisione da sette cifre più avanti.",
+        "author": "Investitore industriale",
+        "org": "Fabbrica greenfield, Africa orientale"
+      },
+      "q3": {
+        "quote": "Qualità PIR costante, lead time trasparenti e un contatto tecnico che capisce davvero la nostra linea. È la combinazione che ci ha portati a consolidare il sourcing.",
+        "author": "Responsabile acquisti",
+        "org": "Produttore di pannelli sandwich, Eurasia"
+      }
+    },
+    "ctaBanner": {
+      "eyebrow": "Costruiamo insieme",
+      "titlePart1": "Costruiamo il tuo prossimo",
+      "titlePart2": "progetto industriale.",
+      "lede": "Che tu stia progettando una nuova fabbrica, aggiornando la produzione o approvvigionando materiali premium, il nostro team di ingegneria è pronto ad aiutarti.",
+      "primary": "Avvia il tuo progetto",
+      "secondary": "Prenota consulenza ingegneristica",
+      "b1": "Scoping guidato dall'ingegneria – non dalla vendita",
+      "b2": "Risposta tecnica entro 1 giorno lavorativo",
+      "b3": "Trattamento riservato dei dettagli di progetto",
+      "b4": "Disponibile in inglese, arabo, russo, turco"
+    },
+    "contactSection": {
+      "eyebrow": "Richiesta di progetto",
+      "title": "Parla con un ingegnere NEVO.",
+      "lede": "Raccontaci il tuo progetto. Un ingegnere senior risponderà entro un giorno lavorativo con una proposta tecnica delineata.",
+      "engineeringDesk": "Sportello ingegneristico",
+      "whatsapp": "WhatsApp",
+      "phone": "Telefono",
+      "office": "Ufficio",
+      "officeCity": "Dubai, Emirati Arabi Uniti",
+      "fullName": "Nome completo",
+      "fullNamePlaceholder": "Il tuo nome",
+      "company": "Azienda",
+      "companyPlaceholder": "Nome azienda",
+      "email": "E-mail",
+      "emailPlaceholder": "tu@azienda.com",
+      "phoneField": "Telefono / WhatsApp",
+      "phonePlaceholder": "+971 …",
+      "country": "Paese",
+      "countryPlaceholder": "es. Arabia Saudita",
+      "solution": "Soluzione di interesse",
+      "solutionPlaceholder": "Seleziona soluzione…",
+      "timeline": "Tempistica stimata",
+      "timelinePlaceholder": "Seleziona tempistica…",
+      "message": "Dettagli del progetto",
+      "messagePlaceholder": "Descrivi brevemente il progetto, capacità obiettivo, mercato e vincoli tecnici.",
+      "confidentiality": "I tuoi dati sono trattati in via riservata e usati solo per rispondere alla tua richiesta.",
+      "submit": "Invia richiesta di progetto",
+      "sending": "Invio in corso…",
+      "successTitle": "Richiesta inviata",
+      "successDesc": "Il tuo progetto è allo sportello ingegneristico – risposta entro un giorno lavorativo.",
+      "s1": "Sviluppo fabbrica",
+      "s2": "Consulenza ingegneristica",
+      "s3": "Soluzioni materie prime",
+      "s4": "Soluzioni linee di produzione",
+      "s5": "Soluzioni pannelli finiti",
+      "s6": "Supporto tecnico",
+      "t1": "Immediato",
+      "t2": "1–3 mesi",
+      "t3": "3–6 mesi",
+      "t4": "6–12 mesi",
+      "t5": "12+ mesi"
+    },
+    "sticky": {
+      "getQuote": "Richiedi preventivo",
+      "whatsapp": "WhatsApp",
+      "inquiry": "Richiesta"
+    },
+    "aiLauncher": {
+      "askEngineer": "Chiedi all'Ingegnere AI NEVO",
+      "aiEngineer": "Ingegnere AI",
+      "openWorkspace": "Apri lo spazio completo Ingegnere AI",
+      "close": "Chiudi"
+    },
+    "cookies": {
+      "text": "Utilizziamo cookie essenziali per far funzionare il sito e cookie analitici opzionali per migliorare la tua esperienza. Consulta la nostra",
+      "privacyLink": "Informativa sulla privacy",
+      "accept": "Accetta",
+      "decline": "Rifiuta"
+    }
   }
 }
