@@ -78,10 +78,23 @@ async function captureStates() {
   await page.waitForTimeout(300);
   const menuBtn = page.locator('header button[aria-label*="menu" i]').first();
   await menuBtn.click();
-  await page.waitForTimeout(500);
-  // Menu open — the visible NEVO logo is the last img on the page
-  // (mobile menu overlay renders after the sticky header).
-  shots.menuOpen = await page.locator(LOGO_SELECTOR).last().screenshot();
+  await page.waitForTimeout(600);
+  // Pick the first NEVO logo that is actually inside the current viewport
+  // (mobile menu overlay renders its own logo at the top of the panel).
+  const menuLogo = page.locator(LOGO_SELECTOR).filter({
+    hasNot: page.locator(":scope:not(:visible)"),
+  });
+  const handles = await menuLogo.elementHandles();
+  let target = null;
+  for (const h of handles) {
+    const box = await h.boundingBox();
+    if (box && box.y >= 0 && box.y < 200 && box.width > 60) {
+      target = h;
+      break;
+    }
+  }
+  if (!target) throw new Error("No visible menu-open logo found in viewport");
+  shots.menuOpen = await target.screenshot();
 
   await browser.close();
   return shots;
