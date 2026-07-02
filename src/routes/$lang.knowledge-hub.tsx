@@ -35,7 +35,12 @@ export const Route = createFileRoute("/$lang/knowledge-hub")({
       { property: "og:description", content: "Technical articles, engineering guides, courses and FAQs for investors, engineers, architects and factory owners." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/${params.lang}/knowledge-hub` },
-      { property: "og:image", content: heroImg },
+      { property: "og:image", content: `${SITE.url}${heroImg}` },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "NEVO Knowledge Hub" },
+      { name: "twitter:image", content: `${SITE.url}${heroImg}` },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}/knowledge-hub` }],
     scripts: [
