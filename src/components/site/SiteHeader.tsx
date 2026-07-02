@@ -431,7 +431,7 @@ function MegaTrigger({
 function PrimaryCTA({ solid }: { solid: boolean }) {
   return (
     <a
-      href="#contact"
+      href="/project-inquiry"
       className={cn(
         "group relative hidden overflow-hidden rounded-lg px-4 py-2.5 text-[13px] font-medium tracking-tight transition-all duration-[220ms] sm:inline-flex sm:items-center sm:gap-1.5",
         solid
@@ -500,7 +500,7 @@ function CardsLayout({ group }: { group: MenuGroup }) {
           {group.items.map((item) => (
             <li key={item.label}>
               <a
-                href={item.href ?? "#"}
+                href={item.href ?? "/project-inquiry"}
                 className="group flex items-start gap-3 rounded-xl border border-transparent p-3.5 transition-all hover:border-border hover:bg-surface/60"
               >
                 <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-white text-foreground transition-colors group-hover:border-[color:var(--accent)] group-hover:text-[color:var(--accent)]">
@@ -567,7 +567,7 @@ function ListLayout({ group }: { group: MenuGroup }) {
           {group.items.map((item) => (
             <li key={item.label}>
               <a
-                href="#"
+                href={item.href ?? "/industries"}
                 className="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-surface/70"
               >
                 {item.icon && (
@@ -605,7 +605,7 @@ function MarketsLayout({ group }: { group: MenuGroup }) {
           {group.items.map((item) => (
             <li key={item.label}>
               <a
-                href="#"
+                href={item.href ?? "/knowledge"}
                 className="group flex items-center justify-between rounded-lg px-3 py-2.5 transition-colors hover:bg-surface/70"
               >
                 <span className="inline-flex items-center gap-2 text-[13.5px] font-medium tracking-tight text-foreground">
@@ -823,7 +823,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
             {["Factory Development", "Production Lines", "Sandwich Panels", "Cold Storage"].map((t) => (
               <a
                 key={t}
-                href="#"
+                href={item.href ?? "/industries"}
                 className="rounded-full border border-border px-3 py-1.5 text-[12.5px] font-medium text-foreground"
                 onClick={onClose}
               >
@@ -846,7 +846,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
               {section.items.map((item) => (
                 <li key={item.label}>
                   <a
-                    href="#"
+                href={item.href ?? "/knowledge"}
                     className="flex items-center gap-3 rounded-lg px-2 py-3 text-[15px] text-foreground/85"
                     onClick={onClose}
                   >
@@ -883,7 +883,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
         </div>
 
         <Button asChild variant="primary" size="lg" className="mt-6 h-14 w-full text-[15px]">
-          <a href="#contact" onClick={onClose}>
+          <a href="/project-inquiry" onClick={onClose}>
             Start Your Project
             <ArrowUpRight className="!size-4" />
           </a>
