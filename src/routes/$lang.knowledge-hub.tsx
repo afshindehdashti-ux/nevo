@@ -24,7 +24,7 @@ import k36 from "@/assets/knowledge/36_investment_report.jpg";
 import k38 from "@/assets/knowledge/38_factory_guide.jpg";
 import k40 from "@/assets/knowledge/40_material_guide.jpg";
 
-export const Route = createFileRoute("/knowledge-hub")({
+export const Route = createFileRoute("/$lang/knowledge-hub")({
   component: KnowledgeHub,
   head: () => ({
     meta: [

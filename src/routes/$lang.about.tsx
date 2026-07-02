@@ -140,7 +140,7 @@ const COMMITMENTS = [
 
 /* ----------------------------- ROUTE ---------------------------- */
 
-export const Route = createFileRoute("/about")({
+export const Route = createFileRoute("/$lang/about")({
   head: () => {
     const orgLd = {
       "@context": "https://schema.org",

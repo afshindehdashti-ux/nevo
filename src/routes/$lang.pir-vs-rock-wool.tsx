@@ -55,7 +55,7 @@ import appWarehouse from "@/assets/pir-vs-rockwool/app-warehouse.png";
 import appCommercial from "@/assets/pir-vs-rockwool/app-commercial-building.png";
 
 // ---------------- SEO ----------------
-export const Route = createFileRoute("/pir-vs-rock-wool")({
+export const Route = createFileRoute("/$lang/pir-vs-rock-wool")({
   component: PirVsRockWoolPage,
   head: () => {
     const seo = buildSeo({

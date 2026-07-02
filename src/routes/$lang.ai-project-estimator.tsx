@@ -38,7 +38,7 @@ const FAQS = [
 ];
 
 /* ─── SEO ─── */
-export const Route = createFileRoute("/ai-project-estimator")({
+export const Route = createFileRoute("/$lang/ai-project-estimator")({
   head: () => ({
     meta: buildSeo({
       title: "AI Project Estimator — Sandwich Panel Factory",

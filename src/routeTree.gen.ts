@@ -9,178 +9,46 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SustainabilityRouteImport } from './routes/sustainability'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ResearchInnovationRouteImport } from './routes/research-innovation'
-import { Route as QualityRouteImport } from './routes/quality'
-import { Route as ProjectInquiryRouteImport } from './routes/project-inquiry'
-import { Route as ProductConfiguratorRouteImport } from './routes/product-configurator'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PirVsRockWoolRouteImport } from './routes/pir-vs-rock-wool'
-import { Route as PartnerPortalRouteImport } from './routes/partner-portal'
-import { Route as PanelThicknessCalculatorRouteImport } from './routes/panel-thickness-calculator'
-import { Route as KnowledgeHubRouteImport } from './routes/knowledge-hub'
-import { Route as InvestorsRouteImport } from './routes/investors'
-import { Route as InvestmentCalculatorRouteImport } from './routes/investment-calculator'
-import { Route as InstallationCommissioningRouteImport } from './routes/installation-commissioning'
-import { Route as IndustriesRouteImport } from './routes/industries'
-import { Route as FactoryLayoutsRouteImport } from './routes/factory-layouts'
-import { Route as FactoryLayoutGeneratorRouteImport } from './routes/factory-layout-generator'
-import { Route as EngineeringToolsRouteImport } from './routes/engineering-tools'
-import { Route as DownloadCenterRouteImport } from './routes/download-center'
-import { Route as CustomerPortalRouteImport } from './routes/customer-portal'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CareersRouteImport } from './routes/careers'
-import { Route as AiProjectEstimatorRouteImport } from './routes/ai-project-estimator'
-import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as SolutionsIndexRouteImport } from './routes/solutions.index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
-import { Route as SolutionsSandwichPanelsRouteImport } from './routes/solutions.sandwich-panels'
-import { Route as SolutionsRawMaterialsRouteImport } from './routes/solutions.raw-materials'
-import { Route as SolutionsProductionLinesRouteImport } from './routes/solutions.production-lines'
-import { Route as SolutionsFactoryDevelopmentRouteImport } from './routes/solutions.factory-development'
-import { Route as SolutionsEngineeringConsultancyRouteImport } from './routes/solutions.engineering-consultancy'
+import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as KnowledgeSplatRouteImport } from './routes/knowledge.$'
-import { Route as KnowledgeHubSlugRouteImport } from './routes/knowledge-hub.$slug'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as LangSustainabilityRouteImport } from './routes/$lang.sustainability'
+import { Route as LangResearchInnovationRouteImport } from './routes/$lang.research-innovation'
+import { Route as LangQualityRouteImport } from './routes/$lang.quality'
+import { Route as LangProjectInquiryRouteImport } from './routes/$lang.project-inquiry'
+import { Route as LangProductConfiguratorRouteImport } from './routes/$lang.product-configurator'
+import { Route as LangPrivacyRouteImport } from './routes/$lang.privacy'
+import { Route as LangPirVsRockWoolRouteImport } from './routes/$lang.pir-vs-rock-wool'
+import { Route as LangPartnerPortalRouteImport } from './routes/$lang.partner-portal'
+import { Route as LangPanelThicknessCalculatorRouteImport } from './routes/$lang.panel-thickness-calculator'
+import { Route as LangKnowledgeHubRouteImport } from './routes/$lang.knowledge-hub'
+import { Route as LangInvestorsRouteImport } from './routes/$lang.investors'
+import { Route as LangInvestmentCalculatorRouteImport } from './routes/$lang.investment-calculator'
+import { Route as LangInstallationCommissioningRouteImport } from './routes/$lang.installation-commissioning'
+import { Route as LangIndustriesRouteImport } from './routes/$lang.industries'
+import { Route as LangFactoryLayoutsRouteImport } from './routes/$lang.factory-layouts'
+import { Route as LangFactoryLayoutGeneratorRouteImport } from './routes/$lang.factory-layout-generator'
+import { Route as LangEngineeringToolsRouteImport } from './routes/$lang.engineering-tools'
+import { Route as LangDownloadCenterRouteImport } from './routes/$lang.download-center'
+import { Route as LangCustomerPortalRouteImport } from './routes/$lang.customer-portal'
+import { Route as LangContactRouteImport } from './routes/$lang.contact'
+import { Route as LangCareersRouteImport } from './routes/$lang.careers'
+import { Route as LangAiProjectEstimatorRouteImport } from './routes/$lang.ai-project-estimator'
+import { Route as LangAiAssistantRouteImport } from './routes/$lang.ai-assistant'
+import { Route as LangAboutRouteImport } from './routes/$lang.about'
+import { Route as LangSolutionsIndexRouteImport } from './routes/$lang.solutions.index'
+import { Route as LangSolutionsSandwichPanelsRouteImport } from './routes/$lang.solutions.sandwich-panels'
+import { Route as LangSolutionsRawMaterialsRouteImport } from './routes/$lang.solutions.raw-materials'
+import { Route as LangSolutionsProductionLinesRouteImport } from './routes/$lang.solutions.production-lines'
+import { Route as LangSolutionsFactoryDevelopmentRouteImport } from './routes/$lang.solutions.factory-development'
+import { Route as LangSolutionsEngineeringConsultancyRouteImport } from './routes/$lang.solutions.engineering-consultancy'
+import { Route as LangKnowledgeHubSlugRouteImport } from './routes/$lang.knowledge-hub.$slug'
 
-const SustainabilityRoute = SustainabilityRouteImport.update({
-  id: '/sustainability',
-  path: '/sustainability',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResearchInnovationRoute = ResearchInnovationRouteImport.update({
-  id: '/research-innovation',
-  path: '/research-innovation',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QualityRoute = QualityRouteImport.update({
-  id: '/quality',
-  path: '/quality',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProjectInquiryRoute = ProjectInquiryRouteImport.update({
-  id: '/project-inquiry',
-  path: '/project-inquiry',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductConfiguratorRoute = ProductConfiguratorRouteImport.update({
-  id: '/product-configurator',
-  path: '/product-configurator',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PirVsRockWoolRoute = PirVsRockWoolRouteImport.update({
-  id: '/pir-vs-rock-wool',
-  path: '/pir-vs-rock-wool',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PartnerPortalRoute = PartnerPortalRouteImport.update({
-  id: '/partner-portal',
-  path: '/partner-portal',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PanelThicknessCalculatorRoute =
-  PanelThicknessCalculatorRouteImport.update({
-    id: '/panel-thickness-calculator',
-    path: '/panel-thickness-calculator',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const KnowledgeHubRoute = KnowledgeHubRouteImport.update({
-  id: '/knowledge-hub',
-  path: '/knowledge-hub',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvestorsRoute = InvestorsRouteImport.update({
-  id: '/investors',
-  path: '/investors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvestmentCalculatorRoute = InvestmentCalculatorRouteImport.update({
-  id: '/investment-calculator',
-  path: '/investment-calculator',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InstallationCommissioningRoute =
-  InstallationCommissioningRouteImport.update({
-    id: '/installation-commissioning',
-    path: '/installation-commissioning',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const IndustriesRoute = IndustriesRouteImport.update({
-  id: '/industries',
-  path: '/industries',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FactoryLayoutsRoute = FactoryLayoutsRouteImport.update({
-  id: '/factory-layouts',
-  path: '/factory-layouts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FactoryLayoutGeneratorRoute = FactoryLayoutGeneratorRouteImport.update({
-  id: '/factory-layout-generator',
-  path: '/factory-layout-generator',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EngineeringToolsRoute = EngineeringToolsRouteImport.update({
-  id: '/engineering-tools',
-  path: '/engineering-tools',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DownloadCenterRoute = DownloadCenterRouteImport.update({
-  id: '/download-center',
-  path: '/download-center',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomerPortalRoute = CustomerPortalRouteImport.update({
-  id: '/customer-portal',
-  path: '/customer-portal',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CareersRoute = CareersRouteImport.update({
-  id: '/careers',
-  path: '/careers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AiProjectEstimatorRoute = AiProjectEstimatorRouteImport.update({
-  id: '/ai-project-estimator',
-  path: '/ai-project-estimator',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AiAssistantRoute = AiAssistantRouteImport.update({
-  id: '/ai-assistant',
-  path: '/ai-assistant',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SolutionsIndexRoute = SolutionsIndexRouteImport.update({
-  id: '/solutions/',
-  path: '/solutions/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KnowledgeIndexRoute = KnowledgeIndexRouteImport.update({
@@ -188,509 +56,463 @@ const KnowledgeIndexRoute = KnowledgeIndexRouteImport.update({
   path: '/knowledge/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SolutionsSandwichPanelsRoute = SolutionsSandwichPanelsRouteImport.update({
-  id: '/solutions/sandwich-panels',
-  path: '/solutions/sandwich-panels',
+const LangIndexRoute = LangIndexRouteImport.update({
+  id: '/$lang/',
+  path: '/$lang/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SolutionsRawMaterialsRoute = SolutionsRawMaterialsRouteImport.update({
-  id: '/solutions/raw-materials',
-  path: '/solutions/raw-materials',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SolutionsProductionLinesRoute =
-  SolutionsProductionLinesRouteImport.update({
-    id: '/solutions/production-lines',
-    path: '/solutions/production-lines',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const SolutionsFactoryDevelopmentRoute =
-  SolutionsFactoryDevelopmentRouteImport.update({
-    id: '/solutions/factory-development',
-    path: '/solutions/factory-development',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const SolutionsEngineeringConsultancyRoute =
-  SolutionsEngineeringConsultancyRouteImport.update({
-    id: '/solutions/engineering-consultancy',
-    path: '/solutions/engineering-consultancy',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const KnowledgeSplatRoute = KnowledgeSplatRouteImport.update({
   id: '/knowledge/$',
   path: '/knowledge/$',
   getParentRoute: () => rootRouteImport,
-} as any)
-const KnowledgeHubSlugRoute = KnowledgeHubSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => KnowledgeHubRoute,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LangSustainabilityRoute = LangSustainabilityRouteImport.update({
+  id: '/$lang/sustainability',
+  path: '/$lang/sustainability',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangResearchInnovationRoute = LangResearchInnovationRouteImport.update({
+  id: '/$lang/research-innovation',
+  path: '/$lang/research-innovation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangQualityRoute = LangQualityRouteImport.update({
+  id: '/$lang/quality',
+  path: '/$lang/quality',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangProjectInquiryRoute = LangProjectInquiryRouteImport.update({
+  id: '/$lang/project-inquiry',
+  path: '/$lang/project-inquiry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangProductConfiguratorRoute = LangProductConfiguratorRouteImport.update({
+  id: '/$lang/product-configurator',
+  path: '/$lang/product-configurator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangPrivacyRoute = LangPrivacyRouteImport.update({
+  id: '/$lang/privacy',
+  path: '/$lang/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangPirVsRockWoolRoute = LangPirVsRockWoolRouteImport.update({
+  id: '/$lang/pir-vs-rock-wool',
+  path: '/$lang/pir-vs-rock-wool',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangPartnerPortalRoute = LangPartnerPortalRouteImport.update({
+  id: '/$lang/partner-portal',
+  path: '/$lang/partner-portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangPanelThicknessCalculatorRoute =
+  LangPanelThicknessCalculatorRouteImport.update({
+    id: '/$lang/panel-thickness-calculator',
+    path: '/$lang/panel-thickness-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LangKnowledgeHubRoute = LangKnowledgeHubRouteImport.update({
+  id: '/$lang/knowledge-hub',
+  path: '/$lang/knowledge-hub',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangInvestorsRoute = LangInvestorsRouteImport.update({
+  id: '/$lang/investors',
+  path: '/$lang/investors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangInvestmentCalculatorRoute =
+  LangInvestmentCalculatorRouteImport.update({
+    id: '/$lang/investment-calculator',
+    path: '/$lang/investment-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LangInstallationCommissioningRoute =
+  LangInstallationCommissioningRouteImport.update({
+    id: '/$lang/installation-commissioning',
+    path: '/$lang/installation-commissioning',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LangIndustriesRoute = LangIndustriesRouteImport.update({
+  id: '/$lang/industries',
+  path: '/$lang/industries',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangFactoryLayoutsRoute = LangFactoryLayoutsRouteImport.update({
+  id: '/$lang/factory-layouts',
+  path: '/$lang/factory-layouts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangFactoryLayoutGeneratorRoute =
+  LangFactoryLayoutGeneratorRouteImport.update({
+    id: '/$lang/factory-layout-generator',
+    path: '/$lang/factory-layout-generator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LangEngineeringToolsRoute = LangEngineeringToolsRouteImport.update({
+  id: '/$lang/engineering-tools',
+  path: '/$lang/engineering-tools',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangDownloadCenterRoute = LangDownloadCenterRouteImport.update({
+  id: '/$lang/download-center',
+  path: '/$lang/download-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangCustomerPortalRoute = LangCustomerPortalRouteImport.update({
+  id: '/$lang/customer-portal',
+  path: '/$lang/customer-portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangContactRoute = LangContactRouteImport.update({
+  id: '/$lang/contact',
+  path: '/$lang/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangCareersRoute = LangCareersRouteImport.update({
+  id: '/$lang/careers',
+  path: '/$lang/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangAiProjectEstimatorRoute = LangAiProjectEstimatorRouteImport.update({
+  id: '/$lang/ai-project-estimator',
+  path: '/$lang/ai-project-estimator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangAiAssistantRoute = LangAiAssistantRouteImport.update({
+  id: '/$lang/ai-assistant',
+  path: '/$lang/ai-assistant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangAboutRoute = LangAboutRouteImport.update({
+  id: '/$lang/about',
+  path: '/$lang/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangSolutionsIndexRoute = LangSolutionsIndexRouteImport.update({
+  id: '/$lang/solutions/',
+  path: '/$lang/solutions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangSolutionsSandwichPanelsRoute =
+  LangSolutionsSandwichPanelsRouteImport.update({
+    id: '/$lang/solutions/sandwich-panels',
+    path: '/$lang/solutions/sandwich-panels',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LangSolutionsRawMaterialsRoute =
+  LangSolutionsRawMaterialsRouteImport.update({
+    id: '/$lang/solutions/raw-materials',
+    path: '/$lang/solutions/raw-materials',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LangSolutionsProductionLinesRoute =
+  LangSolutionsProductionLinesRouteImport.update({
+    id: '/$lang/solutions/production-lines',
+    path: '/$lang/solutions/production-lines',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LangSolutionsFactoryDevelopmentRoute =
+  LangSolutionsFactoryDevelopmentRouteImport.update({
+    id: '/$lang/solutions/factory-development',
+    path: '/$lang/solutions/factory-development',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LangSolutionsEngineeringConsultancyRoute =
+  LangSolutionsEngineeringConsultancyRouteImport.update({
+    id: '/$lang/solutions/engineering-consultancy',
+    path: '/$lang/solutions/engineering-consultancy',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LangKnowledgeHubSlugRoute = LangKnowledgeHubSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => LangKnowledgeHubRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/ai-assistant': typeof AiAssistantRoute
-  '/ai-project-estimator': typeof AiProjectEstimatorRoute
-  '/careers': typeof CareersRoute
-  '/contact': typeof ContactRoute
-  '/customer-portal': typeof CustomerPortalRoute
-  '/download-center': typeof DownloadCenterRoute
-  '/engineering-tools': typeof EngineeringToolsRoute
-  '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
-  '/factory-layouts': typeof FactoryLayoutsRoute
-  '/industries': typeof IndustriesRoute
-  '/installation-commissioning': typeof InstallationCommissioningRoute
-  '/investment-calculator': typeof InvestmentCalculatorRoute
-  '/investors': typeof InvestorsRoute
-  '/knowledge-hub': typeof KnowledgeHubRouteWithChildren
-  '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
-  '/partner-portal': typeof PartnerPortalRoute
-  '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
-  '/privacy': typeof PrivacyRoute
-  '/product-configurator': typeof ProductConfiguratorRoute
-  '/project-inquiry': typeof ProjectInquiryRoute
-  '/quality': typeof QualityRoute
-  '/research-innovation': typeof ResearchInnovationRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/sustainability': typeof SustainabilityRoute
+  '/$lang/about': typeof LangAboutRoute
+  '/$lang/ai-assistant': typeof LangAiAssistantRoute
+  '/$lang/ai-project-estimator': typeof LangAiProjectEstimatorRoute
+  '/$lang/careers': typeof LangCareersRoute
+  '/$lang/contact': typeof LangContactRoute
+  '/$lang/customer-portal': typeof LangCustomerPortalRoute
+  '/$lang/download-center': typeof LangDownloadCenterRoute
+  '/$lang/engineering-tools': typeof LangEngineeringToolsRoute
+  '/$lang/factory-layout-generator': typeof LangFactoryLayoutGeneratorRoute
+  '/$lang/factory-layouts': typeof LangFactoryLayoutsRoute
+  '/$lang/industries': typeof LangIndustriesRoute
+  '/$lang/installation-commissioning': typeof LangInstallationCommissioningRoute
+  '/$lang/investment-calculator': typeof LangInvestmentCalculatorRoute
+  '/$lang/investors': typeof LangInvestorsRoute
+  '/$lang/knowledge-hub': typeof LangKnowledgeHubRouteWithChildren
+  '/$lang/panel-thickness-calculator': typeof LangPanelThicknessCalculatorRoute
+  '/$lang/partner-portal': typeof LangPartnerPortalRoute
+  '/$lang/pir-vs-rock-wool': typeof LangPirVsRockWoolRoute
+  '/$lang/privacy': typeof LangPrivacyRoute
+  '/$lang/product-configurator': typeof LangProductConfiguratorRoute
+  '/$lang/project-inquiry': typeof LangProjectInquiryRoute
+  '/$lang/quality': typeof LangQualityRoute
+  '/$lang/research-innovation': typeof LangResearchInnovationRoute
+  '/$lang/sustainability': typeof LangSustainabilityRoute
   '/api/chat': typeof ApiChatRoute
-  '/knowledge-hub/$slug': typeof KnowledgeHubSlugRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
-  '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
-  '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
-  '/solutions/production-lines': typeof SolutionsProductionLinesRoute
-  '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
-  '/solutions/sandwich-panels': typeof SolutionsSandwichPanelsRoute
+  '/$lang/': typeof LangIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
-  '/solutions/': typeof SolutionsIndexRoute
+  '/$lang/knowledge-hub/$slug': typeof LangKnowledgeHubSlugRoute
+  '/$lang/solutions/engineering-consultancy': typeof LangSolutionsEngineeringConsultancyRoute
+  '/$lang/solutions/factory-development': typeof LangSolutionsFactoryDevelopmentRoute
+  '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
+  '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
+  '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/$lang/solutions/': typeof LangSolutionsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/ai-assistant': typeof AiAssistantRoute
-  '/ai-project-estimator': typeof AiProjectEstimatorRoute
-  '/careers': typeof CareersRoute
-  '/contact': typeof ContactRoute
-  '/customer-portal': typeof CustomerPortalRoute
-  '/download-center': typeof DownloadCenterRoute
-  '/engineering-tools': typeof EngineeringToolsRoute
-  '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
-  '/factory-layouts': typeof FactoryLayoutsRoute
-  '/industries': typeof IndustriesRoute
-  '/installation-commissioning': typeof InstallationCommissioningRoute
-  '/investment-calculator': typeof InvestmentCalculatorRoute
-  '/investors': typeof InvestorsRoute
-  '/knowledge-hub': typeof KnowledgeHubRouteWithChildren
-  '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
-  '/partner-portal': typeof PartnerPortalRoute
-  '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
-  '/privacy': typeof PrivacyRoute
-  '/product-configurator': typeof ProductConfiguratorRoute
-  '/project-inquiry': typeof ProjectInquiryRoute
-  '/quality': typeof QualityRoute
-  '/research-innovation': typeof ResearchInnovationRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/sustainability': typeof SustainabilityRoute
+  '/$lang/about': typeof LangAboutRoute
+  '/$lang/ai-assistant': typeof LangAiAssistantRoute
+  '/$lang/ai-project-estimator': typeof LangAiProjectEstimatorRoute
+  '/$lang/careers': typeof LangCareersRoute
+  '/$lang/contact': typeof LangContactRoute
+  '/$lang/customer-portal': typeof LangCustomerPortalRoute
+  '/$lang/download-center': typeof LangDownloadCenterRoute
+  '/$lang/engineering-tools': typeof LangEngineeringToolsRoute
+  '/$lang/factory-layout-generator': typeof LangFactoryLayoutGeneratorRoute
+  '/$lang/factory-layouts': typeof LangFactoryLayoutsRoute
+  '/$lang/industries': typeof LangIndustriesRoute
+  '/$lang/installation-commissioning': typeof LangInstallationCommissioningRoute
+  '/$lang/investment-calculator': typeof LangInvestmentCalculatorRoute
+  '/$lang/investors': typeof LangInvestorsRoute
+  '/$lang/knowledge-hub': typeof LangKnowledgeHubRouteWithChildren
+  '/$lang/panel-thickness-calculator': typeof LangPanelThicknessCalculatorRoute
+  '/$lang/partner-portal': typeof LangPartnerPortalRoute
+  '/$lang/pir-vs-rock-wool': typeof LangPirVsRockWoolRoute
+  '/$lang/privacy': typeof LangPrivacyRoute
+  '/$lang/product-configurator': typeof LangProductConfiguratorRoute
+  '/$lang/project-inquiry': typeof LangProjectInquiryRoute
+  '/$lang/quality': typeof LangQualityRoute
+  '/$lang/research-innovation': typeof LangResearchInnovationRoute
+  '/$lang/sustainability': typeof LangSustainabilityRoute
   '/api/chat': typeof ApiChatRoute
-  '/knowledge-hub/$slug': typeof KnowledgeHubSlugRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
-  '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
-  '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
-  '/solutions/production-lines': typeof SolutionsProductionLinesRoute
-  '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
-  '/solutions/sandwich-panels': typeof SolutionsSandwichPanelsRoute
+  '/$lang': typeof LangIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
-  '/solutions': typeof SolutionsIndexRoute
+  '/$lang/knowledge-hub/$slug': typeof LangKnowledgeHubSlugRoute
+  '/$lang/solutions/engineering-consultancy': typeof LangSolutionsEngineeringConsultancyRoute
+  '/$lang/solutions/factory-development': typeof LangSolutionsFactoryDevelopmentRoute
+  '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
+  '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
+  '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/$lang/solutions': typeof LangSolutionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/ai-assistant': typeof AiAssistantRoute
-  '/ai-project-estimator': typeof AiProjectEstimatorRoute
-  '/careers': typeof CareersRoute
-  '/contact': typeof ContactRoute
-  '/customer-portal': typeof CustomerPortalRoute
-  '/download-center': typeof DownloadCenterRoute
-  '/engineering-tools': typeof EngineeringToolsRoute
-  '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
-  '/factory-layouts': typeof FactoryLayoutsRoute
-  '/industries': typeof IndustriesRoute
-  '/installation-commissioning': typeof InstallationCommissioningRoute
-  '/investment-calculator': typeof InvestmentCalculatorRoute
-  '/investors': typeof InvestorsRoute
-  '/knowledge-hub': typeof KnowledgeHubRouteWithChildren
-  '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
-  '/partner-portal': typeof PartnerPortalRoute
-  '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
-  '/privacy': typeof PrivacyRoute
-  '/product-configurator': typeof ProductConfiguratorRoute
-  '/project-inquiry': typeof ProjectInquiryRoute
-  '/quality': typeof QualityRoute
-  '/research-innovation': typeof ResearchInnovationRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/sustainability': typeof SustainabilityRoute
+  '/$lang/about': typeof LangAboutRoute
+  '/$lang/ai-assistant': typeof LangAiAssistantRoute
+  '/$lang/ai-project-estimator': typeof LangAiProjectEstimatorRoute
+  '/$lang/careers': typeof LangCareersRoute
+  '/$lang/contact': typeof LangContactRoute
+  '/$lang/customer-portal': typeof LangCustomerPortalRoute
+  '/$lang/download-center': typeof LangDownloadCenterRoute
+  '/$lang/engineering-tools': typeof LangEngineeringToolsRoute
+  '/$lang/factory-layout-generator': typeof LangFactoryLayoutGeneratorRoute
+  '/$lang/factory-layouts': typeof LangFactoryLayoutsRoute
+  '/$lang/industries': typeof LangIndustriesRoute
+  '/$lang/installation-commissioning': typeof LangInstallationCommissioningRoute
+  '/$lang/investment-calculator': typeof LangInvestmentCalculatorRoute
+  '/$lang/investors': typeof LangInvestorsRoute
+  '/$lang/knowledge-hub': typeof LangKnowledgeHubRouteWithChildren
+  '/$lang/panel-thickness-calculator': typeof LangPanelThicknessCalculatorRoute
+  '/$lang/partner-portal': typeof LangPartnerPortalRoute
+  '/$lang/pir-vs-rock-wool': typeof LangPirVsRockWoolRoute
+  '/$lang/privacy': typeof LangPrivacyRoute
+  '/$lang/product-configurator': typeof LangProductConfiguratorRoute
+  '/$lang/project-inquiry': typeof LangProjectInquiryRoute
+  '/$lang/quality': typeof LangQualityRoute
+  '/$lang/research-innovation': typeof LangResearchInnovationRoute
+  '/$lang/sustainability': typeof LangSustainabilityRoute
   '/api/chat': typeof ApiChatRoute
-  '/knowledge-hub/$slug': typeof KnowledgeHubSlugRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
-  '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
-  '/solutions/factory-development': typeof SolutionsFactoryDevelopmentRoute
-  '/solutions/production-lines': typeof SolutionsProductionLinesRoute
-  '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
-  '/solutions/sandwich-panels': typeof SolutionsSandwichPanelsRoute
+  '/$lang/': typeof LangIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
-  '/solutions/': typeof SolutionsIndexRoute
+  '/$lang/knowledge-hub/$slug': typeof LangKnowledgeHubSlugRoute
+  '/$lang/solutions/engineering-consultancy': typeof LangSolutionsEngineeringConsultancyRoute
+  '/$lang/solutions/factory-development': typeof LangSolutionsFactoryDevelopmentRoute
+  '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
+  '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
+  '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/$lang/solutions/': typeof LangSolutionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/about'
-    | '/ai-assistant'
-    | '/ai-project-estimator'
-    | '/careers'
-    | '/contact'
-    | '/customer-portal'
-    | '/download-center'
-    | '/engineering-tools'
-    | '/factory-layout-generator'
-    | '/factory-layouts'
-    | '/industries'
-    | '/installation-commissioning'
-    | '/investment-calculator'
-    | '/investors'
-    | '/knowledge-hub'
-    | '/panel-thickness-calculator'
-    | '/partner-portal'
-    | '/pir-vs-rock-wool'
-    | '/privacy'
-    | '/product-configurator'
-    | '/project-inquiry'
-    | '/quality'
-    | '/research-innovation'
     | '/sitemap.xml'
-    | '/sustainability'
+    | '/$lang/about'
+    | '/$lang/ai-assistant'
+    | '/$lang/ai-project-estimator'
+    | '/$lang/careers'
+    | '/$lang/contact'
+    | '/$lang/customer-portal'
+    | '/$lang/download-center'
+    | '/$lang/engineering-tools'
+    | '/$lang/factory-layout-generator'
+    | '/$lang/factory-layouts'
+    | '/$lang/industries'
+    | '/$lang/installation-commissioning'
+    | '/$lang/investment-calculator'
+    | '/$lang/investors'
+    | '/$lang/knowledge-hub'
+    | '/$lang/panel-thickness-calculator'
+    | '/$lang/partner-portal'
+    | '/$lang/pir-vs-rock-wool'
+    | '/$lang/privacy'
+    | '/$lang/product-configurator'
+    | '/$lang/project-inquiry'
+    | '/$lang/quality'
+    | '/$lang/research-innovation'
+    | '/$lang/sustainability'
     | '/api/chat'
-    | '/knowledge-hub/$slug'
     | '/knowledge/$'
-    | '/solutions/engineering-consultancy'
-    | '/solutions/factory-development'
-    | '/solutions/production-lines'
-    | '/solutions/raw-materials'
-    | '/solutions/sandwich-panels'
+    | '/$lang/'
     | '/knowledge/'
-    | '/solutions/'
+    | '/$lang/knowledge-hub/$slug'
+    | '/$lang/solutions/engineering-consultancy'
+    | '/$lang/solutions/factory-development'
+    | '/$lang/solutions/production-lines'
+    | '/$lang/solutions/raw-materials'
+    | '/$lang/solutions/sandwich-panels'
+    | '/$lang/solutions/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
-    | '/about'
-    | '/ai-assistant'
-    | '/ai-project-estimator'
-    | '/careers'
-    | '/contact'
-    | '/customer-portal'
-    | '/download-center'
-    | '/engineering-tools'
-    | '/factory-layout-generator'
-    | '/factory-layouts'
-    | '/industries'
-    | '/installation-commissioning'
-    | '/investment-calculator'
-    | '/investors'
-    | '/knowledge-hub'
-    | '/panel-thickness-calculator'
-    | '/partner-portal'
-    | '/pir-vs-rock-wool'
-    | '/privacy'
-    | '/product-configurator'
-    | '/project-inquiry'
-    | '/quality'
-    | '/research-innovation'
     | '/sitemap.xml'
-    | '/sustainability'
+    | '/$lang/about'
+    | '/$lang/ai-assistant'
+    | '/$lang/ai-project-estimator'
+    | '/$lang/careers'
+    | '/$lang/contact'
+    | '/$lang/customer-portal'
+    | '/$lang/download-center'
+    | '/$lang/engineering-tools'
+    | '/$lang/factory-layout-generator'
+    | '/$lang/factory-layouts'
+    | '/$lang/industries'
+    | '/$lang/installation-commissioning'
+    | '/$lang/investment-calculator'
+    | '/$lang/investors'
+    | '/$lang/knowledge-hub'
+    | '/$lang/panel-thickness-calculator'
+    | '/$lang/partner-portal'
+    | '/$lang/pir-vs-rock-wool'
+    | '/$lang/privacy'
+    | '/$lang/product-configurator'
+    | '/$lang/project-inquiry'
+    | '/$lang/quality'
+    | '/$lang/research-innovation'
+    | '/$lang/sustainability'
     | '/api/chat'
-    | '/knowledge-hub/$slug'
     | '/knowledge/$'
-    | '/solutions/engineering-consultancy'
-    | '/solutions/factory-development'
-    | '/solutions/production-lines'
-    | '/solutions/raw-materials'
-    | '/solutions/sandwich-panels'
+    | '/$lang'
     | '/knowledge'
-    | '/solutions'
+    | '/$lang/knowledge-hub/$slug'
+    | '/$lang/solutions/engineering-consultancy'
+    | '/$lang/solutions/factory-development'
+    | '/$lang/solutions/production-lines'
+    | '/$lang/solutions/raw-materials'
+    | '/$lang/solutions/sandwich-panels'
+    | '/$lang/solutions'
   id:
     | '__root__'
-    | '/'
-    | '/about'
-    | '/ai-assistant'
-    | '/ai-project-estimator'
-    | '/careers'
-    | '/contact'
-    | '/customer-portal'
-    | '/download-center'
-    | '/engineering-tools'
-    | '/factory-layout-generator'
-    | '/factory-layouts'
-    | '/industries'
-    | '/installation-commissioning'
-    | '/investment-calculator'
-    | '/investors'
-    | '/knowledge-hub'
-    | '/panel-thickness-calculator'
-    | '/partner-portal'
-    | '/pir-vs-rock-wool'
-    | '/privacy'
-    | '/product-configurator'
-    | '/project-inquiry'
-    | '/quality'
-    | '/research-innovation'
     | '/sitemap.xml'
-    | '/sustainability'
+    | '/$lang/about'
+    | '/$lang/ai-assistant'
+    | '/$lang/ai-project-estimator'
+    | '/$lang/careers'
+    | '/$lang/contact'
+    | '/$lang/customer-portal'
+    | '/$lang/download-center'
+    | '/$lang/engineering-tools'
+    | '/$lang/factory-layout-generator'
+    | '/$lang/factory-layouts'
+    | '/$lang/industries'
+    | '/$lang/installation-commissioning'
+    | '/$lang/investment-calculator'
+    | '/$lang/investors'
+    | '/$lang/knowledge-hub'
+    | '/$lang/panel-thickness-calculator'
+    | '/$lang/partner-portal'
+    | '/$lang/pir-vs-rock-wool'
+    | '/$lang/privacy'
+    | '/$lang/product-configurator'
+    | '/$lang/project-inquiry'
+    | '/$lang/quality'
+    | '/$lang/research-innovation'
+    | '/$lang/sustainability'
     | '/api/chat'
-    | '/knowledge-hub/$slug'
     | '/knowledge/$'
-    | '/solutions/engineering-consultancy'
-    | '/solutions/factory-development'
-    | '/solutions/production-lines'
-    | '/solutions/raw-materials'
-    | '/solutions/sandwich-panels'
+    | '/$lang/'
     | '/knowledge/'
-    | '/solutions/'
+    | '/$lang/knowledge-hub/$slug'
+    | '/$lang/solutions/engineering-consultancy'
+    | '/$lang/solutions/factory-development'
+    | '/$lang/solutions/production-lines'
+    | '/$lang/solutions/raw-materials'
+    | '/$lang/solutions/sandwich-panels'
+    | '/$lang/solutions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  AiAssistantRoute: typeof AiAssistantRoute
-  AiProjectEstimatorRoute: typeof AiProjectEstimatorRoute
-  CareersRoute: typeof CareersRoute
-  ContactRoute: typeof ContactRoute
-  CustomerPortalRoute: typeof CustomerPortalRoute
-  DownloadCenterRoute: typeof DownloadCenterRoute
-  EngineeringToolsRoute: typeof EngineeringToolsRoute
-  FactoryLayoutGeneratorRoute: typeof FactoryLayoutGeneratorRoute
-  FactoryLayoutsRoute: typeof FactoryLayoutsRoute
-  IndustriesRoute: typeof IndustriesRoute
-  InstallationCommissioningRoute: typeof InstallationCommissioningRoute
-  InvestmentCalculatorRoute: typeof InvestmentCalculatorRoute
-  InvestorsRoute: typeof InvestorsRoute
-  KnowledgeHubRoute: typeof KnowledgeHubRouteWithChildren
-  PanelThicknessCalculatorRoute: typeof PanelThicknessCalculatorRoute
-  PartnerPortalRoute: typeof PartnerPortalRoute
-  PirVsRockWoolRoute: typeof PirVsRockWoolRoute
-  PrivacyRoute: typeof PrivacyRoute
-  ProductConfiguratorRoute: typeof ProductConfiguratorRoute
-  ProjectInquiryRoute: typeof ProjectInquiryRoute
-  QualityRoute: typeof QualityRoute
-  ResearchInnovationRoute: typeof ResearchInnovationRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  SustainabilityRoute: typeof SustainabilityRoute
+  LangAboutRoute: typeof LangAboutRoute
+  LangAiAssistantRoute: typeof LangAiAssistantRoute
+  LangAiProjectEstimatorRoute: typeof LangAiProjectEstimatorRoute
+  LangCareersRoute: typeof LangCareersRoute
+  LangContactRoute: typeof LangContactRoute
+  LangCustomerPortalRoute: typeof LangCustomerPortalRoute
+  LangDownloadCenterRoute: typeof LangDownloadCenterRoute
+  LangEngineeringToolsRoute: typeof LangEngineeringToolsRoute
+  LangFactoryLayoutGeneratorRoute: typeof LangFactoryLayoutGeneratorRoute
+  LangFactoryLayoutsRoute: typeof LangFactoryLayoutsRoute
+  LangIndustriesRoute: typeof LangIndustriesRoute
+  LangInstallationCommissioningRoute: typeof LangInstallationCommissioningRoute
+  LangInvestmentCalculatorRoute: typeof LangInvestmentCalculatorRoute
+  LangInvestorsRoute: typeof LangInvestorsRoute
+  LangKnowledgeHubRoute: typeof LangKnowledgeHubRouteWithChildren
+  LangPanelThicknessCalculatorRoute: typeof LangPanelThicknessCalculatorRoute
+  LangPartnerPortalRoute: typeof LangPartnerPortalRoute
+  LangPirVsRockWoolRoute: typeof LangPirVsRockWoolRoute
+  LangPrivacyRoute: typeof LangPrivacyRoute
+  LangProductConfiguratorRoute: typeof LangProductConfiguratorRoute
+  LangProjectInquiryRoute: typeof LangProjectInquiryRoute
+  LangQualityRoute: typeof LangQualityRoute
+  LangResearchInnovationRoute: typeof LangResearchInnovationRoute
+  LangSustainabilityRoute: typeof LangSustainabilityRoute
   ApiChatRoute: typeof ApiChatRoute
   KnowledgeSplatRoute: typeof KnowledgeSplatRoute
-  SolutionsEngineeringConsultancyRoute: typeof SolutionsEngineeringConsultancyRoute
-  SolutionsFactoryDevelopmentRoute: typeof SolutionsFactoryDevelopmentRoute
-  SolutionsProductionLinesRoute: typeof SolutionsProductionLinesRoute
-  SolutionsRawMaterialsRoute: typeof SolutionsRawMaterialsRoute
-  SolutionsSandwichPanelsRoute: typeof SolutionsSandwichPanelsRoute
+  LangIndexRoute: typeof LangIndexRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
-  SolutionsIndexRoute: typeof SolutionsIndexRoute
+  LangSolutionsEngineeringConsultancyRoute: typeof LangSolutionsEngineeringConsultancyRoute
+  LangSolutionsFactoryDevelopmentRoute: typeof LangSolutionsFactoryDevelopmentRoute
+  LangSolutionsProductionLinesRoute: typeof LangSolutionsProductionLinesRoute
+  LangSolutionsRawMaterialsRoute: typeof LangSolutionsRawMaterialsRoute
+  LangSolutionsSandwichPanelsRoute: typeof LangSolutionsSandwichPanelsRoute
+  LangSolutionsIndexRoute: typeof LangSolutionsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sustainability': {
-      id: '/sustainability'
-      path: '/sustainability'
-      fullPath: '/sustainability'
-      preLoaderRoute: typeof SustainabilityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/research-innovation': {
-      id: '/research-innovation'
-      path: '/research-innovation'
-      fullPath: '/research-innovation'
-      preLoaderRoute: typeof ResearchInnovationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quality': {
-      id: '/quality'
-      path: '/quality'
-      fullPath: '/quality'
-      preLoaderRoute: typeof QualityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/project-inquiry': {
-      id: '/project-inquiry'
-      path: '/project-inquiry'
-      fullPath: '/project-inquiry'
-      preLoaderRoute: typeof ProjectInquiryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/product-configurator': {
-      id: '/product-configurator'
-      path: '/product-configurator'
-      fullPath: '/product-configurator'
-      preLoaderRoute: typeof ProductConfiguratorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pir-vs-rock-wool': {
-      id: '/pir-vs-rock-wool'
-      path: '/pir-vs-rock-wool'
-      fullPath: '/pir-vs-rock-wool'
-      preLoaderRoute: typeof PirVsRockWoolRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/partner-portal': {
-      id: '/partner-portal'
-      path: '/partner-portal'
-      fullPath: '/partner-portal'
-      preLoaderRoute: typeof PartnerPortalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/panel-thickness-calculator': {
-      id: '/panel-thickness-calculator'
-      path: '/panel-thickness-calculator'
-      fullPath: '/panel-thickness-calculator'
-      preLoaderRoute: typeof PanelThicknessCalculatorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/knowledge-hub': {
-      id: '/knowledge-hub'
-      path: '/knowledge-hub'
-      fullPath: '/knowledge-hub'
-      preLoaderRoute: typeof KnowledgeHubRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/investors': {
-      id: '/investors'
-      path: '/investors'
-      fullPath: '/investors'
-      preLoaderRoute: typeof InvestorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/investment-calculator': {
-      id: '/investment-calculator'
-      path: '/investment-calculator'
-      fullPath: '/investment-calculator'
-      preLoaderRoute: typeof InvestmentCalculatorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/installation-commissioning': {
-      id: '/installation-commissioning'
-      path: '/installation-commissioning'
-      fullPath: '/installation-commissioning'
-      preLoaderRoute: typeof InstallationCommissioningRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/industries': {
-      id: '/industries'
-      path: '/industries'
-      fullPath: '/industries'
-      preLoaderRoute: typeof IndustriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/factory-layouts': {
-      id: '/factory-layouts'
-      path: '/factory-layouts'
-      fullPath: '/factory-layouts'
-      preLoaderRoute: typeof FactoryLayoutsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/factory-layout-generator': {
-      id: '/factory-layout-generator'
-      path: '/factory-layout-generator'
-      fullPath: '/factory-layout-generator'
-      preLoaderRoute: typeof FactoryLayoutGeneratorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/engineering-tools': {
-      id: '/engineering-tools'
-      path: '/engineering-tools'
-      fullPath: '/engineering-tools'
-      preLoaderRoute: typeof EngineeringToolsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/download-center': {
-      id: '/download-center'
-      path: '/download-center'
-      fullPath: '/download-center'
-      preLoaderRoute: typeof DownloadCenterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/customer-portal': {
-      id: '/customer-portal'
-      path: '/customer-portal'
-      fullPath: '/customer-portal'
-      preLoaderRoute: typeof CustomerPortalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/careers': {
-      id: '/careers'
-      path: '/careers'
-      fullPath: '/careers'
-      preLoaderRoute: typeof CareersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ai-project-estimator': {
-      id: '/ai-project-estimator'
-      path: '/ai-project-estimator'
-      fullPath: '/ai-project-estimator'
-      preLoaderRoute: typeof AiProjectEstimatorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ai-assistant': {
-      id: '/ai-assistant'
-      path: '/ai-assistant'
-      fullPath: '/ai-assistant'
-      preLoaderRoute: typeof AiAssistantRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/': {
-      id: '/solutions/'
-      path: '/solutions'
-      fullPath: '/solutions/'
-      preLoaderRoute: typeof SolutionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/knowledge/': {
@@ -700,39 +522,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/solutions/sandwich-panels': {
-      id: '/solutions/sandwich-panels'
-      path: '/solutions/sandwich-panels'
-      fullPath: '/solutions/sandwich-panels'
-      preLoaderRoute: typeof SolutionsSandwichPanelsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/raw-materials': {
-      id: '/solutions/raw-materials'
-      path: '/solutions/raw-materials'
-      fullPath: '/solutions/raw-materials'
-      preLoaderRoute: typeof SolutionsRawMaterialsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/production-lines': {
-      id: '/solutions/production-lines'
-      path: '/solutions/production-lines'
-      fullPath: '/solutions/production-lines'
-      preLoaderRoute: typeof SolutionsProductionLinesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/factory-development': {
-      id: '/solutions/factory-development'
-      path: '/solutions/factory-development'
-      fullPath: '/solutions/factory-development'
-      preLoaderRoute: typeof SolutionsFactoryDevelopmentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/engineering-consultancy': {
-      id: '/solutions/engineering-consultancy'
-      path: '/solutions/engineering-consultancy'
-      fullPath: '/solutions/engineering-consultancy'
-      preLoaderRoute: typeof SolutionsEngineeringConsultancyRouteImport
+    '/$lang/': {
+      id: '/$lang/'
+      path: '/$lang'
+      fullPath: '/$lang/'
+      preLoaderRoute: typeof LangIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/knowledge/$': {
@@ -742,13 +536,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/knowledge-hub/$slug': {
-      id: '/knowledge-hub/$slug'
-      path: '/$slug'
-      fullPath: '/knowledge-hub/$slug'
-      preLoaderRoute: typeof KnowledgeHubSlugRouteImport
-      parentRoute: typeof KnowledgeHubRoute
-    }
     '/api/chat': {
       id: '/api/chat'
       path: '/api/chat'
@@ -756,68 +543,275 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$lang/sustainability': {
+      id: '/$lang/sustainability'
+      path: '/$lang/sustainability'
+      fullPath: '/$lang/sustainability'
+      preLoaderRoute: typeof LangSustainabilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/research-innovation': {
+      id: '/$lang/research-innovation'
+      path: '/$lang/research-innovation'
+      fullPath: '/$lang/research-innovation'
+      preLoaderRoute: typeof LangResearchInnovationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/quality': {
+      id: '/$lang/quality'
+      path: '/$lang/quality'
+      fullPath: '/$lang/quality'
+      preLoaderRoute: typeof LangQualityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/project-inquiry': {
+      id: '/$lang/project-inquiry'
+      path: '/$lang/project-inquiry'
+      fullPath: '/$lang/project-inquiry'
+      preLoaderRoute: typeof LangProjectInquiryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/product-configurator': {
+      id: '/$lang/product-configurator'
+      path: '/$lang/product-configurator'
+      fullPath: '/$lang/product-configurator'
+      preLoaderRoute: typeof LangProductConfiguratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/privacy': {
+      id: '/$lang/privacy'
+      path: '/$lang/privacy'
+      fullPath: '/$lang/privacy'
+      preLoaderRoute: typeof LangPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/pir-vs-rock-wool': {
+      id: '/$lang/pir-vs-rock-wool'
+      path: '/$lang/pir-vs-rock-wool'
+      fullPath: '/$lang/pir-vs-rock-wool'
+      preLoaderRoute: typeof LangPirVsRockWoolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/partner-portal': {
+      id: '/$lang/partner-portal'
+      path: '/$lang/partner-portal'
+      fullPath: '/$lang/partner-portal'
+      preLoaderRoute: typeof LangPartnerPortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/panel-thickness-calculator': {
+      id: '/$lang/panel-thickness-calculator'
+      path: '/$lang/panel-thickness-calculator'
+      fullPath: '/$lang/panel-thickness-calculator'
+      preLoaderRoute: typeof LangPanelThicknessCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/knowledge-hub': {
+      id: '/$lang/knowledge-hub'
+      path: '/$lang/knowledge-hub'
+      fullPath: '/$lang/knowledge-hub'
+      preLoaderRoute: typeof LangKnowledgeHubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/investors': {
+      id: '/$lang/investors'
+      path: '/$lang/investors'
+      fullPath: '/$lang/investors'
+      preLoaderRoute: typeof LangInvestorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/investment-calculator': {
+      id: '/$lang/investment-calculator'
+      path: '/$lang/investment-calculator'
+      fullPath: '/$lang/investment-calculator'
+      preLoaderRoute: typeof LangInvestmentCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/installation-commissioning': {
+      id: '/$lang/installation-commissioning'
+      path: '/$lang/installation-commissioning'
+      fullPath: '/$lang/installation-commissioning'
+      preLoaderRoute: typeof LangInstallationCommissioningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/industries': {
+      id: '/$lang/industries'
+      path: '/$lang/industries'
+      fullPath: '/$lang/industries'
+      preLoaderRoute: typeof LangIndustriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/factory-layouts': {
+      id: '/$lang/factory-layouts'
+      path: '/$lang/factory-layouts'
+      fullPath: '/$lang/factory-layouts'
+      preLoaderRoute: typeof LangFactoryLayoutsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/factory-layout-generator': {
+      id: '/$lang/factory-layout-generator'
+      path: '/$lang/factory-layout-generator'
+      fullPath: '/$lang/factory-layout-generator'
+      preLoaderRoute: typeof LangFactoryLayoutGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/engineering-tools': {
+      id: '/$lang/engineering-tools'
+      path: '/$lang/engineering-tools'
+      fullPath: '/$lang/engineering-tools'
+      preLoaderRoute: typeof LangEngineeringToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/download-center': {
+      id: '/$lang/download-center'
+      path: '/$lang/download-center'
+      fullPath: '/$lang/download-center'
+      preLoaderRoute: typeof LangDownloadCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/customer-portal': {
+      id: '/$lang/customer-portal'
+      path: '/$lang/customer-portal'
+      fullPath: '/$lang/customer-portal'
+      preLoaderRoute: typeof LangCustomerPortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/contact': {
+      id: '/$lang/contact'
+      path: '/$lang/contact'
+      fullPath: '/$lang/contact'
+      preLoaderRoute: typeof LangContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/careers': {
+      id: '/$lang/careers'
+      path: '/$lang/careers'
+      fullPath: '/$lang/careers'
+      preLoaderRoute: typeof LangCareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/ai-project-estimator': {
+      id: '/$lang/ai-project-estimator'
+      path: '/$lang/ai-project-estimator'
+      fullPath: '/$lang/ai-project-estimator'
+      preLoaderRoute: typeof LangAiProjectEstimatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/ai-assistant': {
+      id: '/$lang/ai-assistant'
+      path: '/$lang/ai-assistant'
+      fullPath: '/$lang/ai-assistant'
+      preLoaderRoute: typeof LangAiAssistantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/about': {
+      id: '/$lang/about'
+      path: '/$lang/about'
+      fullPath: '/$lang/about'
+      preLoaderRoute: typeof LangAboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/solutions/': {
+      id: '/$lang/solutions/'
+      path: '/$lang/solutions'
+      fullPath: '/$lang/solutions/'
+      preLoaderRoute: typeof LangSolutionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/solutions/sandwich-panels': {
+      id: '/$lang/solutions/sandwich-panels'
+      path: '/$lang/solutions/sandwich-panels'
+      fullPath: '/$lang/solutions/sandwich-panels'
+      preLoaderRoute: typeof LangSolutionsSandwichPanelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/solutions/raw-materials': {
+      id: '/$lang/solutions/raw-materials'
+      path: '/$lang/solutions/raw-materials'
+      fullPath: '/$lang/solutions/raw-materials'
+      preLoaderRoute: typeof LangSolutionsRawMaterialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/solutions/production-lines': {
+      id: '/$lang/solutions/production-lines'
+      path: '/$lang/solutions/production-lines'
+      fullPath: '/$lang/solutions/production-lines'
+      preLoaderRoute: typeof LangSolutionsProductionLinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/solutions/factory-development': {
+      id: '/$lang/solutions/factory-development'
+      path: '/$lang/solutions/factory-development'
+      fullPath: '/$lang/solutions/factory-development'
+      preLoaderRoute: typeof LangSolutionsFactoryDevelopmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/solutions/engineering-consultancy': {
+      id: '/$lang/solutions/engineering-consultancy'
+      path: '/$lang/solutions/engineering-consultancy'
+      fullPath: '/$lang/solutions/engineering-consultancy'
+      preLoaderRoute: typeof LangSolutionsEngineeringConsultancyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/knowledge-hub/$slug': {
+      id: '/$lang/knowledge-hub/$slug'
+      path: '/$slug'
+      fullPath: '/$lang/knowledge-hub/$slug'
+      preLoaderRoute: typeof LangKnowledgeHubSlugRouteImport
+      parentRoute: typeof LangKnowledgeHubRoute
+    }
   }
 }
 
-interface KnowledgeHubRouteChildren {
-  KnowledgeHubSlugRoute: typeof KnowledgeHubSlugRoute
+interface LangKnowledgeHubRouteChildren {
+  LangKnowledgeHubSlugRoute: typeof LangKnowledgeHubSlugRoute
 }
 
-const KnowledgeHubRouteChildren: KnowledgeHubRouteChildren = {
-  KnowledgeHubSlugRoute: KnowledgeHubSlugRoute,
+const LangKnowledgeHubRouteChildren: LangKnowledgeHubRouteChildren = {
+  LangKnowledgeHubSlugRoute: LangKnowledgeHubSlugRoute,
 }
 
-const KnowledgeHubRouteWithChildren = KnowledgeHubRoute._addFileChildren(
-  KnowledgeHubRouteChildren,
-)
+const LangKnowledgeHubRouteWithChildren =
+  LangKnowledgeHubRoute._addFileChildren(LangKnowledgeHubRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  AiAssistantRoute: AiAssistantRoute,
-  AiProjectEstimatorRoute: AiProjectEstimatorRoute,
-  CareersRoute: CareersRoute,
-  ContactRoute: ContactRoute,
-  CustomerPortalRoute: CustomerPortalRoute,
-  DownloadCenterRoute: DownloadCenterRoute,
-  EngineeringToolsRoute: EngineeringToolsRoute,
-  FactoryLayoutGeneratorRoute: FactoryLayoutGeneratorRoute,
-  FactoryLayoutsRoute: FactoryLayoutsRoute,
-  IndustriesRoute: IndustriesRoute,
-  InstallationCommissioningRoute: InstallationCommissioningRoute,
-  InvestmentCalculatorRoute: InvestmentCalculatorRoute,
-  InvestorsRoute: InvestorsRoute,
-  KnowledgeHubRoute: KnowledgeHubRouteWithChildren,
-  PanelThicknessCalculatorRoute: PanelThicknessCalculatorRoute,
-  PartnerPortalRoute: PartnerPortalRoute,
-  PirVsRockWoolRoute: PirVsRockWoolRoute,
-  PrivacyRoute: PrivacyRoute,
-  ProductConfiguratorRoute: ProductConfiguratorRoute,
-  ProjectInquiryRoute: ProjectInquiryRoute,
-  QualityRoute: QualityRoute,
-  ResearchInnovationRoute: ResearchInnovationRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  SustainabilityRoute: SustainabilityRoute,
+  LangAboutRoute: LangAboutRoute,
+  LangAiAssistantRoute: LangAiAssistantRoute,
+  LangAiProjectEstimatorRoute: LangAiProjectEstimatorRoute,
+  LangCareersRoute: LangCareersRoute,
+  LangContactRoute: LangContactRoute,
+  LangCustomerPortalRoute: LangCustomerPortalRoute,
+  LangDownloadCenterRoute: LangDownloadCenterRoute,
+  LangEngineeringToolsRoute: LangEngineeringToolsRoute,
+  LangFactoryLayoutGeneratorRoute: LangFactoryLayoutGeneratorRoute,
+  LangFactoryLayoutsRoute: LangFactoryLayoutsRoute,
+  LangIndustriesRoute: LangIndustriesRoute,
+  LangInstallationCommissioningRoute: LangInstallationCommissioningRoute,
+  LangInvestmentCalculatorRoute: LangInvestmentCalculatorRoute,
+  LangInvestorsRoute: LangInvestorsRoute,
+  LangKnowledgeHubRoute: LangKnowledgeHubRouteWithChildren,
+  LangPanelThicknessCalculatorRoute: LangPanelThicknessCalculatorRoute,
+  LangPartnerPortalRoute: LangPartnerPortalRoute,
+  LangPirVsRockWoolRoute: LangPirVsRockWoolRoute,
+  LangPrivacyRoute: LangPrivacyRoute,
+  LangProductConfiguratorRoute: LangProductConfiguratorRoute,
+  LangProjectInquiryRoute: LangProjectInquiryRoute,
+  LangQualityRoute: LangQualityRoute,
+  LangResearchInnovationRoute: LangResearchInnovationRoute,
+  LangSustainabilityRoute: LangSustainabilityRoute,
   ApiChatRoute: ApiChatRoute,
   KnowledgeSplatRoute: KnowledgeSplatRoute,
-  SolutionsEngineeringConsultancyRoute: SolutionsEngineeringConsultancyRoute,
-  SolutionsFactoryDevelopmentRoute: SolutionsFactoryDevelopmentRoute,
-  SolutionsProductionLinesRoute: SolutionsProductionLinesRoute,
-  SolutionsRawMaterialsRoute: SolutionsRawMaterialsRoute,
-  SolutionsSandwichPanelsRoute: SolutionsSandwichPanelsRoute,
+  LangIndexRoute: LangIndexRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
-  SolutionsIndexRoute: SolutionsIndexRoute,
+  LangSolutionsEngineeringConsultancyRoute:
+    LangSolutionsEngineeringConsultancyRoute,
+  LangSolutionsFactoryDevelopmentRoute: LangSolutionsFactoryDevelopmentRoute,
+  LangSolutionsProductionLinesRoute: LangSolutionsProductionLinesRoute,
+  LangSolutionsRawMaterialsRoute: LangSolutionsRawMaterialsRoute,
+  LangSolutionsSandwichPanelsRoute: LangSolutionsSandwichPanelsRoute,
+  LangSolutionsIndexRoute: LangSolutionsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

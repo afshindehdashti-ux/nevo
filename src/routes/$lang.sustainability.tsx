@@ -207,7 +207,7 @@ function SustainabilityPage() {
   );
 }
 
-export const Route = createFileRoute("/sustainability")({
+export const Route = createFileRoute("/$lang/sustainability")({
   head: () => ({
     meta: [
       { title: TITLE },

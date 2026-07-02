@@ -49,7 +49,7 @@ import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { downloadInvestmentReport } from "@/lib/investment-pdf";
 
 // ---------------- SEO ----------------
-export const Route = createFileRoute("/investment-calculator")({
+export const Route = createFileRoute("/$lang/investment-calculator")({
   component: InvestmentCalculatorPage,
   head: () => {
     const seo = buildSeo({

@@ -104,7 +104,7 @@ const FAQS: { q: string; a: string }[] = [
   { q: "How do I request a technical proposal?", a: "Submit the inquiry form below with your panel specifications, quantities, application and destination. A NEVO panel specialist responds within one business day with a technical and commercial proposal." },
 ];
 
-export const Route = createFileRoute("/solutions/sandwich-panels")({
+export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
   head: () => {
     const faqLd = {
       "@context": "https://schema.org",

@@ -57,7 +57,7 @@ import matSteel from "@/assets/thickness/mat-steel.png.asset.json";
 import thermalCam from "@/assets/thickness/thermal-cam.png.asset.json";
 
 // ---------------- SEO ----------------
-export const Route = createFileRoute("/panel-thickness-calculator")({
+export const Route = createFileRoute("/$lang/panel-thickness-calculator")({
   component: PanelThicknessPage,
   head: () => {
     const seo = buildSeo({

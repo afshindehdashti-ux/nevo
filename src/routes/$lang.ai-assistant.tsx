@@ -41,7 +41,7 @@ const DESCRIPTION =
   "NEVO AI Engineer: an intelligent industrial engineering assistant for sandwich panel factories, production lines, raw materials, capacity planning and investment estimation. Built by NEVO Industrial, Dubai.";
 const URL_PATH = "/ai-assistant";
 
-export const Route = createFileRoute("/ai-assistant")({
+export const Route = createFileRoute("/$lang/ai-assistant")({
   head: () => ({
     meta: [
       { title: TITLE },

@@ -99,7 +99,7 @@ const CAPABILITIES = [
   { code: "LIFETIME", label: "Spares, upgrades & preventive maintenance" },
 ];
 
-export const Route = createFileRoute("/installation-commissioning")({
+export const Route = createFileRoute("/$lang/installation-commissioning")({
   component: InstallationCommissioningPage,
   head: () => ({
     meta: [

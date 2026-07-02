@@ -236,7 +236,7 @@ function ContactPage() {
   );
 }
 
-export const Route = createFileRoute("/contact")({
+export const Route = createFileRoute("/$lang/contact")({
   head: () => ({
     meta: [
       { title: TITLE },

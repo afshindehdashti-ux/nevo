@@ -99,7 +99,7 @@ const PILLARS = [
   { code: "EDU", label: "Engineering Knowledge Hub" },
 ];
 
-export const Route = createFileRoute("/research-innovation")({
+export const Route = createFileRoute("/$lang/research-innovation")({
   component: ResearchInnovationPage,
   head: () => ({
     meta: [

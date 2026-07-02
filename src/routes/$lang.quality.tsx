@@ -99,7 +99,7 @@ const CERTS = [
   { code: "CE Marking", label: "European Conformity" },
 ];
 
-export const Route = createFileRoute("/quality")({
+export const Route = createFileRoute("/$lang/quality")({
   component: QualityPage,
   head: () => ({
     meta: [

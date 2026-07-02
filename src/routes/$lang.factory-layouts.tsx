@@ -99,7 +99,7 @@ const CAPABILITIES = [
   { code: "EXPANSION", label: "Phased growth masterplans" },
 ];
 
-export const Route = createFileRoute("/factory-layouts")({
+export const Route = createFileRoute("/$lang/factory-layouts")({
   component: FactoryLayoutsPage,
   head: () => ({
     meta: [

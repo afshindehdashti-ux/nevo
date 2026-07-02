@@ -90,7 +90,7 @@ const FAQS = [
   { q: "Do you handle CE marking and export documentation?", a: "Yes. Machinery Directive documentation, technical file, risk assessment and Declaration of Conformity are prepared as part of the delivery scope." },
 ];
 
-export const Route = createFileRoute("/solutions/production-lines")({
+export const Route = createFileRoute("/$lang/solutions/production-lines")({
   head: () => ({
     meta: [
       { title: TITLE },

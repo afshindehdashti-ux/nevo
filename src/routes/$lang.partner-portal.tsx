@@ -39,7 +39,7 @@ import p21 from "@/assets/partner-portal/partner-21.png.asset.json";
 const A = [p01,p02,p03,p04,p05,p06,p07,p08,p09,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21];
 
 /* ─── SEO ─── */
-export const Route = createFileRoute("/partner-portal")({
+export const Route = createFileRoute("/$lang/partner-portal")({
   head: () => ({
     meta: buildSeo({
       title: "Global Partner Portal",

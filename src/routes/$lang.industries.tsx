@@ -286,7 +286,7 @@ const FAQS: { q: string; a: string }[] = [
   { q: "How do I start an industry consultation?", a: "Submit the industry consultation form on this page. A NEVO industry specialist responds within one business day with an engineered technical proposal." },
 ];
 
-export const Route = createFileRoute("/industries")({
+export const Route = createFileRoute("/$lang/industries")({
   head: () => {
     const faqLd = {
       "@context": "https://schema.org",

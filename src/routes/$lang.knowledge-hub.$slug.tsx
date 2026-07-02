@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SITE } from "@/lib/seo";
 import { ARTICLES, ARTICLES_BY_SLUG, type Article } from "@/lib/knowledge-articles";
 
-export const Route = createFileRoute("/knowledge-hub/$slug")({
+export const Route = createFileRoute("/$lang/knowledge-hub/$slug")({
   component: ArticlePage,
   errorComponent: ({ error, reset }) => {
     const router = useRouter();

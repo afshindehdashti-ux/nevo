@@ -80,7 +80,7 @@ const SYSTEMS = [
   "Finished goods, packing and dispatch systems",
 ];
 
-export const Route = createFileRoute("/solutions/factory-development")({
+export const Route = createFileRoute("/$lang/solutions/factory-development")({
   head: () => ({
     meta: [
       { title: TITLE },

@@ -244,7 +244,7 @@ function CareersPage() {
   );
 }
 
-export const Route = createFileRoute("/careers")({
+export const Route = createFileRoute("/$lang/careers")({
   head: () => ({
     meta: [
       { title: TITLE },

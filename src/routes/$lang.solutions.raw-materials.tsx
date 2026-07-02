@@ -91,7 +91,7 @@ const FAQS: { q: string; a: string }[] = [
   { q: "How do I request a technical quotation?", a: "Submit the inquiry form on this page with your panel specification, target market and required volume. A NEVO material specialist responds within one business day with a technical proposal and indicative pricing." },
 ];
 
-export const Route = createFileRoute("/solutions/raw-materials")({
+export const Route = createFileRoute("/$lang/solutions/raw-materials")({
   head: () => {
     const faqLd = {
       "@context": "https://schema.org",

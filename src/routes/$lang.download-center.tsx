@@ -162,7 +162,7 @@ type FilterTab = typeof FILTER_TABS[number];
 /* Route                                                            */
 /* ─────────────────────────────────────────────────────────────── */
 
-export const Route = createFileRoute("/download-center")({
+export const Route = createFileRoute("/$lang/download-center")({
   component: DownloadCenterPage,
   head: () => {
     const seo = buildSeo({

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import heroCockpit from "@/assets/tools/hero-cockpit.jpg";
 import { SITE } from "@/lib/seo";
 
-export const Route = createFileRoute("/engineering-tools")({
+export const Route = createFileRoute("/$lang/engineering-tools")({
   component: EngineeringToolsCenter,
   head: () => ({
     meta: [

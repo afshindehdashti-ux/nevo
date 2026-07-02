@@ -21,7 +21,7 @@ const TITLE =
 const DESCRIPTION =
   "Dubai-based industrial engineering & supply company for the sandwich panel industry — factory development, engineering consultancy, PIR/PUR raw materials, production lines and finished panels.";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/$lang/")({
   head: () => ({
     meta: [
       { title: TITLE },
