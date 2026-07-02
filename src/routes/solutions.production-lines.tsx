@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SITE } from "@/lib/seo";
 import { useRef, useState } from "react";
 import { motion } from "motion/react";
 import { submitLeadForm } from "@/lib/lead-submit";
@@ -97,9 +98,9 @@ export const Route = createFileRoute("/solutions/production-lines")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: URL_PATH },
+      { property: "og:url", content: `${SITE.url}${URL_PATH}` },
     ],
-    links: [{ rel: "canonical", href: URL_PATH }],
+    links: [{ rel: "canonical", href: `${SITE.url}${URL_PATH}` }],
     scripts: [
       {
         type: "application/ld+json",
@@ -266,7 +267,7 @@ function Breadcrumbs() {
   const trail = [
     { label: "Home", href: "/" },
     { label: "Solutions", href: "/solutions" },
-    { label: "Production Lines", href: URL_PATH },
+    { label: "Production Lines", href: `${SITE.url}${URL_PATH}` },
   ];
   return (
     <nav aria-label="Breadcrumb" className="border-b border-border bg-background">

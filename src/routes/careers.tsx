@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SITE } from "@/lib/seo";
 import { motion } from "motion/react";
 import { useRef, useState } from "react";
 import {
@@ -251,10 +252,10 @@ export const Route = createFileRoute("/careers")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: URL_PATH },
+      { property: "og:url", content: `${SITE.url}${URL_PATH}` },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: URL_PATH }],
+    links: [{ rel: "canonical", href: `${SITE.url}${URL_PATH}` }],
   }),
   component: CareersPage,
 });
