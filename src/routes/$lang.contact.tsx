@@ -250,21 +250,8 @@ function ContactPage() {
 
 export const Route = createFileRoute("/$lang/contact")({
   head: ({ params }) => {
-    const TITLE = "Global Offices & Contact — NEVO Industrial | Dubai · Germany · Turkey · Oman";
-    const DESCRIPTION = "Reach NEVO Industrial engineering teams worldwide. Dubai HQ, Germany, Turkey and Oman offices.";
-    return {
-      meta: [
-        { title: TITLE },
-        { name: "description", content: DESCRIPTION },
-        { property: "og:title", content: TITLE },
-        { property: "og:description", content: DESCRIPTION },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
-        { name: "twitter:card", content: "summary_large_image" },
-        ...ogImageMeta("/contact"),
-      ],
-      links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
-    };
+    const { title, description } = localizedMeta(URL_PATH, params.lang);
+    return buildSeo({ title, description, path: URL_PATH, lang: params.lang });
   },
   component: ContactPage,
 });
