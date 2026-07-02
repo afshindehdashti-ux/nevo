@@ -29,6 +29,7 @@ const ROUTES: SitemapEntry[] = [
   { path: "/factory-layout-generator", changefreq: "monthly", priority: "0.9" },
   { path: "/download-center", changefreq: "weekly", priority: "0.9" },
   { path: "/customer-portal", changefreq: "monthly", priority: "0.8" },
+  { path: "/partner-portal", changefreq: "monthly", priority: "0.8" },
 ];
 
 const ACTIVE_LOCALES = ["en", "ar"] as const;

@@ -128,6 +128,7 @@ const KNOWLEDGE: MenuGroup = {
     { label: "White Papers", desc: "Peer-reviewed engineering perspectives.", icon: ScrollText, href: "/knowledge" },
     { label: "Engineering Tools", desc: "Calculators, selectors, references.", icon: Calculator, href: "/ai-assistant" },
     { label: "Customer Portal", desc: "Secure client dashboard: projects, tracking, documents.", icon: ShieldCheck, href: "/customer-portal" },
+    { label: "Partner Portal", desc: "Global distributor & EPC workspace: leads, marketing, AI sales.", icon: Handshake, href: "/partner-portal" },
   ],
   featured: {
     eyebrow: "Latest article",

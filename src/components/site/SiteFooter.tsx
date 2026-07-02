@@ -40,6 +40,7 @@ const COLUMNS = [
       { label: "Case Studies", href: "/knowledge" },
       { label: "Project Inquiry", href: "/project-inquiry" },
       { label: "Customer Portal", href: "/customer-portal" },
+      { label: "Partner Portal", href: "/partner-portal" },
     ],
   },
   {
