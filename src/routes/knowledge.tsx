@@ -528,7 +528,7 @@ function FeaturedArticles() {
                 <div className="text-xs text-black/55">
                   <span className="font-medium text-black/80">{a.author}</span> — {a.date}
                 </div>
-                <a href="#" className="inline-flex items-center gap-1 text-sm font-medium text-black hover:text-accent">
+                <a href="/project-inquiry" className="inline-flex items-center gap-1 text-sm font-medium text-black hover:text-accent">
                   Continue reading <ArrowRight className="size-4" />
                 </a>
               </div>
@@ -786,7 +786,7 @@ function DownloadCenter() {
               <h3 className="mt-2 text-lg font-medium">{d.title}</h3>
               <p className="mt-2 text-sm text-black/65">{d.desc}</p>
               <Button variant="secondary" size="sm" className="mt-5" asChild>
-                <a href="#"><Download className="mr-2 size-4" /> Download PDF</a>
+                <a href="/project-inquiry"><Download className="mr-2 size-4" /> Request PDF</a>
               </Button>
             </div>
           </motion.div>
@@ -811,7 +811,7 @@ function DocumentsStrip() {
         {DOCUMENTS.map((d) => (
           <a
             key={d.title}
-            href="#"
+            href="/project-inquiry"
             className="group overflow-hidden rounded-xl bg-[#f6f6f4] ring-1 ring-black/5 transition hover:ring-accent/50"
           >
             <div className="aspect-[4/3] overflow-hidden bg-black">
@@ -909,7 +909,7 @@ function FinalCTA() {
               <a href="#categories">Browse Engineering Articles <ArrowRight className="ml-2 size-4" /></a>
             </Button>
             <Button size="lg" variant="secondary" asChild>
-              <a href="#">Talk to an Engineer</a>
+              <a href="/project-inquiry">Talk to an Engineer</a>
             </Button>
           </div>
         </div>

@@ -535,7 +535,7 @@ function GridLayout({ group }: { group: MenuGroup }) {
         {group.items.map((item) => (
           <li key={item.label}>
             <a
-              href="#"
+              href={item.href ?? "/industries"}
               className="group flex flex-col items-start gap-3 rounded-xl border border-transparent p-4 transition-all hover:border-border hover:bg-surface/60"
             >
               <span className="grid size-10 place-items-center rounded-lg border border-border bg-white transition-colors group-hover:border-[color:var(--accent)] group-hover:text-[color:var(--accent)]">

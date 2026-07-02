@@ -103,7 +103,7 @@ export function SiteFooter() {
                 WhatsApp Engineering Desk
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/company/nevo-industrial"
                 className="flex items-center gap-3 text-primary-foreground/85 hover:text-primary-foreground"
               >
                 <Linkedin
@@ -122,7 +122,7 @@ export function SiteFooter() {
             </div>
 
             <a
-              href="#contact"
+              href="/project-inquiry"
               className="mt-8 inline-flex items-center gap-1.5 rounded-md border border-primary-foreground/25 px-4 py-2.5 text-xs font-medium uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary-foreground/10"
             >
               Start Your Project
