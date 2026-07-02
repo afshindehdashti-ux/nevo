@@ -601,6 +601,7 @@ function mdSummary(r) {
     if (r.canonicalErrors.length > 50)
       lines.push(`| … | | _${r.canonicalErrors.length - 50} more_ | |`);
     lines.push("");
+  }
   if (r.externalFailures.length) {
     lines.push(`### 🌐 External URL failures (${r.externalFailures.length})`);
     lines.push("");
