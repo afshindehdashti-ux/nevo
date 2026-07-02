@@ -53,7 +53,27 @@ function useCounter(target: number, duration = 1400) {
 }
 
 function ContactPage() {
-  const offices = useCounter(4);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function handleCallback(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    const ok = await submitLeadForm(e.currentTarget, {
+      source: "contact-callback",
+      rules: [
+        { field: "name", label: "Full name" },
+        { field: "email", label: "Email", type: "email" },
+        { field: "phone", label: "Phone / WhatsApp", type: "phone" },
+      ],
+      successTitle: "Callback requested",
+      successDescription: "A senior engineer will call you within one business day.",
+    });
+    setBusy(false);
+    if (ok) formRef.current?.reset();
+  }
+
   const countries = useCounter(38);
   const engineers = useCounter(120);
 
