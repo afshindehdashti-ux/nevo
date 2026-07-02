@@ -87,15 +87,16 @@ export function buildSeo(input: SeoInput) {
 
   const meta: Array<Record<string, string>> = [
     { title: fullTitle },
-    { name: "description", content: input.description },
+    { name: "description", content: effectiveDescription },
     { property: "og:title", content: fullTitle },
-    { property: "og:description", content: input.description },
+    { property: "og:description", content: effectiveDescription },
     { property: "og:type", content: input.type ?? "website" },
     { property: "og:url", content: absolutePath },
     { property: "og:site_name", content: SITE.name },
+    { property: "og:locale", content: (String(input.lang) === "ar" ? "ar_AE" : String(input.lang) === "zh" ? "zh_CN" : `${String(input.lang)}_${String(input.lang).toUpperCase()}`) },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: fullTitle },
-    { name: "twitter:description", content: input.description },
+    { name: "twitter:description", content: effectiveDescription },
   ];
 
   // Resolve OG image: explicit input.image wins, otherwise per-route mapping,
