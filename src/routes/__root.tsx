@@ -8,8 +8,17 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import {
+  BookOpen,
+  Calculator,
+  ClipboardList,
+  ArrowRight,
+  Home,
+} from "lucide-react";
 
 import appCss from "../styles.css?url";
+import nevoLogoDark from "@/assets/nevo-logo-dark.png";
+import nevoLogoLight from "@/assets/nevo-logo-light.png";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AIAssistantLauncher } from "../components/site/AIAssistantLauncher";
 import { Analytics } from "../components/site/Analytics";
