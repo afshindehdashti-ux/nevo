@@ -1,5 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
+import { useLanguage } from "@/i18n/LanguageProvider";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
