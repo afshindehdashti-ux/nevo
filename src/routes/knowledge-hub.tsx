@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/knowledge/hub-hero.jpg";
 import { SITE } from "@/lib/seo";
-import { ARTICLES, type Article, type Category } from "@/lib/knowledge-articles";
+import { ARTICLES, type Category } from "@/lib/knowledge-articles";
 
 // Reuse existing knowledge photography for cards outside the article list
 import k01 from "@/assets/knowledge/01_blueprint.jpg";
