@@ -248,14 +248,23 @@ if (externalCfg.enabled) {
 // -------- Sitemap parity --------
 /** @type {Set<string>} */
 const sitemapPaths = new Set();
+/** @type {Map<string, number>} */
+const sitemapPathCounts = new Map();
 /** @type {{path:string, reason:string}[]} */
 const sitemapErrors = [];
 if (internalEnabled) {
   const sitemapSrc = readFileSync(join(ROUTES_DIR, "sitemap[.]xml.ts"), "utf8");
   const pathRe = /path:\s*["'`](\/[^"'`]*)["'`]/g;
   let sm;
-  while ((sm = pathRe.exec(sitemapSrc))) sitemapPaths.add(sm[1]);
+  while ((sm = pathRe.exec(sitemapSrc))) {
+    sitemapPaths.add(sm[1]);
+    sitemapPathCounts.set(sm[1], (sitemapPathCounts.get(sm[1]) ?? 0) + 1);
+  }
   const SITEMAP_EXCLUDE = new Set(["/*", "/knowledge", "/knowledge/*", "/sitemap.xml"]);
+  for (const [p, count] of sitemapPathCounts) {
+    if (count > 1)
+      sitemapErrors.push({ path: p, reason: `listed ${count}× in sitemap (must be unique)` });
+  }
   for (const p of sitemapPaths) {
     if (ignoreSitemapExtra.has(p)) continue;
     if (!knownRoutes.has(p))
@@ -268,6 +277,67 @@ if (internalEnabled) {
       sitemapErrors.push({ path: r, reason: "route exists but is missing from sitemap" });
   }
 }
+
+// -------- Canonical <-> route parity --------
+// For every static, indexable route file:
+//   • exactly one `rel: "canonical"` link entry must exist in head()
+//   • its href must self-reference the route path (absolute or relative)
+//   • the route must appear exactly once in the sitemap (checked above)
+// Dynamic routes ($param, splat) build canonical from loader data — we only
+// require that at least one canonical entry is declared.
+/** @type {{route:string, file:string, reason:string, found?:string}[]} */
+const canonicalErrors = [];
+if (internalEnabled) {
+  const CANONICAL_SKIP = new Set(["/*", "/sitemap.xml", "/knowledge", "/knowledge/*"]);
+  const CANONICAL_RE = /rel:\s*["'`]canonical["'`]\s*,\s*href:\s*(?:`([^`]+)`|["']([^"']+)["'])/g;
+  const SITE_ORIGIN = /^https?:\/\/[^/]+/;
+  for (const { file, rel } of routeFiles) {
+    const routePath = fileToRoute(rel);
+    if (!routePath) continue;
+    if (CANONICAL_SKIP.has(routePath)) continue;
+    if (ignoreSitemapMissing.has(routePath)) continue;
+    const isDynamic = routePath.includes("$") || routePath.endsWith("/*");
+    const relFile = relative(ROOT, file);
+    const text = readFileSync(file, "utf8");
+    CANONICAL_RE.lastIndex = 0;
+    /** @type {string[]} */
+    const hrefs = [];
+    let cm;
+    while ((cm = CANONICAL_RE.exec(text))) hrefs.push(cm[1] ?? cm[2]);
+
+    if (hrefs.length === 0) {
+      canonicalErrors.push({ route: routePath, file: relFile, reason: "missing <link rel=\"canonical\"> in head()" });
+      continue;
+    }
+    if (hrefs.length > 1) {
+      canonicalErrors.push({
+        route: routePath, file: relFile,
+        reason: `${hrefs.length} canonical entries declared (expected exactly 1)`,
+        found: hrefs.join(", "),
+      });
+      continue;
+    }
+    if (isDynamic) continue; // dynamic routes: presence is enough
+    // Strip site-origin prefix and any `${...}` interpolations (site URL const,
+    // URL_PATH helper, etc.), then compare the remaining literal path.
+    const stripped = hrefs[0]
+      .replace(SITE_ORIGIN, "")
+      .replace(/\$\{[^}]+\}/g, "")
+      .replace(/\/$/, "");
+    // Fully interpolated (nothing left) => presence is enough; can't verify statically.
+    if (stripped === "") continue;
+    const href = stripped || "/";
+    const expected = routePath;
+    if (href !== expected) {
+      canonicalErrors.push({
+        route: routePath, file: relFile,
+        reason: `canonical points to "${href}" but route is "${expected}" (must self-reference)`,
+        found: hrefs[0],
+      });
+    }
+  }
+}
+
 
 // -------- External URL validation ----------
 /** @type {{url:string, status:number|null, error:string|null, attempts:number, occurrences:{file:string,line:number}[]}[]} */
@@ -348,7 +418,8 @@ const staleIgnorePatterns = allDeclared.filter(
 
 
 // -------- Reports --------
-const totalErrors = errors.length + sitemapErrors.length + externalFailures.length;
+const totalErrors =
+  errors.length + sitemapErrors.length + externalFailures.length + canonicalErrors.length;
 const passed = totalErrors === 0;
 const generatedAt = new Date().toISOString();
 const commit = process.env.GITHUB_SHA || "";
@@ -365,6 +436,7 @@ const report = {
     deadLinks: errors.length,
     redirectWarnings: warnings.length,
     sitemapErrors: sitemapErrors.length,
+    canonicalErrors: canonicalErrors.length,
     ignoredLinks: ignoredLinkCount,
     externalChecked: externalUrls.size,
     externalOk: externalOkCount,
@@ -374,6 +446,7 @@ const report = {
   deadLinks: errors,
   redirectWarnings: warnings,
   sitemapErrors,
+  canonicalErrors,
   externalFailures: externalFailures.map((f) => ({
     ...f,
     // Flatten first occurrence for table rendering.
@@ -449,6 +522,7 @@ function htmlReport(r) {
   <div class="card"><b>${r.counts.deadLinks}</b>dead links</div>
   <div class="card"><b>${r.counts.redirectWarnings}</b>redirect warnings</div>
   <div class="card"><b>${r.counts.sitemapErrors}</b>sitemap issues</div>
+  <div class="card"><b>${r.counts.canonicalErrors}</b>canonical issues</div>
   <div class="card"><b>${r.counts.externalChecked}</b>external checked</div>
   <div class="card"><b>${r.counts.externalFailed}</b>external failed</div>
 </div>
@@ -462,6 +536,13 @@ ${rows(r.deadLinks, [
 ${rows(r.sitemapErrors, [
   { key: "path", label: "Path" },
   { key: "reason", label: "Reason" },
+])}
+<h2>Canonical &lt;-&gt; route issues (${r.canonicalErrors.length})</h2>
+${rows(r.canonicalErrors, [
+  { key: "route", label: "Route" },
+  { key: "file", label: "Route file" },
+  { key: "reason", label: "Reason" },
+  { key: "found", label: "Found" },
 ])}
 <h2>External URL failures (${r.externalFailures.length} of ${r.counts.externalChecked} checked)</h2>
 ${rows(r.externalFailures, [
@@ -490,14 +571,11 @@ function mdSummary(r) {
   lines.push(`## 🔗 NEVO Link Check — ${status}`);
   lines.push("");
   lines.push(
-    `| Routes | Sitemap | Dead links | Redirect warnings | Sitemap issues |`,
+    `| Routes | Sitemap | Dead links | Redirects | Sitemap issues | Canonical issues | External ok/fail |`,
   );
+  lines.push(`| ---: | ---: | ---: | ---: | ---: | ---: | ---: |`);
   lines.push(
-    `| Routes | Sitemap | Dead links | Redirects | Sitemap issues | External ok/fail |`,
-  );
-  lines.push(`| ---: | ---: | ---: | ---: | ---: | ---: |`);
-  lines.push(
-    `| ${r.counts.routes} | ${r.counts.sitemapEntries} | **${r.counts.deadLinks}** | ${r.counts.redirectWarnings} | **${r.counts.sitemapErrors}** | ${r.counts.externalOk}/**${r.counts.externalFailed}** |`,
+    `| ${r.counts.routes} | ${r.counts.sitemapEntries} | **${r.counts.deadLinks}** | ${r.counts.redirectWarnings} | **${r.counts.sitemapErrors}** | **${r.counts.canonicalErrors}** | ${r.counts.externalOk}/**${r.counts.externalFailed}** |`,
   );
   lines.push("");
   if (r.deadLinks.length) {
@@ -517,6 +595,19 @@ function mdSummary(r) {
     lines.push(`| Path | Reason |`);
     lines.push(`| --- | --- |`);
     for (const e of r.sitemapErrors) lines.push(`| \`${e.path}\` | ${e.reason} |`);
+    lines.push("");
+  }
+  if (r.canonicalErrors.length) {
+    lines.push(`### 🧭 Canonical ↔ route issues (${r.canonicalErrors.length})`);
+    lines.push("");
+    lines.push(`| Route | File | Reason | Found |`);
+    lines.push(`| --- | --- | --- | --- |`);
+    for (const c of r.canonicalErrors.slice(0, 50))
+      lines.push(
+        `| \`${c.route}\` | \`${c.file}\` | ${c.reason} | ${c.found ? `\`${c.found}\`` : ""} |`,
+      );
+    if (r.canonicalErrors.length > 50)
+      lines.push(`| … | | _${r.canonicalErrors.length - 50} more_ | |`);
     lines.push("");
   }
   if (r.externalFailures.length) {
@@ -586,11 +677,13 @@ if (warnings.length) {
       `  ⚠ Link "${w.link}" in ${w.file}:${w.line} hits 301 → prefer "${w.redirectedTo}"`,
     );
 }
-if (errors.length || sitemapErrors.length || externalFailures.length) {
+if (errors.length || sitemapErrors.length || externalFailures.length || canonicalErrors.length) {
   console.log("\nErrors:");
   for (const e of errors)
     console.log(`  ✗ Dead internal link "${e.link}" in ${e.file}:${e.line}`);
-  for (const s of sitemapErrors) console.log(`  ✗ ${s.path} — ${s.reason}`);
+  for (const s of sitemapErrors) console.log(`  ✗ Sitemap ${s.path} — ${s.reason}`);
+  for (const c of canonicalErrors)
+    console.log(`  ✗ Canonical ${c.route} (${c.file}) — ${c.reason}${c.found ? ` [found: ${c.found}]` : ""}`);
   for (const f of externalFailures) {
     const first = f.occurrences[0];
     console.log(
