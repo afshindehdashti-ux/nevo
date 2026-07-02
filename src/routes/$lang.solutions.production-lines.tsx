@@ -268,7 +268,7 @@ function Breadcrumbs() {
   const trail = [
     { label: "Home", href: "/" },
     { label: "Solutions", href: "/solutions" },
-    { label: "Production Lines", href: `${SITE.url}/${params.lang}${URL_PATH}` },
+    { label: "Production Lines", href: URL_PATH },
   ];
   return (
     <nav aria-label="Breadcrumb" className="border-b border-border bg-background">
