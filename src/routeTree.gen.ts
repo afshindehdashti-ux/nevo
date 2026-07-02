@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ProjectInquiryRouteImport } from './routes/project-inquiry'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as IndustriesRouteImport } from './routes/industries'
+import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SolutionsSandwichPanelsRouteImport } from './routes/solutions.sandwich-panels'
@@ -39,6 +40,11 @@ const KnowledgeRoute = KnowledgeRouteImport.update({
 const IndustriesRoute = IndustriesRouteImport.update({
   id: '/industries',
   path: '/industries',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiAssistantRoute = AiAssistantRouteImport.update({
+  id: '/ai-assistant',
+  path: '/ai-assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -82,6 +88,7 @@ const ApiChatRoute = ApiChatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/ai-assistant': typeof AiAssistantRoute
   '/industries': typeof IndustriesRoute
   '/knowledge': typeof KnowledgeRoute
   '/project-inquiry': typeof ProjectInquiryRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/ai-assistant': typeof AiAssistantRoute
   '/industries': typeof IndustriesRoute
   '/knowledge': typeof KnowledgeRoute
   '/project-inquiry': typeof ProjectInquiryRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/ai-assistant': typeof AiAssistantRoute
   '/industries': typeof IndustriesRoute
   '/knowledge': typeof KnowledgeRoute
   '/project-inquiry': typeof ProjectInquiryRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/ai-assistant'
     | '/industries'
     | '/knowledge'
     | '/project-inquiry'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/ai-assistant'
     | '/industries'
     | '/knowledge'
     | '/project-inquiry'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/ai-assistant'
     | '/industries'
     | '/knowledge'
     | '/project-inquiry'
@@ -164,6 +176,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AiAssistantRoute: typeof AiAssistantRoute
   IndustriesRoute: typeof IndustriesRoute
   KnowledgeRoute: typeof KnowledgeRoute
   ProjectInquiryRoute: typeof ProjectInquiryRoute
@@ -203,6 +216,13 @@ declare module '@tanstack/react-router' {
       path: '/industries'
       fullPath: '/industries'
       preLoaderRoute: typeof IndustriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-assistant': {
+      id: '/ai-assistant'
+      path: '/ai-assistant'
+      fullPath: '/ai-assistant'
+      preLoaderRoute: typeof AiAssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -260,6 +280,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AiAssistantRoute: AiAssistantRoute,
   IndustriesRoute: IndustriesRoute,
   KnowledgeRoute: KnowledgeRoute,
   ProjectInquiryRoute: ProjectInquiryRoute,
