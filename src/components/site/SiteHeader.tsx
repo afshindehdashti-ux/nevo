@@ -84,6 +84,7 @@ const SOLUTIONS: MenuGroup = {
     { label: "Raw Materials", desc: "PIR, PUR, PPGI, GI, rock wool, adhesives.", icon: PackageSearch, href: "/solutions/raw-materials" },
     { label: "Finished Panels", desc: "Premium sandwich panels, delivered.", icon: Layers, href: "/solutions/sandwich-panels" },
     { label: "Panel Configurator", desc: "Configure panels in 3D with live engineering results.", icon: Boxes, href: "/product-configurator" },
+    { label: "Panel Thickness Calculator", desc: "Recommend the correct panel thickness by application, climate & fire.", icon: Calculator, href: "/panel-thickness-calculator" },
     { label: "AI Engineering Assistant", desc: "Calculators, estimators and guided scoping.", icon: LifeBuoy, href: "/ai-assistant" },
   ],
   featured: {
