@@ -968,6 +968,8 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
           </a>
         </Button>
 
+        <LanguageSwitcher variant="mobile" />
+
         <div className="mt-6 flex items-center justify-between text-[12px] text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <MapPin className="size-3.5" strokeWidth={1.75} /> Dubai, UAE
@@ -975,7 +977,6 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
           <a href={whatsappHref} className="inline-flex items-center gap-1.5" onClick={onClose}>
             <MessageCircle className="size-3.5" strokeWidth={1.75} /> {SITE.contact.whatsapp ? "WhatsApp" : "Engineering Desk"}
           </a>
-          <span>EN</span>
         </div>
       </div>
     </div>
