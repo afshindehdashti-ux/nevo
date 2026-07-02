@@ -164,7 +164,7 @@ function QualityPage() {
         <SectionHeader
           eyebrow="Quality Assurance Program"
           title="Ten controls, one uncompromising standard."
-          description="Each panel is measured, tested and documented against international specifications before it earns the NEVO stamp."
+          lede="Each panel is measured, tested and documented against international specifications before it earns the NEVO stamp."
         />
         <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {TILES.map((tile, i) => (
