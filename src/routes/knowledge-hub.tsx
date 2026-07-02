@@ -302,7 +302,7 @@ function KnowledgeHub() {
           {/* Grid */}
           <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((a) => (
-              <article key={a.slug} className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] hover:border-emerald-500/30 transition">
+              <Link key={a.slug} to="/knowledge-hub/$slug" params={{ slug: a.slug }} className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] hover:border-emerald-500/30 transition block">
                 <div className="relative aspect-[16/10] overflow-hidden bg-black/40">
                   <img src={a.cover} alt="" loading="lazy" className="h-full w-full object-cover opacity-90 group-hover:scale-[1.03] transition duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -318,7 +318,7 @@ function KnowledgeHub() {
                     <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">Read more <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" /></span>
                   </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
 
