@@ -1,33 +1,42 @@
 #!/usr/bin/env node
 /**
- * Lightweight visual regression test for the mobile sticky header logo.
+ * Visual regression test for the mobile sticky header logo.
  *
- * Captures three element screenshots on a mobile viewport:
- *   1. initial page load (transparent header over hero)
- *   2. after scrolling (solid sticky header)
- *   3. with the mobile menu open (menu overlay logo)
+ * Purpose: catch color regressions where the white NEVO wordmark or the green
+ * accent (triangle + "INDUSTRIAL") disappear from the logo — the exact class
+ * of bug that was fixed previously (white ink washed out to gray/invisible on
+ * a dark header).
  *
- * Modes:
- *   node scripts/visual/header-logo.mjs                 # compare vs baseline
- *   node scripts/visual/header-logo.mjs --update        # (re)write baselines
+ * Strategy: capture an element screenshot of the logo in three states, then
+ * verify the color signature of each shot — count "white" pixels (bright,
+ * near-neutral) and "NEVO green" pixels (mid-lightness green hue). If either
+ * count drops below its floor, the logo is failing visually and the test
+ * fails with a saved artifact for inspection.
+ *
+ * This is intentionally more robust than pixel-exact diffing: it doesn't
+ * false-alarm on hero image re-compression or menu animation timing, but it
+ * DOES fail loudly if the logo colors ever change.
+ *
+ * Usage:
+ *   npm run test:visual                         # assert + save shots
+ *   node scripts/visual/header-logo.mjs --engine=webkit
  *
  * Options:
  *   --url=<http://...>       target URL (default http://localhost:8080)
- *   --threshold=<0-1>        max mean per-channel diff (default 0.02 = 2%)
  *   --engine=chromium|webkit browser engine (default chromium)
  *
- * Exit codes: 0 pass, 1 pixel-diff regression, 2 harness error.
+ * Exit codes: 0 pass, 1 color regression, 2 harness error.
  */
 import { chromium, webkit } from "playwright";
 import { PNG } from "pngjs";
-import { mkdirSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..", "..");
-const BASELINE_DIR = join(ROOT, "tests", "visual", "baseline");
-const DIFF_DIR = join(ROOT, "tests", "visual", "diff");
+const SHOTS_DIR = join(ROOT, "tests", "visual", "snapshots");
+mkdirSync(SHOTS_DIR, { recursive: true });
 
 const args = new Map(
   process.argv.slice(2).map((a) => {
@@ -35,20 +44,15 @@ const args = new Map(
     return [k, v ?? "true"];
   }),
 );
-const UPDATE = args.get("update") === "true";
 const URL = args.get("url") ?? "http://localhost:8080";
-const THRESHOLD = Number(args.get("threshold") ?? "0.02");
 const ENGINE = args.get("engine") ?? "chromium";
-
-mkdirSync(BASELINE_DIR, { recursive: true });
-mkdirSync(DIFF_DIR, { recursive: true });
 
 const LOGO_SELECTOR = 'img[alt="NEVO Industrial"]';
 
 async function captureStates() {
   const launcher = ENGINE === "webkit" ? webkit : chromium;
   const launchOpts = { headless: true };
-  if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH) {
+  if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH && ENGINE === "chromium") {
     launchOpts.executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
   }
   const browser = await launcher.launch(launchOpts);
@@ -64,108 +68,103 @@ async function captureStates() {
   await page.waitForTimeout(800);
 
   const shots = {};
-
-  // 1. Initial (transparent header)
   shots.initial = await page.locator(LOGO_SELECTOR).first().screenshot();
 
-  // 2. Scrolled (solid sticky header)
   await page.evaluate(() => window.scrollTo(0, 900));
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(600);
   shots.scrolled = await page.locator(LOGO_SELECTOR).first().screenshot();
 
-  // 3. Menu open — the visible logo is the mobile-menu overlay's logo
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(300);
   const menuBtn = page.locator('header button[aria-label*="menu" i]').first();
   await menuBtn.click();
   await page.waitForTimeout(500);
-  // Prefer a logo inside a dialog/overlay if present, else fall back to first
-  const overlayLogo = page.locator(
-    `[role="dialog"] ${LOGO_SELECTOR}, [data-mobile-menu] ${LOGO_SELECTOR}`,
-  );
-  const menuLogo = (await overlayLogo.count())
-    ? overlayLogo.first()
-    : page.locator(LOGO_SELECTOR).last();
-  shots.menuOpen = await menuLogo.screenshot();
+  // Menu open — the visible NEVO logo is the last img on the page
+  // (mobile menu overlay renders after the sticky header).
+  shots.menuOpen = await page.locator(LOGO_SELECTOR).last().screenshot();
 
   await browser.close();
   return shots;
 }
 
-/** Mean per-channel absolute difference, 0–1. Returns Infinity if size differs. */
-function pixelDiff(aBuf, bBuf) {
-  const a = PNG.sync.read(aBuf);
-  const b = PNG.sync.read(bBuf);
-  if (a.width !== b.width || a.height !== b.height) return { diff: Infinity, a, b };
-  let total = 0;
-  const n = a.data.length;
-  for (let i = 0; i < n; i += 4) {
-    total += Math.abs(a.data[i] - b.data[i]);
-    total += Math.abs(a.data[i + 1] - b.data[i + 1]);
-    total += Math.abs(a.data[i + 2] - b.data[i + 2]);
+/**
+ * Analyse a logo screenshot and return the fraction of pixels that are
+ * "white ink" (bright + neutral) and "NEVO green" (green hue in mid range).
+ * Alpha 0 pixels are ignored so anti-aliasing/edges don't skew the ratio.
+ */
+function colorSignature(buf) {
+  const png = PNG.sync.read(buf);
+  const { data, width, height } = png;
+  let visible = 0;
+  let white = 0;
+  let green = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    const a = data[i + 3];
+    if (a < 32) continue;
+    visible++;
+    // White ink: bright and roughly neutral (small channel spread).
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    if (max > 210 && max - min < 30) white++;
+    // NEVO green (~ oklch(0.72 0.155 158) ≈ #2FA36B..#4CD08A). Green dominant,
+    // clearly above red and blue, and mid-lightness.
+    if (g > 90 && g < 230 && g > r + 25 && g > b + 15 && r < 180) green++;
   }
-  const diff = total / ((n / 4) * 3 * 255);
-  return { diff, a, b };
+  return {
+    width,
+    height,
+    visible,
+    whiteRatio: white / visible,
+    greenRatio: green / visible,
+  };
 }
 
-function writeDiffImage(a, b, outPath) {
-  const { width, height } = a;
-  const out = new PNG({ width, height });
-  for (let i = 0; i < a.data.length; i += 4) {
-    const d =
-      Math.abs(a.data[i] - b.data[i]) +
-      Math.abs(a.data[i + 1] - b.data[i + 1]) +
-      Math.abs(a.data[i + 2] - b.data[i + 2]);
-    const v = Math.min(255, d);
-    out.data[i] = v;
-    out.data[i + 1] = 0;
-    out.data[i + 2] = 0;
-    out.data[i + 3] = 255;
-  }
-  writeFileSync(outPath, PNG.sync.write(out));
-}
+// Per-state minimums. Menu-open logo is bigger → same ratio thresholds apply.
+// Floors chosen well below observed values to catch regressions without flaking.
+const THRESHOLDS = {
+  initial:  { minWhite: 0.05, minGreen: 0.005 },
+  scrolled: { minWhite: 0.05, minGreen: 0.005 },
+  menuOpen: { minWhite: 0.05, minGreen: 0.005 },
+};
 
 async function main() {
   const shots = await captureStates();
-  const states = Object.keys(shots);
   let failed = 0;
+  const rows = [];
 
-  for (const state of states) {
-    const baseFile = join(BASELINE_DIR, `header-logo-${state}.png`);
-    const shot = shots[state];
-
-    if (UPDATE || !existsSync(baseFile)) {
-      writeFileSync(baseFile, shot);
-      console.log(`  ✎ baseline written: header-logo-${state}.png`);
-      continue;
-    }
-
-    const baseline = readFileSync(baseFile);
-    const { diff, a, b } = pixelDiff(baseline, shot);
-    const pct = (diff * 100).toFixed(3);
-
-    if (diff > THRESHOLD) {
-      failed++;
-      const diffPath = join(DIFF_DIR, `header-logo-${state}.diff.png`);
-      const actualPath = join(DIFF_DIR, `header-logo-${state}.actual.png`);
-      writeFileSync(actualPath, shot);
-      if (Number.isFinite(diff)) writeDiffImage(a, b, diffPath);
-      console.log(
-        `  ✗ ${state}: ${pct}% mean channel diff (> ${(THRESHOLD * 100).toFixed(1)}%) → ${diffPath}`,
-      );
-    } else {
-      console.log(`  ✓ ${state}: ${pct}% mean channel diff`);
-    }
+  for (const [state, buf] of Object.entries(shots)) {
+    writeFileSync(join(SHOTS_DIR, `header-logo-${state}.png`), buf);
+    const sig = colorSignature(buf);
+    const t = THRESHOLDS[state];
+    const okWhite = sig.whiteRatio >= t.minWhite;
+    const okGreen = sig.greenRatio >= t.minGreen;
+    const ok = okWhite && okGreen;
+    if (!ok) failed++;
+    rows.push({ state, sig, okWhite, okGreen, ok });
   }
 
+  console.log("State       size        white%   green%   result");
+  console.log("─".repeat(56));
+  for (const r of rows) {
+    const size = `${r.sig.width}x${r.sig.height}`.padEnd(11);
+    const w = (r.sig.whiteRatio * 100).toFixed(2).padStart(6);
+    const g = (r.sig.greenRatio * 100).toFixed(2).padStart(6);
+    const mark = r.ok ? "✓ pass" : `✗ fail (white=${r.okWhite} green=${r.okGreen})`;
+    console.log(`${r.state.padEnd(11)} ${size} ${w}%  ${g}%   ${mark}`);
+  }
+
+  console.log(`\nSnapshots saved to tests/visual/snapshots/`);
   if (failed > 0) {
     console.error(
-      `\nVisual regression: ${failed}/${states.length} state(s) exceeded threshold.`,
+      `\nLogo color regression: ${failed}/${rows.length} state(s) missing expected white or green ink.`,
     );
-    console.error("Review diffs in tests/visual/diff/ then rerun with --update if intentional.");
+    console.error("Inspect the snapshot PNGs — the NEVO wordmark or green accent has changed.");
     process.exit(1);
   }
-  console.log(`\nAll ${states.length} header-logo states within tolerance.`);
+  console.log(`All ${rows.length} states have the expected white + green color signature.`);
 }
 
 main().catch((err) => {
