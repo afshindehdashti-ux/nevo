@@ -1,6 +1,8 @@
-import { ArrowRight } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Section, SectionHeader } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { submitLeadForm } from "@/lib/lead-submit";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
 
 const FIELD =
