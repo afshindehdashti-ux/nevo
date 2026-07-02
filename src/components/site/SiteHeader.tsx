@@ -48,6 +48,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
+import { logClientEvent } from "@/lib/client-monitor";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 import nevoLogoFullPointer from "@/assets/nevo-logo-full.png.asset.json";
 
@@ -282,6 +283,8 @@ export function SiteHeader() {
                 <img
                   src={nevoLogoLight}
                   alt="NEVO Industrial"
+                  data-testid="header-logo"
+                  data-logo-variant="light"
                   className="relative z-10 block h-auto w-full"
                   style={{
                     objectFit: "contain",
@@ -293,6 +296,31 @@ export function SiteHeader() {
                   loading="eager"
                   decoding="async"
                   draggable={false}
+                  onLoad={(event) => {
+                    // Log a one-time success ping per session per variant so
+                    // production traffic can be sampled to confirm the correct
+                    // white/green sticky logo actually rendered.
+                    if (typeof window === "undefined") return;
+                    const img = event.currentTarget;
+                    const step = img.dataset.fallbackStep ?? "0";
+                    const variant =
+                      step === "0" ? "primary-light-png"
+                      : step === "1" ? "fallback-cdn-full"
+                      : "fallback-inline-svg";
+                    const flagKey = `__nevoLogoRenderLogged:${variant}`;
+                    // deduplicate per tab so we don't spam the log endpoint
+                    if ((window as unknown as Record<string, unknown>)[flagKey]) return;
+                    (window as unknown as Record<string, unknown>)[flagKey] = true;
+                    logClientEvent("header.logo.render", {
+                      variant,
+                      naturalWidth: img.naturalWidth,
+                      naturalHeight: img.naturalHeight,
+                      viewportWidth: window.innerWidth,
+                      viewportHeight: window.innerHeight,
+                      dpr: window.devicePixelRatio,
+                      src: img.currentSrc || img.src,
+                    }, "info");
+                  }}
                   onError={(event) => {
                     // Defensive fallback chain: if the bundled light logo
                     // fails to load (bundle miss, cache poisoning, blocked
@@ -301,15 +329,39 @@ export function SiteHeader() {
                     // sticky header stays readable no matter what.
                     const img = event.currentTarget;
                     const step = img.dataset.fallbackStep ?? "0";
+                    const failedSrc = img.currentSrc || img.src;
                     if (step === "0") {
                       img.dataset.fallbackStep = "1";
+                      img.dataset.logoVariant = "fallback-cdn";
+                      logClientEvent("header.logo.error", {
+                        stage: "primary-light-png",
+                        failedSrc,
+                        nextSrc: LOGO_FALLBACK_CDN,
+                        viewportWidth: window.innerWidth,
+                        online: navigator.onLine,
+                      }, "error");
                       img.src = LOGO_FALLBACK_CDN;
                     } else if (step === "1") {
                       img.dataset.fallbackStep = "2";
+                      img.dataset.logoVariant = "fallback-svg";
+                      logClientEvent("header.logo.error", {
+                        stage: "fallback-cdn-full",
+                        failedSrc,
+                        nextSrc: "inline-svg",
+                        viewportWidth: window.innerWidth,
+                        online: navigator.onLine,
+                      }, "error");
                       img.src = LOGO_FALLBACK_SVG;
+                    } else {
+                      logClientEvent("header.logo.error", {
+                        stage: "fallback-inline-svg",
+                        failedSrc,
+                        terminal: true,
+                      }, "error");
                     }
                   }}
                 />
+
 
               </span>
             </Link>
