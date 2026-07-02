@@ -108,11 +108,11 @@ export function buildSeo(input: SeoInput) {
   for (const l of LOCALES.filter((l) => l.status === "active")) {
     links.push({
       rel: "alternate",
-      hreflang: l.hreflang,
+      hrefLang: l.hreflang,
       href: l.code === "en" ? absolutePath : `${SITE.url}/${l.code}${input.path}`,
     });
   }
-  links.push({ rel: "alternate", hreflang: "x-default", href: absolutePath });
+  links.push({ rel: "alternate", hrefLang: "x-default", href: absolutePath });
 
   return { meta, links };
 }
@@ -172,10 +172,10 @@ export const hreflangLinks = (path: string) => {
   const suffix = clean === "/" ? "" : clean;
   const links: Array<Record<string, string>> = LOCALES.filter((l) => l.status === "active").map((l) => ({
     rel: "alternate",
-    hreflang: l.hreflang,
+    hrefLang: l.hreflang,
     href: `${SITE.url}/${l.code}${suffix}`,
   }));
-  links.push({ rel: "alternate", hreflang: "x-default", href: `${SITE.url}/en${suffix}` });
+  links.push({ rel: "alternate", hrefLang: "x-default", href: `${SITE.url}/en${suffix}` });
   return links;
 };
 
