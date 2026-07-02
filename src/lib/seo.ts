@@ -3,6 +3,7 @@
  * Use buildSeo() in every route's head() for consistent titles/OG/canonical.
  */
 import { OG_IMAGES, OG_DEFAULT } from "./og-images";
+import { SEO_META } from "./seo-meta";
 
 
 export const SITE = {
