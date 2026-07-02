@@ -1334,8 +1334,8 @@
       "message": "Project brief (capacity, location, timeline)",
       "submit": "申请回电",
       "sending": "发送中…",
-      "successTitle": "Callback requested",
-      "successDesc": "A senior engineer will call you within one business day.",
+      "successTitle": "已收到回电请求",
+      "successDesc": "资深工程师将在一个工作日内与您联系。",
       "whatsapp": "通过 WhatsApp 聊天",
       "validation": {
         "reviewTitle": "请检查表单",

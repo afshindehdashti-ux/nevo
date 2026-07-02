@@ -1334,8 +1334,8 @@
       "message": "Project brief (capacity, location, timeline)",
       "submit": "Demande de rappel",
       "sending": "Envoi…",
-      "successTitle": "Callback requested",
-      "successDesc": "A senior engineer will call you within one business day.",
+      "successTitle": "Rappel demandé",
+      "successDesc": "Un ingénieur senior vous rappellera sous un jour ouvré.",
       "whatsapp": "Discuter sur WhatsApp",
       "validation": {
         "reviewTitle": "Merci de vérifier le formulaire",

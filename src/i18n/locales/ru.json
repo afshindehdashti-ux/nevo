@@ -1334,8 +1334,8 @@
       "message": "Краткое описание проекта (мощность, локация, сроки)",
       "submit": "Обратный звонок",
       "sending": "Отправка…",
-      "successTitle": "Callback requested",
-      "successDesc": "A senior engineer will call you within one business day.",
+      "successTitle": "Обратный звонок запрошен",
+      "successDesc": "Наш ведущий инженер свяжется с вами в течение одного рабочего дня.",
       "whatsapp": "Написать в WhatsApp",
       "validation": {
         "reviewTitle": "Проверьте, пожалуйста, форму",

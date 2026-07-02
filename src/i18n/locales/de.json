@@ -1334,8 +1334,8 @@
       "message": "Project brief (capacity, location, timeline)",
       "submit": "Rückruf",
       "sending": "Wird gesendet…",
-      "successTitle": "Callback requested",
-      "successDesc": "A senior engineer will call you within one business day.",
+      "successTitle": "Rückruf angefordert",
+      "successDesc": "Ein leitender Ingenieur meldet sich innerhalb eines Werktages bei Ihnen.",
       "whatsapp": "Auf WhatsApp chatten",
       "validation": {
         "reviewTitle": "Bitte überprüfen Sie das Formular",
