@@ -20,6 +20,8 @@
     "check:seo:json": "node scripts/check-seo-metadata.mjs --json",
     "check:all": "npm run check:i18n && npm run check:seo",
     "verify:publish": "node scripts/verify-publish.mjs",
+    "test:visual": "node scripts/visual/header-logo.mjs",
+    "test:visual:update": "node scripts/visual/header-logo.mjs --update",
     "format": "prettier --write ."
   },
   "dependencies": {
