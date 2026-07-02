@@ -930,7 +930,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
             className="group border-b border-border py-2"
           >
             <summary className="flex cursor-pointer list-none items-center justify-between py-3 text-[18px] font-semibold tracking-tight text-foreground">
-              {section.label}
+              {t(section.i18nKey, section.label)}
               <ChevronRight className="size-5 transition-transform group-open:rotate-90" strokeWidth={1.75} />
             </summary>
             <ul className="grid gap-0.5 pb-3">
@@ -979,7 +979,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
 
         <Button asChild variant="primary" size="lg" className="mt-6 h-14 w-full text-[15px]">
           <a href="/project-inquiry" onClick={onClose}>
-            Start Your Project
+            {t("cta.startProject")}
             <ArrowUpRight className="!size-4" />
           </a>
         </Button>
