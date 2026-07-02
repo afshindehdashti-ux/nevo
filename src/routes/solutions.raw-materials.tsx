@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
+import { useRef, useState } from "react";
+import { submitLeadForm } from "@/lib/lead-submit";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -17,6 +19,7 @@ import {
   Ruler,
   Sparkles,
   Factory,
+  Loader2,
 } from "lucide-react";
 
 import hero from "@/assets/raw-materials/hero-production-line.jpg";
