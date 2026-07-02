@@ -24,6 +24,7 @@ const ROUTES: SitemapEntry[] = [
   { path: "/solutions/sandwich-panels", changefreq: "monthly", priority: "0.9" },
   { path: "/product-configurator", changefreq: "monthly", priority: "0.9" },
   { path: "/investment-calculator", changefreq: "monthly", priority: "0.9" },
+  { path: "/panel-thickness-calculator", changefreq: "monthly", priority: "0.9" },
 ];
 
 const ACTIVE_LOCALES = ["en", "ar"] as const;
