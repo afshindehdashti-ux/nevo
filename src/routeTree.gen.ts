@@ -41,6 +41,7 @@ import { Route as LangAiProjectEstimatorRouteImport } from './routes/$lang.ai-pr
 import { Route as LangAiAssistantRouteImport } from './routes/$lang.ai-assistant'
 import { Route as LangAboutRouteImport } from './routes/$lang.about'
 import { Route as LangSolutionsIndexRouteImport } from './routes/$lang.solutions.index'
+import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as LangSolutionsSandwichPanelsRouteImport } from './routes/$lang.solutions.sandwich-panels'
 import { Route as LangSolutionsRawMaterialsRouteImport } from './routes/$lang.solutions.raw-materials'
 import { Route as LangSolutionsProductionLinesRouteImport } from './routes/$lang.solutions.production-lines'
@@ -212,6 +213,11 @@ const LangSolutionsIndexRoute = LangSolutionsIndexRouteImport.update({
   path: '/solutions/',
   getParentRoute: () => LangRoute,
 } as any)
+const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
+  id: '/api/public/health',
+  path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LangSolutionsSandwichPanelsRoute =
   LangSolutionsSandwichPanelsRouteImport.update({
     id: '/solutions/sandwich-panels',
@@ -286,6 +292,7 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -325,6 +332,7 @@ export interface FileRoutesByTo {
   '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
 }
 export interface FileRoutesById {
@@ -366,6 +374,7 @@ export interface FileRoutesById {
   '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
 }
 export interface FileRouteTypes {
@@ -408,6 +417,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/production-lines'
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
+    | '/api/public/health'
     | '/$lang/solutions/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -447,6 +457,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/production-lines'
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
+    | '/api/public/health'
     | '/$lang/solutions'
   id:
     | '__root__'
@@ -487,6 +498,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/production-lines'
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
+    | '/api/public/health'
     | '/$lang/solutions/'
   fileRoutesById: FileRoutesById
 }
@@ -497,6 +509,7 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   KnowledgeSplatRoute: typeof KnowledgeSplatRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
+  ApiPublicHealthRoute: typeof ApiPublicHealthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -725,6 +738,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangSolutionsIndexRouteImport
       parentRoute: typeof LangRoute
     }
+    '/api/public/health': {
+      id: '/api/public/health'
+      path: '/api/public/health'
+      fullPath: '/api/public/health'
+      preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$lang/solutions/sandwich-panels': {
       id: '/$lang/solutions/sandwich-panels'
       path: '/solutions/sandwich-panels'
@@ -859,17 +879,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   KnowledgeSplatRoute: KnowledgeSplatRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
+  ApiPublicHealthRoute: ApiPublicHealthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
