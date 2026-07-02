@@ -1667,6 +1667,12 @@ export const SEO_META: Record<string, PerLocale> = {
  */
 export function localizedMeta(path: string, lang: string): LocalizedMeta {
   const perLocale = SEO_META[path];
-  if (!perLocale) throw new Error(`SEO_META missing for path: ${path}`);
+  if (!perLocale) {
+    return {
+      title: "NEVO Industrial",
+      description:
+        "Dubai-based industrial engineering. Factory development, sandwich panel production lines, PIR/PUR raw materials, engineering consultancy & finished panels for global markets.",
+    };
+  }
   return perLocale[lang as LocaleCode] ?? perLocale.en;
 }
