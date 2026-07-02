@@ -349,6 +349,7 @@ export function SiteHeader() {
    ───────────────────────────────────────────────────────────── */
 
 function UtilityBar({ solid }: { solid: boolean }) {
+  const { t } = useTranslation();
   const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
 
   return (
@@ -362,14 +363,14 @@ function UtilityBar({ solid }: { solid: boolean }) {
         <div className="flex items-center gap-5">
           <span className="inline-flex items-center gap-1.5">
             <MapPin className="size-3.5 opacity-80" strokeWidth={1.75} />
-            Dubai, UAE
+            {t("brand.location")}
           </span>
           <span className={cn("hidden h-3 w-px", solid ? "bg-border" : "bg-white/20")} aria-hidden />
-          <span className="hidden lg:inline">Engineering &amp; Industrial Supply</span>
+          <span className="hidden lg:inline">{t("brand.sector")}</span>
           <span className={cn("hidden h-3 w-px lg:block", solid ? "bg-border" : "bg-white/20")} aria-hidden />
           <span className="hidden lg:inline-flex items-center gap-1.5">
             <Globe2 className="size-3.5 opacity-80" strokeWidth={1.75} />
-            Worldwide Projects
+            {t("brand.worldwide")}
           </span>
         </div>
         <div className="flex items-center gap-4">
@@ -381,7 +382,7 @@ function UtilityBar({ solid }: { solid: boolean }) {
             )}
           >
             <MessageCircle className="size-3.5" strokeWidth={1.75} />
-            {SITE.contact.whatsapp ? "WhatsApp" : "Engineering Desk"}
+            {SITE.contact.whatsapp ? t("nav.whatsapp") : t("nav.engineeringDesk")}
           </a>
           <LanguageSwitcher variant="header" onLight={!solid} />
         </div>
