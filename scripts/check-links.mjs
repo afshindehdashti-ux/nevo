@@ -17,13 +17,69 @@
  *
  * Usage: node scripts/check-links.mjs
  */
-import { readdirSync, readFileSync, statSync, mkdirSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { join, relative, dirname } from "node:path";
 
 const ROOT = process.cwd();
 const ROUTES_DIR = join(ROOT, "src/routes");
 const SRC_DIR = join(ROOT, "src");
 const OUT_DIR = join(ROOT, "reports/link-check");
+const IGNORE_FILE = join(ROOT, ".linkcheckignore");
+const CONFIG_FILE = join(ROOT, "link-check.config.json");
+
+// -------- Allowlist / ignore loading ----------
+// Two sources are merged:
+//   1. `.linkcheckignore` — plain text, one link pattern per line, `#` comments.
+//   2. `link-check.config.json` — structured overrides:
+//        {
+//          "ignoreLinks":          ["/preview/*", "/blog/**"],
+//          "ignoreFiles":          ["src/experimental/**"],
+//          "ignoreSitemapMissing": ["/internal-tool"],
+//          "ignoreSitemapExtra":   ["/legacy-redirect"],
+//          "redirects":            { "/old": "/new" },
+//          "redirectPrefixes":     { "/old/": "/new/" }
+//        }
+// Patterns are glob-ish: `*` matches within a segment, `**` matches across.
+function globToRegExp(glob) {
+  let src = "";
+  for (let i = 0; i < glob.length; i++) {
+    const c = glob[i];
+    if (c === "*") {
+      if (glob[i + 1] === "*") { src += ".*"; i++; }
+      else src += "[^/]*";
+    } else if (/[.+?^${}()|[\]\\]/.test(c)) src += "\\" + c;
+    else src += c;
+  }
+  return new RegExp("^" + src + "$");
+}
+function loadIgnoreFile(path) {
+  if (!existsSync(path)) return [];
+  return readFileSync(path, "utf8")
+    .split(/\r?\n/)
+    .map((l) => l.replace(/#.*$/, "").trim())
+    .filter(Boolean);
+}
+function loadConfig(path) {
+  if (!existsSync(path)) return {};
+  try { return JSON.parse(readFileSync(path, "utf8")); }
+  catch (e) {
+    console.error(`✗ Failed to parse ${relative(ROOT, path)}: ${e.message}`);
+    process.exit(2);
+  }
+}
+const fileIgnorePatterns = loadIgnoreFile(IGNORE_FILE);
+const config = loadConfig(CONFIG_FILE);
+const ignoreLinkREs = [...fileIgnorePatterns, ...(config.ignoreLinks ?? [])].map(globToRegExp);
+const ignoreFileREs = (config.ignoreFiles ?? []).map(globToRegExp);
+const ignoreSitemapMissing = new Set(config.ignoreSitemapMissing ?? []);
+const ignoreSitemapExtra = new Set(config.ignoreSitemapExtra ?? []);
+const usedPatterns = new Set();
+function matchAny(res, value) {
+  for (const re of res) if (re.test(value)) { usedPatterns.add(re.source); return true; }
+  return false;
+}
+const isIgnoredLink = (l) => matchAny(ignoreLinkREs, l);
+const isIgnoredFile = (f) => matchAny(ignoreFileREs, f);
 
 // -------- Route discovery (mirrors TanStack file-based routing) ----------
 function fileToRoute(file) {
