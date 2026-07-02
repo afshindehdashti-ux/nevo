@@ -248,14 +248,23 @@ if (externalCfg.enabled) {
 // -------- Sitemap parity --------
 /** @type {Set<string>} */
 const sitemapPaths = new Set();
+/** @type {Map<string, number>} */
+const sitemapPathCounts = new Map();
 /** @type {{path:string, reason:string}[]} */
 const sitemapErrors = [];
 if (internalEnabled) {
   const sitemapSrc = readFileSync(join(ROUTES_DIR, "sitemap[.]xml.ts"), "utf8");
   const pathRe = /path:\s*["'`](\/[^"'`]*)["'`]/g;
   let sm;
-  while ((sm = pathRe.exec(sitemapSrc))) sitemapPaths.add(sm[1]);
+  while ((sm = pathRe.exec(sitemapSrc))) {
+    sitemapPaths.add(sm[1]);
+    sitemapPathCounts.set(sm[1], (sitemapPathCounts.get(sm[1]) ?? 0) + 1);
+  }
   const SITEMAP_EXCLUDE = new Set(["/*", "/knowledge", "/knowledge/*", "/sitemap.xml"]);
+  for (const [p, count] of sitemapPathCounts) {
+    if (count > 1)
+      sitemapErrors.push({ path: p, reason: `listed ${count}× in sitemap (must be unique)` });
+  }
   for (const p of sitemapPaths) {
     if (ignoreSitemapExtra.has(p)) continue;
     if (!knownRoutes.has(p))
@@ -268,6 +277,59 @@ if (internalEnabled) {
       sitemapErrors.push({ path: r, reason: "route exists but is missing from sitemap" });
   }
 }
+
+// -------- Canonical <-> route parity --------
+// For every static, indexable route file:
+//   • exactly one `rel: "canonical"` link entry must exist in head()
+//   • its href must self-reference the route path (absolute or relative)
+//   • the route must appear exactly once in the sitemap (checked above)
+// Dynamic routes ($param, splat) build canonical from loader data — we only
+// require that at least one canonical entry is declared.
+/** @type {{route:string, file:string, reason:string, found?:string}[]} */
+const canonicalErrors = [];
+if (internalEnabled) {
+  const CANONICAL_SKIP = new Set(["/*", "/sitemap.xml", "/knowledge", "/knowledge/*"]);
+  const CANONICAL_RE = /rel:\s*["'`]canonical["'`]\s*,\s*href:\s*(?:`([^`]+)`|["']([^"']+)["'])/g;
+  const SITE_ORIGIN = /^https?:\/\/[^/]+/;
+  for (const { file, rel } of routeFiles) {
+    const routePath = fileToRoute(rel);
+    if (!routePath) continue;
+    if (CANONICAL_SKIP.has(routePath)) continue;
+    if (ignoreSitemapMissing.has(routePath)) continue;
+    const isDynamic = routePath.includes("$") || routePath.endsWith("/*");
+    const relFile = relative(ROOT, file);
+    const text = readFileSync(file, "utf8");
+    CANONICAL_RE.lastIndex = 0;
+    /** @type {string[]} */
+    const hrefs = [];
+    let cm;
+    while ((cm = CANONICAL_RE.exec(text))) hrefs.push(cm[1] ?? cm[2]);
+
+    if (hrefs.length === 0) {
+      canonicalErrors.push({ route: routePath, file: relFile, reason: "missing <link rel=\"canonical\"> in head()" });
+      continue;
+    }
+    if (hrefs.length > 1) {
+      canonicalErrors.push({
+        route: routePath, file: relFile,
+        reason: `${hrefs.length} canonical entries declared (expected exactly 1)`,
+        found: hrefs.join(", "),
+      });
+      continue;
+    }
+    if (isDynamic) continue; // dynamic routes: presence is enough
+    const href = hrefs[0].replace(SITE_ORIGIN, "").replace(/\/$/, "") || "/";
+    const expected = routePath;
+    if (href !== expected) {
+      canonicalErrors.push({
+        route: routePath, file: relFile,
+        reason: `canonical points to "${href}" but route is "${expected}" (must self-reference)`,
+        found: hrefs[0],
+      });
+    }
+  }
+}
+
 
 // -------- External URL validation ----------
 /** @type {{url:string, status:number|null, error:string|null, attempts:number, occurrences:{file:string,line:number}[]}[]} */
