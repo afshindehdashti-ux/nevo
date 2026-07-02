@@ -17,6 +17,7 @@ import { Route as ProductConfiguratorRouteImport } from './routes/product-config
 import { Route as PirVsRockWoolRouteImport } from './routes/pir-vs-rock-wool'
 import { Route as PartnerPortalRouteImport } from './routes/partner-portal'
 import { Route as PanelThicknessCalculatorRouteImport } from './routes/panel-thickness-calculator'
+import { Route as KnowledgeHubRouteImport } from './routes/knowledge-hub'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as InvestmentCalculatorRouteImport } from './routes/investment-calculator'
 import { Route as InstallationCommissioningRouteImport } from './routes/installation-commissioning'
@@ -78,6 +79,11 @@ const PanelThicknessCalculatorRoute =
     path: '/panel-thickness-calculator',
     getParentRoute: () => rootRouteImport,
   } as any)
+const KnowledgeHubRoute = KnowledgeHubRouteImport.update({
+  id: '/knowledge-hub',
+  path: '/knowledge-hub',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KnowledgeRoute = KnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/installation-commissioning': typeof InstallationCommissioningRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
+  '/knowledge-hub': typeof KnowledgeHubRoute
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
   '/partner-portal': typeof PartnerPortalRoute
   '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/installation-commissioning': typeof InstallationCommissioningRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
+  '/knowledge-hub': typeof KnowledgeHubRoute
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
   '/partner-portal': typeof PartnerPortalRoute
   '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
@@ -251,6 +259,7 @@ export interface FileRoutesById {
   '/installation-commissioning': typeof InstallationCommissioningRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
+  '/knowledge-hub': typeof KnowledgeHubRoute
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
   '/partner-portal': typeof PartnerPortalRoute
   '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
@@ -282,6 +291,7 @@ export interface FileRouteTypes {
     | '/installation-commissioning'
     | '/investment-calculator'
     | '/knowledge'
+    | '/knowledge-hub'
     | '/panel-thickness-calculator'
     | '/partner-portal'
     | '/pir-vs-rock-wool'
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/installation-commissioning'
     | '/investment-calculator'
     | '/knowledge'
+    | '/knowledge-hub'
     | '/panel-thickness-calculator'
     | '/partner-portal'
     | '/pir-vs-rock-wool'
@@ -340,6 +351,7 @@ export interface FileRouteTypes {
     | '/installation-commissioning'
     | '/investment-calculator'
     | '/knowledge'
+    | '/knowledge-hub'
     | '/panel-thickness-calculator'
     | '/partner-portal'
     | '/pir-vs-rock-wool'
@@ -370,6 +382,7 @@ export interface RootRouteChildren {
   InstallationCommissioningRoute: typeof InstallationCommissioningRoute
   InvestmentCalculatorRoute: typeof InvestmentCalculatorRoute
   KnowledgeRoute: typeof KnowledgeRoute
+  KnowledgeHubRoute: typeof KnowledgeHubRoute
   PanelThicknessCalculatorRoute: typeof PanelThicknessCalculatorRoute
   PartnerPortalRoute: typeof PartnerPortalRoute
   PirVsRockWoolRoute: typeof PirVsRockWoolRoute
@@ -442,6 +455,13 @@ declare module '@tanstack/react-router' {
       path: '/panel-thickness-calculator'
       fullPath: '/panel-thickness-calculator'
       preLoaderRoute: typeof PanelThicknessCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge-hub': {
+      id: '/knowledge-hub'
+      path: '/knowledge-hub'
+      fullPath: '/knowledge-hub'
+      preLoaderRoute: typeof KnowledgeHubRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/knowledge': {
@@ -594,6 +614,7 @@ const rootRouteChildren: RootRouteChildren = {
   InstallationCommissioningRoute: InstallationCommissioningRoute,
   InvestmentCalculatorRoute: InvestmentCalculatorRoute,
   KnowledgeRoute: KnowledgeRoute,
+  KnowledgeHubRoute: KnowledgeHubRoute,
   PanelThicknessCalculatorRoute: PanelThicknessCalculatorRoute,
   PartnerPortalRoute: PartnerPortalRoute,
   PirVsRockWoolRoute: PirVsRockWoolRoute,
