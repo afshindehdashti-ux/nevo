@@ -44,6 +44,7 @@ import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
+import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 import nevoLogoDark from "@/assets/nevo-logo-dark.png";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
@@ -371,15 +372,7 @@ function UtilityBar({ solid }: { solid: boolean }) {
             <MessageCircle className="size-3.5" strokeWidth={1.75} />
             {SITE.contact.whatsapp ? "WhatsApp" : "Engineering Desk"}
           </a>
-          <button
-            className={cn(
-              "inline-flex items-center gap-1.5 transition-colors",
-              solid ? "hover:text-foreground" : "hover:text-white",
-            )}
-          >
-            EN
-            <ChevronRight className="size-3 rotate-90 opacity-60" strokeWidth={2} />
-          </button>
+          <LanguageSwitcher variant="header" onLight={!solid} />
         </div>
       </div>
     </div>
