@@ -238,10 +238,18 @@ const report = {
     deadLinks: errors.length,
     redirectWarnings: warnings.length,
     sitemapErrors: sitemapErrors.length,
+    ignoredLinks: ignoredLinkCount,
   },
   deadLinks: errors,
   redirectWarnings: warnings,
   sitemapErrors,
+  ignore: {
+    linkPatterns: [...fileIgnorePatterns, ...(config.ignoreLinks ?? [])],
+    filePatterns: config.ignoreFiles ?? [],
+    sitemapMissing: [...ignoreSitemapMissing],
+    sitemapExtra: [...ignoreSitemapExtra],
+    stalePatterns: staleIgnorePatterns,
+  },
 };
 
 function ensureDir(p) {
