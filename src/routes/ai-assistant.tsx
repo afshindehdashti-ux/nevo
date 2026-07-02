@@ -34,10 +34,12 @@ import liveConsult from "@/assets/ai/live-consultation.jpg";
 import techProposal from "@/assets/ai/technical-proposal.jpg";
 import whatsappSupport from "@/assets/ai/whatsapp-support.jpg";
 import collab from "@/assets/ai/collab.jpg";
+import { SITE } from "@/lib/seo";
 
 const TITLE = "NEVO AI Engineer — AI Engineering Assistant for the Sandwich Panel Industry";
 const DESCRIPTION =
   "NEVO AI Engineer: an intelligent industrial engineering assistant for sandwich panel factories, production lines, raw materials, capacity planning and investment estimation. Built by NEVO Industrial, Dubai.";
+const URL_PATH = "/ai-assistant";
 
 export const Route = createFileRoute("/ai-assistant")({
   head: () => ({
@@ -47,8 +49,12 @@ export const Route = createFileRoute("/ai-assistant")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: `${SITE.url}${URL_PATH}` },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: TITLE },
+      { name: "twitter:description", content: DESCRIPTION },
     ],
+    links: [{ rel: "canonical", href: `${SITE.url}${URL_PATH}` }],
   }),
   component: AIAssistantPage,
 });
