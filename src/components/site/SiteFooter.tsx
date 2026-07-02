@@ -187,10 +187,11 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-16 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-t border-primary-foreground/10 pt-8 text-xs text-primary-foreground/50 sm:flex sm:flex-wrap sm:justify-between">
+        <div className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-primary-foreground/10 pt-8 text-xs text-primary-foreground/50">
           <div className="min-w-0 truncate">
             © {new Date().getFullYear()} NEVO Industrial. {t("footer.rights")}
           </div>
+          <LanguageSwitcher variant="footer" />
           <div className="shrink-0 font-mono tracking-widest">
             NEVOINDUSTRIAL.COM · DUBAI · UAE
           </div>
