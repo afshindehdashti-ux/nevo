@@ -53,6 +53,31 @@ const BENEFITS = [
 ];
 
 function CareersPage() {
+  const cvFormRef = useRef<HTMLFormElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [cvName, setCvName] = useState<string>("");
+
+  async function handleApplication(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    const ok = await submitLeadForm(e.currentTarget, {
+      source: "careers-application",
+      rules: [
+        { field: "name", label: "Full name" },
+        { field: "email", label: "Email", type: "email" },
+        { field: "phone", label: "Phone", type: "phone" },
+      ],
+      successTitle: "Application received",
+      successDescription: "Our talent team will review your profile and respond within 5 business days.",
+    });
+    setBusy(false);
+    if (ok) {
+      cvFormRef.current?.reset();
+      setCvName("");
+    }
+  }
+
   return (
     <>
       <AnnouncementBar />
