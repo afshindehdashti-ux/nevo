@@ -164,6 +164,292 @@
     "heroTitle": "Paneles Sándwich, Ingeniería Integral.",
     "heroSubtitle": "Desarrollo llave en mano de fábricas, consultoría de ingeniería, materias primas y líneas de producción — desde Dubái para proyectos industriales globales.",
     "heroCtaPrimary": "Inicie Su Proyecto",
-    "heroCtaSecondary": "Explorar Soluciones"
+    "heroCtaSecondary": "Explorar Soluciones",
+    "announcement": {
+      "location": "NEVO Industrial · Dubái, EAU",
+      "deskOpen": "Mesa de ingeniería abierta →"
+    },
+    "pathways": {
+      "eyebrow": "Recorrido del cliente",
+      "title": "¿Cómo podemos ayudarle?",
+      "lede": "Cada colaboración con NEVO comienza con su objetivo, no con un catálogo. Elija una ruta para descubrir cómo puede ayudarle nuestro equipo de ingeniería.",
+      "build": {
+        "title": "Construir una fábrica",
+        "desc": "Desarrollo integral de fábrica desde el concepto hasta la puesta en marcha.",
+        "cta": "Explorar desarrollo de fábricas"
+      },
+      "improve": {
+        "title": "Mejorar la producción",
+        "desc": "Optimización de ingeniería, modernización y soporte técnico.",
+        "cta": "Consultoría de ingeniería"
+      },
+      "source": {
+        "title": "Abastecer materias primas",
+        "desc": "Suministro global fiable de materiales premium para fabricación.",
+        "cta": "Soluciones de materias primas"
+      },
+      "buy": {
+        "title": "Comprar paneles sándwich",
+        "desc": "Paneles sándwich de alto rendimiento para aplicaciones industriales y comerciales.",
+        "cta": "Soluciones de paneles terminados"
+      }
+    },
+    "whyNevo": {
+      "eyebrow": "Por qué NEVO",
+      "title": "Guiados por la ingeniería. Conectados globalmente.",
+      "lede": "NEVO existe porque la industria del panel sándwich merece un socio que hable su lenguaje técnico de principio a fin.",
+      "engineering": {
+        "title": "Experiencia en ingeniería",
+        "desc": "Ingenieros senior lideran cada alcance – desde la química PIR hasta la automatización de líneas y la metalurgia de bobinas."
+      },
+      "dubai": {
+        "title": "Gestión de proyectos desde Dubái",
+        "desc": "Una base estratégica para Oriente Medio, África, Eurasia y Asia – con coordinación local ágil."
+      },
+      "network": {
+        "title": "Red global de suministro",
+        "desc": "Socios cualificados en Europa, Turquía, Asia y el CCG para materiales, equipos y logística."
+      },
+      "consultancy": {
+        "title": "Consultoría técnica",
+        "desc": "Asesoramiento independiente sobre viabilidad, diseño de proceso, optimización productiva y modernización."
+      },
+      "integrated": {
+        "title": "Soluciones industriales integradas",
+        "desc": "Montaje de fábrica, materias primas, líneas de producción y paneles terminados – un único socio responsable."
+      },
+      "partnership": {
+        "title": "Alianza a largo plazo",
+        "desc": "Auditorías, formación, repuestos y soporte – para fábricas que operan durante décadas."
+      }
+    },
+    "solutionsSection": {
+      "eyebrow": "Soluciones",
+      "title": "Un socio industrial completo para la industria del panel sándwich.",
+      "asideCta": "Explorar desarrollo de fábricas →",
+      "learnMore": "Saber más",
+      "factory": {
+        "title": "Desarrollo de fábricas",
+        "desc": "Acompañamiento llave en mano para nuevas fábricas de panel sándwich – viabilidad, layout, aprovisionamiento y puesta en marcha."
+      },
+      "consultancy": {
+        "title": "Consultoría de ingeniería",
+        "desc": "Diseño de proceso, layout, optimización productiva, modernización y soporte a puesta en marcha."
+      },
+      "productionLines": {
+        "title": "Líneas de producción",
+        "desc": "Líneas continuas y discontinuas, perfilado, sistemas de espumado PU/PIR y automatización."
+      },
+      "rawMaterials": {
+        "title": "Materias primas",
+        "desc": "Sistemas PIR / PUR, bobinas PPGI, GI y Aluzinc, lana de roca, adhesivos y consumibles."
+      },
+      "finishedPanels": {
+        "title": "Paneles terminados",
+        "desc": "Suministro de paneles sándwich terminados en mercados regionales seleccionados."
+      },
+      "aiAssistant": {
+        "title": "Asistente de ingeniería con IA",
+        "desc": "Calculadoras de capacidad, recomendaciones de paneles y encuadre guiado para decisiones más rápidas."
+      }
+    },
+    "industriesSection": {
+      "eyebrow": "Sectores atendidos",
+      "title": "Sistemas de panel sándwich diseñados para entornos exigentes.",
+      "coldStorage": {
+        "name": "Almacenamiento frigorífico",
+        "note": "Envolventes PIR de baja temperatura"
+      },
+      "food": {
+        "name": "Procesado de alimentos",
+        "note": "Sistemas higiénicos de pared y techo"
+      },
+      "industrial": {
+        "name": "Edificios industriales",
+        "note": "Envolventes aislantes estructurales"
+      },
+      "cleanRooms": {
+        "name": "Salas blancas",
+        "note": "Recintos clasificados ISO"
+      },
+      "warehousing": {
+        "name": "Almacenaje",
+        "note": "Cubiertas industriales de gran luz"
+      },
+      "modular": {
+        "name": "Edificios modulares",
+        "note": "Unidades prefabricadas y montadas in situ"
+      },
+      "commercial": {
+        "name": "Edificios comerciales",
+        "note": "Fachadas arquitectónicas con paneles"
+      },
+      "agriculture": {
+        "name": "Agricultura",
+        "note": "Edificaciones agroindustriales aisladas"
+      }
+    },
+    "featured": {
+      "eyebrow": "Filosofía de ingeniería",
+      "title": "La ingeniería empieza mucho antes de producir.",
+      "body1": "Una fábrica de panel sándwich es un sistema, no una compra. Antes de pedir una sola bobina, nuestros ingenieros definen la producción objetivo, el espectro de panel, la huella de planta, los servicios y la logística – y diseñan la línea alrededor de esa realidad.",
+      "body2": "El resultado es una fábrica que alcanza su capacidad declarada desde el primer día, opera de forma predecible durante décadas y evoluciona con su mercado.",
+      "cta": "Explorar desarrollo de fábricas",
+      "figCaption": "FIG. 02 · LÍNEA PIR CONTINUA",
+      "reference": "Proyecto de referencia",
+      "imgAlt": "Línea continua de producción de panel sándwich en una fábrica de referencia NEVO"
+    },
+    "knowledgeSection": {
+      "eyebrow": "Centro de conocimiento",
+      "title": "Conocimiento de ingeniería que mejora las decisiones.",
+      "lede": "Práctico, técnico, útil. Escrito para ingenieros, responsables de compras e inversores industriales.",
+      "browse": "Explorar la biblioteca →",
+      "a1": {
+        "tag": "Materias primas",
+        "title": "¿Qué es el PIR? Química, propiedades y aplicaciones.",
+        "read": "6 min de lectura"
+      },
+      "a2": {
+        "tag": "Comparativa",
+        "title": "PIR vs PUR: cómo elegir la química adecuada para su línea de panel.",
+        "read": "8 min de lectura"
+      },
+      "a3": {
+        "tag": "Proceso",
+        "title": "Cómo se fabrican los paneles sándwich – línea a línea.",
+        "read": "10 min de lectura"
+      },
+      "a4": {
+        "tag": "Inversión",
+        "title": "¿Cuánto cuesta una fábrica de panel sándwich?",
+        "read": "12 min de lectura"
+      },
+      "a5": {
+        "tag": "Materias primas",
+        "title": "Guía de lana de roca: densidad, comportamiento al fuego y especificación.",
+        "read": "7 min de lectura"
+      },
+      "a6": {
+        "tag": "Guía",
+        "title": "Lista de planificación de fábrica para nuevos fabricantes de panel.",
+        "read": "9 min de lectura"
+      }
+    },
+    "marketsSection": {
+      "eyebrow": "Mercados globales",
+      "title": "Ingeniería entregada en todo el mundo.",
+      "lede": "Ingeniería, consultoría, materias primas y líneas de producción se envían globalmente. El suministro de panel terminado opera en mercados regionales seleccionados de Oriente Medio, África y Eurasia.",
+      "mapLabel": "NEVO · Mapa de alcance global",
+      "activeMarkets": "Mercados activos",
+      "sa": "Arabia Saudí",
+      "ae": "EAU",
+      "om": "Omán",
+      "tr": "Turquía",
+      "iq": "Irak",
+      "ru": "Rusia",
+      "ke": "Kenia",
+      "cm": "Camerún"
+    },
+    "stats": {
+      "yearsSuffix": "+",
+      "yearsLabel": "Años de experiencia sectorial",
+      "projectsSuffix": "+",
+      "projectsLabel": "Proyectos industriales",
+      "worldwide": "Mundial",
+      "worldwideLabel": "Soporte de ingeniería",
+      "multiple": "Múltiples",
+      "multipleLabel": "Socios internacionales de suministro"
+    },
+    "testimonials": {
+      "eyebrow": "Voces del sector",
+      "title": "Confianza de ingenieros, operadores e inversores industriales.",
+      "lede": "Citas seleccionadas de propietarios de fábricas, directores de planta y responsables de compras con quienes trabaja NEVO. Se preserva la identidad por confidencialidad de proyecto.",
+      "q1": {
+        "quote": "El equipo de ingeniería de NEVO planteó nuestra ampliación de línea con una honestidad técnica que rara vez vemos en un proveedor. El rendimiento coincidió con el modelo desde la primera semana de puesta en marcha.",
+        "author": "Director de planta",
+        "org": "Fabricante de paneles, CCG"
+      },
+      "q2": {
+        "quote": "Trataron la viabilidad de nuestra fábrica como un problema de ingeniería antes que comercial. El plan de layout y utilidades evitó una rehacer de siete cifras más adelante.",
+        "author": "Inversor industrial",
+        "org": "Fábrica greenfield, África Oriental"
+      },
+      "q3": {
+        "quote": "Calidad PIR constante, plazos transparentes y un contacto técnico que realmente entiende nuestra línea. Esa combinación es la razón por la que consolidamos nuestro sourcing.",
+        "author": "Responsable de compras",
+        "org": "Productor de panel sándwich, Eurasia"
+      }
+    },
+    "ctaBanner": {
+      "eyebrow": "Construyamos juntos",
+      "titlePart1": "Construyamos su próximo",
+      "titlePart2": "proyecto industrial.",
+      "lede": "Ya sea que planifique una nueva fábrica, modernice la producción o abastezca materiales premium, nuestro equipo de ingeniería está listo para apoyarle.",
+      "primary": "Iniciar su proyecto",
+      "secondary": "Reservar consulta de ingeniería",
+      "b1": "Encuadre liderado por ingeniería, no por ventas",
+      "b2": "Respuesta técnica en 1 día laborable",
+      "b3": "Tratamiento confidencial de los detalles del proyecto",
+      "b4": "Disponible en inglés, árabe, ruso, turco"
+    },
+    "contactSection": {
+      "eyebrow": "Consulta de proyecto",
+      "title": "Hable con un ingeniero de NEVO.",
+      "lede": "Cuéntenos su proyecto. Un ingeniero senior le responderá en un día laborable con una propuesta técnica delimitada.",
+      "engineeringDesk": "Mesa de ingeniería",
+      "whatsapp": "WhatsApp",
+      "phone": "Teléfono",
+      "office": "Oficina",
+      "officeCity": "Dubái, Emiratos Árabes Unidos",
+      "fullName": "Nombre completo",
+      "fullNamePlaceholder": "Su nombre",
+      "company": "Empresa",
+      "companyPlaceholder": "Nombre de la empresa",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "usted@empresa.com",
+      "phoneField": "Teléfono / WhatsApp",
+      "phonePlaceholder": "+971 …",
+      "country": "País",
+      "countryPlaceholder": "p. ej. Arabia Saudí",
+      "solution": "Solución de interés",
+      "solutionPlaceholder": "Seleccione una solución…",
+      "timeline": "Plazo estimado",
+      "timelinePlaceholder": "Seleccione plazo…",
+      "message": "Detalles del proyecto",
+      "messagePlaceholder": "Describa brevemente su proyecto, producción objetivo, mercado y restricciones técnicas.",
+      "confidentiality": "Su información se trata de forma confidencial y se usa únicamente para atender su consulta.",
+      "submit": "Enviar consulta de proyecto",
+      "sending": "Enviando…",
+      "successTitle": "Consulta enviada",
+      "successDesc": "Su proyecto está con nuestra mesa de ingeniería – respuesta en un día laborable.",
+      "s1": "Desarrollo de fábricas",
+      "s2": "Consultoría de ingeniería",
+      "s3": "Soluciones de materias primas",
+      "s4": "Soluciones de líneas de producción",
+      "s5": "Soluciones de paneles terminados",
+      "s6": "Soporte técnico",
+      "t1": "Inmediato",
+      "t2": "1–3 meses",
+      "t3": "3–6 meses",
+      "t4": "6–12 meses",
+      "t5": "12+ meses"
+    },
+    "sticky": {
+      "getQuote": "Solicitar cotización",
+      "whatsapp": "WhatsApp",
+      "inquiry": "Consulta"
+    },
+    "aiLauncher": {
+      "askEngineer": "Consultar al Ingeniero IA de NEVO",
+      "aiEngineer": "Ingeniero IA",
+      "openWorkspace": "Abrir espacio completo de Ingeniero IA",
+      "close": "Cerrar"
+    },
+    "cookies": {
+      "text": "Usamos cookies esenciales para operar este sitio y cookies analíticas opcionales para mejorar su experiencia. Vea nuestra",
+      "privacyLink": "Política de privacidad",
+      "accept": "Aceptar",
+      "decline": "Rechazar"
+    }
   }
 }

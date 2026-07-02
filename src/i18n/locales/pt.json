@@ -164,6 +164,292 @@
     "heroTitle": "Painéis Sanduíche, Engenharia Integral.",
     "heroSubtitle": "Desenvolvimento turnkey de fábricas, consultoria de engenharia, matérias-primas e linhas de produção — de Dubai para projetos industriais globais.",
     "heroCtaPrimary": "Inicie o Seu Projeto",
-    "heroCtaSecondary": "Explorar Soluções"
+    "heroCtaSecondary": "Explorar Soluções",
+    "announcement": {
+      "location": "NEVO Industrial · Dubai, EAU",
+      "deskOpen": "Central de engenharia aberta →"
+    },
+    "pathways": {
+      "eyebrow": "Jornada do cliente",
+      "title": "Como podemos ajudar você?",
+      "lede": "Cada projeto com a NEVO começa pelo seu objetivo, não por um catálogo. Escolha um caminho e veja como nossa equipe de engenharia pode apoiar você.",
+      "build": {
+        "title": "Construir uma fábrica",
+        "desc": "Desenvolvimento completo de fábrica, do conceito ao comissionamento.",
+        "cta": "Explorar desenvolvimento de fábrica"
+      },
+      "improve": {
+        "title": "Melhorar a produção",
+        "desc": "Otimização de engenharia, modernização e suporte técnico.",
+        "cta": "Consultoria de engenharia"
+      },
+      "source": {
+        "title": "Suprir matérias-primas",
+        "desc": "Fornecimento global confiável de materiais premium para fabricação.",
+        "cta": "Soluções em matérias-primas"
+      },
+      "buy": {
+        "title": "Comprar painéis sanduíche",
+        "desc": "Painéis sanduíche de alto desempenho para aplicações industriais e comerciais.",
+        "cta": "Soluções em painéis acabados"
+      }
+    },
+    "whyNevo": {
+      "eyebrow": "Por que a NEVO",
+      "title": "Guiada por engenharia. Conectada globalmente.",
+      "lede": "A NEVO existe porque a indústria de painel sanduíche merece um parceiro que fale sua linguagem técnica de ponta a ponta.",
+      "engineering": {
+        "title": "Expertise em engenharia",
+        "desc": "Engenheiros seniores lideram cada escopo – da química PIR à automação de linha e metalurgia de bobinas."
+      },
+      "dubai": {
+        "title": "Gestão de projetos a partir de Dubai",
+        "desc": "Uma base estratégica para Oriente Médio, África, Eurásia e Ásia – com coordenação local ágil."
+      },
+      "network": {
+        "title": "Rede global de suprimentos",
+        "desc": "Parceiros qualificados na Europa, Turquia, Ásia e GCC para materiais, equipamentos e logística."
+      },
+      "consultancy": {
+        "title": "Consultoria técnica",
+        "desc": "Aconselhamento independente em viabilidade, projeto de processo, otimização produtiva e modernização."
+      },
+      "integrated": {
+        "title": "Soluções industriais integradas",
+        "desc": "Montagem de fábrica, matérias-primas, linhas de produção e painéis acabados – um único parceiro responsável."
+      },
+      "partnership": {
+        "title": "Parceria de longo prazo",
+        "desc": "Auditorias, treinamento, peças e troubleshooting – para fábricas que operam por décadas."
+      }
+    },
+    "solutionsSection": {
+      "eyebrow": "Soluções",
+      "title": "Um parceiro industrial completo para a indústria de painel sanduíche.",
+      "asideCta": "Explorar desenvolvimento de fábrica →",
+      "learnMore": "Saiba mais",
+      "factory": {
+        "title": "Desenvolvimento de fábrica",
+        "desc": "Acompanhamento turnkey para novas fábricas de painel sanduíche – viabilidade, layout, aquisição e comissionamento."
+      },
+      "consultancy": {
+        "title": "Consultoria de engenharia",
+        "desc": "Projeto de processo, layout, otimização produtiva, modernização e apoio ao comissionamento."
+      },
+      "productionLines": {
+        "title": "Linhas de produção",
+        "desc": "Linhas contínuas e descontínuas, perfilagem, sistemas de espuma PU/PIR e automação."
+      },
+      "rawMaterials": {
+        "title": "Matérias-primas",
+        "desc": "Sistemas PIR / PUR, bobinas PPGI, GI e Aluzinc, lã de rocha, adesivos e consumíveis."
+      },
+      "finishedPanels": {
+        "title": "Painéis acabados",
+        "desc": "Fornecimento de painéis sanduíche acabados em mercados regionais selecionados."
+      },
+      "aiAssistant": {
+        "title": "Assistente de engenharia com IA",
+        "desc": "Calculadoras de capacidade, recomendações de painel e escopo guiado para decisões mais rápidas."
+      }
+    },
+    "industriesSection": {
+      "eyebrow": "Setores atendidos",
+      "title": "Sistemas de painel sanduíche projetados para ambientes exigentes.",
+      "coldStorage": {
+        "name": "Câmaras frigoríficas",
+        "note": "Envelopes PIR de baixa temperatura"
+      },
+      "food": {
+        "name": "Processamento de alimentos",
+        "note": "Sistemas higiênicos de parede e teto"
+      },
+      "industrial": {
+        "name": "Edifícios industriais",
+        "note": "Envelopes isolantes estruturais"
+      },
+      "cleanRooms": {
+        "name": "Salas limpas",
+        "note": "Ambientes classificados ISO"
+      },
+      "warehousing": {
+        "name": "Armazenagem",
+        "note": "Coberturas industriais de grandes vãos"
+      },
+      "modular": {
+        "name": "Edifícios modulares",
+        "note": "Unidades pré-fabricadas e montadas em obra"
+      },
+      "commercial": {
+        "name": "Edifícios comerciais",
+        "note": "Fachadas arquitetônicas em painel"
+      },
+      "agriculture": {
+        "name": "Agricultura",
+        "note": "Edificações agroindustriais isoladas"
+      }
+    },
+    "featured": {
+      "eyebrow": "Filosofia de engenharia",
+      "title": "A engenharia começa muito antes da produção.",
+      "body1": "Uma fábrica de painel sanduíche é um sistema, não uma compra. Antes de pedir uma única bobina, nossos engenheiros definem produção-alvo, espectro de painel, área da planta, utilidades e logística – e projetam a linha a partir dessa realidade.",
+      "body2": "O resultado é uma fábrica que atinge a capacidade declarada desde o primeiro dia, opera previsivelmente por décadas e evolui com o seu mercado.",
+      "cta": "Explorar desenvolvimento de fábrica",
+      "figCaption": "FIG. 02 · LINHA PIR CONTÍNUA",
+      "reference": "Projeto de referência",
+      "imgAlt": "Linha contínua de produção de painel sanduíche em fábrica de referência NEVO"
+    },
+    "knowledgeSection": {
+      "eyebrow": "Centro de conhecimento",
+      "title": "Conhecimento de engenharia que gera decisões melhores.",
+      "lede": "Prático, técnico, útil. Escrito para engenheiros, líderes de compras e investidores industriais.",
+      "browse": "Navegar pela biblioteca →",
+      "a1": {
+        "tag": "Matérias-primas",
+        "title": "O que é PIR? Química, propriedades e aplicações.",
+        "read": "6 min de leitura"
+      },
+      "a2": {
+        "tag": "Comparativo",
+        "title": "PIR vs PUR: como escolher a química correta para sua linha.",
+        "read": "8 min de leitura"
+      },
+      "a3": {
+        "tag": "Processo",
+        "title": "Como os painéis sanduíche são fabricados – linha a linha.",
+        "read": "10 min de leitura"
+      },
+      "a4": {
+        "tag": "Investimento",
+        "title": "Quanto custa uma fábrica de painel sanduíche?",
+        "read": "12 min de leitura"
+      },
+      "a5": {
+        "tag": "Matérias-primas",
+        "title": "Guia da lã de rocha: densidade, comportamento ao fogo e especificação.",
+        "read": "7 min de leitura"
+      },
+      "a6": {
+        "tag": "Guia",
+        "title": "Checklist de planejamento de fábrica para novos fabricantes de painel.",
+        "read": "9 min de leitura"
+      }
+    },
+    "marketsSection": {
+      "eyebrow": "Mercados globais",
+      "title": "Engenharia entregue em todo o mundo.",
+      "lede": "Engenharia, consultoria, matérias-primas e linhas de produção são despachadas globalmente. O fornecimento de painel acabado opera em mercados regionais selecionados no Oriente Médio, África e Eurásia.",
+      "mapLabel": "NEVO · Mapa de alcance global",
+      "activeMarkets": "Mercados ativos",
+      "sa": "Arábia Saudita",
+      "ae": "EAU",
+      "om": "Omã",
+      "tr": "Turquia",
+      "iq": "Iraque",
+      "ru": "Rússia",
+      "ke": "Quênia",
+      "cm": "Camarões"
+    },
+    "stats": {
+      "yearsSuffix": "+",
+      "yearsLabel": "Anos de experiência no setor",
+      "projectsSuffix": "+",
+      "projectsLabel": "Projetos industriais",
+      "worldwide": "Global",
+      "worldwideLabel": "Suporte de engenharia",
+      "multiple": "Múltiplos",
+      "multipleLabel": "Parceiros internacionais de suprimento"
+    },
+    "testimonials": {
+      "eyebrow": "Vozes do setor",
+      "title": "Escolha de engenheiros, operadores e investidores industriais.",
+      "lede": "Citações selecionadas de proprietários de fábricas, diretores de planta e líderes de compras que trabalham com a NEVO. Identidades preservadas por confidencialidade.",
+      "q1": {
+        "quote": "A equipe de engenharia da NEVO escopou nosso upgrade de linha com um nível de honestidade técnica raro entre fornecedores. A produção alcançou o modelo já na primeira semana de comissionamento.",
+        "author": "Diretor de planta",
+        "org": "Fabricante de painel, CCG"
+      },
+      "q2": {
+        "quote": "Trataram a viabilidade da nossa fábrica como um problema de engenharia antes de comercial. O plano de layout e utilidades evitou um retrabalho de sete dígitos mais adiante.",
+        "author": "Investidor industrial",
+        "org": "Fábrica greenfield, África Oriental"
+      },
+      "q3": {
+        "quote": "Qualidade PIR consistente, prazos transparentes e um contato técnico que realmente entende nossa linha. Foi essa combinação que nos levou a consolidar o sourcing.",
+        "author": "Gerente de compras",
+        "org": "Produtor de painel sanduíche, Eurásia"
+      }
+    },
+    "ctaBanner": {
+      "eyebrow": "Vamos construir juntos",
+      "titlePart1": "Vamos construir seu próximo",
+      "titlePart2": "projeto industrial.",
+      "lede": "Seja planejando uma nova fábrica, modernizando a produção ou adquirindo materiais premium, nossa equipe de engenharia está pronta para apoiar você.",
+      "primary": "Iniciar seu projeto",
+      "secondary": "Agendar consulta de engenharia",
+      "b1": "Escopo conduzido por engenharia – não por vendas",
+      "b2": "Resposta técnica em 1 dia útil",
+      "b3": "Tratamento confidencial dos detalhes do projeto",
+      "b4": "Disponível em inglês, árabe, russo, turco"
+    },
+    "contactSection": {
+      "eyebrow": "Consulta de projeto",
+      "title": "Fale com um engenheiro NEVO.",
+      "lede": "Conte-nos sobre seu projeto. Um engenheiro sênior responderá em um dia útil com uma proposta técnica delimitada.",
+      "engineeringDesk": "Central de engenharia",
+      "whatsapp": "WhatsApp",
+      "phone": "Telefone",
+      "office": "Escritório",
+      "officeCity": "Dubai, Emirados Árabes Unidos",
+      "fullName": "Nome completo",
+      "fullNamePlaceholder": "Seu nome",
+      "company": "Empresa",
+      "companyPlaceholder": "Nome da empresa",
+      "email": "E-mail",
+      "emailPlaceholder": "voce@empresa.com",
+      "phoneField": "Telefone / WhatsApp",
+      "phonePlaceholder": "+971 …",
+      "country": "País",
+      "countryPlaceholder": "ex. Arábia Saudita",
+      "solution": "Solução de interesse",
+      "solutionPlaceholder": "Selecione uma solução…",
+      "timeline": "Prazo estimado",
+      "timelinePlaceholder": "Selecione prazo…",
+      "message": "Detalhes do projeto",
+      "messagePlaceholder": "Descreva brevemente seu projeto, produção-alvo, mercado e restrições técnicas.",
+      "confidentiality": "Suas informações são tratadas como confidenciais e usadas apenas para responder à sua consulta.",
+      "submit": "Enviar consulta de projeto",
+      "sending": "Enviando…",
+      "successTitle": "Consulta enviada",
+      "successDesc": "Seu projeto está com nossa central de engenharia – resposta em um dia útil.",
+      "s1": "Desenvolvimento de fábrica",
+      "s2": "Consultoria de engenharia",
+      "s3": "Soluções em matérias-primas",
+      "s4": "Soluções em linhas de produção",
+      "s5": "Soluções em painéis acabados",
+      "s6": "Suporte técnico",
+      "t1": "Imediato",
+      "t2": "1–3 meses",
+      "t3": "3–6 meses",
+      "t4": "6–12 meses",
+      "t5": "12+ meses"
+    },
+    "sticky": {
+      "getQuote": "Solicitar orçamento",
+      "whatsapp": "WhatsApp",
+      "inquiry": "Consulta"
+    },
+    "aiLauncher": {
+      "askEngineer": "Perguntar ao Engenheiro IA NEVO",
+      "aiEngineer": "Engenheiro IA",
+      "openWorkspace": "Abrir espaço completo Engenheiro IA",
+      "close": "Fechar"
+    },
+    "cookies": {
+      "text": "Usamos cookies essenciais para operar este site e cookies analíticos opcionais para melhorar sua experiência. Consulte nossa",
+      "privacyLink": "Política de privacidade",
+      "accept": "Aceitar",
+      "decline": "Recusar"
+    }
   }
 }

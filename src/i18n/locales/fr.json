@@ -164,6 +164,292 @@
     "heroTitle": "Panneaux Sandwich, Ingénierie Intégrale.",
     "heroSubtitle": "Développement d'usines clé en main, conseil en ingénierie, matières premières et lignes de production — de Dubaï vers les projets industriels mondiaux.",
     "heroCtaPrimary": "Démarrer Votre Projet",
-    "heroCtaSecondary": "Explorer les Solutions"
+    "heroCtaSecondary": "Explorer les Solutions",
+    "announcement": {
+      "location": "NEVO Industrial · Dubaï, EAU",
+      "deskOpen": "Bureau d'ingénierie ouvert →"
+    },
+    "pathways": {
+      "eyebrow": "Parcours client",
+      "title": "Comment pouvons-nous vous aider ?",
+      "lede": "Chaque mission NEVO commence par votre objectif, pas par une liste de produits. Choisissez un parcours pour découvrir comment notre équipe d'ingénierie peut vous accompagner.",
+      "build": {
+        "title": "Construire une usine",
+        "desc": "Développement d'usine complet, du concept à la mise en service.",
+        "cta": "Découvrir le développement d'usines"
+      },
+      "improve": {
+        "title": "Améliorer la production",
+        "desc": "Optimisation d'ingénierie, modernisation et support technique.",
+        "cta": "Conseil en ingénierie"
+      },
+      "source": {
+        "title": "Sourcer des matières premières",
+        "desc": "Approvisionnement mondial fiable en matériaux de fabrication haut de gamme.",
+        "cta": "Solutions matières premières"
+      },
+      "buy": {
+        "title": "Acheter des panneaux sandwich",
+        "desc": "Panneaux sandwich haute performance pour applications industrielles et commerciales.",
+        "cta": "Solutions panneaux finis"
+      }
+    },
+    "whyNevo": {
+      "eyebrow": "Pourquoi NEVO",
+      "title": "Ingénierie d'abord. Connectée globalement.",
+      "lede": "NEVO existe parce que l'industrie du panneau sandwich mérite un partenaire qui parle son langage technique de bout en bout.",
+      "engineering": {
+        "title": "Expertise d'ingénierie",
+        "desc": "Des ingénieurs seniors pilotent chaque périmètre – de la chimie PIR à l'automatisation de ligne et à la métallurgie des bobines."
+      },
+      "dubai": {
+        "title": "Gestion de projet à Dubaï",
+        "desc": "Une base stratégique pour le Moyen-Orient, l'Afrique, l'Eurasie et l'Asie – avec une coordination locale réactive."
+      },
+      "network": {
+        "title": "Réseau d'approvisionnement mondial",
+        "desc": "Des partenaires qualifiés en Europe, Turquie, Asie et CCG pour les matériaux, équipements et la logistique."
+      },
+      "consultancy": {
+        "title": "Conseil technique",
+        "desc": "Avis indépendants sur la faisabilité, la conception de procédés, l'optimisation et la modernisation."
+      },
+      "integrated": {
+        "title": "Solutions industrielles intégrées",
+        "desc": "Mise en place d'usine, matières premières, lignes de production et panneaux finis – un seul partenaire responsable."
+      },
+      "partnership": {
+        "title": "Partenariat à long terme",
+        "desc": "Audits, formation, pièces détachées et dépannage – pour des usines qui fonctionnent des décennies."
+      }
+    },
+    "solutionsSection": {
+      "eyebrow": "Solutions",
+      "title": "Un partenaire industriel complet pour l'industrie du panneau sandwich.",
+      "asideCta": "Découvrir le développement d'usines →",
+      "learnMore": "En savoir plus",
+      "factory": {
+        "title": "Développement d'usines",
+        "desc": "Accompagnement clé en main pour de nouvelles usines de panneaux sandwich – faisabilité, layout, achats et mise en service."
+      },
+      "consultancy": {
+        "title": "Conseil en ingénierie",
+        "desc": "Conception de procédés, layout, optimisation de la production, modernisation et appui à la mise en service."
+      },
+      "productionLines": {
+        "title": "Lignes de production",
+        "desc": "Lignes continues et discontinues, profilage, systèmes de moussage PU/PIR et automatisation."
+      },
+      "rawMaterials": {
+        "title": "Matières premières",
+        "desc": "Systèmes PIR / PUR, bobines PPGI, GI et Aluzinc, laine de roche, adhésifs et consommables."
+      },
+      "finishedPanels": {
+        "title": "Panneaux finis",
+        "desc": "Fourniture de panneaux sandwich finis sur des marchés régionaux sélectionnés."
+      },
+      "aiAssistant": {
+        "title": "Assistant d'ingénierie IA",
+        "desc": "Calculateurs de capacité, recommandations de panneaux et cadrage guidé pour des décisions plus rapides."
+      }
+    },
+    "industriesSection": {
+      "eyebrow": "Secteurs desservis",
+      "title": "Systèmes de panneaux sandwich conçus pour des environnements exigeants.",
+      "coldStorage": {
+        "name": "Entrepôts frigorifiques",
+        "note": "Enveloppes PIR basse température"
+      },
+      "food": {
+        "name": "Agroalimentaire",
+        "note": "Systèmes de parois et plafonds hygiéniques"
+      },
+      "industrial": {
+        "name": "Bâtiments industriels",
+        "note": "Enveloppes isolantes structurelles"
+      },
+      "cleanRooms": {
+        "name": "Salles blanches",
+        "note": "Enceintes classées ISO"
+      },
+      "warehousing": {
+        "name": "Entreposage",
+        "note": "Toitures industrielles de grande portée"
+      },
+      "modular": {
+        "name": "Bâtiments modulaires",
+        "note": "Unités préfabriquées et assemblées sur site"
+      },
+      "commercial": {
+        "name": "Bâtiments commerciaux",
+        "note": "Façades architecturales à panneaux"
+      },
+      "agriculture": {
+        "name": "Agriculture",
+        "note": "Bâtiments agro-industriels isolés"
+      }
+    },
+    "featured": {
+      "eyebrow": "Philosophie d'ingénierie",
+      "title": "L'ingénierie commence bien avant la production.",
+      "body1": "Une usine de panneaux sandwich est un système, pas un achat. Avant même de commander une seule bobine, nos ingénieurs définissent l'objectif de production, la gamme de panneaux, l'emprise, les utilités et la logistique – puis conçoivent la ligne autour de cette réalité.",
+      "body2": "Le résultat : une usine qui atteint sa capacité annoncée dès le premier jour, fonctionne de façon prévisible pendant des décennies et évolue avec votre marché.",
+      "cta": "Découvrir le développement d'usines",
+      "figCaption": "FIG. 02 · LIGNE PIR CONTINUE",
+      "reference": "Projet de référence",
+      "imgAlt": "Ligne de production continue de panneaux sandwich dans une usine de référence NEVO"
+    },
+    "knowledgeSection": {
+      "eyebrow": "Centre de connaissances",
+      "title": "Un savoir d'ingénierie qui améliore la décision.",
+      "lede": "Concret, technique, utile. Écrit pour les ingénieurs, responsables achats et investisseurs industriels.",
+      "browse": "Parcourir la bibliothèque →",
+      "a1": {
+        "tag": "Matières premières",
+        "title": "Qu'est-ce que le PIR ? Chimie, propriétés et applications.",
+        "read": "6 min de lecture"
+      },
+      "a2": {
+        "tag": "Comparatif",
+        "title": "PIR vs PUR : choisir la bonne chimie pour votre ligne de panneaux.",
+        "read": "8 min de lecture"
+      },
+      "a3": {
+        "tag": "Procédé",
+        "title": "Comment sont fabriqués les panneaux sandwich – ligne par ligne.",
+        "read": "10 min de lecture"
+      },
+      "a4": {
+        "tag": "Investissement",
+        "title": "Combien coûte une usine de panneaux sandwich ?",
+        "read": "12 min de lecture"
+      },
+      "a5": {
+        "tag": "Matières premières",
+        "title": "Guide laine de roche : densité, comportement au feu et spécification.",
+        "read": "7 min de lecture"
+      },
+      "a6": {
+        "tag": "Guide",
+        "title": "Check-list de planification d'usine pour nouveaux fabricants de panneaux.",
+        "read": "9 min de lecture"
+      }
+    },
+    "marketsSection": {
+      "eyebrow": "Marchés mondiaux",
+      "title": "Une ingénierie livrée dans le monde entier.",
+      "lede": "Ingénierie, conseil, matières premières et lignes de production expédiés à l'international. La fourniture de panneaux finis opère sur des marchés régionaux sélectionnés au Moyen-Orient, en Afrique et en Eurasie.",
+      "mapLabel": "NEVO · Carte de portée mondiale",
+      "activeMarkets": "Marchés actifs",
+      "sa": "Arabie saoudite",
+      "ae": "EAU",
+      "om": "Oman",
+      "tr": "Turquie",
+      "iq": "Irak",
+      "ru": "Russie",
+      "ke": "Kenya",
+      "cm": "Cameroun"
+    },
+    "stats": {
+      "yearsSuffix": "+",
+      "yearsLabel": "Années d'expérience sectorielle",
+      "projectsSuffix": "+",
+      "projectsLabel": "Projets industriels",
+      "worldwide": "Mondial",
+      "worldwideLabel": "Support d'ingénierie",
+      "multiple": "Multiples",
+      "multipleLabel": "Partenaires d'approvisionnement internationaux"
+    },
+    "testimonials": {
+      "eyebrow": "Voix du secteur",
+      "title": "Choisi par des ingénieurs, exploitants et investisseurs industriels.",
+      "lede": "Citations sélectionnées de propriétaires d'usines, directeurs de site et responsables achats avec lesquels NEVO travaille. Les identités sont préservées par confidentialité.",
+      "q1": {
+        "quote": "L'équipe d'ingénierie de NEVO a cadré la modernisation de notre ligne avec une honnêteté technique rarement vue chez un fournisseur. Le débit a rejoint le modèle dès la première semaine de mise en service.",
+        "author": "Directeur d'usine",
+        "org": "Fabricant de panneaux, CCG"
+      },
+      "q2": {
+        "quote": "Ils ont traité la faisabilité de notre usine comme un problème d'ingénierie avant d'être commercial. Le plan de layout et d'utilités a évité une reprise à sept chiffres plus tard.",
+        "author": "Investisseur industriel",
+        "org": "Usine greenfield, Afrique de l'Est"
+      },
+      "q3": {
+        "quote": "Une qualité PIR constante, des délais transparents et un contact technique qui comprend réellement notre ligne. Cette combinaison est la raison pour laquelle nous avons consolidé notre sourcing.",
+        "author": "Responsable achats",
+        "org": "Producteur de panneaux sandwich, Eurasie"
+      }
+    },
+    "ctaBanner": {
+      "eyebrow": "Construisons ensemble",
+      "titlePart1": "Construisons votre prochain",
+      "titlePart2": "projet industriel.",
+      "lede": "Que vous planifiiez une nouvelle usine, moderniser votre production ou vous approvisionner en matériaux premium, notre équipe d'ingénierie est prête à vous accompagner.",
+      "primary": "Démarrer votre projet",
+      "secondary": "Réserver une consultation d'ingénierie",
+      "b1": "Cadrage piloté par l'ingénierie – pas par la vente",
+      "b2": "Réponse technique sous 1 jour ouvré",
+      "b3": "Traitement confidentiel des détails du projet",
+      "b4": "Disponible en anglais, arabe, russe, turc"
+    },
+    "contactSection": {
+      "eyebrow": "Demande de projet",
+      "title": "Parlez à un ingénieur NEVO.",
+      "lede": "Décrivez-nous votre projet. Un ingénieur senior vous répondra sous un jour ouvré avec une proposition technique cadrée.",
+      "engineeringDesk": "Bureau d'ingénierie",
+      "whatsapp": "WhatsApp",
+      "phone": "Téléphone",
+      "office": "Bureau",
+      "officeCity": "Dubaï, Émirats arabes unis",
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "Votre nom",
+      "company": "Entreprise",
+      "companyPlaceholder": "Nom de l'entreprise",
+      "email": "E-mail",
+      "emailPlaceholder": "vous@entreprise.com",
+      "phoneField": "Téléphone / WhatsApp",
+      "phonePlaceholder": "+971 …",
+      "country": "Pays",
+      "countryPlaceholder": "ex. Arabie saoudite",
+      "solution": "Solution qui vous intéresse",
+      "solutionPlaceholder": "Sélectionner une solution…",
+      "timeline": "Calendrier estimé",
+      "timelinePlaceholder": "Sélectionner un calendrier…",
+      "message": "Détails du projet",
+      "messagePlaceholder": "Décrivez brièvement votre projet, la capacité cible, le marché et les contraintes techniques.",
+      "confidentiality": "Vos informations sont traitées de manière confidentielle et utilisées uniquement pour répondre à votre demande.",
+      "submit": "Envoyer la demande de projet",
+      "sending": "Envoi…",
+      "successTitle": "Demande envoyée",
+      "successDesc": "Votre projet est chez notre bureau d'ingénierie – réponse sous un jour ouvré.",
+      "s1": "Développement d'usines",
+      "s2": "Conseil en ingénierie",
+      "s3": "Solutions matières premières",
+      "s4": "Solutions lignes de production",
+      "s5": "Solutions panneaux finis",
+      "s6": "Support technique",
+      "t1": "Immédiat",
+      "t2": "1–3 mois",
+      "t3": "3–6 mois",
+      "t4": "6–12 mois",
+      "t5": "12+ mois"
+    },
+    "sticky": {
+      "getQuote": "Obtenir un devis",
+      "whatsapp": "WhatsApp",
+      "inquiry": "Demande"
+    },
+    "aiLauncher": {
+      "askEngineer": "Demander à l'ingénieur IA NEVO",
+      "aiEngineer": "Ingénieur IA",
+      "openWorkspace": "Ouvrir l'espace complet Ingénieur IA",
+      "close": "Fermer"
+    },
+    "cookies": {
+      "text": "Nous utilisons des cookies essentiels pour faire fonctionner ce site et des cookies analytiques optionnels pour améliorer votre expérience. Voir notre",
+      "privacyLink": "Politique de confidentialité",
+      "accept": "Accepter",
+      "decline": "Refuser"
+    }
   }
 }

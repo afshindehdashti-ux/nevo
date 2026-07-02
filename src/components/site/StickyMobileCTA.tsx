@@ -1,13 +1,10 @@
-
+import { useTranslation } from "react-i18next";
 import { Link } from "@/components/site/LocalizedLink";
 import { MessageCircle, ClipboardList } from "lucide-react";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
 
-/**
- * Sticky mobile CTA bar — WhatsApp + Project Inquiry.
- * Hidden on desktop (md+) where the header CTA is visible.
- */
 export function StickyMobileCTA() {
+  const { t } = useTranslation();
   const wa = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
 
   return (
@@ -16,19 +13,18 @@ export function StickyMobileCTA() {
         href={wa}
         target="_blank"
         rel="noopener"
-        aria-label="Chat with NEVO on WhatsApp"
+        aria-label="WhatsApp"
         className="flex flex-1 items-center justify-center gap-2 rounded-md border border-border bg-background px-3 py-3 text-sm font-medium text-foreground"
       >
         <MessageCircle className="h-4 w-4" aria-hidden />
-        {SITE.contact.whatsapp ? "WhatsApp" : "Inquiry"}
+        {SITE.contact.whatsapp ? t("home.sticky.whatsapp") : t("home.sticky.inquiry")}
       </a>
       <Link
         to="/project-inquiry"
-        aria-label="Start a project inquiry"
         className="flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-3 py-3 text-sm font-semibold text-primary-foreground"
       >
         <ClipboardList className="h-4 w-4" aria-hidden />
-        Get a Quote
+        {t("home.sticky.getQuote")}
       </Link>
     </div>
   );

@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { X, Sparkles, ArrowUpRight } from "lucide-react";
 import { AIChat } from "./AIChat";
 import { cn } from "@/lib/utils";
+import { Link } from "@/components/site/LocalizedLink";
 
 export function AIAssistantLauncher() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -23,10 +26,9 @@ export function AIAssistantLauncher() {
 
   return (
     <>
-      {/* Floating trigger */}
       <button
         onClick={() => setOpen(true)}
-        aria-label="Open NEVO AI Engineer"
+        aria-label={t("home.aiLauncher.askEngineer")}
         className={cn(
           "group fixed bottom-5 right-5 z-40 inline-flex items-center gap-2.5 rounded-full",
           "border border-white/10 bg-[#0B0F14]/95 py-3 pl-3 pr-4 text-sm text-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] backdrop-blur",
@@ -39,11 +41,10 @@ export function AIAssistantLauncher() {
           <Sparkles className="h-4 w-4 text-[color:var(--color-accent)]" />
           <span className="absolute -bottom-0 -right-0 h-2 w-2 rounded-full bg-[color:var(--color-accent)] ring-2 ring-[#0B0F14]" />
         </span>
-        <span className="hidden sm:inline font-medium tracking-tight">Ask NEVO AI Engineer</span>
-        <span className="sm:hidden font-medium tracking-tight">AI Engineer</span>
+        <span className="hidden sm:inline font-medium tracking-tight">{t("home.aiLauncher.askEngineer")}</span>
+        <span className="sm:hidden font-medium tracking-tight">{t("home.aiLauncher.aiEngineer")}</span>
       </button>
 
-      {/* Slide-over panel */}
       <div
         aria-hidden={!open}
         className={cn(
@@ -67,18 +68,18 @@ export function AIAssistantLauncher() {
         >
           <button
             onClick={() => setOpen(false)}
-            aria-label="Close"
+            aria-label={t("home.aiLauncher.close")}
             className="absolute right-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/70 transition hover:bg-white/[0.1] hover:text-white"
           >
             <X className="h-4 w-4" />
           </button>
           {open && <AIChat compact />}
-          <a
-            href="/ai-assistant"
+          <Link
+            to="/ai-assistant"
             className="border-t border-white/10 bg-black/40 px-5 py-3 text-center text-[11px] uppercase tracking-[0.16em] text-white/60 transition hover:text-[color:var(--color-accent)]"
           >
-            Open full AI Engineer workspace <ArrowUpRight className="ml-1 inline h-3 w-3" />
-          </a>
+            {t("home.aiLauncher.openWorkspace")} <ArrowUpRight className="ml-1 inline h-3 w-3" />
+          </Link>
         </aside>
       </div>
     </>

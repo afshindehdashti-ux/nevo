@@ -1,12 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Section } from "@/components/site/primitives";
-
-const STATS = [
-  { k: "20+", v: "Years of industry experience", num: 20, suffix: "+" },
-  { k: "100+", v: "Industrial projects", num: 100, suffix: "+" },
-  { k: "Worldwide", v: "Engineering support", label: "Worldwide" },
-  { k: "Multiple", v: "International supply partners", label: "Multiple" },
-];
 
 function useCountUp(target: number, run: boolean, duration = 1600) {
   const [n, setN] = useState(0);
@@ -29,6 +23,7 @@ function useCountUp(target: number, run: boolean, duration = 1600) {
 export function Stats() {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const el = ref.current;
@@ -41,6 +36,13 @@ export function Stats() {
     return () => io.disconnect();
   }, []);
 
+  const STATS = [
+    { num: 20,   suffix: t("home.stats.yearsSuffix"),    label: t("home.stats.yearsLabel") },
+    { num: 100,  suffix: t("home.stats.projectsSuffix"), label: t("home.stats.projectsLabel") },
+    { num: 0, text: t("home.stats.worldwide"), label: t("home.stats.worldwideLabel") },
+    { num: 0, text: t("home.stats.multiple"),  label: t("home.stats.multipleLabel") },
+  ];
+
   return (
     <Section tone="default">
       <div
@@ -48,7 +50,7 @@ export function Stats() {
         className="grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4"
       >
         {STATS.map((s, i) => (
-          <StatCell key={s.v} stat={s} run={visible} index={i} />
+          <StatCell key={i} stat={s} run={visible} index={i} />
         ))}
       </div>
     </Section>
@@ -60,11 +62,11 @@ function StatCell({
   run,
   index,
 }: {
-  stat: (typeof STATS)[number];
+  stat: { num: number; suffix?: string; text?: string; label: string };
   run: boolean;
   index: number;
 }) {
-  const n = useCountUp(stat.num ?? 0, run && !!stat.num);
+  const n = useCountUp(stat.num, run && !!stat.num);
   return (
     <div
       className="group relative flex flex-col justify-between gap-8 bg-background p-8 transition-colors hover:bg-surface"
@@ -81,10 +83,10 @@ function StatCell({
               <span className="text-accent">{stat.suffix}</span>
             </>
           ) : (
-            stat.label
+            stat.text
           )}
         </div>
-        <div className="mt-4 text-sm text-muted-foreground">{stat.v}</div>
+        <div className="mt-4 text-sm text-muted-foreground">{stat.label}</div>
       </div>
     </div>
   );

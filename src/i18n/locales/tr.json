@@ -164,6 +164,292 @@
     "heroTitle": "Sandviç Paneller, Uçtan Uca Mühendislik.",
     "heroSubtitle": "Anahtar teslim fabrika kurulumu, mühendislik danışmanlığı, hammaddeler ve üretim hatları — Dubai'den dünya çapındaki endüstriyel projelere.",
     "heroCtaPrimary": "Projenizi Başlatın",
-    "heroCtaSecondary": "Çözümleri Keşfedin"
+    "heroCtaSecondary": "Çözümleri Keşfedin",
+    "announcement": {
+      "location": "NEVO Industrial · Dubai, BAE",
+      "deskOpen": "Mühendislik masası açık →"
+    },
+    "pathways": {
+      "eyebrow": "Müşteri yolculuğu",
+      "title": "Size nasıl yardımcı olabiliriz?",
+      "lede": "NEVO ile her iş birliği bir ürün listesiyle değil, sizin hedefinizle başlar. Mühendislik ekibimizin sizi nasıl destekleyebileceğini görmek için bir yol seçin.",
+      "build": {
+        "title": "Fabrika kurun",
+        "desc": "Konseptten devreye almaya tam kapsamlı fabrika geliştirme.",
+        "cta": "Fabrika geliştirmeyi keşfedin"
+      },
+      "improve": {
+        "title": "Üretimi iyileştirin",
+        "desc": "Mühendislik optimizasyonu, modernizasyon ve teknik destek.",
+        "cta": "Mühendislik danışmanlığı"
+      },
+      "source": {
+        "title": "Hammadde tedarik edin",
+        "desc": "Yüksek kaliteli üretim malzemeleri için güvenilir küresel tedarik.",
+        "cta": "Hammadde çözümleri"
+      },
+      "buy": {
+        "title": "Sandviç panel satın alın",
+        "desc": "Endüstriyel ve ticari uygulamalar için yüksek performanslı sandviç paneller.",
+        "cta": "Bitmiş panel çözümleri"
+      }
+    },
+    "whyNevo": {
+      "eyebrow": "Neden NEVO",
+      "title": "Mühendislik odaklı. Küresel bağlantılı.",
+      "lede": "NEVO, sandviç panel sektörünün uçtan uca teknik dilini konuşan bir ortağı hak ettiği için var.",
+      "engineering": {
+        "title": "Mühendislik uzmanlığı",
+        "desc": "Kıdemli mühendisler her kapsama liderlik eder – PIR kimyasından hat otomasyonuna ve bobin metalurjisine kadar."
+      },
+      "dubai": {
+        "title": "Dubai merkezli proje yönetimi",
+        "desc": "Orta Doğu, Afrika, Avrasya ve Asya için stratejik bir üs – hızlı yerel koordinasyon ile."
+      },
+      "network": {
+        "title": "Küresel tedarik ağı",
+        "desc": "Avrupa, Türkiye, Asya ve Körfez'de malzeme, ekipman ve lojistik için nitelikli iş ortakları."
+      },
+      "consultancy": {
+        "title": "Teknik danışmanlık",
+        "desc": "Fizibilite, proses tasarımı, üretim optimizasyonu ve modernizasyon üzerine bağımsız görüş."
+      },
+      "integrated": {
+        "title": "Entegre endüstriyel çözümler",
+        "desc": "Fabrika kurulumu, hammadde, üretim hatları ve bitmiş paneller – tek sorumlu iş ortağı."
+      },
+      "partnership": {
+        "title": "Uzun vadeli iş birliği",
+        "desc": "Denetim, eğitim, yedek parça ve arıza giderme – on yıllarca çalışan fabrikalar için."
+      }
+    },
+    "solutionsSection": {
+      "eyebrow": "Çözümler",
+      "title": "Sandviç panel sektörü için eksiksiz bir endüstriyel iş ortağı.",
+      "asideCta": "Fabrika geliştirmeyi keşfedin →",
+      "learnMore": "Daha fazla bilgi",
+      "factory": {
+        "title": "Fabrika geliştirme",
+        "desc": "Yeni sandviç panel fabrikaları için anahtar teslim rehberlik – fizibilite, yerleşim, satın alma ve devreye alma."
+      },
+      "consultancy": {
+        "title": "Mühendislik danışmanlığı",
+        "desc": "Proses tasarımı, yerleşim, üretim optimizasyonu, modernizasyon ve devreye alma desteği."
+      },
+      "productionLines": {
+        "title": "Üretim hatları",
+        "desc": "Sürekli ve kesikli hatlar, rollform, PU/PIR köpük sistemleri ve otomasyon."
+      },
+      "rawMaterials": {
+        "title": "Hammadde",
+        "desc": "PIR / PUR sistemleri, PPGI, GI ve Aluzinc bobinler, taşyünü, yapıştırıcılar ve sarf malzemeler."
+      },
+      "finishedPanels": {
+        "title": "Bitmiş paneller",
+        "desc": "Seçili bölgesel pazarlarda bitmiş sandviç panel tedariki."
+      },
+      "aiAssistant": {
+        "title": "AI Mühendislik Asistanı",
+        "desc": "Kapasite hesaplayıcıları, panel önerileri ve daha hızlı karar için rehberli kapsam belirleme."
+      }
+    },
+    "industriesSection": {
+      "eyebrow": "Hizmet verilen sektörler",
+      "title": "Zorlu ortamlar için tasarlanmış sandviç panel sistemleri.",
+      "coldStorage": {
+        "name": "Soğuk hava depoları",
+        "note": "Düşük sıcaklık PIR kabukları"
+      },
+      "food": {
+        "name": "Gıda işleme",
+        "note": "Hijyenik duvar ve tavan sistemleri"
+      },
+      "industrial": {
+        "name": "Endüstriyel yapılar",
+        "note": "Yapısal yalıtımlı kabuklar"
+      },
+      "cleanRooms": {
+        "name": "Temiz odalar",
+        "note": "ISO sınıflı ortamlar"
+      },
+      "warehousing": {
+        "name": "Depolama",
+        "note": "Geniş açıklıklı endüstriyel çatılar"
+      },
+      "modular": {
+        "name": "Modüler yapılar",
+        "note": "Prefabrik ve sahada monte edilen üniteler"
+      },
+      "commercial": {
+        "name": "Ticari yapılar",
+        "note": "Mimari panel cepheler"
+      },
+      "agriculture": {
+        "name": "Tarım",
+        "note": "Yalıtımlı tarım-endüstri yapıları"
+      }
+    },
+    "featured": {
+      "eyebrow": "Mühendislik felsefesi",
+      "title": "Mühendislik, üretimden çok önce başlar.",
+      "body1": "Bir sandviç panel fabrikası bir satın alma değil, bir sistemdir. Henüz tek bir bobin sipariş edilmeden önce, mühendislerimiz hedef üretim, panel yelpazesi, tesis alanı, altyapı ve lojistiği tanımlar – ve hattı bu gerçekliğe göre kurgular.",
+      "body2": "Sonuç: ilk günden belirtilen kapasiteyi karşılayan, on yıllarca öngörülebilir şekilde çalışan ve pazarınızla birlikte gelişen bir fabrika.",
+      "cta": "Fabrika geliştirmeyi keşfedin",
+      "figCaption": "ŞEK. 02 · SÜREKLİ PIR HATTI",
+      "reference": "Referans proje",
+      "imgAlt": "NEVO referans fabrikasında sürekli sandviç panel üretim hattı"
+    },
+    "knowledgeSection": {
+      "eyebrow": "Bilgi merkezi",
+      "title": "Daha iyi kararlar üreten mühendislik bilgisi.",
+      "lede": "Pratik, teknik, kullanışlı. Mühendisler, satın alma yöneticileri ve endüstriyel yatırımcılar için yazıldı.",
+      "browse": "Kütüphaneye göz atın →",
+      "a1": {
+        "tag": "Hammadde",
+        "title": "PIR nedir? Kimyası, özellikleri ve kullanım alanları.",
+        "read": "6 dk okuma"
+      },
+      "a2": {
+        "tag": "Karşılaştırma",
+        "title": "PIR vs PUR: panel hattınız için doğru kimyayı nasıl seçersiniz.",
+        "read": "8 dk okuma"
+      },
+      "a3": {
+        "tag": "Süreç",
+        "title": "Sandviç paneller nasıl üretilir – hat hat anlatım.",
+        "read": "10 dk okuma"
+      },
+      "a4": {
+        "tag": "Yatırım",
+        "title": "Sandviç panel fabrikası kurmak ne kadara mal olur?",
+        "read": "12 dk okuma"
+      },
+      "a5": {
+        "tag": "Hammadde",
+        "title": "Taşyünü rehberi: yoğunluk, yangın davranışı ve şartname.",
+        "read": "7 dk okuma"
+      },
+      "a6": {
+        "tag": "Rehber",
+        "title": "Yeni panel üreticileri için fabrika planlama kontrol listesi.",
+        "read": "9 dk okuma"
+      }
+    },
+    "marketsSection": {
+      "eyebrow": "Küresel pazarlar",
+      "title": "Dünya çapında teslim edilen mühendislik.",
+      "lede": "Mühendislik, danışmanlık, hammadde ve üretim hatları küresel olarak sevk edilir. Bitmiş panel tedariki Orta Doğu, Afrika ve Avrasya'da seçili bölgesel pazarlarda çalışır.",
+      "mapLabel": "NEVO · Küresel erişim haritası",
+      "activeMarkets": "Aktif pazarlar",
+      "sa": "Suudi Arabistan",
+      "ae": "BAE",
+      "om": "Umman",
+      "tr": "Türkiye",
+      "iq": "Irak",
+      "ru": "Rusya",
+      "ke": "Kenya",
+      "cm": "Kamerun"
+    },
+    "stats": {
+      "yearsSuffix": "+",
+      "yearsLabel": "Yıl sektör deneyimi",
+      "projectsSuffix": "+",
+      "projectsLabel": "Endüstriyel proje",
+      "worldwide": "Küresel",
+      "worldwideLabel": "Mühendislik desteği",
+      "multiple": "Çok sayıda",
+      "multipleLabel": "Uluslararası tedarik ortağı"
+    },
+    "testimonials": {
+      "eyebrow": "Sektörün sesi",
+      "title": "Mühendislerin, işletmecilerin ve endüstriyel yatırımcıların tercihi.",
+      "lede": "NEVO'nun birlikte çalıştığı fabrika sahipleri, tesis müdürleri ve satın alma liderlerinden seçilmiş sözler. Kimlikler proje gizliliği gereği paylaşılmaz.",
+      "q1": {
+        "quote": "NEVO'nun mühendislik ekibi, hat modernizasyonumuzu tedarikçilerde nadiren gördüğümüz bir teknik dürüstlükle kapsamlandırdı. Devreye alma haftasında verim modelle örtüştü.",
+        "author": "Tesis müdürü",
+        "org": "Panel üreticisi, Körfez"
+      },
+      "q2": {
+        "quote": "Fabrika fizibilitemizi ticari değil, önce mühendislik problemi olarak ele aldılar. Yerleşim ve altyapı planı, ilerleyen aşamada yedi haneli bir yeniden yapıma engel oldu.",
+        "author": "Endüstriyel yatırımcı",
+        "org": "Greenfield fabrika, Doğu Afrika"
+      },
+      "q3": {
+        "quote": "Tutarlı PIR kalitesi, şeffaf teslim süreleri ve hattımızı gerçekten anlayan teknik bir muhatap. Tedarikimizi konsolide etmemizin nedeni bu birleşim.",
+        "author": "Satın alma yöneticisi",
+        "org": "Sandviç panel üreticisi, Avrasya"
+      }
+    },
+    "ctaBanner": {
+      "eyebrow": "Birlikte inşa edelim",
+      "titlePart1": "Bir sonraki",
+      "titlePart2": "endüstriyel projenizi inşa edelim.",
+      "lede": "Yeni bir fabrika planlıyor, üretimi yükseltiyor ya da premium malzeme tedarik ediyor olun – mühendislik ekibimiz size destek olmaya hazır.",
+      "primary": "Projenizi başlatın",
+      "secondary": "Mühendislik görüşmesi ayırtın",
+      "b1": "Satış değil, mühendislik odaklı kapsam belirleme",
+      "b2": "1 iş günü içinde teknik yanıt",
+      "b3": "Proje detaylarına gizli işlem",
+      "b4": "İngilizce, Arapça, Rusça, Türkçe mevcuttur"
+    },
+    "contactSection": {
+      "eyebrow": "Proje talebi",
+      "title": "Bir NEVO mühendisi ile konuşun.",
+      "lede": "Projenizi anlatın. Kıdemli bir mühendis, bir iş günü içinde kapsamı belirlenmiş bir teknik teklifle geri döner.",
+      "engineeringDesk": "Mühendislik masası",
+      "whatsapp": "WhatsApp",
+      "phone": "Telefon",
+      "office": "Ofis",
+      "officeCity": "Dubai, Birleşik Arap Emirlikleri",
+      "fullName": "Ad soyad",
+      "fullNamePlaceholder": "Adınız",
+      "company": "Şirket",
+      "companyPlaceholder": "Şirket adı",
+      "email": "E-posta",
+      "emailPlaceholder": "siz@sirket.com",
+      "phoneField": "Telefon / WhatsApp",
+      "phonePlaceholder": "+971 …",
+      "country": "Ülke",
+      "countryPlaceholder": "örn. Suudi Arabistan",
+      "solution": "İlgilendiğiniz çözüm",
+      "solutionPlaceholder": "Bir çözüm seçin…",
+      "timeline": "Tahmini zaman çizelgesi",
+      "timelinePlaceholder": "Zaman aralığı seçin…",
+      "message": "Proje detayları",
+      "messagePlaceholder": "Projenizi, hedef üretimi, pazarı ve teknik kısıtları kısaca anlatın.",
+      "confidentiality": "Bilgileriniz gizli tutulur ve yalnızca talebinizi yanıtlamak için kullanılır.",
+      "submit": "Proje talebini gönder",
+      "sending": "Gönderiliyor…",
+      "successTitle": "Talep iletildi",
+      "successDesc": "Projeniz mühendislik masamızda – bir iş günü içinde yanıt bekleyin.",
+      "s1": "Fabrika geliştirme",
+      "s2": "Mühendislik danışmanlığı",
+      "s3": "Hammadde çözümleri",
+      "s4": "Üretim hattı çözümleri",
+      "s5": "Bitmiş panel çözümleri",
+      "s6": "Teknik destek",
+      "t1": "Acil",
+      "t2": "1–3 ay",
+      "t3": "3–6 ay",
+      "t4": "6–12 ay",
+      "t5": "12+ ay"
+    },
+    "sticky": {
+      "getQuote": "Teklif alın",
+      "whatsapp": "WhatsApp",
+      "inquiry": "Talep"
+    },
+    "aiLauncher": {
+      "askEngineer": "NEVO AI Mühendisine sorun",
+      "aiEngineer": "AI Mühendis",
+      "openWorkspace": "Tüm AI Mühendis çalışma alanını aç",
+      "close": "Kapat"
+    },
+    "cookies": {
+      "text": "Bu siteyi çalıştırmak için zorunlu çerezler ve deneyiminizi iyileştirmek için isteğe bağlı analiz çerezleri kullanıyoruz. Bkz.",
+      "privacyLink": "Gizlilik Politikası",
+      "accept": "Kabul et",
+      "decline": "Reddet"
+    }
   }
 }

@@ -164,6 +164,292 @@
     "heroTitle": "Sandwich Panels, Engineered End-to-End.",
     "heroSubtitle": "Turnkey factory development, engineering consultancy, raw materials and production lines — delivered from Dubai to global industrial projects.",
     "heroCtaPrimary": "Start Your Project",
-    "heroCtaSecondary": "Explore Solutions"
+    "heroCtaSecondary": "Explore Solutions",
+    "announcement": {
+      "location": "NEVO Industrial · Dubai, UAE",
+      "deskOpen": "Engineering desk open →"
+    },
+    "pathways": {
+      "eyebrow": "Customer journey",
+      "title": "How can we help you?",
+      "lede": "Every NEVO engagement begins with your goal — not a product list. Choose a pathway to see how our engineering team can support you.",
+      "build": {
+        "title": "Build a Factory",
+        "desc": "Complete factory development from concept to commissioning.",
+        "cta": "Explore Factory Development"
+      },
+      "improve": {
+        "title": "Improve Production",
+        "desc": "Engineering optimization, modernization and technical support.",
+        "cta": "Engineering Consultancy"
+      },
+      "source": {
+        "title": "Source Raw Materials",
+        "desc": "Reliable global sourcing of premium manufacturing materials.",
+        "cta": "Raw Material Solutions"
+      },
+      "buy": {
+        "title": "Buy Sandwich Panels",
+        "desc": "High-performance sandwich panels for industrial and commercial applications.",
+        "cta": "Finished Panel Solutions"
+      }
+    },
+    "whyNevo": {
+      "eyebrow": "Why NEVO",
+      "title": "Engineering-Led. Globally Connected.",
+      "lede": "NEVO exists because the sandwich panel industry deserves a partner that speaks its technical language — end to end.",
+      "engineering": {
+        "title": "Engineering Expertise",
+        "desc": "Senior engineers lead every scope — from PIR chemistry to line automation and coil metallurgy."
+      },
+      "dubai": {
+        "title": "Dubai-Based Project Management",
+        "desc": "A strategic base for the Middle East, Africa, Eurasia and Asia — with responsive local coordination."
+      },
+      "network": {
+        "title": "Global Supply Network",
+        "desc": "Qualified partners across Europe, Turkey, Asia and the GCC for materials, equipment and logistics."
+      },
+      "consultancy": {
+        "title": "Technical Consultancy",
+        "desc": "Independent advice on feasibility, process design, production optimization and modernization."
+      },
+      "integrated": {
+        "title": "Integrated Industrial Solutions",
+        "desc": "Factory setup, raw materials, production lines and finished panels — one accountable partner."
+      },
+      "partnership": {
+        "title": "Long-Term Partnership",
+        "desc": "Audits, training, spare parts and troubleshooting — for factories that operate for decades."
+      }
+    },
+    "solutionsSection": {
+      "eyebrow": "Solutions",
+      "title": "A complete industrial partner for the sandwich panel industry.",
+      "asideCta": "Explore Factory Development →",
+      "learnMore": "Learn more",
+      "factory": {
+        "title": "Factory Development",
+        "desc": "Turnkey guidance for new sandwich panel factories — feasibility, layout, procurement and commissioning."
+      },
+      "consultancy": {
+        "title": "Engineering Consultancy",
+        "desc": "Process design, layout, production optimization, modernization and commissioning support."
+      },
+      "productionLines": {
+        "title": "Production Lines",
+        "desc": "Continuous & discontinuous lines, roll forming, PU/PIR foaming systems and automation."
+      },
+      "rawMaterials": {
+        "title": "Raw Materials",
+        "desc": "PIR / PUR systems, PPGI, GI and Aluzinc coils, rock wool, adhesives and consumables."
+      },
+      "finishedPanels": {
+        "title": "Finished Panels",
+        "desc": "Supply of finished sandwich panels across selected regional markets."
+      },
+      "aiAssistant": {
+        "title": "AI Engineering Assistant",
+        "desc": "Capacity calculators, panel recommendations and guided project scoping for faster decisions."
+      }
+    },
+    "industriesSection": {
+      "eyebrow": "Industries served",
+      "title": "Sandwich panel systems engineered for demanding environments.",
+      "coldStorage": {
+        "name": "Cold Storage",
+        "note": "Low-temperature PIR envelopes"
+      },
+      "food": {
+        "name": "Food Processing",
+        "note": "Hygienic wall & ceiling systems"
+      },
+      "industrial": {
+        "name": "Industrial Buildings",
+        "note": "Structural insulated envelopes"
+      },
+      "cleanRooms": {
+        "name": "Clean Rooms",
+        "note": "ISO-classified enclosures"
+      },
+      "warehousing": {
+        "name": "Warehousing",
+        "note": "Large-span industrial roofing"
+      },
+      "modular": {
+        "name": "Modular Buildings",
+        "note": "Prefab & site-assembled units"
+      },
+      "commercial": {
+        "name": "Commercial Buildings",
+        "note": "Architectural panel facades"
+      },
+      "agriculture": {
+        "name": "Agriculture",
+        "note": "Insulated agri-industrial buildings"
+      }
+    },
+    "featured": {
+      "eyebrow": "Engineering philosophy",
+      "title": "Engineering starts long before production begins.",
+      "body1": "A sandwich panel factory is a system, not a purchase. Before a single coil is ordered, our engineers define target output, panel spectrum, plant footprint, utilities and logistics — then engineer the line around that reality.",
+      "body2": "The result is a factory that meets its stated capacity on day one, operates predictably for decades, and adapts as your market changes.",
+      "cta": "Explore Factory Development",
+      "figCaption": "FIG. 02 · CONTINUOUS PIR LINE",
+      "reference": "Reference project",
+      "imgAlt": "Continuous sandwich panel production line inside a NEVO reference factory"
+    },
+    "knowledgeSection": {
+      "eyebrow": "Knowledge hub",
+      "title": "Engineering knowledge that creates better decisions.",
+      "lede": "Practical, technical, useful. Written for engineers, procurement leads and factory investors.",
+      "browse": "Browse the library →",
+      "a1": {
+        "tag": "Raw materials",
+        "title": "What is PIR? Chemistry, properties and where it's used.",
+        "read": "6 min read"
+      },
+      "a2": {
+        "tag": "Comparison",
+        "title": "PIR vs PUR: how to select the right chemistry for your panel line.",
+        "read": "8 min read"
+      },
+      "a3": {
+        "tag": "Process",
+        "title": "How sandwich panels are manufactured — line by line.",
+        "read": "10 min read"
+      },
+      "a4": {
+        "tag": "Investment",
+        "title": "How much does a sandwich panel factory cost?",
+        "read": "12 min read"
+      },
+      "a5": {
+        "tag": "Raw materials",
+        "title": "Rock wool guide: density, fire behaviour and specification.",
+        "read": "7 min read"
+      },
+      "a6": {
+        "tag": "Guide",
+        "title": "Factory planning checklist for new panel manufacturers.",
+        "read": "9 min read"
+      }
+    },
+    "marketsSection": {
+      "eyebrow": "Global markets",
+      "title": "Engineering delivered worldwide.",
+      "lede": "Engineering, consultancy, raw materials and production lines shipped globally. Finished panel supply operates across selected regional markets in the Middle East, Africa and Eurasia.",
+      "mapLabel": "NEVO · Global reach map",
+      "activeMarkets": "Active markets",
+      "sa": "Saudi Arabia",
+      "ae": "UAE",
+      "om": "Oman",
+      "tr": "Turkey",
+      "iq": "Iraq",
+      "ru": "Russia",
+      "ke": "Kenya",
+      "cm": "Cameroon"
+    },
+    "stats": {
+      "yearsSuffix": "+",
+      "yearsLabel": "Years of industry experience",
+      "projectsSuffix": "+",
+      "projectsLabel": "Industrial projects",
+      "worldwide": "Worldwide",
+      "worldwideLabel": "Engineering support",
+      "multiple": "Multiple",
+      "multipleLabel": "International supply partners"
+    },
+    "testimonials": {
+      "eyebrow": "Industry voices",
+      "title": "Trusted by engineers, operators and industrial investors.",
+      "lede": "Selected quotes from factory owners, plant directors and procurement leaders NEVO works with. Identities are withheld out of respect for project confidentiality.",
+      "q1": {
+        "quote": "NEVO's engineering team scoped our line upgrade with a level of technical honesty we rarely see from suppliers. Throughput matched the model within the first commissioning week.",
+        "author": "Plant Director",
+        "org": "Panel manufacturer, GCC"
+      },
+      "q2": {
+        "quote": "They treated our factory feasibility as an engineering problem before a commercial one. The layout and utility plan avoided a seven-figure rework later in the project.",
+        "author": "Industrial Investor",
+        "org": "Greenfield factory, East Africa"
+      },
+      "q3": {
+        "quote": "Consistent PIR quality, transparent lead times, and a technical contact who actually understands our line. That combination is the reason we consolidated our sourcing.",
+        "author": "Procurement Manager",
+        "org": "Sandwich panel producer, Eurasia"
+      }
+    },
+    "ctaBanner": {
+      "eyebrow": "Let's build together",
+      "titlePart1": "Let's build your next",
+      "titlePart2": "industrial project.",
+      "lede": "Whether you are planning a new factory, upgrading production or sourcing premium materials, our engineering team is ready to support you.",
+      "primary": "Start Your Project",
+      "secondary": "Book Engineering Consultation",
+      "b1": "Engineering-led scoping — not sales-led",
+      "b2": "Technical response within 1 business day",
+      "b3": "Confidential handling of project details",
+      "b4": "Available in English, Arabic, Russian, Turkish"
+    },
+    "contactSection": {
+      "eyebrow": "Project inquiry",
+      "title": "Talk to a NEVO engineer.",
+      "lede": "Tell us about your project. A senior engineer will respond within one business day with a scoped technical proposal.",
+      "engineeringDesk": "Engineering desk",
+      "whatsapp": "WhatsApp",
+      "phone": "Phone",
+      "office": "Office",
+      "officeCity": "Dubai, United Arab Emirates",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Your name",
+      "company": "Company",
+      "companyPlaceholder": "Company name",
+      "email": "Email",
+      "emailPlaceholder": "you@company.com",
+      "phoneField": "Phone / WhatsApp",
+      "phonePlaceholder": "+971 ...",
+      "country": "Country",
+      "countryPlaceholder": "e.g. Saudi Arabia",
+      "solution": "Interested solution",
+      "solutionPlaceholder": "Select a solution…",
+      "timeline": "Estimated timeline",
+      "timelinePlaceholder": "Select timeline…",
+      "message": "Project details",
+      "messagePlaceholder": "Briefly describe your project, target output, market and any technical constraints.",
+      "confidentiality": "Your information is treated as confidential and used only to respond to your inquiry.",
+      "submit": "Submit Project Inquiry",
+      "sending": "Sending…",
+      "successTitle": "Inquiry submitted",
+      "successDesc": "Your project is with our engineering desk — expect a reply within one business day.",
+      "s1": "Factory Development",
+      "s2": "Engineering Consultancy",
+      "s3": "Raw Material Solutions",
+      "s4": "Production Line Solutions",
+      "s5": "Finished Panel Solutions",
+      "s6": "Technical Support",
+      "t1": "Immediate",
+      "t2": "1–3 months",
+      "t3": "3–6 months",
+      "t4": "6–12 months",
+      "t5": "12+ months"
+    },
+    "sticky": {
+      "getQuote": "Get a Quote",
+      "whatsapp": "WhatsApp",
+      "inquiry": "Inquiry"
+    },
+    "aiLauncher": {
+      "askEngineer": "Ask NEVO AI Engineer",
+      "aiEngineer": "AI Engineer",
+      "openWorkspace": "Open full AI Engineer workspace",
+      "close": "Close"
+    },
+    "cookies": {
+      "text": "We use essential cookies to run this site and optional analytics cookies to improve your experience. See our",
+      "privacyLink": "Privacy Policy",
+      "accept": "Accept",
+      "decline": "Decline"
+    }
   }
 }

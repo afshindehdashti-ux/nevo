@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { Section, SectionHeader } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
@@ -10,17 +11,11 @@ const FIELD =
 const LABEL =
   "mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground";
 
-const SOLUTIONS = [
-  "Factory Development",
-  "Engineering Consultancy",
-  "Raw Material Solutions",
-  "Production Line Solutions",
-  "Finished Panel Solutions",
-  "Technical Support",
-];
-const TIMELINES = ["Immediate", "1–3 months", "3–6 months", "6–12 months", "12+ months"];
+const SOLUTION_KEYS = ["s1", "s2", "s3", "s4", "s5", "s6"] as const;
+const TIMELINE_KEYS = ["t1", "t2", "t3", "t4", "t5"] as const;
 
 export function ContactSection() {
+  const { t } = useTranslation();
   const formRef = useRef<HTMLFormElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -31,13 +26,12 @@ export function ContactSection() {
     const ok = await submitLeadForm(e.currentTarget, {
       source: "homepage-contact",
       rules: [
-        { field: "name", label: "Full name" },
-        { field: "email", label: "Email", type: "email" },
-        { field: "message", label: "Project details", min: 10 },
+        { field: "name", label: t("home.contactSection.fullName") },
+        { field: "email", label: t("home.contactSection.email"), type: "email" },
+        { field: "message", label: t("home.contactSection.message"), min: 10 },
       ],
-      successTitle: "Inquiry submitted",
-      successDescription:
-        "Your project is with our engineering desk — expect a reply within one business day.",
+      successTitle: t("home.contactSection.successTitle"),
+      successDescription: t("home.contactSection.successDesc"),
     });
     setBusy(false);
     if (ok) formRef.current?.reset();
@@ -48,23 +42,17 @@ export function ContactSection() {
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <SectionHeader
-            eyebrow="Project inquiry"
-            title="Talk to a NEVO engineer."
-            lede="Tell us about your project. A senior engineer will respond within one business day with a scoped technical proposal."
+            eyebrow={t("home.contactSection.eyebrow")}
+            title={t("home.contactSection.title")}
+            lede={t("home.contactSection.lede")}
           />
           <dl className="mt-4 space-y-5 border-t border-border pt-8">
             <div>
-              <dt className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                Engineering desk
-              </dt>
-              <dd className="mt-1 text-sm text-foreground">
-                solutions@nevoindustrial.com
-              </dd>
+              <dt className={LABEL}>{t("home.contactSection.engineeringDesk")}</dt>
+              <dd className="mt-1 text-sm text-foreground">solutions@nevoindustrial.com</dd>
             </div>
             <div>
-              <dt className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                WhatsApp
-              </dt>
+              <dt className={LABEL}>{t("home.contactSection.whatsapp")}</dt>
               <dd className="mt-1 text-sm text-foreground">
                 <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:underline">
                   {SITE.contact.whatsappDisplay}
@@ -72,18 +60,14 @@ export function ContactSection() {
               </dd>
             </div>
             <div>
-              <dt className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                Phone
-              </dt>
+              <dt className={LABEL}>{t("home.contactSection.phone")}</dt>
               <dd className="mt-1 text-sm text-foreground">
                 <a href={SITE.contact.phoneHref} className="hover:underline">{SITE.contact.phone}</a>
               </dd>
             </div>
             <div>
-              <dt className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                Office
-              </dt>
-              <dd className="mt-1 text-sm text-foreground">Dubai, United Arab Emirates</dd>
+              <dt className={LABEL}>{t("home.contactSection.office")}</dt>
+              <dd className="mt-1 text-sm text-foreground">{t("home.contactSection.officeCity")}</dd>
             </div>
           </dl>
         </div>
@@ -96,65 +80,64 @@ export function ContactSection() {
         >
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <label htmlFor="name" className={LABEL}>Full name</label>
-              <input id="name" name="name" required className={FIELD} placeholder="Your name" />
+              <label htmlFor="name" className={LABEL}>{t("home.contactSection.fullName")}</label>
+              <input id="name" name="name" required className={FIELD} placeholder={t("home.contactSection.fullNamePlaceholder")} />
             </div>
             <div>
-              <label htmlFor="company" className={LABEL}>Company</label>
-              <input id="company" name="company" className={FIELD} placeholder="Company name" />
+              <label htmlFor="company" className={LABEL}>{t("home.contactSection.company")}</label>
+              <input id="company" name="company" className={FIELD} placeholder={t("home.contactSection.companyPlaceholder")} />
             </div>
             <div>
-              <label htmlFor="email" className={LABEL}>Email</label>
-              <input id="email" type="email" required className={FIELD} placeholder="you@company.com" />
+              <label htmlFor="email" className={LABEL}>{t("home.contactSection.email")}</label>
+              <input id="email" type="email" required className={FIELD} placeholder={t("home.contactSection.emailPlaceholder")} />
             </div>
             <div>
-              <label htmlFor="phone" className={LABEL}>Phone / WhatsApp</label>
-              <input id="phone" name="phone" className={FIELD} placeholder="+971 ..." />
+              <label htmlFor="phone" className={LABEL}>{t("home.contactSection.phoneField")}</label>
+              <input id="phone" name="phone" className={FIELD} placeholder={t("home.contactSection.phonePlaceholder")} />
             </div>
             <div>
-              <label htmlFor="country" className={LABEL}>Country</label>
-              <input id="country" name="country" className={FIELD} placeholder="e.g. Saudi Arabia" />
+              <label htmlFor="country" className={LABEL}>{t("home.contactSection.country")}</label>
+              <input id="country" name="country" className={FIELD} placeholder={t("home.contactSection.countryPlaceholder")} />
             </div>
             <div>
-              <label htmlFor="solution" className={LABEL}>Interested solution</label>
+              <label htmlFor="solution" className={LABEL}>{t("home.contactSection.solution")}</label>
               <select id="solution" name="solution" className={FIELD} defaultValue="">
-                <option value="">Select a solution…</option>
-                {SOLUTIONS.map((s) => (
-                  <option key={s}>{s}</option>
+                <option value="">{t("home.contactSection.solutionPlaceholder")}</option>
+                {SOLUTION_KEYS.map((k) => (
+                  <option key={k}>{t(`home.contactSection.${k}`)}</option>
                 ))}
               </select>
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="timeline" className={LABEL}>Estimated timeline</label>
+              <label htmlFor="timeline" className={LABEL}>{t("home.contactSection.timeline")}</label>
               <select id="timeline" name="timeline" className={FIELD} defaultValue="">
-                <option value="">Select timeline…</option>
-                {TIMELINES.map((t) => (
-                  <option key={t}>{t}</option>
+                <option value="">{t("home.contactSection.timelinePlaceholder")}</option>
+                {TIMELINE_KEYS.map((k) => (
+                  <option key={k}>{t(`home.contactSection.${k}`)}</option>
                 ))}
               </select>
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="message" className={LABEL}>Project details</label>
+              <label htmlFor="message" className={LABEL}>{t("home.contactSection.message")}</label>
               <textarea
                 id="message"
                 name="message"
                 rows={5}
                 className={FIELD}
-                placeholder="Briefly describe your project, target output, market and any technical constraints."
+                placeholder={t("home.contactSection.messagePlaceholder")}
               />
             </div>
           </div>
 
           <div className="mt-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <p className="text-xs text-muted-foreground">
-              Your information is treated as confidential and used only to respond to
-              your inquiry.
+              {t("home.contactSection.confidentiality")}
             </p>
             <Button type="submit" variant="primary" size="lg" disabled={busy}>
               {busy ? (
-                <><Loader2 className="!size-4 animate-spin" /> Sending…</>
+                <><Loader2 className="!size-4 animate-spin" /> {t("home.contactSection.sending")}</>
               ) : (
-                <>Submit Project Inquiry <ArrowRight className="!size-4" /></>
+                <>{t("home.contactSection.submit")} <ArrowRight className="!size-4" /></>
               )}
             </Button>
           </div>
