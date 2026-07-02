@@ -110,7 +110,7 @@ function SolutionsIndex() {
   );
 }
 
-export const Route = createFileRoute("/solutions")({
+export const Route = createFileRoute("/solutions/")({
   head: () => ({
     meta: [
       { title: TITLE },
