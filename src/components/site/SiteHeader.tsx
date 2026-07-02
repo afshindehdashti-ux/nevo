@@ -119,7 +119,7 @@ const KNOWLEDGE: MenuGroup = {
   items: [
     { label: "Engineering Articles", desc: "Deep technical writing from our engineers.", icon: BookOpen, href: "/knowledge" },
     { label: "Technical Library", desc: "Specs, datasheets, drawings.", icon: Library, href: "/knowledge" },
-    { label: "Downloads", desc: "Brochures, catalogues, PDFs.", icon: Download, href: "/knowledge" },
+    { label: "Download Center", desc: "Engineering guides, catalogs, datasheets.", icon: Download, href: "/download-center" },
     { label: "Case Studies", desc: "Factories built with NEVO.", icon: FileText, href: "/knowledge" },
     { label: "FAQ", desc: "Common industrial questions.", icon: HelpCircle, href: "/knowledge" },
     { label: "Investment Guides", desc: "Feasibility and CAPEX planning.", icon: LineChart, href: "/knowledge" },

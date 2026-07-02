@@ -27,6 +27,7 @@ const ROUTES: SitemapEntry[] = [
   { path: "/panel-thickness-calculator", changefreq: "monthly", priority: "0.9" },
   { path: "/pir-vs-rock-wool", changefreq: "monthly", priority: "0.9" },
   { path: "/factory-layout-generator", changefreq: "monthly", priority: "0.9" },
+  { path: "/download-center", changefreq: "weekly", priority: "0.9" },
 ];
 
 const ACTIVE_LOCALES = ["en", "ar"] as const;
