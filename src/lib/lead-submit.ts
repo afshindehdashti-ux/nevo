@@ -122,7 +122,7 @@ export async function submitLeadForm(
 ): Promise<boolean> {
   const m = { ...DEFAULT_MESSAGES, ...(opts.messages ?? {}) };
   const payload = collectFormData(form);
-  const error = validateLead(payload, opts.rules, m);
+  const error = validateLead(payload, opts.rules, m, opts.phoneLocale);
   if (error) {
     toast.error(m.reviewTitle, { description: error });
     return false;
