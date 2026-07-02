@@ -451,5 +451,78 @@
       "accept": "Akzeptieren",
       "decline": "Ablehnen"
     }
+  },
+  "solutionsIndex": {
+    "eyebrow": "Lösungen",
+    "heroTitle": "Ingenieurgetriebene Lösungen für Sandwichpanel-Hersteller.",
+    "heroLede": "Vier integrierte Geschäftsbereiche — gemeinsam als schlüsselfertiges Programm oder einzeln als klar umrissene Aufträge.",
+    "ctaQuote": "Angebot anfordern",
+    "ctaContact": "NEVO-Vertrieb kontaktieren",
+    "sectionEyebrow": "Vier Geschäftsbereiche",
+    "sectionTitle": "Wählen Sie einen Bereich zur Erkundung.",
+    "sectionLede": "Jeder Bereich wird von einem eigenen Ingenieurteam geführt — mit gemeinsamer Dokumentation, Normen und Programm-Governance.",
+    "explore": "{{name}} erkunden",
+    "items": {
+      "factory": {
+        "eyebrow": "Schlüsselfertig",
+        "title": "Sandwichpanel-Werke",
+        "lede": "Werksentwicklung von A bis Z — von Machbarkeit und Layout bis Inbetriebnahme und Übergabe."
+      },
+      "lines": {
+        "eyebrow": "Anlagenengineering",
+        "title": "Produktionslinien",
+        "lede": "Kontinuierliche PIR-, PUR- und Steinwolle-Linien — ausgelegt auf Kapazität, Verfügbarkeit und Produktkonstanz."
+      },
+      "consult": {
+        "eyebrow": "Beratung",
+        "title": "Ingenieurberatung",
+        "lede": "Machbarkeitsstudien, Werksaudits, Prozessoptimierung und CAPEX/OPEX-Modellierung für Panelhersteller."
+      },
+      "materials": {
+        "eyebrow": "Beschaffung",
+        "title": "Rohstoffe",
+        "lede": "Vorbeschichtete Stahlbänder, PIR/PUR-Chemie, Steinwolle-Kerne und Klebstoffe — global beschafft und geliefert."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Datenschutzerklärung",
+    "lastUpdated": "Zuletzt aktualisiert: {{year}}",
+    "s1": {
+      "h": "1. Wer wir sind",
+      "p": "NEVO Industrial („NEVO\", „wir\") ist eine Ingenieur- und Industriegruppe mit Sitz in Dubai, VAE. Diese Erklärung beschreibt, wie wir personenbezogene Daten verarbeiten, die über unsere Website, Rechner, das Download-Center sowie Kunden- und Partner-Portale erhoben werden."
+    },
+    "s2": {
+      "h": "2. Erhobene Daten",
+      "items": [
+        "Kontaktdaten, die Sie über Anfrageformulare, Downloads oder Rückrufwünsche übermitteln.",
+        "Projektparameter, die in Rechnern oder Konfiguratoren eingegeben werden.",
+        "Kontodaten der Kunden- und Partner-Portale.",
+        "Technische Daten (IP-Adresse, Gerät, Browser, aufgerufene Seiten) über notwendige und optionale Analyse-Cookies."
+      ]
+    },
+    "s3": {
+      "h": "3. Verwendungszwecke",
+      "p": "Wir verwenden personenbezogene Daten, um Anfragen zu beantworten, Angebote zu erstellen, technische Unterlagen bereitzustellen, Portale zu betreiben, unsere Plattform zu verbessern und gesetzliche Pflichten zu erfüllen. Wir verkaufen keine personenbezogenen Daten."
+    },
+    "s4": {
+      "h": "4. Cookies",
+      "p": "Wir setzen notwendige Cookies für den Betrieb der Website ein sowie optionale Analyse-Cookies. Über das Consent-Banner können Sie optionale Cookies akzeptieren oder ablehnen und Ihre Wahl jederzeit durch Löschen der Seitendaten ändern."
+    },
+    "s5": {
+      "h": "5. Weitergabe",
+      "p": "Wir geben Daten ausschließlich an Dienstleister weiter, die uns beim Betrieb der Plattform unterstützen (Hosting, Analyse, E-Mail-Versand), sowie an NEVO-Gruppengesellschaften, die an der Umsetzung Ihres Projekts beteiligt sind. Alle Auftragsverarbeiter sind zur Vertraulichkeit verpflichtet."
+    },
+    "s6": {
+      "h": "6. Ihre Rechte",
+      "pBefore": "Nach geltendem Recht können Sie Auskunft, Berichtigung, Löschung oder Übertragung Ihrer Daten verlangen und bestimmten Verarbeitungen widersprechen. Zur Wahrnehmung Ihrer Rechte wenden Sie sich an ",
+      "pAfter": "."
+    },
+    "s7": {
+      "h": "7. Kontakt",
+      "pBefore": "NEVO Industrial — Dubai, Vereinigte Arabische Emirate. ",
+      "link": "Kontakt aufnehmen",
+      "pAfter": " bei Fragen zu dieser Erklärung."
+    }
   }
 }
