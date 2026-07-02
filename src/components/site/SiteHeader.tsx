@@ -164,12 +164,15 @@ const COMPANY: MenuGroup = {
   items: [
     { label: "About NEVO", icon: Compass, href: "/about" },
     { label: "Why NEVO", icon: Sparkles, href: "/about" },
-    { label: "Engineering Process", icon: Cog, href: "/solutions/engineering-consultancy" },
-    { label: "Global Network", icon: Network, href: "/industries" },
+    { label: "Quality Assurance", icon: ShieldCheck, href: "/quality" },
+    { label: "Sustainability & ESG", icon: Sprout, href: "/sustainability" },
+    { label: "Careers", icon: Briefcase, href: "/careers" },
+    { label: "Investor Relations", icon: LineChart, href: "/investors" },
+    { label: "Global Offices", icon: Network, href: "/contact" },
     { label: "Project Inquiry", icon: Handshake, href: "/project-inquiry" },
-    { label: "AI Engineering Assistant", icon: Briefcase, href: "/ai-assistant" },
-    { label: "Contact", icon: Mail, href: "/project-inquiry" },
+    { label: "Contact", icon: Mail, href: "/contact" },
   ],
+
 };
 
 const NAV: MenuGroup[] = [SOLUTIONS, INDUSTRIES, KNOWLEDGE, MARKETS, COMPANY];
