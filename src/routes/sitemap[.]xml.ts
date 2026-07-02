@@ -23,6 +23,7 @@ const ROUTES: SitemapEntry[] = [
   { path: "/solutions/engineering-consultancy", changefreq: "monthly", priority: "0.9" },
   { path: "/solutions/sandwich-panels", changefreq: "monthly", priority: "0.9" },
   { path: "/product-configurator", changefreq: "monthly", priority: "0.9" },
+  { path: "/investment-calculator", changefreq: "monthly", priority: "0.9" },
 ];
 
 const ACTIVE_LOCALES = ["en", "ar"] as const;
