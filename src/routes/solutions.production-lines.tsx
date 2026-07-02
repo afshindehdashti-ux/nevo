@@ -25,8 +25,10 @@ import {
   FileText,
   Download,
 } from "lucide-react";
-import heroImg from "@/assets/hero-production-line.jpg";
-import philosophyImg from "@/assets/engineering-philosophy.jpg";
+import heroImgAsset from "@/assets/premium/02-production-line.jpg.asset.json";
+import philosophyImgAsset from "@/assets/premium/12-engineer-bim.jpg.asset.json";
+const heroImg = heroImgAsset.url;
+const philosophyImg = philosophyImgAsset.url;
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
