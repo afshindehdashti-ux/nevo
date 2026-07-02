@@ -199,22 +199,25 @@ function ContactPage() {
             <Eyebrow>Request Callback</Eyebrow>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight">Speak with a senior engineer</h2>
             <p className="mt-3 text-sm text-muted-foreground">Share a few details and we'll call within one business day.</p>
-            <form className="mt-8 grid gap-4" onSubmit={(e) => e.preventDefault()}>
+            <form ref={formRef} className="mt-8 grid gap-4" onSubmit={handleCallback} noValidate>
               <div className="grid gap-4 md:grid-cols-2">
-                <input placeholder="Full name" className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
-                <input placeholder="Company" className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
-                <input placeholder="Email" type="email" className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
-                <input placeholder="Phone / WhatsApp" className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
+                <input name="name" placeholder="Full name" required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
+                <input name="company" placeholder="Company" className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
+                <input name="email" placeholder="Email" type="email" required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
+                <input name="phone" placeholder="Phone / WhatsApp" required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
               </div>
-              <select className="rounded-md border border-input bg-background px-4 py-3 text-sm">
-                <option>Interest — Factory Development</option>
-                <option>Interest — Sandwich Panels</option>
-                <option>Interest — Production Lines</option>
-                <option>Interest — Engineering Consultancy</option>
+              <select name="interest" defaultValue="" className="rounded-md border border-input bg-background px-4 py-3 text-sm">
+                <option value="" disabled>Select interest…</option>
+                <option>Factory Development</option>
+                <option>Sandwich Panels</option>
+                <option>Production Lines</option>
+                <option>Engineering Consultancy</option>
               </select>
-              <textarea rows={4} placeholder="Project brief (capacity, location, timeline)"
+              <textarea name="message" rows={4} placeholder="Project brief (capacity, location, timeline)"
                         className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
-              <Button type="submit" size="lg">Request Callback <ArrowRight className="ml-2 h-4 w-4" /></Button>
+              <Button type="submit" size="lg" disabled={busy}>
+                {busy ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending…</>) : (<>Request Callback <ArrowRight className="ml-2 h-4 w-4" /></>)}
+              </Button>
             </form>
           </div>
         </div>
