@@ -805,9 +805,7 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
    ───────────────────────────────────────────────────────────── */
 
 function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSearch: () => void }) {
-  const whatsappHref = SITE.contact.whatsapp
-    ? `https://wa.me/${SITE.contact.whatsapp}`
-    : "/project-inquiry";
+  const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
   const sections: { label: string; items: NavItem[] }[] = [
     { label: "Solutions", items: SOLUTIONS.items },
     { label: "Industries", items: INDUSTRIES.items },
