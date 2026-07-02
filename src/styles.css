@@ -72,67 +72,83 @@
   --duration-slow: 300ms;
 }
 
+/* ─────────────────────────────────────────────────────
+ * Dark premium industrial palette (default)
+ *
+ * Visual ratio target — Dark 85–90% · White 8–12% · Green 2–4%.
+ *   – Background: obsidian black
+ *   – Surface / card: charcoal → graphite
+ *   – Borders: hairline white at low opacity
+ *   – Foreground: near-white
+ *   – Primary: white on graphite (restrained CTA / chrome)
+ *   – Accent: NEVO green — reserved for CTAs, keywords, icons,
+ *     status, links, hover, indicators. Never dominant.
+ * ─────────────────────────────────────────────────── */
 :root {
   --radius: 0.5rem;
 
-  /* Base surfaces */
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.16 0.005 260);
-  --surface: oklch(0.982 0.002 260);
-  --surface-muted: oklch(0.965 0.003 260);
+  /* Base surfaces — obsidian → charcoal → graphite */
+  --background: oklch(0.13 0.004 260);        /* near-black */
+  --foreground: oklch(0.985 0 0);             /* near-white */
+  --surface: oklch(0.17 0.004 260);           /* charcoal */
+  --surface-muted: oklch(0.21 0.004 260);     /* graphite */
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.16 0.005 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.16 0.005 260);
+  --card: oklch(0.17 0.004 260);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.16 0.004 260);
+  --popover-foreground: oklch(0.985 0 0);
 
-  /* Graphite primary */
-  --primary: oklch(0.18 0.005 260);
-  --primary-foreground: oklch(0.99 0 0);
+  /* Primary — white on graphite. Used for chrome, tooltips, banners.
+     NOT the green CTA (green lives on --accent, wired into Button primary variant). */
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.15 0.004 260);
 
-  --secondary: oklch(0.96 0.003 260);
-  --secondary-foreground: oklch(0.18 0.005 260);
+  --secondary: oklch(0.22 0.004 260);
+  --secondary-foreground: oklch(0.985 0 0);
 
-  --muted: oklch(0.965 0.003 260);
-  --muted-foreground: oklch(0.5 0.008 260);
+  --muted: oklch(0.22 0.004 260);
+  --muted-foreground: oklch(0.72 0.008 260);  /* dark grey body copy */
 
-  /* Emerald accent — used sparingly */
-  --accent: oklch(0.68 0.14 160);
-  --accent-foreground: oklch(0.16 0.005 260);
+  /* NEVO green — accent only. Foreground kept WHITE for CTA legibility. */
+  --accent: oklch(0.72 0.155 158);
+  --accent-foreground: oklch(0.99 0 0);
 
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
 
-  --border: oklch(0.925 0.004 260);
-  --border-strong: oklch(0.86 0.005 260);
-  --input: oklch(0.92 0.004 260);
-  --ring: oklch(0.68 0.14 160);
+  --border: oklch(1 0 0 / 8%);           /* hairline white */
+  --border-strong: oklch(1 0 0 / 20%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.72 0.155 158);          /* green focus ring */
 }
 
+/* Explicit .dark class kept as an alias for components that gate on it
+   (e.g. dark-mode-only logo swap). Values match :root so behaviour is identical. */
 .dark {
-  --background: oklch(0.14 0.005 260);
-  --foreground: oklch(0.98 0 0);
-  --surface: oklch(0.18 0.005 260);
-  --surface-muted: oklch(0.22 0.005 260);
-  --card: oklch(0.18 0.005 260);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.18 0.005 260);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.16 0.005 260);
-  --secondary: oklch(0.24 0.005 260);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.24 0.005 260);
-  --muted-foreground: oklch(0.7 0.008 260);
-  --accent: oklch(0.72 0.15 160);
-  --accent-foreground: oklch(0.14 0.005 260);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --border-strong: oklch(1 0 0 / 22%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.72 0.15 160);
+  --background: oklch(0.13 0.004 260);
+  --foreground: oklch(0.985 0 0);
+  --surface: oklch(0.17 0.004 260);
+  --surface-muted: oklch(0.21 0.004 260);
+  --card: oklch(0.17 0.004 260);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.16 0.004 260);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.15 0.004 260);
+  --secondary: oklch(0.22 0.004 260);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.22 0.004 260);
+  --muted-foreground: oklch(0.72 0.008 260);
+  --accent: oklch(0.72 0.155 158);
+  --accent-foreground: oklch(0.99 0 0);
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(1 0 0 / 8%);
+  --border-strong: oklch(1 0 0 / 20%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.72 0.155 158);
 }
+
 
 @layer base {
   * {
