@@ -1,5 +1,6 @@
 import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 import heroDesktopAsset from "@/assets/premium/homepage-hero-desktop.jpg.asset.json";
 import heroMobileAsset from "@/assets/premium/homepage-hero-mobile.jpg.asset.json";
 import { Button } from "@/components/ui/button";
@@ -16,10 +17,11 @@ const heroMobile = heroMobileAsset.url;
  *    CTAs anchored to the lower third
  */
 export function Hero() {
+  const { t } = useTranslation();
   return (
     <section className="relative isolate -mt-20 overflow-hidden bg-black text-white md:-mt-24">
       <h1 className="sr-only">
-        Engineering the Future of Sandwich Panel Manufacturing — NEVO Industrial, Dubai
+        {t("home.heroTitle")} — {t("brand.name")}, {t("brand.location")}
       </h1>
       <HeroDesktop />
       <HeroMobile />
@@ -32,6 +34,7 @@ export function Hero() {
 /* ------------------------------------------------------------------ */
 
 function HeroDesktop() {
+  const { t } = useTranslation();
   return (
     <div className="relative hidden min-h-[85vh] md:block lg:min-h-[95vh]">
       <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -77,8 +80,7 @@ function HeroDesktop() {
             transition={{ duration: 1, ease: [0.25, 1, 0.5, 1], delay: 0.05 }}
             className="text-display text-balance text-white"
           >
-            Engineering the Future of{" "}
-            <span className="text-accent">Sandwich Panel Manufacturing.</span>
+            {t("home.heroTitle")}
           </motion.p>
 
           <motion.p
@@ -87,8 +89,7 @@ function HeroDesktop() {
             transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1], delay: 0.15 }}
             className="text-body-lg mt-8 max-w-2xl leading-relaxed text-white/75"
           >
-            Engineering consultancy, factory development, production lines, raw
-            materials and premium sandwich panel solutions.
+            {t("home.heroSubtitle")}
           </motion.p>
 
           <motion.div
@@ -103,7 +104,7 @@ function HeroDesktop() {
               className="bg-white text-primary transition-colors duration-200 hover:bg-white/90"
             >
               <a href="/project-inquiry">
-                Start Your Project
+                {t("home.heroCtaPrimary")}
                 <ArrowRight className="!size-4" />
               </a>
             </Button>
@@ -114,7 +115,7 @@ function HeroDesktop() {
               className="border-white/30 bg-transparent text-white transition-colors duration-200 hover:border-white hover:bg-white/10"
             >
               <a href="/ai-assistant">
-                Talk to an Engineer
+                {t("home.heroCtaSecondary")}
                 <ArrowUpRight className="!size-4" />
               </a>
             </Button>
