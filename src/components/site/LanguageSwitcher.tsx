@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, Globe } from "lucide-react";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { LOCALES, useLanguage, type Locale } from "@/i18n/LanguageProvider";
+import { SUPPORTED_LOCALES } from "@/i18n/config";
 
 interface LanguageSwitcherProps {
   variant?: "header" | "mobile" | "footer";
@@ -28,9 +30,21 @@ export function LanguageSwitcher({ variant = "header", onLight = false }: Langua
     };
   }, [open]);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const select = (code: Locale) => {
     setLang(code);
     setOpen(false);
+    // Rewrite current path's locale segment
+    const parts = location.pathname.split("/").filter(Boolean);
+    if (parts.length && (SUPPORTED_LOCALES as readonly string[]).includes(parts[0])) {
+      parts[0] = code;
+    } else {
+      parts.unshift(code);
+    }
+    const next = "/" + parts.join("/");
+    navigate({ to: next, replace: false });
   };
 
   if (variant === "mobile") {

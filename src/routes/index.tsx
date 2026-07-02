@@ -1,88 +1,43 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { AnnouncementBar } from "@/components/site/AnnouncementBar";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { Hero } from "@/components/site/Hero";
-import { Pathways } from "@/components/site/Pathways";
-import { WhyNevo } from "@/components/site/WhyNevo";
-import { Solutions } from "@/components/site/Solutions";
-import { Industries } from "@/components/site/Industries";
-import { FeaturedFactory } from "@/components/site/FeaturedFactory";
-import { KnowledgeHub } from "@/components/site/KnowledgeHub";
-import { Markets } from "@/components/site/Markets";
-import { Stats } from "@/components/site/Stats";
-import { Testimonials } from "@/components/site/Testimonials";
-import { CTABanner } from "@/components/site/CTABanner";
-import { ContactSection } from "@/components/site/ContactSection";
-import { SiteFooter } from "@/components/site/SiteFooter";
-import { SITE } from "@/lib/seo";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES, type Locale } from "@/i18n/config";
 
-const TITLE =
-  "NEVO Industrial — Sandwich Panel Engineering, Factory Development & Raw Materials";
-const DESCRIPTION =
-  "Dubai-based industrial engineering & supply company for the sandwich panel industry — factory development, engineering consultancy, PIR/PUR raw materials, production lines and finished panels.";
+function detectLocale(request?: Request): Locale {
+  if (request) {
+    const cookie = request.headers.get("cookie") ?? "";
+    const m = cookie.match(/NEVO_LANG=([a-zA-Z-]+)/);
+    if (m && (SUPPORTED_LOCALES as readonly string[]).includes(m[1])) {
+      return m[1] as Locale;
+    }
+    const accept = request.headers.get("accept-language") ?? "";
+    for (const part of accept.split(",")) {
+      const code = part.trim().slice(0, 2).toLowerCase();
+      if ((SUPPORTED_LOCALES as readonly string[]).includes(code)) {
+        return code as Locale;
+      }
+    }
+  }
+  if (typeof document !== "undefined") {
+    const m = document.cookie.match(/NEVO_LANG=([a-zA-Z-]+)/);
+    if (m && (SUPPORTED_LOCALES as readonly string[]).includes(m[1])) {
+      return m[1] as Locale;
+    }
+    const nav = navigator.language?.slice(0, 2).toLowerCase();
+    if (nav && (SUPPORTED_LOCALES as readonly string[]).includes(nav)) {
+      return nav as Locale;
+    }
+  }
+  return DEFAULT_LOCALE;
+}
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}/` },
-    ],
-    links: [{ rel: "canonical", href: `${SITE.url}/` }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          name: "NEVO Industrial",
-          url: SITE.url,
-          description: DESCRIPTION,
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: "Dubai",
-            addressCountry: "AE",
-          },
-          areaServed: [
-            "Saudi Arabia",
-            "Oman",
-            "United Arab Emirates",
-            "Turkey",
-            "Iraq",
-            "Kenya",
-            "Cameroon",
-            "Russia",
-          ],
-        }),
-      },
-    ],
-  }),
-  component: Index,
+  beforeLoad: ({ location }) => {
+    // Server-side we don't have request here easily; fall back to default.
+    const lang = detectLocale();
+    throw redirect({
+      to: "/$lang",
+      params: { lang },
+      replace: true,
+      search: location.search,
+    });
+  },
 });
-
-function Index() {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <AnnouncementBar />
-      <SiteHeader />
-      <main>
-        <Hero />
-        <Pathways />
-        <WhyNevo />
-        <Solutions />
-        <Industries />
-        <FeaturedFactory />
-        <KnowledgeHub />
-        <Markets />
-        <Stats />
-        <Testimonials />
-        <CTABanner />
-        <ContactSection />
-      </main>
-      <SiteFooter />
-    </div>
-  );
-}

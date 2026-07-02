@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+
+import { Link } from "@/components/site/LocalizedLink";
 import { MessageCircle, ClipboardList } from "lucide-react";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
 

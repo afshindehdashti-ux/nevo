@@ -166,15 +166,16 @@ export const websiteJsonLd = () => ({
   },
 });
 
-/** Build hreflang <link rel="alternate"> entries for a given path. Path should start with "/". */
+/** Build hreflang <link rel="alternate"> entries for a given canonical path (without a locale prefix, e.g. "/about"). */
 export const hreflangLinks = (path: string) => {
   const clean = path.startsWith("/") ? path : `/${path}`;
+  const suffix = clean === "/" ? "" : clean;
   const links: Array<Record<string, string>> = LOCALES.filter((l) => l.status === "active").map((l) => ({
     rel: "alternate",
     hreflang: l.hreflang,
-    href: `${SITE.url}${clean}?lang=${l.code}`,
+    href: `${SITE.url}/${l.code}${suffix}`,
   }));
-  links.push({ rel: "alternate", hreflang: "x-default", href: `${SITE.url}${clean}` });
+  links.push({ rel: "alternate", hreflang: "x-default", href: `${SITE.url}/en${suffix}` });
   return links;
 };
 

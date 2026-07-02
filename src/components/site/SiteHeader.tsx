@@ -1,4 +1,6 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { Link } from "@/components/site/LocalizedLink";
+import { useLanguage } from "@/i18n/LanguageProvider";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -782,6 +784,7 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
   const [q, setQ] = useState("");
   const [activeIdx, setActiveIdx] = useState(0);
   const navigate = useNavigate();
+  const { lang } = useLanguage();
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -804,7 +807,7 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
 
   useEffect(() => { setActiveIdx(0); }, [q]);
 
-  const go = (href: string) => { onClose(); navigate({ to: href }); };
+  const go = (href: string) => { onClose(); navigate({ to: href.startsWith("/$lang") ? href : `/$lang${href}` as never, params: { lang } as never }); };
 
   const groups = useMemo(() => {
     const m: Record<string, typeof SEARCH_INDEX> = {};
