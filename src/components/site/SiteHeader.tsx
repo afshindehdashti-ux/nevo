@@ -123,6 +123,7 @@ const KNOWLEDGE: MenuGroup = {
     { label: "FAQ", desc: "Common industrial questions.", icon: HelpCircle, href: "/knowledge" },
     { label: "Investment Guides", desc: "Feasibility and CAPEX planning.", icon: LineChart, href: "/knowledge" },
     { label: "Investment Calculator", desc: "Model CAPEX, OPEX, ROI, IRR & payback.", icon: Calculator, href: "/investment-calculator" },
+    { label: "PIR vs Rock Wool", desc: "Complete side-by-side comparison guide.", icon: Layers, href: "/pir-vs-rock-wool" },
     { label: "White Papers", desc: "Peer-reviewed engineering perspectives.", icon: ScrollText, href: "/knowledge" },
     { label: "Engineering Tools", desc: "Calculators, selectors, references.", icon: Calculator, href: "/ai-assistant" },
   ],
