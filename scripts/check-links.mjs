@@ -246,37 +246,106 @@ if (externalCfg.enabled) {
 
 
 // -------- Sitemap parity --------
-const sitemapSrc = readFileSync(join(ROUTES_DIR, "sitemap[.]xml.ts"), "utf8");
+/** @type {Set<string>} */
 const sitemapPaths = new Set();
-const pathRe = /path:\s*["'`](\/[^"'`]*)["'`]/g;
-let sm;
-while ((sm = pathRe.exec(sitemapSrc))) sitemapPaths.add(sm[1]);
-
-const SITEMAP_EXCLUDE = new Set(["/*", "/knowledge", "/knowledge/*", "/sitemap.xml"]);
-
 /** @type {{path:string, reason:string}[]} */
 const sitemapErrors = [];
-for (const p of sitemapPaths) {
-  if (ignoreSitemapExtra.has(p)) continue;
-  if (!knownRoutes.has(p))
-    sitemapErrors.push({ path: p, reason: "listed in sitemap but no matching route file" });
+if (internalEnabled) {
+  const sitemapSrc = readFileSync(join(ROUTES_DIR, "sitemap[.]xml.ts"), "utf8");
+  const pathRe = /path:\s*["'`](\/[^"'`]*)["'`]/g;
+  let sm;
+  while ((sm = pathRe.exec(sitemapSrc))) sitemapPaths.add(sm[1]);
+  const SITEMAP_EXCLUDE = new Set(["/*", "/knowledge", "/knowledge/*", "/sitemap.xml"]);
+  for (const p of sitemapPaths) {
+    if (ignoreSitemapExtra.has(p)) continue;
+    if (!knownRoutes.has(p))
+      sitemapErrors.push({ path: p, reason: "listed in sitemap but no matching route file" });
+  }
+  for (const r of knownRoutes) {
+    if (SITEMAP_EXCLUDE.has(r)) continue;
+    if (ignoreSitemapMissing.has(r)) continue;
+    if (!sitemapPaths.has(r))
+      sitemapErrors.push({ path: r, reason: "route exists but is missing from sitemap" });
+  }
 }
-for (const r of knownRoutes) {
-  if (SITEMAP_EXCLUDE.has(r)) continue;
-  if (ignoreSitemapMissing.has(r)) continue;
-  if (!sitemapPaths.has(r))
-    sitemapErrors.push({ path: r, reason: "route exists but is missing from sitemap" });
+
+// -------- External URL validation ----------
+/** @type {{url:string, status:number|null, error:string|null, attempts:number, occurrences:{file:string,line:number}[]}[]} */
+const externalFailures = [];
+let externalOkCount = 0;
+async function checkOne(entry) {
+  const { timeoutMs, retries, userAgent, acceptStatuses } = externalCfg;
+  let lastErr = null;
+  let lastStatus = null;
+  for (let attempt = 1; attempt <= retries + 1; attempt++) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      // HEAD first, fall back to GET on 405/403/404 (some CDNs disallow HEAD).
+      let res = await fetch(entry.url, {
+        method: "HEAD",
+        redirect: "follow",
+        signal: ctrl.signal,
+        headers: { "user-agent": userAgent, accept: "*/*" },
+      });
+      if ([403, 404, 405, 501].includes(res.status)) {
+        res = await fetch(entry.url, {
+          method: "GET",
+          redirect: "follow",
+          signal: ctrl.signal,
+          headers: { "user-agent": userAgent, accept: "*/*" },
+        });
+      }
+      clearTimeout(timer);
+      lastStatus = res.status;
+      if (acceptStatuses.has(res.status)) return { ok: true, status: res.status, attempts: attempt };
+      // Retry 5xx / 429; hard-fail other 4xx.
+      if (res.status >= 500 || res.status === 429) { lastErr = `HTTP ${res.status}`; continue; }
+      return { ok: false, status: res.status, error: `HTTP ${res.status}`, attempts: attempt };
+    } catch (e) {
+      clearTimeout(timer);
+      lastErr = e.name === "AbortError" ? `timeout after ${timeoutMs}ms` : String(e.message || e);
+    }
+    // small backoff
+    await new Promise((r) => setTimeout(r, 250 * attempt));
+  }
+  return { ok: false, status: lastStatus, error: lastErr, attempts: retries + 1 };
 }
+
+async function runExternalChecks() {
+  const items = [...externalUrls.values()];
+  if (!items.length) return;
+  console.log(`\nChecking ${items.length} external URL(s) (concurrency=${externalCfg.concurrency}, timeout=${externalCfg.timeoutMs}ms, retries=${externalCfg.retries})…`);
+  let idx = 0;
+  const workers = Array.from({ length: Math.min(externalCfg.concurrency, items.length) }, async () => {
+    while (idx < items.length) {
+      const entry = items[idx++];
+      const res = await checkOne(entry);
+      if (res.ok) externalOkCount++;
+      else externalFailures.push({
+        url: entry.url,
+        status: res.status,
+        error: res.error,
+        attempts: res.attempts,
+        occurrences: entry.occurrences,
+      });
+    }
+  });
+  await Promise.all(workers);
+}
+await runExternalChecks();
 
 // Warn about ignore patterns that never matched anything (stale entries).
 const allDeclared = [
   ...fileIgnorePatterns,
   ...(config.ignoreLinks ?? []),
   ...(config.ignoreFiles ?? []),
+  ...(config.ignoreExternal ?? []),
 ];
 const staleIgnorePatterns = allDeclared.filter(
   (p) => !usedPatterns.has(globToRegExp(p).source),
 );
+
 
 // -------- Reports --------
 const totalErrors = errors.length + sitemapErrors.length;
