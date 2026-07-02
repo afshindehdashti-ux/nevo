@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SolutionsRawMaterialsRouteImport } from './routes/solutions.raw-materials'
 import { Route as SolutionsProductionLinesRouteImport } from './routes/solutions.production-lines'
+import { Route as SolutionsEngineeringConsultancyRouteImport } from './routes/solutions.engineering-consultancy'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -35,16 +36,24 @@ const SolutionsProductionLinesRoute =
     path: '/solutions/production-lines',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SolutionsEngineeringConsultancyRoute =
+  SolutionsEngineeringConsultancyRouteImport.update({
+    id: '/solutions/engineering-consultancy',
+    path: '/solutions/engineering-consultancy',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
 }
@@ -52,6 +61,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
 }
@@ -60,18 +70,21 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/sitemap.xml'
+    | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/sitemap.xml'
+    | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
   id:
     | '__root__'
     | '/'
     | '/sitemap.xml'
+    | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
   fileRoutesById: FileRoutesById
@@ -79,6 +92,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SolutionsEngineeringConsultancyRoute: typeof SolutionsEngineeringConsultancyRoute
   SolutionsProductionLinesRoute: typeof SolutionsProductionLinesRoute
   SolutionsRawMaterialsRoute: typeof SolutionsRawMaterialsRoute
 }
@@ -113,12 +127,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolutionsProductionLinesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/solutions/engineering-consultancy': {
+      id: '/solutions/engineering-consultancy'
+      path: '/solutions/engineering-consultancy'
+      fullPath: '/solutions/engineering-consultancy'
+      preLoaderRoute: typeof SolutionsEngineeringConsultancyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SolutionsEngineeringConsultancyRoute: SolutionsEngineeringConsultancyRoute,
   SolutionsProductionLinesRoute: SolutionsProductionLinesRoute,
   SolutionsRawMaterialsRoute: SolutionsRawMaterialsRoute,
 }
