@@ -22,6 +22,7 @@ import nevoLogoLight from "@/assets/nevo-logo-light.png";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AIAssistantLauncher } from "../components/site/AIAssistantLauncher";
 import { Analytics } from "../components/site/Analytics";
+import { ClientMonitor } from "../components/site/ClientMonitor";
 import { CookieConsent } from "../components/site/CookieConsent";
 import { StickyMobileCTA } from "../components/site/StickyMobileCTA";
 import { Toaster } from "../components/ui/sonner";
@@ -262,6 +263,7 @@ function RootComponent() {
         <StickyMobileCTA />
         <CookieConsent />
         <Analytics />
+        <ClientMonitor />
         <Toaster position="top-right" richColors closeButton />
       </LanguageProvider>
     </QueryClientProvider>
