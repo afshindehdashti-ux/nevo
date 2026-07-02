@@ -241,7 +241,7 @@ export function SiteHeader() {
         className={cn(
           "sticky top-0 z-50 transition-[background-color,box-shadow,border-color] duration-[250ms] ease-[var(--ease-out-quart)]",
           solid
-            ? "border-b border-border/70 bg-white/95 shadow-[0_1px_0_0_rgba(15,20,25,0.04),0_8px_28px_-18px_rgba(15,20,25,0.18)] backdrop-blur-xl"
+            ? "border-b border-border bg-background/90 shadow-[0_1px_0_0_rgba(0,0,0,0.4),0_8px_28px_-18px_rgba(0,0,0,0.6)] backdrop-blur-xl"
             : "border-b border-transparent bg-transparent",
         )}
         onMouseLeave={() => setActiveMenu(null)}
@@ -460,8 +460,8 @@ function PrimaryCTA({ solid }: { solid: boolean }) {
       className={cn(
         "group relative hidden overflow-hidden rounded-lg px-4 py-2.5 text-[13px] font-medium tracking-tight transition-all duration-[220ms] sm:inline-flex sm:items-center sm:gap-1.5",
         solid
-          ? "bg-primary text-primary-foreground hover:-translate-y-0.5 hover:shadow-[0_10px_30px_-10px_rgba(15,20,25,0.4)]"
-          : "bg-white text-primary hover:-translate-y-0.5 hover:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]",
+          ? "bg-accent text-accent-foreground hover:-translate-y-0.5 hover:shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--color-accent)_55%,transparent)]"
+          : "bg-accent text-accent-foreground hover:-translate-y-0.5 hover:shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--color-accent)_55%,transparent)]",
       )}
     >
       <span className="relative z-10">{t("cta.startProject")}</span>
@@ -490,7 +490,7 @@ function MegaPanel({
   return (
     <div
       className={cn(
-        "border-b border-border/70 bg-white shadow-[0_20px_40px_-24px_rgba(15,20,25,0.18)] transition-all duration-[220ms] ease-[var(--ease-out-quart)]",
+        "border-b border-border bg-background shadow-[0_20px_40px_-24px_rgba(0,0,0,0.6)] transition-all duration-[220ms] ease-[var(--ease-out-quart)]",
         open ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
       )}
       onMouseLeave={onClose}
@@ -528,7 +528,7 @@ function CardsLayout({ group }: { group: MenuGroup }) {
                 href={item.href ?? "/project-inquiry"}
                 className="group flex items-start gap-3 rounded-xl border border-transparent p-3.5 transition-all hover:border-border hover:bg-surface/60"
               >
-                <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-white text-foreground transition-colors group-hover:border-[color:var(--accent)] group-hover:text-[color:var(--accent)]">
+                <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-surface text-foreground transition-colors group-hover:border-[color:var(--accent)] group-hover:text-[color:var(--accent)]">
                   {item.icon ? <item.icon className="size-[18px]" strokeWidth={1.6} /> : null}
                 </span>
                 <span className="min-w-0">
@@ -563,7 +563,7 @@ function GridLayout({ group }: { group: MenuGroup }) {
               href={item.href ?? "/industries"}
               className="group flex flex-col items-start gap-3 rounded-xl border border-transparent p-4 transition-all hover:border-border hover:bg-surface/60"
             >
-              <span className="grid size-10 place-items-center rounded-lg border border-border bg-white transition-colors group-hover:border-[color:var(--accent)] group-hover:text-[color:var(--accent)]">
+              <span className="grid size-10 place-items-center rounded-lg border border-border bg-surface transition-colors group-hover:border-[color:var(--accent)] group-hover:text-[color:var(--accent)]">
                 {item.icon ? <item.icon className="size-[18px]" strokeWidth={1.6} /> : null}
               </span>
               <span className="text-[13.5px] font-medium tracking-tight text-foreground">
