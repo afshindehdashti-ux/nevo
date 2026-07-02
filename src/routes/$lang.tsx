@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { useEffect } from "react";
 import i18n, { SUPPORTED_LOCALES, DEFAULT_LOCALE, type Locale } from "@/i18n/config";
 import { useLanguage } from "@/i18n/LanguageProvider";
+import { LocaleLinkGuard } from "@/components/site/LocaleLinkGuard";
 
 export const Route = createFileRoute("/$lang")({
   beforeLoad: ({ params }) => {
@@ -30,5 +31,10 @@ function LangLayout() {
   useEffect(() => {
     if (current !== lang) setLang(lang as Locale);
   }, [lang, current, setLang]);
-  return <Outlet />;
+  return (
+    <>
+      <LocaleLinkGuard lang={lang as Locale} />
+      <Outlet />
+    </>
+  );
 }
