@@ -1343,6 +1343,15 @@
         "minLength": "O campo {field} deve ter pelo menos {min} caracteres.",
         "invalidEmail": "Introduza um endereço de e-mail válido.",
         "invalidPhone": "Introduza um número de telefone válido."
+      },
+      "errors": {
+        "serverErrorTitle": "Falha no envio",
+        "serverErrorDesc": "Não conseguimos entregar seu pedido agora. Tente novamente em instantes.",
+        "rateLimitTitle": "Muitas solicitações",
+        "rateLimitDesc": "Você enviou várias solicitações em pouco tempo. Aguarde um momento antes de tentar de novo.",
+        "networkErrorTitle": "Erro de rede",
+        "networkErrorDesc": "Verifique sua conexão e tente novamente. Seus dados não foram enviados.",
+        "retry": "Tentar novamente"
       }
     }
   }

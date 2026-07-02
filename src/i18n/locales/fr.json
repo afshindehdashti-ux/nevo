@@ -1343,6 +1343,15 @@
         "minLength": "{field} doit contenir au moins {min} caractères.",
         "invalidEmail": "Veuillez saisir une adresse e-mail valide.",
         "invalidPhone": "Veuillez saisir un numéro de téléphone valide."
+      },
+      "errors": {
+        "serverErrorTitle": "Échec de l'envoi",
+        "serverErrorDesc": "Nous n'avons pas pu transmettre votre demande. Merci de réessayer dans un instant.",
+        "rateLimitTitle": "Trop de requêtes",
+        "rateLimitDesc": "Vous avez envoyé plusieurs demandes en peu de temps. Patientez un instant avant de réessayer.",
+        "networkErrorTitle": "Erreur réseau",
+        "networkErrorDesc": "Vérifiez votre connexion et réessayez. Vos informations n'ont pas été envoyées.",
+        "retry": "Réessayer"
       }
     }
   }
