@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
-import { SITE } from "@/lib/seo";
+import { buildSeo } from "@/lib/seo";
+import { localizedMeta } from "@/lib/seo-meta";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import {
@@ -40,7 +41,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
-import { ogImageMeta } from "@/lib/og-images";
+
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
@@ -64,24 +65,14 @@ const FAQS_EN: { q: string; a: string }[] = [
 
 export const Route = createFileRoute("/$lang/industries")({
   head: ({ params }) => {
-    const TITLE = "Industries We Engineer For — Cold Storage, Clean Rooms, Food, Logistics | NEVO Industrial";
-    const DESCRIPTION = "Engineering-led sandwich panel and factory solutions for 12+ industries.";
+    const { title, description } = localizedMeta(URL_PATH, params.lang);
+    const base = buildSeo({ title, description, path: URL_PATH, lang: params.lang });
     const faqLd = {
-      "@context":"https://schema.org","@type":"FAQPage",
-      mainEntity: FAQS_EN.map(f=>({"@type":"Question",name:f.q,acceptedAnswer:{"@type":"Answer",text:f.a}})),
+      "@context": "https://schema.org", "@type": "FAQPage",
+      mainEntity: FAQS_EN.map(f => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
     };
     return {
-      meta: [
-        { title: TITLE },
-        { name: "description", content: DESCRIPTION },
-        { property: "og:title", content: TITLE },
-        { property: "og:description", content: DESCRIPTION },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
-        { name: "twitter:card", content: "summary_large_image" },
-        ...ogImageMeta("/industries"),
-      ],
-      links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
+      ...base,
       scripts: [{ type: "application/ld+json", children: JSON.stringify(faqLd) }],
     };
   },

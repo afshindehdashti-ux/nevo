@@ -14,8 +14,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
 import { submitLeadForm } from "@/lib/lead-submit";
-import { SITE, WHATSAPP_URL } from "@/lib/seo";
-import { ogImageMeta } from "@/lib/og-images";
+import { SITE, WHATSAPP_URL, buildSeo } from "@/lib/seo";
+import { localizedMeta } from "@/lib/seo-meta";
 
 const URL_PATH = "/contact";
 
@@ -250,21 +250,8 @@ function ContactPage() {
 
 export const Route = createFileRoute("/$lang/contact")({
   head: ({ params }) => {
-    const TITLE = "Global Offices & Contact — NEVO Industrial | Dubai · Germany · Turkey · Oman";
-    const DESCRIPTION = "Reach NEVO Industrial engineering teams worldwide. Dubai HQ, Germany, Turkey and Oman offices.";
-    return {
-      meta: [
-        { title: TITLE },
-        { name: "description", content: DESCRIPTION },
-        { property: "og:title", content: TITLE },
-        { property: "og:description", content: DESCRIPTION },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
-        { name: "twitter:card", content: "summary_large_image" },
-        ...ogImageMeta("/contact"),
-      ],
-      links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
-    };
+    const { title, description } = localizedMeta(URL_PATH, params.lang);
+    return buildSeo({ title, description, path: URL_PATH, lang: params.lang });
   },
   component: ContactPage,
 });
