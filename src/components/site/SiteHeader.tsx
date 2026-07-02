@@ -43,6 +43,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { SITE } from "@/lib/seo";
 import nevoLogoDark from "@/assets/nevo-logo-dark.png";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
@@ -324,6 +325,10 @@ export function SiteHeader() {
    ───────────────────────────────────────────────────────────── */
 
 function UtilityBar({ solid }: { solid: boolean }) {
+  const whatsappHref = SITE.contact.whatsapp
+    ? `https://wa.me/${SITE.contact.whatsapp}`
+    : "/project-inquiry";
+
   return (
     <div
       className={cn(
@@ -347,7 +352,7 @@ function UtilityBar({ solid }: { solid: boolean }) {
         </div>
         <div className="flex items-center gap-4">
           <a
-            href="https://wa.me/"
+            href={whatsappHref}
             className={cn(
               "inline-flex items-center gap-1.5 transition-colors",
               solid ? "hover:text-foreground" : "hover:text-white",
