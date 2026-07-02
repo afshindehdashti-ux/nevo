@@ -1334,9 +1334,16 @@
       "message": "Project brief (capacity, location, timeline)",
       "submit": "Solicitação de retorno",
       "sending": "Enviando…",
-      "successTitle": "Callback requested",
-      "successDesc": "A senior engineer will call you within one business day.",
-      "whatsapp": "Conversar no WhatsApp"
+      "successTitle": "Chamada de retorno solicitada",
+      "successDesc": "Um engenheiro sénior entrará em contacto no prazo de um dia útil.",
+      "whatsapp": "Conversar no WhatsApp",
+      "validation": {
+        "reviewTitle": "Reveja o formulário, por favor",
+        "required": "O campo {field} é obrigatório.",
+        "minLength": "O campo {field} deve ter pelo menos {min} caracteres.",
+        "invalidEmail": "Introduza um endereço de e-mail válido.",
+        "invalidPhone": "Introduza um número de telefone válido."
+      }
     }
   }
 }

@@ -1336,7 +1336,14 @@
       "sending": "جاري الإرسال…",
       "successTitle": "تم طلب المعاودة",
       "successDesc": "سيتصل بك مهندس أول خلال يوم عمل واحد.",
-      "whatsapp": "محادثة عبر واتساب"
+      "whatsapp": "محادثة عبر واتساب",
+      "validation": {
+        "reviewTitle": "يرجى مراجعة النموذج",
+        "required": "حقل {field} مطلوب.",
+        "minLength": "يجب ألا يقل {field} عن {min} أحرف.",
+        "invalidEmail": "يرجى إدخال بريد إلكتروني صالح.",
+        "invalidPhone": "يرجى إدخال رقم هاتف صالح."
+      }
     }
   }
 }

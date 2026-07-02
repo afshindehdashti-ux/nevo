@@ -13,11 +13,34 @@ export interface ValidateRule {
   min?: number;
 }
 
+export interface LeadMessages {
+  reviewTitle?: string;
+  /** Template with `{field}` placeholder. */
+  required?: string;
+  /** Template with `{field}` and `{min}` placeholders. */
+  minLength?: string;
+  invalidEmail?: string;
+  invalidPhone?: string;
+}
+
 export interface LeadOptions {
   source: string;
   rules?: ValidateRule[];
   successTitle?: string;
   successDescription?: string;
+  messages?: LeadMessages;
+}
+
+const DEFAULT_MESSAGES: Required<LeadMessages> = {
+  reviewTitle: "Please review the form",
+  required: "{field} is required.",
+  minLength: "{field} must be at least {min} characters.",
+  invalidEmail: "Please enter a valid email address.",
+  invalidPhone: "Please enter a valid phone number.",
+};
+
+function fmt(template: string, vars: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
 }
 
 export function collectFormData(form: HTMLFormElement): LeadPayload {
@@ -33,14 +56,16 @@ export function collectFormData(form: HTMLFormElement): LeadPayload {
 export function validateLead(
   payload: LeadPayload,
   rules: ValidateRule[] = [],
+  messages: LeadMessages = {},
 ): string | null {
+  const m = { ...DEFAULT_MESSAGES, ...messages };
   for (const r of rules) {
     const raw = payload[r.field];
     const v = typeof raw === "string" ? raw.trim() : "";
-    if (!v) return `${r.label} is required.`;
-    if (r.min && v.length < r.min) return `${r.label} must be at least ${r.min} characters.`;
-    if (r.type === "email" && !EMAIL_RE.test(v)) return `Please enter a valid email address.`;
-    if (r.type === "phone" && !PHONE_RE.test(v)) return `Please enter a valid phone number.`;
+    if (!v) return fmt(m.required, { field: r.label });
+    if (r.min && v.length < r.min) return fmt(m.minLength, { field: r.label, min: r.min });
+    if (r.type === "email" && !EMAIL_RE.test(v)) return m.invalidEmail;
+    if (r.type === "phone" && !PHONE_RE.test(v)) return m.invalidPhone;
   }
   return null;
 }
@@ -65,10 +90,11 @@ export async function submitLeadForm(
   form: HTMLFormElement,
   opts: LeadOptions,
 ): Promise<boolean> {
+  const m = { ...DEFAULT_MESSAGES, ...(opts.messages ?? {}) };
   const payload = collectFormData(form);
-  const error = validateLead(payload, opts.rules);
+  const error = validateLead(payload, opts.rules, m);
   if (error) {
-    toast.error("Please review the form", { description: error });
+    toast.error(m.reviewTitle, { description: error });
     return false;
   }
 

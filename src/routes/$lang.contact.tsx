@@ -86,6 +86,13 @@ function ContactPage() {
       ],
       successTitle: t("contact.callback.successTitle"),
       successDescription: t("contact.callback.successDesc"),
+      messages: {
+        reviewTitle:  t("contact.callback.validation.reviewTitle"),
+        required:     t("contact.callback.validation.required"),
+        minLength:    t("contact.callback.validation.minLength"),
+        invalidEmail: t("contact.callback.validation.invalidEmail"),
+        invalidPhone: t("contact.callback.validation.invalidPhone"),
+      },
     });
     setBusy(false);
     if (ok) formRef.current?.reset();

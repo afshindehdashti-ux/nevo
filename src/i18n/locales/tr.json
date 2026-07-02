@@ -1336,7 +1336,14 @@
       "sending": "Gönderiliyor…",
       "successTitle": "Geri arama talep edildi",
       "successDesc": "Bir kıdemli mühendis bir iş günü içinde sizi arayacaktır.",
-      "whatsapp": "WhatsApp'ta Sohbet"
+      "whatsapp": "WhatsApp'ta Sohbet",
+      "validation": {
+        "reviewTitle": "Lütfen formu gözden geçirin",
+        "required": "{field} alanı zorunludur.",
+        "minLength": "{field} en az {min} karakter olmalıdır.",
+        "invalidEmail": "Lütfen geçerli bir e-posta adresi girin.",
+        "invalidPhone": "Lütfen geçerli bir telefon numarası girin."
+      }
     }
   }
 }

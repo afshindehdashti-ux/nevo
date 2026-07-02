@@ -1334,9 +1334,16 @@
       "message": "Project brief (capacity, location, timeline)",
       "submit": "申请回电",
       "sending": "发送中…",
-      "successTitle": "Callback requested",
-      "successDesc": "A senior engineer will call you within one business day.",
-      "whatsapp": "通过 WhatsApp 聊天"
+      "successTitle": "已收到回电请求",
+      "successDesc": "资深工程师将在一个工作日内与您联系。",
+      "whatsapp": "通过 WhatsApp 聊天",
+      "validation": {
+        "reviewTitle": "请检查表单",
+        "required": "{field}为必填项。",
+        "minLength": "{field}至少需要 {min} 个字符。",
+        "invalidEmail": "请输入有效的电子邮箱地址。",
+        "invalidPhone": "请输入有效的电话号码。"
+      }
     }
   }
 }
