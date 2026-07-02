@@ -253,14 +253,14 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-medium transition ${
+      className={`flex w-full min-w-0 items-center justify-center gap-2 rounded-md border px-3 py-2 text-center text-xs font-medium leading-tight transition [overflow-wrap:anywhere] ${
         active
           ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-300"
           : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/25 hover:text-white"
       }`}
     >
-      {Icon ? <Icon className="h-3.5 w-3.5" /> : null}
-      {children}
+      {Icon ? <Icon className="h-3.5 w-3.5 shrink-0" /> : null}
+      <span className="min-w-0">{children}</span>
     </button>
   );
 }

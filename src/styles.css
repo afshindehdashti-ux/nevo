@@ -142,6 +142,7 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
+    overflow-x: clip;
   }
   body {
     background-color: var(--color-background);
@@ -149,6 +150,7 @@
     font-family: var(--font-sans);
     font-feature-settings: "cv11", "ss01", "ss03";
     text-underline-offset: 3px;
+    overflow-x: clip;
   }
   ::selection {
     background: var(--color-accent);
