@@ -1,2 +1,13 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /lovable/
+
+# AI crawlers — welcome, engineering knowledge is public
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Sitemap directive is intentionally omitted until a production domain is set.
