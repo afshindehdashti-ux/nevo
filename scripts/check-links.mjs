@@ -589,6 +589,18 @@ function mdSummary(r) {
     for (const e of r.sitemapErrors) lines.push(`| \`${e.path}\` | ${e.reason} |`);
     lines.push("");
   }
+  if (r.canonicalErrors.length) {
+    lines.push(`### 🧭 Canonical ↔ route issues (${r.canonicalErrors.length})`);
+    lines.push("");
+    lines.push(`| Route | File | Reason | Found |`);
+    lines.push(`| --- | --- | --- | --- |`);
+    for (const c of r.canonicalErrors.slice(0, 50))
+      lines.push(
+        `| \`${c.route}\` | \`${c.file}\` | ${c.reason} | ${c.found ? `\`${c.found}\`` : ""} |`,
+      );
+    if (r.canonicalErrors.length > 50)
+      lines.push(`| … | | _${r.canonicalErrors.length - 50} more_ | |`);
+    lines.push("");
   if (r.externalFailures.length) {
     lines.push(`### 🌐 External URL failures (${r.externalFailures.length})`);
     lines.push("");
