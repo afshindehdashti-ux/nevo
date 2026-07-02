@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
-import { SITE } from "@/lib/seo";
+import { buildSeo } from "@/lib/seo";
+import { localizedMeta } from "@/lib/seo-meta";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import {
