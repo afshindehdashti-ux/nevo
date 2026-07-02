@@ -339,10 +339,97 @@ function DownloadCenterPage() {
         </div>
       </section>
 
+      {/* FORMAT HUBS — CAD · CERTIFICATIONS · MANUALS */}
+      <section className="border-b border-white/5 py-20">
+        <div className="mx-auto max-w-7xl px-6">
+          <SectionHead
+            eyebrow="Engineering Format Hubs"
+            title="CAD, Certifications & Manuals"
+            desc="Three specialised libraries — engineered drawings, formal certificates and operational manuals — the same standard investors expect from Siemens, ABB or Bosch Rexroth."
+          />
+          <div className="mt-12 grid md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: Box,
+                title: "CAD & BIM Library",
+                desc: "DWG, DXF, STEP, IGES, SolidWorks and Revit families for panels, joints and complete production lines.",
+                formats: ["DWG","DXF","STEP","IGES","RVT","3D PDF"],
+                filter: "CAD & BIM" as Category,
+              },
+              {
+                icon: Award,
+                title: "Certification Center",
+                desc: "ISO 9001, ISO 14001, CE / EN 14509, fire, thermal and structural load test reports — accredited & downloadable.",
+                formats: ["ISO 9001","ISO 14001","CE","EN 13501","EN 14509"],
+                filter: "Certifications" as Category,
+              },
+              {
+                icon: HardHat,
+                title: "Operational Manuals",
+                desc: "Installation, operation, maintenance, troubleshooting, commissioning and safety manuals for every line we deliver.",
+                formats: ["Installation","Operation","Maintenance","Commissioning","Safety"],
+                filter: null,
+              },
+            ].map((h) => {
+              const Icon = h.icon;
+              const count = h.filter
+                ? DOCS.filter((d) => d.category === h.filter).length
+                : DOCS.filter((d) => ["Installation Guide","Operation Manual","Maintenance Manual","Commissioning Guide","Safety Manual","Troubleshooting Guide"].includes(d.type)).length;
+              return (
+                <button
+                  key={h.title}
+                  onClick={() => {
+                    if (h.filter) {
+                      setActiveCategory(h.filter);
+                      setActiveType("All");
+                    } else {
+                      setActiveCategory("All");
+                      setActiveType("Operation Manual");
+                    }
+                    setTab("Newest");
+                    setTimeout(() => {
+                      document.getElementById("library")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }, 60);
+                  }}
+                  className="group text-left relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-8 hover:border-emerald-500/40 hover:from-emerald-500/[0.06] transition"
+                >
+                  <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_60%)] opacity-0 group-hover:opacity-100 transition" />
+                  <div className="flex items-center justify-between">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-white/40">
+                      {count} files
+                    </span>
+                  </div>
+                  <h3 className="mt-6 text-2xl font-semibold tracking-tight group-hover:text-emerald-300 transition">
+                    {h.title}
+                  </h3>
+                  <p className="mt-3 text-sm text-white/60 leading-relaxed">{h.desc}</p>
+                  <div className="mt-5 flex flex-wrap gap-1.5">
+                    {h.formats.map((f) => (
+                      <span
+                        key={f}
+                        className="rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-white/60"
+                      >
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-6 inline-flex items-center gap-1 text-xs font-medium text-emerald-400">
+                    Open library <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* CATEGORIES */}
       <section className="border-b border-white/5 py-16">
         <div className="mx-auto max-w-7xl px-6">
-          <SectionHead eyebrow="Resource categories" title="Explore the engineering library" desc="17 categories covering every stage of factory development, production and operation." />
+          <SectionHead eyebrow="Resource categories" title="Explore the engineering library" desc={`${CATEGORIES.length} categories covering every stage of factory development, production and operation.`} />
           <div className="mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             <CategoryCard label="All resources" icon={Library} active={activeCategory === "All"} onClick={() => setActiveCategory("All")} count={DOCS.length} />
             {CATEGORIES.map((c) => {
