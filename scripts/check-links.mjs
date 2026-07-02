@@ -305,7 +305,12 @@ if (internalEnabled) {
     let cm;
     while ((cm = CANONICAL_RE.exec(text))) hrefs.push(cm[1] ?? cm[2]);
 
+    // buildSeo() from '@/lib/seo' emits a self-referencing canonical automatically.
+    // Treat any route that calls buildSeo(...) with a `path:` as canonical-correct.
+    const usesBuildSeo = /\bbuildSeo\s*\(/.test(text) && /\bpath\s*:/.test(text);
+
     if (hrefs.length === 0) {
+      if (usesBuildSeo) continue;
       canonicalErrors.push({ route: routePath, file: relFile, reason: "missing <link rel=\"canonical\"> in head()" });
       continue;
     }
