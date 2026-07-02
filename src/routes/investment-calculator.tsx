@@ -42,8 +42,8 @@ import {
   Area,
   AreaChart,
 } from "recharts";
-import SiteHeader from "@/components/site/SiteHeader";
-import SiteFooter from "@/components/site/SiteFooter";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 
