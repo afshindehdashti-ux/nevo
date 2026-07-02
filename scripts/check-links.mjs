@@ -461,6 +461,16 @@ ${rows(r.sitemapErrors, [
   { key: "path", label: "Path" },
   { key: "reason", label: "Reason" },
 ])}
+<h2>External URL failures (${r.externalFailures.length} of ${r.counts.externalChecked} checked)</h2>
+${rows(r.externalFailures, [
+  { key: "url", label: "URL" },
+  { key: "status", label: "Status" },
+  { key: "error", label: "Error" },
+  { key: "attempts", label: "Attempts" },
+  { key: "firstFile", label: "First seen in" },
+  { key: "firstLine", label: "Line" },
+  { key: "occurrenceCount", label: "# refs" },
+])}
 <h2>301 redirect warnings (${r.redirectWarnings.length})</h2>
 ${rows(r.redirectWarnings, [
   { key: "link", label: "Link" },
