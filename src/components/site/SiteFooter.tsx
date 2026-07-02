@@ -36,7 +36,7 @@ const COLUMNS = [
     links: [
       { label: "Knowledge Hub", href: "/knowledge" },
       { label: "Technical Library", href: "/knowledge" },
-      { label: "Downloads", href: "/knowledge" },
+      { label: "Download Center", href: "/download-center" },
       { label: "Case Studies", href: "/knowledge" },
       { label: "Project Inquiry", href: "/project-inquiry" },
     ],
