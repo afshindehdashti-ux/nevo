@@ -117,27 +117,28 @@ const KNOWLEDGE: MenuGroup = {
   layout: "list",
   width: "xl",
   items: [
-    { label: "Engineering Articles", desc: "Deep technical writing from our engineers.", icon: BookOpen, href: "/knowledge" },
-    { label: "Technical Library", desc: "Specs, datasheets, drawings.", icon: Library, href: "/knowledge" },
+    { label: "Engineering Articles", desc: "Deep technical writing from our engineers.", icon: BookOpen, href: "/knowledge-hub" },
+    { label: "Technical Library", desc: "Specs, datasheets, drawings.", icon: Library, href: "/download-center" },
     { label: "Download Center", desc: "Engineering guides, catalogs, datasheets.", icon: Download, href: "/download-center" },
-    { label: "Case Studies", desc: "Factories built with NEVO.", icon: FileText, href: "/knowledge" },
-    { label: "FAQ", desc: "Common industrial questions.", icon: HelpCircle, href: "/knowledge" },
-    { label: "Investment Guides", desc: "Feasibility and CAPEX planning.", icon: LineChart, href: "/knowledge" },
+    { label: "Case Studies", desc: "Factories built with NEVO.", icon: FileText, href: "/factory-layouts" },
+    { label: "FAQ", desc: "Common industrial questions.", icon: HelpCircle, href: "/knowledge-hub" },
+    { label: "Investment Guides", desc: "Feasibility and CAPEX planning.", icon: LineChart, href: "/knowledge-hub" },
     { label: "Investment Calculator", desc: "Model CAPEX, OPEX, ROI, IRR & payback.", icon: Calculator, href: "/investment-calculator" },
     { label: "AI Project Estimator", desc: "Instant AI feasibility: investment, utilities, ROI, IRR.", icon: Sparkles, href: "/ai-project-estimator" },
     { label: "PIR vs Rock Wool", desc: "Complete side-by-side comparison guide.", icon: Layers, href: "/pir-vs-rock-wool" },
-    { label: "White Papers", desc: "Peer-reviewed engineering perspectives.", icon: ScrollText, href: "/knowledge" },
-    { label: "Engineering Tools", desc: "Calculators, selectors, references.", icon: Calculator, href: "/ai-assistant" },
+    { label: "Research & Innovation", desc: "R&D roadmap, prototypes and applied testing.", icon: ScrollText, href: "/research-innovation" },
+    { label: "Engineering Tools", desc: "Calculators, selectors, references.", icon: Calculator, href: "/engineering-tools" },
     { label: "Customer Portal", desc: "Secure client dashboard: projects, tracking, documents.", icon: ShieldCheck, href: "/customer-portal" },
     { label: "Partner Portal", desc: "Global distributor & EPC workspace: leads, marketing, AI sales.", icon: Handshake, href: "/partner-portal" },
   ],
   featured: {
     eyebrow: "Latest article",
-    title: "PIR vs PUR: choosing the right core in 2026",
+    title: "PIR vs Rock Wool: choosing the right core in 2026",
     desc: "A structural, thermal and fire-performance comparison for cold storage.",
-    href: "/knowledge",
+    href: "/pir-vs-rock-wool",
   },
 };
+
 
 const MARKETS: MenuGroup = {
   label: "Markets",
