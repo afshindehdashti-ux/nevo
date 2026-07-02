@@ -9,48 +9,48 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroCockpit from "@/assets/tools/hero-cockpit.jpg";
-import { SITE } from "@/lib/seo";
+import { SITE, buildSeo } from "@/lib/seo";
 import { ogImageMeta } from "@/lib/og-images";
 
 export const Route = createFileRoute("/$lang/engineering-tools")({
   component: EngineeringToolsCenter,
-  head: ({ params }) => ({
-    meta: [
-      { title: "Engineering Tools Center — NEVO Industrial" },
-      { name: "description", content: "20 professional engineering tools for sandwich panel factories: thickness, U-value, fire rating, capacity, investment, ROI, utility, panel selectors, layout planner and AI engineer." },
-      { property: "og:title", content: "Engineering Tools Center — NEVO Industrial" },
-      { property: "og:description", content: "Professional engineering software — 20 real-time calculators, AI recommendations and PDF reports for sandwich panel projects." },
-      { property: "og:type", content: "website" },
-        ...ogImageMeta("/engineering-tools"),
-      { property: "og:url", content: `${SITE.url}/${params.lang}/engineering-tools` },
-    ],
-    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}/engineering-tools` }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-            { "@type": "ListItem", position: 2, name: "Engineering Tools", item: "/engineering-tools" },
-          ],
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: [
-            { "@type": "Question", name: "Are the NEVO engineering tools free to use?", acceptedAnswer: { "@type": "Answer", text: "Yes. All 20 engineering calculators are free. You can export PDF reports, share results and request a full engineering proposal." } },
-            { "@type": "Question", name: "How accurate are the calculations?", acceptedAnswer: { "@type": "Answer", text: "The tools use industry-standard formulas (EN 14509, EN 13501-1, ASTM) calibrated against NEVO's production data. Results are engineering estimates suitable for feasibility and pre-design." } },
-            { "@type": "Question", name: "Can I get an engineer to review my results?", acceptedAnswer: { "@type": "Answer", text: "Yes — after any calculation you can request a proposal and a senior industrial engineer will review your inputs within 24 hours." } },
-          ],
-        }),
-      },
-    ],
-  }),
+  head: ({ params }) => {
+    const seo = buildSeo({
+      title: "Engineering Tools Center",
+      description:
+        "20 professional engineering tools for sandwich panel factories: thickness, U-value, fire rating, capacity, investment, ROI, utility, panel selectors, layout planner and AI engineer.",
+      path: "/engineering-tools",
+      lang: params.lang,
+    });
+    return {
+      ...seo,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+              { "@type": "ListItem", position: 2, name: "Engineering Tools", item: "/engineering-tools" },
+            ],
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              { "@type": "Question", name: "Are the NEVO engineering tools free to use?", acceptedAnswer: { "@type": "Answer", text: "Yes. All 20 engineering calculators are free. You can export PDF reports, share results and request a full engineering proposal." } },
+              { "@type": "Question", name: "How accurate are the calculations?", acceptedAnswer: { "@type": "Answer", text: "The tools use industry-standard formulas (EN 14509, EN 13501-1, ASTM) calibrated against NEVO's production data. Results are engineering estimates suitable for feasibility and pre-design." } },
+              { "@type": "Question", name: "Can I get an engineer to review my results?", acceptedAnswer: { "@type": "Answer", text: "Yes — after any calculation you can request a proposal and a senior industrial engineer will review your inputs within 24 hours." } },
+            ],
+          }),
+        },
+      ],
+    };
+  },
 });
 
 type Category = "Panels" | "Factory" | "Financial" | "Selectors" | "Logistics" | "AI";
