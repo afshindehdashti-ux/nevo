@@ -5,19 +5,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * NEVO Button system
+ * NEVO Button system — dark premium industrial
  *
  * Locked variants:
- *   – primary   Graphite black bg, white text. Main CTAs.
+ *   – primary   NEVO green bg, white text. Main CTA / conversion.
  *                (alias: `default` for shadcn compatibility)
- *   – secondary White bg, graphite border + text. Explore/View.
+ *   – secondary Transparent bg, white border + text.
+ *                Green border + green text on hover.
  *                (alias: `outline`)
- *   – ghost     Transparent, minimal, arrow-forward pattern. Read more / details.
- *   – link      Underlined text link.
+ *   – ghost     Transparent, subtle hover on charcoal surface.
+ *   – link      Underlined white text, green on hover.
  *   – destructive
  *
  * Sizes: sm / md / lg / xl / icon.
- * Radius, spacing and hover states are unified across the platform.
  */
 const buttonVariants = cva(
   [
@@ -32,17 +32,17 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-primary text-primary-foreground hover:bg-primary/92 active:bg-primary",
+          "bg-accent text-accent-foreground hover:bg-accent/90 active:bg-accent shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-accent)_35%,transparent)]",
         default:
-          "bg-primary text-primary-foreground hover:bg-primary/92 active:bg-primary",
+          "bg-accent text-accent-foreground hover:bg-accent/90 active:bg-accent shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-accent)_35%,transparent)]",
         secondary:
-          "border border-border-strong bg-background text-foreground hover:bg-surface hover:border-foreground/60",
+          "border border-border-strong bg-transparent text-foreground hover:border-accent hover:text-accent",
         outline:
-          "border border-border-strong bg-background text-foreground hover:bg-surface hover:border-foreground/60",
+          "border border-border-strong bg-transparent text-foreground hover:border-accent hover:text-accent",
         ghost:
           "text-foreground hover:bg-surface hover:text-foreground",
         link:
-          "text-foreground underline underline-offset-4 hover:text-accent-foreground hover:decoration-accent",
+          "text-foreground underline underline-offset-4 decoration-transparent hover:text-accent hover:decoration-accent",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
       },
