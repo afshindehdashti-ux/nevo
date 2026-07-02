@@ -38,6 +38,8 @@ export interface LeadOptions {
   successTitle?: string;
   successDescription?: string;
   messages?: LeadMessages;
+  /** BCP47 locale (e.g. "en", "ar", "fr") — enables locale-aware phone rules. */
+  phoneLocale?: string;
   /**
    * Optional delivery hook. When provided, its result decides the toast:
    * - resolves with `{ ok: true }` or a `Response` with status < 400 → success
