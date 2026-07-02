@@ -87,11 +87,18 @@ function ContactPage() {
       successTitle: t("contact.callback.successTitle"),
       successDescription: t("contact.callback.successDesc"),
       messages: {
-        reviewTitle:  t("contact.callback.validation.reviewTitle"),
-        required:     t("contact.callback.validation.required"),
-        minLength:    t("contact.callback.validation.minLength"),
-        invalidEmail: t("contact.callback.validation.invalidEmail"),
-        invalidPhone: t("contact.callback.validation.invalidPhone"),
+        reviewTitle:       t("contact.callback.validation.reviewTitle"),
+        required:          t("contact.callback.validation.required"),
+        minLength:         t("contact.callback.validation.minLength"),
+        invalidEmail:      t("contact.callback.validation.invalidEmail"),
+        invalidPhone:      t("contact.callback.validation.invalidPhone"),
+        serverErrorTitle:  t("contact.callback.errors.serverErrorTitle"),
+        serverErrorDesc:   t("contact.callback.errors.serverErrorDesc"),
+        rateLimitTitle:    t("contact.callback.errors.rateLimitTitle"),
+        rateLimitDesc:     t("contact.callback.errors.rateLimitDesc"),
+        networkErrorTitle: t("contact.callback.errors.networkErrorTitle"),
+        networkErrorDesc:  t("contact.callback.errors.networkErrorDesc"),
+        retry:             t("contact.callback.errors.retry"),
       },
     });
     setBusy(false);
