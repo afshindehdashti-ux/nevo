@@ -1,7 +1,6 @@
 {
   "ignoreExternal": [
     "https://fonts.googleapis.com/**",
-    "https://fonts.gstatic.com/**",
     "https://fonts.googleapis.com",
     "https://fonts.gstatic.com",
     "https://www.googletagmanager.com/**",
