@@ -61,7 +61,7 @@ function useCounter(target: number, duration = 1400) {
 }
 
 function ContactPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const formRef = useRef<HTMLFormElement>(null);
   const [busy, setBusy] = useState(false);
 
