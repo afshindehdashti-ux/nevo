@@ -367,7 +367,7 @@ function KnowledgeHub() {
               </div>
               <div className="mt-5 space-y-3">
                 {VIDEOS.map((v) => (
-                  <div key={v.title} className="group flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-3 hover:border-emerald-500/30 transition">
+                  <Link to="/download-center" key={v.title} className="group flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-3 hover:border-emerald-500/30 transition">
                     <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg">
                       <img src={v.cover} alt="" loading="lazy" className="h-full w-full object-cover" />
                       <div className="absolute inset-0 grid place-items-center bg-black/40"><PlayCircle className="h-6 w-6 text-emerald-400" /></div>
@@ -377,7 +377,7 @@ function KnowledgeHub() {
                       <div className="text-[11px] text-white/40 mt-1">{v.min} min</div>
                     </div>
                     <ArrowRight className="h-4 w-4 text-white/40 group-hover:text-emerald-400 transition" />
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
