@@ -73,6 +73,7 @@ const ignoreLinkREs = [...fileIgnorePatterns, ...(config.ignoreLinks ?? [])].map
 const ignoreFileREs = (config.ignoreFiles ?? []).map(globToRegExp);
 const ignoreSitemapMissing = new Set(config.ignoreSitemapMissing ?? []);
 const ignoreSitemapExtra = new Set(config.ignoreSitemapExtra ?? []);
+const ignoreExternalREs = (config.ignoreExternal ?? []).map(globToRegExp);
 const usedPatterns = new Set();
 function matchAny(res, value) {
   for (const re of res) if (re.test(value)) { usedPatterns.add(re.source); return true; }
@@ -80,6 +81,30 @@ function matchAny(res, value) {
 }
 const isIgnoredLink = (l) => matchAny(ignoreLinkREs, l);
 const isIgnoredFile = (f) => matchAny(ignoreFileREs, f);
+const isIgnoredExternal = (u) => matchAny(ignoreExternalREs, u);
+
+// -------- External checker config ----------
+// CLI/env knobs:
+//   --no-external          Skip external URL validation entirely.
+//   --external-only        Only run external checks (skip internal + sitemap).
+//   EXTERNAL_TIMEOUT_MS    Per-request timeout (default 10_000).
+//   EXTERNAL_RETRIES       Retry attempts on network error / 5xx (default 2).
+//   EXTERNAL_CONCURRENCY   Parallel in-flight requests (default 8).
+const args = new Set(process.argv.slice(2));
+const externalCfg = {
+  enabled: !args.has("--no-external"),
+  timeoutMs: Number(process.env.EXTERNAL_TIMEOUT_MS) || (config.external?.timeoutMs ?? 10_000),
+  retries: Number(process.env.EXTERNAL_RETRIES) || (config.external?.retries ?? 2),
+  concurrency:
+    Number(process.env.EXTERNAL_CONCURRENCY) || (config.external?.concurrency ?? 8),
+  userAgent:
+    config.external?.userAgent ??
+    "NEVO-LinkCheck/1.0 (+https://nevoindustrial.com)",
+  // Some servers return 403/405 to bots — treat these as OK when configured.
+  acceptStatuses: new Set(config.external?.acceptStatuses ?? [200, 201, 202, 203, 204, 206, 301, 302, 303, 307, 308]),
+};
+const internalEnabled = !args.has("--external-only");
+
 
 // -------- Route discovery (mirrors TanStack file-based routing) ----------
 function fileToRoute(file) {
