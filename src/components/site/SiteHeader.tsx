@@ -183,7 +183,16 @@ const NAV: MenuGroup[] = [SOLUTIONS, INDUSTRIES, KNOWLEDGE, MARKETS, COMPANY];
    Header
    ───────────────────────────────────────────────────────────── */
 
+const NAV_KEY: Record<string, string> = {
+  Solutions: "nav.solutions",
+  Industries: "nav.industries",
+  Knowledge: "nav.knowledge",
+  Markets: "nav.markets",
+  Company: "nav.company",
+};
+
 export function SiteHeader() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -270,11 +279,12 @@ export function SiteHeader() {
               aria-label="Primary"
               onMouseLeave={() => setActiveMenu(null)}
             >
-              <TopLink label="Home" href="/" onLight={!solid} onEnter={() => setActiveMenu(null)} />
+              <TopLink label={t("nav.home")} href="/" onLight={!solid} onEnter={() => setActiveMenu(null)} />
               {NAV.map((group) => (
                 <MegaTrigger
                   key={group.label}
                   group={group}
+                  displayLabel={t(NAV_KEY[group.label] ?? group.label, group.label)}
                   onLight={!solid}
                   active={activeMenu === group.label}
                   onEnter={() => setActiveMenu(group.label)}
@@ -284,7 +294,7 @@ export function SiteHeader() {
 
             <div className="flex items-center gap-1.5 sm:gap-2">
               <button
-                aria-label="Search"
+                aria-label={t("nav.search")}
                 onClick={() => setSearchOpen(true)}
                 className={cn(
                   "hidden size-10 items-center justify-center rounded-full transition-colors md:inline-flex",
@@ -297,7 +307,7 @@ export function SiteHeader() {
               <PrimaryCTA solid={solid} />
 
               <button
-                aria-label={open ? "Close menu" : "Open menu"}
+                aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")}
                 className={cn(
                   "inline-flex size-11 items-center justify-center rounded-md transition-colors lg:hidden",
                   solid ? "text-foreground hover:bg-surface" : "text-white hover:bg-white/10",
