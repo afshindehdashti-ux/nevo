@@ -820,14 +820,19 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
             Popular solutions
           </div>
           <div className="flex flex-wrap gap-2">
-            {["Factory Development", "Production Lines", "Sandwich Panels", "Cold Storage"].map((t) => (
+            {[
+              { label: "Factory Development", href: "/solutions/factory-development" },
+              { label: "Production Lines", href: "/solutions/production-lines" },
+              { label: "Sandwich Panels", href: "/solutions/sandwich-panels" },
+              { label: "Cold Storage", href: "/industries" },
+            ].map((t) => (
               <a
-                key={t}
-                href={item.href ?? "/industries"}
+                key={t.label}
+                href={t.href}
                 className="rounded-full border border-border px-3 py-1.5 text-[12.5px] font-medium text-foreground"
                 onClick={onClose}
               >
-                {t}
+                {t.label}
               </a>
             ))}
           </div>
@@ -846,7 +851,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
               {section.items.map((item) => (
                 <li key={item.label}>
                   <a
-                href={item.href ?? "/knowledge"}
+                    href={item.href ?? "/knowledge"}
                     className="flex items-center gap-3 rounded-lg px-2 py-3 text-[15px] text-foreground/85"
                     onClick={onClose}
                   >
@@ -869,11 +874,15 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
             Recent resources
           </div>
           <ul className="mt-3 grid gap-2">
-            {["PIR vs PUR: choosing the right core", "CAPEX guide for a 50k m² factory", "Continuous line commissioning checklist"].map(
+            {[
+              { label: "PIR vs PUR: choosing the right core", href: "/knowledge" },
+              { label: "CAPEX guide for a 50k m² factory", href: "/solutions/factory-development" },
+              { label: "Continuous line commissioning checklist", href: "/solutions/production-lines" },
+            ].map(
               (t) => (
-                <li key={t}>
-                  <a href="#" className="flex items-start justify-between gap-3 py-1.5 text-[14px] text-foreground" onClick={onClose}>
-                    <span className="min-w-0 flex-1">{t}</span>
+                <li key={t.label}>
+                  <a href={t.href} className="flex items-start justify-between gap-3 py-1.5 text-[14px] text-foreground" onClick={onClose}>
+                    <span className="min-w-0 flex-1">{t.label}</span>
                     <ArrowUpRight className="mt-0.5 size-4 text-muted-foreground" strokeWidth={1.75} />
                   </a>
                 </li>
