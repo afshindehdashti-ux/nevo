@@ -410,7 +410,8 @@ const staleIgnorePatterns = allDeclared.filter(
 
 
 // -------- Reports --------
-const totalErrors = errors.length + sitemapErrors.length + externalFailures.length;
+const totalErrors =
+  errors.length + sitemapErrors.length + externalFailures.length + canonicalErrors.length;
 const passed = totalErrors === 0;
 const generatedAt = new Date().toISOString();
 const commit = process.env.GITHUB_SHA || "";
@@ -427,6 +428,7 @@ const report = {
     deadLinks: errors.length,
     redirectWarnings: warnings.length,
     sitemapErrors: sitemapErrors.length,
+    canonicalErrors: canonicalErrors.length,
     ignoredLinks: ignoredLinkCount,
     externalChecked: externalUrls.size,
     externalOk: externalOkCount,
@@ -436,6 +438,7 @@ const report = {
   deadLinks: errors,
   redirectWarnings: warnings,
   sitemapErrors,
+  canonicalErrors,
   externalFailures: externalFailures.map((f) => ({
     ...f,
     // Flatten first occurrence for table rendering.
