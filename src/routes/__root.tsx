@@ -12,6 +12,10 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AIAssistantLauncher } from "../components/site/AIAssistantLauncher";
+import { Analytics } from "../components/site/Analytics";
+import { CookieConsent } from "../components/site/CookieConsent";
+import { StickyMobileCTA } from "../components/site/StickyMobileCTA";
+import { orgJsonLd, websiteJsonLd, ldScript } from "../lib/seo";
 
 function NotFoundComponent() {
   return (
@@ -106,10 +110,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.gstatic.com",
         crossOrigin: "anonymous",
       },
+      { rel: "dns-prefetch", href: "https://www.googletagmanager.com" },
+      { rel: "dns-prefetch", href: "https://www.clarity.ms" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
       },
+    ],
+    scripts: [
+      ldScript(orgJsonLd()),
+      ldScript(websiteJsonLd()),
     ],
   }),
   shellComponent: RootShell,
@@ -140,6 +150,9 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <AIAssistantLauncher />
+      <StickyMobileCTA />
+      <CookieConsent />
+      <Analytics />
     </QueryClientProvider>
   );
 }
