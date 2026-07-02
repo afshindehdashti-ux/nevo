@@ -14,6 +14,7 @@ const COLUMNS = [
       { label: "Finished Panels", href: "/solutions/sandwich-panels" },
       { label: "Panel Configurator", href: "/product-configurator" },
       { label: "Investment Calculator", href: "/investment-calculator" },
+      { label: "Panel Thickness Calculator", href: "/panel-thickness-calculator" },
       { label: "AI Engineering Assistant", href: "/ai-assistant" },
     ],
   },
