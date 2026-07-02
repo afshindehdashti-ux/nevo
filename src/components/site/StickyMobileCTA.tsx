@@ -7,9 +7,11 @@ import { SITE } from "@/lib/seo";
  * Hidden on desktop (md+) where the header CTA is visible.
  */
 export function StickyMobileCTA() {
-  const wa = `https://wa.me/${SITE.contact.whatsapp}?text=${encodeURIComponent(
-    "Hello NEVO Engineering — I'd like to discuss a project.",
-  )}`;
+  const wa = SITE.contact.whatsapp
+    ? `https://wa.me/${SITE.contact.whatsapp}?text=${encodeURIComponent(
+        "Hello NEVO Engineering — I'd like to discuss a project.",
+      )}`
+    : "/project-inquiry";
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[60] flex gap-2 border-t border-border/60 bg-background/95 p-2 backdrop-blur md:hidden">
