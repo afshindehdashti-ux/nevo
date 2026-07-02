@@ -42,7 +42,17 @@ export function ContactSection() {
                 WhatsApp
               </dt>
               <dd className="mt-1 text-sm text-foreground">
-                +971 4 000 0000
+                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  {SITE.contact.whatsappDisplay}
+                </a>
+              </dd>
+            </div>
+            <div>
+              <dt className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Phone
+              </dt>
+              <dd className="mt-1 text-sm text-foreground">
+                <a href={SITE.contact.phoneHref} className="hover:underline">{SITE.contact.phone}</a>
               </dd>
             </div>
             <div>
