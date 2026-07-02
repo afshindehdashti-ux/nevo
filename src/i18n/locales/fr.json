@@ -451,5 +451,78 @@
       "accept": "Accepter",
       "decline": "Refuser"
     }
+  },
+  "solutionsIndex": {
+    "eyebrow": "Solutions",
+    "heroTitle": "Des solutions à forte valeur d'ingénierie pour les fabricants de panneaux sandwich.",
+    "heroLede": "Quatre domaines d'activité intégrés — livrés ensemble en programme clé en main ou séparément dans le cadre de missions définies.",
+    "ctaQuote": "Demander un devis",
+    "ctaContact": "Contacter les ventes NEVO",
+    "sectionEyebrow": "Quatre domaines d'activité",
+    "sectionTitle": "Choisissez un domaine à explorer.",
+    "sectionLede": "Chaque domaine est piloté par une équipe d'ingénierie dédiée, avec documentation, normes et gouvernance de programme partagées.",
+    "explore": "Explorer {{name}}",
+    "items": {
+      "factory": {
+        "eyebrow": "Clé en main",
+        "title": "Usines de panneaux sandwich",
+        "lede": "Développement d'usine de bout en bout — de la faisabilité à la mise en service et la réception."
+      },
+      "lines": {
+        "eyebrow": "Ingénierie de ligne",
+        "title": "Lignes de production",
+        "lede": "Lignes continues PIR, PUR et laine de roche conçues pour la capacité, la disponibilité et la constance produit."
+      },
+      "consult": {
+        "eyebrow": "Conseil",
+        "title": "Conseil en ingénierie",
+        "lede": "Études de faisabilité, audits d'usine, optimisation des procédés et modélisation CAPEX/OPEX pour fabricants de panneaux."
+      },
+      "materials": {
+        "eyebrow": "Approvisionnement",
+        "title": "Matières premières",
+        "lede": "Bobines d'acier prélaqué, chimie PIR/PUR, âmes en laine de roche et adhésifs — sourcés et livrés à l'international."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "lastUpdated": "Dernière mise à jour : {{year}}",
+    "s1": {
+      "h": "1. Qui sommes-nous",
+      "p": "NEVO Industrial (« NEVO », « nous ») est un groupe d'ingénierie et industriel dont le siège se situe à Dubaï, EAU. Cette politique explique comment nous traitons les données personnelles collectées via notre site, nos calculateurs, notre centre de téléchargement et nos portails clients et partenaires."
+    },
+    "s2": {
+      "h": "2. Données collectées",
+      "items": [
+        "Coordonnées transmises via formulaires de demande, téléchargements ou rappels.",
+        "Paramètres de projet saisis dans les calculateurs ou configurateurs.",
+        "Données de compte des portails client et partenaire.",
+        "Données techniques (adresse IP, appareil, navigateur, pages consultées) via cookies essentiels et analytiques optionnels."
+      ]
+    },
+    "s3": {
+      "h": "3. Utilisation",
+      "p": "Nous utilisons les données personnelles pour répondre aux demandes, émettre des devis, fournir la documentation technique, exploiter les portails, améliorer notre plateforme et respecter nos obligations légales. Nous ne vendons pas de données personnelles."
+    },
+    "s4": {
+      "h": "4. Cookies",
+      "p": "Nous utilisons des cookies essentiels au fonctionnement du site et des cookies analytiques optionnels. Vous pouvez accepter ou refuser les cookies optionnels via le bandeau de consentement et modifier votre choix à tout moment en effaçant les données du site."
+    },
+    "s5": {
+      "h": "5. Partage",
+      "p": "Nous partageons les données uniquement avec les prestataires qui nous aident à exploiter la plateforme (hébergement, analytique, envoi d'e-mails) et avec les entités du groupe NEVO impliquées dans votre projet. Tous les sous-traitants sont tenus à la confidentialité."
+    },
+    "s6": {
+      "h": "6. Vos droits",
+      "pBefore": "Sous réserve du droit applicable, vous pouvez demander l'accès, la rectification, l'effacement ou la portabilité de vos données et vous opposer à certains traitements. Pour exercer vos droits, contactez ",
+      "pAfter": "."
+    },
+    "s7": {
+      "h": "7. Contact",
+      "pBefore": "NEVO Industrial — Dubaï, Émirats arabes unis. ",
+      "link": "Contactez-nous",
+      "pAfter": " pour toute question relative à cette politique."
+    }
   }
 }

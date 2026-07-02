@@ -451,5 +451,78 @@
       "accept": "Kabul et",
       "decline": "Reddet"
     }
+  },
+  "solutionsIndex": {
+    "eyebrow": "Çözümler",
+    "heroTitle": "Sandviç panel üreticilerine mühendislik odaklı çözümler.",
+    "heroLede": "Dört entegre iş alanı — anahtar teslim program olarak birlikte ya da kapsamı belirli bağımsız angajmanlar olarak sunulur.",
+    "ctaQuote": "Teklif İsteyin",
+    "ctaContact": "NEVO Satış ile İletişime Geçin",
+    "sectionEyebrow": "Dört iş alanı",
+    "sectionTitle": "Keşfetmek istediğiniz alanı seçin.",
+    "sectionLede": "Her alan, ortak dokümantasyon, standartlar ve program yönetişimi altında özel bir mühendislik ekibi tarafından yürütülür.",
+    "explore": "{{name}} alanını keşfet",
+    "items": {
+      "factory": {
+        "eyebrow": "Anahtar teslim",
+        "title": "Sandviç Panel Fabrikaları",
+        "lede": "Fizibiliteden yerleşim tasarımına, devreye almadan teslime uçtan uca fabrika geliştirme."
+      },
+      "lines": {
+        "eyebrow": "Hat mühendisliği",
+        "title": "Üretim Hatları",
+        "lede": "Kapasite, verimlilik ve ürün tutarlılığı için tasarlanmış PIR, PUR ve taş yünü sürekli hatlar."
+      },
+      "consult": {
+        "eyebrow": "Danışmanlık",
+        "title": "Mühendislik Danışmanlığı",
+        "lede": "Fizibilite çalışmaları, tesis denetimleri, süreç optimizasyonu ve CAPEX/OPEX modellemesi."
+      },
+      "materials": {
+        "eyebrow": "Tedarik",
+        "title": "Hammadde",
+        "lede": "Ön boyalı çelik rulolar, PIR/PUR kimyasalları, taş yünü çekirdekler ve yapıştırıcılar — global tedarik."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Gizlilik Politikası",
+    "lastUpdated": "Son güncelleme: {{year}}",
+    "s1": {
+      "h": "1. Biz kimiz",
+      "p": "NEVO Industrial (\"NEVO\", \"biz\"), merkezi Dubai, BAE'de bulunan bir mühendislik ve endüstri grubudur. Bu politika; web sitemiz, hesaplayıcılarımız, indirme merkezimiz ve müşteri/partner portallarımız aracılığıyla toplanan kişisel verileri nasıl işlediğimizi açıklar."
+    },
+    "s2": {
+      "h": "2. Topladığımız veriler",
+      "items": [
+        "Talep formları, indirmeler veya geri arama istekleri aracılığıyla ilettiğiniz iletişim bilgileri.",
+        "Hesaplayıcılara veya konfigüratörlere girdiğiniz proje parametreleri.",
+        "Müşteri ve partner portallarındaki hesap verileri.",
+        "Zorunlu ve isteğe bağlı analitik çerezler aracılığıyla teknik veriler (IP adresi, cihaz, tarayıcı, görüntülenen sayfalar)."
+      ]
+    },
+    "s3": {
+      "h": "3. Nasıl kullanıyoruz",
+      "p": "Kişisel verileri; taleplere yanıt vermek, teklif sunmak, mühendislik dokümantasyonu sağlamak, portalları işletmek, platformumuzu geliştirmek ve yasal yükümlülüklere uymak için kullanırız. Kişisel verileri satmayız."
+    },
+    "s4": {
+      "h": "4. Çerezler",
+      "p": "Sitenin çalışması için gerekli zorunlu çerezleri ve kullanımı anlamak için isteğe bağlı analitik çerezleri kullanırız. İsteğe bağlı çerezleri onay bandı üzerinden kabul veya reddedebilir, tercihinizi site verilerini temizleyerek her zaman değiştirebilirsiniz."
+    },
+    "s5": {
+      "h": "5. Paylaşım",
+      "p": "Verileri yalnızca platformumuzu işletmemize yardımcı olan hizmet sağlayıcılarla (barındırma, analitik, e-posta iletimi) ve projenizin teslimatına dahil olan NEVO grup şirketleriyle paylaşırız. Tüm işleyiciler gizlilik yükümlülüklerine tabidir."
+    },
+    "s6": {
+      "h": "6. Haklarınız",
+      "pBefore": "Yürürlükteki mevzuata bağlı olarak; kişisel verilerinize erişim, düzeltme, silme veya taşınabilirlik talebinde bulunabilir ve belirli işlemelere itiraz edebilirsiniz. Haklarınızı kullanmak için ",
+      "pAfter": " adresine ulaşın."
+    },
+    "s7": {
+      "h": "7. İletişim",
+      "pBefore": "NEVO Industrial — Dubai, Birleşik Arap Emirlikleri. ",
+      "link": "İletişime geçin",
+      "pAfter": " — bu politika hakkındaki sorularınız için."
+    }
   }
 }

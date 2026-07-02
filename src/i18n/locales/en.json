@@ -451,5 +451,78 @@
       "accept": "Accept",
       "decline": "Decline"
     }
+  },
+  "solutionsIndex": {
+    "eyebrow": "Solutions",
+    "heroTitle": "Engineering-led solutions for sandwich panel manufacturers.",
+    "heroLede": "Four integrated business areas — delivered together as a turnkey program, or independently as scoped engagements.",
+    "ctaQuote": "Request a Quotation",
+    "ctaContact": "Contact NEVO Sales",
+    "sectionEyebrow": "Four business areas",
+    "sectionTitle": "Choose an area to explore.",
+    "sectionLede": "Each area is delivered by a dedicated engineering team, with shared documentation, standards and program governance.",
+    "explore": "Explore {{name}}",
+    "items": {
+      "factory": {
+        "eyebrow": "Turnkey delivery",
+        "title": "Sandwich Panel Factories",
+        "lede": "End-to-end factory development — from feasibility and layout to commissioning and handover."
+      },
+      "lines": {
+        "eyebrow": "Line engineering",
+        "title": "Production Lines",
+        "lede": "PIR, PUR and rock-wool continuous lines engineered for capacity, uptime and product consistency."
+      },
+      "consult": {
+        "eyebrow": "Advisory",
+        "title": "Engineering Consultancy",
+        "lede": "Feasibility studies, plant audits, process optimisation and CAPEX/OPEX modelling for panel manufacturers."
+      },
+      "materials": {
+        "eyebrow": "Supply",
+        "title": "Raw Materials",
+        "lede": "Pre-painted steel coils, PIR/PUR chemistry, rock-wool cores and adhesives — sourced and delivered globally."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: {{year}}",
+    "s1": {
+      "h": "1. Who we are",
+      "p": "NEVO Industrial (\"NEVO\", \"we\", \"us\") is an engineering and industrial group headquartered in Dubai, UAE. This policy explains how we handle personal data collected through our website, calculators, download center, and customer or partner portals."
+    },
+    "s2": {
+      "h": "2. Data we collect",
+      "items": [
+        "Contact details you submit through inquiry forms, downloads, or callbacks.",
+        "Project parameters entered into calculators or configurators.",
+        "Account data for the customer and partner portals.",
+        "Technical data (IP address, device, browser, pages viewed) via essential and optional analytics cookies."
+      ]
+    },
+    "s3": {
+      "h": "3. How we use it",
+      "p": "We use personal data to respond to inquiries, deliver quotations, provide engineering documentation, operate portals, improve our platform, and comply with legal obligations. We do not sell personal data."
+    },
+    "s4": {
+      "h": "4. Cookies",
+      "p": "We use essential cookies required for the site to function and optional analytics cookies to understand usage. You can accept or decline optional cookies via the consent banner and change your choice at any time by clearing site data."
+    },
+    "s5": {
+      "h": "5. Sharing",
+      "p": "We share data only with service providers who help operate our platform (hosting, analytics, email delivery), and with NEVO group entities involved in delivering your project. All processors are bound by confidentiality obligations."
+    },
+    "s6": {
+      "h": "6. Your rights",
+      "pBefore": "Subject to applicable law, you may request access, correction, deletion, or portability of your personal data, and object to certain processing. To exercise your rights, contact ",
+      "pAfter": "."
+    },
+    "s7": {
+      "h": "7. Contact",
+      "pBefore": "NEVO Industrial — Dubai, United Arab Emirates. ",
+      "link": "Get in touch",
+      "pAfter": " with any questions about this policy."
+    }
   }
 }

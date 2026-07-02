@@ -451,5 +451,78 @@
       "accept": "Accetta",
       "decline": "Rifiuta"
     }
+  },
+  "solutionsIndex": {
+    "eyebrow": "Soluzioni",
+    "heroTitle": "Soluzioni a forte contenuto ingegneristico per i produttori di pannelli sandwich.",
+    "heroLede": "Quattro aree di business integrate — erogate insieme come programma chiavi in mano o singolarmente come incarichi a perimetro definito.",
+    "ctaQuote": "Richiedi un'offerta",
+    "ctaContact": "Contatta le vendite NEVO",
+    "sectionEyebrow": "Quattro aree di business",
+    "sectionTitle": "Scegli un'area da esplorare.",
+    "sectionLede": "Ogni area è gestita da un team di ingegneria dedicato, con documentazione, standard e governance di programma condivisi.",
+    "explore": "Esplora {{name}}",
+    "items": {
+      "factory": {
+        "eyebrow": "Chiavi in mano",
+        "title": "Stabilimenti per pannelli sandwich",
+        "lede": "Sviluppo di stabilimento end-to-end — dalla fattibilità e layout al commissioning e consegna."
+      },
+      "lines": {
+        "eyebrow": "Ingegneria di linea",
+        "title": "Linee di produzione",
+        "lede": "Linee continue PIR, PUR e lana di roccia progettate per capacità, disponibilità e costanza di prodotto."
+      },
+      "consult": {
+        "eyebrow": "Consulenza",
+        "title": "Consulenza ingegneristica",
+        "lede": "Studi di fattibilità, audit di stabilimento, ottimizzazione di processo e modellazione CAPEX/OPEX per produttori di pannelli."
+      },
+      "materials": {
+        "eyebrow": "Fornitura",
+        "title": "Materie prime",
+        "lede": "Coil in acciaio preverniciato, chimica PIR/PUR, anime in lana di roccia e adesivi — approvvigionati e consegnati a livello globale."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Informativa sulla privacy",
+    "lastUpdated": "Ultimo aggiornamento: {{year}}",
+    "s1": {
+      "h": "1. Chi siamo",
+      "p": "NEVO Industrial («NEVO», «noi») è un gruppo ingegneristico e industriale con sede a Dubai, EAU. La presente informativa spiega come trattiamo i dati personali raccolti tramite il nostro sito, i calcolatori, il centro download e i portali clienti e partner."
+    },
+    "s2": {
+      "h": "2. Dati raccolti",
+      "items": [
+        "Dati di contatto forniti tramite moduli, download o richieste di richiamo.",
+        "Parametri di progetto inseriti nei calcolatori o configuratori.",
+        "Dati di account dei portali clienti e partner.",
+        "Dati tecnici (indirizzo IP, dispositivo, browser, pagine visualizzate) tramite cookie essenziali e analitici opzionali."
+      ]
+    },
+    "s3": {
+      "h": "3. Come li utilizziamo",
+      "p": "Utilizziamo i dati personali per rispondere alle richieste, emettere offerte, fornire documentazione tecnica, gestire i portali, migliorare la piattaforma e adempiere agli obblighi di legge. Non vendiamo dati personali."
+    },
+    "s4": {
+      "h": "4. Cookie",
+      "p": "Utilizziamo cookie essenziali necessari al funzionamento del sito e cookie analitici opzionali. Puoi accettare o rifiutare i cookie opzionali dal banner di consenso e modificare la scelta in qualsiasi momento cancellando i dati del sito."
+    },
+    "s5": {
+      "h": "5. Condivisione",
+      "p": "Condividiamo i dati solo con fornitori che ci supportano nella gestione della piattaforma (hosting, analytics, invio email) e con società del gruppo NEVO coinvolte nel tuo progetto. Tutti i responsabili sono vincolati da obblighi di riservatezza."
+    },
+    "s6": {
+      "h": "6. I tuoi diritti",
+      "pBefore": "In conformità alla legge applicabile, puoi richiedere accesso, rettifica, cancellazione o portabilità dei dati e opporti a determinati trattamenti. Per esercitare i tuoi diritti, contatta ",
+      "pAfter": "."
+    },
+    "s7": {
+      "h": "7. Contatti",
+      "pBefore": "NEVO Industrial — Dubai, Emirati Arabi Uniti. ",
+      "link": "Contattaci",
+      "pAfter": " per qualsiasi domanda su questa informativa."
+    }
   }
 }
