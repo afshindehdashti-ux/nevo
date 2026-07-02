@@ -359,7 +359,7 @@ function UtilityBar({ solid }: { solid: boolean }) {
             )}
           >
             <MessageCircle className="size-3.5" strokeWidth={1.75} />
-            WhatsApp
+            {SITE.contact.whatsapp ? "WhatsApp" : "Engineering Desk"}
           </a>
           <button
             className={cn(

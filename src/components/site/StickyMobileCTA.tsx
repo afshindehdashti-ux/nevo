@@ -23,7 +23,7 @@ export function StickyMobileCTA() {
         className="flex flex-1 items-center justify-center gap-2 rounded-md border border-border bg-background px-3 py-3 text-sm font-medium text-foreground"
       >
         <MessageCircle className="h-4 w-4" aria-hidden />
-        WhatsApp
+        {SITE.contact.whatsapp ? "WhatsApp" : "Inquiry"}
       </a>
       <Link
         to="/project-inquiry"

@@ -105,7 +105,7 @@ export function SiteFooter() {
                   className="size-4 text-primary-foreground/50"
                   strokeWidth={1.75}
                 />
-                WhatsApp Engineering Desk
+                {SITE.contact.whatsapp ? "WhatsApp Engineering Desk" : "Project Inquiry Center"}
               </a>
               <a
                 href="https://www.linkedin.com/company/nevo-industrial"
