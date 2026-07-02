@@ -387,6 +387,13 @@ writeFileSync(htmlPath, htmlReport(report));
 writeFileSync(mdPath, mdSummary(report));
 
 // -------- Console output --------
+if (ignoredLinkCount) {
+  console.log(`\nAllowlisted ${ignoredLinkCount} link occurrence(s) via ignore config.`);
+}
+if (staleIgnorePatterns.length) {
+  console.log("\nStale ignore patterns (never matched — consider removing):");
+  for (const p of staleIgnorePatterns) console.log(`  • ${p}`);
+}
 if (warnings.length) {
   console.log("\nWarnings:");
   for (const w of warnings)
@@ -400,12 +407,12 @@ if (errors.length || sitemapErrors.length) {
     console.log(`  ✗ Dead internal link "${e.link}" in ${e.file}:${e.line}`);
   for (const s of sitemapErrors) console.log(`  ✗ ${s.path} — ${s.reason}`);
   console.log(
-    `\n✗ Link check failed: ${totalErrors} error(s), ${warnings.length} warning(s).`,
+    `\n✗ Link check failed: ${totalErrors} error(s), ${warnings.length} warning(s), ${ignoredLinkCount} ignored.`,
   );
   console.log(`Reports written to ${relative(ROOT, OUT_DIR)}/`);
   process.exit(1);
 }
 console.log(
-  `\n✓ Link check passed: ${knownRoutes.size} routes, ${sitemapPaths.size} sitemap entries, ${warnings.length} warning(s).`,
+  `\n✓ Link check passed: ${knownRoutes.size} routes, ${sitemapPaths.size} sitemap entries, ${warnings.length} warning(s), ${ignoredLinkCount} ignored.`,
 );
 console.log(`Reports written to ${relative(ROOT, OUT_DIR)}/`);
