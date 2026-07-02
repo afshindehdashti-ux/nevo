@@ -20,11 +20,11 @@ const DESCRIPTION =
 const URL_PATH = "/contact";
 
 const OFFICES = [
-  { code: "DXB", city: "Dubai", country: "United Arab Emirates", role: "Global Headquarters", address: "Business Bay, Dubai, UAE", phone: "+971 4 000 0000", email: "dubai@nevo-industrial.com", hours: "Sun–Thu · 08:30–18:00 GST", x: "62%", y: "52%" },
-  { code: "DE",  city: "Düsseldorf", country: "Germany", role: "European Engineering Hub", address: "Königsallee, Düsseldorf", phone: "+49 211 000 000", email: "europe@nevo-industrial.com", hours: "Mon–Fri · 09:00–18:00 CET", x: "48%", y: "34%" },
-  { code: "TR",  city: "Istanbul", country: "Türkiye", role: "Manufacturing & Sourcing", address: "Levent, Istanbul", phone: "+90 212 000 0000", email: "turkey@nevo-industrial.com", hours: "Mon–Fri · 09:00–18:00 TRT", x: "55%", y: "40%" },
-  { code: "OM",  city: "Muscat", country: "Sultanate of Oman", role: "GCC Projects Office", address: "Al Khuwair, Muscat", phone: "+968 24 000 000", email: "oman@nevo-industrial.com", hours: "Sun–Thu · 08:30–17:30 GST", x: "66%", y: "55%" },
-  { code: "…",   city: "Riyadh · Cairo · Nairobi", country: "Opening 2026", role: "Future Offices", address: "Under establishment", phone: "—", email: "expansion@nevo-industrial.com", hours: "Announced Q2 2026", x: "60%", y: "48%" },
+  { code: "DXB", city: "Dubai", country: "United Arab Emirates", role: "Global Headquarters", address: "Business Bay, Dubai, UAE", phone: SITE.contact.phone, email: "solutions@nevoindustrial.com", hours: "Sun–Thu · 08:30–18:00 GST", x: "62%", y: "52%" },
+  { code: "DE",  city: "Düsseldorf", country: "Germany", role: "European Engineering Hub", address: "Königsallee, Düsseldorf", phone: SITE.contact.phone, email: "europe@nevoindustrial.com", hours: "Mon–Fri · 09:00–18:00 CET", x: "48%", y: "34%" },
+  { code: "TR",  city: "Istanbul", country: "Türkiye", role: "Manufacturing & Sourcing", address: "Levent, Istanbul", phone: SITE.contact.phone, email: "turkey@nevoindustrial.com", hours: "Mon–Fri · 09:00–18:00 TRT", x: "55%", y: "40%" },
+  { code: "OM",  city: "Muscat", country: "Sultanate of Oman", role: "GCC Projects Office", address: "Al Khuwair, Muscat", phone: SITE.contact.phone, email: "oman@nevoindustrial.com", hours: "Sun–Thu · 08:30–17:30 GST", x: "66%", y: "55%" },
+  { code: "…",   city: "Riyadh · Cairo · Nairobi", country: "Opening 2026", role: "Future Offices", address: "Under establishment", phone: SITE.contact.phone, email: "expansion@nevoindustrial.com", hours: "Announced Q2 2026", x: "60%", y: "48%" },
 ];
 
 const CONTACT_CARDS = [
