@@ -58,7 +58,7 @@ export const Route = createFileRoute("/customer-portal")({
     scripts: [
       { type: "application/ld+json", children: JSON.stringify(orgJsonLd()) },
       { type: "application/ld+json", children: JSON.stringify(breadcrumbJsonLd([
-        { name: "Home", url: "/" }, { name: "Customer Portal", url: "/customer-portal" },
+        { name: "Home", path: "/" }, { name: "Customer Portal", path: "/customer-portal" },
       ])) },
     ],
   }),
