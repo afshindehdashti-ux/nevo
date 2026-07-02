@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as QualityRouteImport } from './routes/quality'
 import { Route as ProjectInquiryRouteImport } from './routes/project-inquiry'
 import { Route as ProductConfiguratorRouteImport } from './routes/product-configurator'
 import { Route as PirVsRockWoolRouteImport } from './routes/pir-vs-rock-wool'
@@ -35,6 +36,11 @@ import { Route as ApiChatRouteImport } from './routes/api/chat'
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QualityRoute = QualityRouteImport.update({
+  id: '/quality',
+  path: '/quality',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectInquiryRoute = ProjectInquiryRouteImport.update({
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
+  '/quality': typeof QualityRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
+  '/quality': typeof QualityRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
+  '/quality': typeof QualityRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/pir-vs-rock-wool'
     | '/product-configurator'
     | '/project-inquiry'
+    | '/quality'
     | '/sitemap.xml'
     | '/api/chat'
     | '/solutions/engineering-consultancy'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/pir-vs-rock-wool'
     | '/product-configurator'
     | '/project-inquiry'
+    | '/quality'
     | '/sitemap.xml'
     | '/api/chat'
     | '/solutions/engineering-consultancy'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/pir-vs-rock-wool'
     | '/product-configurator'
     | '/project-inquiry'
+    | '/quality'
     | '/sitemap.xml'
     | '/api/chat'
     | '/solutions/engineering-consultancy'
@@ -311,6 +323,7 @@ export interface RootRouteChildren {
   PirVsRockWoolRoute: typeof PirVsRockWoolRoute
   ProductConfiguratorRoute: typeof ProductConfiguratorRoute
   ProjectInquiryRoute: typeof ProjectInquiryRoute
+  QualityRoute: typeof QualityRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
   SolutionsEngineeringConsultancyRoute: typeof SolutionsEngineeringConsultancyRoute
@@ -327,6 +340,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quality': {
+      id: '/quality'
+      path: '/quality'
+      fullPath: '/quality'
+      preLoaderRoute: typeof QualityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/project-inquiry': {
@@ -495,6 +515,7 @@ const rootRouteChildren: RootRouteChildren = {
   PirVsRockWoolRoute: PirVsRockWoolRoute,
   ProductConfiguratorRoute: ProductConfiguratorRoute,
   ProjectInquiryRoute: ProjectInquiryRoute,
+  QualityRoute: QualityRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,
   SolutionsEngineeringConsultancyRoute: SolutionsEngineeringConsultancyRoute,
