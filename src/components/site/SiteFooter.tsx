@@ -34,10 +34,11 @@ const COLUMNS = [
   {
     title: "Resources",
     links: [
-      { label: "Knowledge Hub", href: "/knowledge" },
-      { label: "Technical Library", href: "/knowledge" },
+      { label: "Knowledge Hub", href: "/knowledge-hub" },
+      { label: "Engineering Tools", href: "/engineering-tools" },
       { label: "Download Center", href: "/download-center" },
-      { label: "Case Studies", href: "/knowledge" },
+      { label: "Case Studies", href: "/factory-layouts" },
+      { label: "Installation & Commissioning", href: "/installation-commissioning" },
       { label: "Project Inquiry", href: "/project-inquiry" },
       { label: "Customer Portal", href: "/customer-portal" },
       { label: "Partner Portal", href: "/partner-portal" },
@@ -61,13 +62,17 @@ const COLUMNS = [
     title: "Company",
     links: [
       { label: "About NEVO", href: "/about" },
-      { label: "Why NEVO", href: "/about" },
-      { label: "Dubai Advantage", href: "/about" },
-      { label: "Global Network", href: "/industries" },
-      { label: "Contact", href: "/project-inquiry" },
+      { label: "Quality Assurance", href: "/quality" },
+      { label: "Sustainability & ESG", href: "/sustainability" },
+      { label: "Research & Innovation", href: "/research-innovation" },
+      { label: "Careers", href: "/careers" },
+      { label: "Investor Relations", href: "/investors" },
+      { label: "Contact", href: "/contact" },
+      { label: "Privacy", href: "/privacy" },
     ],
   },
 ];
+
 
 export function SiteFooter() {
   const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
