@@ -2,6 +2,8 @@
  * NEVO SEO helpers — centralized metadata + JSON-LD builders.
  * Use buildSeo() in every route's head() for consistent titles/OG/canonical.
  */
+import { OG_IMAGES, OG_DEFAULT } from "./og-images";
+
 
 export const SITE = {
   name: "NEVO Industrial",
