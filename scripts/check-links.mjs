@@ -181,36 +181,69 @@ function lineOf(text, index) {
 }
 
 let ignoredLinkCount = 0;
-for (const file of srcFiles) {
-  const relFile = relative(ROOT, file);
-  if (isIgnoredFile(relFile)) continue;
-  const text = readFileSync(file, "utf8");
-  for (const pattern of LINK_PATTERNS) {
-    pattern.lastIndex = 0;
-    let m;
-    while ((m = pattern.exec(text))) {
-      const raw = m[1];
-      if (raw.startsWith("//")) continue;
-      if (raw.startsWith("/api/")) continue;
-      if (raw.match(/\.(png|jpg|jpeg|svg|webp|pdf|xml|txt|ico|json|mp4|webm)$/i))
-        continue;
-      if (isIgnoredLink(raw)) { ignoredLinkCount++; continue; }
-      const result = resolveLink(raw);
-      const line = lineOf(text, m.index);
-      if (!result.ok) {
-        errors.push({ link: raw, file: relFile, line, kind: "dead" });
-      } else if (result.redirected) {
-        warnings.push({
-          link: raw,
-          file: relFile,
-          line,
-          kind: "redirect",
-          redirectedTo: result.redirected,
-        });
+let ignoredExternalCount = 0;
+/** @type {Map<string, {url:string, occurrences:{file:string,line:number}[]}>} */
+const externalUrls = new Map();
+const EXTERNAL_RE = /\bhttps?:\/\/[^\s"'`<>()\\]+/g;
+
+if (internalEnabled) {
+  for (const file of srcFiles) {
+    const relFile = relative(ROOT, file);
+    if (isIgnoredFile(relFile)) continue;
+    const text = readFileSync(file, "utf8");
+    for (const pattern of LINK_PATTERNS) {
+      pattern.lastIndex = 0;
+      let m;
+      while ((m = pattern.exec(text))) {
+        const raw = m[1];
+        if (raw.startsWith("//")) continue;
+        if (raw.startsWith("/api/")) continue;
+        if (raw.match(/\.(png|jpg|jpeg|svg|webp|pdf|xml|txt|ico|json|mp4|webm)$/i))
+          continue;
+        if (isIgnoredLink(raw)) { ignoredLinkCount++; continue; }
+        const result = resolveLink(raw);
+        const line = lineOf(text, m.index);
+        if (!result.ok) {
+          errors.push({ link: raw, file: relFile, line, kind: "dead" });
+        } else if (result.redirected) {
+          warnings.push({
+            link: raw,
+            file: relFile,
+            line,
+            kind: "redirect",
+            redirectedTo: result.redirected,
+          });
+        }
       }
     }
   }
 }
+
+// -------- External URL discovery ----------
+if (externalCfg.enabled) {
+  for (const file of srcFiles) {
+    const relFile = relative(ROOT, file);
+    if (isIgnoredFile(relFile)) continue;
+    const text = readFileSync(file, "utf8");
+    EXTERNAL_RE.lastIndex = 0;
+    let m;
+    while ((m = EXTERNAL_RE.exec(text))) {
+      // Strip trailing punctuation that commonly clings to URLs in source.
+      let url = m[0].replace(/[),.;:!?]+$/g, "");
+      // Skip obvious asset URLs — they were already excluded for internal.
+      if (/\.(png|jpg|jpeg|svg|webp|gif|ico|mp4|webm|woff2?)(\?|$)/i.test(url)) continue;
+      // Skip localhost / example / placeholder hosts.
+      if (/^https?:\/\/(localhost|127\.|0\.0\.0\.0|example\.(com|org|net))/i.test(url))
+        continue;
+      if (isIgnoredExternal(url)) { ignoredExternalCount++; continue; }
+      const line = lineOf(text, m.index);
+      const entry = externalUrls.get(url) ?? { url, occurrences: [] };
+      entry.occurrences.push({ file: relFile, line });
+      externalUrls.set(url, entry);
+    }
+  }
+}
+
 
 // -------- Sitemap parity --------
 const sitemapSrc = readFileSync(join(ROUTES_DIR, "sitemap[.]xml.ts"), "utf8");
