@@ -46,6 +46,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import { downloadInvestmentReport } from "@/lib/investment-pdf";
 
 // ---------------- SEO ----------------
 export const Route = createFileRoute("/investment-calculator")({
