@@ -339,7 +339,7 @@ function KnowledgeHub() {
 
           <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {COURSES.map((c) => (
-              <div key={c.title} className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] hover:border-emerald-500/30 transition">
+              <Link to="/download-center" key={c.title} className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] hover:border-emerald-500/30 transition block">
                 <div className="relative aspect-[16/10] overflow-hidden">
                   <img src={c.cover} alt="" loading="lazy" className="h-full w-full object-cover opacity-90" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
@@ -355,7 +355,7 @@ function KnowledgeHub() {
                     <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">Watch training <ArrowRight className="h-3.5 w-3.5" /></span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 
