@@ -181,7 +181,7 @@ export const Route = createFileRoute("/download-center")({
           children: JSON.stringify(
             breadcrumbJsonLd([
               { name: "Home", path: "/" },
-              { name: "Knowledge", path: "/knowledge" },
+              { name: "Knowledge", path: "/knowledge-hub" },
               { name: "Download Center", path: "/download-center" },
             ]),
           ),
@@ -516,7 +516,7 @@ function DownloadCenterPage() {
           <SectionHead eyebrow="Related content" title="Continue your engineering research" />
           <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-5 gap-4">
             {[
-              { title: "Engineering Articles", desc: "Deep-dives from our senior engineers.", href: "/knowledge", icon: BookOpen },
+              { title: "Engineering Articles", desc: "Deep-dives from our senior engineers.", href: "/knowledge-hub", icon: BookOpen },
               { title: "Finished Panels", desc: "Product catalog for cold, food, industrial.", href: "/solutions/sandwich-panels", icon: Layers },
               { title: "Engineering Consultancy", desc: "Feasibility, design, procurement, commissioning.", href: "/solutions/engineering-consultancy", icon: Wrench },
               { title: "Industries We Serve", desc: "40+ markets, 12+ verticals.", href: "/industries", icon: Building2 },
@@ -597,7 +597,7 @@ function Breadcrumbs() {
     <nav className="flex items-center gap-2 text-xs text-white/50 font-mono uppercase tracking-widest">
       <Link to="/" className="hover:text-emerald-400">Home</Link>
       <ChevronRight className="h-3 w-3" />
-      <Link to="/knowledge" className="hover:text-emerald-400">Knowledge</Link>
+      <Link to="/knowledge-hub" className="hover:text-emerald-400">Knowledge</Link>
       <ChevronRight className="h-3 w-3" />
       <span className="text-white/80">Download Center</span>
     </nav>

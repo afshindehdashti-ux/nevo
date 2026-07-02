@@ -629,7 +629,7 @@ function ProductConfiguratorPage() {
                   <Link to="/project-inquiry"><MessageCircle className="mr-2 size-4" /> Talk to an Engineer</Link>
                 </Button>
                 <Button asChild variant="ghost" size="lg" className="text-white/70 hover:bg-white/5 hover:text-white">
-                  <Link to="/knowledge">Read Engineering Notes</Link>
+                  <Link to="/knowledge-hub">Read Engineering Notes</Link>
                 </Button>
               </div>
             </div>

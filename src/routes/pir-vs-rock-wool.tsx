@@ -74,7 +74,7 @@ export const Route = createFileRoute("/pir-vs-rock-wool")({
           children: JSON.stringify(
             breadcrumbJsonLd([
               { name: "Home", path: "/" },
-              { name: "Knowledge", path: "/knowledge" },
+              { name: "Knowledge", path: "/knowledge-hub" },
               { name: "PIR vs Rock Wool", path: "/pir-vs-rock-wool" },
             ]),
           ),
@@ -246,7 +246,7 @@ function PirVsRockWoolPage() {
         <div className="mx-auto flex max-w-[1440px] items-center gap-2 px-6 py-3 text-xs text-white/50">
           <Link to="/" className="hover:text-white">Home</Link>
           <ChevronRight className="h-3 w-3" />
-          <Link to="/knowledge" className="hover:text-white">Knowledge</Link>
+          <Link to="/knowledge-hub" className="hover:text-white">Knowledge</Link>
           <ChevronRight className="h-3 w-3" />
           <span className="text-white">PIR vs Rock Wool</span>
         </div>

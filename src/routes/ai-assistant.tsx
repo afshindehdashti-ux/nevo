@@ -98,7 +98,7 @@ const ECOSYSTEM = [
   { img: ecoMaterials, title: "Raw Materials", href: "/solutions/raw-materials" },
   { img: ecoPanels, title: "Finished Sandwich Panels", href: "/solutions/sandwich-panels" },
   { img: ecoInquiry, title: "Project Inquiry Center", href: "/project-inquiry" },
-  { img: ecoKnowledge, title: "Knowledge Hub", href: "/knowledge" },
+  { img: ecoKnowledge, title: "Knowledge Hub", href: "/knowledge-hub" },
 ];
 
 function AIAssistantPage() {

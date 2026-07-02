@@ -620,7 +620,7 @@ function MarketsLayout({ group }: { group: MenuGroup }) {
           {group.items.map((item) => (
             <li key={item.label}>
               <a
-                href={item.href ?? "/knowledge"}
+                href={item.href ?? "/knowledge-hub"}
                 className="group flex items-center justify-between rounded-lg px-3 py-2.5 transition-colors hover:bg-surface/70"
               >
                 <span className="inline-flex items-center gap-2 text-[13.5px] font-medium tracking-tight text-foreground">
@@ -928,7 +928,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
               {section.items.map((item) => (
                 <li key={item.label}>
                   <a
-                    href={item.href ?? "/knowledge"}
+                    href={item.href ?? "/knowledge-hub"}
                     className="flex items-center gap-3 rounded-lg px-2 py-3 text-[15px] text-foreground/85"
                     onClick={onClose}
                   >
