@@ -9,7 +9,7 @@ export function AnnouncementBar() {
           </span>
         </div>
         <a
-          href="#contact"
+          href="/project-inquiry"
           className="hidden items-center gap-1 font-medium uppercase tracking-widest text-primary-foreground/85 hover:text-primary-foreground sm:inline-flex"
         >
           Engineering desk open →

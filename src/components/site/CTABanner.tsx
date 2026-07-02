@@ -42,7 +42,7 @@ export function CTABanner() {
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                <a href="#contact">
+                <a href="/project-inquiry">
                   Start Your Project
                   <ArrowRight className="!size-4" />
                 </a>
@@ -53,7 +53,7 @@ export function CTABanner() {
                 variant="secondary"
                 className="border-white/30 bg-transparent text-white hover:border-white hover:bg-white/10"
               >
-                <a href="#contact">
+                <a href="/ai-assistant">
                   Book Engineering Consultation
                   <ArrowUpRight className="!size-4" />
                 </a>
