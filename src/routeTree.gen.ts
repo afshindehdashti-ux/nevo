@@ -15,6 +15,7 @@ import { Route as ResearchInnovationRouteImport } from './routes/research-innova
 import { Route as QualityRouteImport } from './routes/quality'
 import { Route as ProjectInquiryRouteImport } from './routes/project-inquiry'
 import { Route as ProductConfiguratorRouteImport } from './routes/product-configurator'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PirVsRockWoolRouteImport } from './routes/pir-vs-rock-wool'
 import { Route as PartnerPortalRouteImport } from './routes/partner-portal'
 import { Route as PanelThicknessCalculatorRouteImport } from './routes/panel-thickness-calculator'
@@ -70,6 +71,11 @@ const ProjectInquiryRoute = ProjectInquiryRouteImport.update({
 const ProductConfiguratorRoute = ProductConfiguratorRouteImport.update({
   id: '/product-configurator',
   path: '/product-configurator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PirVsRockWoolRoute = PirVsRockWoolRouteImport.update({
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
   '/partner-portal': typeof PartnerPortalRoute
   '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
+  '/privacy': typeof PrivacyRoute
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/quality': typeof QualityRoute
@@ -263,6 +270,7 @@ export interface FileRoutesByTo {
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
   '/partner-portal': typeof PartnerPortalRoute
   '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
+  '/privacy': typeof PrivacyRoute
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/quality': typeof QualityRoute
@@ -298,6 +306,7 @@ export interface FileRoutesById {
   '/panel-thickness-calculator': typeof PanelThicknessCalculatorRoute
   '/partner-portal': typeof PartnerPortalRoute
   '/pir-vs-rock-wool': typeof PirVsRockWoolRoute
+  '/privacy': typeof PrivacyRoute
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/quality': typeof QualityRoute
@@ -334,6 +343,7 @@ export interface FileRouteTypes {
     | '/panel-thickness-calculator'
     | '/partner-portal'
     | '/pir-vs-rock-wool'
+    | '/privacy'
     | '/product-configurator'
     | '/project-inquiry'
     | '/quality'
@@ -368,6 +378,7 @@ export interface FileRouteTypes {
     | '/panel-thickness-calculator'
     | '/partner-portal'
     | '/pir-vs-rock-wool'
+    | '/privacy'
     | '/product-configurator'
     | '/project-inquiry'
     | '/quality'
@@ -402,6 +413,7 @@ export interface FileRouteTypes {
     | '/panel-thickness-calculator'
     | '/partner-portal'
     | '/pir-vs-rock-wool'
+    | '/privacy'
     | '/product-configurator'
     | '/project-inquiry'
     | '/quality'
@@ -437,6 +449,7 @@ export interface RootRouteChildren {
   PanelThicknessCalculatorRoute: typeof PanelThicknessCalculatorRoute
   PartnerPortalRoute: typeof PartnerPortalRoute
   PirVsRockWoolRoute: typeof PirVsRockWoolRoute
+  PrivacyRoute: typeof PrivacyRoute
   ProductConfiguratorRoute: typeof ProductConfiguratorRoute
   ProjectInquiryRoute: typeof ProjectInquiryRoute
   QualityRoute: typeof QualityRoute
@@ -493,6 +506,13 @@ declare module '@tanstack/react-router' {
       path: '/product-configurator'
       fullPath: '/product-configurator'
       preLoaderRoute: typeof ProductConfiguratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pir-vs-rock-wool': {
@@ -701,6 +721,7 @@ const rootRouteChildren: RootRouteChildren = {
   PanelThicknessCalculatorRoute: PanelThicknessCalculatorRoute,
   PartnerPortalRoute: PartnerPortalRoute,
   PirVsRockWoolRoute: PirVsRockWoolRoute,
+  PrivacyRoute: PrivacyRoute,
   ProductConfiguratorRoute: ProductConfiguratorRoute,
   ProjectInquiryRoute: ProjectInquiryRoute,
   QualityRoute: QualityRoute,
