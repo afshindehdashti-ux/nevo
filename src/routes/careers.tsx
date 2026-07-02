@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
+import { useRef, useState } from "react";
 import {
   Briefcase, MapPin, Clock, Users, GraduationCap, Rocket,
-  Cpu, Wrench, Zap, Megaphone, Globe2, Building2, ArrowRight, Upload, Heart,
+  Cpu, Wrench, Zap, Megaphone, Globe2, Building2, ArrowRight, Upload, Heart, Loader2,
 } from "lucide-react";
 
 import heroImg from "@/assets/corporate/careers-hero.jpg";
@@ -11,6 +12,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { submitLeadForm } from "@/lib/lead-submit";
 
 const TITLE = "Careers — Build the Future With NEVO Industrial | Dubai · Germany · Türkiye";
 const DESCRIPTION =
