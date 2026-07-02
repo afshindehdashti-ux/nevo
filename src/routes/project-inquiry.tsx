@@ -33,8 +33,11 @@ import {
   FileSignature,
   Flag,
   Headphones,
+  Loader2,
   X,
 } from "lucide-react";
+
+import { toast } from "sonner";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -219,6 +222,7 @@ function ProjectInquiryPage() {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -266,10 +270,32 @@ function ProjectInquiryPage() {
   const removeFile = (name: string) =>
     setForm((f) => ({ ...f, files: f.files.filter((x) => x.name !== name) }));
 
-  const submit = () => {
-    setSubmitted(true);
-    try { localStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
-    setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50);
+  const submit = async () => {
+    if (submitting || submitted) return;
+    // Validate the required contact details captured in step 1.
+    const email = form.email.trim();
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+    if (!form.company.trim() || !form.contact.trim() || !emailOk) {
+      toast.error("Please complete required fields", {
+        description: "Company, contact person, and a valid work email are required before submission.",
+      });
+      setStep(0);
+      return;
+    }
+    setSubmitting(true);
+    try {
+      // Simulate secure delivery to the NEVO engineering desk.
+      // A backend endpoint can replace this without touching UX.
+      await new Promise((r) => setTimeout(r, 650));
+      try { localStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
+      setSubmitted(true);
+      toast.success("Project inquiry submitted", {
+        description: "A senior NEVO engineer will contact you within one business day.",
+      });
+      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -535,9 +561,14 @@ function ProjectInquiryPage() {
                 ) : (
                   <button
                     onClick={submit}
-                    className="flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-white transition hover:bg-emerald-400"
+                    disabled={submitting}
+                    className="flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-white transition hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Submit Project <ArrowRight className="h-4 w-4" />
+                    {submitting ? (
+                      <><Loader2 className="h-4 w-4 animate-spin" /> Submitting…</>
+                    ) : (
+                      <>Submit Project <ArrowRight className="h-4 w-4" /></>
+                    )}
                   </button>
                 )}
               </div>
