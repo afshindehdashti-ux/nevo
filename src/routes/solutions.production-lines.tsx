@@ -469,33 +469,47 @@ function ProcessTimeline() {
 /* ------------------------------------------------------------------ */
 
 const EQUIPMENT = [
-  { icon: Layers, t: "Decoiler", d: "Dual-station hydraulic decoilers with automatic coil change." },
-  { icon: Ruler, t: "Roll Former", d: "Quick-change tooling for wall, roof and cold-storage profiles." },
-  { icon: Flame, t: "Foaming System", d: "High-pressure PIR/PUR mixing head with dual-recipe management." },
-  { icon: Factory, t: "Double Belt Laminator", d: "Precision-tempered belts with self-adjusting side-band pressure." },
-  { icon: Thermometer, t: "Heating System", d: "Hot-oil or electric curing zone with zoned temperature control." },
-  { icon: Snowflake, t: "Cooling Zone", d: "Ambient and forced-air cooling to stabilize panel dimensions." },
-  { icon: Scissors, t: "Flying Saw", d: "Servo-driven cut-to-length with automatic length recipes." },
-  { icon: Package, t: "Stacking System", d: "Vacuum or mechanical stackers with automatic pack turning." },
-  { icon: Package, t: "Packaging Line", d: "Automatic protective film, corner protection and strapping." },
-  { icon: Cpu, t: "Control System", d: "PLC + SCADA with recipe management and full data logging." },
-  { icon: Zap, t: "Utilities", d: "Compressed air, chilled water, hot oil, exhaust and VOC treatment." },
+  { n: "01", img: eq01, icon: Layers, t: "Decoiler", d: "Hydraulic decoiler for PPGI / PPGL steel coils. Stable, precise and high capacity." },
+  { n: "02", img: eq02, icon: Ruler, t: "Roll Forming Machine", d: "High precision roll forming system for perfect panel profile and dimensional accuracy." },
+  { n: "03", img: eq03, icon: Flame, t: "Foam Injection System", d: "High-pressure mixing head for precise PIR foam injection with uniform density and distribution." },
+  { n: "04", img: eq04, icon: Factory, t: "Double Belt Laminator", d: "Heavy-duty double belt laminator ensures strong adhesion, flatness and excellent panel quality." },
+  { n: "05", img: eq05, icon: Scissors, t: "Flying Saw Cutting System", d: "High-speed flying saw for accurate cutting to length with smooth, clean edges." },
+  { n: "06", img: eq06, icon: Snowflake, t: "Cooling Section", d: "Powerful cooling system for stable panel temperature and continuous high-speed production." },
+  { n: "07", img: eq07, icon: Package, t: "Automatic Stacking System", d: "Fully automatic stacking for safe handling, high efficiency and reduced labour cost." },
+  { n: "08", img: eq08, icon: Package, t: "Auto Packaging Line", d: "Automatic packing with stretch film and edge protection for safe ocean transportation." },
+  { n: "09", img: eq09, icon: Cpu, t: "Electrical & Control System", d: "Siemens / Schneider based control system with HMI and intelligent automation." },
+  { n: "10", img: eq10, icon: Zap, t: "Air Compressor System", d: "High-efficiency air compressor ensuring stable air supply for the whole production line." },
 ];
 
 function MainEquipment() {
   return (
     <Section tone="surface">
       <SectionHeader
-        eyebrow="Main equipment"
-        title="Engineered modules — sourced, integrated and warranted by NEVO."
+        eyebrow="Main machinery & equipment"
+        title="Engineered for performance. Built to last."
       />
       <GridBoard className="sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {EQUIPMENT.map((e) => (
-          <BoardCell key={e.t} interactive className="min-h-[180px] justify-between gap-5">
-            <e.icon className="size-5 text-muted-foreground transition-colors group-hover:text-accent" strokeWidth={1.5} />
-            <div>
-              <h3 className="text-base font-semibold tracking-tight text-foreground">{e.t}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{e.d}</p>
+          <BoardCell key={e.t} interactive className="overflow-hidden !p-0">
+            <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+              <img
+                src={e.img}
+                alt={e.t}
+                loading="lazy"
+                width={1280}
+                height={1024}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+              />
+              <span className="absolute left-3 top-3 rounded-sm bg-accent px-2 py-0.5 font-mono text-[11px] font-semibold tracking-wider text-accent-foreground">
+                {e.n}
+              </span>
+            </div>
+            <div className="flex flex-1 flex-col gap-2 p-5">
+              <div className="flex items-center gap-2">
+                <e.icon className="size-4 text-muted-foreground transition-colors group-hover:text-accent" strokeWidth={1.5} />
+                <h3 className="text-base font-semibold tracking-tight text-foreground">{e.t}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">{e.d}</p>
             </div>
           </BoardCell>
         ))}
