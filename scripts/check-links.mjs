@@ -199,14 +199,26 @@ const SITEMAP_EXCLUDE = new Set(["/*", "/knowledge", "/knowledge/*", "/sitemap.x
 /** @type {{path:string, reason:string}[]} */
 const sitemapErrors = [];
 for (const p of sitemapPaths) {
+  if (ignoreSitemapExtra.has(p)) continue;
   if (!knownRoutes.has(p))
     sitemapErrors.push({ path: p, reason: "listed in sitemap but no matching route file" });
 }
 for (const r of knownRoutes) {
   if (SITEMAP_EXCLUDE.has(r)) continue;
+  if (ignoreSitemapMissing.has(r)) continue;
   if (!sitemapPaths.has(r))
     sitemapErrors.push({ path: r, reason: "route exists but is missing from sitemap" });
 }
+
+// Warn about ignore patterns that never matched anything (stale entries).
+const allDeclared = [
+  ...fileIgnorePatterns,
+  ...(config.ignoreLinks ?? []),
+  ...(config.ignoreFiles ?? []),
+];
+const staleIgnorePatterns = allDeclared.filter(
+  (p) => !usedPatterns.has(globToRegExp(p).source),
+);
 
 // -------- Reports --------
 const totalErrors = errors.length + sitemapErrors.length;
