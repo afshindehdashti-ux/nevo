@@ -8,7 +8,6 @@
  * Vite fingerprints these asset imports, so URLs are cache-busted per build.
  */
 
-import { SITE } from "./seo";
 
 // Home / brand
 import heroNevoLine from "@/assets/hero-nevo-line.jpg";
@@ -55,57 +54,57 @@ import aiCollab from "@/assets/ai/collab.jpg";
 import aiDigitalTwin from "@/assets/ai/digital-twin.jpg";
 
 /** Site-wide brand fallback (used when a specific route isn't mapped). */
-export const OG_DEFAULT: string = `${SITE.url}${heroNevoLine}`;
+export const OG_DEFAULT: string = ${heroNevoLine};
 
 /**
  * Path → absolute OG image URL.
  * Keys are locale-agnostic paths (without the /{lang} prefix).
  */
 export const OG_IMAGES: Record<string, string> = {
-  "/":                                    `${SITE.url}${heroNevoLine}`,
-  "/about":                               `${SITE.url}${engineeringPhilosophy}`,
+  "/":                                    ${heroNevoLine},
+  "/about":                               ${engineeringPhilosophy},
 
   // Solutions
-  "/solutions":                           `${SITE.url}${heroProductionLine}`,
-  "/solutions/factory-development":       `${SITE.url}${ecoFactoryDev}`,
-  "/solutions/production-lines":          `${SITE.url}${ecoProductionLines}`,
-  "/solutions/raw-materials":             `${SITE.url}${ecoRawMaterials}`,
-  "/solutions/engineering-consultancy":   `${SITE.url}${ecoConsultancy}`,
-  "/solutions/sandwich-panels":           `${SITE.url}${ecoFinishedPanels}`,
+  "/solutions":                           ${heroProductionLine},
+  "/solutions/factory-development":       ${ecoFactoryDev},
+  "/solutions/production-lines":          ${ecoProductionLines},
+  "/solutions/raw-materials":             ${ecoRawMaterials},
+  "/solutions/engineering-consultancy":   ${ecoConsultancy},
+  "/solutions/sandwich-panels":           ${ecoFinishedPanels},
 
   // Content hubs
-  "/industries":                          `${SITE.url}${industriesTile}`,
-  "/panels":                              `${SITE.url}${panelsTile}`,
-  "/factory-layouts":                     `${SITE.url}${factoryLayoutMaster}`,
-  "/factory-layout-generator":            `${SITE.url}${factoryLayoutMaster}`,
-  "/pir-vs-rock-wool":                    `${SITE.url}${knowledgePirVsPur}`,
-  "/quality":                             `${SITE.url}${knowledgeFireRating}`,
+  "/industries":                          ${industriesTile},
+  "/panels":                              ${panelsTile},
+  "/factory-layouts":                     ${factoryLayoutMaster},
+  "/factory-layout-generator":            ${factoryLayoutMaster},
+  "/pir-vs-rock-wool":                    ${knowledgePirVsPur},
+  "/quality":                             ${knowledgeFireRating},
 
   // Corporate
-  "/careers":                             `${SITE.url}${careersHero}`,
-  "/contact":                             `${SITE.url}${contactHero}`,
-  "/investors":                           `${SITE.url}${investorHero}`,
-  "/sustainability":                      `${SITE.url}${sustainabilityHero}`,
-  "/privacy":                             `${SITE.url}${engineeringPhilosophy}`,
+  "/careers":                             ${careersHero},
+  "/contact":                             ${contactHero},
+  "/investors":                           ${investorHero},
+  "/sustainability":                      ${sustainabilityHero},
+  "/privacy":                             ${engineeringPhilosophy},
 
   // Tools & configurators
-  "/product-configurator":                `${SITE.url}${configuratorHero}`,
-  "/project-inquiry":                     `${SITE.url}${projectBlueprint}`,
-  "/panel-thickness-calculator":          `${SITE.url}${knowledgeCrossSection}`,
-  "/investment-calculator":               `${SITE.url}${knowledgeInvestment}`,
-  "/ai-project-estimator":                `${SITE.url}${aiTechnicalProposal}`,
-  "/engineering-tools":                   `${SITE.url}${engineeringHero}`,
-  "/installation-commissioning":          `${SITE.url}${installationHero}`,
-  "/download-center":                     `${SITE.url}${knowledgeDatasheet}`,
+  "/product-configurator":                ${configuratorHero},
+  "/project-inquiry":                     ${projectBlueprint},
+  "/panel-thickness-calculator":          ${knowledgeCrossSection},
+  "/investment-calculator":               ${knowledgeInvestment},
+  "/ai-project-estimator":                ${aiTechnicalProposal},
+  "/engineering-tools":                   ${engineeringHero},
+  "/installation-commissioning":          ${installationHero},
+  "/download-center":                     ${knowledgeDatasheet},
 
   // Knowledge / AI
-  "/knowledge-hub":                       `${SITE.url}${knowledgeHubHero}`,
-  "/ai-assistant":                        `${SITE.url}${aiHeroEngineer}`,
-  "/research-innovation":                 `${SITE.url}${aiDigitalTwin}`,
+  "/knowledge-hub":                       ${knowledgeHubHero},
+  "/ai-assistant":                        ${aiHeroEngineer},
+  "/research-innovation":                 ${aiDigitalTwin},
 
   // Portals
-  "/customer-portal":                     `${SITE.url}${factoryHero}`,
-  "/partner-portal":                      `${SITE.url}${aiCollab}`,
+  "/customer-portal":                     ${factoryHero},
+  "/partner-portal":                      ${aiCollab},
 };
 
 /** Resolve the OG image URL for a locale-agnostic path, falling back to the brand default. */
