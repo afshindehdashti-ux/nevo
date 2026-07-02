@@ -318,7 +318,15 @@ if (internalEnabled) {
       continue;
     }
     if (isDynamic) continue; // dynamic routes: presence is enough
-    const href = hrefs[0].replace(SITE_ORIGIN, "").replace(/\/$/, "") || "/";
+    // Strip site-origin prefix and any `${...}` interpolations (site URL const,
+    // URL_PATH helper, etc.), then compare the remaining literal path.
+    const stripped = hrefs[0]
+      .replace(SITE_ORIGIN, "")
+      .replace(/\$\{[^}]+\}/g, "")
+      .replace(/\/$/, "");
+    // Fully interpolated (nothing left) => presence is enough; can't verify statically.
+    if (stripped === "") continue;
+    const href = stripped || "/";
     const expected = routePath;
     if (href !== expected) {
       canonicalErrors.push({
