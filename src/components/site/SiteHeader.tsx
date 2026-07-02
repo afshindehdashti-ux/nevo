@@ -783,6 +783,7 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
   const [q, setQ] = useState("");
   const [activeIdx, setActiveIdx] = useState(0);
   const navigate = useNavigate();
+  const { lang } = useLanguage();
 
   useEffect(() => {
     inputRef.current?.focus();
