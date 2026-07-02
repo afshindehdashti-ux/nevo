@@ -165,8 +165,9 @@ type FilterTab = typeof FILTER_TABS[number];
 
 export const Route = createFileRoute("/$lang/download-center")({
   component: DownloadCenterPage,
-  head: () => {
+  head: ({ params }) => {
     const seo = buildSeo({
+      lang: params.lang,
       title: "Download Center — Engineering Resources & Technical Library | NEVO",
       description:
         "Download professional engineering guides, factory planning books, technical catalogs, datasheets and calculation sheets for sandwich panel factories, production lines and raw materials.",

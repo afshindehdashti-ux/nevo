@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SITE } from "@/lib/seo";
 
 export const Route = createFileRoute("/$lang/privacy")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: "Privacy Policy — NEVO Industrial" },
       {
@@ -16,9 +16,9 @@ export const Route = createFileRoute("/$lang/privacy")({
         content:
           "How NEVO Industrial handles personal data, cookies, and inquiries submitted through our platform.",
       },
-      { property: "og:url", content: `${SITE.url}/privacy` },
+      { property: "og:url", content: `${SITE.url}/${params.lang}/privacy` },
     ],
-    links: [{ rel: "canonical", href: `${SITE.url}/privacy` }],
+    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}/privacy` }],
   }),
   component: PrivacyPage,
 });

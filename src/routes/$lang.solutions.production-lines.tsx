@@ -92,16 +92,16 @@ const FAQS = [
 ];
 
 export const Route = createFileRoute("/$lang/solutions/production-lines")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}${URL_PATH}` },
+      { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
     ],
-    links: [{ rel: "canonical", href: `${SITE.url}${URL_PATH}` }],
+    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
     scripts: [
       {
         type: "application/ld+json",
@@ -268,7 +268,7 @@ function Breadcrumbs() {
   const trail = [
     { label: "Home", href: "/" },
     { label: "Solutions", href: "/solutions" },
-    { label: "Production Lines", href: `${SITE.url}${URL_PATH}` },
+    { label: "Production Lines", href: URL_PATH },
   ];
   return (
     <nav aria-label="Breadcrumb" className="border-b border-border bg-background">

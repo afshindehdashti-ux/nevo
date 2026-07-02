@@ -52,8 +52,9 @@ import { downloadInvestmentReport } from "@/lib/investment-pdf";
 // ---------------- SEO ----------------
 export const Route = createFileRoute("/$lang/investment-calculator")({
   component: InvestmentCalculatorPage,
-  head: () => {
+  head: ({ params }) => {
     const seo = buildSeo({
+      lang: params.lang,
       title: "Factory Investment Calculator — Sandwich Panel Plant CAPEX & ROI",
       description:
         "Estimate CAPEX, OPEX, ROI, IRR, NPV and payback for a sandwich panel manufacturing plant. Engineered by NEVO Industrial for investors and developers.",

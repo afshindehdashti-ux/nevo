@@ -41,8 +41,9 @@ const A = [p01,p02,p03,p04,p05,p06,p07,p08,p09,p10,p11,p12,p13,p14,p15,p16,p17,p
 
 /* ─── SEO ─── */
 export const Route = createFileRoute("/$lang/partner-portal")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: buildSeo({
+      lang: params.lang,
       title: "Global Partner Portal",
       description:
         "NEVO Industrial Global Partner Portal — a premium workspace for distributors, EPCs, consultants and international sales partners. Leads, products, marketing, training, analytics and AI sales tools in one place.",
@@ -51,6 +52,7 @@ export const Route = createFileRoute("/$lang/partner-portal")({
       keywords: ["partner portal","distributor portal","nevo partners","international sales","EPC partner"],
     }).meta,
     links: buildSeo({
+      lang: params.lang,
       title: "Global Partner Portal",
       description: "NEVO Industrial Global Partner Portal.",
       path: "/partner-portal",

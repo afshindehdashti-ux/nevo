@@ -43,19 +43,19 @@ const DESCRIPTION =
 const URL_PATH = "/ai-assistant";
 
 export const Route = createFileRoute("/$lang/ai-assistant")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}${URL_PATH}` },
+      { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: TITLE },
       { name: "twitter:description", content: DESCRIPTION },
     ],
-    links: [{ rel: "canonical", href: `${SITE.url}${URL_PATH}` }],
+    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
   }),
   component: AIAssistantPage,
 });

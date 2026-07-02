@@ -13,16 +13,16 @@ import { SITE } from "@/lib/seo";
 
 export const Route = createFileRoute("/$lang/engineering-tools")({
   component: EngineeringToolsCenter,
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: "Engineering Tools Center — NEVO Industrial" },
       { name: "description", content: "20 professional engineering tools for sandwich panel factories: thickness, U-value, fire rating, capacity, investment, ROI, utility, panel selectors, layout planner and AI engineer." },
       { property: "og:title", content: "Engineering Tools Center — NEVO Industrial" },
       { property: "og:description", content: "Professional engineering software — 20 real-time calculators, AI recommendations and PDF reports for sandwich panel projects." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}/engineering-tools` },
+      { property: "og:url", content: `${SITE.url}/${params.lang}/engineering-tools` },
     ],
-    links: [{ rel: "canonical", href: `${SITE.url}/engineering-tools` }],
+    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}/engineering-tools` }],
     scripts: [
       {
         type: "application/ld+json",

@@ -22,16 +22,17 @@ const DESCRIPTION =
   "Dubai-based industrial engineering & supply company for the sandwich panel industry — factory development, engineering consultancy, PIR/PUR raw materials, production lines and finished panels.";
 
 export const Route = createFileRoute("/$lang/")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}/` },
+      { property: "og:url", content: `${SITE.url}/${params.lang}` },
     ],
-    links: [{ rel: "canonical", href: `${SITE.url}/` }],
+    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}` }],
+
     scripts: [
       {
         type: "application/ld+json",

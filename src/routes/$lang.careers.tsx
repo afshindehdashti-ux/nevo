@@ -245,17 +245,17 @@ function CareersPage() {
 }
 
 export const Route = createFileRoute("/$lang/careers")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}${URL_PATH}` },
+      { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: `${SITE.url}${URL_PATH}` }],
+    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
   }),
   component: CareersPage,
 });
