@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ProjectInquiryRouteImport } from './routes/project-inquiry'
 import { Route as ProductConfiguratorRouteImport } from './routes/product-configurator'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
+import { Route as InvestmentCalculatorRouteImport } from './routes/investment-calculator'
 import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as AboutRouteImport } from './routes/about'
@@ -42,6 +43,11 @@ const ProductConfiguratorRoute = ProductConfiguratorRouteImport.update({
 const KnowledgeRoute = KnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestmentCalculatorRoute = InvestmentCalculatorRouteImport.update({
+  id: '/investment-calculator',
+  path: '/investment-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndustriesRoute = IndustriesRouteImport.update({
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
   '/industries': typeof IndustriesRoute
+  '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
   '/industries': typeof IndustriesRoute
+  '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
   '/industries': typeof IndustriesRoute
+  '/investment-calculator': typeof InvestmentCalculatorRoute
   '/knowledge': typeof KnowledgeRoute
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/ai-assistant'
     | '/industries'
+    | '/investment-calculator'
     | '/knowledge'
     | '/product-configurator'
     | '/project-inquiry'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/ai-assistant'
     | '/industries'
+    | '/investment-calculator'
     | '/knowledge'
     | '/product-configurator'
     | '/project-inquiry'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/ai-assistant'
     | '/industries'
+    | '/investment-calculator'
     | '/knowledge'
     | '/product-configurator'
     | '/project-inquiry'
@@ -203,6 +215,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AiAssistantRoute: typeof AiAssistantRoute
   IndustriesRoute: typeof IndustriesRoute
+  InvestmentCalculatorRoute: typeof InvestmentCalculatorRoute
   KnowledgeRoute: typeof KnowledgeRoute
   ProductConfiguratorRoute: typeof ProductConfiguratorRoute
   ProjectInquiryRoute: typeof ProjectInquiryRoute
@@ -243,6 +256,13 @@ declare module '@tanstack/react-router' {
       path: '/knowledge'
       fullPath: '/knowledge'
       preLoaderRoute: typeof KnowledgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/investment-calculator': {
+      id: '/investment-calculator'
+      path: '/investment-calculator'
+      fullPath: '/investment-calculator'
+      preLoaderRoute: typeof InvestmentCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/industries': {
@@ -323,6 +343,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AiAssistantRoute: AiAssistantRoute,
   IndustriesRoute: IndustriesRoute,
+  InvestmentCalculatorRoute: InvestmentCalculatorRoute,
   KnowledgeRoute: KnowledgeRoute,
   ProductConfiguratorRoute: ProductConfiguratorRoute,
   ProjectInquiryRoute: ProjectInquiryRoute,
