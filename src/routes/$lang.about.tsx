@@ -40,21 +40,8 @@ const PROCESS_IMGS = [k04, k05, k36, k11, k07, k06, k30, k02];
 
 export const Route = createFileRoute("/$lang/about")({
   head: ({ params }) => {
-    const TITLE = "About NEVO Industrial — Engineering the Future of Sandwich Panel Manufacturing | Dubai";
-    const DESCRIPTION = "NEVO Industrial — Dubai-based engineering and industrial solutions company.";
-    return {
-      meta: [
-        { title: TITLE },
-        { name: "description", content: DESCRIPTION },
-        { property: "og:title", content: TITLE },
-        { property: "og:description", content: DESCRIPTION },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
-        { name: "twitter:card", content: "summary_large_image" },
-        ...ogImageMeta("/about"),
-      ],
-      links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
-    };
+    const { title, description } = localizedMeta(URL_PATH, params.lang);
+    return buildSeo({ title, description, path: URL_PATH, lang: params.lang });
   },
   component: AboutPage,
 });
