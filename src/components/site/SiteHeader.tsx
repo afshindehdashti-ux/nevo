@@ -293,7 +293,24 @@ export function SiteHeader() {
                   loading="eager"
                   decoding="async"
                   draggable={false}
+                  onError={(event) => {
+                    // Defensive fallback chain: if the bundled light logo
+                    // fails to load (bundle miss, cache poisoning, blocked
+                    // asset), swap to the CDN-hosted white/green variant.
+                    // If that also fails, fall back to an inline SVG so the
+                    // sticky header stays readable no matter what.
+                    const img = event.currentTarget;
+                    const step = img.dataset.fallbackStep ?? "0";
+                    if (step === "0") {
+                      img.dataset.fallbackStep = "1";
+                      img.src = LOGO_FALLBACK_CDN;
+                    } else if (step === "1") {
+                      img.dataset.fallbackStep = "2";
+                      img.src = LOGO_FALLBACK_SVG;
+                    }
+                  }}
                 />
+
               </span>
             </Link>
 
