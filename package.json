@@ -9,7 +9,9 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "check:links": "node scripts/check-links.mjs",
+    "check:links": "node scripts/check-links.mjs --no-external",
+    "check:links:full": "node scripts/check-links.mjs",
+    "check:links:external": "node scripts/check-links.mjs --external-only",
     "format": "prettier --write ."
   },
   "dependencies": {

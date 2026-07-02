@@ -73,6 +73,7 @@ const ignoreLinkREs = [...fileIgnorePatterns, ...(config.ignoreLinks ?? [])].map
 const ignoreFileREs = (config.ignoreFiles ?? []).map(globToRegExp);
 const ignoreSitemapMissing = new Set(config.ignoreSitemapMissing ?? []);
 const ignoreSitemapExtra = new Set(config.ignoreSitemapExtra ?? []);
+const ignoreExternalREs = (config.ignoreExternal ?? []).map(globToRegExp);
 const usedPatterns = new Set();
 function matchAny(res, value) {
   for (const re of res) if (re.test(value)) { usedPatterns.add(re.source); return true; }
@@ -80,6 +81,30 @@ function matchAny(res, value) {
 }
 const isIgnoredLink = (l) => matchAny(ignoreLinkREs, l);
 const isIgnoredFile = (f) => matchAny(ignoreFileREs, f);
+const isIgnoredExternal = (u) => matchAny(ignoreExternalREs, u);
+
+// -------- External checker config ----------
+// CLI/env knobs:
+//   --no-external          Skip external URL validation entirely.
+//   --external-only        Only run external checks (skip internal + sitemap).
+//   EXTERNAL_TIMEOUT_MS    Per-request timeout (default 10_000).
+//   EXTERNAL_RETRIES       Retry attempts on network error / 5xx (default 2).
+//   EXTERNAL_CONCURRENCY   Parallel in-flight requests (default 8).
+const args = new Set(process.argv.slice(2));
+const externalCfg = {
+  enabled: !args.has("--no-external"),
+  timeoutMs: Number(process.env.EXTERNAL_TIMEOUT_MS) || (config.external?.timeoutMs ?? 10_000),
+  retries: Number(process.env.EXTERNAL_RETRIES) || (config.external?.retries ?? 2),
+  concurrency:
+    Number(process.env.EXTERNAL_CONCURRENCY) || (config.external?.concurrency ?? 8),
+  userAgent:
+    config.external?.userAgent ??
+    "NEVO-LinkCheck/1.0 (+https://nevoindustrial.com)",
+  // Some servers return 403/405 to bots — treat these as OK when configured.
+  acceptStatuses: new Set(config.external?.acceptStatuses ?? [200, 201, 202, 203, 204, 206, 301, 302, 303, 307, 308]),
+};
+const internalEnabled = !args.has("--external-only");
+
 
 // -------- Route discovery (mirrors TanStack file-based routing) ----------
 function fileToRoute(file) {
@@ -156,72 +181,174 @@ function lineOf(text, index) {
 }
 
 let ignoredLinkCount = 0;
-for (const file of srcFiles) {
-  const relFile = relative(ROOT, file);
-  if (isIgnoredFile(relFile)) continue;
-  const text = readFileSync(file, "utf8");
-  for (const pattern of LINK_PATTERNS) {
-    pattern.lastIndex = 0;
-    let m;
-    while ((m = pattern.exec(text))) {
-      const raw = m[1];
-      if (raw.startsWith("//")) continue;
-      if (raw.startsWith("/api/")) continue;
-      if (raw.match(/\.(png|jpg|jpeg|svg|webp|pdf|xml|txt|ico|json|mp4|webm)$/i))
-        continue;
-      if (isIgnoredLink(raw)) { ignoredLinkCount++; continue; }
-      const result = resolveLink(raw);
-      const line = lineOf(text, m.index);
-      if (!result.ok) {
-        errors.push({ link: raw, file: relFile, line, kind: "dead" });
-      } else if (result.redirected) {
-        warnings.push({
-          link: raw,
-          file: relFile,
-          line,
-          kind: "redirect",
-          redirectedTo: result.redirected,
-        });
+let ignoredExternalCount = 0;
+/** @type {Map<string, {url:string, occurrences:{file:string,line:number}[]}>} */
+const externalUrls = new Map();
+const EXTERNAL_RE = /\bhttps?:\/\/[^\s"'`<>()\\]+/g;
+
+if (internalEnabled) {
+  for (const file of srcFiles) {
+    const relFile = relative(ROOT, file);
+    if (isIgnoredFile(relFile)) continue;
+    const text = readFileSync(file, "utf8");
+    for (const pattern of LINK_PATTERNS) {
+      pattern.lastIndex = 0;
+      let m;
+      while ((m = pattern.exec(text))) {
+        const raw = m[1];
+        if (raw.startsWith("//")) continue;
+        if (raw.startsWith("/api/")) continue;
+        if (raw.match(/\.(png|jpg|jpeg|svg|webp|pdf|xml|txt|ico|json|mp4|webm)$/i))
+          continue;
+        if (isIgnoredLink(raw)) { ignoredLinkCount++; continue; }
+        const result = resolveLink(raw);
+        const line = lineOf(text, m.index);
+        if (!result.ok) {
+          errors.push({ link: raw, file: relFile, line, kind: "dead" });
+        } else if (result.redirected) {
+          warnings.push({
+            link: raw,
+            file: relFile,
+            line,
+            kind: "redirect",
+            redirectedTo: result.redirected,
+          });
+        }
       }
     }
   }
 }
 
+// -------- External URL discovery ----------
+if (externalCfg.enabled) {
+  for (const file of srcFiles) {
+    const relFile = relative(ROOT, file);
+    if (isIgnoredFile(relFile)) continue;
+    const text = readFileSync(file, "utf8");
+    EXTERNAL_RE.lastIndex = 0;
+    let m;
+    while ((m = EXTERNAL_RE.exec(text))) {
+      // Strip trailing punctuation that commonly clings to URLs in source.
+      let url = m[0].replace(/[),.;:!?]+$/g, "");
+      // Skip obvious asset URLs — they were already excluded for internal.
+      if (/\.(png|jpg|jpeg|svg|webp|gif|ico|mp4|webm|woff2?)(\?|$)/i.test(url)) continue;
+      // Skip localhost / example / placeholder hosts.
+      if (/^https?:\/\/(localhost|127\.|0\.0\.0\.0|example\.(com|org|net))/i.test(url))
+        continue;
+      if (isIgnoredExternal(url)) { ignoredExternalCount++; continue; }
+      const line = lineOf(text, m.index);
+      const entry = externalUrls.get(url) ?? { url, occurrences: [] };
+      entry.occurrences.push({ file: relFile, line });
+      externalUrls.set(url, entry);
+    }
+  }
+}
+
+
 // -------- Sitemap parity --------
-const sitemapSrc = readFileSync(join(ROUTES_DIR, "sitemap[.]xml.ts"), "utf8");
+/** @type {Set<string>} */
 const sitemapPaths = new Set();
-const pathRe = /path:\s*["'`](\/[^"'`]*)["'`]/g;
-let sm;
-while ((sm = pathRe.exec(sitemapSrc))) sitemapPaths.add(sm[1]);
-
-const SITEMAP_EXCLUDE = new Set(["/*", "/knowledge", "/knowledge/*", "/sitemap.xml"]);
-
 /** @type {{path:string, reason:string}[]} */
 const sitemapErrors = [];
-for (const p of sitemapPaths) {
-  if (ignoreSitemapExtra.has(p)) continue;
-  if (!knownRoutes.has(p))
-    sitemapErrors.push({ path: p, reason: "listed in sitemap but no matching route file" });
+if (internalEnabled) {
+  const sitemapSrc = readFileSync(join(ROUTES_DIR, "sitemap[.]xml.ts"), "utf8");
+  const pathRe = /path:\s*["'`](\/[^"'`]*)["'`]/g;
+  let sm;
+  while ((sm = pathRe.exec(sitemapSrc))) sitemapPaths.add(sm[1]);
+  const SITEMAP_EXCLUDE = new Set(["/*", "/knowledge", "/knowledge/*", "/sitemap.xml"]);
+  for (const p of sitemapPaths) {
+    if (ignoreSitemapExtra.has(p)) continue;
+    if (!knownRoutes.has(p))
+      sitemapErrors.push({ path: p, reason: "listed in sitemap but no matching route file" });
+  }
+  for (const r of knownRoutes) {
+    if (SITEMAP_EXCLUDE.has(r)) continue;
+    if (ignoreSitemapMissing.has(r)) continue;
+    if (!sitemapPaths.has(r))
+      sitemapErrors.push({ path: r, reason: "route exists but is missing from sitemap" });
+  }
 }
-for (const r of knownRoutes) {
-  if (SITEMAP_EXCLUDE.has(r)) continue;
-  if (ignoreSitemapMissing.has(r)) continue;
-  if (!sitemapPaths.has(r))
-    sitemapErrors.push({ path: r, reason: "route exists but is missing from sitemap" });
+
+// -------- External URL validation ----------
+/** @type {{url:string, status:number|null, error:string|null, attempts:number, occurrences:{file:string,line:number}[]}[]} */
+const externalFailures = [];
+let externalOkCount = 0;
+async function checkOne(entry) {
+  const { timeoutMs, retries, userAgent, acceptStatuses } = externalCfg;
+  let lastErr = null;
+  let lastStatus = null;
+  for (let attempt = 1; attempt <= retries + 1; attempt++) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      // HEAD first, fall back to GET on 405/403/404 (some CDNs disallow HEAD).
+      let res = await fetch(entry.url, {
+        method: "HEAD",
+        redirect: "follow",
+        signal: ctrl.signal,
+        headers: { "user-agent": userAgent, accept: "*/*" },
+      });
+      if ([403, 404, 405, 501].includes(res.status)) {
+        res = await fetch(entry.url, {
+          method: "GET",
+          redirect: "follow",
+          signal: ctrl.signal,
+          headers: { "user-agent": userAgent, accept: "*/*" },
+        });
+      }
+      clearTimeout(timer);
+      lastStatus = res.status;
+      if (acceptStatuses.has(res.status)) return { ok: true, status: res.status, attempts: attempt };
+      // Retry 5xx / 429; hard-fail other 4xx.
+      if (res.status >= 500 || res.status === 429) { lastErr = `HTTP ${res.status}`; continue; }
+      return { ok: false, status: res.status, error: `HTTP ${res.status}`, attempts: attempt };
+    } catch (e) {
+      clearTimeout(timer);
+      lastErr = e.name === "AbortError" ? `timeout after ${timeoutMs}ms` : String(e.message || e);
+    }
+    // small backoff
+    await new Promise((r) => setTimeout(r, 250 * attempt));
+  }
+  return { ok: false, status: lastStatus, error: lastErr, attempts: retries + 1 };
 }
+
+async function runExternalChecks() {
+  const items = [...externalUrls.values()];
+  if (!items.length) return;
+  console.log(`\nChecking ${items.length} external URL(s) (concurrency=${externalCfg.concurrency}, timeout=${externalCfg.timeoutMs}ms, retries=${externalCfg.retries})…`);
+  let idx = 0;
+  const workers = Array.from({ length: Math.min(externalCfg.concurrency, items.length) }, async () => {
+    while (idx < items.length) {
+      const entry = items[idx++];
+      const res = await checkOne(entry);
+      if (res.ok) externalOkCount++;
+      else externalFailures.push({
+        url: entry.url,
+        status: res.status,
+        error: res.error,
+        attempts: res.attempts,
+        occurrences: entry.occurrences,
+      });
+    }
+  });
+  await Promise.all(workers);
+}
+await runExternalChecks();
 
 // Warn about ignore patterns that never matched anything (stale entries).
 const allDeclared = [
   ...fileIgnorePatterns,
   ...(config.ignoreLinks ?? []),
   ...(config.ignoreFiles ?? []),
+  ...(config.ignoreExternal ?? []),
 ];
 const staleIgnorePatterns = allDeclared.filter(
   (p) => !usedPatterns.has(globToRegExp(p).source),
 );
 
+
 // -------- Reports --------
-const totalErrors = errors.length + sitemapErrors.length;
+const totalErrors = errors.length + sitemapErrors.length + externalFailures.length;
 const passed = totalErrors === 0;
 const generatedAt = new Date().toISOString();
 const commit = process.env.GITHUB_SHA || "";
@@ -239,13 +366,31 @@ const report = {
     redirectWarnings: warnings.length,
     sitemapErrors: sitemapErrors.length,
     ignoredLinks: ignoredLinkCount,
+    externalChecked: externalUrls.size,
+    externalOk: externalOkCount,
+    externalFailed: externalFailures.length,
+    externalIgnored: ignoredExternalCount,
   },
   deadLinks: errors,
   redirectWarnings: warnings,
   sitemapErrors,
+  externalFailures: externalFailures.map((f) => ({
+    ...f,
+    // Flatten first occurrence for table rendering.
+    firstFile: f.occurrences[0]?.file ?? "",
+    firstLine: f.occurrences[0]?.line ?? "",
+    occurrenceCount: f.occurrences.length,
+  })),
+  external: {
+    enabled: externalCfg.enabled,
+    timeoutMs: externalCfg.timeoutMs,
+    retries: externalCfg.retries,
+    concurrency: externalCfg.concurrency,
+  },
   ignore: {
     linkPatterns: [...fileIgnorePatterns, ...(config.ignoreLinks ?? [])],
     filePatterns: config.ignoreFiles ?? [],
+    externalPatterns: config.ignoreExternal ?? [],
     sitemapMissing: [...ignoreSitemapMissing],
     sitemapExtra: [...ignoreSitemapExtra],
     stalePatterns: staleIgnorePatterns,
@@ -304,6 +449,8 @@ function htmlReport(r) {
   <div class="card"><b>${r.counts.deadLinks}</b>dead links</div>
   <div class="card"><b>${r.counts.redirectWarnings}</b>redirect warnings</div>
   <div class="card"><b>${r.counts.sitemapErrors}</b>sitemap issues</div>
+  <div class="card"><b>${r.counts.externalChecked}</b>external checked</div>
+  <div class="card"><b>${r.counts.externalFailed}</b>external failed</div>
 </div>
 <h2>Dead internal links (${r.deadLinks.length})</h2>
 ${rows(r.deadLinks, [
@@ -315,6 +462,16 @@ ${rows(r.deadLinks, [
 ${rows(r.sitemapErrors, [
   { key: "path", label: "Path" },
   { key: "reason", label: "Reason" },
+])}
+<h2>External URL failures (${r.externalFailures.length} of ${r.counts.externalChecked} checked)</h2>
+${rows(r.externalFailures, [
+  { key: "url", label: "URL" },
+  { key: "status", label: "Status" },
+  { key: "error", label: "Error" },
+  { key: "attempts", label: "Attempts" },
+  { key: "firstFile", label: "First seen in" },
+  { key: "firstLine", label: "Line" },
+  { key: "occurrenceCount", label: "# refs" },
 ])}
 <h2>301 redirect warnings (${r.redirectWarnings.length})</h2>
 ${rows(r.redirectWarnings, [
@@ -335,9 +492,12 @@ function mdSummary(r) {
   lines.push(
     `| Routes | Sitemap | Dead links | Redirect warnings | Sitemap issues |`,
   );
-  lines.push(`| ---: | ---: | ---: | ---: | ---: |`);
   lines.push(
-    `| ${r.counts.routes} | ${r.counts.sitemapEntries} | **${r.counts.deadLinks}** | ${r.counts.redirectWarnings} | **${r.counts.sitemapErrors}** |`,
+    `| Routes | Sitemap | Dead links | Redirects | Sitemap issues | External ok/fail |`,
+  );
+  lines.push(`| ---: | ---: | ---: | ---: | ---: | ---: |`);
+  lines.push(
+    `| ${r.counts.routes} | ${r.counts.sitemapEntries} | **${r.counts.deadLinks}** | ${r.counts.redirectWarnings} | **${r.counts.sitemapErrors}** | ${r.counts.externalOk}/**${r.counts.externalFailed}** |`,
   );
   lines.push("");
   if (r.deadLinks.length) {
@@ -357,6 +517,19 @@ function mdSummary(r) {
     lines.push(`| Path | Reason |`);
     lines.push(`| --- | --- |`);
     for (const e of r.sitemapErrors) lines.push(`| \`${e.path}\` | ${e.reason} |`);
+    lines.push("");
+  }
+  if (r.externalFailures.length) {
+    lines.push(`### 🌐 External URL failures (${r.externalFailures.length})`);
+    lines.push("");
+    lines.push(`| URL | Status | Error | First seen | Refs |`);
+    lines.push(`| --- | ---: | --- | --- | ---: |`);
+    for (const f of r.externalFailures.slice(0, 50))
+      lines.push(
+        `| ${f.url} | ${f.status ?? "—"} | ${f.error ?? ""} | \`${f.firstFile}:${f.firstLine}\` | ${f.occurrenceCount} |`,
+      );
+    if (r.externalFailures.length > 50)
+      lines.push(`| … | | | | _${r.externalFailures.length - 50} more_ |`);
     lines.push("");
   }
   if (r.redirectWarnings.length) {
@@ -413,18 +586,24 @@ if (warnings.length) {
       `  ⚠ Link "${w.link}" in ${w.file}:${w.line} hits 301 → prefer "${w.redirectedTo}"`,
     );
 }
-if (errors.length || sitemapErrors.length) {
+if (errors.length || sitemapErrors.length || externalFailures.length) {
   console.log("\nErrors:");
   for (const e of errors)
     console.log(`  ✗ Dead internal link "${e.link}" in ${e.file}:${e.line}`);
   for (const s of sitemapErrors) console.log(`  ✗ ${s.path} — ${s.reason}`);
+  for (const f of externalFailures) {
+    const first = f.occurrences[0];
+    console.log(
+      `  ✗ External ${f.url} → ${f.status ?? "no response"}${f.error ? ` (${f.error})` : ""} — first seen ${first?.file}:${first?.line}${f.occurrences.length > 1 ? ` (+${f.occurrences.length - 1} more)` : ""}`,
+    );
+  }
   console.log(
-    `\n✗ Link check failed: ${totalErrors} error(s), ${warnings.length} warning(s), ${ignoredLinkCount} ignored.`,
+    `\n✗ Link check failed: ${totalErrors} error(s), ${warnings.length} warning(s), ${ignoredLinkCount + ignoredExternalCount} ignored.`,
   );
   console.log(`Reports written to ${relative(ROOT, OUT_DIR)}/`);
   process.exit(1);
 }
 console.log(
-  `\n✓ Link check passed: ${knownRoutes.size} routes, ${sitemapPaths.size} sitemap entries, ${warnings.length} warning(s), ${ignoredLinkCount} ignored.`,
+  `\n✓ Link check passed: ${knownRoutes.size} routes, ${sitemapPaths.size} sitemap entries, ${externalOkCount}/${externalUrls.size} external OK, ${warnings.length} warning(s), ${ignoredLinkCount + ignoredExternalCount} ignored.`,
 );
 console.log(`Reports written to ${relative(ROOT, OUT_DIR)}/`);
