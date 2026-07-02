@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MapPin, Phone, Mail, MessageCircle, Calendar, ArrowRight,
-  Building2, Headphones, Briefcase, Wrench, Globe2, Clock,
+  Building2, Headphones, Briefcase, Wrench, Globe2, Clock, Loader2,
 } from "lucide-react";
 
 import heroImg from "@/assets/corporate/contact-hero.jpg";
@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { submitLeadForm } from "@/lib/lead-submit";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
 
 const TITLE = "Global Offices & Contact — NEVO Industrial | Dubai · Germany · Turkey · Oman";
