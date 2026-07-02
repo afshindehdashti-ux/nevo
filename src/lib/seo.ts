@@ -17,8 +17,12 @@ export const SITE = {
   ],
   contact: {
     email: "solutions@nevoindustrial.com",
-    phone: "",
-    whatsapp: "",
+    phone: "+971 50 242 6167",
+    phoneHref: "tel:+971502426167",
+    whatsapp: "971502426167",
+    whatsappDisplay: "+971 50 242 6167",
+    whatsappMessage:
+      "Hello NEVO Engineering Team,\n\nI am interested in your sandwich panel production solutions and would like to discuss my project.\n\nPlease contact me at your earliest convenience.",
     address: {
       streetAddress: "Business Bay",
       addressLocality: "Dubai",
@@ -26,6 +30,11 @@ export const SITE = {
     },
   },
 } as const;
+
+/** Canonical WhatsApp URL with the standard pre-filled engineering message. */
+export const WHATSAPP_URL = `https://wa.me/971502426167?text=${encodeURIComponent(
+  "Hello NEVO Engineering Team,\n\nI am interested in your sandwich panel production solutions and would like to discuss my project.\n\nPlease contact me at your earliest convenience.",
+)}`;
 
 export const LOCALES = [
   { code: "en", label: "English", hreflang: "en", status: "active" },
