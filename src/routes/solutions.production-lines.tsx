@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion } from "motion/react";
+import { submitLeadForm } from "@/lib/lead-submit";
 import {
   ArrowRight,
   ArrowUpRight,
