@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
-import heroImg from "@/assets/engineering-philosophy.jpg";
+import heroImgAsset from "@/assets/premium/01-aerial-factory.jpg.asset.json";
+const heroImg = heroImgAsset.url;
 import { Section, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
 
