@@ -83,6 +83,7 @@ const SOLUTIONS: MenuGroup = {
     { label: "Production Lines", desc: "Continuous, discontinuous, roll forming.", icon: Wrench, href: "/solutions/production-lines" },
     { label: "Raw Materials", desc: "PIR, PUR, PPGI, GI, rock wool, adhesives.", icon: PackageSearch, href: "/solutions/raw-materials" },
     { label: "Finished Panels", desc: "Premium sandwich panels, delivered.", icon: Layers, href: "/solutions/sandwich-panels" },
+    { label: "Panel Configurator", desc: "Configure panels in 3D with live engineering results.", icon: Boxes, href: "/product-configurator" },
     { label: "AI Engineering Assistant", desc: "Calculators, estimators and guided scoping.", icon: LifeBuoy, href: "/ai-assistant" },
   ],
   featured: {
