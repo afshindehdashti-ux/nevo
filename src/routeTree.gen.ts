@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ResearchInnovationRouteImport } from './routes/research-innovation'
 import { Route as QualityRouteImport } from './routes/quality'
 import { Route as ProjectInquiryRouteImport } from './routes/project-inquiry'
 import { Route as ProductConfiguratorRouteImport } from './routes/product-configurator'
@@ -36,6 +37,11 @@ import { Route as ApiChatRouteImport } from './routes/api/chat'
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResearchInnovationRoute = ResearchInnovationRouteImport.update({
+  id: '/research-innovation',
+  path: '/research-innovation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QualityRoute = QualityRouteImport.update({
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/quality': typeof QualityRoute
+  '/research-innovation': typeof ResearchInnovationRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/quality': typeof QualityRoute
+  '/research-innovation': typeof ResearchInnovationRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
@@ -221,6 +229,7 @@ export interface FileRoutesById {
   '/product-configurator': typeof ProductConfiguratorRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/quality': typeof QualityRoute
+  '/research-innovation': typeof ResearchInnovationRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
@@ -248,6 +257,7 @@ export interface FileRouteTypes {
     | '/product-configurator'
     | '/project-inquiry'
     | '/quality'
+    | '/research-innovation'
     | '/sitemap.xml'
     | '/api/chat'
     | '/solutions/engineering-consultancy'
@@ -273,6 +283,7 @@ export interface FileRouteTypes {
     | '/product-configurator'
     | '/project-inquiry'
     | '/quality'
+    | '/research-innovation'
     | '/sitemap.xml'
     | '/api/chat'
     | '/solutions/engineering-consultancy'
@@ -298,6 +309,7 @@ export interface FileRouteTypes {
     | '/product-configurator'
     | '/project-inquiry'
     | '/quality'
+    | '/research-innovation'
     | '/sitemap.xml'
     | '/api/chat'
     | '/solutions/engineering-consultancy'
@@ -324,6 +336,7 @@ export interface RootRouteChildren {
   ProductConfiguratorRoute: typeof ProductConfiguratorRoute
   ProjectInquiryRoute: typeof ProjectInquiryRoute
   QualityRoute: typeof QualityRoute
+  ResearchInnovationRoute: typeof ResearchInnovationRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
   SolutionsEngineeringConsultancyRoute: typeof SolutionsEngineeringConsultancyRoute
@@ -340,6 +353,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/research-innovation': {
+      id: '/research-innovation'
+      path: '/research-innovation'
+      fullPath: '/research-innovation'
+      preLoaderRoute: typeof ResearchInnovationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quality': {
@@ -516,6 +536,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductConfiguratorRoute: ProductConfiguratorRoute,
   ProjectInquiryRoute: ProjectInquiryRoute,
   QualityRoute: QualityRoute,
+  ResearchInnovationRoute: ResearchInnovationRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,
   SolutionsEngineeringConsultancyRoute: SolutionsEngineeringConsultancyRoute,
