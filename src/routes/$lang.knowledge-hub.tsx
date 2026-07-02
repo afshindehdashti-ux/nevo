@@ -73,7 +73,8 @@ export const Route = createFileRoute("/$lang/knowledge-hub")({
         }),
       },
     ],
-  }),
+    };
+  },
 });
 
 /* ---------- Data ---------- */

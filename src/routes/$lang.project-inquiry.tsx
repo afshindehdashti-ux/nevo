@@ -820,21 +820,14 @@ const BREADCRUMB_JSONLD = {
 
 export const Route = createFileRoute("/$lang/project-inquiry")({
   component: ProjectInquiryPage,
-  head: ({ params }) => ({
-    meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
-      { name: "twitter:card", content: "summary_large_image" },
-        ...ogImageMeta("/project-inquiry"),
-    ],
-    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
-    scripts: [
-      { type: "application/ld+json", children: JSON.stringify(FAQ_JSONLD) },
-      { type: "application/ld+json", children: JSON.stringify(BREADCRUMB_JSONLD) },
-    ],
-  }),
+  head: ({ params }) => {
+    const seo = buildSeo({ title: TITLE, description: DESCRIPTION, path: URL_PATH, lang: params.lang });
+    return {
+      ...seo,
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(FAQ_JSONLD) },
+        { type: "application/ld+json", children: JSON.stringify(BREADCRUMB_JSONLD) },
+      ],
+    };
+  },
 });
