@@ -18,14 +18,19 @@ import {
   Zap,
 } from "lucide-react";
 
-import heroImg from "@/assets/project/hero-factory.jpg";
-import blueprintImg from "@/assets/project/hero-blueprint.jpg";
-import layoutImg from "@/assets/engineering/05-layout.jpg";
-import processImg from "@/assets/engineering/06-flow.jpg";
-import productionImg from "@/assets/engineering/02-factory.jpg";
-import commissioningImg from "@/assets/engineering/13-commissioning.jpg";
-import investmentImg from "@/assets/engineering/23-roi.jpg";
-import materialsImg from "@/assets/raw-materials/warehouse-raw.jpg";
+import heroAsset from "@/assets/premium/24-masterplan.jpg.asset.json";
+import surveyAsset from "@/assets/premium/22-site-survey.jpg.asset.json";
+import bimAsset from "@/assets/premium/12-engineer-bim.jpg.asset.json";
+import foundationAsset from "@/assets/premium/21-foundation-works.jpg.asset.json";
+import steelAsset from "@/assets/premium/14-steel-erection.jpg.asset.json";
+import utilitiesAsset from "@/assets/premium/11-utilities.jpg.asset.json";
+import commissioningAsset from "@/assets/premium/23-commissioning.jpg.asset.json";
+import completedAsset from "@/assets/premium/06-hq-building.jpg.asset.json";
+import boardroomAsset from "@/assets/premium/18-boardroom.jpg.asset.json";
+import warehouseAsset from "@/assets/premium/04-warehouse-racking.jpg.asset.json";
+
+const heroImg = heroAsset.url;
+const investmentImg = boardroomAsset.url;
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { SiteHeader } from "@/components/site/SiteHeader";
