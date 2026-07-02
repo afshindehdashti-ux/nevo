@@ -12,6 +12,9 @@
     "check:links": "node scripts/check-links.mjs --no-external",
     "check:links:full": "node scripts/check-links.mjs",
     "check:links:external": "node scripts/check-links.mjs --external-only",
+    "check:i18n": "node scripts/i18n-coverage.mjs",
+    "check:i18n:warn": "node scripts/i18n-coverage.mjs --warn-only",
+    "check:i18n:json": "node scripts/i18n-coverage.mjs --json",
     "format": "prettier --write ."
   },
   "dependencies": {
