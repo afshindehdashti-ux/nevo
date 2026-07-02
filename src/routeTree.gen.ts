@@ -19,6 +19,7 @@ import { Route as SolutionsSandwichPanelsRouteImport } from './routes/solutions.
 import { Route as SolutionsRawMaterialsRouteImport } from './routes/solutions.raw-materials'
 import { Route as SolutionsProductionLinesRouteImport } from './routes/solutions.production-lines'
 import { Route as SolutionsEngineeringConsultancyRouteImport } from './routes/solutions.engineering-consultancy'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -72,6 +73,11 @@ const SolutionsEngineeringConsultancyRoute =
     path: '/solutions/engineering-consultancy',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/knowledge': typeof KnowledgeRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/knowledge': typeof KnowledgeRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/knowledge': typeof KnowledgeRoute
   '/project-inquiry': typeof ProjectInquiryRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/chat': typeof ApiChatRoute
   '/solutions/engineering-consultancy': typeof SolutionsEngineeringConsultancyRoute
   '/solutions/production-lines': typeof SolutionsProductionLinesRoute
   '/solutions/raw-materials': typeof SolutionsRawMaterialsRoute
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/project-inquiry'
     | '/sitemap.xml'
+    | '/api/chat'
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/project-inquiry'
     | '/sitemap.xml'
+    | '/api/chat'
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/project-inquiry'
     | '/sitemap.xml'
+    | '/api/chat'
     | '/solutions/engineering-consultancy'
     | '/solutions/production-lines'
     | '/solutions/raw-materials'
@@ -156,6 +168,7 @@ export interface RootRouteChildren {
   KnowledgeRoute: typeof KnowledgeRoute
   ProjectInquiryRoute: typeof ProjectInquiryRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiChatRoute: typeof ApiChatRoute
   SolutionsEngineeringConsultancyRoute: typeof SolutionsEngineeringConsultancyRoute
   SolutionsProductionLinesRoute: typeof SolutionsProductionLinesRoute
   SolutionsRawMaterialsRoute: typeof SolutionsRawMaterialsRoute
@@ -234,6 +247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolutionsEngineeringConsultancyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -244,6 +264,7 @@ const rootRouteChildren: RootRouteChildren = {
   KnowledgeRoute: KnowledgeRoute,
   ProjectInquiryRoute: ProjectInquiryRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiChatRoute: ApiChatRoute,
   SolutionsEngineeringConsultancyRoute: SolutionsEngineeringConsultancyRoute,
   SolutionsProductionLinesRoute: SolutionsProductionLinesRoute,
   SolutionsRawMaterialsRoute: SolutionsRawMaterialsRoute,
