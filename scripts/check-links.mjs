@@ -273,6 +273,9 @@ if (internalEnabled) {
   for (const r of knownRoutes) {
     if (SITEMAP_EXCLUDE.has(r)) continue;
     if (ignoreSitemapMissing.has(r)) continue;
+    // Dynamic routes ($param, splat) are indexed by their concrete instances
+    // in the sitemap (e.g. /knowledge-hub/$slug → per-article entries).
+    if (r.includes("$") || r.endsWith("/*")) continue;
     if (!sitemapPaths.has(r))
       sitemapErrors.push({ path: r, reason: "route exists but is missing from sitemap" });
   }
