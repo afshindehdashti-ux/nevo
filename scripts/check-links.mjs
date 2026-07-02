@@ -514,6 +514,7 @@ function htmlReport(r) {
   <div class="card"><b>${r.counts.deadLinks}</b>dead links</div>
   <div class="card"><b>${r.counts.redirectWarnings}</b>redirect warnings</div>
   <div class="card"><b>${r.counts.sitemapErrors}</b>sitemap issues</div>
+  <div class="card"><b>${r.counts.canonicalErrors}</b>canonical issues</div>
   <div class="card"><b>${r.counts.externalChecked}</b>external checked</div>
   <div class="card"><b>${r.counts.externalFailed}</b>external failed</div>
 </div>
@@ -527,6 +528,13 @@ ${rows(r.deadLinks, [
 ${rows(r.sitemapErrors, [
   { key: "path", label: "Path" },
   { key: "reason", label: "Reason" },
+])}
+<h2>Canonical &lt;-&gt; route issues (${r.canonicalErrors.length})</h2>
+${rows(r.canonicalErrors, [
+  { key: "route", label: "Route" },
+  { key: "file", label: "Route file" },
+  { key: "reason", label: "Reason" },
+  { key: "found", label: "Found" },
 ])}
 <h2>External URL failures (${r.externalFailures.length} of ${r.counts.externalChecked} checked)</h2>
 ${rows(r.externalFailures, [
