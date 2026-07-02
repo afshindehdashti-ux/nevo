@@ -34,14 +34,12 @@ import { Button } from "@/components/ui/button";
 import { buildSeo } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
+import panelPIR from "@/assets/configurator/panel-pir.jpg";
+import panelPUR from "@/assets/configurator/panel-pur.jpg";
+import panelRockwool from "@/assets/configurator/panel-rockwool.jpg";
+import panelGlasswool from "@/assets/configurator/panel-glasswool.jpg";
+import panelEPS from "@/assets/configurator/panel-eps.jpg";
 import heroImg from "@/assets/configurator/hero-configurator.jpg";
-import laptopImg from "@/assets/configurator/laptop-results.jpg";
-import panelTypeImg from "@/assets/configurator/panel-type.jpg";
-import coreStackImg from "@/assets/configurator/core-stack.jpg";
-import coatingImg from "@/assets/configurator/coating-fan.jpg";
-import accessoriesImg from "@/assets/configurator/accessories.jpg";
-import panel3dImg from "@/assets/configurator/panel-3d.jpg";
-import datasheetImg from "@/assets/configurator/datasheet.jpg";
 
 export const Route = createFileRoute("/product-configurator")({
   head: () => ({
@@ -85,8 +83,8 @@ const PANEL_TYPES: {
 
 const CORES: {
   id: CoreMaterial;
-  density: number; // kg/m³
-  lambda: number; // W/m·K
+  density: number;
+  lambda: number;
   fire: string;
   desc: string;
 }[] = [
@@ -96,6 +94,14 @@ const CORES: {
   { id: "EPS", density: 15, lambda: 0.038, fire: "E", desc: "Lightweight, economical" },
   { id: "Glass Wool", density: 90, lambda: 0.035, fire: "A1", desc: "Fire safety + acoustic" },
 ];
+
+const PANEL_IMAGES: Record<CoreMaterial, string> = {
+  PIR: panelPIR,
+  PUR: panelPUR,
+  "Rock Wool": panelRockwool,
+  "Glass Wool": panelGlasswool,
+  EPS: panelEPS,
+};
 
 const JOINTS: JointType[] = ["Hidden Screw", "Visible Screw", "Tongue & Groove", "Cam-Lock"];
 const COATINGS: Coating[] = ["PVDF", "Polyester", "Plastisol", "HDP"];
@@ -111,12 +117,12 @@ const COLOR_SWATCHES = [
 interface Config {
   panelType: PanelType;
   core: CoreMaterial;
-  thickness: number; // mm
-  width: number; // mm
-  length: number; // m
+  thickness: number;
+  width: number;
+  length: number;
   joint: JointType;
-  extSteel: number; // mm
-  intSteel: number; // mm
+  extSteel: number;
+  intSteel: number;
   coating: Coating;
   color: string;
   accessories: string[];
@@ -141,8 +147,8 @@ const DEFAULT_CONFIG: Config = {
 function computeResults(cfg: Config) {
   const core = CORES.find((c) => c.id === cfg.core)!;
   const thicknessM = cfg.thickness / 1000;
-  const uValue = core.lambda / thicknessM; // W/m²K (simplified)
-  const steelKg = (cfg.extSteel + cfg.intSteel) * 7.85; // per m²
+  const uValue = core.lambda / thicknessM;
+  const steelKg = (cfg.extSteel + cfg.intSteel) * 7.85;
   const coreKg = core.density * thicknessM;
   const weight = +(steelKg + coreKg).toFixed(1);
   const fireRating = core.fire;
@@ -168,6 +174,52 @@ function computeResults(cfg: Config) {
     application: app,
     coreDensity: core.density,
   };
+}
+
+/* --------------------------- Reusable studio frame --------------------------- */
+/*  White studio card that renders any panel render at true aspect —            */
+/*  never crops, never stretches. Soft engineering-software shadow.             */
+
+function PanelStudio({
+  core,
+  ratio = "aspect-[16/10]",
+  className,
+  caption,
+  overlay,
+}: {
+  core: CoreMaterial;
+  ratio?: string;
+  className?: string;
+  caption?: React.ReactNode;
+  overlay?: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "group relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-white p-6 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.55)] md:p-10",
+        ratio,
+        className,
+      )}
+    >
+      {/* subtle floor gradient — engineering studio */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-8 bottom-4 h-8 rounded-full bg-black/10 blur-2xl"
+      />
+      <img
+        src={PANEL_IMAGES[core]}
+        alt={`${core} sandwich panel render`}
+        className="relative z-10 max-h-full max-w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]"
+        loading="lazy"
+      />
+      {overlay}
+      {caption && (
+        <div className="absolute bottom-3 left-4 right-4 z-20 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-black/50">
+          {caption}
+        </div>
+      )}
+    </div>
+  );
 }
 
 /* --------------------------- Component --------------------------- */
@@ -207,16 +259,6 @@ function ProductConfiguratorPage() {
     <main className="bg-background">
       {/* ============================ HERO ============================ */}
       <section className="relative overflow-hidden border-b border-border bg-[hsl(220_18%_9%)] text-white">
-        <div
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage: `url(${heroImg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-          aria-hidden
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" aria-hidden />
         <div className="container-wide relative py-20 md:py-28">
           <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-xs uppercase tracking-widest text-white/60">
             <Link to="/" className="hover:text-white">Home</Link>
@@ -225,43 +267,65 @@ function ProductConfiguratorPage() {
             <ChevronRight className="size-3" />
             <span className="text-accent">Product Configurator</span>
           </nav>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="max-w-3xl"
-          >
-            <Eyebrow className="text-accent">Engineered to your spec</Eyebrow>
-            <h1 className="mt-6 text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
-              Product <span className="text-accent">Configurator</span>
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg text-white/70">
-              Design your sandwich panel to the millimetre. Get instant thermal,
-              fire, acoustic and structural results — then request a certified
-              quotation from the NEVO engineering team.
-            </p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <Button asChild size="lg" className="bg-accent text-black hover:bg-accent/90">
-                <a href="#configurator">Start Configuring <ArrowRight className="ml-1 size-4" /></a>
-              </Button>
-              <Button asChild variant="secondary" size="lg" className="border-white/30 bg-white/5 text-white hover:bg-white/10">
-                <Link to="/project-inquiry">Talk to an Engineer</Link>
-              </Button>
-            </div>
-            <div className="mt-12 grid max-w-3xl grid-cols-2 gap-6 border-t border-white/10 pt-8 md:grid-cols-4">
-              {[
-                { k: "100+", v: "Panel options" },
-                { k: "5", v: "Core materials" },
-                { k: "10+", v: "Coating options" },
-                { k: "Global", v: "Certifications" },
-              ].map((s) => (
-                <div key={s.v}>
-                  <div className="text-2xl font-semibold text-accent md:text-3xl">{s.k}</div>
-                  <div className="mt-1 text-xs uppercase tracking-widest text-white/50">{s.v}</div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+            >
+              <Eyebrow className="text-accent">Engineered to your spec</Eyebrow>
+              <h1 className="mt-6 text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
+                Product <span className="text-accent">Configurator</span>
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg text-white/70">
+                Design your sandwich panel to the millimetre. Get instant thermal,
+                fire, acoustic and structural results — then request a certified
+                quotation from the NEVO engineering team.
+              </p>
+              <div className="mt-10 flex flex-wrap gap-4">
+                <Button asChild size="lg" className="bg-accent text-black hover:bg-accent/90">
+                  <a href="#configurator">Start Configuring <ArrowRight className="ml-1 size-4" /></a>
+                </Button>
+                <Button asChild variant="secondary" size="lg" className="border-white/30 bg-white/5 text-white hover:bg-white/10">
+                  <Link to="/project-inquiry">Talk to an Engineer</Link>
+                </Button>
+              </div>
+              <div className="mt-12 grid max-w-3xl grid-cols-2 gap-6 border-t border-white/10 pt-8 md:grid-cols-4">
+                {[
+                  { k: "100+", v: "Panel options" },
+                  { k: "5", v: "Core materials" },
+                  { k: "10+", v: "Coating options" },
+                  { k: "Global", v: "Certifications" },
+                ].map((s) => (
+                  <div key={s.v}>
+                    <div className="text-2xl font-semibold text-accent md:text-3xl">{s.k}</div>
+                    <div className="mt-1 text-xs uppercase tracking-widest text-white/50">{s.v}</div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.9, delay: 0.15 }}
+              className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-white p-8 shadow-[0_40px_120px_-40px_rgba(16,185,129,0.35)] md:p-12"
+            >
+              <img
+                src={heroImg}
+                alt="NEVO sandwich panel — engineering render"
+                className="relative z-10 max-h-full max-w-full object-contain"
+                width={1920}
+                height={1280}
+              />
+              <div className="absolute left-5 top-5 z-20 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-black/50">
+                <span className="size-1.5 rounded-full bg-emerald-500" /> Live spec preview
+              </div>
+              <div className="absolute bottom-5 right-5 z-20 rounded-full border border-black/10 bg-white/80 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-black/60 backdrop-blur">
+                NEVO-PIR-100 · RAL 9002
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -311,7 +375,11 @@ function ProductConfiguratorPage() {
             {/* Main configuration area */}
             <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
               {step === 0 && (
-                <StepPanelType selected={cfg.panelType} onSelect={(v) => update("panelType", v)} />
+                <StepPanelType
+                  selected={cfg.panelType}
+                  onSelect={(v) => update("panelType", v)}
+                  core={cfg.core}
+                />
               )}
               {step === 1 && (
                 <StepCore selected={cfg.core} onSelect={(v) => update("core", v)} />
@@ -319,7 +387,11 @@ function ProductConfiguratorPage() {
               {step === 2 && <StepDimensions cfg={cfg} update={update} />}
               {step === 3 && <StepSteel cfg={cfg} update={update} />}
               {step === 4 && (
-                <StepAccessories selected={cfg.accessories} onToggle={toggleAccessory} />
+                <StepAccessories
+                  selected={cfg.accessories}
+                  onToggle={toggleAccessory}
+                  core={cfg.core}
+                />
               )}
               {step === 5 && <StepResults results={results} cfg={cfg} />}
 
@@ -398,48 +470,50 @@ function ProductConfiguratorPage() {
       <section className="border-b border-border bg-[hsl(220_18%_9%)] text-white">
         <div className="container-wide py-16 md:py-24">
           <SectionHeader
-            eyebrow="3D Panel Preview"
-            title={<span className="text-white">Interact with your panel</span>}
-            lede={<span className="text-white/60">Rotate, zoom and inspect the exact configuration you built.</span>}
+            eyebrow="Live Panel Preview"
+            title={<span className="text-white">Inspect the exact panel you built</span>}
+            lede={<span className="text-white/60">Studio-lit engineering renders. Update your spec — the preview updates instantly.</span>}
             onTone="primary"
           />
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-            <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black">
-              <img
-                src={panel3dImg}
-                alt="3D sandwich panel preview"
-                className={cn(
-                  "aspect-[16/10] w-full object-cover transition-all duration-700",
-                  view3d === "exploded" && "scale-105 blur-[0.5px]",
-                  view3d === "section" && "grayscale",
-                )}
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-4 rounded-full border border-white/20 bg-black/60 px-3 py-1 text-xs uppercase tracking-widest text-white/80 backdrop-blur">
-                {cfg.core} · {cfg.thickness} mm · {cfg.color}
-              </div>
-              <div className="absolute right-4 top-4 flex flex-col gap-2">
-                {[
-                  { id: "solid", icon: RotateCw, label: "Rotate" },
-                  { id: "exploded", icon: Move3d, label: "Explode" },
-                  { id: "section", icon: Scissors, label: "Section" },
-                ].map((v) => (
-                  <button
-                    key={v.id}
-                    onClick={() => setView3d(v.id as typeof view3d)}
-                    className={cn(
-                      "flex size-10 items-center justify-center rounded-full border backdrop-blur transition",
-                      view3d === v.id
-                        ? "border-accent bg-accent text-black"
-                        : "border-white/20 bg-black/60 text-white/70 hover:text-white",
-                    )}
-                    aria-label={v.label}
-                  >
-                    <v.icon className="size-4" />
-                  </button>
-                ))}
-              </div>
-            </div>
+            <PanelStudio
+              core={cfg.core}
+              ratio="aspect-[16/10]"
+              className={cn(
+                "transition-all duration-700",
+                view3d === "exploded" && "shadow-[0_50px_120px_-30px_rgba(16,185,129,0.35)]",
+                view3d === "section" && "saturate-[.4]",
+              )}
+              caption={
+                <>
+                  <span>{cfg.core} · {cfg.thickness} mm · {cfg.color}</span>
+                  <span>NEVO INDUSTRIAL · DUBAI</span>
+                </>
+              }
+              overlay={
+                <div className="absolute right-4 top-4 z-20 flex flex-col gap-2">
+                  {[
+                    { id: "solid", icon: RotateCw, label: "Rotate" },
+                    { id: "exploded", icon: Move3d, label: "Explode" },
+                    { id: "section", icon: Scissors, label: "Section" },
+                  ].map((v) => (
+                    <button
+                      key={v.id}
+                      onClick={() => setView3d(v.id as typeof view3d)}
+                      className={cn(
+                        "flex size-10 items-center justify-center rounded-full border backdrop-blur transition",
+                        view3d === v.id
+                          ? "border-accent bg-accent text-black"
+                          : "border-black/10 bg-white/80 text-black/60 hover:text-black",
+                      )}
+                      aria-label={v.label}
+                    >
+                      <v.icon className="size-4" />
+                    </button>
+                  ))}
+                </div>
+              }
+            />
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
               {[
                 { icon: RotateCw, label: "Rotate", hint: "Drag to orbit" },
@@ -462,6 +536,49 @@ function ProductConfiguratorPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Material selector — 5 studio thumbnails, always visible */}
+          <div className="mt-10">
+            <div className="mb-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
+              <span>Core material library</span>
+              <span>{cfg.core} selected</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+              {CORES.map((c) => {
+                const active = c.id === cfg.core;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => update("core", c.id)}
+                    className={cn(
+                      "group flex flex-col overflow-hidden rounded-2xl border bg-white text-left shadow-[0_20px_60px_-30px_rgba(0,0,0,0.5)] transition",
+                      active
+                        ? "border-accent ring-2 ring-accent/40"
+                        : "border-black/5 hover:-translate-y-0.5",
+                    )}
+                  >
+                    <div className="relative flex aspect-[4/3] w-full items-center justify-center bg-white p-3">
+                      <img
+                        src={PANEL_IMAGES[c.id]}
+                        alt={`${c.id} panel render`}
+                        className="max-h-full max-w-full object-contain"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="border-t border-black/5 bg-white px-3 py-2.5">
+                      <div className="flex items-center justify-between text-[11px] font-semibold text-black">
+                        {c.id}
+                        {active && <Check className="size-3.5 text-accent" />}
+                      </div>
+                      <div className="mt-0.5 font-mono text-[9px] uppercase tracking-widest text-black/40">
+                        λ {c.lambda} · {c.fire}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -537,27 +654,37 @@ function ProductConfiguratorPage() {
             {comparisons.map((c, i) => {
               const r = computeResults(c);
               return (
-                <div key={i} className="relative rounded-3xl border border-border bg-surface p-6">
-                  <button
-                    onClick={() => setComparisons(comparisons.filter((_, x) => x !== i))}
-                    className="absolute right-4 top-4 text-muted-foreground hover:text-foreground"
-                    aria-label="Remove"
-                  >
-                    <X className="size-4" />
-                  </button>
-                  <div className="text-xs uppercase tracking-widest text-muted-foreground">
-                    Option {i + 1}
+                <div key={i} className="relative overflow-hidden rounded-3xl border border-border bg-surface">
+                  <div className="relative flex aspect-[4/3] items-center justify-center bg-white p-6">
+                    <img
+                      src={PANEL_IMAGES[c.core]}
+                      alt={`${c.core} panel`}
+                      className="max-h-full max-w-full object-contain"
+                      loading="lazy"
+                    />
+                    <button
+                      onClick={() => setComparisons(comparisons.filter((_, x) => x !== i))}
+                      className="absolute right-3 top-3 flex size-7 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 hover:text-black"
+                      aria-label="Remove"
+                    >
+                      <X className="size-3.5" />
+                    </button>
                   </div>
-                  <div className="mt-1 text-lg font-semibold">
-                    {c.core} · {c.thickness} mm
+                  <div className="border-t border-border p-6">
+                    <div className="text-xs uppercase tracking-widest text-muted-foreground">
+                      Option {i + 1}
+                    </div>
+                    <div className="mt-1 text-lg font-semibold">
+                      {c.core} · {c.thickness} mm
+                    </div>
+                    <dl className="mt-4 space-y-2.5 text-sm">
+                      <Row label="U-Value" value={`${r.uValue} W/m²K`} light />
+                      <Row label="Fire Rating" value={r.fireRating} light />
+                      <Row label="Weight" value={`${r.weight} kg/m²`} light />
+                      <Row label="Sound" value={`${r.sound} dB`} light />
+                      <Row label="Thermal" value={r.thermalScore} light />
+                    </dl>
                   </div>
-                  <dl className="mt-6 space-y-3 text-sm">
-                    <Row label="U-Value" value={`${r.uValue} W/m²K`} light />
-                    <Row label="Fire Rating" value={r.fireRating} light />
-                    <Row label="Weight" value={`${r.weight} kg/m²`} light />
-                    <Row label="Sound" value={`${r.sound} dB`} light />
-                    <Row label="Thermal" value={r.thermalScore} light />
-                  </dl>
                 </div>
               );
             })}
@@ -593,8 +720,27 @@ function ProductConfiguratorPage() {
               </button>
             ))}
           </div>
-          <div className="relative overflow-hidden rounded-3xl border border-border bg-background">
-            <img src={datasheetImg} alt="NEVO datasheet preview" className="h-full w-full object-cover" />
+
+          {/* Engineering-style datasheet card — clean, white, monospaced */}
+          <div className="overflow-hidden rounded-3xl border border-border bg-white shadow-[0_30px_80px_-40px_rgba(0,0,0,0.35)]">
+            <div className="flex items-center justify-between border-b border-black/5 px-5 py-3 font-mono text-[10px] uppercase tracking-[0.25em] text-black/50">
+              <span>Datasheet · NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness}</span>
+              <span>REV 01</span>
+            </div>
+            <div className="relative flex aspect-[4/3] items-center justify-center bg-white p-6">
+              <img
+                src={PANEL_IMAGES[cfg.core]}
+                alt="Datasheet preview"
+                className="max-h-full max-w-full object-contain"
+                loading="lazy"
+              />
+            </div>
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-black/5 px-5 py-4 font-mono text-[11px]">
+              <div className="flex justify-between text-black/60"><span>U-VALUE</span><span className="text-black">{results.uValue}</span></div>
+              <div className="flex justify-between text-black/60"><span>FIRE</span><span className="text-black">{results.fireRating}</span></div>
+              <div className="flex justify-between text-black/60"><span>WEIGHT</span><span className="text-black">{results.weight}</span></div>
+              <div className="flex justify-between text-black/60"><span>Rw</span><span className="text-black">{results.sound} dB</span></div>
+            </dl>
           </div>
         </div>
       </Section>
@@ -823,17 +969,17 @@ function ResultCard({
 function StepPanelType({
   selected,
   onSelect,
+  core,
 }: {
   selected: PanelType;
   onSelect: (v: PanelType) => void;
+  core: CoreMaterial;
 }) {
   return (
     <div>
       <StepHeader n={1} title="Panel Type" desc="Choose the type of panel that fits your application." />
       <div className="grid gap-6 md:grid-cols-[1fr_1.2fr]">
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">
-          <img src={panelTypeImg} alt="Panel type" className="aspect-[4/3] w-full object-cover" />
-        </div>
+        <PanelStudio core={core} ratio="aspect-[4/3]" />
         <div className="space-y-2">
           {PANEL_TYPES.map((p) => {
             const active = p.id === selected;
@@ -879,38 +1025,43 @@ function StepCore({
 }) {
   return (
     <div>
-      <StepHeader n={2} title="Core Material" desc="Select the core material for your performance needs." />
-      <div className="grid gap-6 md:grid-cols-[1.2fr_1fr]">
-        <div className="space-y-2">
-          {CORES.map((c) => {
-            const active = c.id === selected;
-            return (
-              <button
-                key={c.id}
-                onClick={() => onSelect(c.id)}
-                className={cn(
-                  "flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition",
-                  active
-                    ? "border-accent bg-accent/10"
-                    : "border-white/10 bg-white/[0.02] hover:border-white/20",
-                )}
-              >
-                <div className="flex-1">
-                  <div className="text-sm font-semibold">{c.id}</div>
-                  <div className="text-xs text-white/50">{c.desc}</div>
+      <StepHeader n={2} title="Core Material" desc="Select the core material — each has its own dedicated studio render." />
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {CORES.map((c) => {
+          const active = c.id === selected;
+          return (
+            <button
+              key={c.id}
+              onClick={() => onSelect(c.id)}
+              className={cn(
+                "group flex flex-col overflow-hidden rounded-2xl border bg-white text-left shadow-[0_25px_60px_-30px_rgba(0,0,0,0.55)] transition",
+                active
+                  ? "border-accent ring-2 ring-accent/40"
+                  : "border-black/5 hover:-translate-y-0.5",
+              )}
+            >
+              <div className="relative flex aspect-[4/3] items-center justify-center bg-white p-4">
+                <img
+                  src={PANEL_IMAGES[c.id]}
+                  alt={`${c.id} sandwich panel render`}
+                  className="max-h-full max-w-full object-contain"
+                  loading="lazy"
+                />
+              </div>
+              <div className="border-t border-black/5 bg-white p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-black">{c.id}</span>
+                  {active && <Check className="size-4 text-accent" />}
                 </div>
-                <div className="text-right text-[10px] uppercase tracking-widest text-white/50">
-                  <div>λ {c.lambda} W/mK</div>
-                  <div>Fire {c.fire}</div>
+                <p className="mt-1 text-xs text-black/50">{c.desc}</p>
+                <div className="mt-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-black/50">
+                  <span>λ {c.lambda} W/mK</span>
+                  <span>Fire {c.fire}</span>
                 </div>
-                {active && <Check className="size-4 text-accent" />}
-              </button>
-            );
-          })}
-        </div>
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">
-          <img src={coreStackImg} alt="Core stack" className="aspect-[4/5] w-full object-cover" />
-        </div>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -926,47 +1077,59 @@ function StepDimensions({
   return (
     <div>
       <StepHeader n={3} title="Dimensions" desc="Define the exact dimensions of your panel." />
-      <div className="grid gap-6 md:grid-cols-2">
-        <SliderField
-          label="Thickness (mm)"
-          value={cfg.thickness}
-          min={40}
-          max={250}
-          step={10}
-          onChange={(v) => update("thickness", v)}
-        />
-        <SliderField
-          label="Width (mm)"
-          value={cfg.width}
-          min={600}
-          max={1200}
-          step={50}
-          onChange={(v) => update("width", v)}
-        />
-        <SliderField
-          label="Length (m)"
-          value={cfg.length}
-          min={2}
-          max={16}
-          step={0.5}
-          onChange={(v) => update("length", v)}
-        />
-        <div>
-          <label className="text-xs font-medium uppercase tracking-widest text-white/60">
-            Joint Type
-          </label>
-          <select
-            value={cfg.joint}
-            onChange={(e) => update("joint", e.target.value as JointType)}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-black/40 p-3 text-sm text-white focus:border-accent focus:outline-none"
-          >
-            {JOINTS.map((j) => (
-              <option key={j} value={j}>
-                {j}
-              </option>
-            ))}
-          </select>
+      <div className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
+        <div className="grid gap-6 md:grid-cols-2">
+          <SliderField
+            label="Thickness (mm)"
+            value={cfg.thickness}
+            min={40}
+            max={250}
+            step={10}
+            onChange={(v) => update("thickness", v)}
+          />
+          <SliderField
+            label="Width (mm)"
+            value={cfg.width}
+            min={600}
+            max={1200}
+            step={50}
+            onChange={(v) => update("width", v)}
+          />
+          <SliderField
+            label="Length (m)"
+            value={cfg.length}
+            min={2}
+            max={16}
+            step={0.5}
+            onChange={(v) => update("length", v)}
+          />
+          <div>
+            <label className="text-xs font-medium uppercase tracking-widest text-white/60">
+              Joint Type
+            </label>
+            <select
+              value={cfg.joint}
+              onChange={(e) => update("joint", e.target.value as JointType)}
+              className="mt-2 w-full rounded-xl border border-white/10 bg-black/40 p-3 text-sm text-white focus:border-accent focus:outline-none"
+            >
+              {JOINTS.map((j) => (
+                <option key={j} value={j}>
+                  {j}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
+        <PanelStudio
+          core={cfg.core}
+          ratio="aspect-[4/3]"
+          caption={
+            <>
+              <span>{cfg.thickness} × {cfg.width} mm · {cfg.length} m</span>
+              <span>{cfg.joint}</span>
+            </>
+          }
+        />
       </div>
     </div>
   );
@@ -1051,9 +1214,16 @@ function StepSteel({
             <div className="mt-2 text-xs text-white/60">Selected: {cfg.color}</div>
           </div>
         </div>
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">
-          <img src={coatingImg} alt="Coating fan" className="aspect-[3/4] w-full object-cover" />
-        </div>
+        <PanelStudio
+          core={cfg.core}
+          ratio="aspect-[4/5]"
+          caption={
+            <>
+              <span>{cfg.coating}</span>
+              <span>{cfg.color}</span>
+            </>
+          }
+        />
       </div>
     </div>
   );
@@ -1062,9 +1232,11 @@ function StepSteel({
 function StepAccessories({
   selected,
   onToggle,
+  core,
 }: {
   selected: string[];
   onToggle: (a: string) => void;
+  core: CoreMaterial;
 }) {
   const items = ["Flashings", "Sealants", "Fasteners", "Ventilation", "Skylights", "Others"];
   return (
@@ -1095,9 +1267,7 @@ function StepAccessories({
             );
           })}
         </div>
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">
-          <img src={accessoriesImg} alt="Accessories" className="aspect-[4/3] w-full object-cover" />
-        </div>
+        <PanelStudio core={core} ratio="aspect-[4/3]" />
       </div>
     </div>
   );
@@ -1128,8 +1298,17 @@ function StepResults({
           Based on {cfg.core} core at {cfg.thickness}mm with {cfg.coating} finish.
         </div>
       </div>
-      <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
-        <img src={laptopImg} alt="Results dashboard" className="w-full object-cover" />
+      <div className="mt-6">
+        <PanelStudio
+          core={cfg.core}
+          ratio="aspect-[16/9]"
+          caption={
+            <>
+              <span>NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness} · {cfg.color}</span>
+              <span>U {results.uValue} · Fire {results.fireRating}</span>
+            </>
+          }
+        />
       </div>
     </div>
   );
