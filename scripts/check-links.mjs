@@ -668,11 +668,13 @@ if (warnings.length) {
       `  ⚠ Link "${w.link}" in ${w.file}:${w.line} hits 301 → prefer "${w.redirectedTo}"`,
     );
 }
-if (errors.length || sitemapErrors.length || externalFailures.length) {
+if (errors.length || sitemapErrors.length || externalFailures.length || canonicalErrors.length) {
   console.log("\nErrors:");
   for (const e of errors)
     console.log(`  ✗ Dead internal link "${e.link}" in ${e.file}:${e.line}`);
-  for (const s of sitemapErrors) console.log(`  ✗ ${s.path} — ${s.reason}`);
+  for (const s of sitemapErrors) console.log(`  ✗ Sitemap ${s.path} — ${s.reason}`);
+  for (const c of canonicalErrors)
+    console.log(`  ✗ Canonical ${c.route} (${c.file}) — ${c.reason}${c.found ? ` [found: ${c.found}]` : ""}`);
   for (const f of externalFailures) {
     const first = f.occurrences[0];
     console.log(
