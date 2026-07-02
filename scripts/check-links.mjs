@@ -348,7 +348,7 @@ const staleIgnorePatterns = allDeclared.filter(
 
 
 // -------- Reports --------
-const totalErrors = errors.length + sitemapErrors.length;
+const totalErrors = errors.length + sitemapErrors.length + externalFailures.length;
 const passed = totalErrors === 0;
 const generatedAt = new Date().toISOString();
 const commit = process.env.GITHUB_SHA || "";
@@ -366,13 +366,31 @@ const report = {
     redirectWarnings: warnings.length,
     sitemapErrors: sitemapErrors.length,
     ignoredLinks: ignoredLinkCount,
+    externalChecked: externalUrls.size,
+    externalOk: externalOkCount,
+    externalFailed: externalFailures.length,
+    externalIgnored: ignoredExternalCount,
   },
   deadLinks: errors,
   redirectWarnings: warnings,
   sitemapErrors,
+  externalFailures: externalFailures.map((f) => ({
+    ...f,
+    // Flatten first occurrence for table rendering.
+    firstFile: f.occurrences[0]?.file ?? "",
+    firstLine: f.occurrences[0]?.line ?? "",
+    occurrenceCount: f.occurrences.length,
+  })),
+  external: {
+    enabled: externalCfg.enabled,
+    timeoutMs: externalCfg.timeoutMs,
+    retries: externalCfg.retries,
+    concurrency: externalCfg.concurrency,
+  },
   ignore: {
     linkPatterns: [...fileIgnorePatterns, ...(config.ignoreLinks ?? [])],
     filePatterns: config.ignoreFiles ?? [],
+    externalPatterns: config.ignoreExternal ?? [],
     sitemapMissing: [...ignoreSitemapMissing],
     sitemapExtra: [...ignoreSitemapExtra],
     stalePatterns: staleIgnorePatterns,
