@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
+import { useRef, useState } from "react";
 import {
   Briefcase, MapPin, Clock, Users, GraduationCap, Rocket,
-  Cpu, Wrench, Zap, Megaphone, Globe2, Building2, ArrowRight, Upload, Heart,
+  Cpu, Wrench, Zap, Megaphone, Globe2, Building2, ArrowRight, Upload, Heart, Loader2,
 } from "lucide-react";
 
 import heroImg from "@/assets/corporate/careers-hero.jpg";
@@ -11,6 +12,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { submitLeadForm } from "@/lib/lead-submit";
 
 const TITLE = "Careers — Build the Future With NEVO Industrial | Dubai · Germany · Türkiye";
 const DESCRIPTION =
@@ -51,6 +53,31 @@ const BENEFITS = [
 ];
 
 function CareersPage() {
+  const cvFormRef = useRef<HTMLFormElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [cvName, setCvName] = useState<string>("");
+
+  async function handleApplication(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    const ok = await submitLeadForm(e.currentTarget, {
+      source: "careers-application",
+      rules: [
+        { field: "name", label: "Full name" },
+        { field: "email", label: "Email", type: "email" },
+        { field: "phone", label: "Phone", type: "phone" },
+      ],
+      successTitle: "Application received",
+      successDescription: "Our talent team will review your profile and respond within 5 business days.",
+    });
+    setBusy(false);
+    if (ok) {
+      cvFormRef.current?.reset();
+      setCvName("");
+    }
+  }
+
   return (
     <>
       <AnnouncementBar />
@@ -146,27 +173,46 @@ function CareersPage() {
           <Eyebrow>Apply / Upload CV</Eyebrow>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight">Send us your CV</h2>
           <p className="mt-3 text-sm text-muted-foreground">Even if a matching role isn't listed today — our talent team reviews every application.</p>
-          <form className="mt-8 grid gap-4" onSubmit={(e) => e.preventDefault()}>
+          <form ref={cvFormRef} className="mt-8 grid gap-4" onSubmit={handleApplication} noValidate>
             <div className="grid gap-4 md:grid-cols-2">
-              <input placeholder="Full name" className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
-              <input placeholder="Email" type="email" className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
-              <input placeholder="Phone" className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
-              <input placeholder="LinkedIn" className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
+              <input name="name" placeholder="Full name" required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
+              <input name="email" placeholder="Email" type="email" required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
+              <input name="phone" placeholder="Phone" required className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
+              <input name="linkedin" placeholder="LinkedIn" className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
             </div>
-            <select className="rounded-md border border-input bg-background px-4 py-3 text-sm">
-              <option>Preferred team — Engineering</option>
-              <option>Preferred team — Sales</option>
-              <option>Preferred team — Project Management</option>
-              <option>Preferred team — Graduate / Intern</option>
+            <select name="team" defaultValue="" className="rounded-md border border-input bg-background px-4 py-3 text-sm">
+              <option value="" disabled>Preferred team…</option>
+              <option>Engineering</option>
+              <option>Sales</option>
+              <option>Project Management</option>
+              <option>Graduate / Intern</option>
             </select>
             <label className="flex cursor-pointer items-center justify-between rounded-md border border-dashed border-input bg-muted/40 px-4 py-6 text-sm text-muted-foreground hover:bg-muted">
-              <span className="flex items-center gap-3"><Upload className="h-5 w-5" /> Upload CV (PDF, DOCX — max 8 MB)</span>
-              <span className="text-xs">Click to browse</span>
-              <input type="file" className="hidden" accept=".pdf,.doc,.docx" />
+              <span className="flex items-center gap-3"><Upload className="h-5 w-5" /> {cvName || "Upload CV (PDF, DOCX — max 8 MB)"}</span>
+              <span className="text-xs">{cvName ? "Change" : "Click to browse"}</span>
+              <input
+                name="cv"
+                type="file"
+                className="hidden"
+                accept=".pdf,.doc,.docx"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (!f) return setCvName("");
+                  if (f.size > 8 * 1024 * 1024) {
+                    e.target.value = "";
+                    setCvName("");
+                    import("sonner").then(({ toast }) => toast.error("File too large", { description: "CV must be under 8 MB." }));
+                    return;
+                  }
+                  setCvName(f.name);
+                }}
+              />
             </label>
-            <textarea rows={4} placeholder="Why NEVO? (optional)"
+            <textarea name="note" rows={4} placeholder="Why NEVO? (optional)"
                       className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
-            <Button type="submit" size="lg">Submit Application <ArrowRight className="ml-2 h-4 w-4" /></Button>
+            <Button type="submit" size="lg" disabled={busy}>
+              {busy ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting…</>) : (<>Submit Application <ArrowRight className="ml-2 h-4 w-4" /></>)}
+            </Button>
           </form>
         </div>
       </Section>

@@ -1,6 +1,8 @@
-import { ArrowRight } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Section, SectionHeader } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { submitLeadForm } from "@/lib/lead-submit";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
 
 const FIELD =
@@ -19,6 +21,28 @@ const SOLUTIONS = [
 const TIMELINES = ["Immediate", "1–3 months", "3–6 months", "6–12 months", "12+ months"];
 
 export function ContactSection() {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    const ok = await submitLeadForm(e.currentTarget, {
+      source: "homepage-contact",
+      rules: [
+        { field: "name", label: "Full name" },
+        { field: "email", label: "Email", type: "email" },
+        { field: "message", label: "Project details", min: 10 },
+      ],
+      successTitle: "Inquiry submitted",
+      successDescription:
+        "Your project is with our engineering desk — expect a reply within one business day.",
+    });
+    setBusy(false);
+    if (ok) formRef.current?.reset();
+  }
+
   return (
     <Section id="contact" tone="default">
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
@@ -65,8 +89,10 @@ export function ContactSection() {
         </div>
 
         <form
+          ref={formRef}
           className="lg:col-span-7 rounded-2xl border border-border bg-surface p-6 sm:p-10"
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={handleSubmit}
+          noValidate
         >
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
@@ -83,15 +109,15 @@ export function ContactSection() {
             </div>
             <div>
               <label htmlFor="phone" className={LABEL}>Phone / WhatsApp</label>
-              <input id="phone" className={FIELD} placeholder="+971 ..." />
+              <input id="phone" name="phone" className={FIELD} placeholder="+971 ..." />
             </div>
             <div>
               <label htmlFor="country" className={LABEL}>Country</label>
-              <input id="country" className={FIELD} placeholder="e.g. Saudi Arabia" />
+              <input id="country" name="country" className={FIELD} placeholder="e.g. Saudi Arabia" />
             </div>
             <div>
               <label htmlFor="solution" className={LABEL}>Interested solution</label>
-              <select id="solution" className={FIELD}>
+              <select id="solution" name="solution" className={FIELD} defaultValue="">
                 <option value="">Select a solution…</option>
                 {SOLUTIONS.map((s) => (
                   <option key={s}>{s}</option>
@@ -100,7 +126,7 @@ export function ContactSection() {
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="timeline" className={LABEL}>Estimated timeline</label>
-              <select id="timeline" className={FIELD}>
+              <select id="timeline" name="timeline" className={FIELD} defaultValue="">
                 <option value="">Select timeline…</option>
                 {TIMELINES.map((t) => (
                   <option key={t}>{t}</option>
@@ -111,6 +137,7 @@ export function ContactSection() {
               <label htmlFor="message" className={LABEL}>Project details</label>
               <textarea
                 id="message"
+                name="message"
                 rows={5}
                 className={FIELD}
                 placeholder="Briefly describe your project, target output, market and any technical constraints."
@@ -123,9 +150,12 @@ export function ContactSection() {
               Your information is treated as confidential and used only to respond to
               your inquiry.
             </p>
-            <Button type="submit" variant="primary" size="lg">
-              Submit Project Inquiry
-              <ArrowRight className="!size-4" />
+            <Button type="submit" variant="primary" size="lg" disabled={busy}>
+              {busy ? (
+                <><Loader2 className="!size-4 animate-spin" /> Sending…</>
+              ) : (
+                <>Submit Project Inquiry <ArrowRight className="!size-4" /></>
+              )}
             </Button>
           </div>
         </form>
