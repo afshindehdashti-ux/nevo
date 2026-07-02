@@ -109,15 +109,15 @@ export function ContactSection() {
             </div>
             <div>
               <label htmlFor="phone" className={LABEL}>Phone / WhatsApp</label>
-              <input id="phone" className={FIELD} placeholder="+971 ..." />
+              <input id="phone" name="phone" className={FIELD} placeholder="+971 ..." />
             </div>
             <div>
               <label htmlFor="country" className={LABEL}>Country</label>
-              <input id="country" className={FIELD} placeholder="e.g. Saudi Arabia" />
+              <input id="country" name="country" className={FIELD} placeholder="e.g. Saudi Arabia" />
             </div>
             <div>
               <label htmlFor="solution" className={LABEL}>Interested solution</label>
-              <select id="solution" className={FIELD}>
+              <select id="solution" name="solution" className={FIELD} defaultValue="">
                 <option value="">Select a solution…</option>
                 {SOLUTIONS.map((s) => (
                   <option key={s}>{s}</option>
@@ -126,7 +126,7 @@ export function ContactSection() {
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="timeline" className={LABEL}>Estimated timeline</label>
-              <select id="timeline" className={FIELD}>
+              <select id="timeline" name="timeline" className={FIELD} defaultValue="">
                 <option value="">Select timeline…</option>
                 {TIMELINES.map((t) => (
                   <option key={t}>{t}</option>
@@ -137,6 +137,7 @@ export function ContactSection() {
               <label htmlFor="message" className={LABEL}>Project details</label>
               <textarea
                 id="message"
+                name="message"
                 rows={5}
                 className={FIELD}
                 placeholder="Briefly describe your project, target output, market and any technical constraints."
@@ -149,9 +150,12 @@ export function ContactSection() {
               Your information is treated as confidential and used only to respond to
               your inquiry.
             </p>
-            <Button type="submit" variant="primary" size="lg">
-              Submit Project Inquiry
-              <ArrowRight className="!size-4" />
+            <Button type="submit" variant="primary" size="lg" disabled={busy}>
+              {busy ? (
+                <><Loader2 className="!size-4 animate-spin" /> Sending…</>
+              ) : (
+                <>Submit Project Inquiry <ArrowRight className="!size-4" /></>
+              )}
             </Button>
           </div>
         </form>
