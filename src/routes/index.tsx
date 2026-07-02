@@ -14,6 +14,7 @@ import { Testimonials } from "@/components/site/Testimonials";
 import { CTABanner } from "@/components/site/CTABanner";
 import { ContactSection } from "@/components/site/ContactSection";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { SITE } from "@/lib/seo";
 
 const TITLE =
   "NEVO Industrial — Sandwich Panel Engineering, Factory Development & Raw Materials";
@@ -28,9 +29,9 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: `${SITE.url}/` },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: `${SITE.url}/` }],
     scripts: [
       {
         type: "application/ld+json",
@@ -38,7 +39,7 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "NEVO Industrial",
-          url: "https://nevoindustrial.com",
+          url: SITE.url,
           description: DESCRIPTION,
           address: {
             "@type": "PostalAddress",
