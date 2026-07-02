@@ -49,6 +49,27 @@ import { cn } from "@/lib/utils";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
+import nevoLogoFullPointer from "@/assets/nevo-logo-full.png.asset.json";
+
+/**
+ * Defensive logo fallback chain.
+ * 1) Primary: bundled white/green light logo (nevo-logo-light.png).
+ * 2) Fallback A: CDN-hosted full logo pointer (independent origin — survives
+ *    a bundle/cache miss on the primary asset).
+ * 3) Fallback B: inline SVG data-URI rendering "NEVO" in white with a green
+ *    triangle accent. Zero network dependency — guarantees the sticky header
+ *    stays readable even if both PNGs fail to load.
+ */
+const LOGO_FALLBACK_CDN = nevoLogoFullPointer.url;
+const LOGO_FALLBACK_SVG =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" role="img" aria-label="NEVO Industrial">
+      <polygon points="18,86 46,30 74,86" fill="#22c55e"/>
+      <text x="92" y="78" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="72" fill="#ffffff" letter-spacing="2">NEVO</text>
+      <text x="94" y="106" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="18" fill="#22c55e" letter-spacing="6">INDUSTRIAL</text>
+    </svg>`
+  );
 
 /* ─────────────────────────────────────────────────────────────
    Navigation model
@@ -272,7 +293,24 @@ export function SiteHeader() {
                   loading="eager"
                   decoding="async"
                   draggable={false}
+                  onError={(event) => {
+                    // Defensive fallback chain: if the bundled light logo
+                    // fails to load (bundle miss, cache poisoning, blocked
+                    // asset), swap to the CDN-hosted white/green variant.
+                    // If that also fails, fall back to an inline SVG so the
+                    // sticky header stays readable no matter what.
+                    const img = event.currentTarget;
+                    const step = img.dataset.fallbackStep ?? "0";
+                    if (step === "0") {
+                      img.dataset.fallbackStep = "1";
+                      img.src = LOGO_FALLBACK_CDN;
+                    } else if (step === "1") {
+                      img.dataset.fallbackStep = "2";
+                      img.src = LOGO_FALLBACK_SVG;
+                    }
+                  }}
                 />
+
               </span>
             </Link>
 
