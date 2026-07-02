@@ -6,7 +6,7 @@ import {
   Layers, Factory, Cog, PackageSearch, Snowflake, ShieldCheck,
   Flame, Zap, Building2, Wrench, Sparkles, BookOpen, ClipboardCheck,
   Ruler, MessageSquare, PhoneCall, Boxes, LineChart, ScrollText,
-  CheckCircle2, Star, TrendingUp, Clock, Globe2,
+  CheckCircle2, Star, TrendingUp, Clock, Globe2, Box, Award, HardHat,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
