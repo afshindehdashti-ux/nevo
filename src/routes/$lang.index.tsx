@@ -14,7 +14,7 @@ import { Testimonials } from "@/components/site/Testimonials";
 import { CTABanner } from "@/components/site/CTABanner";
 import { ContactSection } from "@/components/site/ContactSection";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { SITE } from "@/lib/seo";
+import { SITE, buildSeo } from "@/lib/seo";
 import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE =
@@ -23,46 +23,39 @@ const DESCRIPTION =
   "Dubai-based industrial engineering & supply company for the sandwich panel industry — factory development, engineering consultancy, PIR/PUR raw materials, production lines and finished panels.";
 
 export const Route = createFileRoute("/$lang/")({
-  head: ({ params }) => ({
-    meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
-      { property: "og:type", content: "website" },
-        ...ogImageMeta("/"),
-      { property: "og:url", content: `${SITE.url}/${params.lang}` },
-    ],
-    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}` }],
-
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          name: "NEVO Industrial",
-          url: SITE.url,
-          description: DESCRIPTION,
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: "Dubai",
-            addressCountry: "AE",
-          },
-          areaServed: [
-            "Saudi Arabia",
-            "Oman",
-            "United Arab Emirates",
-            "Turkey",
-            "Iraq",
-            "Kenya",
-            "Cameroon",
-            "Russia",
-          ],
-        }),
-      },
-    ],
-  }),
+  head: ({ params }) => {
+    const seo = buildSeo({ title: TITLE, description: DESCRIPTION, path: "/", lang: params.lang });
+    return {
+      ...seo,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "NEVO Industrial",
+            url: SITE.url,
+            description: DESCRIPTION,
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "Dubai",
+              addressCountry: "AE",
+            },
+            areaServed: [
+              "Saudi Arabia",
+              "Oman",
+              "United Arab Emirates",
+              "Turkey",
+              "Iraq",
+              "Kenya",
+              "Cameroon",
+              "Russia",
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: Index,
 });
 

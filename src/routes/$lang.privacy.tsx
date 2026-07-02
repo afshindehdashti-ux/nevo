@@ -1,28 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { SITE } from "@/lib/seo";
-import { ogImageMeta } from "@/lib/og-images";
+import { buildSeo } from "@/lib/seo";
 
 export const Route = createFileRoute("/$lang/privacy")({
-  head: ({ params }) => ({
-    meta: [
-      { title: "Privacy Policy — NEVO Industrial" },
-      {
-        name: "description",
-        content:
-          "How NEVO Industrial collects, uses, stores, and protects personal data across our engineering platform, calculators, and customer portals.",
-      },
-      { property: "og:title", content: "Privacy Policy — NEVO Industrial" },
-      {
-        property: "og:description",
-        content:
-          "How NEVO Industrial handles personal data, cookies, and inquiries submitted through our platform.",
-      },
-      { property: "og:url", content: `${SITE.url}/${params.lang}/privacy` },
-      ...ogImageMeta("/privacy", "NEVO Industrial — Privacy Policy"),
-    ],
-    links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}/privacy` }],
-  }),
+  head: ({ params }) =>
+    buildSeo({
+      title: "Privacy Policy",
+      description:
+        "How NEVO Industrial collects, uses, stores, and protects personal data across our engineering platform, calculators, and customer portals.",
+      path: "/privacy",
+      lang: params.lang,
+    }),
 
   component: PrivacyPage,
 });
