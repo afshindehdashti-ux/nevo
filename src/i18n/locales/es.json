@@ -61,15 +61,416 @@
     "featuredDesc": "Del estudio de viabilidad a la primera producción — ingeniería integral."
   },
   "industries": {
-    "coldStorage": "Almacenaje Frigorífico",
-    "foodProcessing": "Procesamiento de Alimentos",
-    "industrialBuildings": "Edificios Industriales",
-    "cleanRooms": "Salas Blancas",
-    "warehousing": "Almacenaje",
-    "commercialBuildings": "Edificios Comerciales",
-    "modularBuildings": "Edificios Modulares",
-    "agriculture": "Agricultura",
-    "pharmaceutical": "Farmacéutico"
+    "meta": {
+      "title": "Industries We Engineer For — Cold Storage, Clean Rooms, Food, Logistics | NEVO Industrial",
+      "description": "Engineering-led sandwich panel and factory solutions for 12+ industries: cold storage, clean rooms, food & pharma, industrial, warehouses, commercial, agriculture, modular, data centers, retail, sports and transport. NEVO Industrial, Dubai."
+    },
+    "hero": {
+      "eyebrow": "Industrias",
+      "titleA": "Industrias para las que",
+      "titleB": "diseñamos.",
+      "lede": "Complete engineering, premium materials, production technologies and sandwich panel solutions — tailored for every industry we serve.",
+      "ctaExplore": "Explorar industrias",
+      "ctaTalk": "Hablar con un especialista",
+      "stats": [
+        {
+          "k": "Quality",
+          "v": "Certified panels"
+        },
+        {
+          "k": "Performance",
+          "v": "Engineered envelopes"
+        },
+        {
+          "k": "Reliability",
+          "v": "Global supply chain"
+        },
+        {
+          "k": "Sustainability",
+          "v": "Eco-efficient materials"
+        }
+      ]
+    },
+    "overview": {
+      "eyebrow": "Panorama sectorial",
+      "title": "Every industry demands its own engineering brief.",
+      "lede": "A cold store is not a bakery. A pharma suite is not a hangar. NEVO engineers the envelope, the panel and the factory around the industry it serves — not the other way around.",
+      "items": [
+        {
+          "t": "Different insulation",
+          "d": "Thermal, acoustic and vapour requirements shift per industry."
+        },
+        {
+          "t": "Different fire ratings",
+          "d": "From B-s2,d0 industrial to A2-s1,d0 data centres and hangars."
+        },
+        {
+          "t": "Different hygiene",
+          "d": "Food, pharma and hospital envelopes need certified cleanability."
+        },
+        {
+          "t": "Different production",
+          "d": "Each industry demands its own building physics and layout."
+        },
+        {
+          "t": "Different regulations",
+          "d": "Civil defence, HACCP, GMP, ISO and local codes vary by market."
+        }
+      ]
+    },
+    "grid": {
+      "eyebrow": "Industrias",
+      "title": "Doce industrias. Una disciplina de ingeniería.",
+      "typicalLabel": "Aplicaciones típicas",
+      "panelLabel": "Panel recomendado",
+      "discuss": "Hablar sobre esta industria",
+      "items": [
+        {
+          "t": "Instalaciones frigoríficas",
+          "d": "Airtight low-temperature envelopes for logistics hubs, distribution centers and –40 °C freezer stores.",
+          "apps": [
+            "Frozen distribution",
+            "Chilled logistics",
+            "Blast freezers"
+          ],
+          "panel": "PIR — 100–200 mm, cam-lock joints"
+        },
+        {
+          "t": "Salas limpias y farmacéutica",
+          "d": "ISO-classified environments with hygienic flush-finish panels and controlled airtightness.",
+          "apps": [
+            "Pharmaceutical suites",
+            "Semiconductor fabs",
+            "Hospital OR"
+          ],
+          "panel": "Clean Room Panel — flush face, PIR/Rock Wool core"
+        },
+        {
+          "t": "Plantas de procesado de alimentos",
+          "d": "HACCP-compliant hygienic envelopes with food-grade coatings and sealed sanitary joints.",
+          "apps": [
+            "Meat & poultry",
+            "Dairy",
+            "Bakery",
+            "Beverage"
+          ],
+          "panel": "PIR / Rock Wool — HDP food-grade facing"
+        },
+        {
+          "t": "Edificios industriales",
+          "d": "Manufacturing halls, workshops and heavy-industry envelopes with engineered fire and structural performance.",
+          "apps": [
+            "Manufacturing",
+            "Heavy industry",
+            "Assembly plants"
+          ],
+          "panel": "PIR / Rock Wool — 80–150 mm structural"
+        },
+        {
+          "t": "Almacenes y centros logísticos",
+          "d": "Large-span envelopes for distribution, e-commerce and freight hubs — fast assembly, low lifecycle cost.",
+          "apps": [
+            "Distribution",
+            "E-commerce fulfilment",
+            "Freight terminals"
+          ],
+          "panel": "PIR wall + PIR/Rock Wool roof"
+        },
+        {
+          "t": "Edificios comerciales",
+          "d": "Showrooms, retail and office facades combining architectural design and engineered performance.",
+          "apps": [
+            "Showrooms",
+            "Oficinas",
+            "Retail"
+          ],
+          "panel": "Hidden-fix PIR facade + insulated glass"
+        },
+        {
+          "t": "Edificios agrícolas",
+          "d": "Livestock, storage and agro-industrial envelopes engineered for humidity, ammonia and long spans.",
+          "apps": [
+            "Livestock",
+            "Grain storage",
+            "Agro-processing"
+          ],
+          "panel": "PIR — corrosion-resistant PVDF facing"
+        },
+        {
+          "t": "Edificios modulares",
+          "d": "Prefabricated modular systems for offices, camps and site accommodation — factory built, site assembled.",
+          "apps": [
+            "Site offices",
+            "Worker accommodation",
+            "Prefab clinics"
+          ],
+          "panel": "PIR — 50–80 mm lightweight"
+        },
+        {
+          "t": "Centros de datos",
+          "d": "Non-combustible envelopes with EMI-shielded finishes and stringent fire compartmentation.",
+          "apps": [
+            "Hyperscale halls",
+            "Edge data centers",
+            "Modular pods"
+          ],
+          "panel": "Rock Wool — 120–150 mm A2 fire class"
+        },
+        {
+          "t": "Retail y supermercados",
+          "d": "Retail envelopes combining thermal comfort, fast build and integrated cold-storage back-of-house.",
+          "apps": [
+            "Supermarkets",
+            "Big-box retail",
+            "DIY stores"
+          ],
+          "panel": "PIR facade + integrated cold rooms"
+        },
+        {
+          "t": "Instalaciones deportivas",
+          "d": "Long-span sports halls, arenas and ice rinks with engineered acoustic and thermal envelopes.",
+          "apps": [
+            "Sports halls",
+            "Ice rinks",
+            "Indoor arenas"
+          ],
+          "panel": "Rock Wool — acoustic Rw 32+ dB"
+        },
+        {
+          "t": "Aeropuertos y transporte",
+          "d": "Terminals, hangars and MRO facilities engineered for fire, security and long-span roof structures.",
+          "apps": [
+            "Terminals",
+            "Hangars",
+            "MRO facilities"
+          ],
+          "panel": "Rock Wool + PIR — certified fire/thermal"
+        }
+      ]
+    },
+    "applications": {
+      "eyebrow": "Ejemplos de aplicación",
+      "title": "Where our engineering shows up in production.",
+      "lede": "Every application below has its own building physics — different vapour, temperature, hygiene and fire brief. Engineering is what makes each work.",
+      "items": [
+        {
+          "t": "Refrigerated Warehouses",
+          "n": "Continuous cold chain with PIR panels and vapour-tight joints."
+        },
+        {
+          "t": "Freezer Rooms",
+          "n": "–25 to –40 °C envelopes with cam-lock joints and heated door frames."
+        },
+        {
+          "t": "Meat & Poultry Processing",
+          "n": "Food-grade coatings, sealed sanitary joints, washdown-resistant surfaces."
+        },
+        {
+          "t": "Dairy & Beverage Plants",
+          "n": "Hygienic envelopes engineered for CIP, humidity and thermal shock."
+        },
+        {
+          "t": "Bakery & Food Production",
+          "n": "Fire-classified panels near ovens, hygienic panels on process lines."
+        },
+        {
+          "t": "Pharmaceutical Production",
+          "n": "ISO 5–8 clean rooms with flush-finish panels and controlled leakage."
+        }
+      ]
+    },
+    "panels": {
+      "eyebrow": "Soluciones de paneles",
+      "title": "The right panel for the right industry.",
+      "lede": "Five engineered panel families cover every industry NEVO serves — matched to fire, thermal, hygiene and structural briefs.",
+      "all": "Todos los sistemas de paneles",
+      "items": [
+        {
+          "t": "Panel de muro PIR",
+          "w": "Industrial, cold storage, food, logistics."
+        },
+        {
+          "t": "Panel de cubierta PIR",
+          "w": "Long-span roofs — logistics, industrial, commercial."
+        },
+        {
+          "t": "Panel de muro lana de roca",
+          "w": "Fire-critical envelopes — data centers, transport, industrial."
+        },
+        {
+          "t": "Panel de cubierta lana de roca",
+          "w": "Acoustic and fire-critical roofing."
+        },
+        {
+          "t": "Panel sala limpia",
+          "w": "Pharma, hospital, semiconductor, food process rooms."
+        }
+      ]
+    },
+    "engineering": {
+      "eyebrow": "Soluciones de ingeniería",
+      "title": "Cómo NEVO apoya a cada industria.",
+      "consultancy": "Consultoría de ingeniería",
+      "items": [
+        {
+          "t": "Feasibility Study & Concept Design",
+          "d": "Tailored solutions for your industry needs."
+        },
+        {
+          "t": "Factory Planning & Layout",
+          "d": "Optimised layouts for maximum efficiency."
+        },
+        {
+          "t": "Material Selection & Engineering",
+          "d": "Right materials for long-term performance."
+        },
+        {
+          "t": "Production Line Integration",
+          "d": "Seamless integration with manufacturing systems."
+        },
+        {
+          "t": "Automation & Smart Control",
+          "d": "Advanced automation for higher productivity."
+        },
+        {
+          "t": "Commissioning & After-Sales",
+          "d": "Complete support through the entire lifecycle."
+        },
+        {
+          "t": "Long-Term Technical Support",
+          "d": "Engineering partnership after handover."
+        }
+      ]
+    },
+    "whyChoose": {
+      "eyebrow": "Por qué NEVO",
+      "title": "Engineering-led. Industry-specific. Global.",
+      "lede": "NEVO combines industry engineering, premium materials and disciplined project delivery — one accountable partner from feasibility to long-term support.",
+      "items": [
+        "Industry-specific engineering expertise",
+        "Optimised technical solutions",
+        "Premium materials & global sourcing",
+        "End-to-end project management",
+        "Global standards & certifications",
+        "Quality assurance on every batch",
+        "Technical consultancy included",
+        "Long-term partnership approach"
+      ]
+    },
+    "caseStudies": {
+      "eyebrow": "Casos de estudio",
+      "title": "Engineered projects across industries.",
+      "note": "Project photography and full case studies coming to the Knowledge Hub soon.",
+      "items": [
+        {
+          "t": "Cold Storage — 25,000 m²",
+          "l": "GCC",
+          "i": "Cold Storage"
+        },
+        {
+          "t": "Meat Processing Plant",
+          "l": "East Africa",
+          "i": "Food Processing"
+        },
+        {
+          "t": "E-commerce Warehouse",
+          "l": "Levant",
+          "i": "Warehouse"
+        },
+        {
+          "t": "Automotive Assembly",
+          "l": "North Africa",
+          "i": "Industrial Plant"
+        },
+        {
+          "t": "Corporate HQ Facade",
+          "l": "UAE",
+          "i": "Commercial"
+        },
+        {
+          "t": "Pharma Clean Room Suite",
+          "l": "South Asia",
+          "i": "Clean Room"
+        }
+      ]
+    },
+    "downloads": {
+      "eyebrow": "Descargas",
+      "title": "Industry-specific technical guides.",
+      "request": "Solicitar descarga",
+      "items": [
+        {
+          "t": "Industry Capability Brochure",
+          "d": "NEVO's full industry-by-industry engineering capabilities."
+        },
+        {
+          "t": "Cold Storage Design Guide",
+          "d": "Panel selection, thickness, joints and vapour control."
+        },
+        {
+          "t": "Clean Room Guide",
+          "d": "ISO class selection, panel systems and airtightness."
+        },
+        {
+          "t": "Food Processing Guide",
+          "d": "HACCP-compliant envelopes and hygienic detailing."
+        },
+        {
+          "t": "Warehouse & Logistics Guide",
+          "d": "Long-span roofs, wall systems and lifecycle economics."
+        },
+        {
+          "t": "Panel Selection Guide",
+          "d": "Choosing PIR, Rock Wool or Clean Room panels by industry."
+        }
+      ]
+    },
+    "faq": {
+      "eyebrow": "Preguntas frecuentes",
+      "title": "Industry-specific engineering answers.",
+      "links": {
+        "production": "Líneas de producción",
+        "consultancy": "Consultoría de ingeniería",
+        "materials": "Materias primas",
+        "panels": "Paneles sándwich terminados",
+        "factory": "Desarrollo de fábricas",
+        "hub": "Centro de conocimiento"
+      }
+    },
+    "consultation": {
+      "eyebrow": "Consultoría sectorial",
+      "title": "Hable con un especialista.",
+      "lede": "Share your project brief and a NEVO industry engineer will reply within one business day with an engineered technical proposal.",
+      "bullets": [
+        "Industry-specific engineering advice",
+        "Sustainable material recommendations",
+        "Global delivery — DDP in select markets"
+      ],
+      "company": "Empresa",
+      "industry": "Industria",
+      "industryPh": "Cold storage / Pharma / …",
+      "country": "País",
+      "projectType": "Tipo de proyecto",
+      "projectTypePh": "New build / Extension",
+      "size": "Tamaño del edificio (m²)",
+      "sizePh": "e.g. 8,000",
+      "panel": "Tipo de panel",
+      "panelPh": "PIR / Rock Wool / Clean Room",
+      "fire": "Requisito de resistencia al fuego",
+      "firePh": "EI 30 / 60 / 120",
+      "timeline": "Cronograma",
+      "timelinePh": "Q3 2026",
+      "message": "Mensaje",
+      "submit": "Enviar consulta",
+      "successMsg": "Thank you. A NEVO industry specialist will reply within one business day."
+    },
+    "cta": {
+      "eyebrow": "Listo para diseñar",
+      "title": "Cada industria merece una solución de ingeniería.",
+      "lede": "Whether you're building a cold storage warehouse, food factory, pharmaceutical facility or industrial plant, NEVO delivers engineering-driven solutions built for long-term performance.",
+      "primary": "Agendar consultoría",
+      "secondary": "Solicitar propuesta técnica"
+    }
   },
   "knowledge": {
     "articles": "Artículos de Ingeniería",
@@ -523,6 +924,419 @@
       "pBefore": "NEVO Industrial — Dubái, Emiratos Árabes Unidos. ",
       "link": "Contáctenos",
       "pAfter": " para cualquier consulta sobre esta política."
+    }
+  },
+  "about": {
+    "meta": {
+      "title": "About NEVO Industrial — Engineering the Future of Sandwich Panel Manufacturing | Dubai",
+      "description": "NEVO Industrial is a Dubai-based engineering and industrial solutions company. We integrate engineering, factory development, production technologies, raw materials and sandwich panel supply into one complete industrial partner."
+    },
+    "hero": {
+      "eyebrow": "Acerca de NEVO Industrial",
+      "titleA": "Ingeniería del futuro.",
+      "titleB": "Construyendo excelencia industrial.",
+      "lede": "NEVO Industrial is a Dubai-based engineering and industrial solutions company specialising in sandwich panel factories, production technologies, raw materials and complete industrial project development.",
+      "ctaProject": "Iniciar tu proyecto",
+      "ctaTeam": "Conoce a nuestro equipo de ingeniería",
+      "stats": {
+        "hqK": "Dubai",
+        "hqV": "Sede global",
+        "ctK": "8+",
+        "ctV": "Países atendidos",
+        "prK": "40+",
+        "prV": "Proyectos de ingeniería",
+        "pnK": "1",
+        "pnV": "Socio integrado"
+      }
+    },
+    "story": {
+      "eyebrow": "Nuestra historia",
+      "title": "An engineering company built to close the gap between design and industry.",
+      "p1": "NEVO Industrial was founded on a straightforward observation: the sandwich panel industry is served by machinery suppliers, chemistry traders and panel producers — but rarely by engineers who understand all three.",
+      "p2": "Investors were forced to stitch together a factory from disconnected vendors, each optimising their own scope. The result was long commissioning cycles, inconsistent quality and factories that never reached their nameplate capacity.",
+      "p3": "NEVO was created to bridge engineering, industrial supply and project execution under one brand. From feasibility to commissioning — and long after — a single engineering-led partner owns the outcome.",
+      "p4": "Headquartered in Dubai and operating across eight countries, we work with ambitious industrialists building the next generation of production capacity for cold chain, food, pharma, logistics and heavy industry."
+    },
+    "mission": {
+      "eyebrow": "Nuestra misión",
+      "title": "Seis compromisos que dan forma a cada proyecto.",
+      "lede": "No una declaración de misión — una arquitectura de misión.",
+      "items": [
+        {
+          "t": "Excelencia en ingeniería",
+          "b": "Every project starts with rigorous engineering — never with a catalogue."
+        },
+        {
+          "t": "Innovación industrial",
+          "b": "We adopt proven technologies faster and integrate them deeper than legacy suppliers."
+        },
+        {
+          "t": "Alianzas globales",
+          "b": "A curated network of the world's best machinery, chemistry and steel partners."
+        },
+        {
+          "t": "Valor a largo plazo",
+          "b": "Designed for 20-year performance — not lowest bid, not shortest lead time."
+        },
+        {
+          "t": "Éxito del cliente",
+          "b": "We are measured by our clients' plant uptime, quality yield and margin — not by ours."
+        },
+        {
+          "t": "Crecimiento sostenible",
+          "b": "Energy-efficient production, responsible sourcing and lifecycle thinking in every design."
+        }
+      ]
+    },
+    "vision": {
+      "eyebrow": "Nuestra visión",
+      "titleA": "Construyendo el socio de ingeniería",
+      "titleB": "más confiable del mundo.",
+      "p1": "To become the reference engineering partner for the global sandwich panel industry — combining deep technical expertise, curated technology, and a network of premium suppliers into one integrated offer.",
+      "p2": "We measure our vision in factories commissioned, engineers trained, and long-term partnerships built — not in units shipped.",
+      "labels": [
+        "Engineering",
+        "Technology",
+        "Global Manufacturing",
+        "Innovation",
+        "Knowledge",
+        "Industrial Growth"
+      ]
+    },
+    "whatWeDo": {
+      "eyebrow": "Qué hacemos",
+      "title": "Ocho disciplinas. Un socio de ingeniería integrado.",
+      "lede": "Every service listed below is owned end-to-end by NEVO — never subcontracted, never resold without engineering.",
+      "items": [
+        {
+          "t": "Desarrollo de fábricas",
+          "b": "Greenfield and brownfield sandwich panel plants — feasibility to commissioning."
+        },
+        {
+          "t": "Consultoría de ingeniería",
+          "b": "Process, layout, utilities, automation and quality engineering."
+        },
+        {
+          "t": "Líneas de producción",
+          "b": "Continuous double-belt lines, roll formers, flying saws, stackers."
+        },
+        {
+          "t": "Materias primas",
+          "b": "PPGI, GI, Aluzinc, PIR chemistry (polyol/MDI), Rock Wool."
+        },
+        {
+          "t": "Paneles sándwich terminados",
+          "b": "PIR, Rock Wool, roof, wall and cold room systems."
+        },
+        {
+          "t": "Soporte técnico",
+          "b": "Commissioning, training, spare parts, process optimisation."
+        },
+        {
+          "t": "Automatización",
+          "b": "PLC, HMI, SCADA, MES integration and Industry 4.0 modules."
+        },
+        {
+          "t": "Gestión de proyectos",
+          "b": "Single point of accountability from PO to production ramp-up."
+        }
+      ]
+    },
+    "approach": {
+      "eyebrow": "Nuestro enfoque",
+      "title": "Nine engineering steps, one continuous partnership.",
+      "steps": [
+        "Entender",
+        "Ingeniería",
+        "Diseño",
+        "Abastecimiento",
+        "Construir",
+        "Instalar",
+        "Puesta en marcha",
+        "Soporte",
+        "Optimizar"
+      ]
+    },
+    "why": {
+      "eyebrow": "Por qué NEVO",
+      "title": "Eight reasons industrialists choose us.",
+      "items": [
+        {
+          "t": "Engineering Before Products",
+          "b": "We solve the problem before we quote the equipment."
+        },
+        {
+          "t": "Technology Neutral",
+          "b": "We specify what fits — not what we're contracted to sell."
+        },
+        {
+          "t": "Global Supplier Network",
+          "b": "The best machinery, chemistry and steel — regardless of geography."
+        },
+        {
+          "t": "Premium Quality",
+          "b": "Only vetted suppliers with verified test data and traceability."
+        },
+        {
+          "t": "Technical Expertise",
+          "b": "Engineers, chemists, process specialists and installation leads."
+        },
+        {
+          "t": "Long-Term Partnership",
+          "b": "Support that continues long after commissioning."
+        },
+        {
+          "t": "Worldwide Support",
+          "b": "Remote diagnostics, on-site interventions, spare-parts logistics."
+        },
+        {
+          "t": "Dubai Headquarters",
+          "b": "Positioned between Europe, Asia and Africa for global reach."
+        }
+      ]
+    },
+    "presence": {
+      "eyebrow": "Presencia global",
+      "titleA": "Sede en Dubái.",
+      "titleB": "Global por diseño.",
+      "lede": "NEVO delivers engineering, materials and production technologies across the Middle East, Africa, CIS and beyond — with a curated partner network that follows every project.",
+      "serving": "Atendiendo más de 8 países",
+      "countries": [
+        {
+          "n": "United Arab Emirates",
+          "g": "HQ"
+        },
+        {
+          "n": "Saudi Arabia",
+          "g": "Active"
+        },
+        {
+          "n": "Oman",
+          "g": "Active"
+        },
+        {
+          "n": "Turkey",
+          "g": "Partner"
+        },
+        {
+          "n": "Iraq",
+          "g": "Active"
+        },
+        {
+          "n": "Russia",
+          "g": "Partner"
+        },
+        {
+          "n": "Kenya",
+          "g": "Active"
+        },
+        {
+          "n": "Cameroon",
+          "g": "Active"
+        },
+        {
+          "n": "Future Global Expansion",
+          "g": "Next"
+        }
+      ]
+    },
+    "values": {
+      "eyebrow": "Nuestros valores",
+      "title": "The principles we hire, engineer and partner by.",
+      "items": [
+        "Integrity",
+        "Engineering Precision",
+        "Innovation",
+        "Quality",
+        "Reliability",
+        "Continuous Improvement",
+        "Customer Partnership",
+        "Sustainability"
+      ]
+    },
+    "difference": {
+      "eyebrow": "Nuestra diferencia",
+      "title": "What NEVO is — and what NEVO is not.",
+      "notLabel": "NEVO NO ES",
+      "notItems": [
+        "Only a machinery supplier.",
+        "Only a raw material trader.",
+        "Only a sandwich panel supplier."
+      ],
+      "isLabel": "NEVO ES",
+      "isText": "An engineering-led industrial partner that integrates engineering, technology, industrial supply and project execution into one complete solution — for the entire lifecycle of a sandwich panel factory."
+    },
+    "process": {
+      "eyebrow": "Nuestro proceso",
+      "title": "From first conversation to long-term optimization.",
+      "stepLabel": "Paso",
+      "items": [
+        {
+          "t": "Discovery",
+          "b": "Requirements, site, capacity, market — mapped in engineering terms."
+        },
+        {
+          "t": "Engineering",
+          "b": "Process design, mass balance, utility sizing, layout, DFMEA."
+        },
+        {
+          "t": "Planning",
+          "b": "CAPEX model, schedule, procurement plan, risk register."
+        },
+        {
+          "t": "Procurement",
+          "b": "Vetted machinery, chemistry, steel and auxiliary suppliers."
+        },
+        {
+          "t": "Execution",
+          "b": "Manufacturing oversight, FATs, logistics, on-site coordination."
+        },
+        {
+          "t": "Commissioning",
+          "b": "Installation, cold and hot commissioning, performance runs."
+        },
+        {
+          "t": "Optimization",
+          "b": "Yield, energy, cycle-time and quality improvement programs."
+        },
+        {
+          "t": "Long-Term Support",
+          "b": "Spare parts, training, remote diagnostics, upgrades."
+        }
+      ]
+    },
+    "commitment": {
+      "eyebrow": "Nuestro compromiso",
+      "title": "The promise behind every NEVO partnership.",
+      "lede": "A relationship with NEVO is designed for the full lifecycle of your factory — not the duration of a single purchase order.",
+      "items": [
+        "Transparent communication.",
+        "Engineering-first thinking.",
+        "Premium quality.",
+        "Long-term partnership.",
+        "Technical support.",
+        "Continuous improvement."
+      ]
+    },
+    "cta": {
+      "eyebrow": "Construyamos",
+      "titleA": "Construyamos algo",
+      "titleB": "excepcional juntos.",
+      "lede": "Bring your factory ambition, cold-chain project, or panel programme to a team that engineers the outcome — not just the equipment.",
+      "primary": "Habla con un ingeniero",
+      "secondary": "Solicitar consultoría"
+    }
+  },
+  "contact": {
+    "meta": {
+      "title": "Global Offices & Contact — NEVO Industrial | Dubai · Germany · Turkey · Oman",
+      "description": "Reach NEVO Industrial engineering teams worldwide. Dubai HQ, Germany, Turkey and Oman offices. Engineering hotline, international sales, project department, WhatsApp and booked meetings."
+    },
+    "hero": {
+      "eyebrow": "Presencia global",
+      "titleA": "Ingeniería global.",
+      "titleB": "Presencia local.",
+      "lede": "From our Dubai headquarters to European engineering hubs and GCC project offices, NEVO delivers industrial engineering with senior expertise wherever your project lives.",
+      "ctaOffices": "Explorar oficinas",
+      "ctaCallback": "Solicitar llamada",
+      "statOffices": "Oficinas",
+      "statCountries": "Países atendidos",
+      "statEngineers": "Ingenieros en plantilla"
+    },
+    "offices": {
+      "eyebrow": "Mapa interactivo",
+      "title": "Dónde opera NEVO",
+      "lede": "Click any office to see contact details and local engineering capability.",
+      "list": [
+        {
+          "city": "Dubai",
+          "country": "United Arab Emirates",
+          "role": "Global Headquarters",
+          "address": "Business Bay, Dubai, UAE",
+          "hours": "Sun–Thu · 08:30–18:00 GST"
+        },
+        {
+          "city": "Düsseldorf",
+          "country": "Germany",
+          "role": "European Engineering Hub",
+          "address": "Königsallee, Düsseldorf",
+          "hours": "Mon–Fri · 09:00–18:00 CET"
+        },
+        {
+          "city": "Istanbul",
+          "country": "Türkiye",
+          "role": "Manufacturing & Sourcing",
+          "address": "Levent, Istanbul",
+          "hours": "Mon–Fri · 09:00–18:00 TRT"
+        },
+        {
+          "city": "Muscat",
+          "country": "Sultanate of Oman",
+          "role": "GCC Projects Office",
+          "address": "Al Khuwair, Muscat",
+          "hours": "Sun–Thu · 08:30–17:30 GST"
+        },
+        {
+          "city": "Riyadh · Cairo · Nairobi",
+          "country": "Opening 2026",
+          "role": "Future Offices",
+          "address": "Under establishment",
+          "hours": "Announced Q2 2026"
+        }
+      ]
+    },
+    "cards": {
+      "eyebrow": "Canales directos",
+      "title": "Hable con el equipo correcto, rápido",
+      "lede": "Every enquiry is routed to a senior engineer or account director within one business day.",
+      "items": [
+        {
+          "t": "Línea de ingeniería",
+          "d": "24/7 senior engineer on call for active project sites."
+        },
+        {
+          "t": "Ventas internacionales",
+          "d": "Panel supply, factory equipment and export enquiries."
+        },
+        {
+          "t": "Soporte de ingeniería",
+          "d": "Technical drawings, U-value & fire compliance help."
+        },
+        {
+          "t": "Departamento de proyectos",
+          "d": "Turn-key factories, EPC and consulting programs."
+        },
+        {
+          "t": "WhatsApp",
+          "d": "Fast response from our GCC engineering desk."
+        },
+        {
+          "t": "Agendar reunión online",
+          "d": "30-minute video consultation with a senior engineer.",
+          "v": "Reservar horario"
+        }
+      ]
+    },
+    "callback": {
+      "mapTitle": "NEVO Dubai HQ",
+      "eyebrow": "Solicitud de llamada",
+      "title": "Hable con un ingeniero senior",
+      "lede": "Share a few details and we'll call within one business day.",
+      "name": "Nombre completo",
+      "company": "Empresa",
+      "email": "Correo",
+      "phone": "Teléfono / WhatsApp",
+      "interestPlaceholder": "Selecciona interés…",
+      "interest1": "Desarrollo de fábricas",
+      "interest2": "Paneles sándwich",
+      "interest3": "Líneas de producción",
+      "interest4": "Consultoría de ingeniería",
+      "message": "Project brief (capacity, location, timeline)",
+      "submit": "Solicitud de llamada",
+      "sending": "Enviando…",
+      "successTitle": "Callback requested",
+      "successDesc": "A senior engineer will call you within one business day.",
+      "whatsapp": "Chatear por WhatsApp"
     }
   }
 }
