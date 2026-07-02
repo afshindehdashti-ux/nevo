@@ -134,7 +134,7 @@ function Menu({
     <div
       role="listbox"
       className={cn(
-        "absolute z-[60] w-64 overflow-hidden rounded-lg border border-border bg-white text-foreground shadow-lg ring-1 ring-black/5",
+        "absolute z-[60] w-64 overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-lg ring-1 ring-black/40",
         anchor === "down" ? "end-0 top-full mt-2" : "end-0 bottom-full mb-2",
       )}
     >
