@@ -18,6 +18,7 @@ import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as InvestmentCalculatorRouteImport } from './routes/investment-calculator'
 import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as FactoryLayoutGeneratorRouteImport } from './routes/factory-layout-generator'
+import { Route as DownloadCenterRouteImport } from './routes/download-center'
 import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -74,6 +75,11 @@ const FactoryLayoutGeneratorRoute = FactoryLayoutGeneratorRouteImport.update({
   path: '/factory-layout-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DownloadCenterRoute = DownloadCenterRouteImport.update({
+  id: '/download-center',
+  path: '/download-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AiAssistantRoute = AiAssistantRouteImport.update({
   id: '/ai-assistant',
   path: '/ai-assistant',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
+  '/download-center': typeof DownloadCenterRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/industries': typeof IndustriesRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
+  '/download-center': typeof DownloadCenterRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/industries': typeof IndustriesRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-assistant': typeof AiAssistantRoute
+  '/download-center': typeof DownloadCenterRoute
   '/factory-layout-generator': typeof FactoryLayoutGeneratorRoute
   '/industries': typeof IndustriesRoute
   '/investment-calculator': typeof InvestmentCalculatorRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-assistant'
+    | '/download-center'
     | '/factory-layout-generator'
     | '/industries'
     | '/investment-calculator'
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-assistant'
+    | '/download-center'
     | '/factory-layout-generator'
     | '/industries'
     | '/investment-calculator'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-assistant'
+    | '/download-center'
     | '/factory-layout-generator'
     | '/industries'
     | '/investment-calculator'
@@ -251,6 +263,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AiAssistantRoute: typeof AiAssistantRoute
+  DownloadCenterRoute: typeof DownloadCenterRoute
   FactoryLayoutGeneratorRoute: typeof FactoryLayoutGeneratorRoute
   IndustriesRoute: typeof IndustriesRoute
   InvestmentCalculatorRoute: typeof InvestmentCalculatorRoute
@@ -333,6 +346,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FactoryLayoutGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/download-center': {
+      id: '/download-center'
+      path: '/download-center'
+      fullPath: '/download-center'
+      preLoaderRoute: typeof DownloadCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai-assistant': {
       id: '/ai-assistant'
       path: '/ai-assistant'
@@ -403,6 +423,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AiAssistantRoute: AiAssistantRoute,
+  DownloadCenterRoute: DownloadCenterRoute,
   FactoryLayoutGeneratorRoute: FactoryLayoutGeneratorRoute,
   IndustriesRoute: IndustriesRoute,
   InvestmentCalculatorRoute: InvestmentCalculatorRoute,
