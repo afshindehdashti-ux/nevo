@@ -1,12 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
-  Link,
   createRootRouteWithContext,
   useRouter,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { Link } from "@/components/site/LocalizedLink";
 import { useEffect, type ReactNode } from "react";
 import {
   BookOpen,
