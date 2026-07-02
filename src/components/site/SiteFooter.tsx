@@ -12,6 +12,7 @@ const COLUMNS = [
       { label: "Raw Materials", href: "/solutions/raw-materials" },
       { label: "Production Lines", href: "/solutions/production-lines" },
       { label: "Finished Panels", href: "/solutions/sandwich-panels" },
+      { label: "Panel Configurator", href: "/product-configurator" },
       { label: "AI Engineering Assistant", href: "/ai-assistant" },
     ],
   },
