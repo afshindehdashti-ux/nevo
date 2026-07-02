@@ -878,13 +878,14 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
    ───────────────────────────────────────────────────────────── */
 
 function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSearch: () => void }) {
+  const { t } = useTranslation();
   const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
-  const sections: { label: string; items: NavItem[] }[] = [
-    { label: "Solutions", items: SOLUTIONS.items },
-    { label: "Industries", items: INDUSTRIES.items },
-    { label: "Knowledge", items: KNOWLEDGE.items.slice(0, 6) },
-    { label: "Markets", items: MARKETS.items },
-    { label: "Company", items: COMPANY.items },
+  const sections: { label: string; i18nKey: string; items: NavItem[] }[] = [
+    { label: "Solutions",  i18nKey: "nav.solutions",  items: SOLUTIONS.items },
+    { label: "Industries", i18nKey: "nav.industries", items: INDUSTRIES.items },
+    { label: "Knowledge",  i18nKey: "nav.knowledge",  items: KNOWLEDGE.items.slice(0, 6) },
+    { label: "Markets",    i18nKey: "nav.markets",    items: MARKETS.items },
+    { label: "Company",    i18nKey: "nav.company",    items: COMPANY.items },
   ];
 
   return (
