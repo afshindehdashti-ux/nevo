@@ -21,6 +21,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
+import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE =
   "Installation, Commissioning & After-Sales Support | NEVO Industrial";
@@ -109,6 +110,7 @@ export const Route = createFileRoute("/$lang/installation-commissioning")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
+        ...ogImageMeta("/installation-commissioning"),
       { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
     ],
     links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
