@@ -89,8 +89,10 @@ export function ContactSection() {
         </div>
 
         <form
+          ref={formRef}
           className="lg:col-span-7 rounded-2xl border border-border bg-surface p-6 sm:p-10"
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={handleSubmit}
+          noValidate
         >
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
