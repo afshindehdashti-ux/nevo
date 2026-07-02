@@ -14,6 +14,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
 import { submitLeadForm } from "@/lib/lead-submit";
+import { getPhoneExample } from "@/lib/phone-validation";
 import { SITE, WHATSAPP_URL, buildSeo } from "@/lib/seo";
 import { localizedMeta } from "@/lib/seo-meta";
 
