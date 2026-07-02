@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { SITE } from "@/lib/seo";
 import { ogImageMeta } from "@/lib/og-images";
 
@@ -27,82 +28,65 @@ export const Route = createFileRoute("/$lang/privacy")({
 });
 
 function PrivacyPage() {
+  const { t } = useTranslation();
+  const year = new Date().getFullYear();
+  const bullets = t("privacy.s2.items", { returnObjects: true }) as string[];
+
   return (
     <main className="mx-auto max-w-3xl px-6 py-24 text-foreground">
-      <h1 className="mb-2 text-4xl font-semibold tracking-tight">Privacy Policy</h1>
+      <h1 className="mb-2 text-4xl font-semibold tracking-tight">{t("privacy.title")}</h1>
       <p className="mb-10 text-sm text-muted-foreground">
-        Last updated: {new Date().getFullYear()}
+        {t("privacy.lastUpdated", { year })}
       </p>
 
       <div className="space-y-8 text-[15px] leading-relaxed text-muted-foreground">
         <section>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">1. Who we are</h2>
-          <p>
-            NEVO Industrial ("NEVO", "we", "us") is an engineering and industrial group
-            headquartered in Dubai, UAE. This policy explains how we handle personal data
-            collected through our website, calculators, download center, and customer or
-            partner portals.
-          </p>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">{t("privacy.s1.h")}</h2>
+          <p>{t("privacy.s1.p")}</p>
         </section>
 
         <section>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">2. Data we collect</h2>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">{t("privacy.s2.h")}</h2>
           <ul className="list-disc space-y-1 pl-6">
-            <li>Contact details you submit through inquiry forms, downloads, or callbacks.</li>
-            <li>Project parameters entered into calculators or configurators.</li>
-            <li>Account data for the customer and partner portals.</li>
-            <li>Technical data (IP address, device, browser, pages viewed) via essential and optional analytics cookies.</li>
+            {Array.isArray(bullets) &&
+              bullets.map((item, i) => <li key={i}>{item}</li>)}
           </ul>
         </section>
 
         <section>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">3. How we use it</h2>
-          <p>
-            We use personal data to respond to inquiries, deliver quotations, provide
-            engineering documentation, operate portals, improve our platform, and comply
-            with legal obligations. We do not sell personal data.
-          </p>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">{t("privacy.s3.h")}</h2>
+          <p>{t("privacy.s3.p")}</p>
         </section>
 
         <section>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">4. Cookies</h2>
-          <p>
-            We use essential cookies required for the site to function and optional analytics
-            cookies to understand usage. You can accept or decline optional cookies via the
-            consent banner and change your choice at any time by clearing site data.
-          </p>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">{t("privacy.s4.h")}</h2>
+          <p>{t("privacy.s4.p")}</p>
         </section>
 
         <section>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">5. Sharing</h2>
-          <p>
-            We share data only with service providers who help operate our platform
-            (hosting, analytics, email delivery), and with NEVO group entities involved in
-            delivering your project. All processors are bound by confidentiality obligations.
-          </p>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">{t("privacy.s5.h")}</h2>
+          <p>{t("privacy.s5.p")}</p>
         </section>
 
         <section>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">6. Your rights</h2>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">{t("privacy.s6.h")}</h2>
           <p>
-            Subject to applicable law, you may request access, correction, deletion, or
-            portability of your personal data, and object to certain processing. To exercise
-            your rights, contact{" "}
+            {t("privacy.s6.pBefore")}
             <a href="mailto:privacy@nevoindustrial.com" className="underline">
               privacy@nevoindustrial.com
             </a>
-            .
+            {t("privacy.s6.pAfter")}
           </p>
         </section>
 
         <section>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">7. Contact</h2>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">{t("privacy.s7.h")}</h2>
           <p>
-            NEVO Industrial — Dubai, United Arab Emirates.{" "}
+            {t("privacy.s7.pBefore")}
             <a href="/contact" className="underline">
-              Get in touch
-            </a>{" "}
-            with any questions about this policy.
+              {t("privacy.s7.link")}
+            </a>
+            {t("privacy.s7.pAfter")}
           </p>
         </section>
       </div>
