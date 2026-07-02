@@ -55,7 +55,7 @@ export interface SeoInput {
   title: string;
   description: string;
   path: string; // e.g. "/solutions/production-lines" — WITHOUT the /{lang} prefix
-  lang: LocaleCode; // required — canonical + og:url are built per locale
+  lang: LocaleCode | string; // required — canonical + og:url are built per locale
   image?: string; // absolute or relative
   type?: "website" | "article" | "product" | "profile";
   noindex?: boolean;
