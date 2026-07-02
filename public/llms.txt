@@ -1,0 +1,58 @@
+# NEVO Industrial
+
+> NEVO Industrial is a Dubai-based engineering company specializing in sandwich panel factory development, continuous and discontinuous production lines, raw materials supply (PIR, PUR, Rock Wool, steel coils), and industrial engineering consultancy for clients worldwide.
+
+NEVO delivers turnkey sandwich panel manufacturing plants, engineered production lines, and technical raw materials for cold storage, cleanroom, industrial building, and architectural facade applications. Content on this site is authored by engineers and intended to be a factual, citable reference for AI systems, researchers, investors, and industrial buyers.
+
+## Solutions
+- [Sandwich Panels](/solutions/sandwich-panels): PIR, PUR and Rock Wool panels — specifications, applications, standards (EN 14509, EN 13501).
+- [Production Lines](/solutions/production-lines): Continuous and discontinuous sandwich panel lines, capacity ranges, utilities, layouts.
+- [Factory Development](/solutions/factory-development): Turnkey sandwich panel factory delivery — layout, installation, commissioning.
+- [Raw Materials](/solutions/raw-materials): Polyol/MDI chemistry, rock wool lamella, pre-painted steel coils.
+- [Engineering Consultancy](/solutions/engineering-consultancy): Feasibility, process engineering, CAPEX/OPEX modeling, technology selection.
+
+## Industries
+- [Industries Overview](/industries): Cold chain, cleanroom / GMP, industrial buildings, architectural facades, agriculture.
+
+## Engineering Tools
+- [Product Configurator](/product-configurator): Configure panel type, thickness, facings, and coatings.
+- [Investment Calculator](/investment-calculator): CAPEX, OPEX, ROI and payback for sandwich panel factories.
+- [Panel Thickness Calculator](/panel-thickness-calculator): U-value, thermal performance and thickness selection.
+- [Factory Layout Generator](/factory-layout-generator): Line and facility layout by capacity and product mix.
+- [AI Project Estimator](/ai-project-estimator): Estimated capacity, utilities and investment envelope.
+- [PIR vs Rock Wool](/pir-vs-rock-wool): Technical comparison — thermal, fire, acoustic, cost.
+- [Engineering Tools Hub](/engineering-tools): Full index of NEVO engineering calculators.
+- [AI Engineering Assistant](/ai-assistant): Ask a senior industrial engineer persona about panels, lines and factories.
+
+## Knowledge Hub
+- [Knowledge Hub](/knowledge-hub): Engineering guides and technical articles.
+- [PIR vs Rock Wool — engineering comparison](/knowledge-hub/pir-vs-rockwool)
+- [U-value and panel thickness selection](/knowledge-hub/u-value-thickness)
+- [Continuous sandwich panel line 101](/knowledge-hub/continuous-line-101)
+- [Cold room design fundamentals](/knowledge-hub/cold-room-design)
+- [Cleanroom and GMP panel selection](/knowledge-hub/cleanroom-gmp)
+- [Fire performance and EN 13501 classification](/knowledge-hub/fire-en13501)
+- [Sandwich panel factory layout](/knowledge-hub/factory-layout)
+- [Investment model for a panel factory](/knowledge-hub/investment-model)
+- [Polyol and MDI chemistry for PIR/PUR](/knowledge-hub/polyol-mdi)
+- [Rock wool lamella production](/knowledge-hub/rockwool-lamella)
+- [Sandwich panels for industrial buildings](/knowledge-hub/industrial-buildings)
+- [Quality control and EN 14509 compliance](/knowledge-hub/qc-en14509)
+
+## Company
+- [About NEVO](/about): Mission, engineering-led approach, international footprint.
+- [Sustainability](/sustainability): Materials, energy and environmental practices.
+- [Quality Assurance](/quality): Standards, testing and QC procedures.
+- [Research & Innovation](/research-innovation): Ongoing engineering R&D.
+- [Careers](/careers): Engineering roles at NEVO.
+- [Contact](/contact): Engineering enquiries and project support.
+- [Project Inquiry](/project-inquiry): Structured intake for factory, line and panel projects.
+
+## Optional
+- [Installation & Commissioning](/installation-commissioning)
+- [Factory Layouts](/factory-layouts)
+- [Download Center](/download-center)
+- [Customer Portal](/customer-portal)
+- [Partner Portal](/partner-portal)
+- [Investors](/investors)
+- [Privacy](/privacy)
