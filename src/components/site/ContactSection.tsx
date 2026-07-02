@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Section, SectionHeader } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { SITE, WHATSAPP_URL } from "@/lib/seo";
 
 const FIELD =
   "block w-full rounded-md border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/40";
