@@ -58,6 +58,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { GridBoard, BoardCell, SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
+import { ogImageMeta } from "@/lib/og-images";
 import {
   Accordion,
   AccordionContent,
@@ -138,6 +139,7 @@ export const Route = createFileRoute("/$lang/solutions/engineering-consultancy")
         { property: "og:type", content: "website" },
         { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
         { name: "twitter:card", content: "summary_large_image" },
+        ...ogImageMeta("/solutions/engineering-consultancy"),
       ],
       links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
       scripts: [

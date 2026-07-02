@@ -14,6 +14,7 @@ import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
 import { submitLeadForm } from "@/lib/lead-submit";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
+import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE = "Global Offices & Contact — NEVO Industrial | Dubai · Germany · Turkey · Oman";
 const DESCRIPTION =
@@ -246,6 +247,7 @@ export const Route = createFileRoute("/$lang/contact")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
       { name: "twitter:card", content: "summary_large_image" },
+        ...ogImageMeta("/contact"),
     ],
     links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
     scripts: [{

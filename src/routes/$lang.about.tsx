@@ -47,6 +47,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE =
   "About NEVO Industrial — Engineering the Future of Sandwich Panel Manufacturing | Dubai";
@@ -175,6 +176,7 @@ export const Route = createFileRoute("/$lang/about")({
         { property: "og:type", content: "website" },
         { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
         { name: "twitter:card", content: "summary_large_image" },
+        ...ogImageMeta("/about"),
       ],
       links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
       scripts: [

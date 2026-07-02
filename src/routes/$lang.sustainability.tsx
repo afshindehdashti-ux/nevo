@@ -13,6 +13,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE = "Sustainability & ESG — Engineering a Sustainable Future | NEVO Industrial";
 const DESCRIPTION =
@@ -217,6 +218,7 @@ export const Route = createFileRoute("/$lang/sustainability")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
       { name: "twitter:card", content: "summary_large_image" },
+        ...ogImageMeta("/sustainability"),
     ],
     links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
   }),

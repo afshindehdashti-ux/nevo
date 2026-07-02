@@ -60,6 +60,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
+import { ogImageMeta } from "@/lib/og-images";
 import {
   Accordion,
   AccordionContent,
@@ -133,6 +134,7 @@ export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
         { property: "og:type", content: "website" },
         { property: "og:url", content: `${SITE.url}/${params.lang}${URL_PATH}` },
         { name: "twitter:card", content: "summary_large_image" },
+        ...ogImageMeta("/solutions/sandwich-panels"),
       ],
       links: [{ rel: "canonical", href: `${SITE.url}/${params.lang}${URL_PATH}` }],
       scripts: [
