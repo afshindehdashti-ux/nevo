@@ -120,8 +120,8 @@ for (const { rel } of routeFiles) {
   else knownRoutes.add(r);
 }
 
-const REDIRECTS = { "/knowledge": "/knowledge-hub" };
-const REDIRECT_PREFIXES = { "/knowledge/": "/knowledge-hub/" };
+const REDIRECTS = { "/knowledge": "/knowledge-hub", ...(config.redirects ?? {}) };
+const REDIRECT_PREFIXES = { "/knowledge/": "/knowledge-hub/", ...(config.redirectPrefixes ?? {}) };
 
 function resolveLink(path) {
   const clean = path.split("#")[0].split("?")[0] || "/";
