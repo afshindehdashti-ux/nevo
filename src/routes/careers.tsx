@@ -171,6 +171,27 @@ function CareersPage() {
         </div>
       </Section>
 
+      {/* SALES CTA */}
+      <Section className="bg-graphite text-white">
+        <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 text-center">
+          <Eyebrow className="text-white/60">Working with NEVO</Eyebrow>
+          <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
+            Have a project instead of a CV? Talk to our engineering team.
+          </h2>
+          <p className="max-w-2xl text-sm text-white/70">
+            Requesting a factory, panel line or sandwich panel quotation? Our sales engineers respond within one business day.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button asChild size="lg" className="bg-emerald text-graphite hover:bg-emerald/90">
+              <a href="/project-inquiry">Request a Quotation <ArrowRight className="ml-2 h-4 w-4" /></a>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10">
+              <a href="/contact">Contact NEVO Sales</a>
+            </Button>
+          </div>
+        </div>
+      </Section>
+
       <SiteFooter />
     </>
   );
