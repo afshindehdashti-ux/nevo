@@ -158,7 +158,7 @@ export function SiteFooter() {
               href="/project-inquiry"
               className="mt-8 inline-flex items-center gap-1.5 rounded-md border border-primary-foreground/25 px-4 py-2.5 text-xs font-medium uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary-foreground/10"
             >
-              Start Your Project
+              {t("cta.startProject")}
               <ArrowUpRight className="size-3.5" />
             </a>
           </div>
@@ -168,7 +168,7 @@ export function SiteFooter() {
             {COLUMNS.map((col) => (
               <div key={col.title}>
                 <div className="mb-4 font-mono text-[10px] uppercase tracking-widest text-primary-foreground/50">
-                  {col.title}
+                  {t(columnKeys[col.title] ?? "", col.title)}
                 </div>
                 <ul className="space-y-2.5">
                 {col.links.map((l) => (
@@ -189,7 +189,7 @@ export function SiteFooter() {
 
         <div className="mt-16 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-t border-primary-foreground/10 pt-8 text-xs text-primary-foreground/50 sm:flex sm:flex-wrap sm:justify-between">
           <div className="min-w-0 truncate">
-            © {new Date().getFullYear()} NEVO Industrial. All rights reserved.
+            © {new Date().getFullYear()} NEVO Industrial. {t("footer.rights")}
           </div>
           <div className="shrink-0 font-mono tracking-widest">
             NEVOINDUSTRIAL.COM · DUBAI · UAE
