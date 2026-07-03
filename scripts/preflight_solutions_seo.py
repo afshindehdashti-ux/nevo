@@ -51,6 +51,11 @@ Env:
                        can't be size-checked via HEAD — use GET for those).
   METHOD_OVERRIDES     per-path method overrides, `path=METHOD` entries
                        separated by `|` (e.g. `/sitemap.xml=GET|/health=HEAD`).
+  BODY_SNIPPET_CHARS   chars of body preview to render for failed URLs in
+                       the step summary (default: 200; set 0 to disable).
+  BODY_HASH            `true` (default) attaches a sha256[:12] of the failed
+                       response body — quick way to tell "same error page as
+                       yesterday" vs "new failure mode" without diffing text.
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
