@@ -1,0 +1,39 @@
+{
+  "$schema": "https://docs.sentry.io/api/alerts/create-an-issue-alert-rule-for-a-project/",
+  "name": "header.logo.error · terminal (inline-svg fail)",
+  "owner": null,
+  "environment": "production",
+  "actionMatch": "all",
+  "filterMatch": "all",
+  "frequency": 5,
+  "conditions": [
+    {
+      "id": "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition"
+    },
+    {
+      "id": "sentry.rules.conditions.reappeared_event.ReappearedEventCondition"
+    }
+  ],
+  "filters": [
+    {
+      "id": "sentry.rules.filters.tagged_event.TaggedEventFilter",
+      "key": "logger",
+      "match": "eq",
+      "value": "header.logo"
+    },
+    {
+      "id": "sentry.rules.filters.tagged_event.TaggedEventFilter",
+      "key": "terminal",
+      "match": "eq",
+      "value": "true"
+    }
+  ],
+  "actions": [
+    {
+      "id": "sentry.mail.actions.NotifyEmailAction",
+      "targetType": "IssueOwners",
+      "targetIdentifier": null,
+      "fallthroughType": "ActiveMembers"
+    }
+  ]
+}
