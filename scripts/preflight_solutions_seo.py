@@ -983,7 +983,11 @@ def main() -> int:
         detail = r["error"] if r["error"] else f"{r['bytes']}B"
         meth = r.get("method") or METHOD
         kind = r.get("error_kind") or ("ok" if r["ok"] else "unknown")
-        print(f"  {marker} [{meth} {http} {kind}] {r['ms']:6.0f}ms  {r['url']} — {detail}")
+        trail = ">".join(r.get("attempt_kinds") or []) or "-"
+        stop = " (stopped early)" if r.get("stopped_early") else ""
+        print(f"  {marker} [{meth} {http} {kind}] {r['ms']:6.0f}ms "
+              f"attempts={r['attempts']} trail={trail}{stop}  {r['url']} — {detail}")
+
 
     write_step_summary(results)
     export_results(results)
