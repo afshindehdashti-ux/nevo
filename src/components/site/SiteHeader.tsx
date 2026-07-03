@@ -440,28 +440,32 @@ export function SiteHeader() {
                     if (step === "0") {
                       img.dataset.fallbackStep = "1";
                       img.dataset.logoVariant = "fallback-cdn";
-                      logClientEvent("header.logo.error", {
-                        correlationId,
-                        stage: "primary-light-png",
-                        failedSrc,
-                        nextSrc: LOGO_FALLBACK_CDN,
-                        viewportWidth: window.innerWidth,
-                        online: navigator.onLine,
-                      }, "error");
+                      if (shouldLogError("primary-light-png", false)) {
+                        logClientEvent("header.logo.error", {
+                          correlationId,
+                          stage: "primary-light-png",
+                          failedSrc,
+                          nextSrc: LOGO_FALLBACK_CDN,
+                          viewportWidth: window.innerWidth,
+                          online: navigator.onLine,
+                        }, "error");
+                      }
                       img.src = LOGO_FALLBACK_CDN;
                     } else if (step === "1") {
                       img.dataset.fallbackStep = "2";
                       img.dataset.logoVariant = "fallback-svg";
-                      logClientEvent("header.logo.error", {
-                        correlationId,
-                        stage: "fallback-cdn-full",
-                        failedSrc,
-                        nextSrc: "inline-svg",
-                        viewportWidth: window.innerWidth,
-                        online: navigator.onLine,
-                      }, "error");
+                      if (shouldLogError("fallback-cdn-full", false)) {
+                        logClientEvent("header.logo.error", {
+                          correlationId,
+                          stage: "fallback-cdn-full",
+                          failedSrc,
+                          nextSrc: "inline-svg",
+                          viewportWidth: window.innerWidth,
+                          online: navigator.onLine,
+                        }, "error");
+                      }
                       img.src = LOGO_FALLBACK_SVG;
-                    } else {
+                    } else if (shouldLogError("fallback-inline-svg", true)) {
                       logClientEvent("header.logo.error", {
                         correlationId,
                         stage: "fallback-inline-svg",
@@ -469,6 +473,7 @@ export function SiteHeader() {
                         terminal: true,
                       }, "error");
                     }
+
 
                   }}
                 />
