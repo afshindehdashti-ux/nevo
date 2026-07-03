@@ -901,6 +901,94 @@ def _render_latency_heatmap(results: list[dict]) -> list[str]:
 
 
 
+def _group_key_for(url: str) -> str:
+    """Derive a 'solution / section' group key from a URL path.
+
+    Uses `/solutions/<slug>` when present (so per-solution failures cluster),
+    otherwise falls back to the first two path segments (e.g. `/en/pricing`).
+    Returns `/` for the root URL.
+    """
+    from urllib.parse import urlparse
+    path = urlparse(url).path or "/"
+    parts = [p for p in path.split("/") if p]
+    if "solutions" in parts:
+        i = parts.index("solutions")
+        tail = parts[i + 1] if i + 1 < len(parts) else ""
+        return f"/solutions/{tail}" if tail else "/solutions"
+    if not parts:
+        return "/"
+    return "/" + "/".join(parts[:2])
+
+
+def _render_top_offenders(results: list[dict], top_n: int) -> list[str]:
+    """Rank URLs and path groups by failure count + retry attempts.
+
+    Two tables:
+      1. Top URLs — one row per URL, sorted by (failed, attempts desc, ms desc).
+         Highlights individual endpoints that burned the most retry budget.
+      2. Top solution/section groups — aggregates failures and total attempts
+         per `_group_key_for(url)` bucket so a systemic issue (e.g. an entire
+         /solutions/<slug> tree failing) is visible even when no single URL
+         dominates.
+    Only rendered when there is at least one failure or attempts>1 row.
+    """
+    from collections import defaultdict
+    interesting = [r for r in results if not r.get("ok") or (r.get("attempts") or 1) > 1]
+    if not interesting:
+        return []
+
+    lines: list[str] = ["", f"#### Top repeat offenders (top {top_n})", ""]
+
+    # --- Per-URL ranking ---
+    url_rows = sorted(
+        interesting,
+        key=lambda r: (0 if r.get("ok") else -1,
+                       -(r.get("attempts") or 1),
+                       -(r.get("ms") or 0)),
+    )[:top_n]
+    lines += [
+        "| URL | Failures | Attempts | Kind | Status |",
+        "| --- | ---: | ---: | :---: | :---: |",
+    ]
+    for r in url_rows:
+        rel = r["url"].replace(BASE, "") or r["url"]
+        failed = 0 if r.get("ok") else 1
+        kind = _ERROR_KIND_LABELS.get(r.get("error_kind") or "unknown",
+                                       r.get("error_kind") or "—")
+        sc = r.get("status_class") or _classify_status(r.get("status"))
+        sc_label = _STATUS_CLASS_LABELS.get(sc, sc)
+        lines.append(
+            f"| [{_md_cell(rel)}]({r['url']}) | {failed} | "
+            f"{r.get('attempts') or 1} | {kind} | {sc_label} |"
+        )
+
+    # --- Per-group ranking ---
+    groups: dict[str, dict[str, int]] = defaultdict(
+        lambda: {"failed": 0, "attempts": 0, "total": 0})
+    for r in results:
+        g = groups[_group_key_for(r["url"])]
+        g["total"] += 1
+        g["attempts"] += r.get("attempts") or 1
+        if not r.get("ok"):
+            g["failed"] += 1
+    group_rows = sorted(
+        ((k, v) for k, v in groups.items() if v["failed"] or v["attempts"] > v["total"]),
+        key=lambda kv: (-kv[1]["failed"], -kv[1]["attempts"], kv[0]),
+    )[:top_n]
+    if group_rows:
+        lines += [
+            "",
+            "| Section | Failures | Total attempts | URLs |",
+            "| --- | ---: | ---: | ---: |",
+        ]
+        for k, v in group_rows:
+            lines.append(
+                f"| `{k}` | {v['failed']} | {v['attempts']} | {v['total']} |"
+            )
+    lines.append("")
+    return lines
+
+
 def write_step_summary(results: list[dict]) -> None:
     """Append a Markdown table of results to $GITHUB_STEP_SUMMARY."""
     path = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -997,6 +1085,15 @@ def write_step_summary(results: list[dict]) -> None:
     # HTTP-level failures (4xx/5xx) from transport failures (none) so their
     # latency shapes are not averaged together.
     lines += _render_latency_heatmap(display)
+
+    # Top repeat offenders: surface which URLs (and which solution/path
+    # groups) burned the most retry attempts or produced failures, so a
+    # reader can jump straight to the worst actors without scanning the
+    # full per-URL table. Env-tunable via TOP_OFFENDERS (default 5, 0
+    # disables the section).
+    top_n = int(_num("TOP_OFFENDERS", 5, cast=int, minimum=0))
+    if top_n > 0:
+        lines += _render_top_offenders(display, top_n)
 
 
 
