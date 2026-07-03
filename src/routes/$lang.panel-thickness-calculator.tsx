@@ -1104,7 +1104,30 @@ function PanelThicknessPage() {
 
   const InputsPanel = (
     <div className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-      <Section label="Application">
+      {(errors.length > 0 || warnings.length > 0) && (
+        <div
+          role={errors.length > 0 ? "alert" : "status"}
+          className={`rounded-xl border p-4 text-sm ${
+            errors.length > 0
+              ? "border-rose-400/40 bg-rose-400/10 text-rose-100"
+              : "border-amber-400/40 bg-amber-400/5 text-amber-100"
+          }`}
+        >
+          <div className="mb-2 flex items-center gap-2 font-semibold">
+            <AlertTriangle className="size-4" aria-hidden="true" />
+            {errors.length > 0
+              ? `${errors.length} configuration ${errors.length === 1 ? "issue" : "issues"} — results are hidden until resolved`
+              : `${warnings.length} configuration ${warnings.length === 1 ? "warning" : "warnings"}`}
+          </div>
+          <ul className="ml-5 list-disc space-y-1 text-xs">
+            {[...errors, ...warnings].map((i, idx) => (
+              <li key={`${i.field}-${idx}`}>{i.message}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <Section label="Application" issue={fieldIssues.app}>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {APPLICATIONS.map((a) => (
             <Chip key={a} active={app === a} onClick={() => setApp(a)}>
@@ -1114,7 +1137,7 @@ function PanelThicknessPage() {
         </div>
       </Section>
 
-      <Section label="Core Material">
+      <Section label="Core Material" issue={fieldIssues.core}>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
           {CORES.map((c) => (
             <Chip key={c} active={core === c} onClick={() => setCore(c)}>
@@ -1125,7 +1148,7 @@ function PanelThicknessPage() {
       </Section>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <Section label="Climate Zone">
+        <Section label="Climate Zone" issue={fieldIssues.climate}>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
             {CLIMATES.map((c) => (
               <Chip key={c} active={climate === c} onClick={() => setClimate(c)}>
@@ -1135,7 +1158,7 @@ function PanelThicknessPage() {
           </div>
         </Section>
 
-        <Section label="Required Internal Temperature">
+        <Section label="Required Internal Temperature" issue={fieldIssues.temp}>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
             {TEMPS.map((t) => (
               <Chip key={t} active={temp === t} onClick={() => setTemp(t)}>
@@ -1146,7 +1169,7 @@ function PanelThicknessPage() {
         </Section>
       </div>
 
-      <Section label="Fire Rating Requirement">
+      <Section label="Fire Rating Requirement" issue={fieldIssues.fire}>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
           {FIRES.map((f) => (
             <Chip key={f} active={fire === f} onClick={() => setFire(f)}>
@@ -1156,7 +1179,7 @@ function PanelThicknessPage() {
         </div>
       </Section>
 
-      <Section label="Panel Thickness (mm)">
+      <Section label="Panel Thickness (mm)" issue={fieldIssues.thickness}>
         <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-12">
           {THICKNESSES.map((t) => (
             <Chip key={t} active={thickness === t} onClick={() => setThickness(t)}>
@@ -1167,7 +1190,7 @@ function PanelThicknessPage() {
       </Section>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <Section label="Exterior Steel (mm)">
+        <Section label="Exterior Steel (mm)" issue={fieldIssues.extSteel}>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
             {STEEL_GAUGES.map((s) => (
               <Chip key={s} active={extSteel === s} onClick={() => setExtSteel(s)}>
@@ -1176,8 +1199,9 @@ function PanelThicknessPage() {
             ))}
           </div>
         </Section>
-        <Section label="Interior Steel (mm)">
+        <Section label="Interior Steel (mm)" issue={fieldIssues.intSteel}>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+
             {STEEL_GAUGES.map((s) => (
               <Chip key={s} active={intSteel === s} onClick={() => setIntSteel(s)}>
                 {s.toFixed(2)}
