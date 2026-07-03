@@ -807,6 +807,61 @@ def _render_latency_histogram(results: list[dict]) -> list[str]:
     return lines
 
 
+def _render_latency_heatmap(results: list[dict]) -> list[str]:
+    """Latency histogram grouped by both error_kind and status_class.
+
+    Same buckets as the per-kind histogram, but columns are split by
+    status_class so transport failures (`none`) are shown separately from
+    HTTP-level failures (`4xx`, `5xx`, etc.). This makes it obvious whether
+    e.g. 5xx responses are slow (backend struggling) or fast (a denied/waf
+    response), while timeouts/DNS/TLS remain in the `none` column.
+    """
+    if not results:
+        return []
+    from collections import defaultdict
+
+    # (error_kind, status_class) -> bucket_idx -> count
+    grid: dict[tuple[str, str], list[int]] = defaultdict(lambda: [0] * len(_LATENCY_BUCKETS))
+    for r in results:
+        kind = r.get("error_kind") or ("ok" if r["ok"] else "unknown")
+        status_class = r.get("status_class") or _classify_status(r.get("status"))
+        grid[(kind, status_class)][_bucket_for(float(r.get("ms") or 0))] += 1
+
+    # Stable order: ok first, then by total count desc, then alphabetically.
+    keys = sorted(grid.keys(),
+                  key=lambda k: (k[0] != "ok", -sum(grid[k]), k[0], k[1]))
+    max_cell = max((max(row) for row in grid.values()), default=0)
+    if max_cell == 0:
+        return []
+
+    def bar(n: int) -> str:
+        if n <= 0:
+            return ""
+        width = max(1, round((n / max_cell) * 8))
+        return "█" * width
+
+    header_labels = [
+        f"{_ERROR_KIND_LABELS.get(k, k)} ({_STATUS_CLASS_LABELS.get(c, c)})"
+        for k, c in keys
+    ]
+    lines = [
+        "",
+        "#### Latency distribution by error kind × status class",
+        "",
+        "| Bucket (ms) | " + " | ".join(header_labels) + " |",
+        "| :--- | " + " | ".join([":---"] * len(keys)) + " |",
+    ]
+    for i, (label, _) in enumerate(_LATENCY_BUCKETS):
+        cells = []
+        for k in keys:
+            n = grid[k][i]
+            cells.append(f"{n} {bar(n)}".strip() if n else "·")
+        lines.append(f"| {label} | " + " | ".join(cells) + " |")
+    lines.append("")
+    return lines
+
+
+
 
 def write_step_summary(results: list[dict]) -> None:
     """Append a Markdown table of results to $GITHUB_STEP_SUMMARY."""
@@ -882,6 +937,12 @@ def write_step_summary(results: list[dict]) -> None:
     # timeouts cluster at the timeout ceiling, TLS failures fail fast, or DNS
     # errors have their own bimodal shape vs healthy `ok` responses.
     lines += _render_latency_histogram(results)
+
+    # Heatmap grouping latency by both error_kind and status_class: separates
+    # HTTP-level failures (4xx/5xx) from transport failures (none) so their
+    # latency shapes are not averaged together.
+    lines += _render_latency_heatmap(results)
+
 
 
     lines += [
