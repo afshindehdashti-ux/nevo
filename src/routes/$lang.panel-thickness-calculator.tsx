@@ -232,17 +232,45 @@ function Chip({
 function Section({
   label,
   children,
+  issue,
 }: {
   label: string;
   children: React.ReactNode;
+  issue?: { severity: "error" | "warning"; message: string };
 }) {
+  const tone =
+    issue?.severity === "error"
+      ? "text-rose-300"
+      : issue?.severity === "warning"
+        ? "text-amber-300"
+        : "text-white/50";
   return (
     <div>
-      <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">{label}</div>
+      <div className={`mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] ${tone}`}>
+        <span>{label}</span>
+        {issue && (
+          <span aria-hidden="true">•</span>
+        )}
+        {issue && (
+          <span className="normal-case tracking-normal">{issue.severity === "error" ? "Invalid" : "Check"}</span>
+        )}
+      </div>
       {children}
+      {issue && (
+        <p
+          role={issue.severity === "error" ? "alert" : "status"}
+          className={`mt-2 flex items-start gap-1.5 text-xs ${
+            issue.severity === "error" ? "text-rose-300" : "text-amber-300"
+          }`}
+        >
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+          <span>{issue.message}</span>
+        </p>
+      )}
     </div>
   );
 }
+
 
 // ---------------- Dynamic SVG Cross-section ----------------
 function CrossSection({
