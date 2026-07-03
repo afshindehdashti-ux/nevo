@@ -302,23 +302,22 @@ function ProductConfiguratorPage() {
             <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
               {step === 0 && (
                 <StepPanelType
-                  selected={cfg.panelType}
+                  cfg={cfg}
                   onSelect={(v) => update("panelType", v)}
-                  core={cfg.core}
                 />
               )}
               {step === 1 && (
-                <StepCore selected={cfg.core} onSelect={(v) => update("core", v)} />
+                <StepCore cfg={cfg} onSelect={(v) => update("core", v)} />
               )}
               {step === 2 && <StepDimensions cfg={cfg} update={update} />}
               {step === 3 && <StepSteel cfg={cfg} update={update} />}
               {step === 4 && (
                 <StepAccessories
-                  selected={cfg.accessories}
+                  cfg={cfg}
                   onToggle={toggleAccessory}
-                  core={cfg.core}
                 />
               )}
+
               {step === 5 && <StepResults results={results} cfg={cfg} />}
 
               <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-6">
