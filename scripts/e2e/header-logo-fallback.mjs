@@ -152,13 +152,11 @@ try {
   assert(state.naturalWidth > 0 && state.naturalHeight > 0, "inline SVG must decode with non-zero dimensions");
   assert(state.visible, "logo must remain visibly laid out after fallback");
 
-  // Flush any pending telemetry batch (client-monitor batches with a small
-  // debounce, so nudge a visibility change to force a beacon flush).
-  await page.evaluate(() => {
-    Object.defineProperty(document, "visibilityState", { configurable: true, get: () => "hidden" });
-    document.dispatchEvent(new Event("visibilitychange"));
-  });
-  await page.waitForTimeout(1500);
+  // Client-monitor batches entries and flushes on a 5s timer or on beacon
+  // triggers (pagehide / visibilitychange=hidden). Wait past the timer so
+  // buffered header.logo.* events land in the sink.
+  await page.waitForTimeout(6500);
+
 
   const logoEvents = loggedEntries.filter(
     (e) => e?.message === "header.logo.error" || e?.message === "header.logo.render",
