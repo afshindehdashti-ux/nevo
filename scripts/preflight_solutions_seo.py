@@ -614,6 +614,8 @@ def probe(url: str) -> dict:
 
     last_headers: dict[str, str] = {}
     last_content_type = ""
+    attempt_kinds: list[str] = []
+    stopped_early = False
     for attempt in range(1, RETRIES + 1):
         attempts = attempt
 
@@ -627,6 +629,8 @@ def probe(url: str) -> dict:
         if status is not None:
             ok = _evaluate(status, size, ms, first_method, body)
             if ok:
+                ok["attempt_kinds"] = attempt_kinds + ["ok"]
+                ok["final_kind"] = "ok"
                 return ok
 
         if method_mode == "HEAD_THEN_GET" and first_method == "HEAD":
@@ -638,13 +642,29 @@ def probe(url: str) -> dict:
             if status2 is not None:
                 ok2 = _evaluate(status2, size2, ms2, "GET", body2)
                 if ok2:
+                    ok2["attempt_kinds"] = attempt_kinds + ["ok"]
+                    ok2["final_kind"] = "ok"
                     return ok2
+                # Use the GET result as the attempt's classified outcome.
+                status, err = status2, last_err
             elif err2:
                 last_err = err2
+                last_ms = ms2
+                status, err = None, err2
 
         elif status is None:
             last_err = err
             last_ms = ms
+
+        # Classify this attempt so we can (a) decide whether to retry and
+        # (b) show the per-attempt trail in the result.
+        this_kind = _classify_error(err or last_err or "", status)
+        attempt_kinds.append(this_kind)
+
+        if this_kind not in RETRYABLE_ERROR_KINDS:
+            # Deterministic failure — stop burning retries and backoff time.
+            stopped_early = True
+            break
 
         if attempt < RETRIES:
             time.sleep(_backoff_delay(attempt))
@@ -652,12 +672,17 @@ def probe(url: str) -> dict:
     body_hash, body_snippet = _body_preview(last_body, last_content_type)
 
     err_msg = last_err or "unknown error"
+    final_kind = _classify_error(err_msg, last_status)
     return {"url": url, "ok": False, "status": last_status, "bytes": last_bytes,
             "ms": last_ms, "attempts": attempts,
             "error": err_msg, "method": last_method or method_mode,
             "body_hash": body_hash, "body_snippet": body_snippet,
             "response_headers": last_headers,
-            "error_kind": _classify_error(err_msg, last_status)}
+            "error_kind": final_kind,
+            "final_kind": final_kind,
+            "attempt_kinds": attempt_kinds,
+            "stopped_early": stopped_early}
+
 
 
 
