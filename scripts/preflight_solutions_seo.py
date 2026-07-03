@@ -157,6 +157,53 @@ for item in (x.strip() for x in os.environ.get("ACCEPT_STATUS_OVERRIDES", "").sp
 
 FOLLOW_REDIRECTS = os.environ.get("FOLLOW_REDIRECTS", "true").strip().lower() not in ("0", "false", "no")
 
+USER_AGENT = os.environ.get("USER_AGENT", "lovable-seo-preflight/1.0").strip() or "lovable-seo-preflight/1.0"
+
+# Header names whose values must be masked in any user-facing output.
+_SENSITIVE_HEADER_SUBSTR = ("authorization", "cookie", "token", "secret", "api-key", "apikey")
+
+def _is_sensitive_header(name: str) -> bool:
+    n = name.lower()
+    return any(s in n for s in _SENSITIVE_HEADER_SUBSTR)
+
+def _mask(value: str) -> str:
+    if not value:
+        return ""
+    if len(value) <= 8:
+        return "***"
+    return f"{value[:3]}…{value[-2:]} ({len(value)} chars)"
+
+def _parse_headers(spec: str) -> dict[str, str]:
+    """Parse `Name: value` lines and/or `Name=value;` entries into a dict."""
+    out: dict[str, str] = {}
+    if not spec:
+        return out
+    # Normalize: split on newlines AND on `;` so both styles work.
+    parts: list[str] = []
+    for line in spec.splitlines():
+        parts.extend(p for p in line.split(";"))
+    for raw in (p.strip() for p in parts if p.strip()):
+        if ":" in raw:
+            name, _, val = raw.partition(":")
+        elif "=" in raw:
+            name, _, val = raw.partition("=")
+        else:
+            print(f"preflight: warning: skipping malformed CUSTOM_HEADERS entry {raw!r}", file=sys.stderr)
+            continue
+        name = name.strip()
+        val = os.path.expandvars(val.strip())
+        if not name:
+            continue
+        if val.startswith("$"):
+            # expandvars couldn't resolve it — leave it out rather than send a literal `$VAR`.
+            print(f"preflight: warning: env var for header {name!r} unresolved; skipping", file=sys.stderr)
+            continue
+        out[name] = val
+    return out
+
+CUSTOM_HEADERS: dict[str, str] = _parse_headers(os.environ.get("CUSTOM_HEADERS", ""))
+
+
 
 def _accepted_for(path: str) -> set[int]:
     return ACCEPT_STATUS_OVERRIDES.get(path, ACCEPT_STATUS)
