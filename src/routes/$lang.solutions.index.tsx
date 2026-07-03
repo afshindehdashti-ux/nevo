@@ -99,6 +99,20 @@ function SolutionsIndex() {
 
 export const Route = createFileRoute("/$lang/solutions/")({
   head: ({ params }) =>
-    buildSeo({ title: TITLE, description: DESCRIPTION, path: URL_PATH, lang: params.lang }),
+    buildSeo({
+      title: TITLE,
+      description: DESCRIPTION,
+      path: URL_PATH,
+      lang: params.lang,
+      keywords: [
+        "sandwich panel solutions",
+        "sandwich panel factory development",
+        "sandwich panel production lines",
+        "sandwich panel engineering consultancy",
+        "sandwich panel raw materials",
+        "PIR PUR rock wool panels",
+        "industrial engineering Dubai",
+      ],
+    }),
   component: SolutionsIndex,
 });
