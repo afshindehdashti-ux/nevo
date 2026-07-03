@@ -61,14 +61,14 @@ const SCOPE = [
 ];
 
 const PROCESS = [
-  "Discovery",
-  "Feasibility",
-  "Master Plan",
-  "Technology Selection",
-  "Supplier Coordination",
-  "Installation Planning",
-  "Commissioning",
-  "Ramp-Up Support",
+  "Site Assessment",
+  "Feasibility & Business Case",
+  "Master Planning",
+  "Building & Utility Design",
+  "Contractor Coordination",
+  "Construction Supervision",
+  "Handover & Commissioning",
+  "Operational Ramp-Up",
 ];
 
 const SYSTEMS = [
