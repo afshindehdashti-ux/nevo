@@ -14,6 +14,7 @@ Env:
   BASE_URL     default http://127.0.0.1:8080
   REPORT_JSON  optional path — write machine-readable report
   REPORT_MD    optional path — write GitHub Step Summary markdown
+  REPORT_HTML  optional path — write standalone HTML dashboard
 
 Exit 1 on any failure. --warn-only forces exit 0.
 """
