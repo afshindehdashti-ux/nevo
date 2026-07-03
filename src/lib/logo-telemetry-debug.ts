@@ -34,7 +34,13 @@
  *   // → array of decisions against a fresh session state.
  */
 
-import { LOGO_TELEMETRY_CONFIG, type LogoTelemetryConfig } from "./logo-telemetry-config";
+import {
+  LOGO_TELEMETRY_CONFIG,
+  disableLogoDebug,
+  enableLogoDebug,
+  isLogoDebugEnabled,
+  type LogoTelemetryConfig,
+} from "./logo-telemetry-config";
 import {
   createLogoRateState,
   getLogoRateState,
