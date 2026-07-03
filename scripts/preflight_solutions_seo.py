@@ -34,8 +34,9 @@ Env:
                        `lovable-seo-preflight/1.0`). Set to a real browser UA
                        when a site blocks bot UAs.
   CUSTOM_HEADERS       extra request headers, one `Name: value` per line OR
-                       `Name=value` entries separated by `;`. Example:
-                       `Authorization: Bearer $TOKEN;Accept-Language: fa`.
+                       `Name: value` entries separated by `|` (values often
+                       contain `;`, so `;` is not a separator). Example:
+                       `Authorization: Bearer $TOKEN|Accept-Language: fa,en;q=0.8`.
                        `$VAR` / `${VAR}` are expanded from env so secrets
                        stay in Actions secrets, not the YAML. Sensitive
                        header values are masked in logs and the summary.
