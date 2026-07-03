@@ -194,7 +194,7 @@ function EngineeringConsultancyPage() {
         <Process />
         <DownloadsCTA />
         <FAQ />
-        <KnowledgeHubPreview slugs={["factory-layout", "u-value-thickness", "qc-en14509"]} />
+        <KnowledgeHubPreview route="engineering-consultancy" />
         <InquiryCTA
           source="consultancy"
           eyebrow="Engineering inquiry"

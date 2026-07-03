@@ -182,7 +182,7 @@ function ProductionLinesPage() {
         <Applications />
         <DownloadsCTA />
         <FAQSection />
-        <KnowledgeHubPreview slugs={["continuous-line-101", "qc-en14509", "polyol-mdi"]} />
+        <KnowledgeHubPreview route="production-lines" />
         <InquiryCTA
           source="production-line"
           eyebrow="Production line inquiry"

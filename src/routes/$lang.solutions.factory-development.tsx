@@ -185,7 +185,7 @@ function FactoryDevelopmentPage() {
         <DevelopmentProcess />
         <InvestmentModel />
         <ConnectedSolutions />
-        <KnowledgeHubPreview slugs={["factory-layout", "investment-model", "continuous-line-101"]} />
+        <KnowledgeHubPreview route="factory-development" />
         <FAQSection />
         <InquiryCTA
           source="new-factory"

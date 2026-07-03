@@ -192,7 +192,7 @@ function SandwichPanelsPage() {
         <Sustainability />
         <DownloadsCTA />
         <FAQSection />
-        <KnowledgeHubPreview slugs={["pir-vs-rockwool", "fire-en13501", "cold-room-design"]} />
+        <KnowledgeHubPreview route="sandwich-panels" />
         <InquiryCTA
           source="panels"
           eyebrow="Panel inquiry"
