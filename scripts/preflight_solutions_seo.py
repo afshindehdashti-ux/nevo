@@ -11,11 +11,20 @@ Env:
   BASE_URL             site to probe (default: http://127.0.0.1:8080)
   LOCALES              comma-separated locales to sample (default: en,ar,tr)
   TIMEOUT_SECONDS      per-request timeout (default: 20)
-  RETRIES              attempts per URL (default: 3)
+  RETRIES              max attempts per URL (default: 3). A probe stops
+                       early when the attempt's classified error_kind is not
+                       in RETRYABLE_ERROR_KINDS — deterministic failures
+                       (TLS, 4xx, body-too-small) do not retry.
+  RETRYABLE_ERROR_KINDS  comma list of error_kind values that are worth
+                       retrying (default:
+                       `timeout,connection_reset,connection_refused,connection_error,dns`).
+                       Set to `''` to disable retries entirely, or add
+                       `http_status` to also retry HTTP 4xx/5xx.
   BACKOFF_BASE_SECONDS backoff base; wait = base * factor**(attempt-1),
                        capped at BACKOFF_MAX_SECONDS (default: 2)
   BACKOFF_FACTOR       exponential factor (default: 2 → 2s, 4s, 8s …)
   BACKOFF_MAX_SECONDS  cap between retries (default: 30)
+
   MIN_BODY_BYTES       default minimum body size for HTML pages (default: 500)
   MIN_BODY_BYTES_SITEMAP   min bytes for /sitemap.xml (default: 200)
   MIN_BODY_BYTES_ROBOTS    min bytes for /robots.txt (default: 20)
