@@ -85,6 +85,29 @@ try {
   // decodes, data-logo-variant must be "fallback-svg".
   const logo = page.locator('[data-testid="header-logo"]').first();
   await logo.waitFor({ state: "attached", timeout: 15_000 });
+
+  // The SSR-served HTML starts loading the <img> before React hydrates, so
+  // the initial load error fires *before* React attaches its onError
+  // listener and gets dropped. Once React has hydrated, re-poke the src to
+  // trigger a fresh (still-intercepted) request that React can observe.
+  await page.waitForFunction(
+    () => {
+      const el = document.querySelector('[data-testid="header-logo"]');
+      return el instanceof HTMLImageElement && el.complete;
+    },
+    null,
+    { timeout: 15_000 },
+  );
+  await page.waitForTimeout(500); // let hydration attach listeners
+  await logo.evaluate((el) => {
+    const img = /** @type {HTMLImageElement} */ (el);
+    if (img.dataset.logoVariant === "light" && img.naturalWidth === 0) {
+      const src = img.src;
+      img.src = "";
+      img.src = src;
+    }
+  });
+
   await page.waitForFunction(
     () => {
       const el = document.querySelector('[data-testid="header-logo"]');
