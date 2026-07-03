@@ -70,6 +70,7 @@ export const Route = createFileRoute("/api/public/client-log")({
           const ip = request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || "-";
           const ref = request.headers.get("referer") || "-";
 
+          const logoRows: Array<any> = [];
           for (const e of entries) {
             const line = [
               "[client-log]",
@@ -92,6 +93,50 @@ export const Route = createFileRoute("/api/public/client-log")({
             if (level === "error") console.error(line);
             else if (level === "warn") console.warn(line);
             else console.log(line);
+
+            // Persist header.logo.* events for the admin dashboard.
+            const msg = typeof e.message === "string" ? e.message : "";
+            if (msg === "header.logo.render" || msg === "header.logo.error") {
+              const extra = (e.extra && typeof e.extra === "object" ? e.extra as Record<string, unknown> : {});
+              const vp = extra.viewport as { width?: unknown } | undefined;
+              const num = (v: unknown) =>
+                typeof v === "number" && Number.isFinite(v) ? v : null;
+              const str = (v: unknown, cap = 400) =>
+                typeof v === "string" ? (v.length > cap ? v.slice(0, cap) : v) : null;
+              const rawTs = e.ts;
+              const clientTs =
+                typeof rawTs === "string" || typeof rawTs === "number" ? new Date(rawTs) : null;
+              logoRows.push({
+                event_type: msg === "header.logo.render" ? "render" : "error",
+                variant: str(extra.variant, 64),
+                stage: str(extra.stage, 32),
+                device_width: num(extra.viewportWidth) ?? num(vp?.width),
+                dpr: num(extra.dpr),
+                correlation_id: str(extra.correlationId, 64),
+                sample_rate: num(extra.sampleRate),
+                src: str(extra.src, 500),
+                next_src: str(extra.nextSrc, 500),
+                natural_width: num(extra.naturalWidth),
+                natural_height: num(extra.naturalHeight),
+                online: typeof extra.online === "boolean" ? extra.online : null,
+                route: str(e.route, 200),
+                url: str(e.url, 400),
+                ua: str(e.ua, 240),
+                release: str(e.release, 40),
+                ip: ip === "-" ? null : ip.slice(0, 64),
+                client_ts: clientTs && !isNaN(clientTs.getTime()) ? clientTs.toISOString() : null,
+              });
+            }
+          }
+
+          if (logoRows.length > 0) {
+            try {
+              const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+              const { error } = await supabaseAdmin.from("header_logo_events").insert(logoRows);
+              if (error) console.error("[client-log] logo insert failed:", error.message);
+            } catch (err) {
+              console.error("[client-log] logo persist error:", err);
+            }
           }
 
           return Response.json({ ok: true, received: entries.length }, { headers: corsHeaders() });

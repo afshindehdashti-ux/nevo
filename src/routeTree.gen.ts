@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LangRouteImport } from './routes/$lang'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
@@ -44,6 +46,7 @@ import { Route as LangAboutRouteImport } from './routes/$lang.about'
 import { Route as LangSolutionsIndexRouteImport } from './routes/$lang.solutions.index'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicClientLogRouteImport } from './routes/api/public/client-log'
+import { Route as AuthenticatedAdminLogoEventsRouteImport } from './routes/_authenticated/admin.logo-events'
 import { Route as LangSolutionsSandwichPanelsRouteImport } from './routes/$lang.solutions.sandwich-panels'
 import { Route as LangSolutionsRawMaterialsRouteImport } from './routes/$lang.solutions.raw-materials'
 import { Route as LangSolutionsProductionLinesRouteImport } from './routes/$lang.solutions.production-lines'
@@ -61,9 +64,18 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LangRoute = LangRouteImport.update({
   id: '/$lang',
   path: '/$lang',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -230,6 +242,12 @@ const ApiPublicClientLogRoute = ApiPublicClientLogRouteImport.update({
   path: '/api/public/client-log',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminLogoEventsRoute =
+  AuthenticatedAdminLogoEventsRouteImport.update({
+    id: '/admin/logo-events',
+    path: '/admin/logo-events',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const LangSolutionsSandwichPanelsRoute =
   LangSolutionsSandwichPanelsRouteImport.update({
     id: '/solutions/sandwich-panels',
@@ -269,6 +287,7 @@ const LangKnowledgeHubSlugRoute = LangKnowledgeHubSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
+  '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/$lang/about': typeof LangAboutRoute
@@ -305,12 +324,14 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/$lang/about': typeof LangAboutRoute
@@ -347,6 +368,7 @@ export interface FileRoutesByTo {
   '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
@@ -354,7 +376,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/$lang': typeof LangRouteWithChildren
+  '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/$lang/about': typeof LangAboutRoute
@@ -391,6 +415,7 @@ export interface FileRoutesById {
   '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/_authenticated/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
@@ -400,6 +425,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$lang'
+    | '/auth'
     | '/sitemap.xml'
     | '/status'
     | '/$lang/about'
@@ -436,12 +462,14 @@ export interface FileRouteTypes {
     | '/$lang/solutions/production-lines'
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
+    | '/admin/logo-events'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/sitemap.xml'
     | '/status'
     | '/$lang/about'
@@ -478,13 +506,16 @@ export interface FileRouteTypes {
     | '/$lang/solutions/production-lines'
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
+    | '/admin/logo-events'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/$lang'
+    | '/auth'
     | '/sitemap.xml'
     | '/status'
     | '/$lang/about'
@@ -521,6 +552,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/production-lines'
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
+    | '/_authenticated/admin/logo-events'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions/'
@@ -528,7 +560,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LangRoute: typeof LangRouteWithChildren
+  AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -554,11 +588,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$lang': {
       id: '/$lang'
       path: '/$lang'
       fullPath: '/$lang'
       preLoaderRoute: typeof LangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -785,6 +833,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicClientLogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/logo-events': {
+      id: '/_authenticated/admin/logo-events'
+      path: '/admin/logo-events'
+      fullPath: '/admin/logo-events'
+      preLoaderRoute: typeof AuthenticatedAdminLogoEventsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/$lang/solutions/sandwich-panels': {
       id: '/$lang/solutions/sandwich-panels'
       path: '/solutions/sandwich-panels'
@@ -829,6 +884,17 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminLogoEventsRoute: typeof AuthenticatedAdminLogoEventsRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminLogoEventsRoute: AuthenticatedAdminLogoEventsRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface LangKnowledgeHubRouteChildren {
   LangKnowledgeHubSlugRoute: typeof LangKnowledgeHubSlugRoute
@@ -914,7 +980,9 @@ const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LangRoute: LangRouteWithChildren,
+  AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
   ApiChatRoute: ApiChatRoute,
