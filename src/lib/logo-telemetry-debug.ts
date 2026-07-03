@@ -263,6 +263,11 @@ export type LogoTelemetryDump = {
    * the blob isn't the raw wire format. Empty array = nothing matched.
    */
   redactions: string[];
+  /**
+   * True when the dump helper was called from a production bundle and
+   * refused to expose telemetry. Payload is empty in that case.
+   */
+  disabled?: boolean;
 };
 
 const REDACTED = "[redacted]";
