@@ -120,20 +120,44 @@ export function clearLogoDecisions(): void {
   decisionBuffer.length = 0;
 }
 
-function formatLogoDecisionRecord(record: LogoDecisionRecord): string {
+/**
+ * Replace ASCII control chars (newlines, tabs, CR, DEL, etc.) and the
+ * intra-field separator space with a printable `\xNN` escape so that a
+ * single formatted decision NEVER spans more than one line and every
+ * `key=value` pair grep-splits cleanly on a single space.
+ *
+ * Exported so tests can guard the invariant directly.
+ */
+export function sanitizeLogoDecisionField(raw: string): string {
+  let out = "";
+  for (let i = 0; i < raw.length; i += 1) {
+    const code = raw.charCodeAt(i);
+    // C0 controls (0x00–0x1F), space (0x20 — would split key=value pairs),
+    // and DEL (0x7F) all become `\xNN`. Everything else passes through.
+    if (code <= 0x20 || code === 0x7f) {
+      out += "\\x" + code.toString(16).padStart(2, "0");
+    } else {
+      out += raw[i];
+    }
+  }
+  return out;
+}
+
+export function formatLogoDecisionRecord(record: LogoDecisionRecord): string {
   const c = record.counters;
   const l = record.limits;
+  const s = sanitizeLogoDecisionField;
   return [
-    `kind=${record.kind}`,
-    `decision=${record.decision}`,
-    `reason=${record.reason}`,
-    `stage=${record.stage === null ? "null" : record.stage}`,
+    `kind=${s(record.kind)}`,
+    `decision=${s(record.decision)}`,
+    `reason=${s(record.reason)}`,
+    `stage=${record.stage === null ? "null" : s(record.stage)}`,
     `terminal=${record.terminal === undefined ? "undefined" : record.terminal}`,
-    `correlationId=${record.correlationId === undefined ? "undefined" : record.correlationId}`,
+    `correlationId=${record.correlationId === undefined ? "undefined" : s(record.correlationId)}`,
     `counters.renderLogged=${c.renderLogged}`,
     `counters.renderSampled=${c.renderSampled === null ? "null" : c.renderSampled}`,
     `counters.errorCount=${c.errorCount}`,
-    `counters.lastErrorStage=${c.lastErrorStage}`,
+    `counters.lastErrorStage=${s(c.lastErrorStage)}`,
     `counters.msSinceLastError=${c.msSinceLastError === null ? "null" : c.msSinceLastError}`,
     `limits.renderSampleRate=${l.renderSampleRate}`,
     `limits.errorMaxPerSession=${l.errorMaxPerSession}`,
