@@ -672,13 +672,45 @@ export function attachLogoDebugUtil(): void {
       /** Empty the ring buffer (useful before a fresh repro). */
       clearRecent: () => void;
       /** Full QA bug-report blob (metadata + config + state + decisions). */
-      dump: (origin?: LogoTelemetryDump["origin"]) => LogoTelemetryDump;
+      dump: (
+        origin?: LogoTelemetryDump["origin"],
+        opts?: LogoDumpOptions,
+      ) => LogoTelemetryDump;
       /** Same blob, pretty-printed JSON. */
-      dumpAsJSON: (origin?: LogoTelemetryDump["origin"]) => string;
+      dumpAsJSON: (
+        origin?: LogoTelemetryDump["origin"],
+        opts?: LogoDumpOptions,
+      ) => string;
       /** Echo to console + write to clipboard when permitted. */
-      copyDump: (origin?: LogoTelemetryDump["origin"]) => Promise<string>;
+      copyDump: (
+        origin?: LogoTelemetryDump["origin"],
+        opts?: LogoDumpOptions,
+      ) => Promise<string>;
       /** Save the dump to a .json file via a synthetic download. */
-      downloadDump: (origin?: LogoTelemetryDump["origin"]) => string;
+      downloadDump: (
+        origin?: LogoTelemetryDump["origin"],
+        opts?: LogoDumpOptions,
+      ) => string;
+      /**
+       * Scope a dump to a single correlationId — QA can share a minimal
+       * JSON blob for one incident without leaking unrelated decisions.
+       */
+      dumpForCorrelationId: (
+        correlationId: string,
+        origin?: LogoTelemetryDump["origin"],
+      ) => LogoTelemetryDump;
+      dumpForCorrelationIdAsJSON: (
+        correlationId: string,
+        origin?: LogoTelemetryDump["origin"],
+      ) => string;
+      copyDumpForCorrelationId: (
+        correlationId: string,
+        origin?: LogoTelemetryDump["origin"],
+      ) => Promise<string>;
+      downloadDumpForCorrelationId: (
+        correlationId: string,
+        origin?: LogoTelemetryDump["origin"],
+      ) => string;
     };
   };
   w.__nevoLogoDebug = {
@@ -700,6 +732,14 @@ export function attachLogoDebugUtil(): void {
     dumpAsJSON: dumpLogoTelemetryAsJSON,
     copyDump: copyLogoTelemetryDump,
     downloadDump: downloadLogoTelemetryDump,
+    dumpForCorrelationId: (correlationId, origin = "console") =>
+      buildLogoTelemetryDump(origin, { correlationId }),
+    dumpForCorrelationIdAsJSON: (correlationId, origin = "console") =>
+      dumpLogoTelemetryAsJSON(origin, { correlationId }),
+    copyDumpForCorrelationId: (correlationId, origin = "console") =>
+      copyLogoTelemetryDump(origin, { correlationId }),
+    downloadDumpForCorrelationId: (correlationId, origin = "console") =>
+      downloadLogoTelemetryDump(origin, { correlationId }),
   };
 }
 
