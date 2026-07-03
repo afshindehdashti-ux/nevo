@@ -842,6 +842,21 @@ def write_step_summary(results: list[dict]) -> None:
                  for k, n in kinds.most_common()]
         lines.append(f"- Failure kinds: {' · '.join(parts)}")
 
+    # HTTP status classification is separate from error_kind so a reader can
+    # tell "the server answered 4xx/5xx" from "we never got a response"
+    # (`none` = transport failure — DNS/TLS/timeout/reset). Covers all
+    # results, not just failures, so 2xx/3xx counts are visible too.
+    status_classes = Counter(
+        r.get("status_class") or _classify_status(r.get("status")) for r in results
+    )
+    if status_classes:
+        order = ["2xx", "3xx", "4xx", "5xx", "1xx", "xxx", "none"]
+        ordered = sorted(status_classes.items(),
+                         key=lambda kv: (order.index(kv[0]) if kv[0] in order else 99, kv[0]))
+        parts = [f"{_STATUS_CLASS_LABELS.get(k, k)} × **{n}**" for k, n in ordered]
+        lines.append(f"- HTTP status classes: {' · '.join(parts)}")
+
+
     # Latency histogram grouped by error_kind: makes it obvious whether e.g.
     # timeouts cluster at the timeout ceiling, TLS failures fail fast, or DNS
     # errors have their own bimodal shape vs healthy `ok` responses.
