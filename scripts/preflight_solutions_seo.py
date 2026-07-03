@@ -442,13 +442,15 @@ def main() -> int:
         for path in LOCALIZED_PATHS:
             urls.append(f"{BASE}/{locale}{path}")
 
-    print(f"Preflight: probing {len(urls)} URL(s) at {BASE} (timeout={TIMEOUT}s, retries={RETRIES})")
+    print(f"Preflight: probing {len(urls)} URL(s) at {BASE} "
+          f"(method={METHOD}, timeout={TIMEOUT}s, retries={RETRIES})")
     results = [probe(u) for u in urls]
     for r in results:
         marker = "✓" if r["ok"] else "✗"
         http = r["status"] if r["status"] is not None else "-"
         detail = r["error"] if r["error"] else f"{r['bytes']}B"
-        print(f"  {marker} [{http}] {r['ms']:6.0f}ms  {r['url']} — {detail}")
+        meth = r.get("method") or METHOD
+        print(f"  {marker} [{meth} {http}] {r['ms']:6.0f}ms  {r['url']} — {detail}")
 
     write_step_summary(results)
 
