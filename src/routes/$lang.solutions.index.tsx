@@ -98,8 +98,17 @@ function SolutionsIndex() {
 }
 
 export const Route = createFileRoute("/$lang/solutions/")({
-  head: ({ params }) =>
-    buildSeo({
+  head: ({ params }) => {
+    const canonical = `${SITE.url}/${params.lang}${URL_PATH}`;
+    const crumbsLd = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/${params.lang}` },
+        { "@type": "ListItem", position: 2, name: "Solutions", item: canonical },
+      ],
+    };
+    const seo = buildSeo({
       title: TITLE,
       description: DESCRIPTION,
       path: URL_PATH,
@@ -113,6 +122,15 @@ export const Route = createFileRoute("/$lang/solutions/")({
         "PIR PUR rock wool panels",
         "industrial engineering Dubai",
       ],
-    }),
+    });
+    return {
+      ...seo,
+      scripts: [
+        ...(seo.scripts ?? []),
+        { type: "application/ld+json", children: JSON.stringify(crumbsLd) },
+      ],
+    };
+  },
   component: SolutionsIndex,
 });
+
