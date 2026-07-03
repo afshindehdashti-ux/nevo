@@ -53,6 +53,7 @@ import img24 from "@/assets/engineering/24-timeline.jpg";
 import img25 from "@/assets/engineering/25-materials.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
+import { InquiryCTA } from "@/components/site/InquiryCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
@@ -164,7 +165,7 @@ function EngineeringConsultancyPage() {
         <Process />
         <Downloads />
         <FAQ />
-        <InquiryForm />
+        <InquiryCTA />
         <FinalCTA />
       </main>
       <SiteFooter />
@@ -223,7 +224,7 @@ function Hero() {
 
           <div className="mt-10 flex flex-wrap gap-3">
             <Button asChild variant="primary" size="lg" className="bg-white text-primary hover:bg-white/90">
-              <a href="#inquiry">
+              <a href="/project-inquiry">
                 Book Engineering Consultation
                 <ArrowRight className="!size-4" />
               </a>
@@ -613,7 +614,7 @@ function Documentation() {
             <div className="flex flex-col p-5">
               <h3 className="text-h3 text-foreground">{d.title}</h3>
               <p className="text-body mt-2 text-sm">{d.desc}</p>
-              <a href="#inquiry" className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent hover:underline">
+              <a href="/project-inquiry" className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent hover:underline">
                 <Download className="size-4" /> Request sample
               </a>
             </div>
@@ -774,7 +775,7 @@ function Downloads() {
         {DOWNLOADS.map((t) => (
           <a
             key={t}
-            href="#inquiry"
+            href="/project-inquiry"
             className="group flex items-center justify-between gap-4 rounded-lg border border-border bg-background p-5 transition-colors hover:border-border-strong hover:bg-surface-muted"
           >
             <div className="flex items-center gap-4">
@@ -960,13 +961,13 @@ function FinalCTA() {
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             <Button asChild variant="primary" size="lg" className="bg-white text-primary hover:bg-white/90">
-              <a href="#inquiry">
+              <a href="/project-inquiry">
                 Book Engineering Consultation
                 <ArrowRight className="!size-4" />
               </a>
             </Button>
             <Button asChild variant="secondary" size="lg" className="border-white/30 bg-transparent text-white hover:bg-white/10">
-              <a href="#inquiry">
+              <a href="/project-inquiry">
                 Talk to a Senior Engineer
                 <ArrowUpRight className="!size-4" />
               </a>

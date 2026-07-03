@@ -44,6 +44,7 @@ import eq08 from "@/assets/machinery/08-packaging-line.jpg";
 import eq09 from "@/assets/machinery/09-control-system.jpg";
 import eq10 from "@/assets/machinery/10-air-compressor.jpg";
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
+import { InquiryCTA } from "@/components/site/InquiryCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
@@ -149,7 +150,7 @@ function ProductionLinesPage() {
         <Applications />
         <Downloads />
         <FAQSection />
-        <ProjectInquiry />
+        <InquiryCTA />
         <FinalCTA />
       </main>
       <SiteFooter />
@@ -225,7 +226,7 @@ function PageHero() {
               className="mt-10 flex flex-col gap-3 sm:flex-row"
             >
               <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                <a href="#inquiry">
+                <a href="/project-inquiry">
                   Request a Production Line Proposal
                   <ArrowRight className="!size-4" />
                 </a>
@@ -236,7 +237,7 @@ function PageHero() {
                 variant="secondary"
                 className="border-white/30 bg-transparent text-white hover:border-white hover:bg-white/10"
               >
-                <a href="#inquiry">
+                <a href="/project-inquiry">
                   Talk to an Engineering Specialist
                   <ArrowUpRight className="!size-4" />
                 </a>
@@ -982,7 +983,7 @@ function FinalCTA() {
         </h2>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-            <a href="#inquiry">
+            <a href="/project-inquiry">
               Request Technical Proposal
               <ArrowRight className="!size-4" />
             </a>
@@ -993,7 +994,7 @@ function FinalCTA() {
             variant="secondary"
             className="border-white/30 bg-transparent text-white hover:border-white hover:bg-white/10"
           >
-            <a href="#inquiry">
+            <a href="/project-inquiry">
               Schedule Engineering Consultation
               <ArrowUpRight className="!size-4" />
             </a>

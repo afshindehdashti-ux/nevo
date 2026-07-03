@@ -44,6 +44,7 @@ import imgWhChem from "@/assets/raw-materials/warehouse-chemical.jpg";
 import imgWhShip from "@/assets/raw-materials/warehouse-shipping.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
+import { InquiryCTA } from "@/components/site/InquiryCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
@@ -145,7 +146,7 @@ function RawMaterialsPage() {
         <QualityAssurance />
         <Downloads />
         <FAQ />
-        <InquiryForm />
+        <InquiryCTA />
         <FinalCTA />
       </main>
       <SiteFooter />
@@ -209,7 +210,7 @@ function Hero() {
               size="lg"
               className="bg-white text-primary hover:bg-white/90"
             >
-              <a href="#inquiry">
+              <a href="/project-inquiry">
                 Request Material Quotation
                 <ArrowRight className="!size-4" />
               </a>
@@ -220,7 +221,7 @@ function Hero() {
               variant="secondary"
               className="border-white/30 bg-transparent text-white hover:border-white hover:bg-white/10"
             >
-              <a href="#inquiry">
+              <a href="/project-inquiry">
                 Talk to a Material Specialist
                 <ArrowUpRight className="!size-4" />
               </a>
@@ -283,7 +284,7 @@ function ProductCard({ p }: { p: Product }) {
         </div>
         <p className="mt-1 text-sm text-foreground/80">{p.apps}</p>
         <a
-          href="#inquiry"
+          href="/project-inquiry"
           className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-foreground transition-colors hover:text-accent"
         >
           Learn more
@@ -719,7 +720,7 @@ function Downloads() {
         {files.map((f) => (
           <a
             key={f}
-            href="#inquiry"
+            href="/project-inquiry"
             className="group flex items-center justify-between rounded-lg border border-border bg-background p-5 transition-colors hover:border-border-strong hover:bg-surface"
           >
             <div className="flex items-center gap-4">
@@ -894,7 +895,7 @@ function FinalCTA() {
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-            <a href="#inquiry">
+            <a href="/project-inquiry">
               Request Material Quotation
               <ArrowRight className="!size-4" />
             </a>
@@ -905,7 +906,7 @@ function FinalCTA() {
             variant="secondary"
             className="border-white/30 bg-transparent text-white hover:border-white hover:bg-white/10"
           >
-            <a href="#inquiry">
+            <a href="/project-inquiry">
               Talk to a Material Engineer
               <ArrowUpRight className="!size-4" />
             </a>
