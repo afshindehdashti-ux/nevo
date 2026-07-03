@@ -5,6 +5,8 @@ import { motion } from "motion/react";
 import {
   AlertTriangle,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   CheckCircle2,
   Check,
   Download,
@@ -209,16 +211,20 @@ function Chip({
   active,
   onClick,
   children,
+  ariaLabel,
 }: {
   active?: boolean;
   onClick: () => void;
   children: React.ReactNode;
+  ariaLabel?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`w-full rounded-md border px-3 py-2 text-center text-xs font-medium leading-tight transition ${
+      aria-pressed={active ? "true" : "false"}
+      aria-label={ariaLabel}
+      className={`w-full rounded-md border px-3 py-2 text-center text-xs font-medium leading-tight transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
         active
           ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-200"
           : "border-white/10 bg-white/[0.03] text-white/70 hover:border-white/20 hover:text-white"
@@ -244,9 +250,14 @@ function Section({
       : issue?.severity === "warning"
         ? "text-amber-300"
         : "text-white/50";
+  const labelId = `section-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const messageId = issue ? `${labelId}-msg` : undefined;
   return (
     <div>
-      <div className={`mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] ${tone}`}>
+      <div
+        id={labelId}
+        className={`mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] ${tone}`}
+      >
         <span>{label}</span>
         {issue && (
           <span aria-hidden="true">•</span>
@@ -255,9 +266,17 @@ function Section({
           <span className="normal-case tracking-normal">{issue.severity === "error" ? "Invalid" : "Check"}</span>
         )}
       </div>
-      {children}
+      <div
+        role="group"
+        aria-labelledby={labelId}
+        aria-describedby={messageId}
+        aria-invalid={issue?.severity === "error" ? "true" : undefined}
+      >
+        {children}
+      </div>
       {issue && (
         <p
+          id={messageId}
           role={issue.severity === "error" ? "alert" : "status"}
           className={`mt-2 flex items-start gap-1.5 text-xs ${
             issue.severity === "error" ? "text-rose-300" : "text-amber-300"
@@ -270,6 +289,7 @@ function Section({
     </div>
   );
 }
+
 
 
 // ---------------- Dynamic SVG Cross-section ----------------
@@ -306,11 +326,32 @@ function CrossSection({
   const style = CORE_STYLE[core];
   const patternId = `core-pattern-${core.replace(/\s+/g, "")}`;
 
+  const titleId = "cross-section-title";
+  const descId = "cross-section-desc";
+  const totalMm = +(thickness + extSteel + intSteel).toFixed(2);
+  const description = `Panel cross-section: ${core} core ${thickness} millimetres thick between an exterior steel skin of ${extSteel.toFixed(2)} millimetres and an interior steel skin of ${intSteel.toFixed(2)} millimetres, for a total panel thickness of ${totalMm} millimetres.`;
+
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-4">
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" className="block w-full" style={{ aspectRatio: `${W} / ${H}` }} xmlns="http://www.w3.org/2000/svg">
+    <figure
+      className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-4"
+      aria-labelledby={titleId}
+      aria-describedby={descId}
+    >
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="xMidYMid meet"
+        className="block w-full"
+        style={{ aspectRatio: `${W} / ${H}` }}
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby={titleId}
+        aria-describedby={descId}
+      >
+        <title id={titleId}>Sandwich panel cross-section — {core}, {thickness} mm</title>
+        <desc id={descId}>{description}</desc>
         <defs>
           <CorePattern id={patternId} kind={style.pattern} base={style.base} accent={style.accent} />
+
           <linearGradient id="skin-shade" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" stopColor="rgba(255,255,255,0.5)" />
             <stop offset="100%" stopColor="rgba(0,0,0,0.35)" />
@@ -407,9 +448,11 @@ function CrossSection({
           </text>
         </g>
       </svg>
-    </div>
+      <figcaption className="sr-only">{description}</figcaption>
+    </figure>
   );
 }
+
 
 function CorePattern({
   id,
@@ -1486,9 +1529,18 @@ function PanelThicknessPage() {
   const CrossSectionPanel = (
     <div className="space-y-4">
       <CrossSection core={core} thickness={thickness} extSteel={extSteel} intSteel={intSteel} />
+      <CrossSectionControls
+        thickness={thickness}
+        extSteel={extSteel}
+        intSteel={intSteel}
+        setThickness={setThickness}
+        setExtSteel={setExtSteel}
+        setIntSteel={setIntSteel}
+      />
       {ResultCards}
     </div>
   );
+
 
   const tabContent = {
     Inputs: InputsPanel,
@@ -1641,14 +1693,34 @@ function MetricCard({
     amber: "text-amber-300",
     rose: "text-rose-300",
   }[tone];
+  const labelId = `metric-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
-      <div className="mb-1 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-white/50">
-        <Icon className="size-3.5" />
+    <div
+      role="group"
+      aria-labelledby={labelId}
+      className="rounded-xl border border-white/10 bg-white/[0.02] p-3"
+    >
+      <div
+        id={labelId}
+        className="mb-1 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-white/50"
+      >
+        <Icon className="size-3.5" aria-hidden="true" />
         {label}
       </div>
-      <div className={`font-mono text-lg font-semibold ${toneCls}`}>{value}</div>
-      {unit && <div className="font-mono text-[10px] text-white/50">{unit}</div>}
+      <div
+        className={`font-mono text-lg font-semibold ${toneCls}`}
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <span className="sr-only">{label}: </span>
+        {value}
+        {unit && <span className="sr-only"> {unit}</span>}
+      </div>
+      {unit && (
+        <div className="font-mono text-[10px] text-white/50" aria-hidden="true">
+          {unit}
+        </div>
+      )}
     </div>
   );
 }
@@ -1660,13 +1732,24 @@ function ScoreBadge({
   label: string;
   value: "Excellent" | "Very Good" | "Good" | "Limited" | "Not Recommended";
 }) {
+  const labelId = `score-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return (
-    <div className={`rounded-xl border p-3 ${performanceBadge(value)}`}>
-      <div className="font-mono text-[10px] uppercase tracking-[0.2em] opacity-70">{label}</div>
-      <div className="mt-1 text-sm font-semibold">{value}</div>
+    <div
+      role="group"
+      aria-labelledby={labelId}
+      className={`rounded-xl border p-3 ${performanceBadge(value)}`}
+    >
+      <div id={labelId} className="font-mono text-[10px] uppercase tracking-[0.2em] opacity-70">
+        {label}
+      </div>
+      <div className="mt-1 text-sm font-semibold" aria-live="polite" aria-atomic="true">
+        <span className="sr-only">{label} rating: </span>
+        {value}
+      </div>
     </div>
   );
 }
+
 
 function ReportRow({ k, v }: { k: string; v: string }) {
   return (
@@ -1676,3 +1759,158 @@ function ReportRow({ k, v }: { k: string; v: string }) {
     </div>
   );
 }
+
+/**
+ * Keyboard-first stepper cluster that lets AT users adjust the cross-section
+ * without navigating back to the Inputs tab. Each stepper is a labelled group
+ * of two <button>s. Arrow keys and Home/End also step through options while
+ * either button is focused.
+ */
+function Stepper<T extends string | number>({
+  label,
+  value,
+  options,
+  onChange,
+  format,
+  unit,
+}: {
+  label: string;
+  value: T;
+  options: readonly T[];
+  onChange: (v: T) => void;
+  format?: (v: T) => string;
+  unit?: string;
+}) {
+  const idx = options.indexOf(value);
+  const display = format ? format(value) : String(value);
+  const go = (delta: number) => {
+    const next = Math.min(options.length - 1, Math.max(0, idx + delta));
+    if (next !== idx) onChange(options[next]);
+  };
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case "ArrowLeft":
+      case "ArrowDown":
+        e.preventDefault();
+        go(-1);
+        break;
+      case "ArrowRight":
+      case "ArrowUp":
+        e.preventDefault();
+        go(1);
+        break;
+      case "Home":
+        e.preventDefault();
+        if (idx !== 0) onChange(options[0]);
+        break;
+      case "End":
+        e.preventDefault();
+        if (idx !== options.length - 1) onChange(options[options.length - 1]);
+        break;
+    }
+  };
+  const groupLabelId = `stepper-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const atMin = idx <= 0;
+  const atMax = idx >= options.length - 1;
+  return (
+    <div
+      role="group"
+      aria-labelledby={groupLabelId}
+      onKeyDown={onKeyDown}
+      className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2"
+    >
+      <div id={groupLabelId} className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50">
+        {label}
+      </div>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => go(-1)}
+          disabled={atMin}
+          aria-label={`Decrease ${label}`}
+          aria-keyshortcuts="ArrowLeft ArrowDown Home"
+          className="inline-flex size-8 items-center justify-center rounded-md border border-white/15 bg-white/[0.03] text-white/80 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 disabled:cursor-not-allowed disabled:opacity-30"
+        >
+          <ChevronLeft className="size-4" aria-hidden="true" />
+        </button>
+        <div
+          className="min-w-[5.5rem] text-center font-mono text-sm font-semibold text-white"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <span className="sr-only">{label}: </span>
+          {display}
+          {unit ? ` ${unit}` : ""}
+        </div>
+        <button
+          type="button"
+          onClick={() => go(1)}
+          disabled={atMax}
+          aria-label={`Increase ${label}`}
+          aria-keyshortcuts="ArrowRight ArrowUp End"
+          className="inline-flex size-8 items-center justify-center rounded-md border border-white/15 bg-white/[0.03] text-white/80 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 disabled:cursor-not-allowed disabled:opacity-30"
+        >
+          <ChevronRight className="size-4" aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function CrossSectionControls({
+  thickness,
+  extSteel,
+  intSteel,
+  setThickness,
+  setExtSteel,
+  setIntSteel,
+}: {
+  thickness: Thickness;
+  extSteel: number;
+  intSteel: number;
+  setThickness: (v: Thickness) => void;
+  setExtSteel: (v: number) => void;
+  setIntSteel: (v: number) => void;
+}) {
+  return (
+    <section
+      aria-label="Adjust cross-section"
+      className="rounded-2xl border border-white/10 bg-white/[0.02] p-4"
+    >
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
+          Adjust cross-section
+        </h3>
+        <p className="text-[10px] text-white/40">
+          Use ← → or Home/End to step
+        </p>
+      </div>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <Stepper<Thickness>
+          label="Panel thickness"
+          value={thickness}
+          options={THICKNESSES}
+          onChange={setThickness}
+          unit="mm"
+        />
+        <Stepper<number>
+          label="Exterior steel"
+          value={extSteel}
+          options={STEEL_GAUGES}
+          onChange={setExtSteel}
+          format={(v) => v.toFixed(2)}
+          unit="mm"
+        />
+        <Stepper<number>
+          label="Interior steel"
+          value={intSteel}
+          options={STEEL_GAUGES}
+          onChange={setIntSteel}
+          format={(v) => v.toFixed(2)}
+          unit="mm"
+        />
+      </div>
+    </section>
+  );
+}
+
