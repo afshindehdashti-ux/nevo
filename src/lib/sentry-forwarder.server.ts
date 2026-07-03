@@ -161,7 +161,7 @@ function buildFallbackChain(e: LogoErrorEvent): string {
   return parts.join(" → ");
 }
 
-function buildSentryEvent(e: LogoErrorEvent) {
+function buildSentryEvent(e: LogoErrorEvent, sampling?: import("./sentry-sampler.server").SamplingDecision) {
   const stage = e.stage ?? "unknown";
   const terminal = e.terminal === true;
   const nextStep =
@@ -171,6 +171,7 @@ function buildSentryEvent(e: LogoErrorEvent) {
         ? "inline-svg"
         : "none";
   const fallbackChain = buildFallbackChain(e);
+
   return {
     event_id: randomEventId(),
     timestamp: toEpochSeconds(e.clientTs),
