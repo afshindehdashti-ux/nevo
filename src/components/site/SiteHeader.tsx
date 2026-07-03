@@ -49,6 +49,7 @@ import { cn } from "@/lib/utils";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 import { logClientEvent } from "@/lib/client-monitor";
+import { LOGO_TELEMETRY_CONFIG } from "@/lib/logo-telemetry-config";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 import nevoLogoFullPointer from "@/assets/nevo-logo-full.png.asset.json";
 
@@ -107,17 +108,22 @@ function getLogoCorrelationId(): string {
  * Client-side rate limiting + sampling for header logo telemetry.
  *
  * Goals: keep production log volume tiny while preserving signal.
- *  - Render events are high-volume (every page load) → sample at 5% in
- *    production, always in dev. Only one render event per tab session.
- *  - Error events are rare and high-value → always sampled, but capped at
- *    a few per session and throttled to at most one per second per stage
- *    so a broken CDN can't flood the sink.
- *  - Terminal SVG-fallback errors bypass sampling limits (still capped) so
- *    we never miss a total-outage signal.
+ *  - Render events are high-volume (every page load) → sampled per session.
+ *    Only one render event per tab session.
+ *  - Error events are rare and high-value → always sampled, but capped per
+ *    session and throttled per-stage so a broken CDN can't flood the sink.
+ *  - Terminal SVG-fallback errors bypass the per-stage throttle (still
+ *    capped) so we never miss a total-outage signal.
+ *
+ * The three knobs below are read from Vite env vars at build time via
+ * `LOGO_TELEMETRY_CONFIG`, so ops can retune sampling per environment
+ * without touching component code. See `src/lib/logo-telemetry-config.ts`.
  */
-const LOGO_RENDER_SAMPLE_RATE = import.meta.env.DEV ? 1 : 0.05;
-const LOGO_ERROR_MAX_PER_SESSION = 4;
-const LOGO_ERROR_MIN_INTERVAL_MS = 1000;
+
+const LOGO_RENDER_SAMPLE_RATE = LOGO_TELEMETRY_CONFIG.renderSampleRate;
+const LOGO_ERROR_MAX_PER_SESSION = LOGO_TELEMETRY_CONFIG.errorMaxPerSession;
+const LOGO_ERROR_MIN_INTERVAL_MS = LOGO_TELEMETRY_CONFIG.errorMinIntervalMs;
+
 
 type LogoRateState = {
   renderLogged: boolean;
