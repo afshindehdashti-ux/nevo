@@ -37,7 +37,7 @@ function SolutionsSeoAdmin() {
   const runFn = useServerFn(runSolutionsInspection);
 
   const adminQ = useQuery({ queryKey: ["is-admin"], queryFn: () => checkAdmin() });
-  const dataQ = useQuery({
+  const dataQ = useQuery<SolutionsInspectionList>({
     queryKey: ["solutions-inspection"],
     queryFn: () => listFn(),
     enabled: !!adminQ.data?.admin,
