@@ -524,6 +524,11 @@ function ProductConfiguratorPage() {
                   <Row label="U-Value" value={`${results.uValue} W/m²K`} accent />
                   <Row label="Fire Rating" value={results.fireRating} accent />
                   <Row label="Weight" value={`${results.weight} kg/m²`} accent />
+                  <Row label="Sound (Rw)" value={`${results.sound} dB`} accent />
+                  <Row label="Warranty" value={`${results.warranty} years`} accent />
+                  <Row label="Price / m²" value={`$${results.pricePerM2}`} accent />
+                  <Row label="Panel Total" value={`$${results.totalPrice.toLocaleString()}`} accent />
+                  <Row label="Lead Time" value={`${results.leadTime} weeks`} accent />
                 </dl>
               </div>
 
