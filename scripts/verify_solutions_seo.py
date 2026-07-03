@@ -85,8 +85,13 @@ def audit(path: str, locale: str):
         fails.append("missing <title>")
     if not desc:
         fails.append("missing meta description")
-    elif not (120 <= len(desc[0]) <= 180):
-        fails.append(f"description length {len(desc[0])} outside 120-180")
+    else:
+        # Measure in UTF-8 bytes so CJK / Arabic aren't penalized by char-count.
+        # Google's SERP truncation is ~155 Latin chars ≈ 155-320 UTF-8 bytes.
+        bl = len(desc[0].encode("utf-8"))
+        if not (100 <= bl <= 320):
+            fails.append(f"description byte-length {bl} outside 100-320")
+
     missing_hl = [l for l in LOCALES if l not in hl_locales]
     if missing_hl:
         fails.append(f"hreflang missing locales: {','.join(missing_hl)}")
