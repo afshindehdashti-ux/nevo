@@ -393,6 +393,32 @@ function ProjectInquiryPage() {
         </div>
       </section>
 
+      {/* ATTACHED CONFIGURATION (from calculator/configurator) */}
+      {attachedConfig && (
+        <Section className="border-b border-border/60 bg-emerald-500/5 py-10">
+          <div className="mx-auto flex max-w-[1200px] flex-col gap-4 rounded-2xl border border-emerald-500/30 bg-background p-6 md:flex-row md:items-start md:justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-emerald-500">
+                <ClipboardCheck className="h-4 w-4" /> Attached configuration
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                We received your selections from the NEVO engineering tools. Our team will use this as the starting point for your recommendation.
+              </p>
+              <pre className="mt-3 max-h-48 overflow-auto rounded-lg bg-muted/50 p-3 text-xs leading-relaxed text-foreground/80">
+{JSON.stringify(attachedConfig, null, 2)}
+              </pre>
+            </div>
+            <button
+              type="button"
+              onClick={() => setAttachedConfig(null)}
+              className="text-xs font-medium text-muted-foreground underline underline-offset-2 hover:text-foreground"
+            >
+              Remove attachment
+            </button>
+          </div>
+        </Section>
+      )}
+
       {/* PROJECT TYPES */}
       <Section className="bg-background">
         <SectionHeader
