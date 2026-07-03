@@ -48,12 +48,15 @@ try {
   });
   const page = await context.newPage();
 
-  // 1) Force every request for the NEVO logo raster (primary bundled PNG +
-  //    CDN fallback pointer) to fail. The inline SVG is a data: URI so it
-  //    is never a network request and always resolves.
+  // 1) Force every image request for the NEVO logo raster (primary bundled
+  //    PNG + CDN fallback pointer) to fail. Only abort actual image loads —
+  //    Vite's `?import` JS module requests share the same path and must be
+  //    served normally or the whole SiteHeader chunk fails to load.
+  //    The inline SVG is a data: URI so it is never a network request.
   await context.route("**/*", async (route) => {
-    const url = route.request().url();
-    if (/nevo-logo/i.test(url) && !url.startsWith("data:")) {
+    const req = route.request();
+    const url = req.url();
+    if (req.resourceType() === "image" && /nevo-logo/i.test(url) && !url.startsWith("data:")) {
       await route.abort("failed");
       return;
     }
