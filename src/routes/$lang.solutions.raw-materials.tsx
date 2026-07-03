@@ -45,6 +45,7 @@ import imgWhShip from "@/assets/raw-materials/warehouse-shipping.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { InquiryCTA } from "@/components/site/InquiryCTA";
+import { KnowledgeHubPreview } from "@/components/site/KnowledgeHubPreview";
 import { DownloadsCTA } from "@/components/site/DownloadsCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -146,6 +147,7 @@ function RawMaterialsPage() {
         <QualityAssurance />
         <DownloadsCTA />
         <FAQ />
+        <KnowledgeHubPreview slugs={["polyol-mdi", "rockwool-lamella", "pir-vs-rockwool"]} />
         <InquiryCTA
           source="raw-materials"
           eyebrow="Material inquiry"

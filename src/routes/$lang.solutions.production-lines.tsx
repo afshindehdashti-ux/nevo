@@ -45,6 +45,7 @@ import eq09 from "@/assets/machinery/09-control-system.jpg";
 import eq10 from "@/assets/machinery/10-air-compressor.jpg";
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { InquiryCTA } from "@/components/site/InquiryCTA";
+import { KnowledgeHubPreview } from "@/components/site/KnowledgeHubPreview";
 import { DownloadsCTA } from "@/components/site/DownloadsCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -151,6 +152,7 @@ function ProductionLinesPage() {
         <Applications />
         <DownloadsCTA />
         <FAQSection />
+        <KnowledgeHubPreview slugs={["continuous-line-101", "qc-en14509", "polyol-mdi"]} />
         <InquiryCTA
           source="production-line"
           eyebrow="Production line inquiry"

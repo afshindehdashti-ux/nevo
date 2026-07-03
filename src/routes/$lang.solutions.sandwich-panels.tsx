@@ -56,6 +56,7 @@ import t29 from "@/assets/panels/tile-29.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { InquiryCTA } from "@/components/site/InquiryCTA";
+import { KnowledgeHubPreview } from "@/components/site/KnowledgeHubPreview";
 import { DownloadsCTA } from "@/components/site/DownloadsCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -159,6 +160,7 @@ function SandwichPanelsPage() {
         <Sustainability />
         <DownloadsCTA />
         <FAQSection />
+        <KnowledgeHubPreview slugs={["pir-vs-rockwool", "fire-en13501", "cold-room-design"]} />
         <InquiryCTA
           source="panels"
           eyebrow="Panel inquiry"
