@@ -411,6 +411,65 @@ def _render_response_headers_md(headers: dict[str, str]) -> str:
     return " · ".join(parts)
 
 
+# Coarse error taxonomy so the summary distinguishes "server was slow" from
+# "server rejected us" from "we never reached the server". Kinds:
+#   timeout           — request exceeded TIMEOUT_SECONDS
+#   dns               — hostname failed to resolve
+#   tls               — SSL/TLS handshake or cert validation failed
+#   connection_reset  — peer sent RST mid-stream
+#   connection_refused— nothing listening on that port
+#   connection_error  — other socket-level failure (broken pipe, unreachable)
+#   http_status       — got an HTTP response but the code isn't in ACCEPT_STATUS
+#   body_too_small    — 2xx but body < MIN_BODY_BYTES (likely SPA error shell)
+#   ok                — probe succeeded
+#   unknown           — none of the above patterns matched
+def _classify_error(err: str, status: int | None) -> str:
+    if not err:
+        return "ok"
+    low = err.lower()
+    if "body" in low and "< min" in low:
+        return "body_too_small"
+    if status is not None and low.startswith("http "):
+        return "http_status"
+    if "timeout" in low or "timed out" in low:
+        return "timeout"
+    if any(s in low for s in (
+        "name or service not known", "nodename nor servname",
+        "getaddrinfo", "temporary failure in name resolution",
+        "no address associated", "name resolution",
+    )):
+        return "dns"
+    if any(s in low for s in (
+        "ssl", "tls", "certificate", "cert verify", "handshake",
+        "sslerror", "sslcertverificationerror",
+    )):
+        return "tls"
+    if "connection reset" in low or "connectionresete" in low:
+        return "connection_reset"
+    if "connection refused" in low or "connectionrefused" in low:
+        return "connection_refused"
+    if any(s in low for s in (
+        "connection", "broken pipe", "network is unreachable",
+        "no route to host", "host is down", "urlerror",
+    )):
+        return "connection_error"
+    return "unknown"
+
+
+_ERROR_KIND_LABELS: dict[str, str] = {
+    "ok": "✅ ok",
+    "timeout": "⏱ timeout",
+    "dns": "🌐 dns",
+    "tls": "🔒 tls",
+    "connection_reset": "🔌 reset",
+    "connection_refused": "🚫 refused",
+    "connection_error": "🔗 net",
+    "http_status": "📄 http",
+    "body_too_small": "📉 body",
+    "unknown": "❓ unknown",
+}
+
+
 def probe(url: str) -> dict:
     """Probe a URL with retries. Return a result dict with timing/status."""
     path = urlparse(url).path
