@@ -41,6 +41,11 @@ import panelRockwool from "@/assets/configurator/panel-rockwool.jpg";
 import panelGlasswool from "@/assets/configurator/panel-glasswool.jpg";
 import panelEPS from "@/assets/configurator/panel-eps.jpg";
 import heroImg from "@/assets/configurator/hero-configurator.jpg";
+import ctxWall from "@/assets/configurator/context-wall.jpg";
+import ctxRoof from "@/assets/configurator/context-roof.jpg";
+import ctxColdroom from "@/assets/configurator/context-coldroom.jpg";
+import ctxCleanroom from "@/assets/configurator/context-cleanroom.jpg";
+import ctxFire from "@/assets/configurator/context-fire.jpg";
 
 export const Route = createFileRoute("/$lang/product-configurator")({
   head: ({ params }) => ({
@@ -105,6 +110,29 @@ const PANEL_IMAGES: Record<CoreMaterial, string> = {
   EPS: panelEPS,
 };
 
+const CONTEXT_IMAGES: Record<PanelType, string> = {
+  wall: ctxWall,
+  roof: ctxRoof,
+  coldroom: ctxColdroom,
+  cleanroom: ctxCleanroom,
+  fire: ctxFire,
+};
+
+const COATING_META: Record<Coating, { warranty: number; durability: string; priceFactor: number }> = {
+  PVDF: { warranty: 25, durability: "Marine / harsh UV", priceFactor: 1.35 },
+  Polyester: { warranty: 10, durability: "Standard exterior", priceFactor: 1.0 },
+  Plastisol: { warranty: 15, durability: "Industrial / corrosive", priceFactor: 1.18 },
+  HDP: { warranty: 20, durability: "High-durability polymer", priceFactor: 1.22 },
+};
+
+const PANEL_TYPE_META: Record<PanelType, { fireBoost: string | null; premium: number }> = {
+  wall: { fireBoost: null, premium: 1.0 },
+  roof: { fireBoost: null, premium: 1.05 },
+  coldroom: { fireBoost: null, premium: 1.15 },
+  cleanroom: { fireBoost: null, premium: 1.25 },
+  fire: { fireBoost: "EI 120 (A1)", premium: 1.4 },
+};
+
 const JOINTS: JointType[] = ["Hidden Screw", "Visible Screw", "Tongue & Groove", "Cam-Lock"];
 const COATINGS: Coating[] = ["PVDF", "Polyester", "Plastisol", "HDP"];
 const COLOR_SWATCHES = [
@@ -148,15 +176,29 @@ const DEFAULT_CONFIG: Config = {
 
 function computeResults(cfg: Config) {
   const core = CORES.find((c) => c.id === cfg.core)!;
+  const coating = COATING_META[cfg.coating];
+  const ptype = PANEL_TYPE_META[cfg.panelType];
   const thicknessM = cfg.thickness / 1000;
+
   const uValue = core.lambda / thicknessM;
   const steelKg = (cfg.extSteel + cfg.intSteel) * 7.85;
   const coreKg = core.density * thicknessM;
   const weight = +(steelKg + coreKg).toFixed(1);
-  const fireRating = core.fire;
-  const sound = 25 + Math.round(core.density / 10);
+
+  // Fire rating: fire panel type upgrades non-A1 cores to a rated system
+  const fireRating =
+    ptype.fireBoost && core.fire !== "A1" ? ptype.fireBoost : core.fire;
+
+  // Rw acoustic: density + thickness contribution + steel gauge
+  const sound =
+    20 +
+    Math.round(core.density / 12) +
+    Math.round(cfg.thickness / 25) +
+    Math.round((cfg.extSteel + cfg.intSteel) * 4);
+
   const thermalScore =
-    uValue < 0.25 ? "Excellent" : uValue < 0.35 ? "Very Good" : uValue < 0.5 ? "Good" : "Standard";
+    uValue < 0.2 ? "Excellent" : uValue < 0.3 ? "Very Good" : uValue < 0.45 ? "Good" : "Standard";
+
   const app =
     cfg.panelType === "coldroom"
       ? "Cold storage, food processing, logistics"
@@ -167,6 +209,20 @@ function computeResults(cfg: Config) {
           : cfg.panelType === "roof"
             ? "Industrial roofs, warehouses, factories"
             : "Facades, partitions, industrial envelopes";
+
+  // Indicative price per m² (USD) — deterministic, transparent
+  const basePrice =
+    12 + core.density * 0.11 + cfg.thickness * 0.14 + (cfg.extSteel + cfg.intSteel) * 8;
+  const pricePerM2 = +(basePrice * coating.priceFactor * ptype.premium).toFixed(1);
+  const totalArea = +((cfg.width / 1000) * cfg.length).toFixed(2);
+  const totalPrice = +(pricePerM2 * totalArea).toFixed(0);
+
+  // Lead time scales with core availability and accessories
+  const leadTime =
+    (core.id === "Rock Wool" || core.id === "Glass Wool" ? 5 : 3) +
+    Math.ceil(cfg.accessories.length / 2) +
+    (cfg.panelType === "cleanroom" || cfg.panelType === "fire" ? 2 : 0);
+
   return {
     uValue: +uValue.toFixed(3),
     weight,
@@ -175,6 +231,12 @@ function computeResults(cfg: Config) {
     thermalScore,
     application: app,
     coreDensity: core.density,
+    warranty: coating.warranty,
+    coatingDurability: coating.durability,
+    pricePerM2,
+    totalArea,
+    totalPrice,
+    leadTime,
   };
 }
 
@@ -188,12 +250,16 @@ function PanelStudio({
   className,
   caption,
   overlay,
+  tint,
+  thicknessMm,
 }: {
   core: CoreMaterial;
   ratio?: string;
   className?: string;
   caption?: React.ReactNode;
   overlay?: React.ReactNode;
+  tint?: string;
+  thicknessMm?: number;
 }) {
   return (
     <div
@@ -203,17 +269,30 @@ function PanelStudio({
         className,
       )}
     >
-      {/* subtle floor gradient — engineering studio */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-8 bottom-4 h-8 rounded-full bg-black/10 blur-2xl"
       />
-      <img
-        src={PANEL_IMAGES[core]}
-        alt={`${core} sandwich panel render`}
-        className="relative z-10 max-h-full max-w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]"
-        loading="lazy"
-      />
+      <div className="relative z-10 flex max-h-full max-w-full items-center justify-center">
+        <img
+          src={PANEL_IMAGES[core]}
+          alt={`${core} sandwich panel render`}
+          className="max-h-full max-w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]"
+          loading="lazy"
+        />
+        {tint && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 mix-blend-multiply opacity-40 transition-colors duration-500"
+            style={{ background: tint }}
+          />
+        )}
+      </div>
+      {typeof thicknessMm === "number" && (
+        <div className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full border border-black/10 bg-white/90 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-black/70 backdrop-blur">
+          <Ruler className="size-3" /> {thicknessMm} mm
+        </div>
+      )}
       {overlay}
       {caption && (
         <div className="absolute bottom-3 left-4 right-4 z-20 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-black/50">
@@ -445,6 +524,11 @@ function ProductConfiguratorPage() {
                   <Row label="U-Value" value={`${results.uValue} W/m²K`} accent />
                   <Row label="Fire Rating" value={results.fireRating} accent />
                   <Row label="Weight" value={`${results.weight} kg/m²`} accent />
+                  <Row label="Sound (Rw)" value={`${results.sound} dB`} accent />
+                  <Row label="Warranty" value={`${results.warranty} years`} accent />
+                  <Row label="Price / m²" value={`$${results.pricePerM2}`} accent />
+                  <Row label="Panel Total" value={`$${results.totalPrice.toLocaleString()}`} accent />
+                  <Row label="Lead Time" value={`${results.leadTime} weeks`} accent />
                 </dl>
               </div>
 
@@ -481,6 +565,8 @@ function ProductConfiguratorPage() {
             <PanelStudio
               core={cfg.core}
               ratio="aspect-[16/10]"
+              tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
+              thicknessMm={cfg.thickness}
               className={cn(
                 "transition-all duration-700",
                 view3d === "exploded" && "shadow-[0_50px_120px_-30px_rgba(16,185,129,0.35)]",
@@ -1125,6 +1211,8 @@ function StepDimensions({
         <PanelStudio
           core={cfg.core}
           ratio="aspect-[4/3]"
+          tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
+          thicknessMm={cfg.thickness}
           caption={
             <>
               <span>{cfg.thickness} × {cfg.width} mm · {cfg.length} m</span>
@@ -1219,6 +1307,8 @@ function StepSteel({
         <PanelStudio
           core={cfg.core}
           ratio="aspect-[4/5]"
+          tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
+          thicknessMm={cfg.thickness}
           caption={
             <>
               <span>{cfg.coating}</span>
@@ -1282,6 +1372,7 @@ function StepResults({
   results: ReturnType<typeof computeResults>;
   cfg: Config;
 }) {
+  const panelLabel = PANEL_TYPES.find((p) => p.id === cfg.panelType)!.label;
   return (
     <div>
       <StepHeader n={6} title="Results" desc="Review full technical results and confirm your specification." />
@@ -1292,18 +1383,24 @@ function StepResults({
         <MiniResult label="Panel Weight" value={`${results.weight} kg/m²`} />
         <MiniResult label="Core Density" value={`${results.coreDensity} kg/m³`} />
         <MiniResult label="Thermal Score" value={results.thermalScore} />
+        <MiniResult label="Indicative Price" value={`$${results.pricePerM2}/m²`} />
+        <MiniResult label="Panel Total" value={`$${results.totalPrice.toLocaleString()} · ${results.totalArea} m²`} />
+        <MiniResult label="Coating Warranty" value={`${results.warranty} yrs · ${results.coatingDurability}`} />
+        <MiniResult label="Lead Time" value={`${results.leadTime} weeks`} />
       </div>
       <div className="mt-6 rounded-2xl border border-accent/30 bg-accent/5 p-6">
         <div className="text-xs uppercase tracking-widest text-accent">Recommended Application</div>
         <div className="mt-2 text-lg font-medium text-white">{results.application}</div>
         <div className="mt-1 text-sm text-white/60">
-          Based on {cfg.core} core at {cfg.thickness}mm with {cfg.coating} finish.
+          Based on {cfg.core} core at {cfg.thickness}mm with {cfg.coating} finish for a {panelLabel.toLowerCase()} system.
         </div>
       </div>
-      <div className="mt-6">
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
         <PanelStudio
           core={cfg.core}
-          ratio="aspect-[16/9]"
+          ratio="aspect-[4/3]"
+          tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
+          thicknessMm={cfg.thickness}
           caption={
             <>
               <span>NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness} · {cfg.color}</span>
@@ -1311,6 +1408,22 @@ function StepResults({
             </>
           }
         />
+        <div className="relative overflow-hidden rounded-2xl border border-white/10 aspect-[4/3]">
+          <img
+            src={CONTEXT_IMAGES[cfg.panelType]}
+            alt={`${panelLabel} in-situ reference`}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            width={1024}
+            height={1024}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent">In-situ reference</div>
+            <div className="mt-1 text-lg font-semibold text-white">{panelLabel}</div>
+            <div className="text-sm text-white/70">{results.application}</div>
+          </div>
+        </div>
       </div>
     </div>
   );
