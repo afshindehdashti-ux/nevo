@@ -78,9 +78,8 @@ function entry(over: Record<string, unknown> = {}) {
 
 async function postBatch(entries: unknown[]) {
   const { Route } = await import("../client-log");
-  const POST = Route.options.server!.handlers!.POST as (ctx: {
-    request: Request;
-  }) => Promise<Response>;
+  const handlers = (Route.options.server as { handlers: Record<string, unknown> }).handlers;
+  const POST = handlers.POST as (ctx: { request: Request }) => Promise<Response>;
   const req = new Request("http://localhost/api/public/client-log", {
     method: "POST",
     headers: { "content-type": "application/json" },
