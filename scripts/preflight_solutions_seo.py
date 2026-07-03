@@ -40,6 +40,17 @@ Env:
                        `$VAR` / `${VAR}` are expanded from env so secrets
                        stay in Actions secrets, not the YAML. Sensitive
                        header values are masked in logs and the summary.
+  METHOD               `GET` (default), `HEAD`, or `HEAD_THEN_GET`.
+                       HEAD skips the body download — much faster on heavy
+                       SSR pages. HEAD_THEN_GET tries HEAD first and falls
+                       back to GET when HEAD returns a non-accepted status
+                       (some CDNs / SPAs return 405/404 for HEAD).
+                       Under HEAD, min-body-bytes is evaluated against the
+                       `Content-Length` response header when present, and
+                       skipped otherwise (routes without Content-Length
+                       can't be size-checked via HEAD — use GET for those).
+  METHOD_OVERRIDES     per-path method overrides, `path=METHOD` entries
+                       separated by `|` (e.g. `/sitemap.xml=GET|/health=HEAD`).
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
