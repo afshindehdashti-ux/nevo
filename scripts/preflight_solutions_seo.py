@@ -616,9 +616,22 @@ def write_step_summary(results: list[dict]) -> None:
         f"- **{ok_count}/{len(results)}** healthy",
         f"- Total wall time: **{total_ms:.0f} ms**",
         f"- Slowest response: **{slowest:.0f} ms**",
+    ]
+
+    # Failure-kind breakdown: shows at a glance whether the run is dominated
+    # by timeouts (latency), DNS/TLS (infra) or HTTP errors (app/content).
+    from collections import Counter
+    kinds = Counter(r.get("error_kind") or ("ok" if r["ok"] else "unknown")
+                    for r in results if not r["ok"])
+    if kinds:
+        parts = [f"{_ERROR_KIND_LABELS.get(k, k)} × **{n}**"
+                 for k, n in kinds.most_common()]
+        lines.append(f"- Failure kinds: {' · '.join(parts)}")
+
+    lines += [
         "",
-        "| Status | URL | Method | HTTP | Time (ms) | Size | Attempts | Notes |",
-        "| :---: | --- | :---: | ---: | ---: | ---: | ---: | --- |",
+        "| Status | Kind | URL | Method | HTTP | Time (ms) | Size | Attempts | Notes |",
+        "| :---: | :---: | --- | :---: | ---: | ---: | ---: | ---: | --- |",
     ]
     for r in sorted(results, key=lambda x: (x["ok"], -x["ms"])):
         marker = "✅" if r["ok"] else "❌"
@@ -627,8 +640,10 @@ def write_step_summary(results: list[dict]) -> None:
         size = f"{r['bytes']:,} B" if r["bytes"] else "—"
         note = _md_cell(r["error"]) if r["error"] else "ok"
         meth = r.get("method") or METHOD
+        kind = _ERROR_KIND_LABELS.get(r.get("error_kind") or ("ok" if r["ok"] else "unknown"),
+                                       r.get("error_kind") or "—")
         lines.append(
-            f"| {marker} | [{_md_cell(rel)}]({r['url']}) | `{meth}` "
+            f"| {marker} | {kind} | [{_md_cell(rel)}]({r['url']}) | `{meth}` "
             f"| `{http}` | {r['ms']:.0f} | {size} | {r['attempts']} | {note} |"
         )
     lines.append("")
