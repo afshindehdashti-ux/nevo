@@ -46,6 +46,7 @@ import { Route as LangAboutRouteImport } from './routes/$lang.about'
 import { Route as LangSolutionsIndexRouteImport } from './routes/$lang.solutions.index'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicClientLogRouteImport } from './routes/api/public/client-log'
+import { Route as AuthenticatedAdminSolutionsSeoRouteImport } from './routes/_authenticated/admin.solutions-seo'
 import { Route as AuthenticatedAdminLogoEventsRouteImport } from './routes/_authenticated/admin.logo-events'
 import { Route as LangSolutionsSandwichPanelsRouteImport } from './routes/$lang.solutions.sandwich-panels'
 import { Route as LangSolutionsRawMaterialsRouteImport } from './routes/$lang.solutions.raw-materials'
@@ -242,6 +243,12 @@ const ApiPublicClientLogRoute = ApiPublicClientLogRouteImport.update({
   path: '/api/public/client-log',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminSolutionsSeoRoute =
+  AuthenticatedAdminSolutionsSeoRouteImport.update({
+    id: '/admin/solutions-seo',
+    path: '/admin/solutions-seo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminLogoEventsRoute =
   AuthenticatedAdminLogoEventsRouteImport.update({
     id: '/admin/logo-events',
@@ -325,6 +332,7 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
+  '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
@@ -369,6 +377,7 @@ export interface FileRoutesByTo {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
+  '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
@@ -416,6 +425,7 @@ export interface FileRoutesById {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/_authenticated/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
+  '/_authenticated/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
@@ -463,6 +473,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
     | '/admin/logo-events'
+    | '/admin/solutions-seo'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions/'
@@ -507,6 +518,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
     | '/admin/logo-events'
+    | '/admin/solutions-seo'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions'
@@ -553,6 +565,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
     | '/_authenticated/admin/logo-events'
+    | '/_authenticated/admin/solutions-seo'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions/'
@@ -833,6 +846,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicClientLogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/solutions-seo': {
+      id: '/_authenticated/admin/solutions-seo'
+      path: '/admin/solutions-seo'
+      fullPath: '/admin/solutions-seo'
+      preLoaderRoute: typeof AuthenticatedAdminSolutionsSeoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/logo-events': {
       id: '/_authenticated/admin/logo-events'
       path: '/admin/logo-events'
@@ -887,10 +907,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminLogoEventsRoute: typeof AuthenticatedAdminLogoEventsRoute
+  AuthenticatedAdminSolutionsSeoRoute: typeof AuthenticatedAdminSolutionsSeoRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminLogoEventsRoute: AuthenticatedAdminLogoEventsRoute,
+  AuthenticatedAdminSolutionsSeoRoute: AuthenticatedAdminSolutionsSeoRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
