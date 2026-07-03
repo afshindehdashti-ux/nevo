@@ -70,7 +70,7 @@ export const Route = createFileRoute("/api/public/client-log")({
           const ip = request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || "-";
           const ref = request.headers.get("referer") || "-";
 
-          const logoRows: Array<Record<string, unknown>> = [];
+          const logoRows: Array<any> = [];
           for (const e of entries) {
             const line = [
               "[client-log]",
