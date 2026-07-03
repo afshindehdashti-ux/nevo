@@ -906,9 +906,18 @@ def write_step_summary(results: list[dict]) -> None:
     path = os.environ.get("GITHUB_STEP_SUMMARY")
     if not path:
         return
-    ok_count = sum(1 for r in results if r["ok"])
-    total_ms = sum(r["ms"] for r in results)
-    slowest = max((r["ms"] for r in results), default=0.0)
+
+    # SUMMARY_FILTER reuses the RESULTS_INCLUDE grammar so the on-screen
+    # breakdown and per-URL table can be narrowed to specific error_kinds
+    # / status_classes without affecting the exported CSV/JSON.
+    raw_filter = (os.environ.get("SUMMARY_FILTER") or "all").strip()
+    filtered, filter_scope = _filter_results_for_export(results, raw_filter)
+    total = len(results)
+    display = filtered if filter_scope != "all" else results
+
+    ok_count = sum(1 for r in display if r["ok"])
+    total_ms = sum(r["ms"] for r in display)
+    slowest = max((r["ms"] for r in display), default=0.0)
     lines = [
         "## Preflight — site + sitemap reachable",
         "",
