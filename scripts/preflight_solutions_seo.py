@@ -30,6 +30,16 @@ Env:
                            the code list.
   FOLLOW_REDIRECTS     `true` (default) follows 3xx before checking status;
                        set `false` to accept raw 3xx via ACCEPT_STATUS.
+  USER_AGENT           override the request UA (default:
+                       `lovable-seo-preflight/1.0`). Set to a real browser UA
+                       when a site blocks bot UAs.
+  CUSTOM_HEADERS       extra request headers, one `Name: value` per line OR
+                       `Name: value` entries separated by `|` (values often
+                       contain `;`, so `;` is not a separator). Example:
+                       `Authorization: Bearer $TOKEN|Accept-Language: fa,en;q=0.8`.
+                       `$VAR` / `${VAR}` are expanded from env so secrets
+                       stay in Actions secrets, not the YAML. Sensitive
+                       header values are masked in logs and the summary.
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
@@ -39,6 +49,7 @@ Exits 0 when every probe returns 200. Exits 1 on any failure, printing a
 GitHub `::error::` line so the workflow surfaces the failing URL directly
 without needing to open the job log.
 """
+from __future__ import annotations
 from __future__ import annotations
 import os, sys, time, urllib.request, urllib.error
 from pathlib import Path
@@ -148,6 +159,62 @@ for item in (x.strip() for x in os.environ.get("ACCEPT_STATUS_OVERRIDES", "").sp
 
 FOLLOW_REDIRECTS = os.environ.get("FOLLOW_REDIRECTS", "true").strip().lower() not in ("0", "false", "no")
 
+USER_AGENT = os.environ.get("USER_AGENT", "lovable-seo-preflight/1.0").strip() or "lovable-seo-preflight/1.0"
+
+# Header names whose values must be masked in any user-facing output.
+_SENSITIVE_HEADER_SUBSTR = ("authorization", "cookie", "token", "secret", "api-key", "apikey")
+
+def _is_sensitive_header(name: str) -> bool:
+    n = name.lower()
+    return any(s in n for s in _SENSITIVE_HEADER_SUBSTR)
+
+def _mask(value: str) -> str:
+    if not value:
+        return ""
+    if len(value) <= 8:
+        return "***"
+    return f"{value[:3]}…{value[-2:]} ({len(value)} chars)"
+
+def _parse_headers(spec: str) -> dict[str, str]:
+    """Parse `Name: value` lines and/or `Name=value;` entries into a dict."""
+    out: dict[str, str] = {}
+    if not spec:
+        return out
+    # Split on newlines and `|`. `;` is NOT a separator because it commonly
+    # appears inside header values (e.g. `Accept-Language: fa,en;q=0.8`).
+    parts: list[str] = []
+    for line in spec.splitlines():
+        parts.extend(line.split("|"))
+    for raw in (p.strip() for p in parts if p.strip()):
+        if ":" in raw:
+            name, _, val = raw.partition(":")
+        elif "=" in raw:
+            name, _, val = raw.partition("=")
+        else:
+            print(f"preflight: warning: skipping malformed CUSTOM_HEADERS entry {raw!r}", file=sys.stderr)
+            continue
+        name = name.strip()
+        val = os.path.expandvars(val.strip())
+        if not name:
+            continue
+        if val.startswith("$"):
+            # expandvars couldn't resolve it — leave it out rather than send a literal `$VAR`.
+            print(f"preflight: warning: env var for header {name!r} unresolved; skipping", file=sys.stderr)
+            continue
+        out[name] = val
+    return out
+
+CUSTOM_HEADERS: dict[str, str] = _parse_headers(os.environ.get("CUSTOM_HEADERS", ""))
+
+# Register sensitive header values with the Actions log masker so they can't
+# leak via a stray print / traceback elsewhere in the job.
+if os.environ.get("GITHUB_ACTIONS") == "true":
+    for _name, _val in CUSTOM_HEADERS.items():
+        if _is_sensitive_header(_name) and _val:
+            print(f"::add-mask::{_val}", flush=True)
+
+
+
 
 def _accepted_for(path: str) -> set[int]:
     return ACCEPT_STATUS_OVERRIDES.get(path, ACCEPT_STATUS)
@@ -197,10 +264,13 @@ def probe(url: str) -> dict:
         attempts = attempt
         t0 = time.perf_counter()
         try:
-            req = urllib.request.Request(url, headers={
-                "User-Agent": "lovable-seo-preflight/1.0",
+            headers = {
+                "User-Agent": USER_AGENT,
                 "Accept": "text/html,application/xml,text/plain;q=0.9,*/*;q=0.5",
-            })
+            }
+            # CUSTOM_HEADERS wins so callers can override UA / Accept too.
+            headers.update(CUSTOM_HEADERS)
+            req = urllib.request.Request(url, headers=headers)
             opener = urllib.request.urlopen if FOLLOW_REDIRECTS else _NO_REDIRECT_OPENER.open
             with opener(req, timeout=TIMEOUT) as r:
                 body = r.read()
@@ -232,6 +302,17 @@ def _md_cell(s: object) -> str:
     return str(s).replace("|", "\\|").replace("\n", " ")
 
 
+def _render_headers_md(headers: dict[str, str]) -> str:
+    if not headers:
+        return "_none_"
+    parts = []
+    for name, val in headers.items():
+        shown = _mask(val) if _is_sensitive_header(name) else val
+        parts.append(f"`{name}: {shown}`")
+    return ", ".join(parts)
+
+
+
 def write_step_summary(results: list[dict]) -> None:
     """Append a Markdown table of results to $GITHUB_STEP_SUMMARY."""
     path = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -249,6 +330,8 @@ def write_step_summary(results: list[dict]) -> None:
         f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
         f"follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
         "",
+        f"- UA: `{USER_AGENT}`",
+        f"- Custom headers: {_render_headers_md(CUSTOM_HEADERS)}",
         f"- **{ok_count}/{len(results)}** healthy",
         f"- Total wall time: **{total_ms:.0f} ms**",
         f"- Slowest response: **{slowest:.0f} ms**",
