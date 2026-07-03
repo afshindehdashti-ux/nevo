@@ -231,10 +231,10 @@ def render_md(base: str, results: list, failed: list) -> str:
         f"",
         "| Metric | Value |",
         "| --- | --- |",
-        f"| Total pages | {total} |",
-        f"| Passing | {passed} |",
-        f"| Failing | {len(failed)} |",
-        f"| Pass rate | {pct:.1f}% |",
+        f"| Total pages | {_md_cell(total)} |",
+        f"| Passing | {_md_cell(passed)} |",
+        f"| Failing | {_md_cell(len(failed))} |",
+        f"| Pass rate | {_md_cell(f'{pct:.1f}%')} |",
         f"",
         "### By locale",
         f"",
@@ -244,7 +244,9 @@ def render_md(base: str, results: list, failed: list) -> str:
     for locale in sorted(per_locale.keys()):
         d = per_locale[locale]
         status = "✅" if d["fail"] == 0 else "❌"
-        lines.append(f"| `{locale}` | {d['pass']} | {d['fail']} | {status} |")
+        lines.append(
+            f"| `{_md_cell(locale)}` | {_md_cell(d['pass'])} | {_md_cell(d['fail'])} | {status} |"
+        )
 
     if failed:
         lines.extend([
@@ -256,14 +258,15 @@ def render_md(base: str, results: list, failed: list) -> str:
         ])
         for r in sorted(failed, key=lambda r: (r["locale"], r["path"])):
             rel_url = r["url"].replace(base, "") or r["path"]
-            issues = "<br>".join(str(f) for f in r["failures"])
+            issues = "<br>".join(_md_cell(f) for f in r["failures"])
             lines.append(
-                f"| ❌ | `{r['locale']}` | `{r['path']}` | `{rel_url}` | {issues} |"
+                f"| ❌ | `{_md_cell(r['locale']}` | `{_md_cell(r['path'])}` | `{_md_cell(rel_url)}` | {issues} |"
             )
     else:
         lines.extend([f"", "### Result", f"", "✅ All pages passed."])
 
     return "\n".join(lines)
+
 
 
 
