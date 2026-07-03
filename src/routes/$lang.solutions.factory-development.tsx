@@ -52,6 +52,18 @@ const DESCRIPTION =
   "NEVO Industrial develops complete sandwich panel factories: feasibility, master planning, layouts, production lines, raw materials, utilities, commissioning and ramp-up support from Dubai.";
 const URL_PATH = "/solutions/factory-development";
 
+// Route-scoped downloads list — surfaced as ItemList JSON-LD unique to this
+// Solutions page. Items resolve to /download-center.
+const DOWNLOADS_LD_ITEMS = [
+  "Turnkey Factory Development Brochure",
+  "Feasibility Study Template",
+  "CAPEX / OPEX Model Overview",
+  "Master Planning & Site Layout Guide",
+  "Commissioning & Ramp-Up Playbook",
+  "Bankable Documentation Checklist",
+];
+
+
 const PILLARS = [
   { icon: ClipboardList, title: "Feasibility & Business Case", body: "Market demand, product mix, target output, CAPEX model and launch roadmap before equipment selection." },
   { icon: Building2, title: "Factory Master Planning", body: "Land use, hall geometry, material flow, utilities, expansion zones and installation access engineered as one system." },

@@ -70,6 +70,18 @@ const DESCRIPTION =
   "Complete continuous and discontinuous sandwich panel production lines — PIR, PUR and rock wool. Engineering, equipment selection, automation, installation and commissioning by NEVO Industrial, Dubai.";
 const URL_PATH = "/solutions/production-lines";
 
+// Route-scoped downloads list — surfaced as ItemList JSON-LD unique to this
+// Solutions page. Items resolve to /download-center.
+const DOWNLOADS_LD_ITEMS = [
+  "Continuous PIR/PUR Line Catalogue",
+  "Discontinuous Line Technical Brochure",
+  "Rock Wool Lamella Line Overview",
+  "Line Capacity & Speed Guide",
+  "Automation & SCADA Architecture",
+  "General Layout & Utility Requirements",
+];
+
+
 const FAQS = [
   { q: "How much production capacity do I need?", a: "Capacity is defined by your target market, panel spectrum and shift model. A typical entry continuous line runs 6–10 m/min, mid-range 12–18 m/min, and high-output above 20 m/min. Our engineers size the line against your 5-year demand forecast, not against a catalogue." },
   { q: "What is the maximum line speed?", a: "Continuous PIR/PUR lines are engineered up to 25 m/min for standard thicknesses. Real productive speed depends on panel thickness, core reactivity, curing zone length and cutting cycle — not the nameplate figure." },

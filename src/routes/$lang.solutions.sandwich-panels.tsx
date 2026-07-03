@@ -77,6 +77,18 @@ const DESCRIPTION =
   "Premium PIR and Rock Wool sandwich panels engineered for industrial, commercial, food processing and cold storage applications — up to 120 min fire rating, tongue-and-groove joints, EN 13501 certified. NEVO Industrial, Dubai.";
 const URL_PATH = "/solutions/sandwich-panels";
 
+// Route-scoped downloads list — surfaced as ItemList JSON-LD so the schema
+// stays unique to this Solutions page. Items resolve to /download-center.
+const DOWNLOADS_LD_ITEMS = [
+  "PIR Sandwich Panel Datasheet",
+  "Rock Wool Sandwich Panel Datasheet",
+  "Cold Storage Panel Selection Guide",
+  "EN 13501 Fire Classification Summary",
+  "Panel Colour & Coating Reference",
+  "Installation & Fixing Handbook",
+];
+
+
 const FAQS: { q: string; a: string }[] = [
   { q: "What panel types does NEVO supply?", a: "PIR (polyisocyanurate) wall panels, PIR roof panels, and rock wool wall/roof panels for industrial, commercial, food processing, cold storage and clean-room applications." },
   { q: "What is the difference between PIR and rock wool panels?", a: "PIR panels offer excellent thermal insulation (λ 0.022–0.024 W/m·K) with a lightweight closed-cell core. Rock wool panels deliver non-combustible A2-s1,d0 fire performance, superior acoustic insulation and higher operating temperatures — at a slightly higher weight and thermal conductivity (0.036–0.040 W/m·K)." },

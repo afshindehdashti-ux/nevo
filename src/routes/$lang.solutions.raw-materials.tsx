@@ -66,6 +66,18 @@ const DESCRIPTION =
   "Engineered raw material solutions for sandwich panel manufacturing: PPGI/GI/Aluzinc steel coils, polyol and MDI chemical systems, PIR and rock wool cores, adhesives and finished panels — sourced, tested and delivered by NEVO Industrial, Dubai.";
 const URL_PATH = "/solutions/raw-materials";
 
+// Route-scoped downloads list — surfaced as ItemList JSON-LD unique to this
+// Solutions page. Items resolve to /download-center.
+const DOWNLOADS_LD_ITEMS = [
+  "PPGI & Aluzinc Steel Coil Specification",
+  "PIR Polyol & MDI System Datasheet",
+  "Rock Wool Lamella Datasheet",
+  "Structural PU Adhesive Datasheet",
+  "Raw Material Sourcing & Logistics Guide",
+  "Certificates of Analysis Sample Pack",
+];
+
+
 const FAQS: { q: string; a: string }[] = [
   { q: "What raw materials do you supply?", a: "Complete raw material systems for sandwich panel manufacturing: PPGI/GI/Aluzinc/prepainted aluminium coils, polyol and MDI chemical systems (IBC and drum), PIR and rock wool insulation cores, structural adhesives, sealants, release films and packaging consumables." },
   { q: "Do you sell single materials or full systems?", a: "Both. Manufacturers can source a single item (e.g. one polyol tanker) or a fully engineered material package matched to a specific line, panel spectrum and target market." },
