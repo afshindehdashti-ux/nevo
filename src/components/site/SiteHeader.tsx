@@ -402,23 +402,22 @@ export function SiteHeader() {
                   decoding="async"
                   draggable={false}
                   onLoad={(event) => {
-                    // Log a one-time success ping per session per variant so
-                    // production traffic can be sampled to confirm the correct
-                    // white/green sticky logo actually rendered.
+                    // One sampled success ping per tab session (see
+                    // shouldLogRender) so production traffic stays low-volume
+                    // while confirming the correct sticky logo actually
+                    // rendered.
                     if (typeof window === "undefined") return;
+                    if (!shouldLogRender()) return;
                     const img = event.currentTarget;
                     const step = img.dataset.fallbackStep ?? "0";
                     const variant =
                       step === "0" ? "primary-light-png"
                       : step === "1" ? "fallback-cdn-full"
                       : "fallback-inline-svg";
-                    const flagKey = `__nevoLogoRenderLogged:${variant}`;
-                    // deduplicate per tab so we don't spam the log endpoint
-                    if ((window as unknown as Record<string, unknown>)[flagKey]) return;
-                    (window as unknown as Record<string, unknown>)[flagKey] = true;
                     logClientEvent("header.logo.render", {
                       correlationId: getLogoCorrelationId(),
                       variant,
+                      sampleRate: LOGO_RENDER_SAMPLE_RATE,
                       naturalWidth: img.naturalWidth,
                       naturalHeight: img.naturalHeight,
                       viewportWidth: window.innerWidth,
@@ -426,8 +425,8 @@ export function SiteHeader() {
                       dpr: window.devicePixelRatio,
                       src: img.currentSrc || img.src,
                     }, "info");
-
                   }}
+
                   onError={(event) => {
                     // Defensive fallback chain: if the bundled light logo
                     // fails to load (bundle miss, cache poisoning, blocked
