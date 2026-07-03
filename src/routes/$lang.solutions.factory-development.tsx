@@ -32,6 +32,7 @@ const investmentImg = boardroomAsset.url;
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { InquiryCTA } from "@/components/site/InquiryCTA";
+import { KnowledgeHubPreview } from "@/components/site/KnowledgeHubPreview";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
@@ -132,6 +133,7 @@ function FactoryDevelopmentPage() {
         <DevelopmentProcess />
         <InvestmentModel />
         <ConnectedSolutions />
+        <KnowledgeHubPreview slugs={["factory-layout", "investment-model", "continuous-line-101"]} />
         <InquiryCTA
           source="new-factory"
           eyebrow="Factory inquiry"

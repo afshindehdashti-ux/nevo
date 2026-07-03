@@ -54,6 +54,7 @@ import img25 from "@/assets/engineering/25-materials.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { InquiryCTA } from "@/components/site/InquiryCTA";
+import { KnowledgeHubPreview } from "@/components/site/KnowledgeHubPreview";
 import { DownloadsCTA } from "@/components/site/DownloadsCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -166,6 +167,7 @@ function EngineeringConsultancyPage() {
         <Process />
         <DownloadsCTA />
         <FAQ />
+        <KnowledgeHubPreview slugs={["factory-layout", "u-value-thickness", "qc-en14509"]} />
         <InquiryCTA
           source="consultancy"
           eyebrow="Engineering inquiry"
