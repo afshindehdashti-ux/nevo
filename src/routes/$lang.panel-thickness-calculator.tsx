@@ -1214,17 +1214,38 @@ function PanelThicknessPage() {
   );
 
   const ResultCards = (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-      <MetricCard icon={Thermometer} label="U-Value" value={`${u}`} unit="W/m²K" tone="emerald" />
-      <MetricCard icon={Zap} label="Thermal Perf." value={perf} unit="" tone="emerald" />
-      <MetricCard icon={Weight} label="Weight" value={`${w}`} unit="kg/m²" tone="white" />
-      <MetricCard icon={Flame} label="Fire Achieved" value={fireLabel(fireAchieved)} unit="" tone={fireOk ? "emerald" : "amber"} />
-      <MetricCard icon={Thermometer} label="R-Value" value={`${rTotal}`} unit="m²K/W" tone="white" />
-      <MetricCard icon={Zap} label="Heat Loss" value={`${hLoss}`} unit={`W/m² · ΔT ${deltaT}K`} tone="white" />
-      <MetricCard icon={Weight} label="Recommended" value={`${rec.min}–${rec.max}`} unit="mm" tone="emerald" />
-      <MetricCard icon={CheckCircle2} label="Selected" value={`${thickness}`} unit="mm" tone={meetsRec ? "emerald" : belowRec ? "rose" : "amber"} />
+    <div className="relative">
+      <div
+        className={`grid grid-cols-2 gap-3 transition sm:grid-cols-3 lg:grid-cols-4 ${
+          hasErrors ? "pointer-events-none blur-sm opacity-40" : ""
+        }`}
+        aria-hidden={hasErrors || undefined}
+      >
+        <MetricCard icon={Thermometer} label="U-Value" value={`${u}`} unit="W/m²K" tone="emerald" />
+        <MetricCard icon={Zap} label="Thermal Perf." value={perf} unit="" tone="emerald" />
+        <MetricCard icon={Weight} label="Weight" value={`${w}`} unit="kg/m²" tone="white" />
+        <MetricCard icon={Flame} label="Fire Achieved" value={fireLabel(fireAchieved)} unit="" tone={fireOk ? "emerald" : "amber"} />
+        <MetricCard icon={Thermometer} label="R-Value" value={`${rTotal}`} unit="m²K/W" tone="white" />
+        <MetricCard icon={Zap} label="Heat Loss" value={`${hLoss}`} unit={`W/m² · ΔT ${deltaT}K`} tone="white" />
+        <MetricCard icon={Weight} label="Recommended" value={`${rec.min}–${rec.max}`} unit="mm" tone="emerald" />
+        <MetricCard icon={CheckCircle2} label="Selected" value={`${thickness}`} unit="mm" tone={meetsRec ? "emerald" : belowRec ? "rose" : "amber"} />
+      </div>
+      {hasErrors && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="max-w-md rounded-xl border border-rose-400/40 bg-slate-950/85 p-4 text-center text-sm text-rose-100 backdrop-blur">
+            <div className="mb-1 flex items-center justify-center gap-2 font-semibold">
+              <AlertTriangle className="size-4" aria-hidden="true" />
+              Results unavailable
+            </div>
+            <p className="text-xs text-rose-100/80">
+              Resolve the {errors.length} configuration {errors.length === 1 ? "issue" : "issues"} above to see valid engineering results.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
+
 
   const RecommendationPanel = (
     <div className="space-y-4">
