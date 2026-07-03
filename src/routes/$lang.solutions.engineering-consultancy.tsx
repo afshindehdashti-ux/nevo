@@ -115,6 +115,7 @@ const FAQS: { q: string; a: string }[] = [
 
 export const Route = createFileRoute("/$lang/solutions/engineering-consultancy")({
   head: ({ params }) => {
+    const canonical = `${SITE.url}/${params.lang}${URL_PATH}`;
     const faqLd = {
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -128,16 +129,42 @@ export const Route = createFileRoute("/$lang/solutions/engineering-consultancy")
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-        { "@type": "ListItem", position: 2, name: "Solutions", item: "/solutions" },
-        { "@type": "ListItem", position: 3, name: "Engineering Consultancy", item: URL_PATH },
+        { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/${params.lang}` },
+        { "@type": "ListItem", position: 2, name: "Solutions", item: `${SITE.url}/${params.lang}/solutions` },
+        { "@type": "ListItem", position: 3, name: "Engineering Consultancy", item: canonical },
       ],
     };
-    const seo = buildSeo({ title: TITLE, description: DESCRIPTION, path: URL_PATH, lang: params.lang });
+    const serviceLd = {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: "Sandwich Panel Engineering Consultancy",
+      serviceType: "Industrial engineering consultancy",
+      provider: { "@type": "Organization", name: SITE.name, url: SITE.url },
+      areaServed: ["AE", "SA", "OM", "QA", "KW", "TR", "IQ", "KE", "CM", "RU", "EU"],
+      url: canonical,
+      description: DESCRIPTION,
+      category: ["Feasibility study", "Factory layout", "Process engineering", "Automation architecture", "Commissioning support"],
+    };
+    const seo = buildSeo({
+      title: TITLE,
+      description: DESCRIPTION,
+      path: URL_PATH,
+      lang: params.lang,
+      keywords: [
+        "sandwich panel engineering consultancy",
+        "sandwich panel factory feasibility study",
+        "plant layout design",
+        "process engineering sandwich panels",
+        "factory commissioning support",
+        "industrial engineering Dubai",
+        "PIR panel plant engineering",
+      ],
+    });
     return {
       ...seo,
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(faqLd) },
+        { type: "application/ld+json", children: JSON.stringify(serviceLd) },
         { type: "application/ld+json", children: JSON.stringify(crumbsLd) },
       ],
     };

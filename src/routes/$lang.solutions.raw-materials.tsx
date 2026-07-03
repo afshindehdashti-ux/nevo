@@ -96,6 +96,7 @@ const FAQS: { q: string; a: string }[] = [
 
 export const Route = createFileRoute("/$lang/solutions/raw-materials")({
   head: ({ params }) => {
+    const canonical = `${SITE.url}/${params.lang}${URL_PATH}`;
     const faqLd = {
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -109,16 +110,43 @@ export const Route = createFileRoute("/$lang/solutions/raw-materials")({
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-        { "@type": "ListItem", position: 2, name: "Solutions", item: "/solutions" },
-        { "@type": "ListItem", position: 3, name: "Raw Materials", item: URL_PATH },
+        { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/${params.lang}` },
+        { "@type": "ListItem", position: 2, name: "Solutions", item: `${SITE.url}/${params.lang}/solutions` },
+        { "@type": "ListItem", position: 3, name: "Raw Materials", item: canonical },
       ],
     };
-    const seo = buildSeo({ title: TITLE, description: DESCRIPTION, path: URL_PATH, lang: params.lang });
+    const serviceLd = {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: "Sandwich Panel Raw Material Supply",
+      serviceType: "Industrial raw material sourcing & supply",
+      provider: { "@type": "Organization", name: SITE.name, url: SITE.url },
+      areaServed: ["AE", "SA", "OM", "TR", "IQ", "KE", "CM", "RU", "EU"],
+      url: canonical,
+      description: DESCRIPTION,
+      category: ["PPGI coils", "Galvanized steel", "Aluzinc", "PIR polyol", "MDI", "Rock wool lamella", "Adhesives"],
+    };
+    const seo = buildSeo({
+      title: TITLE,
+      description: DESCRIPTION,
+      path: URL_PATH,
+      lang: params.lang,
+      keywords: [
+        "PPGI coils supplier",
+        "prepainted galvanized steel",
+        "aluzinc coil supplier",
+        "PIR polyol supplier",
+        "MDI supplier sandwich panels",
+        "rock wool lamella",
+        "sandwich panel raw materials",
+        "PU chemicals sandwich panels",
+      ],
+    });
     return {
       ...seo,
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(faqLd) },
+        { type: "application/ld+json", children: JSON.stringify(serviceLd) },
         { type: "application/ld+json", children: JSON.stringify(crumbsLd) },
       ],
     };

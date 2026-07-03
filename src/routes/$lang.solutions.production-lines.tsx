@@ -97,7 +97,23 @@ const FAQS = [
 
 export const Route = createFileRoute("/$lang/solutions/production-lines")({
   head: ({ params }) => {
-    const seo = buildSeo({ title: TITLE, description: DESCRIPTION, path: URL_PATH, lang: params.lang });
+    const canonical = `${SITE.url}/${params.lang}${URL_PATH}`;
+    const seo = buildSeo({
+      title: TITLE,
+      description: DESCRIPTION,
+      path: URL_PATH,
+      lang: params.lang,
+      keywords: [
+        "sandwich panel production line",
+        "continuous PIR line",
+        "continuous PUR laminator",
+        "discontinuous sandwich panel line",
+        "rock wool panel line",
+        "EPS sandwich panel line",
+        "sandwich panel machine manufacturer",
+        "PIR panel manufacturing equipment",
+      ],
+    });
     return {
       ...seo,
       scripts: [
@@ -117,11 +133,25 @@ export const Route = createFileRoute("/$lang/solutions/production-lines")({
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
+            "@type": "Service",
+            name: "Sandwich Panel Production Lines",
+            serviceType: "Production line engineering & supply",
+            provider: { "@type": "Organization", name: SITE.name, url: SITE.url },
+            areaServed: ["AE", "SA", "TR", "IQ", "KE", "CM", "RU", "EU", "LATAM"],
+            url: canonical,
+            description: DESCRIPTION,
+            category: ["Continuous PIR/PUR lines", "Discontinuous lines", "Rock wool lamella lines", "EPS lines", "Roll forming"],
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-              { "@type": "ListItem", position: 2, name: "Solutions", item: "/solutions" },
-              { "@type": "ListItem", position: 3, name: "Production Lines", item: URL_PATH },
+              { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/${params.lang}` },
+              { "@type": "ListItem", position: 2, name: "Solutions", item: `${SITE.url}/${params.lang}/solutions` },
+              { "@type": "ListItem", position: 3, name: "Production Lines", item: canonical },
             ],
           }),
         },
