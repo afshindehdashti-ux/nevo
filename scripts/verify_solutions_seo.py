@@ -422,6 +422,8 @@ def render_html(base: str, results: list, failed: list) -> str:
   .badge.fail {{ background:rgba(239,68,68,.15); color:var(--fail); }}
   ul.issues {{ margin:0; padding-left:16px; }} ul.issues li {{ margin:2px 0; }}
   ul.issues li.ok {{ color:var(--muted); list-style:none; margin-left:-16px; }}
+  .hint {{ display:block; color:var(--muted); font-size:12px; margin-top:2px; padding-left:12px; border-left:2px solid var(--accent); }}
+
   td.ok {{ color:var(--ok); }} td.fail {{ color:var(--fail); font-weight:600; }}
   .filters {{ margin:12px 0; display:flex; gap:8px; }}
   .filters button {{ background:var(--card); color:var(--text); border:1px solid var(--border);
