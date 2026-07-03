@@ -181,9 +181,17 @@ function buildSentryEvent(e: LogoErrorEvent) {
     release: e.release,
     transaction: e.route,
     message: {
-      formatted: `header.logo.error [${stage}]${terminal ? " · terminal" : ""} · ${fallbackChain}`,
+      formatted: `header.logo.error [${stage}]${terminal ? " · terminal" : ""} · cid=${e.correlationId ?? "-"} · ${fallbackChain}`,
     },
-    fingerprint: ["header.logo.error", stage, fallbackChain],
+    // Include correlationId in the fingerprint so every event from the same
+    // page load groups into one Sentry issue — the full logo sequence lives
+    // together instead of splitting across stages.
+    fingerprint: [
+      "header.logo.error",
+      stage,
+      fallbackChain,
+      e.correlationId ?? "no-cid",
+    ],
     tags: {
       stage,
       variant: e.variant ?? null,
@@ -203,10 +211,20 @@ function buildSentryEvent(e: LogoErrorEvent) {
       url: e.url,
       headers: e.ua ? { "User-Agent": e.ua } : undefined,
     },
+    contexts: {
+      logo: {
+        correlationId: e.correlationId ?? null,
+        stage,
+        variant: e.variant ?? null,
+        terminal,
+        fallbackChain,
+        chainLength: (e.history?.length ?? 0) + 1,
+      },
+    },
     extra: {
+      correlationId: e.correlationId,
       failedSrc: e.failedSrc,
       nextSrc: e.nextSrc,
-      correlationId: e.correlationId,
       fallbackChain,
       history: e.history ?? [],
       payload: e.extra,
@@ -214,6 +232,7 @@ function buildSentryEvent(e: LogoErrorEvent) {
     breadcrumbs: buildBreadcrumbs(e),
   };
 }
+
 
 
 function buildEnvelope(dsn: ParsedDsn, events: ReturnType<typeof buildSentryEvent>[]): string {
