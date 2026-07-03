@@ -54,7 +54,7 @@ export function KnowledgeHubPreview({
     <Section tone="default">
       <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-2xl">
-          <SectionHeader eyebrow={eyebrow} title={title} lede={lede} />
+          <SectionHeader eyebrow={resolvedEyebrow} title={resolvedTitle} lede={resolvedLede} />
         </div>
         <Button asChild variant="ghost" size="lg" className="self-start lg:self-end">
           <LocalizedLink to="/knowledge-hub">
