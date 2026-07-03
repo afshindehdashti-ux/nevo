@@ -74,7 +74,34 @@ def emit_annotation(level: str, file: str, title: str, message: str) -> None:
     )
 
 
-# --- Actionable fix hints -----------------------------------------------------
+# --- Issue codes --------------------------------------------------------------
+# Stable machine-readable codes for each failure category, used by the JSON
+# artifact so downstream analysis can group / filter without regex-ing messages.
+ISSUE_CODES: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"^FETCH_ERROR"), "FETCH_ERROR"),
+    (re.compile(r"^canonical count"), "CANONICAL_COUNT"),
+    (re.compile(r"^canonical not self-ref"), "CANONICAL_NOT_SELF_REF"),
+    (re.compile(r"^og:url not self-ref"), "OG_URL_NOT_SELF_REF"),
+    (re.compile(r"^og:image not absolute"), "OG_IMAGE_NOT_ABSOLUTE"),
+    (re.compile(r"^twitter:card"), "TWITTER_CARD_INVALID"),
+    (re.compile(r"^twitter:image not absolute"), "TWITTER_IMAGE_NOT_ABSOLUTE"),
+    (re.compile(r"^missing <title>"), "TITLE_MISSING"),
+    (re.compile(r"^missing meta description"), "DESCRIPTION_MISSING"),
+    (re.compile(r"^description byte-length"), "DESCRIPTION_LENGTH"),
+    (re.compile(r"^hreflang missing locales"), "HREFLANG_MISSING_LOCALES"),
+    (re.compile(r"^hreflang missing x-default"), "HREFLANG_MISSING_XDEFAULT"),
+    (re.compile(r"^hreflang has non-absolute"), "HREFLANG_NOT_ABSOLUTE"),
+]
+
+
+def issue_code(failure: str) -> str:
+    for pat, code in ISSUE_CODES:
+        if pat.search(failure):
+            return code
+    return "UNKNOWN"
+
+
+
 # Map each failure category to a short, concrete remediation. Kept intentionally
 # terse so it fits inside a GitHub annotation / MD table cell without wrapping.
 FIX_HINTS: list[tuple[re.Pattern, str]] = [
@@ -251,10 +278,40 @@ def main() -> int:
 
 
 
-    # Machine JSON report
+    # Machine JSON report — enriched with a flat `issues` list carrying
+    # {url, path, locale, issue_code, message, fix, file_path} per failure so
+    # downstream analysis can group by code or file without re-parsing messages.
     if p := os.environ.get("REPORT_JSON"):
         Path(p).parent.mkdir(parents=True, exist_ok=True)
-        Path(p).write_text(json.dumps({"base": BASE, "total": len(results), "failed": len(failed), "results": results}, indent=2))
+        issues_flat = []
+        for r in failed:
+            file_path = ROUTE_FILES.get(r["path"], "src/routes/__root.tsx")
+            for f in r["failures"]:
+                issues_flat.append({
+                    "url": r["url"],
+                    "locale": r["locale"],
+                    "path": r["path"],
+                    "issue_code": issue_code(f),
+                    "message": f,
+                    "fix": suggest_fix(f),
+                    "file_path": file_path,
+                })
+        by_code: dict[str, int] = {}
+        for i in issues_flat:
+            by_code[i["issue_code"]] = by_code.get(i["issue_code"], 0) + 1
+        payload = {
+            "base": BASE,
+            "generated_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
+            "total": len(results),
+            "passed": len(results) - len(failed),
+            "failed": len(failed),
+            "issue_count": len(issues_flat),
+            "by_code": by_code,
+            "issues": issues_flat,
+            "results": results,
+        }
+        Path(p).write_text(json.dumps(payload, indent=2, ensure_ascii=False))
+
 
     # GitHub step summary markdown
     if p := os.environ.get("REPORT_MD"):

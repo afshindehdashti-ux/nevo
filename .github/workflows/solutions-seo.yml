@@ -68,3 +68,5 @@ jobs:
             reports/seo/solutions-seo.html
             vite.log
           if-no-files-found: warn
+          retention-days: 30
+
