@@ -119,66 +119,10 @@ function getLogoCorrelationId(): string {
  * `LOGO_TELEMETRY_CONFIG`, so ops can retune sampling per environment
  * without touching component code. See `src/lib/logo-telemetry-config.ts`.
  */
+import { shouldLogRender, shouldLogError } from "@/lib/logo-telemetry";
 
 const LOGO_RENDER_SAMPLE_RATE = LOGO_TELEMETRY_CONFIG.renderSampleRate;
-const LOGO_ERROR_MAX_PER_SESSION = LOGO_TELEMETRY_CONFIG.errorMaxPerSession;
-const LOGO_ERROR_MIN_INTERVAL_MS = LOGO_TELEMETRY_CONFIG.errorMinIntervalMs;
 
-
-type LogoRateState = {
-  renderLogged: boolean;
-  renderSampled: boolean | null; // null = not decided yet
-  errorCount: number;
-  lastErrorAt: number;
-  lastErrorStage: string;
-};
-
-function getLogoRateState(): LogoRateState {
-  if (typeof window === "undefined") {
-    return { renderLogged: false, renderSampled: null, errorCount: 0, lastErrorAt: 0, lastErrorStage: "" };
-  }
-  const w = window as unknown as { __nevoLogoRate?: LogoRateState };
-  if (!w.__nevoLogoRate) {
-    w.__nevoLogoRate = {
-      renderLogged: false,
-      renderSampled: null,
-      errorCount: 0,
-      lastErrorAt: 0,
-      lastErrorStage: "",
-    };
-  }
-  return w.__nevoLogoRate;
-}
-
-/** Returns true when a render event should be sent to the log sink. */
-function shouldLogRender(): boolean {
-  const state = getLogoRateState();
-  if (state.renderLogged) return false;
-  if (state.renderSampled === null) {
-    state.renderSampled = Math.random() < LOGO_RENDER_SAMPLE_RATE;
-  }
-  if (!state.renderSampled) return false;
-  state.renderLogged = true;
-  return true;
-}
-
-/** Returns true when an error event should be sent. Terminal errors bypass throttle. */
-function shouldLogError(stage: string, terminal: boolean): boolean {
-  const state = getLogoRateState();
-  if (state.errorCount >= LOGO_ERROR_MAX_PER_SESSION) return false;
-  const now = Date.now();
-  if (
-    !terminal &&
-    stage === state.lastErrorStage &&
-    now - state.lastErrorAt < LOGO_ERROR_MIN_INTERVAL_MS
-  ) {
-    return false;
-  }
-  state.errorCount += 1;
-  state.lastErrorAt = now;
-  state.lastErrorStage = stage;
-  return true;
-}
 
 
 
