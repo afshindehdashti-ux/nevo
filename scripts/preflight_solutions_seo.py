@@ -60,6 +60,12 @@ Env:
                        from the snippet and redacts obvious secrets (JWTs,
                        bearer tokens, api_key=…, emails, long hex, AWS/SB
                        keys). Set `false` to render raw text.
+  RESPONSE_HEADERS     comma-separated response headers to surface for
+                       failed URLs in the step summary. Default:
+                       `Content-Type,Content-Length,Server,Retry-After,
+                       Cache-Control,Age,Location,X-Cache,CF-Ray,Via`.
+                       Sensitive values (Set-Cookie, Authorization, …) are
+                       masked.
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
@@ -366,6 +372,45 @@ def _body_preview(body: bytes) -> tuple[str, str]:
     return digest, text
 
 
+# Response headers surfaced for failed URLs in the step summary. Content-Type
+# distinguishes an HTML error page from a JSON API error; Server / X-Cache /
+# CF-Ray / Age pinpoint which layer (origin vs CDN) served the response;
+# Retry-After tells us if the server is asking us to back off; Cache-Control
+# and Location explain stuck 3xx/304 loops. Comma-separated env override.
+_DEFAULT_RESPONSE_HEADERS = [
+    "Content-Type", "Content-Length", "Server", "Retry-After",
+    "Cache-Control", "Age", "Location", "X-Cache", "CF-Ray", "Via",
+]
+RESPONSE_HEADERS: list[str] = [
+    h.strip() for h in os.environ.get(
+        "RESPONSE_HEADERS", ",".join(_DEFAULT_RESPONSE_HEADERS)
+    ).split(",") if h.strip()
+]
+# Response header values that likely carry secrets — mask before rendering.
+_SENSITIVE_RESPONSE_HEADER_SUBSTR = ("set-cookie", "authorization", "token", "secret", "api-key", "apikey")
+
+def _pick_response_headers(headers) -> dict[str, str]:
+    """Extract the configured response headers, preserving the requested order."""
+    if not headers:
+        return {}
+    out: dict[str, str] = {}
+    for name in RESPONSE_HEADERS:
+        val = headers.get(name)
+        if val:
+            out[name] = val
+    return out
+
+def _render_response_headers_md(headers: dict[str, str]) -> str:
+    if not headers:
+        return ""
+    parts = []
+    for name, val in headers.items():
+        low = name.lower()
+        shown = _mask(val) if any(s in low for s in _SENSITIVE_RESPONSE_HEADER_SUBSTR) else val
+        parts.append(f"`{name}: {_md_cell(shown)}`")
+    return " · ".join(parts)
+
+
 def probe(url: str) -> dict:
     """Probe a URL with retries. Return a result dict with timing/status."""
     path = urlparse(url).path
@@ -393,11 +438,12 @@ def probe(url: str) -> dict:
         return {"url": url, "ok": True, "status": status, "bytes": body_bytes,
                 "ms": ms, "attempts": attempts, "error": "", "method": http_method}
 
-    def _do_request(http_method: str) -> tuple[int | None, int, float, str, bytes]:
-        """Issue one request. Returns (status, size_bytes, ms, error, body).
+    def _do_request(http_method: str) -> tuple[int | None, int, float, str, bytes, dict[str, str]]:
+        """Issue one request. Returns (status, size_bytes, ms, error, body, headers).
 
         For HEAD, body is always b"" (no body). For GET, body carries whatever
         the server returned so failed probes can surface a snippet + hash.
+        `headers` is the filtered response-header dict (see RESPONSE_HEADERS).
         """
         t0 = time.perf_counter()
         try:
@@ -409,30 +455,35 @@ def probe(url: str) -> dict:
             req = urllib.request.Request(url, headers=headers, method=http_method)
             opener = urllib.request.urlopen if FOLLOW_REDIRECTS else _NO_REDIRECT_OPENER.open
             with opener(req, timeout=TIMEOUT) as r:
+                resp_headers = _pick_response_headers(r.headers)
                 if http_method == "HEAD":
                     return r.status, int(r.headers.get("Content-Length") or 0), \
-                        (time.perf_counter() - t0) * 1000, "", b""
+                        (time.perf_counter() - t0) * 1000, "", b"", resp_headers
                 body = r.read()
-                return r.status, len(body), (time.perf_counter() - t0) * 1000, "", body
+                return r.status, len(body), (time.perf_counter() - t0) * 1000, "", body, resp_headers
         except urllib.error.HTTPError as e:
             ms = (time.perf_counter() - t0) * 1000
+            resp_headers = _pick_response_headers(e.headers) if e.headers else {}
             if http_method == "HEAD":
                 size = int(e.headers.get("Content-Length") or 0) if e.headers else 0
-                return e.code, size, ms, f"HTTP {e.code}", b""
+                return e.code, size, ms, f"HTTP {e.code}", b"", resp_headers
             try:
                 body = e.read() or b""
             except Exception:
                 body = b""
-            return e.code, len(body), ms, f"HTTP {e.code}", body
+            return e.code, len(body), ms, f"HTTP {e.code}", body, resp_headers
         except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
             ms = (time.perf_counter() - t0) * 1000
-            return None, 0, ms, f"{type(e).__name__}: {e}", b""
+            return None, 0, ms, f"{type(e).__name__}: {e}", b"", {}
 
+    last_headers: dict[str, str] = {}
     for attempt in range(1, RETRIES + 1):
         attempts = attempt
 
         first_method = "HEAD" if method_mode in ("HEAD", "HEAD_THEN_GET") else "GET"
-        status, size, ms, err, body = _do_request(first_method)
+        status, size, ms, err, body, resp_headers = _do_request(first_method)
+        if resp_headers:
+            last_headers = resp_headers
 
         if status is not None:
             ok = _evaluate(status, size, ms, first_method, body)
@@ -440,7 +491,9 @@ def probe(url: str) -> dict:
                 return ok
 
         if method_mode == "HEAD_THEN_GET" and first_method == "HEAD":
-            status2, size2, ms2, err2, body2 = _do_request("GET")
+            status2, size2, ms2, err2, body2, resp_headers2 = _do_request("GET")
+            if resp_headers2:
+                last_headers = resp_headers2
             if status2 is not None:
                 ok2 = _evaluate(status2, size2, ms2, "GET", body2)
                 if ok2:
@@ -459,7 +512,8 @@ def probe(url: str) -> dict:
     return {"url": url, "ok": False, "status": last_status, "bytes": last_bytes,
             "ms": last_ms, "attempts": attempts,
             "error": last_err or "unknown error", "method": last_method or method_mode,
-            "body_hash": body_hash, "body_snippet": body_snippet}
+            "body_hash": body_hash, "body_snippet": body_snippet,
+            "response_headers": last_headers}
 
 
 
@@ -520,19 +574,25 @@ def write_step_summary(results: list[dict]) -> None:
     # Deep-dive block for failures: body hash + snippet so the reader can tell
     # "this is the CDN's HTML error page again" from "a new failure mode" or
     # "the request went through but latency was the killer".
-    failures_with_body = [r for r in results if not r["ok"] and (r.get("body_hash") or r.get("body_snippet"))]
-    if failures_with_body:
+    failures_with_detail = [r for r in results if not r["ok"] and (
+        r.get("body_hash") or r.get("body_snippet") or r.get("response_headers"))]
+    if failures_with_detail:
         lines.append("### Failed response bodies")
         lines.append("")
         lines.append("_Preview of what the server actually returned. Same hash across"
                      " runs = same error page; empty snippet = no body (transport error"
-                     " or HEAD request)._")
+                     " or HEAD request). Response headers help pinpoint the source"
+                     " (origin vs CDN, cache hit, Retry-After, redirect target)._")
         lines.append("")
-        for r in failures_with_body:
+        for r in failures_with_detail:
             rel = r["url"].replace(BASE, "") or r["url"]
             hash_part = f"`sha256:{r['body_hash']}`" if r.get("body_hash") else "_no hash_"
             snippet = r.get("body_snippet") or ""
+            headers_md = _render_response_headers_md(r.get("response_headers") or {})
             lines.append(f"**{_md_cell(rel)}** — {hash_part} · `{r['bytes']:,} B` · `{r['ms']:.0f} ms`")
+            if headers_md:
+                lines.append("")
+                lines.append(f"Response headers: {headers_md}")
             if snippet:
                 # Fenced block avoids Markdown interpreting HTML/pipes in the snippet.
                 lines.append("")
