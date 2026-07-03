@@ -258,7 +258,167 @@ export type LogoTelemetryDump = {
   state: LogoRateState;
   decisions: LogoDecisionRecord[];
   decisionsTruncated: boolean;
+  /**
+   * Report of what redactLogoTelemetryDump() stripped so reporters know
+   * the blob isn't the raw wire format. Empty array = nothing matched.
+   */
+  redactions: string[];
 };
+
+const REDACTED = "[redacted]";
+
+// Query / hash param names that carry auth material on this app and in
+// most OAuth / Supabase flows. Match case-insensitively.
+const SENSITIVE_PARAM_NAMES = new Set(
+  [
+    "token",
+    "access_token",
+    "refresh_token",
+    "id_token",
+    "code",
+    "state",
+    "key",
+    "apikey",
+    "api_key",
+    "secret",
+    "password",
+    "pwd",
+    "email",
+    "session",
+    "sig",
+    "signature",
+    "authorization",
+    "auth",
+    "bearer",
+  ].map((n) => n.toLowerCase()),
+);
+
+// String-value patterns that almost always mean a credential regardless of
+// where they appear in the dump. Kept intentionally narrow to avoid eating
+// legitimate stage strings ("primary-light-png" etc.).
+const CREDENTIAL_STRING_PATTERNS: Array<{ label: string; re: RegExp }> = [
+  { label: "jwt", re: /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g },
+  { label: "bearer", re: /\bBearer\s+[A-Za-z0-9._~+/=-]{16,}\b/gi },
+  { label: "sk-token", re: /\b(?:sk|pk|rk|xox[abpr])[-_][A-Za-z0-9]{16,}\b/g },
+  { label: "email", re: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g },
+];
+
+// correlationId is meant to be an opaque short id. Anything longer than
+// this is suspicious (could embed a user id, email, path). Also redact if
+// it contains "@" or a "user"/"uid" prefix regardless of length.
+const CORRELATION_ID_MAX_LEN = 64;
+
+function redactUrl(raw: string, hits: string[]): string {
+  try {
+    const u = new URL(raw);
+    let touched = false;
+    // Query params
+    for (const name of Array.from(u.searchParams.keys())) {
+      if (SENSITIVE_PARAM_NAMES.has(name.toLowerCase())) {
+        u.searchParams.set(name, REDACTED);
+        touched = true;
+      }
+    }
+    // Hash (Supabase implicit OAuth returns tokens after #)
+    if (u.hash && u.hash.length > 1) {
+      const params = new URLSearchParams(u.hash.replace(/^#/, ""));
+      let hashTouched = false;
+      for (const name of Array.from(params.keys())) {
+        if (SENSITIVE_PARAM_NAMES.has(name.toLowerCase())) {
+          params.set(name, REDACTED);
+          hashTouched = true;
+        }
+      }
+      if (hashTouched) {
+        u.hash = `#${params.toString()}`;
+        touched = true;
+      }
+    }
+    // userinfo (http://user:pass@host)
+    if (u.username || u.password) {
+      u.username = "";
+      u.password = "";
+      touched = true;
+    }
+    if (touched) hits.push("url:params");
+    return u.toString();
+  } catch {
+    return raw;
+  }
+}
+
+function redactString(value: string, hits: string[]): string {
+  let out = value;
+  for (const { label, re } of CREDENTIAL_STRING_PATTERNS) {
+    if (re.test(out)) {
+      out = out.replace(re, REDACTED);
+      hits.push(`string:${label}`);
+      // reset lastIndex for the /g regex before next use
+      re.lastIndex = 0;
+    }
+  }
+  return out;
+}
+
+function redactCorrelationId(
+  id: string | undefined,
+  hits: string[],
+): string | undefined {
+  if (!id) return id;
+  const looksSensitive =
+    id.length > CORRELATION_ID_MAX_LEN ||
+    id.includes("@") ||
+    /^(user|uid|email)[:=/-]/i.test(id);
+  if (looksSensitive) {
+    hits.push("correlationId");
+    return REDACTED;
+  }
+  // Still scrub embedded credential shapes just in case.
+  return redactString(id, hits);
+}
+
+function redactDecisions(
+  decisions: LogoDecisionRecord[],
+  hits: string[],
+): LogoDecisionRecord[] {
+  return decisions.map((d) => ({
+    ...d,
+    correlationId: redactCorrelationId(d.correlationId, hits),
+    // stage strings are internal enum-ish labels, but pass through the
+    // string scrubber defensively in case a custom stage carries a token.
+    stage: d.stage == null ? d.stage : redactString(d.stage, hits),
+    counters: {
+      ...d.counters,
+      lastErrorStage: redactString(d.counters.lastErrorStage, hits),
+    },
+  }));
+}
+
+/**
+ * Strip anything that looks like a token, user identifier, credential, or
+ * auth-bearing URL param from an already-built dump. Returns a NEW dump
+ * (never mutates the input) plus the deduped list of redaction labels
+ * that fired, which is exposed on `dump.redactions`.
+ *
+ * We intentionally do NOT try to redact `userAgent` — it's needed to
+ * reproduce browser-specific rendering bugs and doesn't carry auth
+ * material. We also don't capture HTTP headers anywhere in the dump, so
+ * there is nothing header-shaped to strip.
+ */
+export function redactLogoTelemetryDump(
+  raw: LogoTelemetryDump,
+): LogoTelemetryDump {
+  const hits: string[] = [];
+  const url = raw.url ? redactUrl(raw.url, hits) : raw.url;
+  const decisions = redactDecisions(raw.decisions, hits);
+  const deduped = Array.from(new Set([...raw.redactions, ...hits]));
+  return {
+    ...raw,
+    url,
+    decisions,
+    redactions: deduped,
+  };
+}
 
 export function buildLogoTelemetryDump(
   origin: LogoTelemetryDump["origin"] = "console",
@@ -270,7 +430,7 @@ export function buildLogoTelemetryDump(
     typeof window !== "undefined" && window.location
       ? window.location.href
       : null;
-  return {
+  const raw: LogoTelemetryDump = {
     schema: "nevo.logo-telemetry.dump/v1",
     capturedAt: new Date().toISOString(),
     origin,
@@ -283,7 +443,9 @@ export function buildLogoTelemetryDump(
     // The buffer caps at 50 in logo-telemetry.ts — flag when we hit the wall
     // so the reporter knows earlier decisions were dropped.
     decisionsTruncated: decisions.length >= 50,
+    redactions: [],
   };
+  return redactLogoTelemetryDump(raw);
 }
 
 export function dumpLogoTelemetryAsJSON(
