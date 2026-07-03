@@ -344,6 +344,7 @@ export function SiteHeader() {
                     if ((window as unknown as Record<string, unknown>)[flagKey]) return;
                     (window as unknown as Record<string, unknown>)[flagKey] = true;
                     logClientEvent("header.logo.render", {
+                      correlationId: getLogoCorrelationId(),
                       variant,
                       naturalWidth: img.naturalWidth,
                       naturalHeight: img.naturalHeight,
@@ -352,6 +353,7 @@ export function SiteHeader() {
                       dpr: window.devicePixelRatio,
                       src: img.currentSrc || img.src,
                     }, "info");
+
                   }}
                   onError={(event) => {
                     // Defensive fallback chain: if the bundled light logo
