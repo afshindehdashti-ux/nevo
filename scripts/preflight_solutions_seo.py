@@ -241,6 +241,9 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
         return None  # surface the 3xx as an HTTPError so caller can inspect it
 
 
+_NO_REDIRECT_OPENER = urllib.request.build_opener(_NoRedirect)
+
+
 _VALID_METHODS = {"GET", "HEAD", "HEAD_THEN_GET"}
 
 def _norm_method(raw: str, default: str = "GET") -> str:
