@@ -124,19 +124,22 @@ export function shouldLogRender(deps: Deps = {}): boolean {
   const state = deps.state ?? getLogoRateState();
   const config = deps.config ?? LOGO_TELEMETRY_CONFIG;
   const random = deps.random ?? Math.random;
+  const nowFn = deps.now ?? Date.now;
+  const now = nowFn();
+  const dbgCtx = { correlationId: deps.correlationId, now };
   if (state.renderLogged) {
-    debugLog("render", "sampled-out", "already-logged", state, config);
+    debugLog("render", "sampled-out", "already-logged", state, config, dbgCtx);
     return false;
   }
   if (state.renderSampled === null) {
     state.renderSampled = random() < config.renderSampleRate;
   }
   if (!state.renderSampled) {
-    debugLog("render", "sampled-out", "sample-rate", state, config);
+    debugLog("render", "sampled-out", "sample-rate", state, config, dbgCtx);
     return false;
   }
   state.renderLogged = true;
-  debugLog("render", "sampled-in", "first-render", state, config);
+  debugLog("render", "sampled-in", "first-render", state, config, dbgCtx);
   return true;
 }
 
@@ -153,29 +156,27 @@ export function shouldLogError(
   const state = deps.state ?? getLogoRateState();
   const config = deps.config ?? LOGO_TELEMETRY_CONFIG;
   const nowFn = deps.now ?? Date.now;
+  const now = nowFn();
+  const base = { stage, terminal, correlationId: deps.correlationId, now };
   if (state.errorCount >= config.errorMaxPerSession) {
-    debugLog("error", "sampled-out", "session-cap", state, config, { stage, terminal });
+    debugLog("error", "sampled-out", "session-cap", state, config, base);
     return false;
   }
-  const now = nowFn();
   if (
     !terminal &&
     stage === state.lastErrorStage &&
     now - state.lastErrorAt < config.errorMinIntervalMs
   ) {
     debugLog("error", "sampled-out", "throttle", state, config, {
-      stage,
-      terminal,
-      msSinceLast: now - state.lastErrorAt,
+      ...base,
+      msSinceLastError: now - state.lastErrorAt,
     });
     return false;
   }
   state.errorCount += 1;
   state.lastErrorAt = now;
   state.lastErrorStage = stage;
-  debugLog("error", "sampled-in", terminal ? "terminal" : "accepted", state, config, {
-    stage,
-    terminal,
-  });
+  debugLog("error", "sampled-in", terminal ? "terminal" : "accepted", state, config, base);
   return true;
 }
+
