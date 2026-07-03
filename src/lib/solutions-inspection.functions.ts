@@ -14,6 +14,7 @@ const SITE_URL = "https://nevo-engineering-hub.lovable.app/";
 const GATEWAY =
   "https://connector-gateway.lovable.dev/google_search_console/v1/urlInspection/index:inspect";
 
+export type RichTypeSummary = { count: number; errors: number; warnings: number };
 export type SolutionsInspectionRow = {
   id: string;
   locale: string;
@@ -25,9 +26,13 @@ export type SolutionsInspectionRow = {
   mobile_verdict: string | null;
   rich_verdict: string | null;
   google_canonical: string | null;
-  rich_detail: Record<string, unknown>;
+  rich_detail: { types: Record<string, RichTypeSummary> };
   last_error: string | null;
   inspected_at: string;
+};
+export type SolutionsInspectionList = {
+  rows: SolutionsInspectionRow[];
+  expected: Array<{ locale: string; path: string }>;
 };
 
 async function ensureAdmin(supabase: any, userId: string) {
