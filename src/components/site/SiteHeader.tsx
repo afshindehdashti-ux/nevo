@@ -49,6 +49,7 @@ import { cn } from "@/lib/utils";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 import { logClientEvent } from "@/lib/client-monitor";
+import { LOGO_TELEMETRY_CONFIG } from "@/lib/logo-telemetry-config";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 import nevoLogoFullPointer from "@/assets/nevo-logo-full.png.asset.json";
 
