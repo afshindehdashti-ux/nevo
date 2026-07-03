@@ -169,7 +169,7 @@ _NO_REDIRECT_OPENER = urllib.request.build_opener(_NoRedirect)
 
 def probe(url: str) -> dict:
     """Probe a URL with retries. Return a result dict with timing/status."""
-    path = urplace = urlparse(url).path
+    path = urlparse(url).path
     accepted = _accepted_for(path)
     min_bytes = MIN_BODY_BYTES.get(path, DEFAULT_MIN_BYTES)
     last_err = ""
