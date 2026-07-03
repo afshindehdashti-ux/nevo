@@ -16,10 +16,17 @@ Env:
                        in RETRYABLE_ERROR_KINDS — deterministic failures
                        (TLS, 4xx, body-too-small) do not retry.
   RETRYABLE_ERROR_KINDS  comma list of error_kind values that are worth
-                       retrying (default:
-                       `timeout,connection_reset,connection_refused,connection_error,dns`).
-                       Set to `''` to disable retries entirely, or add
-                       `http_status` to also retry HTTP 4xx/5xx.
+                        retrying (default:
+                        `timeout,connection_reset,connection_refused,connection_error,dns`).
+                        Set to `''` to disable retries entirely, or add
+                        `http_status` to also retry all HTTP 4xx/5xx.
+  RETRYABLE_STATUS_CLASSES comma list of HTTP status classes (`4xx`, `5xx`)
+                        and/or specific codes (`429`, `503`) that should be
+                        retried even when `http_status` is not in
+                        RETRYABLE_ERROR_KINDS. Empty by default. Use this to
+                        retry only rate-limit (429) or backend-overload
+                        (503) responses without retrying every 4xx/5xx.
+
   BACKOFF_BASE_SECONDS backoff base; wait = base * factor**(attempt-1),
                        capped at BACKOFF_MAX_SECONDS (default: 2)
   BACKOFF_FACTOR       exponential factor (default: 2 → 2s, 4s, 8s …)
@@ -162,7 +169,18 @@ RETRYABLE_ERROR_KINDS: set[str] = {
     for k in (os.environ.get("RETRYABLE_ERROR_KINDS") or _DEFAULT_RETRYABLE).split(",")
     if k.strip()
 }
+
+# HTTP status classes/codes worth retrying independently of RETRYABLE_ERROR_KINDS.
+# Accepts `4xx`, `5xx` classes or exact codes like `429`, `503`. This lets the
+# user retry only rate-limit/overload responses without enabling retry for
+# every HTTP error via RETRYABLE_ERROR_KINDS.
+RETRYABLE_STATUS_CLASSES: set[str] = {
+    s.strip().lower()
+    for s in (os.environ.get("RETRYABLE_STATUS_CLASSES") or "").split(",")
+    if s.strip()
+}
 IN_GHA = os.environ.get("GITHUB_ACTIONS") == "true"
+
 
 
 # Minimum body size (bytes) that indicates a real page vs. an SPA error shell.
@@ -575,6 +593,16 @@ def _classify_status(status: int | None) -> str:
     return "xxx"
 
 
+def _status_class_retryable(status: int | None) -> bool:
+    """Return True when the HTTP status/code is in RETRYABLE_STATUS_CLASSES."""
+    if status is None or not RETRYABLE_STATUS_CLASSES:
+        return False
+    return _classify_status(status) in RETRYABLE_STATUS_CLASSES or str(status) in RETRYABLE_STATUS_CLASSES
+
+
+
+
+
 
 def probe(url: str) -> dict:
     """Probe a URL with retries. Return a result dict with timing/status."""
@@ -696,10 +724,13 @@ def probe(url: str) -> dict:
         this_kind = _classify_error(err or last_err or "", status)
         attempt_kinds.append(this_kind)
 
-        if this_kind not in RETRYABLE_ERROR_KINDS:
+        if this_kind not in RETRYABLE_ERROR_KINDS and not _status_class_retryable(status):
             # Deterministic failure — stop burning retries and backoff time.
+            # A status class/code listed in RETRYABLE_STATUS_CLASSES overrides
+            # this so e.g. 429/503 can still be retried.
             stopped_early = True
             break
+
 
         if attempt < RETRIES:
             time.sleep(_backoff_delay(attempt))
@@ -879,13 +910,17 @@ def write_step_summary(results: list[dict]) -> None:
         f"backoff `{BACKOFF_BASE:g}s × {BACKOFF_FACTOR:g}` cap `{BACKOFF_MAX:g}s`, "
         f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
         f"method `{METHOD}`, follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
+
         "",
         f"- UA: `{USER_AGENT}`",
         f"- Custom headers: {_render_headers_md(CUSTOM_HEADERS)}",
         f"- **{ok_count}/{len(results)}** healthy",
         f"- Total wall time: **{total_ms:.0f} ms**",
         f"- Slowest response: **{slowest:.0f} ms**",
+        f"- Retry kinds: `{','.join(sorted(RETRYABLE_ERROR_KINDS)) or 'none'}` "
+        f"(status classes/codes: `{','.join(sorted(RETRYABLE_STATUS_CLASSES)) or 'none'}`)",
     ]
+
 
     # Failure-kind breakdown: shows at a glance whether the run is dominated
     # by timeouts (latency), DNS/TLS (infra) or HTTP errors (app/content).
