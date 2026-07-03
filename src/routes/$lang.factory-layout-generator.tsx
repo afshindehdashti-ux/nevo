@@ -938,6 +938,7 @@ function FactoryLayoutPage() {
             </aside>
             <div className="space-y-4 lg:col-span-8">
               {LayoutViewer}
+              {ZoneTogglesPanel}
               {RecommendationsPanel}
               {EquipmentPanel}
               {CTAPanel}
