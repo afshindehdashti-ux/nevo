@@ -203,6 +203,14 @@ def _parse_headers(spec: str) -> dict[str, str]:
 
 CUSTOM_HEADERS: dict[str, str] = _parse_headers(os.environ.get("CUSTOM_HEADERS", ""))
 
+# Register sensitive header values with the Actions log masker so they can't
+# leak via a stray print / traceback elsewhere in the job.
+if os.environ.get("GITHUB_ACTIONS") == "true":
+    for _name, _val in CUSTOM_HEADERS.items():
+        if _is_sensitive_header(_name) and _val:
+            print(f"::add-mask::{_val}", flush=True)
+
+
 
 
 def _accepted_for(path: str) -> set[int]:
