@@ -25,6 +25,33 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Pull the JSON from the most recent previous weekly run so we can diff.
+      # continue-on-error so first-ever runs (no history) still succeed and
+      # simply publish a baseline diff note.
+      - name: Download previous weekly report
+        id: prev
+        continue-on-error: true
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: solutions-seo-weekly.yml
+          workflow_conclusion: ""
+          name_is_regexp: true
+          name: ^solutions-seo-weekly-.*$
+          path: reports/seo/previous
+          if_no_artifact_found: warn
+
+      - name: Locate previous JSON
+        id: prev_json
+        run: |
+          PREV="$(find reports/seo/previous -maxdepth 3 -name 'solutions-seo-*.json' | head -n 1)"
+          if [ -n "$PREV" ]; then
+            echo "path=$PREV" >> "$GITHUB_OUTPUT"
+            echo "Previous report: $PREV"
+          else
+            echo "path=" >> "$GITHUB_OUTPUT"
+            echo "No previous report found — this run will be the baseline."
+          fi
+
       # Run against the live published site — no local Vite boot required.
       # --warn-only keeps the scheduled run green so a regression doesn't
       # spam the team with failed-workflow emails; the report is the deliverable.
@@ -35,6 +62,14 @@ jobs:
           REPORT_HTML: reports/seo/solutions-seo.html
           REPORT_MD: ${{ github.step_summary }}
         run: python3 scripts/verify_solutions_seo.py --warn-only
+
+      # Highlight ONLY new / resolved issues since the previous weekly run.
+      - name: Diff against previous run
+        run: |
+          python3 scripts/diff_solutions_seo.py \
+            --previous "${{ steps.prev_json.outputs.path }}" \
+            --current reports/seo/solutions-seo.json \
+            --out "$GITHUB_STEP_SUMMARY"
 
       - name: Stamp report filename with ISO week
         run: |
@@ -48,6 +83,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: solutions-seo-weekly-${{ env.REPORT_WEEK }}
-          path: reports/seo/*
+          path: |
+            reports/seo/solutions-seo-*.html
+            reports/seo/solutions-seo-*.json
           retention-days: 90
           if-no-files-found: error
+
