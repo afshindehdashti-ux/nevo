@@ -260,7 +260,7 @@ def render_md(base: str, results: list, failed: list) -> str:
             rel_url = r["url"].replace(base, "") or r["path"]
             issues = "<br>".join(_md_cell(f) for f in r["failures"])
             lines.append(
-                f"| ❌ | `{_md_cell(r['locale']}` | `{_md_cell(r['path'])}` | `{_md_cell(rel_url)}` | {issues} |"
+                f"| ❌ | `{_md_cell(r['locale'])}` | `{_md_cell(r['path'])}` | `{_md_cell(rel_url)}` | {issues} |"
             )
     else:
         lines.extend([f"", "### Result", f"", "✅ All pages passed."])
