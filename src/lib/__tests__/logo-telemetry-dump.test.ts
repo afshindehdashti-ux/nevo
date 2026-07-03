@@ -119,4 +119,64 @@ describe("logo telemetry QA dump", () => {
     const json = await w.__nevoLogoDebug!.copyDump();
     expect(() => JSON.parse(json)).not.toThrow();
   });
+
+  it("downloadLogoTelemetryDump triggers a synthetic download of the JSON", async () => {
+    const { downloadLogoTelemetryDump } = await import(
+      "../logo-telemetry-debug"
+    );
+    shouldLogRender({ state: createLogoRateState(), config: cfg() });
+
+    const created: string[] = [];
+    const revoked: string[] = [];
+    const clicks: Array<{ href: string; download: string }> = [];
+    const anchor = {
+      href: "",
+      download: "",
+      rel: "",
+      style: { display: "" } as { display: string },
+      click() {
+        clicks.push({ href: this.href, download: this.download });
+      },
+      remove: vi.fn(),
+    };
+
+    vi.stubGlobal("window", {
+      Blob: class {
+        parts: unknown[];
+        opts: unknown;
+        constructor(parts: unknown[], opts: unknown) {
+          this.parts = parts;
+          this.opts = opts;
+        }
+      },
+      URL: {
+        createObjectURL: (b: unknown) => {
+          const id = `blob:mock-${created.length}`;
+          created.push(id);
+          void b;
+          return id;
+        },
+        revokeObjectURL: (u: string) => revoked.push(u),
+      },
+      location: { href: "http://x/y" },
+    });
+    vi.stubGlobal("document", {
+      createElement: () => anchor,
+      body: { appendChild: vi.fn() },
+    });
+    vi.useFakeTimers();
+
+    const json = downloadLogoTelemetryDump("button");
+    expect(() => JSON.parse(json)).not.toThrow();
+    expect(clicks).toHaveLength(1);
+    expect(clicks[0].href).toBe(created[0]);
+    expect(clicks[0].download).toMatch(
+      /^nevo-logo-telemetry-button-.+\.json$/,
+    );
+    expect(anchor.remove).toHaveBeenCalled();
+
+    vi.runAllTimers();
+    expect(revoked).toEqual(created);
+    vi.useRealTimers();
+  });
 });
