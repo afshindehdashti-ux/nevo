@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      skip_on_preflight_failure:
+        description: "If preflight fails, skip the audit instead of failing the check"
+        required: false
+        default: "false"
 
 permissions:
   contents: read
@@ -14,6 +19,11 @@ jobs:
   seo-snapshot:
     name: Canonical / og / twitter / hreflang (Solutions × 10 locales)
     runs-on: ubuntu-latest
+    # Default to hard-fail on PRs (a broken dev server is a real regression),
+    # but allow overriding via workflow_dispatch input or a repo variable
+    # (vars.SEO_SKIP_ON_PREFLIGHT_FAILURE=true) for temporary infra outages.
+    env:
+      SKIP_ON_PREFLIGHT_FAILURE: ${{ github.event.inputs.skip_on_preflight_failure || vars.SEO_SKIP_ON_PREFLIGHT_FAILURE || 'false' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -46,7 +56,12 @@ jobs:
       # Fail fast if the local dev server is up but serving broken routes /
       # sitemap. Cheaper than running the 60-page snapshot against a broken
       # build, and the error surfaces the exact failing URL in the run log.
+      #
+      # continue-on-error so the next step can decide whether a preflight
+      # failure should skip cleanly (opt-in) or fail the PR check (default).
       - name: Preflight — site + sitemap reachable
+        id: preflight
+        continue-on-error: true
         env:
           BASE_URL: http://127.0.0.1:4323
           LOCALES: en,ar,tr
@@ -54,10 +69,36 @@ jobs:
           RETRIES: "2"
         run: python3 scripts/preflight_solutions_seo.py
 
+      - name: Evaluate preflight outcome
+        id: preflight_gate
+        env:
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
+        run: |
+          if [ "$PREFLIGHT_OUTCOME" = "success" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "✅ Preflight passed — running SSR snapshot." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if [ "$SKIP_ON_PREFLIGHT_FAILURE" = "true" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "## ⚠️ SEO snapshot skipped"
+              echo ""
+              echo "Preflight failed (local Vite server or a sample route not reachable)."
+              echo "Skipping the SSR snapshot because \`skip_on_preflight_failure=true\`."
+              echo "See the Preflight step above for the exact failing URL, HTTP status,"
+              echo "and response time."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::Preflight failed — skipping SEO snapshot (skip_on_preflight_failure=true)."
+            exit 0
+          fi
+          echo "::error::Preflight failed. Set skip_on_preflight_failure=true (workflow input or vars.SEO_SKIP_ON_PREFLIGHT_FAILURE) to skip instead of failing."
+          exit 1
+
       # Run the SSR SEO snapshot. On failure, exit 1 fails the job -> red PR check.
       # Emits a JSON artifact and a Markdown block appended to the PR/run summary.
       - name: Verify Solutions SEO (SSR snapshot)
-
+        if: steps.preflight_gate.outputs.skip != 'true'
         env:
           BASE_URL: http://127.0.0.1:4323
           REPORT_JSON: reports/seo/solutions-seo.json
@@ -73,7 +114,7 @@ jobs:
       # One-glance index: every failing URL in a single table, appended to the
       # PR run summary AND uploaded as an artifact for offline review.
       - name: Build consolidated failure index
-        if: always()
+        if: always() && steps.preflight_gate.outputs.skip != 'true'
         run: |
           python3 scripts/index_solutions_seo.py \
             --input reports/seo/solutions-seo.json \
@@ -84,7 +125,7 @@ jobs:
       # Notify Slack when there are failures. No-op if SLACK_WEBHOOK_URL is unset
       # (feature is opt-in — add the webhook as a repo secret to enable).
       - name: Notify Slack on failure
-        if: always()
+        if: always() && steps.preflight_gate.outputs.skip != 'true'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           REPORT_JSON: reports/seo/solutions-seo.json
@@ -94,7 +135,7 @@ jobs:
 
 
       - name: Upload SEO snapshot report
-        if: always()
+        if: always() && steps.preflight_gate.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: solutions-seo-report
@@ -105,6 +146,3 @@ jobs:
             vite.log
           if-no-files-found: warn
           retention-days: 30
-
-          retention-days: 30
-
