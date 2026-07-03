@@ -246,7 +246,8 @@ def write_step_summary(results: list[dict]) -> None:
         f"_Probed **{len(results)}** URL(s) at `{BASE}` "
         f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`, "
         f"backoff `{BACKOFF_BASE:g}s × {BACKOFF_FACTOR:g}` cap `{BACKOFF_MAX:g}s`, "
-        f"min body `{DEFAULT_MIN_BYTES}B`)._",
+        f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
+        f"follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
         "",
         f"- **{ok_count}/{len(results)}** healthy",
         f"- Total wall time: **{total_ms:.0f} ms**",
