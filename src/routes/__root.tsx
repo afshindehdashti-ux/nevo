@@ -30,6 +30,8 @@ import { Toaster } from "../components/ui/sonner";
 import { orgJsonLd, websiteJsonLd, ldScript, hreflangLinks } from "../lib/seo";
 import { LanguageProvider } from "../i18n/LanguageProvider";
 import "../i18n/config";
+// Dev-only: exposes window.__nevoLogoDebug for validating sampling/throttle configs.
+import "../lib/logo-telemetry-debug";
 
 import { useTranslation } from "react-i18next";
 
