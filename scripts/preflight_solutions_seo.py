@@ -909,7 +909,8 @@ def write_step_summary(results: list[dict]) -> None:
         f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`, "
         f"backoff `{BACKOFF_BASE:g}s × {BACKOFF_FACTOR:g}` cap `{BACKOFF_MAX:g}s`, "
         f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
-        f"method `{METHOD}`, follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`). _",
+        f"method `{METHOD}`, follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
+
         "",
         f"- UA: `{USER_AGENT}`",
         f"- Custom headers: {_render_headers_md(CUSTOM_HEADERS)}",
