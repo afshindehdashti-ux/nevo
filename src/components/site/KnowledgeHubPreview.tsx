@@ -227,9 +227,11 @@ export function KnowledgeHubPreview({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
         />
       ) : null}
-      {/* Silence unused-import lint when hubUrl isn't consumed directly. */}
-      <link rel="prefetch" href={hubUrl} className="hidden" aria-hidden="true" />
+      </nav>
+      {/* Prefetch hub index so following the "Open Knowledge Hub" link is instant. */}
+      <link rel="prefetch" href={hubUrl} />
     </Section>
+
   );
 }
 
