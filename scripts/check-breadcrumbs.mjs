@@ -109,16 +109,18 @@ function validateBreadcrumb(bc) {
 function auditPage(html, locale, path) {
   const blocks = extractJsonLdBlocks(html);
   const parseErrors = blocks.filter((b) => b.__parseError).map((b) => b.__parseError);
-  const breadcrumbs = blocks.filter((b) => b["@type"] === "BreadcrumbList");
+  const breadcrumbs = blocks.filter((b) => b && b["@type"] === "BreadcrumbList");
 
   const failures = [];
   if (parseErrors.length) failures.push(`JSON parse errors: ${parseErrors.join("; ")}`);
   if (breadcrumbs.length === 0) failures.push("no BreadcrumbList JSON-LD found");
+  if (breadcrumbs.length > 1) failures.push(`expected exactly 1 BreadcrumbList, found ${breadcrumbs.length}`);
 
   breadcrumbs.forEach((bc, i) => {
     const errs = validateBreadcrumb(bc);
     for (const e of errs) failures.push(`BreadcrumbList[${i}]: ${e}`);
   });
+
 
   return {
     url: `/${locale}${path}`,
