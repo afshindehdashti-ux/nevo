@@ -120,6 +120,7 @@ function getLogoCorrelationId(): string {
  * without touching component code. See `src/lib/logo-telemetry-config.ts`.
  */
 import { shouldLogRender, shouldLogError } from "@/lib/logo-telemetry";
+import { withLogoEventSchema } from "@/lib/logo-event-schema";
 
 const LOGO_RENDER_SAMPLE_RATE = LOGO_TELEMETRY_CONFIG.renderSampleRate;
 
