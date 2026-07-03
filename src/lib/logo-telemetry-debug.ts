@@ -497,9 +497,18 @@ function disabledDump(
 
 export function buildLogoTelemetryDump(
   origin: LogoTelemetryDump["origin"] = "console",
+  opts: LogoDumpOptions = {},
 ): LogoTelemetryDump {
   if (!isLogoDebugBuildEnabled()) return disabledDump(origin);
-  const decisions = getRecentLogoDecisions();
+  const allDecisions = getRecentLogoDecisions();
+  const totalScanned = allDecisions.length;
+  // Filter BEFORE redaction so we match against raw ids (a sensitive id
+  // gets rewritten to "[redacted]" and would never match a QA-supplied
+  // value).
+  const filtered =
+    opts.correlationId !== undefined
+      ? allDecisions.filter((d) => d.correlationId === opts.correlationId)
+      : allDecisions;
   const nav =
     typeof navigator !== "undefined" ? navigator.userAgent ?? null : null;
   const url =
@@ -515,20 +524,31 @@ export function buildLogoTelemetryDump(
     debugEnabled: isLogoDebugEnabled(),
     config: LOGO_TELEMETRY_CONFIG,
     state: cloneState(getLogoRateState()),
-    decisions,
-    // The buffer caps at 50 in logo-telemetry.ts — flag when we hit the wall
-    // so the reporter knows earlier decisions were dropped.
-    decisionsTruncated: decisions.length >= 50,
+    decisions: filtered,
+    // The buffer caps at 50 in logo-telemetry.ts. When filtering, the
+    // "did we drop earlier data?" question is about the ring buffer, not
+    // about the filter — so still report against the raw capture.
+    decisionsTruncated: totalScanned >= 50,
     redactions: [],
+    ...(opts.correlationId !== undefined
+      ? {
+          filter: {
+            correlationId: opts.correlationId,
+            matchedCount: filtered.length,
+            totalScanned,
+          },
+        }
+      : {}),
   };
   return redactLogoTelemetryDump(raw);
 }
 
 export function dumpLogoTelemetryAsJSON(
   origin: LogoTelemetryDump["origin"] = "console",
+  opts: LogoDumpOptions = {},
 ): string {
   if (!isLogoDebugBuildEnabled()) return "";
-  return JSON.stringify(buildLogoTelemetryDump(origin), null, 2);
+  return JSON.stringify(buildLogoTelemetryDump(origin, opts), null, 2);
 }
 
 /**
@@ -538,9 +558,10 @@ export function dumpLogoTelemetryAsJSON(
  */
 async function copyLogoTelemetryDump(
   origin: LogoTelemetryDump["origin"] = "console",
+  opts: LogoDumpOptions = {},
 ): Promise<string> {
   if (!isLogoDebugBuildEnabled()) return "";
-  const json = dumpLogoTelemetryAsJSON(origin);
+  const json = dumpLogoTelemetryAsJSON(origin, opts);
   // Console echo first — clipboard may reject if the tab isn't focused.
   if (typeof console !== "undefined" && typeof console.log === "function") {
     console.log("[nevo:logo-telemetry] dump", json);
