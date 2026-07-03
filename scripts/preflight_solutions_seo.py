@@ -241,7 +241,29 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
         return None  # surface the 3xx as an HTTPError so caller can inspect it
 
 
-_NO_REDIRECT_OPENER = urllib.request.build_opener(_NoRedirect)
+_VALID_METHODS = {"GET", "HEAD", "HEAD_THEN_GET"}
+
+def _norm_method(raw: str, default: str = "GET") -> str:
+    m = (raw or "").strip().upper().replace("-", "_")
+    if m not in _VALID_METHODS:
+        if raw:
+            print(f"preflight: warning: invalid METHOD {raw!r}; using {default}", file=sys.stderr)
+        return default
+    return m
+
+METHOD = _norm_method(os.environ.get("METHOD", "GET"))
+METHOD_OVERRIDES: dict[str, str] = {}
+for item in (x.strip() for x in os.environ.get("METHOD_OVERRIDES", "").split("|") if x.strip()):
+    if "=" not in item:
+        print(f"preflight: warning: skipping malformed METHOD_OVERRIDES entry {item!r}", file=sys.stderr)
+        continue
+    p, _, m = item.partition("=")
+    METHOD_OVERRIDES[p.strip()] = _norm_method(m, default=METHOD)
+
+
+def _method_for(path: str) -> str:
+    return METHOD_OVERRIDES.get(path, METHOD)
+
 
 
 
