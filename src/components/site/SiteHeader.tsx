@@ -365,7 +365,7 @@ export function SiteHeader() {
                       step === "0" ? "primary-light-png"
                       : step === "1" ? "fallback-cdn-full"
                       : "fallback-inline-svg";
-                    logClientEvent("header.logo.render", {
+                    logClientEvent("header.logo.render", withLogoEventSchema({
                       correlationId: getLogoCorrelationId(),
                       variant,
                       sampleRate: LOGO_RENDER_SAMPLE_RATE,
@@ -375,7 +375,7 @@ export function SiteHeader() {
                       viewportHeight: window.innerHeight,
                       dpr: window.devicePixelRatio,
                       src: img.currentSrc || img.src,
-                    }, "info");
+                    }), "info");
                   }}
 
                   onError={(event) => {
