@@ -74,6 +74,49 @@ def emit_annotation(level: str, file: str, title: str, message: str) -> None:
     )
 
 
+# --- Actionable fix hints -----------------------------------------------------
+# Map each failure category to a short, concrete remediation. Kept intentionally
+# terse so it fits inside a GitHub annotation / MD table cell without wrapping.
+FIX_HINTS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"^FETCH_ERROR"),
+     "Server unreachable — start dev server (npm run dev) or check BASE_URL."),
+    (re.compile(r"^canonical count"),
+     "Emit exactly one <link rel=\"canonical\"> in the route head() — remove duplicates from __root."),
+    (re.compile(r"^canonical not self-ref"),
+     "Set canonical to https://<host>/<locale><path> for THIS page (not the home URL)."),
+    (re.compile(r"^og:url not self-ref"),
+     "Set og:url to the same absolute URL as canonical (self-referencing)."),
+    (re.compile(r"^og:image not absolute"),
+     "Use an absolute https://… URL for og:image (1200×630 JPG/PNG, <300KB)."),
+    (re.compile(r"^twitter:card"),
+     "Set <meta name=\"twitter:card\" content=\"summary_large_image\">."),
+    (re.compile(r"^twitter:image not absolute"),
+     "Set twitter:image to the same absolute https:// URL as og:image."),
+    (re.compile(r"^missing <title>"),
+     "Add a unique <title> 30–60 chars including locale + primary keyword."),
+    (re.compile(r"^missing meta description"),
+     "Add <meta name=\"description\"> — 120–160 chars, localized, with a call to action."),
+    (re.compile(r"^description byte-length"),
+     "Rewrite meta description to ~120–160 chars (100–320 UTF-8 bytes)."),
+    (re.compile(r"^hreflang missing locales"),
+     "Emit <link rel=\"alternate\" hreflang=\"xx\"> for every active locale in LOCALES."),
+    (re.compile(r"^hreflang missing x-default"),
+     "Add <link rel=\"alternate\" hreflang=\"x-default\" href=…> pointing at the default locale URL."),
+    (re.compile(r"^hreflang has non-absolute"),
+     "All hreflang href values must be absolute https:// URLs."),
+]
+
+
+def suggest_fix(failure: str) -> str:
+    """Return a short actionable hint for a failure message, or '' if none."""
+    for pat, hint in FIX_HINTS:
+        if pat.search(failure):
+            return hint
+    return ""
+
+
+
+
 def fetch(url: str) -> str:
     req = urllib.request.Request(url, headers={"User-Agent": "Googlebot/2.1 (+http://www.google.com/bot.html)"})
     with urllib.request.urlopen(req, timeout=30) as r:
