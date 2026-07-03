@@ -29,27 +29,11 @@ BASE = os.environ.get("BASE_URL", "http://127.0.0.1:8080").rstrip("/")
 WARN_ONLY = "--warn-only" in sys.argv
 GROUP_ANNOTATIONS = "--group-annotations" in sys.argv or os.environ.get("GROUP_ANNOTATIONS") == "true"
 
-LOCALES = ["en", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"]
-PATHS = [
-    "/solutions",
-    "/solutions/sandwich-panels",
-    "/solutions/production-lines",
-    "/solutions/raw-materials",
-    "/solutions/factory-development",
-    "/solutions/engineering-consultancy",
-]
+# Shared with scripts/preflight_solutions_seo.py so both tools audit the same
+# locale × path matrix — keeping diffs and preflight coverage in lock-step.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from solutions_seo_config import LOCALES, PATHS, ROUTE_FILES  # noqa: E402
 
-# Map each Solutions path → the route file that owns its head() / SEO helpers.
-# Used for GitHub workflow-command annotations so a PR shows the failure inline
-# on the file a developer can actually edit.
-ROUTE_FILES = {
-    "/solutions": "src/routes/$lang.solutions.index.tsx",
-    "/solutions/sandwich-panels": "src/routes/$lang.solutions.sandwich-panels.tsx",
-    "/solutions/production-lines": "src/routes/$lang.solutions.production-lines.tsx",
-    "/solutions/raw-materials": "src/routes/$lang.solutions.raw-materials.tsx",
-    "/solutions/factory-development": "src/routes/$lang.solutions.factory-development.tsx",
-    "/solutions/engineering-consultancy": "src/routes/$lang.solutions.engineering-consultancy.tsx",
-}
 IN_GHA = os.environ.get("GITHUB_ACTIONS") == "true"
 
 

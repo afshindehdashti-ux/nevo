@@ -19,20 +19,41 @@ without needing to open the job log.
 """
 from __future__ import annotations
 import os, sys, time, urllib.request, urllib.error
+from pathlib import Path
 from urllib.parse import urlparse
 
+# Shared source of truth for locales / paths — same list drives
+# verify_solutions_seo.py, so preflight coverage tracks the audit matrix.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from solutions_seo_config import (  # noqa: E402
+    LOCALES as ALL_LOCALES,
+    PATHS as ALL_PATHS,
+    CORE_PATHS,
+    preflight_sample,
+)
 
 
 BASE = os.environ.get("BASE_URL", "http://127.0.0.1:8080").rstrip("/")
-LOCALES = [l.strip() for l in os.environ.get("LOCALES", "en,ar,tr").split(",") if l.strip()]
+
+# LOCALES / PATHS env overrides are validated against the shared matrix:
+# any value not in the shared list is dropped with a warning so we can't
+# probe a locale/path the audit doesn't recognize.
+def _select(env_name: str, default: list[str], universe: list[str]) -> list[str]:
+    raw = os.environ.get(env_name, "").strip()
+    if not raw:
+        return default
+    picked, unknown = [], []
+    for item in (x.strip() for x in raw.split(",") if x.strip()):
+        (picked if item in universe else unknown).append(item)
+    if unknown:
+        print(f"preflight: warning: ignoring unknown {env_name} values: {unknown}", file=sys.stderr)
+    return picked or default
+
+LOCALES = _select("LOCALES", ALL_LOCALES[:3], ALL_LOCALES)
+LOCALIZED_PATHS = _select("PATHS", ALL_PATHS[:1], ALL_PATHS)
 TIMEOUT = int(os.environ.get("TIMEOUT_SECONDS", "20"))
 RETRIES = max(1, int(os.environ.get("RETRIES", "3")))
 IN_GHA = os.environ.get("GITHUB_ACTIONS") == "true"
-
-# Paths every deployment must serve. Kept short — this is a smoke test, not
-# a snapshot; verify_solutions_seo.py covers the exhaustive matrix afterward.
-CORE_PATHS = ["/", "/sitemap.xml", "/robots.txt"]
-LOCALIZED_PATHS = ["/solutions"]
 
 # Minimum body size (bytes) that indicates a real page vs. an SPA error shell.
 MIN_BODY_BYTES = {
@@ -40,6 +61,7 @@ MIN_BODY_BYTES = {
     "/sitemap.xml": 200,
 }
 DEFAULT_MIN_BYTES = 500
+
 
 
 def probe(url: str) -> dict:
