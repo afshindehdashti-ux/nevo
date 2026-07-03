@@ -160,7 +160,18 @@ export const Route = createFileRoute("/$lang/solutions/raw-materials")({
         { type: "application/ld+json", children: JSON.stringify(faqLd) },
         { type: "application/ld+json", children: JSON.stringify(serviceLd) },
         { type: "application/ld+json", children: JSON.stringify(crumbsLd) },
+        ldScript(
+          downloadsItemListJsonLd({
+            path: URL_PATH,
+            lang: String(params.lang),
+            name: "Sandwich Panel Raw Materials — Technical Downloads",
+            description:
+              "PPGI/Aluzinc coil specs, PIR polyol & MDI datasheets, rock wool lamella data and structural adhesive references from the NEVO Download Center.",
+            items: DOWNLOADS_LD_ITEMS,
+          }),
+        ),
       ],
+
     };
   },
   component: RawMaterialsPage,

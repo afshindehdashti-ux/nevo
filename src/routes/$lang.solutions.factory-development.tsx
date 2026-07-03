@@ -177,7 +177,18 @@ export const Route = createFileRoute("/$lang/solutions/factory-development")({
             ],
           }),
         },
+        ldScript(
+          downloadsItemListJsonLd({
+            path: URL_PATH,
+            lang: String(params.lang),
+            name: "Factory Development — Technical Downloads",
+            description:
+              "Turnkey factory brochure, feasibility template, CAPEX/OPEX overview and commissioning playbook from the NEVO Download Center.",
+            items: DOWNLOADS_LD_ITEMS,
+          }),
+        ),
       ],
+
     };
   },
   component: FactoryDevelopmentPage,

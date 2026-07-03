@@ -177,7 +177,18 @@ export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
         { type: "application/ld+json", children: JSON.stringify(faqLd) },
         { type: "application/ld+json", children: JSON.stringify(productLd) },
         { type: "application/ld+json", children: JSON.stringify(crumbsLd) },
+        ldScript(
+          downloadsItemListJsonLd({
+            path: URL_PATH,
+            lang: String(params.lang),
+            name: "Finished Sandwich Panels — Technical Downloads",
+            description:
+              "PIR and rock wool sandwich panel datasheets, cold-storage selection guides and fire classification references from the NEVO Download Center.",
+            items: DOWNLOADS_LD_ITEMS,
+          }),
+        ),
       ],
+
     };
   },
   component: SandwichPanelsPage,

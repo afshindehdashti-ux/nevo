@@ -178,7 +178,18 @@ export const Route = createFileRoute("/$lang/solutions/engineering-consultancy")
         { type: "application/ld+json", children: JSON.stringify(faqLd) },
         { type: "application/ld+json", children: JSON.stringify(serviceLd) },
         { type: "application/ld+json", children: JSON.stringify(crumbsLd) },
+        ldScript(
+          downloadsItemListJsonLd({
+            path: URL_PATH,
+            lang: String(params.lang),
+            name: "Engineering Consultancy — Technical Downloads",
+            description:
+              "Engineering capability brochure, factory planning guide, process/utility checklist and capacity calculator from the NEVO Download Center.",
+            items: DOWNLOADS_LD_ITEMS,
+          }),
+        ),
       ],
+
     };
   },
   component: EngineeringConsultancyPage,

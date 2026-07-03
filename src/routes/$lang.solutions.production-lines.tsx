@@ -167,7 +167,18 @@ export const Route = createFileRoute("/$lang/solutions/production-lines")({
             ],
           }),
         },
+        ldScript(
+          downloadsItemListJsonLd({
+            path: URL_PATH,
+            lang: String(params.lang),
+            name: "Sandwich Panel Production Lines — Technical Downloads",
+            description:
+              "Continuous PIR/PUR, discontinuous and rock wool lamella line brochures, capacity guides and automation references from the NEVO Download Center.",
+            items: DOWNLOADS_LD_ITEMS,
+          }),
+        ),
       ],
+
     };
   },
   component: ProductionLinesPage,
