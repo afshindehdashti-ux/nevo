@@ -419,3 +419,29 @@ function FinalCTA() {
     </section>
   );
 }
+
+function FAQSection() {
+  return (
+    <Section tone="surface">
+      <SectionHeader
+        eyebrow="FAQ"
+        title="Factory development questions from investors."
+        lede="Straight answers on CAPEX, timeline, financing, phasing and how NEVO takes responsibility from empty plot to first invoiced panel."
+      />
+      <div className="mx-auto mt-12 max-w-3xl">
+        <Accordion type="single" collapsible className="w-full divide-y divide-border border-y border-border">
+          {FAQS.map((f, i) => (
+            <AccordionItem key={f.q} value={`fd-${i}`} className="border-b-0">
+              <AccordionTrigger className="py-5 text-left text-base font-medium tracking-tight text-foreground hover:no-underline">
+                {f.q}
+              </AccordionTrigger>
+              <AccordionContent className="pb-6 pl-4 text-sm leading-relaxed text-muted-foreground">
+                {f.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+    </Section>
+  );
+}
