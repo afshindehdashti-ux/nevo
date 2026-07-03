@@ -1,0 +1,51 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  vitest:
+    name: Vitest (unit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Full unit suite. Fails the job on any test failure, which blocks the
+      # build via required-status-check on `main`.
+      - name: Run vitest
+        run: bun run test -- --reporter=default --reporter=junit --outputFile=reports/vitest/junit.xml
+
+      # Targeted guard: re-run just the logo telemetry sampling / throttling
+      # tests as a distinct step so a regression here shows up as its own
+      # red check in the PR UI, not buried inside "all tests".
+      #
+      # Covers:
+      #   - src/lib/__tests__/logo-telemetry.test.ts
+      #       shouldLogRender sampling, per-stage throttle, session cap,
+      #       terminal-error bypass, full fallback-chain scenario.
+      #   - src/lib/__tests__/logo-telemetry-env.test.ts
+      #       VITE_LOGO_RENDER_SAMPLE_RATE, VITE_LOGO_ERROR_MAX_PER_SESSION,
+      #       VITE_LOGO_ERROR_MIN_INTERVAL_MS clamp + emission behavior.
+      - name: Logo telemetry sampling & throttling guard
+        run: bunx vitest run src/lib/__tests__/logo-telemetry.test.ts src/lib/__tests__/logo-telemetry-env.test.ts
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-report
+          path: reports/vitest/
+          if-no-files-found: warn
