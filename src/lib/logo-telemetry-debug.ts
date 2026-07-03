@@ -42,10 +42,13 @@ import {
   type LogoTelemetryConfig,
 } from "./logo-telemetry-config";
 import {
+  clearLogoDecisions,
   createLogoRateState,
   getLogoRateState,
+  getRecentLogoDecisions,
   shouldLogError,
   shouldLogRender,
+  type LogoDecisionRecord,
   type LogoRateState,
 } from "./logo-telemetry";
 
