@@ -168,16 +168,33 @@ def main() -> int:
             time.sleep(SLEEP)
 
     # Console table
-    hdr = f"{'LOCALE':6} {'PATH':40} {'VERDICT':10} {'COVERAGE':22} {'INDEX':16} {'MOBILE':10} {'RICH':10}"
+    hdr = (f"{'LOCALE':6} {'PATH':40} {'VERDICT':10} {'COVERAGE':22} "
+           f"{'INDEX':16} {'MOBILE':10} {'RICH':10} {'BREADCRUMB':11} {'FAQ':8}")
     print("\n" + hdr)
     print("-" * len(hdr))
     for r in rows:
         print(f"{r['locale']:6} {r['path']:40} {r['verdict']:10} {r['coverage']:22} "
-              f"{r['indexing']:16} {r['mobile']:10} {r['rich']:10}")
+              f"{r['indexing']:16} {r['mobile']:10} {r['rich']:10} "
+              f"{r['breadcrumb']:11} {r['faq']:8}")
+
+    # Rich-results issue detail
+    rich_err_rows = [r for r in rows if any(i["severity"] == "ERROR" for i in r["rich_issues"])
+                     or r["rich_detail"]["missing"]]
+    if rich_err_rows:
+        print("\nRich-results problems:")
+        for r in rich_err_rows:
+            if r["rich_detail"]["missing"]:
+                print(f"  ✗ {r['locale']}{r['path']} — MISSING: {', '.join(r['rich_detail']['missing'])}")
+            for iss in r["rich_issues"]:
+                if iss["severity"] == "ERROR":
+                    print(f"  ✗ {r['locale']}{r['path']} — [{iss['type']}] {iss['message']}")
 
     fails = [r for r in rows if r["verdict"] not in ("PASS", "-")]
     ok_count = sum(1 for r in rows if r["verdict"] == "PASS")
-    print(f"\n{ok_count}/{len(rows)} PASS · {len(fails)} needs attention")
+    rich_error_count = sum(1 for r in rows if any(i["severity"] == "ERROR" for i in r["rich_issues"]))
+    missing_count = sum(1 for r in rows if r["rich_detail"]["missing"])
+    print(f"\n{ok_count}/{len(rows)} PASS · {len(fails)} needs attention · "
+          f"rich errors: {rich_error_count} · missing required schema: {missing_count}")
 
     if REPORT_JSON:
         with open(REPORT_JSON, "w", encoding="utf-8") as f:
@@ -187,23 +204,44 @@ def main() -> int:
     if REPORT_MD:
         lines = [
             f"## Google Search Console — Solutions URL Inspection",
-            f"Site: `{SITE_URL}` · {ok_count}/{len(rows)} PASS",
+            f"Site: `{SITE_URL}` · {ok_count}/{len(rows)} PASS · "
+            f"{rich_error_count} rich-result errors · {missing_count} missing required schema",
             "",
-            "| Locale | Path | Verdict | Coverage | Indexing | Mobile | Rich | Google Canonical |",
-            "|---|---|---|---|---|---|---|---|",
+            "| Locale | Path | Verdict | Coverage | Indexing | Mobile | Rich | Breadcrumb | FAQ | Google Canonical |",
+            "|---|---|---|---|---|---|---|---|---|---|",
         ]
         for r in rows:
             lines.append(
                 f"| {r['locale']} | `{r['path']}` | {r['verdict']} | {r['coverage']} | "
-                f"{r['indexing']} | {r['mobile']} | {r['rich']} | {r['canonical']} |"
+                f"{r['indexing']} | {r['mobile']} | {r['rich']} | {r['breadcrumb']} | "
+                f"{r['faq']} | {r['canonical']} |"
             )
+        if rich_err_rows:
+            lines += ["", "### Rich-results problems", ""]
+            for r in rich_err_rows:
+                if r["rich_detail"]["missing"]:
+                    lines.append(f"- ❌ `{r['locale']}{r['path']}` — missing required: "
+                                 f"**{', '.join(r['rich_detail']['missing'])}**")
+                for iss in r["rich_issues"]:
+                    icon = "❌" if iss["severity"] == "ERROR" else "⚠️"
+                    lines.append(f"- {icon} `{r['locale']}{r['path']}` "
+                                 f"[{iss['type']}] {iss['message']}")
         with open(REPORT_MD, "a", encoding="utf-8") as f:
             f.write("\n".join(lines) + "\n")
         print(f"wrote {REPORT_MD}", file=sys.stderr)
 
-    # Exit non-zero only on transport errors; a NEUTRAL/FAIL verdict is informational.
+    # Exit non-zero on transport errors, or on rich-results problems when strict.
+    warn_only = "--warn-only" in sys.argv
+    strict_rich = "--strict-rich" in sys.argv or os.environ.get("STRICT_RICH") == "1"
     transport_errors = [r for r in rows if r["verdict"] == "ERROR"]
-    return 1 if transport_errors and "--warn-only" not in sys.argv else 0
+    if warn_only:
+        return 0
+    if transport_errors:
+        return 1
+    if strict_rich and (rich_error_count or missing_count):
+        return 1
+    return 0
+
 
 
 if __name__ == "__main__":
