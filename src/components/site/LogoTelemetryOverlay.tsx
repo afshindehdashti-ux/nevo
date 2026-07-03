@@ -55,10 +55,6 @@ async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 export function LogoTelemetryOverlay() {
-  // Dev-only guard — matches attachLogoDebugUtil()'s import.meta.env.DEV check
-  // so the overlay literally isn't rendered on published builds.
-  if (!import.meta.env.DEV) return null;
-
   const [status, setStatus] = useState<"idle" | "copying" | "copied" | "error">(
     "idle",
   );
@@ -75,7 +71,11 @@ export function LogoTelemetryOverlay() {
     return () => window.clearTimeout(id);
   }, []);
 
+  // Dev-only guard — matches attachLogoDebugUtil()'s import.meta.env.DEV check
+  // so the overlay literally isn't rendered on published builds.
+  if (!import.meta.env.DEV) return null;
   if (!available) return null;
+
 
   const label =
     status === "copying"
