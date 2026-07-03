@@ -278,7 +278,7 @@ function CrossSection({
 
   return (
     <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-4">
-      <svg viewBox={`0 0 ${W} ${H}`} className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" className="block w-full" style={{ aspectRatio: `${W} / ${H}` }} xmlns="http://www.w3.org/2000/svg">
         <defs>
           <CorePattern id={patternId} kind={style.pattern} base={style.base} accent={style.accent} />
           <linearGradient id="skin-shade" x1="0" x2="0" y1="0" y2="1">
@@ -287,54 +287,66 @@ function CrossSection({
           </linearGradient>
         </defs>
 
-        {/* Core */}
-        <motion.rect
-          animate={{ y: coreTop, height: coreH }}
-          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+        {/* Core — solid base color guarantees visibility; pattern overlay adds texture */}
+        <rect
           x={padX}
+          y={coreTop}
           width={panelW}
-          fill={`url(#${patternId})`}
+          height={coreH}
+          fill={style.base}
           stroke="rgba(0,0,0,0.35)"
           strokeWidth={0.8}
         />
+        <rect
+          x={padX}
+          y={coreTop}
+          width={panelW}
+          height={coreH}
+          fill={`url(#${patternId})`}
+          opacity={0.9}
+          pointerEvents="none"
+        />
+
 
         {/* Exterior skin */}
-        <motion.rect
-          animate={{ y: startY, height: skinExt }}
-          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+        <rect
           x={padX}
+          y={startY}
           width={panelW}
+          height={skinExt}
           fill="#B7BEC6"
           stroke="rgba(0,0,0,0.5)"
           strokeWidth={0.6}
         />
-        <motion.rect
-          animate={{ y: startY, height: skinExt }}
-          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+        <rect
           x={padX}
+          y={startY}
           width={panelW}
+          height={skinExt}
           fill="url(#skin-shade)"
           opacity={0.6}
         />
 
         {/* Interior skin */}
-        <motion.rect
-          animate={{ y: intTop, height: skinInt }}
-          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+        <rect
           x={padX}
+          y={intTop}
           width={panelW}
+          height={skinInt}
           fill="#E7EBDA"
           stroke="rgba(0,0,0,0.5)"
           strokeWidth={0.6}
         />
-        <motion.rect
-          animate={{ y: intTop, height: skinInt }}
-          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+        <rect
           x={padX}
+          y={intTop}
           width={panelW}
+          height={skinInt}
           fill="url(#skin-shade)"
           opacity={0.4}
         />
+
+
 
         {/* Thickness dimension */}
         <g stroke="rgba(255,255,255,0.7)" strokeWidth={0.8} fill="rgba(255,255,255,0.85)">
