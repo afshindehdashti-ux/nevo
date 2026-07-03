@@ -392,14 +392,14 @@ export function SiteHeader() {
                       img.dataset.fallbackStep = "1";
                       img.dataset.logoVariant = "fallback-cdn";
                       if (shouldLogError("primary-light-png", false)) {
-                        logClientEvent("header.logo.error", {
+                        logClientEvent("header.logo.error", withLogoEventSchema({
                           correlationId,
                           stage: "primary-light-png",
                           failedSrc,
                           nextSrc: LOGO_FALLBACK_CDN,
                           viewportWidth: window.innerWidth,
                           online: navigator.onLine,
-                        }, "error");
+                        }), "error");
                       }
                       img.src = LOGO_FALLBACK_CDN;
                     } else if (step === "1") {
