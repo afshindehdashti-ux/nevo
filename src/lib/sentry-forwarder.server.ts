@@ -100,6 +100,7 @@ function buildBreadcrumbs(e: LogoErrorEvent) {
   const nowStage = e.stage ?? "unknown";
   const currentTs = toEpochSeconds(e.clientTs);
   const history = Array.isArray(e.history) ? e.history : [];
+  const cid = e.correlationId ?? null;
 
   const crumbs = history.map((h) => {
     const kind = h.eventType === "error" ? "fail" : "render";
@@ -108,8 +109,9 @@ function buildBreadcrumbs(e: LogoErrorEvent) {
       category: `header.logo.${h.eventType}`,
       level: h.eventType === "error" ? "warning" : "info",
       timestamp: toEpochSeconds(h.clientTs ?? undefined),
-      message: `${kind}:${h.stage ?? "unknown"}`,
+      message: `[cid:${cid ?? "-"}] ${kind}:${h.stage ?? "unknown"}`,
       data: {
+        correlationId: cid,
         variant: h.variant ?? undefined,
         src: h.src ?? undefined,
         nextSrc: h.nextSrc ?? undefined,
@@ -120,10 +122,11 @@ function buildBreadcrumbs(e: LogoErrorEvent) {
 
   // Always include the current failure as the final crumb so the tail of the
   // chain matches the event itself, even if the DB lookup missed the row.
+  const tailMessage = `[cid:${cid ?? "-"}] fail:${nowStage}`;
   const alreadyPresent = crumbs.some(
     (c) =>
       c.category === "header.logo.error" &&
-      c.message === `fail:${nowStage}` &&
+      c.message === tailMessage &&
       Math.abs(c.timestamp - currentTs) < 0.001,
   );
   if (!alreadyPresent) {
@@ -132,8 +135,9 @@ function buildBreadcrumbs(e: LogoErrorEvent) {
       category: "header.logo.error",
       level: e.terminal ? "error" : "warning",
       timestamp: currentTs,
-      message: `fail:${nowStage}`,
+      message: tailMessage,
       data: {
+        correlationId: cid,
         variant: e.variant,
         src: e.failedSrc,
         nextSrc: e.nextSrc,
@@ -143,6 +147,7 @@ function buildBreadcrumbs(e: LogoErrorEvent) {
   }
   return { values: crumbs };
 }
+
 
 function buildFallbackChain(e: LogoErrorEvent): string {
   const parts: string[] = [];
@@ -176,9 +181,17 @@ function buildSentryEvent(e: LogoErrorEvent) {
     release: e.release,
     transaction: e.route,
     message: {
-      formatted: `header.logo.error [${stage}]${terminal ? " · terminal" : ""} · ${fallbackChain}`,
+      formatted: `header.logo.error [${stage}]${terminal ? " · terminal" : ""} · cid=${e.correlationId ?? "-"} · ${fallbackChain}`,
     },
-    fingerprint: ["header.logo.error", stage, fallbackChain],
+    // Include correlationId in the fingerprint so every event from the same
+    // page load groups into one Sentry issue — the full logo sequence lives
+    // together instead of splitting across stages.
+    fingerprint: [
+      "header.logo.error",
+      stage,
+      fallbackChain,
+      e.correlationId ?? "no-cid",
+    ],
     tags: {
       stage,
       variant: e.variant ?? null,
@@ -198,10 +211,20 @@ function buildSentryEvent(e: LogoErrorEvent) {
       url: e.url,
       headers: e.ua ? { "User-Agent": e.ua } : undefined,
     },
+    contexts: {
+      logo: {
+        correlationId: e.correlationId ?? null,
+        stage,
+        variant: e.variant ?? null,
+        terminal,
+        fallbackChain,
+        chainLength: (e.history?.length ?? 0) + 1,
+      },
+    },
     extra: {
+      correlationId: e.correlationId,
       failedSrc: e.failedSrc,
       nextSrc: e.nextSrc,
-      correlationId: e.correlationId,
       fallbackChain,
       history: e.history ?? [],
       payload: e.extra,
@@ -209,6 +232,7 @@ function buildSentryEvent(e: LogoErrorEvent) {
     breadcrumbs: buildBreadcrumbs(e),
   };
 }
+
 
 
 function buildEnvelope(dsn: ParsedDsn, events: ReturnType<typeof buildSentryEvent>[]): string {
