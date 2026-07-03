@@ -139,7 +139,7 @@ export const runSolutionsInspection = createServerFn({ method: "POST" })
           record.last_error = String(e?.message ?? e).slice(0, 200);
           failed++;
         }
-        const { error: upErr } = await context.supabase
+        const { error: upErr } = await (context.supabase as any)
           .from("solutions_inspection")
           .upsert(record, { onConflict: "locale,path" });
         if (upErr) throw new Error(upErr.message);
