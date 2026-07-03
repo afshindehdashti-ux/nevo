@@ -41,6 +41,11 @@ import panelRockwool from "@/assets/configurator/panel-rockwool.jpg";
 import panelGlasswool from "@/assets/configurator/panel-glasswool.jpg";
 import panelEPS from "@/assets/configurator/panel-eps.jpg";
 import heroImg from "@/assets/configurator/hero-configurator.jpg";
+import ctxWall from "@/assets/configurator/context-wall.jpg";
+import ctxRoof from "@/assets/configurator/context-roof.jpg";
+import ctxColdroom from "@/assets/configurator/context-coldroom.jpg";
+import ctxCleanroom from "@/assets/configurator/context-cleanroom.jpg";
+import ctxFire from "@/assets/configurator/context-fire.jpg";
 
 export const Route = createFileRoute("/$lang/product-configurator")({
   head: ({ params }) => ({
