@@ -944,7 +944,9 @@ def _flatten_for_csv(r: dict) -> dict:
         "ok": "true" if r.get("ok") else "false",
         "method": r.get("method") or "",
         "status": "" if r.get("status") is None else r.get("status"),
+        "status_class": r.get("status_class") or _classify_status(r.get("status")),
         "error_kind": r.get("error_kind") or "",
+
         "final_kind": r.get("final_kind") or r.get("error_kind") or "",
         "error": r.get("error") or "",
         "ms": f"{float(r.get('ms') or 0):.1f}",
