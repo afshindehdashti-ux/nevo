@@ -692,6 +692,12 @@ def write_step_summary(results: list[dict]) -> None:
                  for k, n in kinds.most_common()]
         lines.append(f"- Failure kinds: {' · '.join(parts)}")
 
+    # Latency histogram grouped by error_kind: makes it obvious whether e.g.
+    # timeouts cluster at the timeout ceiling, TLS failures fail fast, or DNS
+    # errors have their own bimodal shape vs healthy `ok` responses.
+    lines += _render_latency_histogram(results)
+
+
     lines += [
         "",
         "| Status | Kind | URL | Method | HTTP | Time (ms) | Size | Attempts | Notes |",
