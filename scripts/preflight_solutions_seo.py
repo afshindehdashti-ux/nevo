@@ -54,9 +54,6 @@ def probe(url: str) -> tuple[bool, str]:
             with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
                 status = r.status
                 body = r.read()
-                path = urllib.request.urlparse(url).path if hasattr(urllib.request, "urlparse") else url
-                # urlparse actually lives on urllib.parse — use it explicitly.
-                from urllib.parse import urlparse
                 path = urlparse(url).path
                 min_bytes = MIN_BODY_BYTES.get(path, DEFAULT_MIN_BYTES)
                 if status != 200:
@@ -65,6 +62,7 @@ def probe(url: str) -> tuple[bool, str]:
                     last_err = f"body {len(body)}B < min {min_bytes}B (likely error page)"
                 else:
                     return True, f"200 OK ({len(body)}B)"
+
         except urllib.error.HTTPError as e:
             last_err = f"HTTP {e.code}"
         except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
