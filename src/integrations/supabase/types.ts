@@ -173,6 +173,54 @@ export type Database = {
         }
         Relationships: []
       }
+      solutions_inspection: {
+        Row: {
+          coverage_state: string | null
+          google_canonical: string | null
+          id: string
+          indexing_state: string | null
+          inspected_at: string
+          last_error: string | null
+          locale: string
+          mobile_verdict: string | null
+          path: string
+          rich_detail: Json
+          rich_verdict: string | null
+          url: string
+          verdict: string | null
+        }
+        Insert: {
+          coverage_state?: string | null
+          google_canonical?: string | null
+          id?: string
+          indexing_state?: string | null
+          inspected_at?: string
+          last_error?: string | null
+          locale: string
+          mobile_verdict?: string | null
+          path: string
+          rich_detail?: Json
+          rich_verdict?: string | null
+          url: string
+          verdict?: string | null
+        }
+        Update: {
+          coverage_state?: string | null
+          google_canonical?: string | null
+          id?: string
+          indexing_state?: string | null
+          inspected_at?: string
+          last_error?: string | null
+          locale?: string
+          mobile_verdict?: string | null
+          path?: string
+          rich_detail?: Json
+          rich_verdict?: string | null
+          url?: string
+          verdict?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
