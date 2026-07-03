@@ -823,7 +823,95 @@ def write_step_summary(results: list[dict]) -> None:
         fh.write("\n".join(lines) + "\n")
 
 
+# Columns exported to CSV. Order is stable so downstream analysis (spreadsheet
+# pivots, `duckdb read_csv_auto`, pandas) sees the same schema across runs.
+_CSV_COLUMNS: list[str] = [
+    "url", "ok", "method", "status", "error_kind", "error",
+    "ms", "bytes", "attempts",
+    "body_hash", "body_snippet", "content_type",
+    "response_headers",
+]
+
+
+def _flatten_for_csv(r: dict) -> dict:
+    """Coerce a result row into flat, CSV-safe scalar values."""
+    headers = r.get("response_headers") or {}
+    # Serialize headers as `k: v; k: v` — keeps the CSV single-row per URL
+    # and stays greppable without needing a JSON parser.
+    hdr_str = "; ".join(f"{k}: {v}" for k, v in headers.items()) if headers else ""
+    ct = headers.get("Content-Type") or headers.get("content-type") or ""
+    row = {c: "" for c in _CSV_COLUMNS}
+    row.update({
+        "url": r.get("url", ""),
+        "ok": "true" if r.get("ok") else "false",
+        "method": r.get("method") or "",
+        "status": "" if r.get("status") is None else r.get("status"),
+        "error_kind": r.get("error_kind") or "",
+        "error": r.get("error") or "",
+        "ms": f"{float(r.get('ms') or 0):.1f}",
+        "bytes": r.get("bytes") or 0,
+        "attempts": r.get("attempts") or 0,
+        "body_hash": r.get("body_hash") or "",
+        # Collapse newlines so the snippet stays in one CSV cell.
+        "body_snippet": (r.get("body_snippet") or "").replace("\r", " ").replace("\n", " "),
+        "content_type": ct,
+        "response_headers": hdr_str,
+    })
+    return row
+
+
+def export_results(results: list[dict]) -> None:
+    """Write results as CSV / JSON artifacts for post-run analysis.
+
+    Paths are opt-in via env so the script stays side-effect free by default:
+      RESULTS_CSV_PATH   write full per-URL CSV (recommended for CI artifacts)
+      RESULTS_JSON_PATH  write the raw list[dict] as pretty JSON
+      RESULTS_INCLUDE    `all` (default) or `failures` — filter rows on disk
+    Both files are also linked from $GITHUB_STEP_SUMMARY when set.
+    """
+    import csv
+    import json
+
+    csv_path = os.environ.get("RESULTS_CSV_PATH", "").strip()
+    json_path = os.environ.get("RESULTS_JSON_PATH", "").strip()
+    if not csv_path and not json_path:
+        return
+
+    scope = (os.environ.get("RESULTS_INCLUDE") or "all").strip().lower()
+    rows = [r for r in results if not r["ok"]] if scope == "failures" else list(results)
+
+    written: list[str] = []
+    if csv_path:
+        os.makedirs(os.path.dirname(csv_path) or ".", exist_ok=True)
+        with open(csv_path, "w", encoding="utf-8", newline="") as fh:
+            writer = csv.DictWriter(fh, fieldnames=_CSV_COLUMNS)
+            writer.writeheader()
+            for r in rows:
+                writer.writerow(_flatten_for_csv(r))
+        written.append(csv_path)
+        print(f"Wrote results CSV → {csv_path} ({len(rows)} row(s), scope={scope})")
+
+    if json_path:
+        os.makedirs(os.path.dirname(json_path) or ".", exist_ok=True)
+        with open(json_path, "w", encoding="utf-8") as fh:
+            # default=str handles any stray non-serializable values (e.g.
+            # datetimes) without failing the whole export.
+            json.dump(rows, fh, ensure_ascii=False, indent=2, default=str)
+        written.append(json_path)
+        print(f"Wrote results JSON → {json_path} ({len(rows)} row(s), scope={scope})")
+
+    summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary_path and written:
+        with open(summary_path, "a", encoding="utf-8") as fh:
+            fh.write("\n### Result artifacts\n\n")
+            fh.write(f"_Scope: **{scope}** ({len(rows)} of {len(results)} row(s))._\n\n")
+            for p in written:
+                fh.write(f"- `{p}`\n")
+            fh.write("\n")
+
+
 def main() -> int:
+
     urls: list[str] = [f"{BASE}{p}" for p in CORE_PATHS]
     for locale in LOCALES:
         for path in LOCALIZED_PATHS:
