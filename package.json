@@ -22,6 +22,7 @@
     "check:breadcrumbs:warn": "node scripts/check-breadcrumbs.mjs --warn-only",
     "check:breadcrumbs:json": "node scripts/check-breadcrumbs.mjs --json",
     "check:all": "npm run check:i18n && npm run check:seo && npm run check:breadcrumbs",
+    "inspect:gsc": "python3 scripts/inspect_solutions_gsc.py",
     "verify:publish": "node scripts/verify-publish.mjs",
     "test": "vitest run",
     "test:visual": "node scripts/visual/header-logo.mjs",
