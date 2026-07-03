@@ -1302,6 +1302,8 @@ function StepSteel({
         <PanelStudio
           core={cfg.core}
           ratio="aspect-[4/5]"
+          tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
+          thicknessMm={cfg.thickness}
           caption={
             <>
               <span>{cfg.coating}</span>
