@@ -1529,9 +1529,18 @@ function PanelThicknessPage() {
   const CrossSectionPanel = (
     <div className="space-y-4">
       <CrossSection core={core} thickness={thickness} extSteel={extSteel} intSteel={intSteel} />
+      <CrossSectionControls
+        thickness={thickness}
+        extSteel={extSteel}
+        intSteel={intSteel}
+        setThickness={setThickness}
+        setExtSteel={setExtSteel}
+        setIntSteel={setIntSteel}
+      />
       {ResultCards}
     </div>
   );
+
 
   const tabContent = {
     Inputs: InputsPanel,
