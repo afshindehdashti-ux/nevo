@@ -40,9 +40,9 @@ function HeroDesktop() {
           className="h-full w-full object-cover will-change-transform"
           fetchPriority="high"
           decoding="async"
-          initial={reduce ? false : { scale: 1.015 }}
-          animate={reduce ? undefined : { scale: 1 }}
-          transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
+          initial={reduce ? { scale: 1 } : { scale: 1.015 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: reduce ? 0 : 2.2, ease: [0.22, 1, 0.36, 1] }}
           style={{ objectPosition: "72% center", y: reduce ? 0 : imageY }}
         />
         {/* Left-side readability wash */}
