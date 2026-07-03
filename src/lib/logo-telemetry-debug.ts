@@ -320,6 +320,52 @@ async function copyLogoTelemetryDump(
 }
 
 /**
+ * Save the dump as a downloadable `.json` file — one click, ready to attach
+ * to a bug report. Uses a Blob + object URL + synthetic <a download> click,
+ * which works in every evergreen browser without any extra permission
+ * prompts (unlike the clipboard path). Filename encodes the origin and an
+ * ISO timestamp so multiple dumps from the same session don't collide.
+ *
+ * Returns the JSON string so tests (and callers who want to log it too)
+ * can inspect what was written without re-serialising.
+ */
+export function downloadLogoTelemetryDump(
+  origin: LogoTelemetryDump["origin"] = "console",
+): string {
+  const json = dumpLogoTelemetryAsJSON(origin);
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return json;
+  }
+  const BlobCtor = (window as unknown as { Blob?: typeof Blob }).Blob;
+  const URLRef = (window as unknown as { URL?: typeof URL }).URL;
+  if (!BlobCtor || !URLRef || typeof URLRef.createObjectURL !== "function") {
+    return json;
+  }
+  // ISO with `:` stripped so the filename is portable across OSes.
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const filename = `nevo-logo-telemetry-${origin}-${stamp}.json`;
+  const blob = new BlobCtor([json], { type: "application/json" });
+  const href = URLRef.createObjectURL(blob);
+  try {
+    const a = document.createElement("a");
+    a.href = href;
+    a.download = filename;
+    a.rel = "noopener";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } finally {
+    // Free the object URL on the next tick so the click had time to start
+    // the download in every browser (Safari in particular).
+    if (typeof URLRef.revokeObjectURL === "function") {
+      setTimeout(() => URLRef.revokeObjectURL(href), 0);
+    }
+  }
+  return json;
+}
+
+/**
  * Attach the debug utility to `window.__nevoLogoDebug` in dev builds only.
  * No-op in production so nothing ships to end users.
  */
