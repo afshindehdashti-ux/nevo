@@ -158,6 +158,19 @@ def main() -> int:
             for f in r["failures"]:
                 print(f"      {f}")
 
+    # GitHub PR annotations — one per failing check, pinned to the route file.
+    level = "warning" if WARN_ONLY else "error"
+    for r in failed:
+        file = ROUTE_FILES.get(r["path"], "src/routes/__root.tsx")
+        for f in r["failures"]:
+            emit_annotation(
+                level,
+                file,
+                f"Solutions SEO [{r['locale']}] {r['path']}",
+                f"{f} — {r['url']}",
+            )
+
+
     # Machine JSON report
     if p := os.environ.get("REPORT_JSON"):
         Path(p).parent.mkdir(parents=True, exist_ok=True)
