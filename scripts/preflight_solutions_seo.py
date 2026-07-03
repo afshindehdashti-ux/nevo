@@ -111,6 +111,12 @@ Env:
   LATENCY_MAX_MS       highest finite edge for LATENCY_BIN_SIZE; slower
                        samples land in the always-present `+` overflow bin.
 
+  SORT_COMBOS_BY       sort the summary error_kind × status_class breakdown by
+                       `default` (ok rows first, then count descending),
+                       `count`, `success_rate`, or `failures_pct`.
+  SORT_COMBOS_ORDER    `asc` or `desc`; default is `desc` for `count`,
+                       `success_rate`, and `failures_pct`. Ignored for `default`.
+
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
