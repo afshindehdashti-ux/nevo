@@ -696,7 +696,8 @@ def main() -> int:
         http = r["status"] if r["status"] is not None else "-"
         detail = r["error"] if r["error"] else f"{r['bytes']}B"
         meth = r.get("method") or METHOD
-        print(f"  {marker} [{meth} {http}] {r['ms']:6.0f}ms  {r['url']} — {detail}")
+        kind = r.get("error_kind") or ("ok" if r["ok"] else "unknown")
+        print(f"  {marker} [{meth} {http} {kind}] {r['ms']:6.0f}ms  {r['url']} — {detail}")
 
     write_step_summary(results)
 
@@ -704,8 +705,9 @@ def main() -> int:
     if failures:
         for r in failures:
             if IN_GHA:
+                kind = r.get("error_kind") or "unknown"
                 print(
-                    f"::error title=Preflight failure::{r['url']} "
+                    f"::error title=Preflight {kind}::{r['url']} "
                     f"[HTTP {r['status']}] {r['ms']:.0f}ms — {r['error']}",
                     flush=True,
                 )
