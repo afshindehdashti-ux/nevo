@@ -23,11 +23,17 @@ const GREP_QUERIES = [
   { label: "All logo-telemetry lines", query: 'grep "\\[nevo:logo-telemetry\\]" console.log' },
   { label: "One incident by correlationId", query: 'grep "correlationId=cid-123" console.log' },
   { label: "Errors that were emitted", query: 'grep "kind=error decision=sampled-in" console.log' },
-  { label: "Errors suppressed (and why)", query: 'grep "kind=error decision=sampled-out" console.log' },
+  {
+    label: "Errors suppressed (and why)",
+    query: 'grep "kind=error decision=sampled-out" console.log',
+  },
   { label: "Specific render stage", query: 'grep "stage=primary-light-png" console.log' },
   { label: "Throttled per-stage repeats", query: 'grep "reason=throttle" console.log' },
   { label: "First-render sample decision", query: 'grep "reason=first-render" console.log' },
-  { label: "Terminal errors", query: 'grep -E "kind=error.*reason=terminal|reason=terminal.*kind=error" console.log' },
+  {
+    label: "Terminal errors",
+    query: 'grep -E "kind=error.*reason=terminal|reason=terminal.*kind=error" console.log',
+  },
   { label: "Count emitted errors", query: 'grep -c "kind=error decision=sampled-in" console.log' },
 ];
 
@@ -55,9 +61,7 @@ async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 export function LogoTelemetryOverlay() {
-  const [status, setStatus] = useState<"idle" | "copying" | "copied" | "error">(
-    "idle",
-  );
+  const [status, setStatus] = useState<"idle" | "copying" | "copied" | "error">("idle");
   const [copiedExample, setCopiedExample] = useState<number | null>(null);
   const [copiedQuery, setCopiedQuery] = useState<number | null>(null);
   const [hubOpen, setHubOpen] = useState(false);
@@ -75,7 +79,6 @@ export function LogoTelemetryOverlay() {
   // so the overlay literally isn't rendered on published builds.
   if (!import.meta.env.DEV) return null;
   if (!available) return null;
-
 
   const label =
     status === "copying"
@@ -121,8 +124,7 @@ export function LogoTelemetryOverlay() {
             }
           }}
           style={{
-            fontFamily:
-              "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
             fontSize: 11,
             lineHeight: 1,
             padding: "6px 10px",
@@ -144,20 +146,19 @@ export function LogoTelemetryOverlay() {
         </button>
         <button
           type="button"
-          aria-label={hubOpen ? "Close logo telemetry knowledge hub" : "Open logo telemetry knowledge hub"}
+          aria-label={
+            hubOpen ? "Close logo telemetry knowledge hub" : "Open logo telemetry knowledge hub"
+          }
           aria-expanded={hubOpen}
           onClick={() => setHubOpen((s) => !s)}
           style={{
-            fontFamily:
-              "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
             fontSize: 11,
             lineHeight: 1,
             padding: "6px 10px",
             borderRadius: 6,
             border: "1px solid rgba(255,255,255,0.15)",
-            background: hubOpen
-              ? "rgba(59,130,246,0.9)"
-              : "rgba(17,24,39,0.85)",
+            background: hubOpen ? "rgba(59,130,246,0.9)" : "rgba(17,24,39,0.85)",
             color: "#fff",
             cursor: "pointer",
             boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
@@ -181,8 +182,7 @@ export function LogoTelemetryOverlay() {
             color: "#e5e7eb",
             boxShadow: "0 4px 14px rgba(0,0,0,0.4)",
             padding: 12,
-            fontFamily:
-              "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
             fontSize: 11,
             lineHeight: 1.45,
           }}
@@ -191,9 +191,8 @@ export function LogoTelemetryOverlay() {
             Single-line console format
           </h3>
           <p style={{ margin: "0 0 10px", opacity: 0.85 }}>
-            Each decision prints as one flat line of space-separated key=value
-            pairs. Control chars and spaces inside values are escaped as \xNN so
-            the line is always grep-safe.
+            Each decision prints as one flat line of space-separated key=value pairs. Control chars
+            and spaces inside values are escaped as \xNN so the line is always grep-safe.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {LOG_LINE_EXAMPLES.map((ex, i) => (
@@ -258,9 +257,7 @@ export function LogoTelemetryOverlay() {
                 }}
               >
                 <div style={{ flex: 1 }}>
-                  <div style={{ color: "#d1d5db", marginBottom: 2 }}>
-                    {q.label}
-                  </div>
+                  <div style={{ color: "#d1d5db", marginBottom: 2 }}>{q.label}</div>
                   <code
                     style={{
                       display: "block",
@@ -309,12 +306,11 @@ export function LogoTelemetryOverlay() {
               opacity: 0.75,
             }}
           >
-            Toggle live console lines: enableLogLine() / disableLogLine().
-            Scope a dump to one incident: copyDumpForCorrelationId("cid-123").
+            Toggle live console lines: enableLogLine() / disableLogLine(). Scope a dump to one
+            incident: copyDumpForCorrelationId("cid-123").
           </div>
         </div>
       )}
     </div>
   );
 }
-
