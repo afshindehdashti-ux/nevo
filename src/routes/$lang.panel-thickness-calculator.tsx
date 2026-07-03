@@ -1182,6 +1182,14 @@ function PanelThicknessPage() {
           <Download className="size-4" />
           Download Calculation Report
         </button>
+        <button
+          type="button"
+          onClick={downloadPdfReport}
+          className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90"
+        >
+          <Download className="size-4" />
+          Download PDF Report
+        </button>
         <Link
           to={`/project-inquiry?${inquiryParams}` as never}
           className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
