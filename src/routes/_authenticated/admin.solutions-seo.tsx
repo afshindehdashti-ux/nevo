@@ -55,27 +55,30 @@ function SolutionsSeoAdmin() {
     onSuccess: () => navigate({ to: "/auth" }),
   });
 
-  const merged = useMemo(() => {
-    const rows = (dataQ.data?.rows ?? []) as SolutionsInspectionRow[];
+  const merged = useMemo<SolutionsInspectionRow[]>(() => {
+    const rows: SolutionsInspectionRow[] = dataQ.data?.rows ?? [];
     const expected = dataQ.data?.expected ?? [];
     const byKey = new Map(rows.map((r) => [`${r.locale}|${r.path}`, r]));
-    return expected.map(({ locale, path }) => {
+    return expected.map(({ locale, path }: { locale: string; path: string }) => {
       const key = `${locale}|${path}`;
-      return byKey.get(key) ?? {
-        id: key,
-        locale,
-        path,
-        url: "",
-        verdict: null,
-        coverage_state: null,
-        indexing_state: null,
-        mobile_verdict: null,
-        rich_verdict: null,
-        google_canonical: null,
-        rich_detail: {},
-        last_error: null,
-        inspected_at: "",
-      } as SolutionsInspectionRow;
+      return (
+        byKey.get(key) ??
+        ({
+          id: key,
+          locale,
+          path,
+          url: "",
+          verdict: null,
+          coverage_state: null,
+          indexing_state: null,
+          mobile_verdict: null,
+          rich_verdict: null,
+          google_canonical: null,
+          rich_detail: { types: {} },
+          last_error: null,
+          inspected_at: "",
+        } as SolutionsInspectionRow)
+      );
     });
   }, [dataQ.data]);
 
