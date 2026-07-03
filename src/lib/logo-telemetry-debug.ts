@@ -124,7 +124,6 @@
  *   // filename becomes nevo-logo-telemetry-button-cid-cid-123-<timestamp>.json
  */
 
-
 import {
   LOGO_TELEMETRY_CONFIG,
   disableLogoDebug,
