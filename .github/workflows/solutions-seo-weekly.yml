@@ -52,9 +52,19 @@ jobs:
             echo "No previous report found — this run will be the baseline."
           fi
 
+      # Fail fast if the live site is down or misconfigured. Cheaper than
+      # running the full 60-page snapshot against a broken deploy, and the
+      # error surfaces the exact failing URL in the run log / summary.
+      - name: Preflight — site + sitemap reachable
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url || 'https://nevo-engineering-hub.lovable.app' }}
+          LOCALES: en,ar,tr
+        run: python3 scripts/preflight_solutions_seo.py
+
       # Run against the live published site — no local Vite boot required.
       # --warn-only keeps the scheduled run green so a regression doesn't
       # spam the team with failed-workflow emails; the report is the deliverable.
+
       - name: Verify Solutions SEO (live)
         env:
           BASE_URL: ${{ github.event.inputs.base_url || 'https://nevo-engineering-hub.lovable.app' }}
