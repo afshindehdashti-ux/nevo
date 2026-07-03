@@ -38,7 +38,6 @@ function HeroDesktop() {
           src={heroDesktop}
           alt="NEVO continuous double-belt laminator producing a PIR sandwich panel with PPGI facings"
           className="h-full w-full object-cover will-change-transform"
-          style={{ objectPosition: "72% center" }}
           fetchPriority="high"
           decoding="async"
           initial={reduce ? false : { scale: 1.015 }}
