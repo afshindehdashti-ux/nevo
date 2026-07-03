@@ -270,6 +270,32 @@ def _method_for(path: str) -> str:
 
 
 
+BODY_SNIPPET_CHARS = int(_num("BODY_SNIPPET_CHARS", 200, int, minimum=0))
+BODY_HASH_ENABLED = os.environ.get("BODY_HASH", "true").strip().lower() not in ("0", "false", "no")
+
+
+def _body_preview(body: bytes) -> tuple[str, str]:
+    """Return (sha256_short, snippet) for a failed-response body.
+
+    snippet is whitespace-collapsed, truncated to BODY_SNIPPET_CHARS chars.
+    Both are safe to embed in Markdown (backticks/pipes escaped).
+    """
+    import hashlib, re as _re
+    if not body:
+        return "", ""
+    digest = hashlib.sha256(body).hexdigest()[:12] if BODY_HASH_ENABLED else ""
+    if BODY_SNIPPET_CHARS <= 0:
+        return digest, ""
+    try:
+        text = body.decode("utf-8", errors="replace")
+    except Exception:
+        text = repr(body[:BODY_SNIPPET_CHARS * 2])
+    text = _re.sub(r"\s+", " ", text).strip()
+    if len(text) > BODY_SNIPPET_CHARS:
+        text = text[:BODY_SNIPPET_CHARS] + "…"
+    return digest, text
+
+
 def probe(url: str) -> dict:
     """Probe a URL with retries. Return a result dict with timing/status."""
     path = urlparse(url).path
@@ -281,21 +307,15 @@ def probe(url: str) -> dict:
     last_bytes = 0
     last_ms = 0.0
     last_method = ""
+    last_body: bytes = b""
     attempts = 0
 
-    def _evaluate(status: int, body_bytes: int, ms: float, http_method: str) -> dict | None:
-        """Return a success dict when the response satisfies accept + min-bytes rules.
-
-        `body_bytes` is len(body) for GET, or Content-Length (0 when absent) for HEAD.
-        """
-        nonlocal last_err, last_status, last_bytes, last_ms, last_method
-        last_status, last_bytes, last_ms, last_method = status, body_bytes, ms, http_method
+    def _evaluate(status: int, body_bytes: int, ms: float, http_method: str, body: bytes) -> dict | None:
+        nonlocal last_err, last_status, last_bytes, last_ms, last_method, last_body
+        last_status, last_bytes, last_ms, last_method, last_body = status, body_bytes, ms, http_method, body
         if status not in accepted:
             last_err = f"HTTP {status} not in accept set {sorted(accepted)}"
             return None
-        # Min-bytes only for accepted 2xx. On HEAD, we only enforce when we
-        # actually know the size (Content-Length > 0); otherwise skip so a
-        # missing Content-Length doesn't false-positive.
         if 200 <= status < 300 and body_bytes > 0 and body_bytes < min_bytes:
             last_err = f"body {body_bytes}B < min {min_bytes}B (likely error page)"
             return None
@@ -303,10 +323,11 @@ def probe(url: str) -> dict:
         return {"url": url, "ok": True, "status": status, "bytes": body_bytes,
                 "ms": ms, "attempts": attempts, "error": "", "method": http_method}
 
-    def _do_request(http_method: str) -> tuple[int | None, int, float, str]:
-        """Issue one request. Returns (status, size_bytes, ms, error).
+    def _do_request(http_method: str) -> tuple[int | None, int, float, str, bytes]:
+        """Issue one request. Returns (status, size_bytes, ms, error, body).
 
-        On success, error is "". On failure, status may be None.
+        For HEAD, body is always b"" (no body). For GET, body carries whatever
+        the server returned so failed probes can surface a snippet + hash.
         """
         t0 = time.perf_counter()
         try:
@@ -319,63 +340,56 @@ def probe(url: str) -> dict:
             opener = urllib.request.urlopen if FOLLOW_REDIRECTS else _NO_REDIRECT_OPENER.open
             with opener(req, timeout=TIMEOUT) as r:
                 if http_method == "HEAD":
-                    size = int(r.headers.get("Content-Length") or 0)
-                else:
-                    size = len(r.read())
-                return r.status, size, (time.perf_counter() - t0) * 1000, ""
+                    return r.status, int(r.headers.get("Content-Length") or 0), \
+                        (time.perf_counter() - t0) * 1000, "", b""
+                body = r.read()
+                return r.status, len(body), (time.perf_counter() - t0) * 1000, "", body
         except urllib.error.HTTPError as e:
             ms = (time.perf_counter() - t0) * 1000
             if http_method == "HEAD":
                 size = int(e.headers.get("Content-Length") or 0) if e.headers else 0
-            else:
-                try:
-                    size = len(e.read() or b"")
-                except Exception:
-                    size = 0
-            return e.code, size, ms, f"HTTP {e.code}"
+                return e.code, size, ms, f"HTTP {e.code}", b""
+            try:
+                body = e.read() or b""
+            except Exception:
+                body = b""
+            return e.code, len(body), ms, f"HTTP {e.code}", body
         except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
             ms = (time.perf_counter() - t0) * 1000
-            return None, 0, ms, f"{type(e).__name__}: {e}"
+            return None, 0, ms, f"{type(e).__name__}: {e}", b""
 
     for attempt in range(1, RETRIES + 1):
         attempts = attempt
 
-        # Pick the first method to try, then optional fallback for HEAD_THEN_GET.
         first_method = "HEAD" if method_mode in ("HEAD", "HEAD_THEN_GET") else "GET"
-        status, size, ms, err = _do_request(first_method)
+        status, size, ms, err, body = _do_request(first_method)
 
         if status is not None:
-            ok = _evaluate(status, size, ms, first_method)
+            ok = _evaluate(status, size, ms, first_method, body)
             if ok:
                 return ok
 
-        # HEAD_THEN_GET: if HEAD failed evaluation OR the transport errored,
-        # retry the SAME attempt with GET before backing off. Cheap upgrade.
         if method_mode == "HEAD_THEN_GET" and first_method == "HEAD":
-            status2, size2, ms2, err2 = _do_request("GET")
+            status2, size2, ms2, err2, body2 = _do_request("GET")
             if status2 is not None:
-                ok2 = _evaluate(status2, size2, ms2, "GET")
+                ok2 = _evaluate(status2, size2, ms2, "GET", body2)
                 if ok2:
                     return ok2
-            # Prefer the GET error for reporting (it's the authoritative attempt).
-            if status2 is not None or err2:
-                # _evaluate already updated last_* on the GET call above.
-                pass
-            elif err:
-                # HEAD transport error and GET transport error → keep GET's err message.
-                last_err = err2 or err
+            elif err2:
+                last_err = err2
 
         elif status is None:
-            # No HTTP response at all; record the transport error.
             last_err = err
             last_ms = ms
 
         if attempt < RETRIES:
             time.sleep(_backoff_delay(attempt))
 
+    body_hash, body_snippet = _body_preview(last_body)
     return {"url": url, "ok": False, "status": last_status, "bytes": last_bytes,
             "ms": last_ms, "attempts": attempts,
-            "error": last_err or "unknown error", "method": last_method or method_mode}
+            "error": last_err or "unknown error", "method": last_method or method_mode,
+            "body_hash": body_hash, "body_snippet": body_snippet}
 
 
 
