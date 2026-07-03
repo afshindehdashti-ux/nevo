@@ -332,15 +332,17 @@ def render_md(base: str, results: list, failed: list) -> str:
             f"",
             "### Failures",
             f"",
-            "| Status | Locale | Path | URL | Issue |",
-            "| --- | --- | --- | --- | --- |",
+            "| Status | Locale | Path | URL | Issue | Suggested fix |",
+            "| --- | --- | --- | --- | --- | --- |",
         ])
         for r in sorted(failed, key=lambda r: (r["locale"], r["path"])):
             rel_url = r["url"].replace(base, "") or r["path"]
             issues = "<br>".join(_md_cell(f) for f in r["failures"])
+            hints = "<br>".join(_md_cell(suggest_fix(f) or "—") for f in r["failures"])
             lines.append(
-                f"| ❌ | `{_md_cell(r['locale'])}` | `{_md_cell(r['path'])}` | `{_md_cell(rel_url)}` | {issues} |"
+                f"| ❌ | `{_md_cell(r['locale'])}` | `{_md_cell(r['path'])}` | `{_md_cell(rel_url)}` | {issues} | {hints} |"
             )
+
     else:
         lines.extend([f"", "### Result", f"", "✅ All pages passed."])
 
