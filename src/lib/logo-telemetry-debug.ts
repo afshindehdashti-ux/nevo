@@ -833,6 +833,27 @@ export function attachLogoDebugUtil(): void {
         correlationId: string,
         origin?: LogoTelemetryDump["origin"],
       ) => string;
+      /**
+       * Scope a dump by any combination of kind/decision/reason/stage/
+       * terminal/correlationId. Each field accepts a scalar or array;
+       * fields AND together, values within a field OR together.
+       */
+      dumpForFilter: (
+        filter: LogoDumpFilter,
+        origin?: LogoTelemetryDump["origin"],
+      ) => LogoTelemetryDump;
+      dumpForFilterAsJSON: (
+        filter: LogoDumpFilter,
+        origin?: LogoTelemetryDump["origin"],
+      ) => string;
+      copyDumpForFilter: (
+        filter: LogoDumpFilter,
+        origin?: LogoTelemetryDump["origin"],
+      ) => Promise<string>;
+      downloadDumpForFilter: (
+        filter: LogoDumpFilter,
+        origin?: LogoTelemetryDump["origin"],
+      ) => string;
     };
   };
   w.__nevoLogoDebug = {
