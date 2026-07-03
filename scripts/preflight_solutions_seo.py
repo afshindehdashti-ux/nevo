@@ -841,6 +841,8 @@ def main() -> int:
         print(f"  {marker} [{meth} {http} {kind}] {r['ms']:6.0f}ms  {r['url']} — {detail}")
 
     write_step_summary(results)
+    export_results(results)
+
 
     failures = [r for r in results if not r["ok"]]
     if failures:
