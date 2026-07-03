@@ -568,11 +568,13 @@ def probe(url: str) -> dict:
             time.sleep(_backoff_delay(attempt))
 
     body_hash, body_snippet = _body_preview(last_body)
+    err_msg = last_err or "unknown error"
     return {"url": url, "ok": False, "status": last_status, "bytes": last_bytes,
             "ms": last_ms, "attempts": attempts,
-            "error": last_err or "unknown error", "method": last_method or method_mode,
+            "error": err_msg, "method": last_method or method_mode,
             "body_hash": body_hash, "body_snippet": body_snippet,
-            "response_headers": last_headers}
+            "response_headers": last_headers,
+            "error_kind": _classify_error(err_msg, last_status)}
 
 
 
