@@ -45,6 +45,7 @@ import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
+import { WhyNevo } from "@/components/site/WhyNevo";
 import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
 import {
