@@ -869,11 +869,12 @@ def write_step_summary(results: list[dict]) -> None:
 # Columns exported to CSV. Order is stable so downstream analysis (spreadsheet
 # pivots, `duckdb read_csv_auto`, pandas) sees the same schema across runs.
 _CSV_COLUMNS: list[str] = [
-    "url", "ok", "method", "status", "error_kind", "error",
-    "ms", "bytes", "attempts",
+    "url", "ok", "method", "status", "error_kind", "final_kind", "error",
+    "ms", "bytes", "attempts", "attempt_kinds", "stopped_early",
     "body_hash", "body_snippet", "content_type",
     "response_headers",
 ]
+
 
 
 def _flatten_for_csv(r: dict) -> dict:
