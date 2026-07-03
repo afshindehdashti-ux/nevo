@@ -42,10 +42,16 @@ MIN_BODY_BYTES = {
 DEFAULT_MIN_BYTES = 500
 
 
-def probe(url: str) -> tuple[bool, str]:
-    """Return (ok, message). Retries transient failures with backoff."""
+def probe(url: str) -> dict:
+    """Probe a URL with retries. Return a result dict with timing/status."""
     last_err = ""
+    last_status: int | None = None
+    last_bytes = 0
+    last_ms = 0.0
+    attempts = 0
     for attempt in range(1, RETRIES + 1):
+        attempts = attempt
+        t0 = time.perf_counter()
         try:
             req = urllib.request.Request(url, headers={
                 "User-Agent": "lovable-seo-preflight/1.0",
@@ -54,22 +60,68 @@ def probe(url: str) -> tuple[bool, str]:
             with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
                 status = r.status
                 body = r.read()
-                path = urlparse(url).path
-                min_bytes = MIN_BODY_BYTES.get(path, DEFAULT_MIN_BYTES)
+                last_ms = (time.perf_counter() - t0) * 1000
+                last_status = status
+                last_bytes = len(body)
+                min_bytes = MIN_BODY_BYTES.get(urlparse(url).path, DEFAULT_MIN_BYTES)
                 if status != 200:
                     last_err = f"HTTP {status}"
                 elif len(body) < min_bytes:
                     last_err = f"body {len(body)}B < min {min_bytes}B (likely error page)"
                 else:
-                    return True, f"200 OK ({len(body)}B)"
-
+                    return {"url": url, "ok": True, "status": status, "bytes": len(body),
+                            "ms": last_ms, "attempts": attempt, "error": ""}
         except urllib.error.HTTPError as e:
+            last_ms = (time.perf_counter() - t0) * 1000
+            last_status = e.code
             last_err = f"HTTP {e.code}"
         except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+            last_ms = (time.perf_counter() - t0) * 1000
             last_err = f"{type(e).__name__}: {e}"
         if attempt < RETRIES:
             time.sleep(2 ** attempt)
-    return False, last_err or "unknown error"
+    return {"url": url, "ok": False, "status": last_status, "bytes": last_bytes,
+            "ms": last_ms, "attempts": attempts, "error": last_err or "unknown error"}
+
+
+def _md_cell(s: object) -> str:
+    return str(s).replace("|", "\\|").replace("\n", " ")
+
+
+def write_step_summary(results: list[dict]) -> None:
+    """Append a Markdown table of results to $GITHUB_STEP_SUMMARY."""
+    path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if not path:
+        return
+    ok_count = sum(1 for r in results if r["ok"])
+    total_ms = sum(r["ms"] for r in results)
+    slowest = max((r["ms"] for r in results), default=0.0)
+    lines = [
+        "## Preflight — site + sitemap reachable",
+        "",
+        f"_Probed **{len(results)}** URL(s) at `{BASE}` "
+        f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`)._",
+        "",
+        f"- **{ok_count}/{len(results)}** healthy",
+        f"- Total wall time: **{total_ms:.0f} ms**",
+        f"- Slowest response: **{slowest:.0f} ms**",
+        "",
+        "| Status | URL | HTTP | Time (ms) | Size | Attempts | Notes |",
+        "| :---: | --- | ---: | ---: | ---: | ---: | --- |",
+    ]
+    for r in sorted(results, key=lambda x: (x["ok"], -x["ms"])):
+        marker = "✅" if r["ok"] else "❌"
+        rel = r["url"].replace(BASE, "") or r["url"]
+        http = r["status"] if r["status"] is not None else "—"
+        size = f"{r['bytes']:,} B" if r["bytes"] else "—"
+        note = _md_cell(r["error"]) if r["error"] else "ok"
+        lines.append(
+            f"| {marker} | [{_md_cell(rel)}]({r['url']}) "
+            f"| `{http}` | {r['ms']:.0f} | {size} | {r['attempts']} | {note} |"
+        )
+    lines.append("")
+    with open(path, "a", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n")
 
 
 def main() -> int:
@@ -79,24 +131,31 @@ def main() -> int:
             urls.append(f"{BASE}/{locale}{path}")
 
     print(f"Preflight: probing {len(urls)} URL(s) at {BASE} (timeout={TIMEOUT}s, retries={RETRIES})")
-    failures: list[tuple[str, str]] = []
-    for url in urls:
-        ok, msg = probe(url)
-        marker = "✓" if ok else "✗"
-        print(f"  {marker} {url} — {msg}")
-        if not ok:
-            failures.append((url, msg))
+    results = [probe(u) for u in urls]
+    for r in results:
+        marker = "✓" if r["ok"] else "✗"
+        http = r["status"] if r["status"] is not None else "-"
+        detail = r["error"] if r["error"] else f"{r['bytes']}B"
+        print(f"  {marker} [{http}] {r['ms']:6.0f}ms  {r['url']} — {detail}")
 
+    write_step_summary(results)
+
+    failures = [r for r in results if not r["ok"]]
     if failures:
-        for url, msg in failures:
+        for r in failures:
             if IN_GHA:
-                print(f"::error title=Preflight failure::{url} — {msg}", flush=True)
-        print(f"\nPreflight FAILED: {len(failures)}/{len(urls)} URL(s) unhealthy.")
+                print(
+                    f"::error title=Preflight failure::{r['url']} "
+                    f"[HTTP {r['status']}] {r['ms']:.0f}ms — {r['error']}",
+                    flush=True,
+                )
+        print(f"\nPreflight FAILED: {len(failures)}/{len(results)} URL(s) unhealthy.")
         return 1
 
-    print(f"\nPreflight OK: all {len(urls)} URL(s) reachable.")
+    print(f"\nPreflight OK: all {len(results)} URL(s) reachable.")
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
+
