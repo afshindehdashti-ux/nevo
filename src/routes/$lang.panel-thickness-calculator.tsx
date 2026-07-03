@@ -209,16 +209,20 @@ function Chip({
   active,
   onClick,
   children,
+  ariaLabel,
 }: {
   active?: boolean;
   onClick: () => void;
   children: React.ReactNode;
+  ariaLabel?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`w-full rounded-md border px-3 py-2 text-center text-xs font-medium leading-tight transition ${
+      aria-pressed={active ? "true" : "false"}
+      aria-label={ariaLabel}
+      className={`w-full rounded-md border px-3 py-2 text-center text-xs font-medium leading-tight transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
         active
           ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-200"
           : "border-white/10 bg-white/[0.03] text-white/70 hover:border-white/20 hover:text-white"
@@ -244,9 +248,14 @@ function Section({
       : issue?.severity === "warning"
         ? "text-amber-300"
         : "text-white/50";
+  const labelId = `section-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const messageId = issue ? `${labelId}-msg` : undefined;
   return (
     <div>
-      <div className={`mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] ${tone}`}>
+      <div
+        id={labelId}
+        className={`mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] ${tone}`}
+      >
         <span>{label}</span>
         {issue && (
           <span aria-hidden="true">•</span>
@@ -255,9 +264,17 @@ function Section({
           <span className="normal-case tracking-normal">{issue.severity === "error" ? "Invalid" : "Check"}</span>
         )}
       </div>
-      {children}
+      <div
+        role="group"
+        aria-labelledby={labelId}
+        aria-describedby={messageId}
+        aria-invalid={issue?.severity === "error" ? "true" : undefined}
+      >
+        {children}
+      </div>
       {issue && (
         <p
+          id={messageId}
           role={issue.severity === "error" ? "alert" : "status"}
           className={`mt-2 flex items-start gap-1.5 text-xs ${
             issue.severity === "error" ? "text-rose-300" : "text-amber-300"
@@ -270,6 +287,7 @@ function Section({
     </div>
   );
 }
+
 
 
 // ---------------- Dynamic SVG Cross-section ----------------
