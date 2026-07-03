@@ -14,6 +14,7 @@ Env:
   BASE_URL     default http://127.0.0.1:8080
   REPORT_JSON  optional path — write machine-readable report
   REPORT_MD    optional path — write GitHub Step Summary markdown
+  REPORT_HTML  optional path — write standalone HTML dashboard
 
 Exit 1 on any failure. --warn-only forces exit 0.
 """
@@ -199,9 +200,139 @@ def main() -> int:
         with Path(p).open("a", encoding="utf-8") as fh:
             fh.write("\n".join(lines) + "\n")
 
+    # Standalone HTML dashboard
+    if p := os.environ.get("REPORT_HTML"):
+        Path(p).parent.mkdir(parents=True, exist_ok=True)
+        Path(p).write_text(render_html(BASE, results, failed), encoding="utf-8")
+
     if failed and not WARN_ONLY:
         return 1
     return 0
+
+
+def _esc(s: object) -> str:
+    return (
+        str(s).replace("&", "&amp;").replace("<", "&lt;")
+        .replace(">", "&gt;").replace('"', "&quot;")
+    )
+
+
+def render_html(base: str, results: list, failed: list) -> str:
+    from datetime import datetime, timezone
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    total = len(results)
+    passed = total - len(failed)
+    pct = (passed / total * 100) if total else 0
+
+    # Per-locale aggregate
+    per_locale: dict[str, dict[str, int]] = {}
+    for r in results:
+        d = per_locale.setdefault(r["locale"], {"pass": 0, "fail": 0})
+        d["fail" if r["failures"] else "pass"] += 1
+
+    rows = []
+    for r in sorted(results, key=lambda r: (bool(not r["failures"]), r["locale"], r["path"])):
+        status = "FAIL" if r["failures"] else "PASS"
+        cls = "fail" if r["failures"] else "pass"
+        issues = "".join(f"<li>{_esc(f)}</li>" for f in r["failures"]) or "<li class=ok>All checks passed</li>"
+        rows.append(f"""
+        <tr class="{cls}">
+          <td><span class="badge {cls}">{status}</span></td>
+          <td><code>{_esc(r['locale'])}</code></td>
+          <td><code>{_esc(r['path'])}</code></td>
+          <td><a href="{_esc(r['url'])}" target="_blank" rel="noopener">{_esc(r['url'])}</a></td>
+          <td><ul class="issues">{issues}</ul></td>
+        </tr>""")
+
+    loc_rows = "".join(
+        f"<tr><td><code>{_esc(l)}</code></td><td>{d['pass']}</td><td class='{ 'fail' if d['fail'] else 'ok'}'>{d['fail']}</td></tr>"
+        for l, d in sorted(per_locale.items())
+    )
+
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solutions SEO Report — {_esc(ts)}</title>
+<style>
+  :root {{ --bg:#0f172a; --card:#1e293b; --muted:#94a3b8; --text:#f1f5f9;
+           --ok:#10b981; --fail:#ef4444; --accent:#38bdf8; --border:#334155; }}
+  * {{ box-sizing:border-box; }}
+  body {{ margin:0; font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;
+          background:var(--bg); color:var(--text); padding:32px; }}
+  h1 {{ margin:0 0 4px; font-size:24px; }}
+  .sub {{ color:var(--muted); margin-bottom:24px; }}
+  .grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:24px; }}
+  .card {{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; }}
+  .card .label {{ color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.05em; }}
+  .card .value {{ font-size:32px; font-weight:600; margin-top:4px; }}
+  .value.ok {{ color:var(--ok); }} .value.fail {{ color:var(--fail); }}
+  .bar {{ height:8px; background:var(--border); border-radius:4px; overflow:hidden; margin-top:12px; }}
+  .bar > span {{ display:block; height:100%; background:var(--ok); width:{pct:.1f}%; }}
+  h2 {{ font-size:16px; margin:24px 0 12px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }}
+  table {{ width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; }}
+  th, td {{ padding:10px 12px; text-align:left; border-bottom:1px solid var(--border); vertical-align:top; }}
+  th {{ background:#0b1220; color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; }}
+  tr:last-child td {{ border-bottom:none; }}
+  tr.fail td {{ background:rgba(239,68,68,.06); }}
+  code {{ background:#0b1220; padding:2px 6px; border-radius:4px; font-size:12px; color:var(--accent); }}
+  a {{ color:var(--accent); text-decoration:none; }} a:hover {{ text-decoration:underline; }}
+  .badge {{ display:inline-block; padding:3px 8px; border-radius:999px; font-size:11px; font-weight:600; }}
+  .badge.pass {{ background:rgba(16,185,129,.15); color:var(--ok); }}
+  .badge.fail {{ background:rgba(239,68,68,.15); color:var(--fail); }}
+  ul.issues {{ margin:0; padding-left:16px; }} ul.issues li {{ margin:2px 0; }}
+  ul.issues li.ok {{ color:var(--muted); list-style:none; margin-left:-16px; }}
+  td.ok {{ color:var(--ok); }} td.fail {{ color:var(--fail); font-weight:600; }}
+  .filters {{ margin:12px 0; display:flex; gap:8px; }}
+  .filters button {{ background:var(--card); color:var(--text); border:1px solid var(--border);
+                      padding:6px 12px; border-radius:6px; cursor:pointer; font:inherit; }}
+  .filters button.active {{ border-color:var(--accent); color:var(--accent); }}
+</style>
+</head>
+<body>
+  <h1>Solutions SEO Report</h1>
+  <div class="sub">Base: <code>{_esc(base)}</code> · Generated {_esc(ts)}</div>
+
+  <div class="grid">
+    <div class="card"><div class="label">Total pages</div><div class="value">{total}</div></div>
+    <div class="card"><div class="label">Passing</div><div class="value ok">{passed}</div>
+      <div class="bar"><span></span></div></div>
+    <div class="card"><div class="label">Failing</div><div class="value {'fail' if failed else 'ok'}">{len(failed)}</div></div>
+    <div class="card"><div class="label">Pass rate</div><div class="value {'ok' if pct==100 else 'fail'}">{pct:.1f}%</div></div>
+  </div>
+
+  <h2>By locale</h2>
+  <table>
+    <thead><tr><th>Locale</th><th>Passing</th><th>Failing</th></tr></thead>
+    <tbody>{loc_rows}</tbody>
+  </table>
+
+  <h2>Page results</h2>
+  <div class="filters">
+    <button class="active" data-f="all">All ({total})</button>
+    <button data-f="fail">Failing ({len(failed)})</button>
+    <button data-f="pass">Passing ({passed})</button>
+  </div>
+  <table id="results">
+    <thead><tr><th>Status</th><th>Locale</th><th>Path</th><th>URL</th><th>Issues</th></tr></thead>
+    <tbody>{''.join(rows)}</tbody>
+  </table>
+
+<script>
+  document.querySelectorAll('.filters button').forEach(b => b.addEventListener('click', () => {{
+    document.querySelectorAll('.filters button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    const f = b.dataset.f;
+    document.querySelectorAll('#results tbody tr').forEach(tr => {{
+      tr.style.display = (f === 'all' || tr.classList.contains(f)) ? '' : 'none';
+    }});
+  }}));
+</script>
+</body>
+</html>
+"""
+
 
 
 if __name__ == "__main__":

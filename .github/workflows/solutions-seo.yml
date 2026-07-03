@@ -49,6 +49,7 @@ jobs:
         env:
           BASE_URL: http://127.0.0.1:4323
           REPORT_JSON: reports/seo/solutions-seo.json
+          REPORT_HTML: reports/seo/solutions-seo.html
           REPORT_MD: ${{ github.step_summary }}
         run: python3 scripts/verify_solutions_seo.py
 
@@ -64,5 +65,6 @@ jobs:
           name: solutions-seo-report
           path: |
             reports/seo/solutions-seo.json
+            reports/seo/solutions-seo.html
             vite.log
           if-no-files-found: warn
