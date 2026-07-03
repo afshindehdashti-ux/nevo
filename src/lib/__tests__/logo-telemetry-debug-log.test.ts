@@ -21,6 +21,7 @@ const cfg = (over: Partial<LogoTelemetryConfig> = {}): LogoTelemetryConfig => ({
   errorMaxPerSession: 3,
   errorMinIntervalMs: 1000,
   debug: false,
+  logLine: true,
   ...over,
 });
 
