@@ -891,10 +891,14 @@ def _flatten_for_csv(r: dict) -> dict:
         "method": r.get("method") or "",
         "status": "" if r.get("status") is None else r.get("status"),
         "error_kind": r.get("error_kind") or "",
+        "final_kind": r.get("final_kind") or r.get("error_kind") or "",
         "error": r.get("error") or "",
         "ms": f"{float(r.get('ms') or 0):.1f}",
         "bytes": r.get("bytes") or 0,
         "attempts": r.get("attempts") or 0,
+        "attempt_kinds": ">".join(r.get("attempt_kinds") or []),
+        "stopped_early": "true" if r.get("stopped_early") else "false",
+
         "body_hash": r.get("body_hash") or "",
         # Collapse newlines so the snippet stays in one CSV cell.
         "body_snippet": (r.get("body_snippet") or "").replace("\r", " ").replace("\n", " "),
