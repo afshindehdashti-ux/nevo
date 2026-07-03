@@ -751,6 +751,53 @@ function FactoryLayoutPage() {
     </div>
   );
 
+  const ZoneTogglesPanel = (
+    <div className="rounded-3xl border border-white/10 bg-white/[0.02]">
+      <div className="flex items-center justify-between border-b border-white/10 bg-black/40 px-4 py-3">
+        <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/60">
+          Zone Visibility — {layoutPreview.zones.length - hiddenZones.size}/
+          {layoutPreview.zones.length} shown
+        </div>
+        <button
+          type="button"
+          onClick={showAllZones}
+          disabled={hiddenZones.size === 0}
+          className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Show all
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-1.5 p-3">
+        {layoutPreview.zones.map((z) => {
+          const hidden = hiddenZones.has(z.id);
+          return (
+            <button
+              key={z.id}
+              type="button"
+              onClick={() => toggleZone(z.id)}
+              aria-pressed={!hidden}
+              className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] transition ${
+                hidden
+                  ? "border-white/10 bg-white/[0.02] text-white/40 line-through"
+                  : "border-white/15 bg-white/5 text-white hover:border-emerald-400/50"
+              }`}
+            >
+              <span
+                className="h-2.5 w-2.5 rounded-sm"
+                style={{ background: zoneFill(z.category), opacity: hidden ? 0.35 : 1 }}
+              />
+              {z.short}
+            </button>
+          );
+        })}
+      </div>
+      <div className="border-t border-white/5 px-4 py-2 font-mono text-[10px] text-white/40">
+        Each toggle is React state → filters <code>layout.zones</code> → SVG re-renders
+        with a spring animation.
+      </div>
+    </div>
+  );
+
   const EquipmentPanel = (
     <div className="rounded-3xl border border-white/10 bg-white/[0.02]">
       <div className="flex items-center justify-between border-b border-white/10 bg-black/40 px-4 py-3">
