@@ -141,9 +141,9 @@ function HeroMobile() {
         style={{ objectPosition: "50% center", y: reduce ? 0 : imageY }}
         fetchPriority="high"
         decoding="async"
-        initial={reduce ? false : { scale: 1.012 }}
-        animate={reduce ? undefined : { scale: 1 }}
-        transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
+        initial={reduce ? { scale: 1 } : { scale: 1.012 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: reduce ? 0 : 2.2, ease: [0.22, 1, 0.36, 1] }}
       />
       {/* Top + bottom readability washes */}
       <div
