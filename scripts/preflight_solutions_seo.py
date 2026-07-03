@@ -568,19 +568,32 @@ def write_step_summary(results: list[dict]) -> None:
     # Deep-dive block for failures: body hash + snippet so the reader can tell
     # "this is the CDN's HTML error page again" from "a new failure mode" or
     # "the request went through but latency was the killer".
-    failures_with_body = [r for r in results if not r["ok"] and (r.get("body_hash") or r.get("body_snippet"))]
-    if failures_with_body:
+    failures_with_detail = [r for r in results if not r["ok"] and (
+        r.get("body_hash") or r.get("body_snippet") or r.get("response_headers"))]
+    if failures_with_detail:
         lines.append("### Failed response bodies")
         lines.append("")
         lines.append("_Preview of what the server actually returned. Same hash across"
                      " runs = same error page; empty snippet = no body (transport error"
-                     " or HEAD request)._")
+                     " or HEAD request). Response headers help pinpoint the source"
+                     " (origin vs CDN, cache hit, Retry-After, redirect target)._")
         lines.append("")
-        for r in failures_with_body:
+        for r in failures_with_detail:
             rel = r["url"].replace(BASE, "") or r["url"]
             hash_part = f"`sha256:{r['body_hash']}`" if r.get("body_hash") else "_no hash_"
             snippet = r.get("body_snippet") or ""
+            headers_md = _render_response_headers_md(r.get("response_headers") or {})
             lines.append(f"**{_md_cell(rel)}** — {hash_part} · `{r['bytes']:,} B` · `{r['ms']:.0f} ms`")
+            if headers_md:
+                lines.append("")
+                lines.append(f"Response headers: {headers_md}")
+            if snippet:
+                # Fenced block avoids Markdown interpreting HTML/pipes in the snippet.
+                lines.append("")
+                lines.append("```text")
+                lines.append(snippet)
+                lines.append("```")
+            lines.append("")
             if snippet:
                 # Fenced block avoids Markdown interpreting HTML/pipes in the snippet.
                 lines.append("")
