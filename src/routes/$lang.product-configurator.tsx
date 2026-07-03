@@ -1206,6 +1206,8 @@ function StepDimensions({
         <PanelStudio
           core={cfg.core}
           ratio="aspect-[4/3]"
+          tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
+          thicknessMm={cfg.thickness}
           caption={
             <>
               <span>{cfg.thickness} × {cfg.width} mm · {cfg.length} m</span>
