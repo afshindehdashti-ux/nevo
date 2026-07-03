@@ -93,7 +93,14 @@ Env:
                        (opt-in; upload as a CI artifact for later analysis).
   RESULTS_JSON_PATH    also write results as pretty JSON (raw dict per URL,
                        including response headers and body snippet).
-  RESULTS_INCLUDE      `all` (default) or `failures` — filter exported rows.
+  RESULTS_INCLUDE      filter exported rows. Supports:
+                         - `all` (default) — every row
+                         - `failures` — only rows with ok=false
+                         - `status_class=4xx,5xx` — rows whose status_class matches
+                         - `error_kind=timeout,tls` — rows whose error_kind matches
+                         - `combo=http:5xx,timeout:none` — exact error_kind:status_class pairs
+                       Multiple clauses may be combined with `;` (logical OR),
+                       e.g. `RESULTS_INCLUDE="status_class=5xx;error_kind=timeout"`.
 
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
