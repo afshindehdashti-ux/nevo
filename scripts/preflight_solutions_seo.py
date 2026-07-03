@@ -551,6 +551,31 @@ _ERROR_KIND_LABELS: dict[str, str] = {
 }
 
 
+# HTTP status classification is orthogonal to error_kind: it says what the
+# server returned, while error_kind says why we treated the probe as failed
+# (a 200 with a tiny body still fails via `body_too_small`, and a transport
+# error has no status at all).
+_STATUS_CLASS_LABELS: dict[str, str] = {
+    "none": "🚧 none",   # transport failure — no HTTP response at all
+    "1xx": "ℹ️ 1xx",
+    "2xx": "🟢 2xx",
+    "3xx": "🔀 3xx",
+    "4xx": "🟠 4xx",
+    "5xx": "🔴 5xx",
+    "xxx": "❓ xxx",
+}
+
+
+def _classify_status(status: int | None) -> str:
+    """Bucket an HTTP status into `2xx`/`3xx`/`4xx`/`5xx`/`none`."""
+    if status is None:
+        return "none"
+    if 100 <= status < 600:
+        return f"{status // 100}xx"
+    return "xxx"
+
+
+
 def probe(url: str) -> dict:
     """Probe a URL with retries. Return a result dict with timing/status."""
     path = urlparse(url).path
@@ -577,7 +602,8 @@ def probe(url: str) -> dict:
         last_err = ""
         return {"url": url, "ok": True, "status": status, "bytes": body_bytes,
                 "ms": ms, "attempts": attempts, "error": "", "method": http_method,
-                "error_kind": "ok"}
+                "error_kind": "ok", "status_class": _classify_status(status)}
+
 
     def _do_request(http_method: str) -> tuple[int | None, int, float, str, bytes, dict[str, str], str]:
         """Issue one request. Returns (status, size_bytes, ms, error, body, headers, content_type).
@@ -689,8 +715,10 @@ def probe(url: str) -> dict:
             "response_headers": last_headers,
             "error_kind": final_kind,
             "final_kind": final_kind,
+            "status_class": _classify_status(last_status),
             "attempt_kinds": attempt_kinds,
             "stopped_early": stopped_early}
+
 
 
 
@@ -814,6 +842,21 @@ def write_step_summary(results: list[dict]) -> None:
                  for k, n in kinds.most_common()]
         lines.append(f"- Failure kinds: {' · '.join(parts)}")
 
+    # HTTP status classification is separate from error_kind so a reader can
+    # tell "the server answered 4xx/5xx" from "we never got a response"
+    # (`none` = transport failure — DNS/TLS/timeout/reset). Covers all
+    # results, not just failures, so 2xx/3xx counts are visible too.
+    status_classes = Counter(
+        r.get("status_class") or _classify_status(r.get("status")) for r in results
+    )
+    if status_classes:
+        order = ["2xx", "3xx", "4xx", "5xx", "1xx", "xxx", "none"]
+        ordered = sorted(status_classes.items(),
+                         key=lambda kv: (order.index(kv[0]) if kv[0] in order else 99, kv[0]))
+        parts = [f"{_STATUS_CLASS_LABELS.get(k, k)} × **{n}**" for k, n in ordered]
+        lines.append(f"- HTTP status classes: {' · '.join(parts)}")
+
+
     # Latency histogram grouped by error_kind: makes it obvious whether e.g.
     # timeouts cluster at the timeout ceiling, TLS failures fail fast, or DNS
     # errors have their own bimodal shape vs healthy `ok` responses.
@@ -878,11 +921,13 @@ def write_step_summary(results: list[dict]) -> None:
 # Columns exported to CSV. Order is stable so downstream analysis (spreadsheet
 # pivots, `duckdb read_csv_auto`, pandas) sees the same schema across runs.
 _CSV_COLUMNS: list[str] = [
-    "url", "ok", "method", "status", "error_kind", "final_kind", "error",
+    "url", "ok", "method", "status", "status_class",
+    "error_kind", "final_kind", "error",
     "ms", "bytes", "attempts", "attempt_kinds", "stopped_early",
     "body_hash", "body_snippet", "content_type",
     "response_headers",
 ]
+
 
 
 
@@ -899,7 +944,9 @@ def _flatten_for_csv(r: dict) -> dict:
         "ok": "true" if r.get("ok") else "false",
         "method": r.get("method") or "",
         "status": "" if r.get("status") is None else r.get("status"),
+        "status_class": r.get("status_class") or _classify_status(r.get("status")),
         "error_kind": r.get("error_kind") or "",
+
         "final_kind": r.get("final_kind") or r.get("error_kind") or "",
         "error": r.get("error") or "",
         "ms": f"{float(r.get('ms') or 0):.1f}",
