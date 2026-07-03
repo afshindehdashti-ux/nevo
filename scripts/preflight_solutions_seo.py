@@ -957,7 +957,7 @@ def write_step_summary(results: list[dict]) -> None:
     # (`none` = transport failure — DNS/TLS/timeout/reset). Covers all
     # results, not just failures, so 2xx/3xx counts are visible too.
     status_classes = Counter(
-        r.get("status_class") or _classify_status(r.get("status")) for r in results
+        r.get("status_class") or _classify_status(r.get("status")) for r in display
     )
     if status_classes:
         order = ["2xx", "3xx", "4xx", "5xx", "1xx", "xxx", "none"]
