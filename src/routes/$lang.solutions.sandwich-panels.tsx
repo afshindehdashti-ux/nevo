@@ -158,7 +158,7 @@ function SandwichPanelsPage() {
         <Sustainability />
         <Downloads />
         <FAQSection />
-        <InquiryForm />
+        <InquiryCTA />
         <FinalCTA />
       </main>
       <SiteFooter />
@@ -217,7 +217,7 @@ function Hero() {
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Button size="lg" variant="primary" asChild>
-              <a href="#inquiry">
+              <a href="/project-inquiry">
                 Request Panel Quotation <ArrowRight className="ml-2 size-4" />
               </a>
             </Button>
@@ -778,7 +778,7 @@ function Downloads() {
             <h3 className="mt-3 text-base font-medium text-foreground">{d.title}</h3>
             <p className="mt-2 flex-1 text-sm text-muted-foreground">{d.desc}</p>
             <Button variant="ghost" className="mt-4 justify-start px-0" asChild>
-              <a href="#inquiry">
+              <a href="/project-inquiry">
                 <Download className="mr-2 size-4" /> Request download
               </a>
             </Button>
@@ -924,7 +924,7 @@ function FinalCTA() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button size="lg" variant="primary" asChild>
-              <a href="#inquiry">Request Panel Quotation <ArrowRight className="ml-2 size-4" /></a>
+              <a href="/project-inquiry">Request Panel Quotation <ArrowRight className="ml-2 size-4" /></a>
             </Button>
             <Button size="lg" variant="secondary" asChild>
               <a href="#downloads">Download Datasheet</a>
