@@ -12,6 +12,16 @@
  * File is `.server.ts` — never imported directly from client bundles.
  */
 
+export type LogoHistoryEntry = {
+  eventType: "render" | "error";
+  stage?: string | null;
+  variant?: string | null;
+  src?: string | null;
+  nextSrc?: string | null;
+  online?: boolean | null;
+  clientTs?: string | null;
+};
+
 type LogoErrorEvent = {
   correlationId?: string;
   stage?: string;
@@ -29,7 +39,10 @@ type LogoErrorEvent = {
   release?: string;
   clientTs?: string | number | null;
   extra: Record<string, unknown>;
+  /** Ordered fallback-chain timeline for this correlationId (oldest first). */
+  history?: LogoHistoryEntry[];
 };
+
 
 type ParsedDsn = {
   publicKey: string;
