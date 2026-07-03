@@ -120,6 +120,7 @@ function getLogoCorrelationId(): string {
  * without touching component code. See `src/lib/logo-telemetry-config.ts`.
  */
 import { shouldLogRender, shouldLogError } from "@/lib/logo-telemetry";
+import { withLogoEventSchema } from "@/lib/logo-event-schema";
 
 const LOGO_RENDER_SAMPLE_RATE = LOGO_TELEMETRY_CONFIG.renderSampleRate;
 
@@ -364,7 +365,7 @@ export function SiteHeader() {
                       step === "0" ? "primary-light-png"
                       : step === "1" ? "fallback-cdn-full"
                       : "fallback-inline-svg";
-                    logClientEvent("header.logo.render", {
+                    logClientEvent("header.logo.render", withLogoEventSchema({
                       correlationId: getLogoCorrelationId(),
                       variant,
                       sampleRate: LOGO_RENDER_SAMPLE_RATE,
@@ -374,7 +375,7 @@ export function SiteHeader() {
                       viewportHeight: window.innerHeight,
                       dpr: window.devicePixelRatio,
                       src: img.currentSrc || img.src,
-                    }, "info");
+                    }), "info");
                   }}
 
                   onError={(event) => {
@@ -391,37 +392,37 @@ export function SiteHeader() {
                       img.dataset.fallbackStep = "1";
                       img.dataset.logoVariant = "fallback-cdn";
                       if (shouldLogError("primary-light-png", false)) {
-                        logClientEvent("header.logo.error", {
+                        logClientEvent("header.logo.error", withLogoEventSchema({
                           correlationId,
                           stage: "primary-light-png",
                           failedSrc,
                           nextSrc: LOGO_FALLBACK_CDN,
                           viewportWidth: window.innerWidth,
                           online: navigator.onLine,
-                        }, "error");
+                        }), "error");
                       }
                       img.src = LOGO_FALLBACK_CDN;
                     } else if (step === "1") {
                       img.dataset.fallbackStep = "2";
                       img.dataset.logoVariant = "fallback-svg";
                       if (shouldLogError("fallback-cdn-full", false)) {
-                        logClientEvent("header.logo.error", {
+                        logClientEvent("header.logo.error", withLogoEventSchema({
                           correlationId,
                           stage: "fallback-cdn-full",
                           failedSrc,
                           nextSrc: "inline-svg",
                           viewportWidth: window.innerWidth,
                           online: navigator.onLine,
-                        }, "error");
+                        }), "error");
                       }
                       img.src = LOGO_FALLBACK_SVG;
                     } else if (shouldLogError("fallback-inline-svg", true)) {
-                      logClientEvent("header.logo.error", {
+                      logClientEvent("header.logo.error", withLogoEventSchema({
                         correlationId,
                         stage: "fallback-inline-svg",
                         failedSrc,
                         terminal: true,
-                      }, "error");
+                      }), "error");
                     }
 
 

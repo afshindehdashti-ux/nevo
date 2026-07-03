@@ -31,6 +31,8 @@ export type Database = {
           release: string | null
           route: string | null
           sample_rate: number | null
+          schema: string | null
+          schema_version: number | null
           src: string | null
           stage: string | null
           ua: string | null
@@ -53,6 +55,8 @@ export type Database = {
           release?: string | null
           route?: string | null
           sample_rate?: number | null
+          schema?: string | null
+          schema_version?: number | null
           src?: string | null
           stage?: string | null
           ua?: string | null
@@ -75,6 +79,8 @@ export type Database = {
           release?: string | null
           route?: string | null
           sample_rate?: number | null
+          schema?: string | null
+          schema_version?: number | null
           src?: string | null
           stage?: string | null
           ua?: string | null
