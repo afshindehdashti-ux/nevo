@@ -16,10 +16,17 @@ Env:
                        in RETRYABLE_ERROR_KINDS — deterministic failures
                        (TLS, 4xx, body-too-small) do not retry.
   RETRYABLE_ERROR_KINDS  comma list of error_kind values that are worth
-                       retrying (default:
-                       `timeout,connection_reset,connection_refused,connection_error,dns`).
-                       Set to `''` to disable retries entirely, or add
-                       `http_status` to also retry HTTP 4xx/5xx.
+                        retrying (default:
+                        `timeout,connection_reset,connection_refused,connection_error,dns`).
+                        Set to `''` to disable retries entirely, or add
+                        `http_status` to also retry all HTTP 4xx/5xx.
+  RETRYABLE_STATUS_CLASSES comma list of HTTP status classes (`4xx`, `5xx`)
+                        and/or specific codes (`429`, `503`) that should be
+                        retried even when `http_status` is not in
+                        RETRYABLE_ERROR_KINDS. Empty by default. Use this to
+                        retry only rate-limit (429) or backend-overload
+                        (503) responses without retrying every 4xx/5xx.
+
   BACKOFF_BASE_SECONDS backoff base; wait = base * factor**(attempt-1),
                        capped at BACKOFF_MAX_SECONDS (default: 2)
   BACKOFF_FACTOR       exponential factor (default: 2 → 2s, 4s, 8s …)
