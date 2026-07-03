@@ -914,6 +914,7 @@ function PanelThicknessPage() {
   }
 
   function downloadReport() {
+    if (hasErrors) return;
     const lines = [
       "NEVO Panel Thickness Calculation Report",
       "======================================",
