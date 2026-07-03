@@ -11,12 +11,15 @@ Fetches each Solutions page (default: all 10 locales) from a running server
   - <title> present, meta description 120-180 chars
 
 Env:
-  BASE_URL     default http://127.0.0.1:8080
-  REPORT_JSON  optional path — write machine-readable report
-  REPORT_MD    optional path — write GitHub Step Summary markdown
-  REPORT_HTML  optional path — write standalone HTML dashboard
+  BASE_URL            default http://127.0.0.1:8080
+  REPORT_JSON         optional path — write machine-readable report
+  REPORT_MD           optional path — write GitHub Step Summary markdown
+  REPORT_HTML         optional path — write standalone HTML dashboard
+  GROUP_ANNOTATIONS   "true" to group all issues per page into one annotation
 
-Exit 1 on any failure. --warn-only forces exit 0.
+Exit 1 on any failure. --warn-only forces exit 0. --group-annotations reduces
+PR clutter by collapsing multiple issues for the same page into a single
+GitHub annotation.
 """
 from __future__ import annotations
 import json, os, re, sys, urllib.request, urllib.error
