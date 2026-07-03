@@ -103,6 +103,79 @@ function getLogoCorrelationId(): string {
   }
 }
 
+/**
+ * Client-side rate limiting + sampling for header logo telemetry.
+ *
+ * Goals: keep production log volume tiny while preserving signal.
+ *  - Render events are high-volume (every page load) → sample at 5% in
+ *    production, always in dev. Only one render event per tab session.
+ *  - Error events are rare and high-value → always sampled, but capped at
+ *    a few per session and throttled to at most one per second per stage
+ *    so a broken CDN can't flood the sink.
+ *  - Terminal SVG-fallback errors bypass sampling limits (still capped) so
+ *    we never miss a total-outage signal.
+ */
+const LOGO_RENDER_SAMPLE_RATE = import.meta.env.DEV ? 1 : 0.05;
+const LOGO_ERROR_MAX_PER_SESSION = 4;
+const LOGO_ERROR_MIN_INTERVAL_MS = 1000;
+
+type LogoRateState = {
+  renderLogged: boolean;
+  renderSampled: boolean | null; // null = not decided yet
+  errorCount: number;
+  lastErrorAt: number;
+  lastErrorStage: string;
+};
+
+function getLogoRateState(): LogoRateState {
+  if (typeof window === "undefined") {
+    return { renderLogged: false, renderSampled: null, errorCount: 0, lastErrorAt: 0, lastErrorStage: "" };
+  }
+  const w = window as unknown as { __nevoLogoRate?: LogoRateState };
+  if (!w.__nevoLogoRate) {
+    w.__nevoLogoRate = {
+      renderLogged: false,
+      renderSampled: null,
+      errorCount: 0,
+      lastErrorAt: 0,
+      lastErrorStage: "",
+    };
+  }
+  return w.__nevoLogoRate;
+}
+
+/** Returns true when a render event should be sent to the log sink. */
+function shouldLogRender(): boolean {
+  const state = getLogoRateState();
+  if (state.renderLogged) return false;
+  if (state.renderSampled === null) {
+    state.renderSampled = Math.random() < LOGO_RENDER_SAMPLE_RATE;
+  }
+  if (!state.renderSampled) return false;
+  state.renderLogged = true;
+  return true;
+}
+
+/** Returns true when an error event should be sent. Terminal errors bypass throttle. */
+function shouldLogError(stage: string, terminal: boolean): boolean {
+  const state = getLogoRateState();
+  if (state.errorCount >= LOGO_ERROR_MAX_PER_SESSION) return false;
+  const now = Date.now();
+  if (
+    !terminal &&
+    stage === state.lastErrorStage &&
+    now - state.lastErrorAt < LOGO_ERROR_MIN_INTERVAL_MS
+  ) {
+    return false;
+  }
+  state.errorCount += 1;
+  state.lastErrorAt = now;
+  state.lastErrorStage = stage;
+  return true;
+}
+
+
+
 
 /* ─────────────────────────────────────────────────────────────
    Navigation model
@@ -329,23 +402,22 @@ export function SiteHeader() {
                   decoding="async"
                   draggable={false}
                   onLoad={(event) => {
-                    // Log a one-time success ping per session per variant so
-                    // production traffic can be sampled to confirm the correct
-                    // white/green sticky logo actually rendered.
+                    // One sampled success ping per tab session (see
+                    // shouldLogRender) so production traffic stays low-volume
+                    // while confirming the correct sticky logo actually
+                    // rendered.
                     if (typeof window === "undefined") return;
+                    if (!shouldLogRender()) return;
                     const img = event.currentTarget;
                     const step = img.dataset.fallbackStep ?? "0";
                     const variant =
                       step === "0" ? "primary-light-png"
                       : step === "1" ? "fallback-cdn-full"
                       : "fallback-inline-svg";
-                    const flagKey = `__nevoLogoRenderLogged:${variant}`;
-                    // deduplicate per tab so we don't spam the log endpoint
-                    if ((window as unknown as Record<string, unknown>)[flagKey]) return;
-                    (window as unknown as Record<string, unknown>)[flagKey] = true;
                     logClientEvent("header.logo.render", {
                       correlationId: getLogoCorrelationId(),
                       variant,
+                      sampleRate: LOGO_RENDER_SAMPLE_RATE,
                       naturalWidth: img.naturalWidth,
                       naturalHeight: img.naturalHeight,
                       viewportWidth: window.innerWidth,
@@ -353,8 +425,8 @@ export function SiteHeader() {
                       dpr: window.devicePixelRatio,
                       src: img.currentSrc || img.src,
                     }, "info");
-
                   }}
+
                   onError={(event) => {
                     // Defensive fallback chain: if the bundled light logo
                     // fails to load (bundle miss, cache poisoning, blocked
@@ -368,28 +440,32 @@ export function SiteHeader() {
                     if (step === "0") {
                       img.dataset.fallbackStep = "1";
                       img.dataset.logoVariant = "fallback-cdn";
-                      logClientEvent("header.logo.error", {
-                        correlationId,
-                        stage: "primary-light-png",
-                        failedSrc,
-                        nextSrc: LOGO_FALLBACK_CDN,
-                        viewportWidth: window.innerWidth,
-                        online: navigator.onLine,
-                      }, "error");
+                      if (shouldLogError("primary-light-png", false)) {
+                        logClientEvent("header.logo.error", {
+                          correlationId,
+                          stage: "primary-light-png",
+                          failedSrc,
+                          nextSrc: LOGO_FALLBACK_CDN,
+                          viewportWidth: window.innerWidth,
+                          online: navigator.onLine,
+                        }, "error");
+                      }
                       img.src = LOGO_FALLBACK_CDN;
                     } else if (step === "1") {
                       img.dataset.fallbackStep = "2";
                       img.dataset.logoVariant = "fallback-svg";
-                      logClientEvent("header.logo.error", {
-                        correlationId,
-                        stage: "fallback-cdn-full",
-                        failedSrc,
-                        nextSrc: "inline-svg",
-                        viewportWidth: window.innerWidth,
-                        online: navigator.onLine,
-                      }, "error");
+                      if (shouldLogError("fallback-cdn-full", false)) {
+                        logClientEvent("header.logo.error", {
+                          correlationId,
+                          stage: "fallback-cdn-full",
+                          failedSrc,
+                          nextSrc: "inline-svg",
+                          viewportWidth: window.innerWidth,
+                          online: navigator.onLine,
+                        }, "error");
+                      }
                       img.src = LOGO_FALLBACK_SVG;
-                    } else {
+                    } else if (shouldLogError("fallback-inline-svg", true)) {
                       logClientEvent("header.logo.error", {
                         correlationId,
                         stage: "fallback-inline-svg",
@@ -397,6 +473,7 @@ export function SiteHeader() {
                         terminal: true,
                       }, "error");
                     }
+
 
                   }}
                 />
