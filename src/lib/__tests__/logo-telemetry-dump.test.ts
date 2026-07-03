@@ -1,4 +1,3 @@
-// @vitest-environment jsdom
 /**
  * Verifies the QA "one-paste" dump helpers exposed on __nevoLogoDebug.
  *
