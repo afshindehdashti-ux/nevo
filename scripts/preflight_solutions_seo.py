@@ -906,13 +906,22 @@ def write_step_summary(results: list[dict]) -> None:
     path = os.environ.get("GITHUB_STEP_SUMMARY")
     if not path:
         return
-    ok_count = sum(1 for r in results if r["ok"])
-    total_ms = sum(r["ms"] for r in results)
-    slowest = max((r["ms"] for r in results), default=0.0)
+
+    # SUMMARY_FILTER reuses the RESULTS_INCLUDE grammar so the on-screen
+    # breakdown and per-URL table can be narrowed to specific error_kinds
+    # / status_classes without affecting the exported CSV/JSON.
+    raw_filter = (os.environ.get("SUMMARY_FILTER") or "all").strip()
+    filtered, filter_scope = _filter_results_for_export(results, raw_filter)
+    total = len(results)
+    display = filtered if filter_scope != "all" else results
+
+    ok_count = sum(1 for r in display if r["ok"])
+    total_ms = sum(r["ms"] for r in display)
+    slowest = max((r["ms"] for r in display), default=0.0)
     lines = [
         "## Preflight — site + sitemap reachable",
         "",
-        f"_Probed **{len(results)}** URL(s) at `{BASE}` "
+        f"_Probed **{total}** URL(s) at `{BASE}` "
         f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`, "
         f"backoff `{BACKOFF_BASE:g}s × {BACKOFF_FACTOR:g}` cap `{BACKOFF_MAX:g}s`, "
         f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
@@ -921,19 +930,23 @@ def write_step_summary(results: list[dict]) -> None:
         "",
         f"- UA: `{USER_AGENT}`",
         f"- Custom headers: {_render_headers_md(CUSTOM_HEADERS)}",
-        f"- **{ok_count}/{len(results)}** healthy",
+        f"- **{ok_count}/{len(display)}** healthy"
+        + (f" _(filtered from {total})_" if filter_scope != "all" else ""),
         f"- Total wall time: **{total_ms:.0f} ms**",
         f"- Slowest response: **{slowest:.0f} ms**",
         f"- Retry kinds: `{','.join(sorted(RETRYABLE_ERROR_KINDS)) or 'none'}` "
         f"(status classes/codes: `{','.join(sorted(RETRYABLE_STATUS_CLASSES)) or 'none'}`)",
     ]
+    if filter_scope != "all":
+        lines.append(f"- Summary filter: `{filter_scope}` "
+                     f"(showing {len(display)} of {total} row(s))")
 
 
     # Failure-kind breakdown: shows at a glance whether the run is dominated
     # by timeouts (latency), DNS/TLS (infra) or HTTP errors (app/content).
     from collections import Counter
     kinds = Counter(r.get("error_kind") or ("ok" if r["ok"] else "unknown")
-                    for r in results if not r["ok"])
+                    for r in display if not r["ok"])
     if kinds:
         parts = [f"{_ERROR_KIND_LABELS.get(k, k)} × **{n}**"
                  for k, n in kinds.most_common()]
@@ -944,7 +957,7 @@ def write_step_summary(results: list[dict]) -> None:
     # (`none` = transport failure — DNS/TLS/timeout/reset). Covers all
     # results, not just failures, so 2xx/3xx counts are visible too.
     status_classes = Counter(
-        r.get("status_class") or _classify_status(r.get("status")) for r in results
+        r.get("status_class") or _classify_status(r.get("status")) for r in display
     )
     if status_classes:
         order = ["2xx", "3xx", "4xx", "5xx", "1xx", "xxx", "none"]
@@ -962,7 +975,7 @@ def write_step_summary(results: list[dict]) -> None:
         combo = Counter(
             (r.get("error_kind") or "unknown",
              r.get("status_class") or _classify_status(r.get("status")))
-            for r in results if not r["ok"]
+            for r in display if not r["ok"]
         )
         combo_rows = sorted(
             combo.items(),
@@ -978,12 +991,12 @@ def write_step_summary(results: list[dict]) -> None:
     # Latency histogram grouped by error_kind: makes it obvious whether e.g.
     # timeouts cluster at the timeout ceiling, TLS failures fail fast, or DNS
     # errors have their own bimodal shape vs healthy `ok` responses.
-    lines += _render_latency_histogram(results)
+    lines += _render_latency_histogram(display)
 
     # Heatmap grouping latency by both error_kind and status_class: separates
     # HTTP-level failures (4xx/5xx) from transport failures (none) so their
     # latency shapes are not averaged together.
-    lines += _render_latency_heatmap(results)
+    lines += _render_latency_heatmap(display)
 
 
 
@@ -992,7 +1005,7 @@ def write_step_summary(results: list[dict]) -> None:
         "| Status | Kind | URL | Method | HTTP | Time (ms) | Size | Attempts | Notes |",
         "| :---: | :---: | --- | :---: | ---: | ---: | ---: | ---: | --- |",
     ]
-    for r in sorted(results, key=lambda x: (x["ok"], -x["ms"])):
+    for r in sorted(display, key=lambda x: (x["ok"], -x["ms"])):
         marker = "✅" if r["ok"] else "❌"
         rel = r["url"].replace(BASE, "") or r["url"]
         http = r["status"] if r["status"] is not None else "—"
@@ -1010,7 +1023,7 @@ def write_step_summary(results: list[dict]) -> None:
     # Deep-dive block for failures: body hash + snippet so the reader can tell
     # "this is the CDN's HTML error page again" from "a new failure mode" or
     # "the request went through but latency was the killer".
-    failures_with_detail = [r for r in results if not r["ok"] and (
+    failures_with_detail = [r for r in display if not r["ok"] and (
         r.get("body_hash") or r.get("body_snippet") or r.get("response_headers"))]
     if failures_with_detail:
         lines.append("### Failed response bodies")
