@@ -979,6 +979,8 @@ export function attachLogoDebugUtil(): void {
       copyLogoTelemetryDump(origin, { filter }),
     downloadDumpForFilter: (filter, origin = "console") =>
       downloadLogoTelemetryDump(origin, { filter }),
+    getStats: buildLogoTelemetryStats,
+    getStatsAsJSON: (opts) => JSON.stringify(buildLogoTelemetryStats(opts), null, 2),
   };
 }
 
