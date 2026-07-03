@@ -1149,11 +1149,15 @@ def write_step_summary(results: list[dict]) -> None:
             f"- Breakdown by kind × status class "
             f"(overall failure rate **{overall_fail_pct:.1f}%**):"
         )
+        # Inline sparkline width (chars) for the success/failure bar column.
+        # 10 keeps each 10% ≈ 1 block so a reader can eyeball the split at
+        # a glance without the column dominating the table.
+        bar_w = 10
         lines += [
             "",
             "| Kind | Status class | Count | Failed | Success rate "
-            "| % of all | % of failures | p50 (ms) | p95 (ms) | p99 (ms) |",
-            "| --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            "| Rate bar | % of all | % of failures | p50 (ms) | p95 (ms) | p99 (ms) |",
+            "| --- | :---: | ---: | ---: | ---: | :--- | ---: | ---: | ---: | ---: | ---: |",
         ]
         for (kind, status_class), n in combo_rows:
             failed = combo.get((kind, status_class), 0) if kind != "ok" else 0
@@ -1163,9 +1167,14 @@ def write_step_summary(results: list[dict]) -> None:
             kind_label = _ERROR_KIND_LABELS.get(kind, kind)
             class_label = _STATUS_CLASS_LABELS.get(status_class, status_class)
             pr = pctile_index.get((kind, status_class), {})
+            # Bar: green = success share, red = failure share. Uses solid
+            # block chars so the ratio is legible in monospace summaries.
+            success_cells = int(round(success_pct / 100 * bar_w))
+            fail_cells = bar_w - success_cells
+            bar = "🟩" * success_cells + "🟥" * fail_cells
             lines.append(
                 f"| {kind_label} | {class_label} | {n} | {failed} "
-                f"| {success_pct:.1f}% | {share_all:.1f}% "
+                f"| {success_pct:.1f}% | {bar} | {share_all:.1f}% "
                 f"| {share_fail:.1f}% "
                 f"| {pr.get('ms_p50', 0):.0f} | {pr.get('ms_p95', 0):.0f} "
                 f"| {pr.get('ms_p99', 0):.0f} |"
