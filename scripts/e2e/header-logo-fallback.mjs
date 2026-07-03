@@ -88,18 +88,17 @@ try {
 
   // The SSR-served HTML starts loading the <img> before React hydrates, so
   // the initial load error fires *before* React attaches its onError
-  // listener and gets dropped. Wait for hydration, then dispatch a native
-  // "error" event on the still-broken image — React's synthetic event
-  // system picks it up in the capture phase and runs the onError handler,
-  // which is the exact production code path this test exercises.
-  await page.waitForTimeout(1500);
+  // listener and gets dropped. Wait for hydration, then reassign src to
+  // force a fresh (still-intercepted) request that React observes.
+  await page.waitForTimeout(2000);
   await page.evaluate(() => {
     const img = document.querySelector('[data-testid="header-logo"]');
     if (!(img instanceof HTMLImageElement)) return;
-    if (img.complete && img.naturalWidth === 0) {
-      img.dispatchEvent(new Event("error", { bubbles: false }));
-    }
+    const src = img.src;
+    img.src = "";
+    img.src = src;
   });
+
 
 
 
