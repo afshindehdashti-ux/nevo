@@ -591,7 +591,7 @@ export function downloadLogoTelemetryDump(
  * No-op in production so nothing ships to end users.
  */
 export function attachLogoDebugUtil(): void {
-  if (!import.meta.env.DEV) return;
+  if (!isLogoDebugBuildEnabled()) return;
   if (typeof window === "undefined") return;
   const w = window as unknown as {
     __nevoLogoDebug?: {
