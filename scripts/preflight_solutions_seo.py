@@ -1072,6 +1072,12 @@ def write_step_summary(results: list[dict]) -> None:
              r.get("status_class") or _classify_status(r.get("status")))
             for r in display
         )
+        # Latency percentiles per combo — reuse _build_breakdown_rows so the
+        # summary numbers match the CSV/JSON export exactly.
+        pctile_index = {
+            (r["error_kind"], r["status_class"]): r
+            for r in _build_breakdown_rows(display)
+        }
         combo_rows = sorted(
             combo_all.items(),
             key=lambda kv: (0 if kv[0][0] == "ok" else -1,
@@ -1087,8 +1093,9 @@ def write_step_summary(results: list[dict]) -> None:
         )
         lines += [
             "",
-            "| Kind | Status class | Count | Failed | Success rate | % of all | % of failures |",
-            "| --- | :---: | ---: | ---: | ---: | ---: | ---: |",
+            "| Kind | Status class | Count | Failed | Success rate "
+            "| % of all | % of failures | p50 (ms) | p95 (ms) | p99 (ms) |",
+            "| --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
         ]
         for (kind, status_class), n in combo_rows:
             failed = combo.get((kind, status_class), 0) if kind != "ok" else 0
@@ -1097,10 +1104,13 @@ def write_step_summary(results: list[dict]) -> None:
             share_fail = 100.0 * failed / total_fail if failed else 0.0
             kind_label = _ERROR_KIND_LABELS.get(kind, kind)
             class_label = _STATUS_CLASS_LABELS.get(status_class, status_class)
+            pr = pctile_index.get((kind, status_class), {})
             lines.append(
                 f"| {kind_label} | {class_label} | {n} | {failed} "
                 f"| {success_pct:.1f}% | {share_all:.1f}% "
-                f"| {share_fail:.1f}% |"
+                f"| {share_fail:.1f}% "
+                f"| {pr.get('ms_p50', 0):.0f} | {pr.get('ms_p95', 0):.0f} "
+                f"| {pr.get('ms_p99', 0):.0f} |"
             )
         lines.append("")
 
@@ -1289,30 +1299,46 @@ def _filter_results_for_export(
     return [r for r in results if matches(r)], scope
 
 
+def _percentile(sorted_values: list[float], pct: float) -> float:
+    """Nearest-rank percentile over an already-sorted, non-empty list.
+
+    Nearest-rank keeps the returned value equal to an observed sample (no
+    interpolation), which is what we want for latency buckets: p95 must
+    reflect a real request, not a synthetic average between two.
+    """
+    if not sorted_values:
+        return 0.0
+    if len(sorted_values) == 1:
+        return sorted_values[0]
+    k = max(0, min(len(sorted_values) - 1,
+                   int(round((pct / 100.0) * (len(sorted_values) - 1)))))
+    return sorted_values[k]
+
+
 def _build_breakdown_rows(results: list[dict]) -> list[dict]:
     """Aggregate results into (error_kind, status_class) rows for export.
 
     Each row carries counts, share (%), attempt totals, and latency stats
-    so the CSV/JSON is directly analyzable without re-deriving anything
-    from the per-URL export.
+    (avg, max, p50/p95/p99) so the CSV/JSON is directly analyzable without
+    re-deriving anything from the per-URL export.
     """
     from collections import defaultdict
     buckets: dict[tuple[str, str], dict] = defaultdict(
-        lambda: {"count": 0, "failed": 0, "attempts": 0,
-                 "ms_total": 0.0, "ms_max": 0.0})
+        lambda: {"count": 0, "failed": 0, "attempts": 0, "ms": []})
     for r in results:
         kind = r.get("error_kind") or ("ok" if r.get("ok") else "unknown")
         sc = r.get("status_class") or _classify_status(r.get("status"))
         b = buckets[(kind, sc)]
         b["count"] += 1
         b["attempts"] += r.get("attempts") or 1
-        b["ms_total"] += float(r.get("ms") or 0)
-        b["ms_max"] = max(b["ms_max"], float(r.get("ms") or 0))
+        b["ms"].append(float(r.get("ms") or 0))
         if not r.get("ok"):
             b["failed"] += 1
     total = max(len(results), 1)
     rows = []
     for (kind, sc), b in buckets.items():
+        ms_sorted = sorted(b["ms"])
+        ms_total = sum(ms_sorted)
         rows.append({
             "error_kind": kind,
             "status_class": sc,
@@ -1321,8 +1347,11 @@ def _build_breakdown_rows(results: list[dict]) -> list[dict]:
             "share_pct": round(100 * b["count"] / total, 2),
             "attempts_total": b["attempts"],
             "attempts_avg": round(b["attempts"] / b["count"], 2),
-            "ms_avg": round(b["ms_total"] / b["count"], 1),
-            "ms_max": round(b["ms_max"], 1),
+            "ms_avg": round(ms_total / b["count"], 1),
+            "ms_max": round(ms_sorted[-1], 1),
+            "ms_p50": round(_percentile(ms_sorted, 50), 1),
+            "ms_p95": round(_percentile(ms_sorted, 95), 1),
+            "ms_p99": round(_percentile(ms_sorted, 99), 1),
         })
     rows.sort(key=lambda r: (-r["failed"], -r["count"],
                              r["error_kind"], r["status_class"]))
@@ -1331,7 +1360,8 @@ def _build_breakdown_rows(results: list[dict]) -> list[dict]:
 
 _BREAKDOWN_COLUMNS = [
     "error_kind", "status_class", "count", "failed", "share_pct",
-    "attempts_total", "attempts_avg", "ms_avg", "ms_max",
+    "attempts_total", "attempts_avg",
+    "ms_avg", "ms_p50", "ms_p95", "ms_p99", "ms_max",
 ]
 
 
@@ -1435,6 +1465,21 @@ def main() -> int:
         print(f"  {marker} [{meth} {http} {kind}] {r['ms']:6.0f}ms "
               f"attempts={r['attempts']} trail={trail}{stop}  {r['url']} — {detail}")
 
+
+    # Per-combo latency percentiles, printed regardless of failure state so
+    # trend data (p95/p99 regressions on healthy runs) is captured too.
+    breakdown = _build_breakdown_rows(results)
+    if breakdown:
+        print("\nLatency by error_kind × status_class "
+              "(count/failed  avg  p50 / p95 / p99  max):")
+        for row in breakdown:
+            print(f"  {row['error_kind']:>16s} × {row['status_class']:<4s} "
+                  f"{row['count']:>3d}/{row['failed']:<3d}  "
+                  f"avg {row['ms_avg']:>7.1f}ms  "
+                  f"p50 {row['ms_p50']:>7.1f}  "
+                  f"p95 {row['ms_p95']:>7.1f}  "
+                  f"p99 {row['ms_p99']:>7.1f}  "
+                  f"max {row['ms_max']:>7.1f}")
 
     write_step_summary(results)
     export_results(results)
