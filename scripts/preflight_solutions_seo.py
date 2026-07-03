@@ -40,6 +40,17 @@ Env:
                        `$VAR` / `${VAR}` are expanded from env so secrets
                        stay in Actions secrets, not the YAML. Sensitive
                        header values are masked in logs and the summary.
+  METHOD               `GET` (default), `HEAD`, or `HEAD_THEN_GET`.
+                       HEAD skips the body download — much faster on heavy
+                       SSR pages. HEAD_THEN_GET tries HEAD first and falls
+                       back to GET when HEAD returns a non-accepted status
+                       (some CDNs / SPAs return 405/404 for HEAD).
+                       Under HEAD, min-body-bytes is evaluated against the
+                       `Content-Length` response header when present, and
+                       skipped otherwise (routes without Content-Length
+                       can't be size-checked via HEAD — use GET for those).
+  METHOD_OVERRIDES     per-path method overrides, `path=METHOD` entries
+                       separated by `|` (e.g. `/sitemap.xml=GET|/health=HEAD`).
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
@@ -233,69 +244,139 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
 _NO_REDIRECT_OPENER = urllib.request.build_opener(_NoRedirect)
 
 
+_VALID_METHODS = {"GET", "HEAD", "HEAD_THEN_GET"}
+
+def _norm_method(raw: str, default: str = "GET") -> str:
+    m = (raw or "").strip().upper().replace("-", "_")
+    if m not in _VALID_METHODS:
+        if raw:
+            print(f"preflight: warning: invalid METHOD {raw!r}; using {default}", file=sys.stderr)
+        return default
+    return m
+
+METHOD = _norm_method(os.environ.get("METHOD", "GET"))
+METHOD_OVERRIDES: dict[str, str] = {}
+for item in (x.strip() for x in os.environ.get("METHOD_OVERRIDES", "").split("|") if x.strip()):
+    if "=" not in item:
+        print(f"preflight: warning: skipping malformed METHOD_OVERRIDES entry {item!r}", file=sys.stderr)
+        continue
+    p, _, m = item.partition("=")
+    METHOD_OVERRIDES[p.strip()] = _norm_method(m, default=METHOD)
+
+
+def _method_for(path: str) -> str:
+    return METHOD_OVERRIDES.get(path, METHOD)
+
+
+
 
 def probe(url: str) -> dict:
     """Probe a URL with retries. Return a result dict with timing/status."""
     path = urlparse(url).path
     accepted = _accepted_for(path)
     min_bytes = MIN_BODY_BYTES.get(path, DEFAULT_MIN_BYTES)
+    method_mode = _method_for(path)
     last_err = ""
     last_status: int | None = None
     last_bytes = 0
     last_ms = 0.0
+    last_method = ""
     attempts = 0
 
-    def _evaluate(status: int, body: bytes, ms: float) -> dict | None:
-        """Return a success dict when the response satisfies accept + min-bytes rules."""
-        nonlocal last_err, last_status, last_bytes, last_ms
-        last_status, last_bytes, last_ms = status, len(body), ms
+    def _evaluate(status: int, body_bytes: int, ms: float, http_method: str) -> dict | None:
+        """Return a success dict when the response satisfies accept + min-bytes rules.
+
+        `body_bytes` is len(body) for GET, or Content-Length (0 when absent) for HEAD.
+        """
+        nonlocal last_err, last_status, last_bytes, last_ms, last_method
+        last_status, last_bytes, last_ms, last_method = status, body_bytes, ms, http_method
         if status not in accepted:
             last_err = f"HTTP {status} not in accept set {sorted(accepted)}"
             return None
-        # Only enforce min-bytes for 2xx — 3xx/4xx accepted-by-design often have empty bodies.
-        if 200 <= status < 300 and len(body) < min_bytes:
-            last_err = f"body {len(body)}B < min {min_bytes}B (likely error page)"
+        # Min-bytes only for accepted 2xx. On HEAD, we only enforce when we
+        # actually know the size (Content-Length > 0); otherwise skip so a
+        # missing Content-Length doesn't false-positive.
+        if 200 <= status < 300 and body_bytes > 0 and body_bytes < min_bytes:
+            last_err = f"body {body_bytes}B < min {min_bytes}B (likely error page)"
             return None
         last_err = ""
-        return {"url": url, "ok": True, "status": status, "bytes": len(body),
-                "ms": ms, "attempts": attempts, "error": ""}
+        return {"url": url, "ok": True, "status": status, "bytes": body_bytes,
+                "ms": ms, "attempts": attempts, "error": "", "method": http_method}
 
-    for attempt in range(1, RETRIES + 1):
-        attempts = attempt
+    def _do_request(http_method: str) -> tuple[int | None, int, float, str]:
+        """Issue one request. Returns (status, size_bytes, ms, error).
+
+        On success, error is "". On failure, status may be None.
+        """
         t0 = time.perf_counter()
         try:
             headers = {
                 "User-Agent": USER_AGENT,
                 "Accept": "text/html,application/xml,text/plain;q=0.9,*/*;q=0.5",
             }
-            # CUSTOM_HEADERS wins so callers can override UA / Accept too.
             headers.update(CUSTOM_HEADERS)
-            req = urllib.request.Request(url, headers=headers)
+            req = urllib.request.Request(url, headers=headers, method=http_method)
             opener = urllib.request.urlopen if FOLLOW_REDIRECTS else _NO_REDIRECT_OPENER.open
             with opener(req, timeout=TIMEOUT) as r:
-                body = r.read()
-                ms = (time.perf_counter() - t0) * 1000
-                ok = _evaluate(r.status, body, ms)
-                if ok:
-                    return ok
+                if http_method == "HEAD":
+                    size = int(r.headers.get("Content-Length") or 0)
+                else:
+                    size = len(r.read())
+                return r.status, size, (time.perf_counter() - t0) * 1000, ""
         except urllib.error.HTTPError as e:
             ms = (time.perf_counter() - t0) * 1000
-            # Accepted non-2xx (e.g. 301, 403, 404) come through here — try to read
-            # whatever body was returned and evaluate against the accept set.
-            try:
-                body = e.read() or b""
-            except Exception:
-                body = b""
-            ok = _evaluate(e.code, body, ms)
+            if http_method == "HEAD":
+                size = int(e.headers.get("Content-Length") or 0) if e.headers else 0
+            else:
+                try:
+                    size = len(e.read() or b"")
+                except Exception:
+                    size = 0
+            return e.code, size, ms, f"HTTP {e.code}"
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+            ms = (time.perf_counter() - t0) * 1000
+            return None, 0, ms, f"{type(e).__name__}: {e}"
+
+    for attempt in range(1, RETRIES + 1):
+        attempts = attempt
+
+        # Pick the first method to try, then optional fallback for HEAD_THEN_GET.
+        first_method = "HEAD" if method_mode in ("HEAD", "HEAD_THEN_GET") else "GET"
+        status, size, ms, err = _do_request(first_method)
+
+        if status is not None:
+            ok = _evaluate(status, size, ms, first_method)
             if ok:
                 return ok
-        except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
-            last_ms = (time.perf_counter() - t0) * 1000
-            last_err = f"{type(e).__name__}: {e}"
+
+        # HEAD_THEN_GET: if HEAD failed evaluation OR the transport errored,
+        # retry the SAME attempt with GET before backing off. Cheap upgrade.
+        if method_mode == "HEAD_THEN_GET" and first_method == "HEAD":
+            status2, size2, ms2, err2 = _do_request("GET")
+            if status2 is not None:
+                ok2 = _evaluate(status2, size2, ms2, "GET")
+                if ok2:
+                    return ok2
+            # Prefer the GET error for reporting (it's the authoritative attempt).
+            if status2 is not None or err2:
+                # _evaluate already updated last_* on the GET call above.
+                pass
+            elif err:
+                # HEAD transport error and GET transport error → keep GET's err message.
+                last_err = err2 or err
+
+        elif status is None:
+            # No HTTP response at all; record the transport error.
+            last_err = err
+            last_ms = ms
+
         if attempt < RETRIES:
             time.sleep(_backoff_delay(attempt))
+
     return {"url": url, "ok": False, "status": last_status, "bytes": last_bytes,
-            "ms": last_ms, "attempts": attempts, "error": last_err or "unknown error"}
+            "ms": last_ms, "attempts": attempts,
+            "error": last_err or "unknown error", "method": last_method or method_mode}
+
 
 
 def _md_cell(s: object) -> str:
@@ -328,7 +409,7 @@ def write_step_summary(results: list[dict]) -> None:
         f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`, "
         f"backoff `{BACKOFF_BASE:g}s × {BACKOFF_FACTOR:g}` cap `{BACKOFF_MAX:g}s`, "
         f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
-        f"follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
+        f"method `{METHOD}`, follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
         "",
         f"- UA: `{USER_AGENT}`",
         f"- Custom headers: {_render_headers_md(CUSTOM_HEADERS)}",
@@ -336,8 +417,8 @@ def write_step_summary(results: list[dict]) -> None:
         f"- Total wall time: **{total_ms:.0f} ms**",
         f"- Slowest response: **{slowest:.0f} ms**",
         "",
-        "| Status | URL | HTTP | Time (ms) | Size | Attempts | Notes |",
-        "| :---: | --- | ---: | ---: | ---: | ---: | --- |",
+        "| Status | URL | Method | HTTP | Time (ms) | Size | Attempts | Notes |",
+        "| :---: | --- | :---: | ---: | ---: | ---: | ---: | --- |",
     ]
     for r in sorted(results, key=lambda x: (x["ok"], -x["ms"])):
         marker = "✅" if r["ok"] else "❌"
@@ -345,8 +426,9 @@ def write_step_summary(results: list[dict]) -> None:
         http = r["status"] if r["status"] is not None else "—"
         size = f"{r['bytes']:,} B" if r["bytes"] else "—"
         note = _md_cell(r["error"]) if r["error"] else "ok"
+        meth = r.get("method") or METHOD
         lines.append(
-            f"| {marker} | [{_md_cell(rel)}]({r['url']}) "
+            f"| {marker} | [{_md_cell(rel)}]({r['url']}) | `{meth}` "
             f"| `{http}` | {r['ms']:.0f} | {size} | {r['attempts']} | {note} |"
         )
     lines.append("")
@@ -360,13 +442,15 @@ def main() -> int:
         for path in LOCALIZED_PATHS:
             urls.append(f"{BASE}/{locale}{path}")
 
-    print(f"Preflight: probing {len(urls)} URL(s) at {BASE} (timeout={TIMEOUT}s, retries={RETRIES})")
+    print(f"Preflight: probing {len(urls)} URL(s) at {BASE} "
+          f"(method={METHOD}, timeout={TIMEOUT}s, retries={RETRIES})")
     results = [probe(u) for u in urls]
     for r in results:
         marker = "✓" if r["ok"] else "✗"
         http = r["status"] if r["status"] is not None else "-"
         detail = r["error"] if r["error"] else f"{r['bytes']}B"
-        print(f"  {marker} [{http}] {r['ms']:6.0f}ms  {r['url']} — {detail}")
+        meth = r.get("method") or METHOD
+        print(f"  {marker} [{meth} {http}] {r['ms']:6.0f}ms  {r['url']} — {detail}")
 
     write_step_summary(results)
 
