@@ -1750,3 +1750,158 @@ function ReportRow({ k, v }: { k: string; v: string }) {
     </div>
   );
 }
+
+/**
+ * Keyboard-first stepper cluster that lets AT users adjust the cross-section
+ * without navigating back to the Inputs tab. Each stepper is a labelled group
+ * of two <button>s. Arrow keys and Home/End also step through options while
+ * either button is focused.
+ */
+function Stepper<T extends string | number>({
+  label,
+  value,
+  options,
+  onChange,
+  format,
+  unit,
+}: {
+  label: string;
+  value: T;
+  options: readonly T[];
+  onChange: (v: T) => void;
+  format?: (v: T) => string;
+  unit?: string;
+}) {
+  const idx = options.indexOf(value);
+  const display = format ? format(value) : String(value);
+  const go = (delta: number) => {
+    const next = Math.min(options.length - 1, Math.max(0, idx + delta));
+    if (next !== idx) onChange(options[next]);
+  };
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case "ArrowLeft":
+      case "ArrowDown":
+        e.preventDefault();
+        go(-1);
+        break;
+      case "ArrowRight":
+      case "ArrowUp":
+        e.preventDefault();
+        go(1);
+        break;
+      case "Home":
+        e.preventDefault();
+        if (idx !== 0) onChange(options[0]);
+        break;
+      case "End":
+        e.preventDefault();
+        if (idx !== options.length - 1) onChange(options[options.length - 1]);
+        break;
+    }
+  };
+  const groupLabelId = `stepper-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const atMin = idx <= 0;
+  const atMax = idx >= options.length - 1;
+  return (
+    <div
+      role="group"
+      aria-labelledby={groupLabelId}
+      onKeyDown={onKeyDown}
+      className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2"
+    >
+      <div id={groupLabelId} className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50">
+        {label}
+      </div>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => go(-1)}
+          disabled={atMin}
+          aria-label={`Decrease ${label}`}
+          aria-keyshortcuts="ArrowLeft ArrowDown Home"
+          className="inline-flex size-8 items-center justify-center rounded-md border border-white/15 bg-white/[0.03] text-white/80 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 disabled:cursor-not-allowed disabled:opacity-30"
+        >
+          <ChevronLeft className="size-4" aria-hidden="true" />
+        </button>
+        <div
+          className="min-w-[5.5rem] text-center font-mono text-sm font-semibold text-white"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <span className="sr-only">{label}: </span>
+          {display}
+          {unit ? ` ${unit}` : ""}
+        </div>
+        <button
+          type="button"
+          onClick={() => go(1)}
+          disabled={atMax}
+          aria-label={`Increase ${label}`}
+          aria-keyshortcuts="ArrowRight ArrowUp End"
+          className="inline-flex size-8 items-center justify-center rounded-md border border-white/15 bg-white/[0.03] text-white/80 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 disabled:cursor-not-allowed disabled:opacity-30"
+        >
+          <ChevronRight className="size-4" aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function CrossSectionControls({
+  thickness,
+  extSteel,
+  intSteel,
+  setThickness,
+  setExtSteel,
+  setIntSteel,
+}: {
+  thickness: Thickness;
+  extSteel: number;
+  intSteel: number;
+  setThickness: (v: Thickness) => void;
+  setExtSteel: (v: number) => void;
+  setIntSteel: (v: number) => void;
+}) {
+  return (
+    <section
+      aria-label="Adjust cross-section"
+      className="rounded-2xl border border-white/10 bg-white/[0.02] p-4"
+    >
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
+          Adjust cross-section
+        </h3>
+        <p className="text-[10px] text-white/40">
+          Use ← → or Home/End to step
+        </p>
+      </div>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <Stepper<Thickness>
+          label="Panel thickness"
+          value={thickness}
+          options={THICKNESSES}
+          onChange={setThickness}
+          unit="mm"
+        />
+        <Stepper<number>
+          label="Exterior steel"
+          value={extSteel}
+          options={STEEL_GAUGES}
+          onChange={setExtSteel}
+          format={(v) => v.toFixed(2)}
+          unit="mm"
+        />
+        <Stepper<number>
+          label="Interior steel"
+          value={intSteel}
+          options={STEEL_GAUGES}
+          onChange={setIntSteel}
+          format={(v) => v.toFixed(2)}
+          unit="mm"
+        />
+      </div>
+    </section>
+  );
+}
+
