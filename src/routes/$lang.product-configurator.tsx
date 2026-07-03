@@ -35,17 +35,32 @@ import { Button } from "@/components/ui/button";
 import { buildSeo } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
-import panelPIR from "@/assets/configurator/panel-pir.jpg";
-import panelPUR from "@/assets/configurator/panel-pur.jpg";
-import panelRockwool from "@/assets/configurator/panel-rockwool.jpg";
-import panelGlasswool from "@/assets/configurator/panel-glasswool.jpg";
-import panelEPS from "@/assets/configurator/panel-eps.jpg";
 import heroImg from "@/assets/configurator/hero-configurator.jpg";
 import ctxWall from "@/assets/configurator/context-wall.jpg";
 import ctxRoof from "@/assets/configurator/context-roof.jpg";
 import ctxColdroom from "@/assets/configurator/context-coldroom.jpg";
 import ctxCleanroom from "@/assets/configurator/context-cleanroom.jpg";
 import ctxFire from "@/assets/configurator/context-fire.jpg";
+
+import { DynamicPanelPreview } from "@/components/configurator/DynamicPanelPreview";
+import {
+  type Config,
+  type PanelType,
+  type CoreMaterial,
+  type JointType,
+  type Coating,
+  type ProfileType,
+  CORES,
+  COATINGS,
+  JOINTS,
+  COLOR_SWATCHES,
+  PROFILES,
+  THICKNESSES,
+  STEEL_GAUGES,
+  DEFAULT_CONFIG,
+  computeResults,
+  findColor,
+} from "@/components/configurator/panel-data";
 
 export const Route = createFileRoute("/$lang/product-configurator")({
   head: ({ params }) => ({
@@ -70,11 +85,6 @@ export const Route = createFileRoute("/$lang/product-configurator")({
 
 /* --------------------------- Domain data --------------------------- */
 
-type PanelType = "wall" | "roof" | "coldroom" | "cleanroom" | "fire";
-type CoreMaterial = "PIR" | "PUR" | "Rock Wool" | "EPS" | "Glass Wool";
-type JointType = "Hidden Screw" | "Visible Screw" | "Tongue & Groove" | "Cam-Lock";
-type Coating = "PVDF" | "Polyester" | "Plastisol" | "HDP";
-
 const PANEL_TYPES: {
   id: PanelType;
   label: string;
@@ -88,28 +98,6 @@ const PANEL_TYPES: {
   { id: "fire", label: "Fire Rated Panel", desc: "EI 60 – EI 240 rated", icon: Flame },
 ];
 
-const CORES: {
-  id: CoreMaterial;
-  density: number;
-  lambda: number;
-  fire: string;
-  desc: string;
-}[] = [
-  { id: "PIR", density: 40, lambda: 0.022, fire: "B-s1,d0", desc: "Best thermal / weight ratio" },
-  { id: "PUR", density: 40, lambda: 0.023, fire: "B-s2,d0", desc: "Cost-optimised insulation" },
-  { id: "Rock Wool", density: 110, lambda: 0.041, fire: "A1", desc: "Non-combustible, acoustic" },
-  { id: "EPS", density: 15, lambda: 0.038, fire: "E", desc: "Lightweight, economical" },
-  { id: "Glass Wool", density: 90, lambda: 0.035, fire: "A1", desc: "Fire safety + acoustic" },
-];
-
-const PANEL_IMAGES: Record<CoreMaterial, string> = {
-  PIR: panelPIR,
-  PUR: panelPUR,
-  "Rock Wool": panelRockwool,
-  "Glass Wool": panelGlasswool,
-  EPS: panelEPS,
-};
-
 const CONTEXT_IMAGES: Record<PanelType, string> = {
   wall: ctxWall,
   roof: ctxRoof,
@@ -118,127 +106,7 @@ const CONTEXT_IMAGES: Record<PanelType, string> = {
   fire: ctxFire,
 };
 
-const COATING_META: Record<Coating, { warranty: number; durability: string; priceFactor: number }> = {
-  PVDF: { warranty: 25, durability: "Marine / harsh UV", priceFactor: 1.35 },
-  Polyester: { warranty: 10, durability: "Standard exterior", priceFactor: 1.0 },
-  Plastisol: { warranty: 15, durability: "Industrial / corrosive", priceFactor: 1.18 },
-  HDP: { warranty: 20, durability: "High-durability polymer", priceFactor: 1.22 },
-};
 
-const PANEL_TYPE_META: Record<PanelType, { fireBoost: string | null; premium: number }> = {
-  wall: { fireBoost: null, premium: 1.0 },
-  roof: { fireBoost: null, premium: 1.05 },
-  coldroom: { fireBoost: null, premium: 1.15 },
-  cleanroom: { fireBoost: null, premium: 1.25 },
-  fire: { fireBoost: "EI 120 (A1)", premium: 1.4 },
-};
-
-const JOINTS: JointType[] = ["Hidden Screw", "Visible Screw", "Tongue & Groove", "Cam-Lock"];
-const COATINGS: Coating[] = ["PVDF", "Polyester", "Plastisol", "HDP"];
-const COLOR_SWATCHES = [
-  { ral: "RAL 9002", hex: "#E7E7DE" },
-  { ral: "RAL 7016", hex: "#293133" },
-  { ral: "RAL 9010", hex: "#F1ECE1" },
-  { ral: "RAL 5010", hex: "#0E4C7E" },
-  { ral: "RAL 3020", hex: "#B81A1F" },
-  { ral: "RAL 6005", hex: "#114232" },
-];
-
-interface Config {
-  panelType: PanelType;
-  core: CoreMaterial;
-  thickness: number;
-  width: number;
-  length: number;
-  joint: JointType;
-  extSteel: number;
-  intSteel: number;
-  coating: Coating;
-  color: string;
-  accessories: string[];
-}
-
-const DEFAULT_CONFIG: Config = {
-  panelType: "wall",
-  core: "PIR",
-  thickness: 100,
-  width: 1000,
-  length: 6,
-  joint: "Hidden Screw",
-  extSteel: 0.5,
-  intSteel: 0.4,
-  coating: "PVDF",
-  color: "RAL 9002",
-  accessories: [],
-};
-
-/* ------------------ Engineering result calculations ------------------ */
-
-function computeResults(cfg: Config) {
-  const core = CORES.find((c) => c.id === cfg.core)!;
-  const coating = COATING_META[cfg.coating];
-  const ptype = PANEL_TYPE_META[cfg.panelType];
-  const thicknessM = cfg.thickness / 1000;
-
-  const uValue = core.lambda / thicknessM;
-  const steelKg = (cfg.extSteel + cfg.intSteel) * 7.85;
-  const coreKg = core.density * thicknessM;
-  const weight = +(steelKg + coreKg).toFixed(1);
-
-  // Fire rating: fire panel type upgrades non-A1 cores to a rated system
-  const fireRating =
-    ptype.fireBoost && core.fire !== "A1" ? ptype.fireBoost : core.fire;
-
-  // Rw acoustic: density + thickness contribution + steel gauge
-  const sound =
-    20 +
-    Math.round(core.density / 12) +
-    Math.round(cfg.thickness / 25) +
-    Math.round((cfg.extSteel + cfg.intSteel) * 4);
-
-  const thermalScore =
-    uValue < 0.2 ? "Excellent" : uValue < 0.3 ? "Very Good" : uValue < 0.45 ? "Good" : "Standard";
-
-  const app =
-    cfg.panelType === "coldroom"
-      ? "Cold storage, food processing, logistics"
-      : cfg.panelType === "cleanroom"
-        ? "Pharma, semiconductor, laboratories"
-        : cfg.panelType === "fire"
-          ? "Compartmentation, escape routes, industrial fire zones"
-          : cfg.panelType === "roof"
-            ? "Industrial roofs, warehouses, factories"
-            : "Facades, partitions, industrial envelopes";
-
-  // Indicative price per m² (USD) — deterministic, transparent
-  const basePrice =
-    12 + core.density * 0.11 + cfg.thickness * 0.14 + (cfg.extSteel + cfg.intSteel) * 8;
-  const pricePerM2 = +(basePrice * coating.priceFactor * ptype.premium).toFixed(1);
-  const totalArea = +((cfg.width / 1000) * cfg.length).toFixed(2);
-  const totalPrice = +(pricePerM2 * totalArea).toFixed(0);
-
-  // Lead time scales with core availability and accessories
-  const leadTime =
-    (core.id === "Rock Wool" || core.id === "Glass Wool" ? 5 : 3) +
-    Math.ceil(cfg.accessories.length / 2) +
-    (cfg.panelType === "cleanroom" || cfg.panelType === "fire" ? 2 : 0);
-
-  return {
-    uValue: +uValue.toFixed(3),
-    weight,
-    fireRating,
-    sound,
-    thermalScore,
-    application: app,
-    coreDensity: core.density,
-    warranty: coating.warranty,
-    coatingDurability: coating.durability,
-    pricePerM2,
-    totalArea,
-    totalPrice,
-    leadTime,
-  };
-}
 
 /* --------------------------- Reusable studio frame --------------------------- */
 /*  White studio card that renders any panel render at true aspect —            */
