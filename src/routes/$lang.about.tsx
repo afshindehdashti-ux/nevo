@@ -221,50 +221,6 @@ function WhatWeDo() {
   );
 }
 
-function OurApproach() {
-  const { t } = useTranslation();
-  const steps = t("about.approach.steps", { returnObjects: true }) as string[];
-  return (
-    <Section className="bg-[#f6f6f4]">
-      <SectionHeader eyebrow={t("about.approach.eyebrow")} title={t("about.approach.title")} />
-      <div className="mt-14 relative">
-        <div aria-hidden className="absolute left-0 right-0 top-6 hidden h-px bg-black/10 md:block" />
-        <ol className="grid grid-cols-3 gap-6 md:grid-cols-9">
-          {steps.map((step, i) => (
-            <motion.li key={step} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.4, delay: i * 0.04 }} className="relative flex flex-col items-center text-center">
-              <div className="relative z-10 grid size-12 place-items-center rounded-full bg-white ring-1 ring-black/10">
-                <span className="font-mono text-xs text-accent">{String(i + 1).padStart(2, "0")}</span>
-              </div>
-              <div className="mt-3 text-sm font-medium">{step}</div>
-            </motion.li>
-          ))}
-        </ol>
-      </div>
-    </Section>
-  );
-}
-
-function WhyNEVO() {
-  const { t } = useTranslation();
-  const items = t("about.why.items", { returnObjects: true }) as Array<{t:string;b:string}>;
-  return (
-    <Section className="bg-white">
-      <SectionHeader eyebrow={t("about.why.eyebrow")} title={t("about.why.title")} />
-      <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {items.map((w, i) => {
-          const Icon = WHY_ICONS[i];
-          return (
-            <motion.div key={w.t} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.5, delay: (i % 4) * 0.05 }} className="rounded-2xl bg-[#f6f6f4] p-6 ring-1 ring-black/5">
-              <Icon className="size-5 text-accent" />
-              <h3 className="mt-4 text-base font-medium">{w.t}</h3>
-              <p className="mt-2 text-sm text-black/65">{w.b}</p>
-            </motion.div>
-          );
-        })}
-      </div>
-    </Section>
-  );
-}
 
 function GlobalPresence() {
   const { t } = useTranslation();
