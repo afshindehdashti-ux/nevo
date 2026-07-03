@@ -998,6 +998,15 @@ def write_step_summary(results: list[dict]) -> None:
     # latency shapes are not averaged together.
     lines += _render_latency_heatmap(display)
 
+    # Top repeat offenders: surface which URLs (and which solution/path
+    # groups) burned the most retry attempts or produced failures, so a
+    # reader can jump straight to the worst actors without scanning the
+    # full per-URL table. Env-tunable via TOP_OFFENDERS (default 5, 0
+    # disables the section).
+    top_n = int(_num("TOP_OFFENDERS", 5, cast=int, minimum=0))
+    if top_n > 0:
+        lines += _render_top_offenders(display, top_n)
+
 
 
     lines += [
