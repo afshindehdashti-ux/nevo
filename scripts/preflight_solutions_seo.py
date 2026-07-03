@@ -169,7 +169,18 @@ RETRYABLE_ERROR_KINDS: set[str] = {
     for k in (os.environ.get("RETRYABLE_ERROR_KINDS") or _DEFAULT_RETRYABLE).split(",")
     if k.strip()
 }
+
+# HTTP status classes/codes worth retrying independently of RETRYABLE_ERROR_KINDS.
+# Accepts `4xx`, `5xx` classes or exact codes like `429`, `503`. This lets the
+# user retry only rate-limit/overload responses without enabling retry for
+# every HTTP error via RETRYABLE_ERROR_KINDS.
+RETRYABLE_STATUS_CLASSES: set[str] = {
+    s.strip().lower()
+    for s in (os.environ.get("RETRYABLE_STATUS_CLASSES") or "").split(",")
+    if s.strip()
+}
 IN_GHA = os.environ.get("GITHUB_ACTIONS") == "true"
+
 
 
 # Minimum body size (bytes) that indicates a real page vs. an SPA error shell.
