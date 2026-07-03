@@ -1,0 +1,68 @@
+name: Solutions SEO snapshot
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  seo-snapshot:
+    name: Canonical / og / twitter / hreflang (Solutions × 10 locales)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Boot Vite dev in the background and wait for the port.
+      - name: Start Vite dev server
+        run: |
+          nohup bun run dev --port 4323 --host 127.0.0.1 > vite.log 2>&1 &
+          echo $! > vite.pid
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:4323/ -o /dev/null; then
+              echo "vite is up"; exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::Vite did not start in 60s"
+          tail -n 200 vite.log || true
+          exit 1
+
+      # Run the SSR SEO snapshot. On failure, exit 1 fails the job -> red PR check.
+      # Emits a JSON artifact and a Markdown block appended to the PR/run summary.
+      - name: Verify Solutions SEO (SSR snapshot)
+        env:
+          BASE_URL: http://127.0.0.1:4323
+          REPORT_JSON: reports/seo/solutions-seo.json
+          REPORT_MD: ${{ github.step_summary }}
+        run: python3 scripts/verify_solutions_seo.py
+
+      - name: Stop Vite dev server
+        if: always()
+        run: |
+          if [ -f vite.pid ]; then kill "$(cat vite.pid)" || true; fi
+
+      - name: Upload SEO snapshot report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: solutions-seo-report
+          path: |
+            reports/seo/solutions-seo.json
+            vite.log
+          if-no-files-found: warn
