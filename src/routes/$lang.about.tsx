@@ -58,8 +58,7 @@ function AboutPage() {
         <OurMission />
         <OurVision />
         <WhatWeDo />
-        <OurApproach />
-        <WhyNEVO />
+        <SharedWhyNevo />
         <GlobalPresence />
         <OurValues />
         <OurDifference />
