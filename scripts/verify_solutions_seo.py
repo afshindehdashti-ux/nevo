@@ -201,6 +201,12 @@ def _esc(s: object) -> str:
     )
 
 
+def _md_cell(s: object) -> str:
+    """Escape a string for use inside a Markdown table cell."""
+    return str(s).replace("|", "\\|").replace("\n", "<br>")
+
+
+
 def render_md(base: str, results: list, failed: list) -> str:
     from datetime import datetime, timezone
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
