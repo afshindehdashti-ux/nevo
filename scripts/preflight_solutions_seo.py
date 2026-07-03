@@ -291,6 +291,17 @@ def _md_cell(s: object) -> str:
     return str(s).replace("|", "\\|").replace("\n", " ")
 
 
+def _render_headers_md(headers: dict[str, str]) -> str:
+    if not headers:
+        return "_none_"
+    parts = []
+    for name, val in headers.items():
+        shown = _mask(val) if _is_sensitive_header(name) else val
+        parts.append(f"`{name}: {shown}`")
+    return ", ".join(parts)
+
+
+
 def write_step_summary(results: list[dict]) -> None:
     """Append a Markdown table of results to $GITHUB_STEP_SUMMARY."""
     path = os.environ.get("GITHUB_STEP_SUMMARY")
