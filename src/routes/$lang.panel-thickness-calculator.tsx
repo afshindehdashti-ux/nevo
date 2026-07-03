@@ -556,6 +556,154 @@ function BarChart({
   );
 }
 
+// ---------------- Input validation / engineering guardrails ----------------
+type IssueField =
+  | "app"
+  | "core"
+  | "climate"
+  | "temp"
+  | "fire"
+  | "thickness"
+  | "extSteel"
+  | "intSteel";
+
+type Issue = {
+  field: IssueField;
+  severity: "error" | "warning";
+  message: string;
+};
+
+function validateInputs(input: {
+  app: Application;
+  core: Core;
+  climate: Climate;
+  temp: Temp;
+  fire: Fire;
+  thickness: Thickness;
+  extSteel: number;
+  intSteel: number;
+}): Issue[] {
+  const { app, core, climate, temp, fire, thickness, extSteel, intSteel } = input;
+  const issues: Issue[] = [];
+  const requiredFireMin = fireRequirementMinutes(fire);
+  const isCombustibleCore = core === "PIR" || core === "PUR" || core === "EPS";
+
+  // --- Hard errors: physically / regulatorily impossible combinations ---
+
+  if (requiredFireMin >= 120 && isCombustibleCore) {
+    issues.push({
+      field: "core",
+      severity: "error",
+      message: `${core} cannot achieve a ${fire} fire rating. Switch to Rock Wool or Glass Wool for ≥120 min.`,
+    });
+    issues.push({
+      field: "fire",
+      severity: "error",
+      message: `A ${fire} rating requires a mineral (non-combustible) core.`,
+    });
+  }
+
+  if (core === "EPS" && requiredFireMin >= 60) {
+    issues.push({
+      field: "core",
+      severity: "error",
+      message: `EPS cannot achieve a ${fire} fire rating; it is limited to short-duration ratings.`,
+    });
+  }
+
+  if (app === "Freezer Room" && core === "EPS") {
+    issues.push({
+      field: "core",
+      severity: "error",
+      message: "EPS is not suitable for freezer rooms (moisture absorption and thermal drift).",
+    });
+  }
+
+  if ((temp === "-25°C" || temp === "-40°C") && thickness < 120) {
+    issues.push({
+      field: "thickness",
+      severity: "error",
+      message: `Internal temperatures at ${temp} require ≥120 mm to prevent condensation and thermal loss.`,
+    });
+  }
+  if (temp === "-40°C" && thickness < 150) {
+    issues.push({
+      field: "thickness",
+      severity: "error",
+      message: "Blast freezer (-40°C) applications require at least 150 mm of insulation.",
+    });
+  }
+
+  if (app === "Clean Room" && (extSteel < 0.5 || intSteel < 0.5)) {
+    if (extSteel < 0.5)
+      issues.push({
+        field: "extSteel",
+        severity: "error",
+        message: "Clean rooms require ≥0.50 mm exterior skin for rigidity and hygiene compliance.",
+      });
+    if (intSteel < 0.5)
+      issues.push({
+        field: "intSteel",
+        severity: "error",
+        message: "Clean rooms require ≥0.50 mm interior skin for rigidity and hygiene compliance.",
+      });
+  }
+
+  // --- Warnings: unusual but not blocked ---
+
+  if (intSteel > extSteel) {
+    issues.push({
+      field: "extSteel",
+      severity: "warning",
+      message: "Interior skin is thicker than exterior. Exterior faces weather; typically ext ≥ int.",
+    });
+  }
+
+  if (climate === "Very Cold" && thickness < 100) {
+    issues.push({
+      field: "thickness",
+      severity: "warning",
+      message: "In very cold climates, ≥100 mm is usually recommended to control heat loss.",
+    });
+  }
+
+  if (core === "EPS" && thickness > 150) {
+    issues.push({
+      field: "thickness",
+      severity: "warning",
+      message: "EPS panels above 150 mm are rarely produced; consider PIR or Rock Wool.",
+    });
+  }
+
+  if (app === "Cold Storage" && thickness < 80) {
+    issues.push({
+      field: "thickness",
+      severity: "warning",
+      message: "Cold storage typically uses ≥80 mm to maintain stable interior temperatures.",
+    });
+  }
+
+  if ((core === "Rock Wool" || core === "Glass Wool") && thickness >= 250) {
+    issues.push({
+      field: "thickness",
+      severity: "warning",
+      message: `${core} at ${thickness} mm becomes very heavy; verify structural support and handling.`,
+    });
+  }
+
+  return issues;
+}
+
+function firstBy<T extends { field: IssueField; severity: "error" | "warning" }>(
+  issues: T[],
+  field: IssueField,
+): T | undefined {
+  return (
+    issues.find((i) => i.field === field && i.severity === "error") ??
+    issues.find((i) => i.field === field && i.severity === "warning")
+  );
+}
+
 // ---------------- Shareable state (URL query encoding) ----------------
 const APPLICATIONS_ALL: Application[] = [
   "Cold Storage",
