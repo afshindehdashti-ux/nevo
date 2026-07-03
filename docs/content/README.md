@@ -306,3 +306,15 @@ When any single tier crosses these thresholds, revisit this doc:
 - `docs/content/templates/` — per-template field specs *(to be authored with first page of each type)*
 - `docs/content/checklist.md` — pre-publish quality gate *(to be authored before first launch)*
 - `docs/content/calendar.md` — editorial calendar *(to be authored when scheduling begins)*
+
+## 17. Logo Telemetry Configuration
+
+Header logo events (`header.logo.render` and `header.logo.error`) are controlled by three build-time environment variables. All are read by Vite at build time and clamped to safe ranges; malformed or missing values fall back to defaults.
+
+| Variable | Type | Range | Default | Behavior |
+|---|---|---|---|---|
+| `VITE_LOGO_RENDER_SAMPLE_RATE` | number | `0..1` | `1` in dev, `0.05` in production | Probability that a single render event is logged per tab session. Set to `0` to disable render logging entirely. |
+| `VITE_LOGO_ERROR_MAX_PER_SESSION` | integer | `0..1000` | `4` | Maximum `header.logo.error` events sent per tab session. Set to `0` to disable error logging entirely. |
+| `VITE_LOGO_ERROR_MIN_INTERVAL_MS` | integer | `0..60000` | `1000` | Minimum milliseconds between two non-terminal errors of the same stage. Used to suppress duplicate bursts while preserving real-time alerting. |
+
+These values are consumed in `src/lib/logo-telemetry-config.ts` and emitted by the client logger to `/api/public/client-log`. Events are stored in `public.header_logo_events` and forwarded to Sentry for operational alerts.
