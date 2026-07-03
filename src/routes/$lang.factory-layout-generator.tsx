@@ -951,6 +951,7 @@ function FactoryLayoutPage() {
             {tab === "layout" && (
               <>
                 {LayoutViewer}
+                {ZoneTogglesPanel}
                 {RecommendationsPanel}
               </>
             )}
