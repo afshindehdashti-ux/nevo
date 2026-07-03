@@ -131,6 +131,13 @@ function FactoryDevelopmentPage() {
         <DevelopmentProcess />
         <InvestmentModel />
         <ConnectedSolutions />
+        <InquiryCTA
+          source="new-factory"
+          eyebrow="Factory inquiry"
+          title="Start scoping your greenfield factory."
+          lede="Share your target market, capacity and site. We respond with a scoped development plan — feasibility, master plan, building, utilities and commissioning — within one business day."
+          ctaLabel="Start Factory Inquiry"
+        />
         <FinalCTA />
       </main>
       <SiteFooter />
