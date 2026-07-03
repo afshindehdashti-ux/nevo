@@ -1156,13 +1156,9 @@ def write_step_summary(results: list[dict]) -> None:
             (r["error_kind"], r["status_class"]): r
             for r in _build_breakdown_rows(display)
         }
-        combo_rows = sorted(
-            combo_all.items(),
-            key=lambda kv: (0 if kv[0][0] == "ok" else -1,
-                            -kv[1], kv[0][0], kv[0][1]),
-        )
         total_all = max(len(display), 1)
         total_fail = max(sum(combo.values()), 1)
+        combo_rows = _sort_combo_rows(combo_all, combo, total_all, total_fail)
         overall_fail_pct = 100.0 * sum(combo.values()) / total_all
         lines.append("")
         lines.append(
