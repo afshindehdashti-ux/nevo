@@ -935,6 +935,13 @@ export function attachLogoDebugUtil(): void {
         filter: LogoDumpFilter,
         origin?: LogoTelemetryDump["origin"],
       ) => string;
+      /**
+       * Aggregate counts (totalScanned, matchedCount, emitted vs
+       * suppressed errors, by-reason breakdown) over the ring buffer.
+       * Optional `opts` accepts the same filter shape as `dump()`.
+       */
+      getStats: (opts?: LogoDumpOptions) => LogoTelemetryStats;
+      getStatsAsJSON: (opts?: LogoDumpOptions) => string;
     };
   };
   w.__nevoLogoDebug = {
