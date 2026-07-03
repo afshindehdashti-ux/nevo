@@ -180,13 +180,11 @@ def _parse_headers(spec: str) -> dict[str, str]:
     out: dict[str, str] = {}
     if not spec:
         return out
-    # Split on newlines first, then split each line on `;` ONLY where the
-    # following chunk looks like `Name:` or `Name=` — this keeps values like
-    # `Accept-Language: fa,en;q=0.8` intact.
-    _entry_split = re.compile(r";\s*(?=[A-Za-z][\w-]*\s*[:=])")
+    # Split on newlines and `|`. `;` is NOT a separator because it commonly
+    # appears inside header values (e.g. `Accept-Language: fa,en;q=0.8`).
     parts: list[str] = []
     for line in spec.splitlines():
-        parts.extend(_entry_split.split(line))
+        parts.extend(line.split("|"))
     for raw in (p.strip() for p in parts if p.strip()):
         if ":" in raw:
             name, _, val = raw.partition(":")
