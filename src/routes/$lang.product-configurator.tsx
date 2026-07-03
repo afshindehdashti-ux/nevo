@@ -176,15 +176,29 @@ const DEFAULT_CONFIG: Config = {
 
 function computeResults(cfg: Config) {
   const core = CORES.find((c) => c.id === cfg.core)!;
+  const coating = COATING_META[cfg.coating];
+  const ptype = PANEL_TYPE_META[cfg.panelType];
   const thicknessM = cfg.thickness / 1000;
+
   const uValue = core.lambda / thicknessM;
   const steelKg = (cfg.extSteel + cfg.intSteel) * 7.85;
   const coreKg = core.density * thicknessM;
   const weight = +(steelKg + coreKg).toFixed(1);
-  const fireRating = core.fire;
-  const sound = 25 + Math.round(core.density / 10);
+
+  // Fire rating: fire panel type upgrades non-A1 cores to a rated system
+  const fireRating =
+    ptype.fireBoost && core.fire !== "A1" ? ptype.fireBoost : core.fire;
+
+  // Rw acoustic: density + thickness contribution + steel gauge
+  const sound =
+    20 +
+    Math.round(core.density / 12) +
+    Math.round(cfg.thickness / 25) +
+    Math.round((cfg.extSteel + cfg.intSteel) * 4);
+
   const thermalScore =
-    uValue < 0.25 ? "Excellent" : uValue < 0.35 ? "Very Good" : uValue < 0.5 ? "Good" : "Standard";
+    uValue < 0.2 ? "Excellent" : uValue < 0.3 ? "Very Good" : uValue < 0.45 ? "Good" : "Standard";
+
   const app =
     cfg.panelType === "coldroom"
       ? "Cold storage, food processing, logistics"
@@ -195,6 +209,20 @@ function computeResults(cfg: Config) {
           : cfg.panelType === "roof"
             ? "Industrial roofs, warehouses, factories"
             : "Facades, partitions, industrial envelopes";
+
+  // Indicative price per m² (USD) — deterministic, transparent
+  const basePrice =
+    12 + core.density * 0.11 + cfg.thickness * 0.14 + (cfg.extSteel + cfg.intSteel) * 8;
+  const pricePerM2 = +(basePrice * coating.priceFactor * ptype.premium).toFixed(1);
+  const totalArea = +((cfg.width / 1000) * cfg.length).toFixed(2);
+  const totalPrice = +(pricePerM2 * totalArea).toFixed(0);
+
+  // Lead time scales with core availability and accessories
+  const leadTime =
+    (core.id === "Rock Wool" || core.id === "Glass Wool" ? 5 : 3) +
+    Math.ceil(cfg.accessories.length / 2) +
+    (cfg.panelType === "cleanroom" || cfg.panelType === "fire" ? 2 : 0);
+
   return {
     uValue: +uValue.toFixed(3),
     weight,
@@ -203,6 +231,12 @@ function computeResults(cfg: Config) {
     thermalScore,
     application: app,
     coreDensity: core.density,
+    warranty: coating.warranty,
+    coatingDurability: coating.durability,
+    pricePerM2,
+    totalArea,
+    totalPrice,
+    leadTime,
   };
 }
 
