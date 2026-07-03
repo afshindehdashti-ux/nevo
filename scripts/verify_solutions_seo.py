@@ -163,17 +163,35 @@ def main() -> int:
             for f in r["failures"]:
                 print(f"      {f}")
 
-    # GitHub PR annotations — one per failing check, pinned to the route file.
+    # GitHub PR annotations — pinned to the route file.
+    # Per-check annotations give the finest detail; grouping keeps PRs tidy when
+    # one page has many related issues.
     level = "warning" if WARN_ONLY else "error"
-    for r in failed:
-        file = ROUTE_FILES.get(r["path"], "src/routes/__root.tsx")
-        for f in r["failures"]:
+    if GROUP_ANNOTATIONS:
+        by_key: dict[tuple[str, str, str], list[dict]] = {}
+        for r in failed:
+            file = ROUTE_FILES.get(r["path"], "src/routes/__root.tsx")
+            key = (file, r["path"], r["locale"])
+            by_key.setdefault(key, []).append(r)
+        for (file, path, locale), rs in by_key.items():
+            urls = sorted({r["url"] for r in rs})
+            issues = "\n".join(f"• {f}" for r in rs for f in r["failures"])
             emit_annotation(
                 level,
                 file,
-                f"Solutions SEO [{r['locale']}] {r['path']}",
-                f"{f} — {r['url']}",
+                f"Solutions SEO [{locale}] {path}",
+                f"{len(rs)} issue(s) on {len(urls)} URL(s)\n{issues}",
             )
+    else:
+        for r in failed:
+            file = ROUTE_FILES.get(r["path"], "src/routes/__root.tsx")
+            for f in r["failures"]:
+                emit_annotation(
+                    level,
+                    file,
+                    f"Solutions SEO [{r['locale']}] {r['path']}",
+                    f"{f} — {r['url']}",
+                )
 
 
     # Machine JSON report
