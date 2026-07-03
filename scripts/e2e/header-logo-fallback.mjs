@@ -88,19 +88,19 @@ try {
 
   // The SSR-served HTML starts loading the <img> before React hydrates, so
   // the initial load error fires *before* React attaches its onError
-  // listener and gets dropped. Wait for hydration, then re-poke the src to
-  // trigger a fresh (still-intercepted) request that React can observe.
+  // listener and gets dropped. Wait for hydration, then dispatch a native
+  // "error" event on the still-broken image — React's synthetic event
+  // system picks it up in the capture phase and runs the onError handler,
+  // which is the exact production code path this test exercises.
   await page.waitForTimeout(1500);
   await page.evaluate(() => {
     const img = document.querySelector('[data-testid="header-logo"]');
     if (!(img instanceof HTMLImageElement)) return;
-    // Cache-bust so the browser actually issues a fresh network request
-    // that React's post-hydration onError listener can observe (the initial
-    // SSR-driven load error fires before hydration and gets dropped).
-    const base = img.src.split("?")[0];
-    img.removeAttribute("src");
-    img.src = `${base}?e2e-force-fail=${Date.now()}`;
+    if (img.complete && img.naturalWidth === 0) {
+      img.dispatchEvent(new Event("error", { bubbles: false }));
+    }
   });
+
 
 
   // Poll until the SVG fallback is present; on each miss dump the current
