@@ -272,6 +272,22 @@ export type LogoTelemetryDump = {
    * refused to expose telemetry. Payload is empty in that case.
    */
   disabled?: boolean;
+  /**
+   * Set when the dump was scoped to a single correlationId so QA can
+   * share a minimal blob for one incident. `matchedCount` counts the
+   * raw ring-buffer entries that matched BEFORE redaction so a reporter
+   * can tell "0 matches" apart from "filter dropped everything".
+   */
+  filter?: {
+    correlationId: string;
+    matchedCount: number;
+    totalScanned: number;
+  };
+};
+
+export type LogoDumpOptions = {
+  /** Filter decisions to only those whose correlationId strictly equals this. */
+  correlationId?: string;
 };
 
 const REDACTED = "[redacted]";
