@@ -885,6 +885,26 @@ function PanelThicknessPage() {
     return { thermal, fire: fireS, weight: weightS, cost: costS, appFit };
   }, [u, w, thickness, meetsRec, belowRec, fireAchieved, requiredFireMin]);
 
+  // ---------- Validation & guardrails ----------
+  const issues = useMemo(
+    () => validateInputs({ app, core, climate, temp, fire, thickness, extSteel, intSteel }),
+    [app, core, climate, temp, fire, thickness, extSteel, intSteel],
+  );
+  const errors = useMemo(() => issues.filter((i) => i.severity === "error"), [issues]);
+  const warnings = useMemo(() => issues.filter((i) => i.severity === "warning"), [issues]);
+  const hasErrors = errors.length > 0;
+  const fieldIssues: Partial<Record<IssueField, Issue>> = {
+    app: firstBy(issues, "app"),
+    core: firstBy(issues, "core"),
+    climate: firstBy(issues, "climate"),
+    temp: firstBy(issues, "temp"),
+    fire: firstBy(issues, "fire"),
+    thickness: firstBy(issues, "thickness"),
+    extSteel: firstBy(issues, "extSteel"),
+    intSteel: firstBy(issues, "intSteel"),
+  };
+
+
   function toggleCompare(t: number) {
     setCompare((prev) => {
       if (prev.includes(t)) return prev.filter((x) => x !== t);
