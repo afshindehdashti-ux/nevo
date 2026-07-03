@@ -161,7 +161,7 @@ function buildFallbackChain(e: LogoErrorEvent): string {
   return parts.join(" → ");
 }
 
-function buildSentryEvent(e: LogoErrorEvent) {
+function buildSentryEvent(e: LogoErrorEvent, sampling?: import("./sentry-sampler.server").SamplingDecision) {
   const stage = e.stage ?? "unknown";
   const terminal = e.terminal === true;
   const nextStep =
@@ -171,6 +171,7 @@ function buildSentryEvent(e: LogoErrorEvent) {
         ? "inline-svg"
         : "none";
   const fallbackChain = buildFallbackChain(e);
+
   return {
     event_id: randomEventId(),
     timestamp: toEpochSeconds(e.clientTs),
@@ -205,7 +206,11 @@ function buildSentryEvent(e: LogoErrorEvent) {
       schema_version:
         typeof e.schemaVersion === "number" ? String(e.schemaVersion) : null,
       correlation_id: e.correlationId ?? null,
+      sampled_reason: sampling?.reason ?? "unsampled",
+      sampled_window_index: sampling ? String(sampling.windowIndex) : null,
+      sample_divisor: sampling ? String(sampling.sampleDivisor) : null,
     },
+
     user: e.correlationId ? { id: e.correlationId } : undefined,
     request: {
       url: e.url,
@@ -265,13 +270,37 @@ export async function forwardLogoErrorsToSentry(
   const dsn = getDsn();
   if (!dsn) return; // no DSN configured — silent no-op
   try {
-    const sentryEvents = events.map(buildSentryEvent);
+    const { decideForwardLogoError } = await import("./sentry-sampler.server");
+
+    let dropped = 0;
+    const kept: Array<{ event: LogoErrorEvent; sampling: import("./sentry-sampler.server").SamplingDecision }> = [];
+    for (const ev of events) {
+      const decision = decideForwardLogoError({
+        stage: ev.stage,
+        variant: ev.variant,
+        terminal: ev.terminal,
+      });
+      if (decision.forward) {
+        kept.push({ event: ev, sampling: decision });
+      } else {
+        dropped += 1;
+      }
+    }
+    if (dropped > 0) {
+      console.info(
+        `[sentry-forwarder] sampled out ${dropped}/${events.length} logo errors (kept ${kept.length})`,
+      );
+    }
+    if (kept.length === 0) return;
+
+    const sentryEvents = kept.map(({ event, sampling }) => buildSentryEvent(event, sampling));
     const body = buildEnvelope(dsn, sentryEvents);
     const auth = [
       "Sentry sentry_version=7",
       `sentry_client=nevo-logo-forwarder/1.0`,
       `sentry_key=${dsn.publicKey}`,
     ].join(", ");
+
     const res = await fetch(dsn.envelopeUrl, {
       method: "POST",
       headers: {
