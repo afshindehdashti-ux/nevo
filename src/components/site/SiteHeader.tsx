@@ -103,6 +103,79 @@ function getLogoCorrelationId(): string {
   }
 }
 
+/**
+ * Client-side rate limiting + sampling for header logo telemetry.
+ *
+ * Goals: keep production log volume tiny while preserving signal.
+ *  - Render events are high-volume (every page load) → sample at 5% in
+ *    production, always in dev. Only one render event per tab session.
+ *  - Error events are rare and high-value → always sampled, but capped at
+ *    a few per session and throttled to at most one per second per stage
+ *    so a broken CDN can't flood the sink.
+ *  - Terminal SVG-fallback errors bypass sampling limits (still capped) so
+ *    we never miss a total-outage signal.
+ */
+const LOGO_RENDER_SAMPLE_RATE = import.meta.env.DEV ? 1 : 0.05;
+const LOGO_ERROR_MAX_PER_SESSION = 4;
+const LOGO_ERROR_MIN_INTERVAL_MS = 1000;
+
+type LogoRateState = {
+  renderLogged: boolean;
+  renderSampled: boolean | null; // null = not decided yet
+  errorCount: number;
+  lastErrorAt: number;
+  lastErrorStage: string;
+};
+
+function getLogoRateState(): LogoRateState {
+  if (typeof window === "undefined") {
+    return { renderLogged: false, renderSampled: null, errorCount: 0, lastErrorAt: 0, lastErrorStage: "" };
+  }
+  const w = window as unknown as { __nevoLogoRate?: LogoRateState };
+  if (!w.__nevoLogoRate) {
+    w.__nevoLogoRate = {
+      renderLogged: false,
+      renderSampled: null,
+      errorCount: 0,
+      lastErrorAt: 0,
+      lastErrorStage: "",
+    };
+  }
+  return w.__nevoLogoRate;
+}
+
+/** Returns true when a render event should be sent to the log sink. */
+function shouldLogRender(): boolean {
+  const state = getLogoRateState();
+  if (state.renderLogged) return false;
+  if (state.renderSampled === null) {
+    state.renderSampled = Math.random() < LOGO_RENDER_SAMPLE_RATE;
+  }
+  if (!state.renderSampled) return false;
+  state.renderLogged = true;
+  return true;
+}
+
+/** Returns true when an error event should be sent. Terminal errors bypass throttle. */
+function shouldLogError(stage: string, terminal: boolean): boolean {
+  const state = getLogoRateState();
+  if (state.errorCount >= LOGO_ERROR_MAX_PER_SESSION) return false;
+  const now = Date.now();
+  if (
+    !terminal &&
+    stage === state.lastErrorStage &&
+    now - state.lastErrorAt < LOGO_ERROR_MIN_INTERVAL_MS
+  ) {
+    return false;
+  }
+  state.errorCount += 1;
+  state.lastErrorAt = now;
+  state.lastErrorStage = stage;
+  return true;
+}
+
+
+
 
 /* ─────────────────────────────────────────────────────────────
    Navigation model
