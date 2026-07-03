@@ -722,7 +722,7 @@ def write_step_summary(results: list[dict]) -> None:
         lines.append("### Failed response bodies")
         lines.append("")
         lines.append("_Preview of what the server actually returned. Same hash across"
-                     " runs = same error page; empty snippet = no body (transport error"
+                     " runs = same error page; empty snippet = no body (transport error,"
                      " or HEAD request). Response headers help pinpoint the source"
                      " (origin vs CDN, cache hit, Retry-After, redirect target)._")
         lines.append("")
