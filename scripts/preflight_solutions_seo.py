@@ -73,6 +73,12 @@ Env:
                         (images, PDFs, archives, etc.) get an empty
                         snippet to avoid dumping base64/null bytes.
 
+  RESULTS_CSV_PATH     write the full per-URL result set as CSV to this path
+                       (opt-in; upload as a CI artifact for later analysis).
+  RESULTS_JSON_PATH    also write results as pretty JSON (raw dict per URL,
+                       including response headers and body snippet).
+  RESULTS_INCLUDE      `all` (default) or `failures` — filter exported rows.
+
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
