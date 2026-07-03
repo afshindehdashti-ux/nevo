@@ -393,11 +393,12 @@ def probe(url: str) -> dict:
         return {"url": url, "ok": True, "status": status, "bytes": body_bytes,
                 "ms": ms, "attempts": attempts, "error": "", "method": http_method}
 
-    def _do_request(http_method: str) -> tuple[int | None, int, float, str, bytes]:
-        """Issue one request. Returns (status, size_bytes, ms, error, body).
+    def _do_request(http_method: str) -> tuple[int | None, int, float, str, bytes, dict[str, str]]:
+        """Issue one request. Returns (status, size_bytes, ms, error, body, headers).
 
         For HEAD, body is always b"" (no body). For GET, body carries whatever
         the server returned so failed probes can surface a snippet + hash.
+        `headers` is the filtered response-header dict (see RESPONSE_HEADERS).
         """
         t0 = time.perf_counter()
         try:
@@ -409,30 +410,35 @@ def probe(url: str) -> dict:
             req = urllib.request.Request(url, headers=headers, method=http_method)
             opener = urllib.request.urlopen if FOLLOW_REDIRECTS else _NO_REDIRECT_OPENER.open
             with opener(req, timeout=TIMEOUT) as r:
+                resp_headers = _pick_response_headers(r.headers)
                 if http_method == "HEAD":
                     return r.status, int(r.headers.get("Content-Length") or 0), \
-                        (time.perf_counter() - t0) * 1000, "", b""
+                        (time.perf_counter() - t0) * 1000, "", b"", resp_headers
                 body = r.read()
-                return r.status, len(body), (time.perf_counter() - t0) * 1000, "", body
+                return r.status, len(body), (time.perf_counter() - t0) * 1000, "", body, resp_headers
         except urllib.error.HTTPError as e:
             ms = (time.perf_counter() - t0) * 1000
+            resp_headers = _pick_response_headers(e.headers) if e.headers else {}
             if http_method == "HEAD":
                 size = int(e.headers.get("Content-Length") or 0) if e.headers else 0
-                return e.code, size, ms, f"HTTP {e.code}", b""
+                return e.code, size, ms, f"HTTP {e.code}", b"", resp_headers
             try:
                 body = e.read() or b""
             except Exception:
                 body = b""
-            return e.code, len(body), ms, f"HTTP {e.code}", body
+            return e.code, len(body), ms, f"HTTP {e.code}", body, resp_headers
         except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
             ms = (time.perf_counter() - t0) * 1000
-            return None, 0, ms, f"{type(e).__name__}: {e}", b""
+            return None, 0, ms, f"{type(e).__name__}: {e}", b"", {}
 
+    last_headers: dict[str, str] = {}
     for attempt in range(1, RETRIES + 1):
         attempts = attempt
 
         first_method = "HEAD" if method_mode in ("HEAD", "HEAD_THEN_GET") else "GET"
-        status, size, ms, err, body = _do_request(first_method)
+        status, size, ms, err, body, resp_headers = _do_request(first_method)
+        if resp_headers:
+            last_headers = resp_headers
 
         if status is not None:
             ok = _evaluate(status, size, ms, first_method, body)
@@ -440,7 +446,9 @@ def probe(url: str) -> dict:
                 return ok
 
         if method_mode == "HEAD_THEN_GET" and first_method == "HEAD":
-            status2, size2, ms2, err2, body2 = _do_request("GET")
+            status2, size2, ms2, err2, body2, resp_headers2 = _do_request("GET")
+            if resp_headers2:
+                last_headers = resp_headers2
             if status2 is not None:
                 ok2 = _evaluate(status2, size2, ms2, "GET", body2)
                 if ok2:
@@ -459,7 +467,8 @@ def probe(url: str) -> dict:
     return {"url": url, "ok": False, "status": last_status, "bytes": last_bytes,
             "ms": last_ms, "attempts": attempts,
             "error": last_err or "unknown error", "method": last_method or method_mode,
-            "body_hash": body_hash, "body_snippet": body_snippet}
+            "body_hash": body_hash, "body_snippet": body_snippet,
+            "response_headers": last_headers}
 
 
 
