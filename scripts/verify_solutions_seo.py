@@ -180,25 +180,9 @@ def main() -> int:
     # GitHub step summary markdown
     if p := os.environ.get("REPORT_MD"):
         Path(p).parent.mkdir(parents=True, exist_ok=True)
-        lines = [
-            f"## Solutions SEO snapshot",
-            f"- Base: `{BASE}`",
-            f"- Pages checked: **{len(results)}** ({len(LOCALES)} locales × {len(PATHS)} routes)",
-            f"- Failing: **{len(failed)}**",
-            "",
-        ]
-        if failed:
-            lines.append("### Failures")
-            lines.append("| URL | Issue |")
-            lines.append("| --- | --- |")
-            for r in failed:
-                for f in r["failures"]:
-                    lines.append(f"| `{r['url'].replace(BASE, '')}` | {f} |")
-        else:
-            lines.append("All pages passed ✅")
         # Append (GitHub step summary supports concatenation across steps)
         with Path(p).open("a", encoding="utf-8") as fh:
-            fh.write("\n".join(lines) + "\n")
+            fh.write(render_md(BASE, results, failed) + "\n")
 
     # Standalone HTML dashboard
     if p := os.environ.get("REPORT_HTML"):
@@ -215,6 +199,75 @@ def _esc(s: object) -> str:
         str(s).replace("&", "&amp;").replace("<", "&lt;")
         .replace(">", "&gt;").replace('"', "&quot;")
     )
+
+
+def _md_cell(s: object) -> str:
+    """Escape a string for use inside a Markdown table cell."""
+    return str(s).replace("|", "\\|").replace("\n", "<br>")
+
+
+
+def render_md(base: str, results: list, failed: list) -> str:
+    from datetime import datetime, timezone
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    total = len(results)
+    passed = total - len(failed)
+    pct = (passed / total * 100) if total else 0
+
+    # Per-locale aggregate
+    per_locale: dict[str, dict[str, int]] = {}
+    for r in results:
+        d = per_locale.setdefault(r["locale"], {"pass": 0, "fail": 0})
+        d["fail" if r["failures"] else "pass"] += 1
+
+    lines = [
+        "## Solutions SEO snapshot",
+        f"",
+        f"- Base: `{base}`",
+        f"- Generated: {ts}",
+        f"- Pages checked: **{total}** ({len(LOCALES)} locales × {len(PATHS)} routes)",
+        f"",
+        "### Summary",
+        f"",
+        "| Metric | Value |",
+        "| --- | --- |",
+        f"| Total pages | {_md_cell(total)} |",
+        f"| Passing | {_md_cell(passed)} |",
+        f"| Failing | {_md_cell(len(failed))} |",
+        f"| Pass rate | {_md_cell(f'{pct:.1f}%')} |",
+        f"",
+        "### By locale",
+        f"",
+        "| Locale | Passing | Failing | Status |",
+        "| --- | --- | --- | --- |",
+    ]
+    for locale in sorted(per_locale.keys()):
+        d = per_locale[locale]
+        status = "✅" if d["fail"] == 0 else "❌"
+        lines.append(
+            f"| `{_md_cell(locale)}` | {_md_cell(d['pass'])} | {_md_cell(d['fail'])} | {status} |"
+        )
+
+    if failed:
+        lines.extend([
+            f"",
+            "### Failures",
+            f"",
+            "| Status | Locale | Path | URL | Issue |",
+            "| --- | --- | --- | --- | --- |",
+        ])
+        for r in sorted(failed, key=lambda r: (r["locale"], r["path"])):
+            rel_url = r["url"].replace(base, "") or r["path"]
+            issues = "<br>".join(_md_cell(f) for f in r["failures"])
+            lines.append(
+                f"| ❌ | `{_md_cell(r['locale'])}` | `{_md_cell(r['path'])}` | `{_md_cell(rel_url)}` | {issues} |"
+            )
+    else:
+        lines.extend([f"", "### Result", f"", "✅ All pages passed."])
+
+    return "\n".join(lines)
+
+
 
 
 def render_html(base: str, results: list, failed: list) -> str:
