@@ -99,19 +99,36 @@ try {
     img.src = src;
   });
 
-
-  await page.waitForFunction(
-    () => {
+  // Poll until the SVG fallback is present; on each miss dump the current
+  // state so a debug run shows why the chain stalled.
+  const deadline = Date.now() + 15_000;
+  let lastState = null;
+  while (Date.now() < deadline) {
+    lastState = await page.evaluate(() => {
       const el = document.querySelector('[data-testid="header-logo"]');
-      if (!(el instanceof HTMLImageElement)) return false;
-      return el.dataset.logoVariant === "fallback-svg"
-        && el.currentSrc.startsWith("data:image/svg+xml")
-        && el.complete
-        && el.naturalWidth > 0;
-    },
-    null,
-    { timeout: 15_000 },
-  );
+      if (!(el instanceof HTMLImageElement)) return null;
+      return {
+        variant: el.dataset.logoVariant,
+        step: el.dataset.fallbackStep,
+        currentSrc: el.currentSrc,
+        complete: el.complete,
+        naturalWidth: el.naturalWidth,
+      };
+    });
+    if (
+      lastState
+      && lastState.variant === "fallback-svg"
+      && lastState.currentSrc.startsWith("data:image/svg+xml")
+      && lastState.complete
+      && lastState.naturalWidth > 0
+    ) break;
+    await page.waitForTimeout(250);
+  }
+  if (!lastState || lastState.variant !== "fallback-svg") {
+    console.error("Logo never reached SVG fallback. Last observed:", lastState);
+    throw new Error("logo fallback chain did not complete");
+  }
+
 
 
   const state = await logo.evaluate((el) => {
