@@ -53,6 +53,30 @@ export function KnowledgeHubPreview({
 
   const hasMatches = items.length > 0;
 
+  const { lang } = useParams({ strict: false }) as { lang?: string };
+  const localePrefix = lang ? `/${lang}` : "";
+  const hubUrl = `${SITE.url}${localePrefix}/knowledge-hub`;
+  const articleUrl = (slug: string) =>
+    `${SITE.url}${localePrefix}/knowledge-hub/${slug}`;
+
+  const itemListJsonLd = hasMatches
+    ? {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: resolvedTitle,
+        description: resolvedLede,
+        itemListOrder: "https://schema.org/ItemListOrderAscending",
+        numberOfItems: items.length,
+        itemListElement: items.map((a, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          url: articleUrl(a.slug),
+          name: a.title,
+        })),
+      }
+    : null;
+
+
   return (
     <Section tone="default">
       <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
