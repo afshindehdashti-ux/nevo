@@ -74,7 +74,34 @@ def emit_annotation(level: str, file: str, title: str, message: str) -> None:
     )
 
 
-# --- Actionable fix hints -----------------------------------------------------
+# --- Issue codes --------------------------------------------------------------
+# Stable machine-readable codes for each failure category, used by the JSON
+# artifact so downstream analysis can group / filter without regex-ing messages.
+ISSUE_CODES: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"^FETCH_ERROR"), "FETCH_ERROR"),
+    (re.compile(r"^canonical count"), "CANONICAL_COUNT"),
+    (re.compile(r"^canonical not self-ref"), "CANONICAL_NOT_SELF_REF"),
+    (re.compile(r"^og:url not self-ref"), "OG_URL_NOT_SELF_REF"),
+    (re.compile(r"^og:image not absolute"), "OG_IMAGE_NOT_ABSOLUTE"),
+    (re.compile(r"^twitter:card"), "TWITTER_CARD_INVALID"),
+    (re.compile(r"^twitter:image not absolute"), "TWITTER_IMAGE_NOT_ABSOLUTE"),
+    (re.compile(r"^missing <title>"), "TITLE_MISSING"),
+    (re.compile(r"^missing meta description"), "DESCRIPTION_MISSING"),
+    (re.compile(r"^description byte-length"), "DESCRIPTION_LENGTH"),
+    (re.compile(r"^hreflang missing locales"), "HREFLANG_MISSING_LOCALES"),
+    (re.compile(r"^hreflang missing x-default"), "HREFLANG_MISSING_XDEFAULT"),
+    (re.compile(r"^hreflang has non-absolute"), "HREFLANG_NOT_ABSOLUTE"),
+]
+
+
+def issue_code(failure: str) -> str:
+    for pat, code in ISSUE_CODES:
+        if pat.search(failure):
+            return code
+    return "UNKNOWN"
+
+
+
 # Map each failure category to a short, concrete remediation. Kept intentionally
 # terse so it fits inside a GitHub annotation / MD table cell without wrapping.
 FIX_HINTS: list[tuple[re.Pattern, str]] = [
