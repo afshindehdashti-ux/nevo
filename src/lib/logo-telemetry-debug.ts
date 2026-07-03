@@ -610,6 +610,15 @@ export function attachLogoDebugUtil(): void {
       /** Whether live debug logging is currently on. */
       isEnabled: () => boolean;
       /**
+       * Toggle the single-line grep-friendly `[nevo:logo-telemetry] ...`
+       * console output at runtime. When disabled, the ring buffer keeps
+       * recording so `dump()` / `getRecent()` still return everything.
+       */
+      enableLogLine: () => void;
+      disableLogLine: () => void;
+      setLogLine: (on: boolean) => void;
+      isLogLineEnabled: () => boolean;
+      /**
        * Snapshot of the last ≤50 sampling decisions (oldest first). Safe to
        * `JSON.stringify` and paste into a bug report — the buffer records
        * every sampler call regardless of the debug flag.
