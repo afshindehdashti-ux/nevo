@@ -78,14 +78,10 @@ export function KnowledgeHubPreview({
 
 
   return (
-    <Section
-      tone="default"
-      // Semantic landmark so assistive tech + crawlers recognise this as a
-      // curated internal-link block, not a random list of teasers.
-      as="nav"
-      aria-label={`${resolvedEyebrow}: related articles`}
-    >
+    <Section tone="default">
+      <nav aria-label={`${resolvedEyebrow}: related articles`}>
       <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+
         <div className="max-w-2xl">
           <SectionHeader eyebrow={resolvedEyebrow} title={resolvedTitle} lede={resolvedLede} />
         </div>
