@@ -528,20 +528,154 @@ function BarChart({
   );
 }
 
+// ---------------- Shareable state (URL query encoding) ----------------
+const APPLICATIONS_ALL: Application[] = [
+  "Cold Storage",
+  "Freezer Room",
+  "Food Processing",
+  "Warehouse",
+  "Industrial Building",
+  "Clean Room",
+  "Commercial Building",
+  "Agriculture",
+  "Data Center",
+];
+const CORES_ALL: Core[] = ["PIR", "PUR", "Rock Wool", "EPS", "Glass Wool"];
+const CLIMATES_ALL: Climate[] = ["Very Cold", "Cold", "Moderate", "Hot", "Very Hot"];
+const TEMPS_ALL: Temp[] = ["+20°C", "+5°C", "0°C", "-18°C", "-25°C", "-40°C"];
+const FIRES_ALL: Fire[] = ["None", "30 min", "60 min", "90 min", "120 min", "180 min"];
+
+type SharedState = {
+  app: Application;
+  core: Core;
+  climate: Climate;
+  temp: Temp;
+  fire: Fire;
+  thickness: Thickness;
+  extSteel: number;
+  intSteel: number;
+  compare: number[];
+};
+
+const DEFAULT_SHARED: SharedState = {
+  app: "Cold Storage",
+  core: "PIR",
+  climate: "Moderate",
+  temp: "+5°C",
+  fire: "None",
+  thickness: 100,
+  extSteel: 0.5,
+  intSteel: 0.4,
+  compare: [80, 100, 150],
+};
+
+function pickIn<T extends string>(v: string | null, options: readonly T[], fallback: T): T {
+  return v && (options as readonly string[]).includes(v) ? (v as T) : fallback;
+}
+
+function readSharedFromUrl(): SharedState {
+  if (typeof window === "undefined") return DEFAULT_SHARED;
+  const p = new URLSearchParams(window.location.search);
+  if (![...p.keys()].length) return DEFAULT_SHARED;
+
+  const thicknessNum = Number(p.get("th"));
+  const thickness = (THICKNESSES as readonly number[]).includes(thicknessNum)
+    ? (thicknessNum as Thickness)
+    : DEFAULT_SHARED.thickness;
+
+  const extNum = Number(p.get("ext"));
+  const intNum = Number(p.get("int"));
+  const extSteel = (STEEL_GAUGES as readonly number[]).includes(extNum) ? extNum : DEFAULT_SHARED.extSteel;
+  const intSteel = (STEEL_GAUGES as readonly number[]).includes(intNum) ? intNum : DEFAULT_SHARED.intSteel;
+
+  const cmp = (p.get("cmp") ?? "")
+    .split(",")
+    .map((x) => Number(x))
+    .filter((n) => (THICKNESSES as readonly number[]).includes(n));
+  const compare = cmp.length ? cmp.slice(0, 3) : DEFAULT_SHARED.compare;
+
+  return {
+    app: pickIn(p.get("app"), APPLICATIONS_ALL, DEFAULT_SHARED.app),
+    core: pickIn(p.get("core"), CORES_ALL, DEFAULT_SHARED.core),
+    climate: pickIn(p.get("cli"), CLIMATES_ALL, DEFAULT_SHARED.climate),
+    temp: pickIn(p.get("tmp"), TEMPS_ALL, DEFAULT_SHARED.temp),
+    fire: pickIn(p.get("fire"), FIRES_ALL, DEFAULT_SHARED.fire),
+    thickness,
+    extSteel,
+    intSteel,
+    compare,
+  };
+}
+
+function buildSharedQuery(s: SharedState): string {
+  return new URLSearchParams({
+    app: s.app,
+    core: s.core,
+    cli: s.climate,
+    tmp: s.temp,
+    fire: s.fire,
+    th: String(s.thickness),
+    ext: String(s.extSteel),
+    int: String(s.intSteel),
+    cmp: s.compare.join(","),
+  }).toString();
+}
+
 // ---------------- Page ----------------
 function PanelThicknessPage() {
-  const [app, setApp] = useState<Application>("Cold Storage");
-  const [core, setCore] = useState<Core>("PIR");
-  const [climate, setClimate] = useState<Climate>("Moderate");
-  const [temp, setTemp] = useState<Temp>("+5°C");
-  const [fire, setFire] = useState<Fire>("None");
-  const [thickness, setThickness] = useState<Thickness>(100);
-  const [extSteel, setExtSteel] = useState<number>(0.5);
-  const [intSteel, setIntSteel] = useState<number>(0.4);
-  const [compare, setCompare] = useState<number[]>([80, 100, 150]);
+  const initial = readSharedFromUrl();
+  const [app, setApp] = useState<Application>(initial.app);
+  const [core, setCore] = useState<Core>(initial.core);
+  const [climate, setClimate] = useState<Climate>(initial.climate);
+  const [temp, setTemp] = useState<Temp>(initial.temp);
+  const [fire, setFire] = useState<Fire>(initial.fire);
+  const [thickness, setThickness] = useState<Thickness>(initial.thickness);
+  const [extSteel, setExtSteel] = useState<number>(initial.extSteel);
+  const [intSteel, setIntSteel] = useState<number>(initial.intSteel);
+  const [compare, setCompare] = useState<number[]>(initial.compare);
   const [tab, setTab] = useState<"Inputs" | "Recommendation" | "Cross Section" | "Charts" | "Compare" | "Report">(
     "Inputs",
   );
+  const [copied, setCopied] = useState(false);
+
+  const shareQuery = useMemo(
+    () => buildSharedQuery({ app, core, climate, temp, fire, thickness, extSteel, intSteel, compare }),
+    [app, core, climate, temp, fire, thickness, extSteel, intSteel, compare],
+  );
+
+  // Keep URL in sync with current selections so a copy/refresh reproduces state.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const next = `${window.location.pathname}?${shareQuery}`;
+    if (next !== `${window.location.pathname}${window.location.search}`) {
+      window.history.replaceState(null, "", next);
+    }
+  }, [shareQuery]);
+
+  async function copyShareLink() {
+    if (typeof window === "undefined") return;
+    const url = `${window.location.origin}${window.location.pathname}?${shareQuery}`;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // Fallback for browsers without clipboard permission
+      const ta = document.createElement("textarea");
+      ta.value = url;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {
+        /* ignore */
+      }
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  }
+
 
   // Live results
   const u = useMemo(() => calcUValue(core, thickness), [core, thickness]);
