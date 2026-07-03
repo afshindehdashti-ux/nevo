@@ -206,7 +206,11 @@ function buildSentryEvent(e: LogoErrorEvent, sampling?: import("./sentry-sampler
       schema_version:
         typeof e.schemaVersion === "number" ? String(e.schemaVersion) : null,
       correlation_id: e.correlationId ?? null,
+      sampled_reason: sampling?.reason ?? "unsampled",
+      sampled_window_index: sampling ? String(sampling.windowIndex) : null,
+      sample_divisor: sampling ? String(sampling.sampleDivisor) : null,
     },
+
     user: e.correlationId ? { id: e.correlationId } : undefined,
     request: {
       url: e.url,
