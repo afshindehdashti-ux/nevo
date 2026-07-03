@@ -78,6 +78,54 @@ type Deps = {
  *     ts:             number,              // ms since epoch, from the sampler's clock
  *   }
  */
+export type LogoDecisionRecord = {
+  kind: "render" | "error";
+  decision: "sampled-in" | "sampled-out";
+  reason: string;
+  stage: string | null;
+  terminal: boolean | undefined;
+  correlationId: string | undefined;
+  counters: {
+    renderLogged: boolean;
+    renderSampled: boolean | null;
+    errorCount: number;
+    lastErrorStage: string;
+    msSinceLastError: number | null;
+  };
+  limits: {
+    renderSampleRate: number;
+    errorMaxPerSession: number;
+    errorMinIntervalMs: number;
+  };
+  ts: number;
+};
+
+/**
+ * Ring buffer of the last N sampling decisions. Populated on EVERY sampler
+ * call (regardless of the `debug` flag) so QA can call
+ * `window.__nevoLogoDebug.getRecent()` after a repro and paste the tail.
+ * Size is intentionally small (50) — enough to cover a page load plus a
+ * handful of retries without unbounded memory growth.
+ */
+export const LOGO_DECISION_BUFFER_SIZE = 50;
+const decisionBuffer: LogoDecisionRecord[] = [];
+
+export function recordLogoDecision(record: LogoDecisionRecord): void {
+  decisionBuffer.push(record);
+  if (decisionBuffer.length > LOGO_DECISION_BUFFER_SIZE) {
+    decisionBuffer.splice(0, decisionBuffer.length - LOGO_DECISION_BUFFER_SIZE);
+  }
+}
+
+/** Returns a copy of the ring buffer, oldest first. Safe to mutate. */
+export function getRecentLogoDecisions(): LogoDecisionRecord[] {
+  return decisionBuffer.slice();
+}
+
+export function clearLogoDecisions(): void {
+  decisionBuffer.length = 0;
+}
+
 function debugLog(
   kind: "render" | "error",
   decision: "sampled-in" | "sampled-out",
@@ -92,9 +140,7 @@ function debugLog(
     msSinceLastError?: number;
   },
 ): void {
-  if (!config.debug) return;
-  if (typeof console === "undefined" || typeof console.debug !== "function") return;
-  console.debug("[nevo:logo-telemetry]", {
+  const record: LogoDecisionRecord = {
     kind,
     decision,
     reason,
@@ -116,7 +162,14 @@ function debugLog(
       errorMinIntervalMs: config.errorMinIntervalMs,
     },
     ts: ctx.now,
-  });
+  };
+  // Always record — cheap, capped, and the whole point of the ring buffer
+  // is that QA can grab a tail after a repro without having flipped the
+  // debug flag ahead of time.
+  recordLogoDecision(record);
+  if (!config.debug) return;
+  if (typeof console === "undefined" || typeof console.debug !== "function") return;
+  console.debug("[nevo:logo-telemetry]", record);
 }
 
 /** Returns true when a render event should be sent to the log sink. */
