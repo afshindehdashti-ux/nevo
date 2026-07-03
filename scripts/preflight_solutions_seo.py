@@ -921,7 +921,7 @@ def write_step_summary(results: list[dict]) -> None:
     lines = [
         "## Preflight — site + sitemap reachable",
         "",
-        f"_Probed **{len(results)}** URL(s) at `{BASE}` "
+        f"_Probed **{total}** URL(s) at `{BASE}` "
         f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`, "
         f"backoff `{BACKOFF_BASE:g}s × {BACKOFF_FACTOR:g}` cap `{BACKOFF_MAX:g}s`, "
         f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
@@ -930,12 +930,16 @@ def write_step_summary(results: list[dict]) -> None:
         "",
         f"- UA: `{USER_AGENT}`",
         f"- Custom headers: {_render_headers_md(CUSTOM_HEADERS)}",
-        f"- **{ok_count}/{len(results)}** healthy",
+        f"- **{ok_count}/{len(display)}** healthy"
+        + (f" _(filtered from {total})_" if filter_scope != "all" else ""),
         f"- Total wall time: **{total_ms:.0f} ms**",
         f"- Slowest response: **{slowest:.0f} ms**",
         f"- Retry kinds: `{','.join(sorted(RETRYABLE_ERROR_KINDS)) or 'none'}` "
         f"(status classes/codes: `{','.join(sorted(RETRYABLE_STATUS_CLASSES)) or 'none'}`)",
     ]
+    if filter_scope != "all":
+        lines.append(f"- Summary filter: `{filter_scope}` "
+                     f"(showing {len(display)} of {total} row(s))")
 
 
     # Failure-kind breakdown: shows at a glance whether the run is dominated
