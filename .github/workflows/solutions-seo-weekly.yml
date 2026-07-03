@@ -88,6 +88,17 @@ jobs:
           cp reports/seo/solutions-seo.html "reports/seo/solutions-seo-${WEEK}.html"
           cp reports/seo/solutions-seo.json "reports/seo/solutions-seo-${WEEK}.json"
 
+      # One-glance index: every failing URL in a single table. Written both to
+      # the run summary (fast triage in the browser) and to a Markdown artifact
+      # (readable offline, shareable in Slack/email threads).
+      - name: Build consolidated failure index
+        run: |
+          python3 scripts/index_solutions_seo.py \
+            --input reports/seo/solutions-seo.json \
+            --out "reports/seo/solutions-seo-index-${REPORT_WEEK}.md" \
+            --append "$GITHUB_STEP_SUMMARY" \
+            --title "Consolidated failure index — weekly ${REPORT_WEEK}"
+
       # 90-day retention so the team can compare week-over-week.
       - name: Upload weekly SEO report
         uses: actions/upload-artifact@v4
@@ -96,8 +107,10 @@ jobs:
           path: |
             reports/seo/solutions-seo-*.html
             reports/seo/solutions-seo-*.json
+            reports/seo/solutions-seo-index-*.md
           retention-days: 90
           if-no-files-found: error
+
 
       # Notify Slack when the live snapshot finds regressions.
       # Runs after upload so the "View run & artifacts" link resolves.

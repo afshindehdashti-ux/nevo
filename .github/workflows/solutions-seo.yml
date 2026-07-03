@@ -58,6 +58,17 @@ jobs:
         run: |
           if [ -f vite.pid ]; then kill "$(cat vite.pid)" || true; fi
 
+      # One-glance index: every failing URL in a single table, appended to the
+      # PR run summary AND uploaded as an artifact for offline review.
+      - name: Build consolidated failure index
+        if: always()
+        run: |
+          python3 scripts/index_solutions_seo.py \
+            --input reports/seo/solutions-seo.json \
+            --out reports/seo/solutions-seo-index.md \
+            --append "$GITHUB_STEP_SUMMARY" \
+            --title "Consolidated failure index"
+
       # Notify Slack when there are failures. No-op if SLACK_WEBHOOK_URL is unset
       # (feature is opt-in — add the webhook as a repo secret to enable).
       - name: Notify Slack on failure
@@ -78,7 +89,10 @@ jobs:
           path: |
             reports/seo/solutions-seo.json
             reports/seo/solutions-seo.html
+            reports/seo/solutions-seo-index.md
             vite.log
           if-no-files-found: warn
+          retention-days: 30
+
           retention-days: 30
 
