@@ -110,6 +110,29 @@ const PANEL_IMAGES: Record<CoreMaterial, string> = {
   EPS: panelEPS,
 };
 
+const CONTEXT_IMAGES: Record<PanelType, string> = {
+  wall: ctxWall,
+  roof: ctxRoof,
+  coldroom: ctxColdroom,
+  cleanroom: ctxCleanroom,
+  fire: ctxFire,
+};
+
+const COATING_META: Record<Coating, { warranty: number; durability: string; priceFactor: number }> = {
+  PVDF: { warranty: 25, durability: "Marine / harsh UV", priceFactor: 1.35 },
+  Polyester: { warranty: 10, durability: "Standard exterior", priceFactor: 1.0 },
+  Plastisol: { warranty: 15, durability: "Industrial / corrosive", priceFactor: 1.18 },
+  HDP: { warranty: 20, durability: "High-durability polymer", priceFactor: 1.22 },
+};
+
+const PANEL_TYPE_META: Record<PanelType, { fireBoost: string | null; premium: number }> = {
+  wall: { fireBoost: null, premium: 1.0 },
+  roof: { fireBoost: null, premium: 1.05 },
+  coldroom: { fireBoost: null, premium: 1.15 },
+  cleanroom: { fireBoost: null, premium: 1.25 },
+  fire: { fireBoost: "EI 120 (A1)", premium: 1.4 },
+};
+
 const JOINTS: JointType[] = ["Hidden Screw", "Visible Screw", "Tongue & Groove", "Cam-Lock"];
 const COATINGS: Coating[] = ["PVDF", "Polyester", "Plastisol", "HDP"];
 const COLOR_SWATCHES = [
