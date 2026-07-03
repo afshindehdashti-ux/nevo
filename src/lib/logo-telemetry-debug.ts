@@ -671,6 +671,7 @@ export function buildLogoTelemetryDump(
       : {}),
   };
   return redactLogoTelemetryDump(raw);
+}
 
 /**
  * Aggregate counts over the ring buffer of sampling decisions. "Since
