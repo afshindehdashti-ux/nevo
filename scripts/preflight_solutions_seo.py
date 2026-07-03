@@ -142,7 +142,19 @@ RETRIES = int(_num("RETRIES", 3, int, minimum=1))
 BACKOFF_BASE = _num("BACKOFF_BASE_SECONDS", 2.0, float, minimum=0.0)
 BACKOFF_FACTOR = _num("BACKOFF_FACTOR", 2.0, float, minimum=1.0)
 BACKOFF_MAX = _num("BACKOFF_MAX_SECONDS", 30.0, float, minimum=0.0)
+
+# Which error_kind values are worth retrying. Transient network faults
+# (timeouts, resets, refused, DNS blips) retry by default; deterministic
+# failures (TLS handshake mismatch, HTTP 4xx, body-too-small, unknown) do
+# not — retrying them just burns time and inflates latency stats.
+_DEFAULT_RETRYABLE = "timeout,connection_reset,connection_refused,connection_error,dns"
+RETRYABLE_ERROR_KINDS: set[str] = {
+    k.strip().lower()
+    for k in (os.environ.get("RETRYABLE_ERROR_KINDS") or _DEFAULT_RETRYABLE).split(",")
+    if k.strip()
+}
 IN_GHA = os.environ.get("GITHUB_ACTIONS") == "true"
+
 
 # Minimum body size (bytes) that indicates a real page vs. an SPA error shell.
 # All defaults are env-tunable so noisy / lightweight endpoints can be dialed in.
