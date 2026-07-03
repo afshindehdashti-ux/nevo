@@ -1,6 +1,7 @@
-import { ArrowRight, Clock, FileText } from "lucide-react";
+import { ArrowRight, Clock, FileText, Inbox } from "lucide-react";
 import { Section, SectionHeader } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { LocalizedLink } from "@/components/site/LocalizedLink";
 import { ARTICLES } from "@/lib/knowledge-articles";
 
@@ -9,7 +10,9 @@ type Props = {
   eyebrow?: string;
   title?: string;
   lede?: string;
+  loading?: boolean;
 };
+
 
 /**
  * Route-scoped Knowledge Hub preview. Each Solutions page picks 3 relevant
