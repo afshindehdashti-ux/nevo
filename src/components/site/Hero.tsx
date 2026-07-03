@@ -3,10 +3,12 @@ import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import heroDesktopAsset from "@/assets/premium/homepage-hero-desktop.jpg.asset.json";
 import heroMobileAsset from "@/assets/premium/homepage-hero-mobile.jpg.asset.json";
+import heroVideoAsset from "@/assets/premium/hero-laminator.mp4.asset.json";
 import { Button } from "@/components/ui/button";
 
 const heroDesktop = heroDesktopAsset.url;
 const heroMobile = heroMobileAsset.url;
+const heroVideo = heroVideoAsset.url;
 
 /**
  * Cinematic hero — real premium industrial photography (no baked UI).
