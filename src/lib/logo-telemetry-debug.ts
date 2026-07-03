@@ -186,7 +186,10 @@ export type LogoDecision = {
   stateBefore: LogoRateState;
   /** Snapshot of the state *after* the decision was applied (in the sandbox). */
   stateAfter: LogoRateState;
-  config: Pick<LogoTelemetryConfig, "renderSampleRate" | "errorMaxPerSession" | "errorMinIntervalMs">;
+  config: Pick<
+    LogoTelemetryConfig,
+    "renderSampleRate" | "errorMaxPerSession" | "errorMinIntervalMs"
+  >;
 };
 
 const cloneState = (s: LogoRateState): LogoRateState => ({
@@ -197,9 +200,7 @@ const cloneState = (s: LogoRateState): LogoRateState => ({
   lastErrorStage: s.lastErrorStage,
 });
 
-const pickConfig = (
-  c: LogoTelemetryConfig,
-): LogoDecision["config"] => ({
+const pickConfig = (c: LogoTelemetryConfig): LogoDecision["config"] => ({
   renderSampleRate: c.renderSampleRate,
   errorMaxPerSession: c.errorMaxPerSession,
   errorMinIntervalMs: c.errorMinIntervalMs,
@@ -238,9 +239,7 @@ export function explainLogoDecision(
       wouldEmit = false;
     } else {
       const sampled =
-        sandbox.renderSampled === null
-          ? random() < config.renderSampleRate
-          : sandbox.renderSampled;
+        sandbox.renderSampled === null ? random() < config.renderSampleRate : sandbox.renderSampled;
       if (!wouldEmit_from(sampled)) {
         reason = "sample-rate";
         wouldEmit = false;
@@ -475,15 +474,10 @@ function redactString(value: string, hits: string[]): string {
   return out;
 }
 
-function redactCorrelationId(
-  id: string | undefined,
-  hits: string[],
-): string | undefined {
+function redactCorrelationId(id: string | undefined, hits: string[]): string | undefined {
   if (!id) return id;
   const looksSensitive =
-    id.length > CORRELATION_ID_MAX_LEN ||
-    id.includes("@") ||
-    /^(user|uid|email)[:=/-]/i.test(id);
+    id.length > CORRELATION_ID_MAX_LEN || id.includes("@") || /^(user|uid|email)[:=/-]/i.test(id);
   if (looksSensitive) {
     hits.push("correlationId");
     return REDACTED;
@@ -492,10 +486,7 @@ function redactCorrelationId(
   return redactString(id, hits);
 }
 
-function redactDecisions(
-  decisions: LogoDecisionRecord[],
-  hits: string[],
-): LogoDecisionRecord[] {
+function redactDecisions(decisions: LogoDecisionRecord[], hits: string[]): LogoDecisionRecord[] {
   return decisions.map((d) => ({
     ...d,
     correlationId: redactCorrelationId(d.correlationId, hits),
@@ -520,9 +511,7 @@ function redactDecisions(
  * material. We also don't capture HTTP headers anywhere in the dump, so
  * there is nothing header-shaped to strip.
  */
-export function redactLogoTelemetryDump(
-  raw: LogoTelemetryDump,
-): LogoTelemetryDump {
+export function redactLogoTelemetryDump(raw: LogoTelemetryDump): LogoTelemetryDump {
   const hits: string[] = [];
   const url = raw.url ? redactUrl(raw.url, hits) : raw.url;
   const decisions = redactDecisions(raw.decisions, hits);
@@ -560,9 +549,7 @@ function isLogoDebugBuildEnabled(): boolean {
  * bundle. The `disabled` flag lets callers (and QA reports) tell a real
  * empty dump apart from "we refused to build one".
  */
-function disabledDump(
-  origin: LogoTelemetryDump["origin"],
-): LogoTelemetryDump {
+function disabledDump(origin: LogoTelemetryDump["origin"]): LogoTelemetryDump {
   return {
     schema: "nevo.logo-telemetry.dump/v1",
     capturedAt: new Date().toISOString(),
@@ -599,12 +586,8 @@ export function buildLogoTelemetryDump(
     opts.correlationId !== undefined
       ? allDecisions.filter((d) => d.correlationId === opts.correlationId)
       : allDecisions;
-  const nav =
-    typeof navigator !== "undefined" ? navigator.userAgent ?? null : null;
-  const url =
-    typeof window !== "undefined" && window.location
-      ? window.location.href
-      : null;
+  const nav = typeof navigator !== "undefined" ? (navigator.userAgent ?? null) : null;
+  const url = typeof window !== "undefined" && window.location ? window.location.href : null;
   const raw: LogoTelemetryDump = {
     schema: "nevo.logo-telemetry.dump/v1",
     capturedAt: new Date().toISOString(),
@@ -762,25 +745,13 @@ export function attachLogoDebugUtil(): void {
       /** Empty the ring buffer (useful before a fresh repro). */
       clearRecent: () => void;
       /** Full QA bug-report blob (metadata + config + state + decisions). */
-      dump: (
-        origin?: LogoTelemetryDump["origin"],
-        opts?: LogoDumpOptions,
-      ) => LogoTelemetryDump;
+      dump: (origin?: LogoTelemetryDump["origin"], opts?: LogoDumpOptions) => LogoTelemetryDump;
       /** Same blob, pretty-printed JSON. */
-      dumpAsJSON: (
-        origin?: LogoTelemetryDump["origin"],
-        opts?: LogoDumpOptions,
-      ) => string;
+      dumpAsJSON: (origin?: LogoTelemetryDump["origin"], opts?: LogoDumpOptions) => string;
       /** Echo to console + write to clipboard when permitted. */
-      copyDump: (
-        origin?: LogoTelemetryDump["origin"],
-        opts?: LogoDumpOptions,
-      ) => Promise<string>;
+      copyDump: (origin?: LogoTelemetryDump["origin"], opts?: LogoDumpOptions) => Promise<string>;
       /** Save the dump to a .json file via a synthetic download. */
-      downloadDump: (
-        origin?: LogoTelemetryDump["origin"],
-        opts?: LogoDumpOptions,
-      ) => string;
+      downloadDump: (origin?: LogoTelemetryDump["origin"], opts?: LogoDumpOptions) => string;
       /**
        * Scope a dump to a single correlationId — QA can share a minimal
        * JSON blob for one incident without leaking unrelated decisions.
