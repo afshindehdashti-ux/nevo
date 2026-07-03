@@ -1105,8 +1105,8 @@ def export_results(results: list[dict]) -> None:
     if not csv_path and not json_path:
         return
 
-    scope = (os.environ.get("RESULTS_INCLUDE") or "all").strip().lower()
-    rows = [r for r in results if not r["ok"]] if scope == "failures" else list(results)
+    raw_scope = (os.environ.get("RESULTS_INCLUDE") or "all").strip()
+    rows, scope = _filter_results_for_export(results, raw_scope)
 
     written: list[str] = []
     if csv_path:
