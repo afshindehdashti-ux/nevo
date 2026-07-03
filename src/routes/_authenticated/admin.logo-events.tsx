@@ -207,7 +207,7 @@ function LogoEventsAdmin() {
             <SelectTrigger className="w-56"><SelectValue placeholder="All" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="__all">All variants</SelectItem>
-              {variants.map((v) => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+              {(variants as string[]).map((v: string) => <SelectItem key={v} value={v}>{v}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
