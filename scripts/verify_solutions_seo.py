@@ -11,12 +11,15 @@ Fetches each Solutions page (default: all 10 locales) from a running server
   - <title> present, meta description 120-180 chars
 
 Env:
-  BASE_URL     default http://127.0.0.1:8080
-  REPORT_JSON  optional path — write machine-readable report
-  REPORT_MD    optional path — write GitHub Step Summary markdown
-  REPORT_HTML  optional path — write standalone HTML dashboard
+  BASE_URL            default http://127.0.0.1:8080
+  REPORT_JSON         optional path — write machine-readable report
+  REPORT_MD           optional path — write GitHub Step Summary markdown
+  REPORT_HTML         optional path — write standalone HTML dashboard
+  GROUP_ANNOTATIONS   "true" to group all issues per page into one annotation
 
-Exit 1 on any failure. --warn-only forces exit 0.
+Exit 1 on any failure. --warn-only forces exit 0. --group-annotations reduces
+PR clutter by collapsing multiple issues for the same page into a single
+GitHub annotation.
 """
 from __future__ import annotations
 import json, os, re, sys, urllib.request, urllib.error
@@ -24,6 +27,7 @@ from pathlib import Path
 
 BASE = os.environ.get("BASE_URL", "http://127.0.0.1:8080").rstrip("/")
 WARN_ONLY = "--warn-only" in sys.argv
+GROUP_ANNOTATIONS = "--group-annotations" in sys.argv or os.environ.get("GROUP_ANNOTATIONS") == "true"
 
 LOCALES = ["en", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"]
 PATHS = [
@@ -159,17 +163,35 @@ def main() -> int:
             for f in r["failures"]:
                 print(f"      {f}")
 
-    # GitHub PR annotations — one per failing check, pinned to the route file.
+    # GitHub PR annotations — pinned to the route file.
+    # Per-check annotations give the finest detail; grouping keeps PRs tidy when
+    # one page has many related issues.
     level = "warning" if WARN_ONLY else "error"
-    for r in failed:
-        file = ROUTE_FILES.get(r["path"], "src/routes/__root.tsx")
-        for f in r["failures"]:
+    if GROUP_ANNOTATIONS:
+        by_key: dict[tuple[str, str, str], list[dict]] = {}
+        for r in failed:
+            file = ROUTE_FILES.get(r["path"], "src/routes/__root.tsx")
+            key = (file, r["path"], r["locale"])
+            by_key.setdefault(key, []).append(r)
+        for (file, path, locale), rs in by_key.items():
+            urls = sorted({r["url"] for r in rs})
+            issues = "\n".join(f"• {f}" for r in rs for f in r["failures"])
             emit_annotation(
                 level,
                 file,
-                f"Solutions SEO [{r['locale']}] {r['path']}",
-                f"{f} — {r['url']}",
+                f"Solutions SEO [{locale}] {path}",
+                f"{len(rs)} issue(s) on {len(urls)} URL(s)\n{issues}",
             )
+    else:
+        for r in failed:
+            file = ROUTE_FILES.get(r["path"], "src/routes/__root.tsx")
+            for f in r["failures"]:
+                emit_annotation(
+                    level,
+                    file,
+                    f"Solutions SEO [{r['locale']}] {r['path']}",
+                    f"{f} — {r['url']}",
+                )
 
 
     # Machine JSON report
