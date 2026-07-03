@@ -184,6 +184,7 @@ function debugLog(
   // debug flag ahead of time.
   recordLogoDecision(record);
   if (!config.debug) return;
+  if (config.logLine === false) return;
   if (typeof console === "undefined" || typeof console.debug !== "function") return;
   console.debug("[nevo:logo-telemetry]", formatLogoDecisionRecord(record));
 }
