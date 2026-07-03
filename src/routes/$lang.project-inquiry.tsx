@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { submitInquiry } from "@/lib/inquiries.functions";
 import {
   ArrowRight,
   ArrowUpRight,
