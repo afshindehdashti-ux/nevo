@@ -34,6 +34,40 @@ PATHS = [
     "/solutions/engineering-consultancy",
 ]
 
+# Map each Solutions path → the route file that owns its head() / SEO helpers.
+# Used for GitHub workflow-command annotations so a PR shows the failure inline
+# on the file a developer can actually edit.
+ROUTE_FILES = {
+    "/solutions": "src/routes/$lang.solutions.index.tsx",
+    "/solutions/sandwich-panels": "src/routes/$lang.solutions.sandwich-panels.tsx",
+    "/solutions/production-lines": "src/routes/$lang.solutions.production-lines.tsx",
+    "/solutions/raw-materials": "src/routes/$lang.solutions.raw-materials.tsx",
+    "/solutions/factory-development": "src/routes/$lang.solutions.factory-development.tsx",
+    "/solutions/engineering-consultancy": "src/routes/$lang.solutions.engineering-consultancy.tsx",
+}
+IN_GHA = os.environ.get("GITHUB_ACTIONS") == "true"
+
+
+def gha_escape(s: str) -> str:
+    """Escape a workflow-command property/message per GitHub's spec."""
+    return (
+        s.replace("%", "%25")
+         .replace("\r", "%0D")
+         .replace("\n", "%0A")
+         .replace(":", "%3A")
+         .replace(",", "%2C")
+    )
+
+
+def emit_annotation(level: str, file: str, title: str, message: str) -> None:
+    """Print `::error file=…,title=…::message` (or ::warning)."""
+    if not IN_GHA:
+        return
+    print(
+        f"::{level} file={gha_escape(file)},title={gha_escape(title)}::{gha_escape(message)}",
+        flush=True,
+    )
+
 
 def fetch(url: str) -> str:
     req = urllib.request.Request(url, headers={"User-Agent": "Googlebot/2.1 (+http://www.google.com/bot.html)"})
