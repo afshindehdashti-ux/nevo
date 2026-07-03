@@ -36,7 +36,8 @@ ROUTE_FILES: dict[str, str] = {
     "/solutions/raw-materials": "src/routes/$lang.solutions.raw-materials.tsx",
     "/solutions/factory-development": "src/routes/$lang.solutions.factory-development.tsx",
     "/solutions/engineering-consultancy": "src/routes/$lang.solutions.engineering-consultancy.tsx",
-]
+}
+
 
 # Non-localized core paths the preflight smoke-tests before spending time
 # on the per-locale matrix. Not part of the SEO audit itself.
