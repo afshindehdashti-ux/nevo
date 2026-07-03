@@ -768,6 +768,112 @@ function PanelThicknessPage() {
     URL.revokeObjectURL(url);
   }
 
+  async function downloadPdfReport() {
+    const { default: jsPDF } = await import("jspdf");
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const pageW = doc.internal.pageSize.getWidth();
+    const marginX = 48;
+    let y = 56;
+
+    const line = (text: string, opts?: { size?: number; bold?: boolean; color?: [number, number, number] }) => {
+      const size = opts?.size ?? 10;
+      doc.setFont("helvetica", opts?.bold ? "bold" : "normal");
+      doc.setFontSize(size);
+      const [r, g, b] = opts?.color ?? [30, 30, 30];
+      doc.setTextColor(r, g, b);
+      const wrapped = doc.splitTextToSize(text, pageW - marginX * 2);
+      doc.text(wrapped, marginX, y);
+      y += wrapped.length * (size + 3);
+    };
+    const spacer = (h = 8) => { y += h; };
+    const rule = () => {
+      doc.setDrawColor(200);
+      doc.line(marginX, y, pageW - marginX, y);
+      y += 10;
+    };
+    const kv = (k: string, v: string) => {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(90);
+      doc.text(k, marginX, y);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(20);
+      doc.text(v, marginX + 190, y);
+      y += 15;
+    };
+
+    // Header
+    doc.setFillColor(15, 23, 42);
+    doc.rect(0, 0, pageW, 40, "F");
+    doc.setTextColor(255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("NEVO Engineering", marginX, 26);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Panel Thickness Calculation Report", pageW - marginX, 26, { align: "right" });
+
+    y = 72;
+    line("Panel Thickness Calculation Report", { size: 18, bold: true });
+    line(`Generated ${new Date().toLocaleString()}`, { size: 9, color: [110, 110, 110] });
+    spacer(6);
+    rule();
+
+    line("Inputs", { size: 12, bold: true });
+    spacer(2);
+    kv("Application", app);
+    kv("Core Material", core);
+    kv("Climate Zone", climate);
+    kv("Required Internal Temp", temp);
+    kv("Fire Requirement", fire);
+    kv("Selected Thickness", `${thickness} mm`);
+    kv("Exterior Steel Skin", `${extSteel.toFixed(2)} mm`);
+    kv("Interior Steel Skin", `${intSteel.toFixed(2)} mm`);
+    spacer(4);
+    rule();
+
+    line("Computed Results", { size: 12, bold: true });
+    spacer(2);
+    kv("U-Value", `${u} W/m²K`);
+    kv("Thermal Resistance (R)", `${rTotal} m²K/W`);
+    kv("Panel Weight", `${w} kg/m²`);
+    kv("Estimated Heat Loss", `${hLoss} W/m² (ΔT ${deltaT} K)`);
+    kv("Fire Rating Achieved", `${fireLabel(fireAchieved)} (required: ${fire})`);
+    kv("Thermal Performance", perf);
+    spacer(4);
+    rule();
+
+    line("Recommendation", { size: 12, bold: true });
+    spacer(2);
+    kv("Recommended Range", `${rec.min}–${rec.max} mm`);
+    kv("Selection Status", meetsRec ? "Within recommended range" : belowRec ? "Below recommended range" : "Above recommended range");
+    line(`Note: ${rec.note}`, { size: 10 });
+    if (fireWarn) {
+      spacer(4);
+      line("WARNING: For high fire resistance requirements (>=120 min), Rock Wool or Glass Wool cores are strongly recommended.", { size: 10, bold: true, color: [180, 60, 30] });
+    }
+    spacer(6);
+    rule();
+
+    line("Disclaimer", { size: 12, bold: true });
+    spacer(2);
+    line(
+      "This calculator provides conceptual guidance only. Final sandwich panel thickness must be verified by project-specific engineering, local building regulations, fire safety requirements and detailed thermal performance calculations. Contact NEVO Engineering for a validated project specification.",
+      { size: 9, color: [90, 90, 90] },
+    );
+
+    // Footer
+    const pageH = doc.internal.pageSize.getHeight();
+    doc.setDrawColor(220);
+    doc.line(marginX, pageH - 40, pageW - marginX, pageH - 40);
+    doc.setFontSize(8);
+    doc.setTextColor(120);
+    doc.text("NEVO Engineering · Panel Thickness Calculator", marginX, pageH - 24);
+    doc.text("nevo.engineering", pageW - marginX, pageH - 24, { align: "right" });
+
+    doc.save(`nevo-panel-thickness-${app.replace(/\s+/g, "-")}-${core.replace(/\s+/g, "-")}-${thickness}mm.pdf`);
+  }
+
   const inquiryParams = new URLSearchParams({
     subject: "Panel Thickness Recommendation",
     application: app,
@@ -1076,6 +1182,14 @@ function PanelThicknessPage() {
           <Download className="size-4" />
           Download Calculation Report
         </button>
+        <button
+          type="button"
+          onClick={downloadPdfReport}
+          className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90"
+        >
+          <Download className="size-4" />
+          Download PDF Report
+        </button>
         <Link
           to={`/project-inquiry?${inquiryParams}` as never}
           className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
@@ -1200,6 +1314,13 @@ function PanelThicknessPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
           >
             <Download className="size-4" /> Download Report
+          </button>
+          <button
+            type="button"
+            onClick={downloadPdfReport}
+            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+          >
+            <Download className="size-4" /> Download PDF
           </button>
           <Link
             to={"/contact" as never}
