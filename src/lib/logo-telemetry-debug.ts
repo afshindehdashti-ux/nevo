@@ -592,9 +592,10 @@ async function copyLogoTelemetryDump(
  */
 export function downloadLogoTelemetryDump(
   origin: LogoTelemetryDump["origin"] = "console",
+  opts: LogoDumpOptions = {},
 ): string {
   if (!isLogoDebugBuildEnabled()) return "";
-  const json = dumpLogoTelemetryAsJSON(origin);
+  const json = dumpLogoTelemetryAsJSON(origin, opts);
   if (typeof window === "undefined" || typeof document === "undefined") {
     return json;
   }
@@ -605,7 +606,12 @@ export function downloadLogoTelemetryDump(
   }
   // ISO with `:` stripped so the filename is portable across OSes.
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const filename = `nevo-logo-telemetry-${origin}-${stamp}.json`;
+  // Include a filesystem-safe correlationId slug in the filename when the
+  // dump is scoped, so an attached incident file is self-describing.
+  const cidSlug = opts.correlationId
+    ? `-cid-${opts.correlationId.replace(/[^A-Za-z0-9._-]+/g, "_").slice(0, 40)}`
+    : "";
+  const filename = `nevo-logo-telemetry-${origin}${cidSlug}-${stamp}.json`;
   const blob = new BlobCtor([json], { type: "application/json" });
   const href = URLRef.createObjectURL(blob);
   try {
