@@ -289,9 +289,12 @@ function CrossSection({
 
         {/* Core */}
         <motion.rect
+          initial={false}
           animate={{ y: coreTop, height: coreH }}
           transition={{ type: "spring", stiffness: 220, damping: 26 }}
           x={padX}
+          y={coreTop}
+          height={coreH}
           width={panelW}
           fill={`url(#${patternId})`}
           stroke="rgba(0,0,0,0.35)"
@@ -300,18 +303,24 @@ function CrossSection({
 
         {/* Exterior skin */}
         <motion.rect
+          initial={false}
           animate={{ y: startY, height: skinExt }}
           transition={{ type: "spring", stiffness: 220, damping: 26 }}
           x={padX}
+          y={startY}
+          height={skinExt}
           width={panelW}
           fill="#B7BEC6"
           stroke="rgba(0,0,0,0.5)"
           strokeWidth={0.6}
         />
         <motion.rect
+          initial={false}
           animate={{ y: startY, height: skinExt }}
           transition={{ type: "spring", stiffness: 220, damping: 26 }}
           x={padX}
+          y={startY}
+          height={skinExt}
           width={panelW}
           fill="url(#skin-shade)"
           opacity={0.6}
@@ -319,22 +328,29 @@ function CrossSection({
 
         {/* Interior skin */}
         <motion.rect
+          initial={false}
           animate={{ y: intTop, height: skinInt }}
           transition={{ type: "spring", stiffness: 220, damping: 26 }}
           x={padX}
+          y={intTop}
+          height={skinInt}
           width={panelW}
           fill="#E7EBDA"
           stroke="rgba(0,0,0,0.5)"
           strokeWidth={0.6}
         />
         <motion.rect
+          initial={false}
           animate={{ y: intTop, height: skinInt }}
           transition={{ type: "spring", stiffness: 220, damping: 26 }}
           x={padX}
+          y={intTop}
+          height={skinInt}
           width={panelW}
           fill="url(#skin-shade)"
           opacity={0.4}
         />
+
 
         {/* Thickness dimension */}
         <g stroke="rgba(255,255,255,0.7)" strokeWidth={0.8} fill="rgba(255,255,255,0.85)">
