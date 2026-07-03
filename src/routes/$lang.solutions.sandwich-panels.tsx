@@ -55,6 +55,7 @@ import t28 from "@/assets/panels/tile-28.jpg";
 import t29 from "@/assets/panels/tile-29.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
+import { InquiryCTA } from "@/components/site/InquiryCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
