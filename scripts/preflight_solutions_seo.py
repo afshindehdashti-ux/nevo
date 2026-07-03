@@ -593,6 +593,16 @@ def _classify_status(status: int | None) -> str:
     return "xxx"
 
 
+def _status_class_retryable(status: int | None) -> bool:
+    """Return True when the HTTP status/code is in RETRYABLE_STATUS_CLASSES."""
+    if status is None or not RETRYABLE_STATUS_CLASSES:
+        return False
+    return _classify_status(status) in RETRYABLE_STATUS_CLASSES or str(status) in RETRYABLE_STATUS_CLASSES
+
+
+
+
+
 
 def probe(url: str) -> dict:
     """Probe a URL with retries. Return a result dict with timing/status."""
