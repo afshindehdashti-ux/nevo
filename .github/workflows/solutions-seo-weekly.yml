@@ -10,6 +10,10 @@ on:
         description: "Base URL to audit (defaults to published site)"
         required: false
         default: "https://nevo-engineering-hub.lovable.app"
+      skip_on_preflight_failure:
+        description: "If preflight fails, skip the audit instead of failing the workflow"
+        required: false
+        default: "true"
 
 permissions:
   contents: read
@@ -55,17 +59,56 @@ jobs:
       # Fail fast if the live site is down or misconfigured. Cheaper than
       # running the full 60-page snapshot against a broken deploy, and the
       # error surfaces the exact failing URL in the run log / summary.
+      #
+      # continue-on-error lets us decide in the next step whether to skip
+      # the rest of the job (default for scheduled runs) or fail hard.
       - name: Preflight — site + sitemap reachable
+        id: preflight
+        continue-on-error: true
         env:
           BASE_URL: ${{ github.event.inputs.base_url || 'https://nevo-engineering-hub.lovable.app' }}
           LOCALES: en,ar,tr
         run: python3 scripts/preflight_solutions_seo.py
+
+      # Decide: skip cleanly (default) or fail the workflow.
+      # Scheduled runs default to skip so the team doesn't get paged for
+      # transient outages of the live site — the diff would be noise anyway.
+      - name: Evaluate preflight outcome
+        id: preflight_gate
+        env:
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
+          SKIP_ON_FAILURE: ${{ github.event.inputs.skip_on_preflight_failure || 'true' }}
+        run: |
+          if [ "$PREFLIGHT_OUTCOME" = "success" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "✅ Preflight passed — running full audit." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if [ "$SKIP_ON_FAILURE" = "true" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "## ⚠️ Weekly audit skipped"
+              echo ""
+              echo "Preflight failed (live site or sitemap not reachable). Skipping the"
+              echo "full snapshot for this week so the team is not paged on a transient"
+              echo "outage. See the Preflight step above for the exact failing URL,"
+              echo "HTTP status, and response time."
+              echo ""
+              echo "To force a hard failure instead, re-run via **Run workflow** with"
+              echo "\`skip_on_preflight_failure = false\`."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::Preflight failed — skipping weekly audit (skip_on_preflight_failure=true)."
+            exit 0
+          fi
+          echo "::error::Preflight failed and skip_on_preflight_failure=false — failing the workflow."
+          exit 1
 
       # Run against the live published site — no local Vite boot required.
       # --warn-only keeps the scheduled run green so a regression doesn't
       # spam the team with failed-workflow emails; the report is the deliverable.
 
       - name: Verify Solutions SEO (live)
+        if: steps.preflight_gate.outputs.skip != 'true'
         env:
           BASE_URL: ${{ github.event.inputs.base_url || 'https://nevo-engineering-hub.lovable.app' }}
           REPORT_JSON: reports/seo/solutions-seo.json
@@ -75,6 +118,7 @@ jobs:
 
       # Highlight ONLY new / resolved issues since the previous weekly run.
       - name: Diff against previous run
+        if: steps.preflight_gate.outputs.skip != 'true'
         run: |
           python3 scripts/diff_solutions_seo.py \
             --previous "${{ steps.prev_json.outputs.path }}" \
@@ -82,6 +126,7 @@ jobs:
             --out "$GITHUB_STEP_SUMMARY"
 
       - name: Stamp report filename with ISO week
+        if: steps.preflight_gate.outputs.skip != 'true'
         run: |
           WEEK="$(date -u +'%Y-W%V')"
           echo "REPORT_WEEK=$WEEK" >> "$GITHUB_ENV"
@@ -92,6 +137,7 @@ jobs:
       # the run summary (fast triage in the browser) and to a Markdown artifact
       # (readable offline, shareable in Slack/email threads).
       - name: Build consolidated failure index
+        if: steps.preflight_gate.outputs.skip != 'true'
         run: |
           python3 scripts/index_solutions_seo.py \
             --input reports/seo/solutions-seo.json \
@@ -101,6 +147,7 @@ jobs:
 
       # 90-day retention so the team can compare week-over-week.
       - name: Upload weekly SEO report
+        if: steps.preflight_gate.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: solutions-seo-weekly-${{ env.REPORT_WEEK }}
@@ -115,12 +162,10 @@ jobs:
       # Notify Slack when the live snapshot finds regressions.
       # Runs after upload so the "View run & artifacts" link resolves.
       - name: Notify Slack on failure
-        if: always()
+        if: always() && steps.preflight_gate.outputs.skip != 'true'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           REPORT_JSON: reports/seo/solutions-seo.json
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           RUN_LABEL: weekly ${{ env.REPORT_WEEK }}
         run: python3 scripts/notify_solutions_seo.py
-
-
