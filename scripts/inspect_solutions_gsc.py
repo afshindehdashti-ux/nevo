@@ -72,24 +72,80 @@ def inspect(url: str) -> dict:
         return {"ok": False, "status": 0, "error": str(e)}
 
 
+EXPECTED_RICH_TYPES = {"Breadcrumbs"}  # always required on Solutions pages
+TRACKED_RICH_TYPES = {"Breadcrumbs", "FAQ"}  # additionally reported when present
+
+
+def summarize_rich(rich: dict) -> dict:
+    """Parse richResultsResult.detectedItems[] → per-type status + issues."""
+    detected = rich.get("detectedItems", []) or []
+    by_type: dict[str, dict] = {}
+    for group in detected:
+        rtype = group.get("richResultType", "Unknown")
+        items = group.get("items", []) or []
+        errors, warnings, item_issues = 0, 0, []
+        for it in items:
+            for iss in it.get("issues", []) or []:
+                sev = (iss.get("severity") or "").upper()
+                msg = iss.get("issueMessage", "")
+                item_issues.append({"severity": sev, "message": msg, "name": it.get("name", "")})
+                if sev == "ERROR":
+                    errors += 1
+                elif sev == "WARNING":
+                    warnings += 1
+        by_type[rtype] = {
+            "count": len(items),
+            "errors": errors,
+            "warnings": warnings,
+            "issues": item_issues,
+        }
+    missing = sorted(t for t in EXPECTED_RICH_TYPES if t not in by_type)
+    return {"verdict": rich.get("verdict", "-"), "types": by_type, "missing": missing}
+
+
+def _rich_flag(rd: dict, key: str) -> str:
+    """Compact per-type cell: 'OK(2)' / 'ERR(1)' / 'WARN(1)' / '—'."""
+    t = rd["types"].get(key)
+    if not t:
+        return "missing" if key in EXPECTED_RICH_TYPES else "—"
+    if t["errors"]:
+        return f"ERR({t['errors']})"
+    if t["warnings"]:
+        return f"WARN({t['warnings']})"
+    return f"OK({t['count']})"
+
+
 def summarize(res: dict) -> dict:
     if not res.get("ok"):
         return {"verdict": "ERROR", "coverage": "-", "indexing": "-",
                 "mobile": "-", "rich": "-", "canonical": "-",
+                "rich_detail": {"verdict": "-", "types": {}, "missing": []},
+                "breadcrumb": "-", "faq": "-", "rich_issues": [],
                 "note": res.get("error", "")[:120]}
     idx = res["data"].get("inspectionResult", {})
     ir = idx.get("indexStatusResult", {}) or {}
     mob = idx.get("mobileUsabilityResult", {}) or {}
     rich = idx.get("richResultsResult", {}) or {}
+    rd = summarize_rich(rich)
+    issues = []
+    for rtype, t in rd["types"].items():
+        for iss in t["issues"]:
+            if iss["severity"] in ("ERROR", "WARNING"):
+                issues.append({"type": rtype, **iss})
     return {
         "verdict": ir.get("verdict", "-"),
         "coverage": ir.get("coverageState", "-"),
         "indexing": ir.get("indexingState", "-"),
         "mobile": mob.get("verdict", "-"),
-        "rich": rich.get("verdict", "-"),
+        "rich": rd["verdict"],
         "canonical": ir.get("googleCanonical", "-"),
+        "rich_detail": rd,
+        "breadcrumb": _rich_flag(rd, "Breadcrumbs"),
+        "faq": _rich_flag(rd, "FAQ"),
+        "rich_issues": issues,
         "note": "",
     }
+
 
 
 def main() -> int:
