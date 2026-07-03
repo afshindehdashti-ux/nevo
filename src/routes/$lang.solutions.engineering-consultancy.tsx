@@ -54,6 +54,7 @@ import img25 from "@/assets/engineering/25-materials.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { InquiryCTA } from "@/components/site/InquiryCTA";
+import { DownloadsCTA } from "@/components/site/DownloadsCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
@@ -163,7 +164,7 @@ function EngineeringConsultancyPage() {
         <EngineeringMaterials />
         <Services />
         <Process />
-        <Downloads />
+        <DownloadsCTA />
         <FAQ />
         <InquiryCTA />
         <FinalCTA />

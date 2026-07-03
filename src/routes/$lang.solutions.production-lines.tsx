@@ -45,6 +45,7 @@ import eq09 from "@/assets/machinery/09-control-system.jpg";
 import eq10 from "@/assets/machinery/10-air-compressor.jpg";
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { InquiryCTA } from "@/components/site/InquiryCTA";
+import { DownloadsCTA } from "@/components/site/DownloadsCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
@@ -148,7 +149,7 @@ function ProductionLinesPage() {
         <ComparisonTable />
         <Automation />
         <Applications />
-        <Downloads />
+        <DownloadsCTA />
         <FAQSection />
         <InquiryCTA />
         <FinalCTA />
