@@ -856,6 +856,27 @@ def write_step_summary(results: list[dict]) -> None:
         parts = [f"{_STATUS_CLASS_LABELS.get(k, k)} × **{n}**" for k, n in ordered]
         lines.append(f"- HTTP status classes: {' · '.join(parts)}")
 
+    # Combined error_kind × status_class breakdown: shows which transport
+    # failures (timeout, dns, tls, reset) sit next to `none` status class vs
+    # which HTTP-level errors carry 4xx/5xx. A transport error with `none`
+    # means the server never responded; a transport error with `4xx` would
+    # hint at a misclassified HTTP refusal or WAF behavior.
+    if kinds:
+        combo = Counter(
+            (r.get("error_kind") or "unknown",
+             r.get("status_class") or _classify_status(r.get("status")))
+            for r in results if not r["ok"]
+        )
+        combo_rows = sorted(
+            combo.items(),
+            key=lambda kv: (kinds.get(kv[0][0], 0), -kv[1], kv[0][0], kv[0][1]),
+            reverse=True,
+        )
+        lines.append("- Failure breakdown by kind × status class:")
+        for (kind, status_class), n in combo_rows:
+            kind_label = _ERROR_KIND_LABELS.get(kind, kind)
+            class_label = _STATUS_CLASS_LABELS.get(status_class, status_class)
+            lines.append(f"  - {kind_label} + {class_label} × **{n}**")
 
     # Latency histogram grouped by error_kind: makes it obvious whether e.g.
     # timeouts cluster at the timeout ceiling, TLS failures fail fast, or DNS
