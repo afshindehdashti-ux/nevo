@@ -40,14 +40,19 @@ function HeroDesktop() {
   return (
     <div className="relative hidden min-h-[85vh] md:block lg:min-h-[95vh]">
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        <img
-          src={heroDesktop}
-          alt="NEVO continuous double-belt laminator producing a PIR sandwich panel with PPGI facings"
+        <video
+          src={heroVideo}
+          poster={heroDesktop}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-label="NEVO continuous double-belt laminator producing a PIR sandwich panel with PPGI facings"
           className="h-full w-full object-cover"
           style={{ objectPosition: "72% center" }}
-          fetchPriority="high"
-          decoding="async"
         />
+
         {/* Left-side readability wash */}
         <div
           aria-hidden
