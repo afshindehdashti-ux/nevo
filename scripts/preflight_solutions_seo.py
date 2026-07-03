@@ -602,7 +602,8 @@ def probe(url: str) -> dict:
         last_err = ""
         return {"url": url, "ok": True, "status": status, "bytes": body_bytes,
                 "ms": ms, "attempts": attempts, "error": "", "method": http_method,
-                "error_kind": "ok"}
+                "error_kind": "ok", "status_class": _classify_status(status)}
+
 
     def _do_request(http_method: str) -> tuple[int | None, int, float, str, bytes, dict[str, str], str]:
         """Issue one request. Returns (status, size_bytes, ms, error, body, headers, content_type).
