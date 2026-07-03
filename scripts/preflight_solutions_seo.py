@@ -594,13 +594,6 @@ def write_step_summary(results: list[dict]) -> None:
                 lines.append(snippet)
                 lines.append("```")
             lines.append("")
-            if snippet:
-                # Fenced block avoids Markdown interpreting HTML/pipes in the snippet.
-                lines.append("")
-                lines.append("```text")
-                lines.append(snippet)
-                lines.append("```")
-            lines.append("")
 
     with open(path, "a", encoding="utf-8") as fh:
         fh.write("\n".join(lines) + "\n")
