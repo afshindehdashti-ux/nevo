@@ -96,6 +96,66 @@ function toEpochSeconds(v: unknown): number {
   return Date.now() / 1000;
 }
 
+function buildBreadcrumbs(e: LogoErrorEvent) {
+  const nowStage = e.stage ?? "unknown";
+  const currentTs = toEpochSeconds(e.clientTs);
+  const history = Array.isArray(e.history) ? e.history : [];
+
+  const crumbs = history.map((h) => {
+    const kind = h.eventType === "error" ? "fail" : "render";
+    return {
+      type: "default",
+      category: `header.logo.${h.eventType}`,
+      level: h.eventType === "error" ? "warning" : "info",
+      timestamp: toEpochSeconds(h.clientTs ?? undefined),
+      message: `${kind}:${h.stage ?? "unknown"}`,
+      data: {
+        variant: h.variant ?? undefined,
+        src: h.src ?? undefined,
+        nextSrc: h.nextSrc ?? undefined,
+        online: h.online ?? undefined,
+      },
+    };
+  });
+
+  // Always include the current failure as the final crumb so the tail of the
+  // chain matches the event itself, even if the DB lookup missed the row.
+  const alreadyPresent = crumbs.some(
+    (c) =>
+      c.category === "header.logo.error" &&
+      c.message === `fail:${nowStage}` &&
+      Math.abs(c.timestamp - currentTs) < 0.001,
+  );
+  if (!alreadyPresent) {
+    crumbs.push({
+      type: "default",
+      category: "header.logo.error",
+      level: e.terminal ? "error" : "warning",
+      timestamp: currentTs,
+      message: `fail:${nowStage}`,
+      data: {
+        variant: e.variant,
+        src: e.failedSrc,
+        nextSrc: e.nextSrc,
+        online: e.online,
+      },
+    });
+  }
+  return { values: crumbs };
+}
+
+function buildFallbackChain(e: LogoErrorEvent): string {
+  const parts: string[] = [];
+  const history = Array.isArray(e.history) ? e.history : [];
+  for (const h of history) {
+    const kind = h.eventType === "error" ? "fail" : "render";
+    parts.push(`${kind}:${h.stage ?? "unknown"}`);
+  }
+  const tail = `fail:${e.stage ?? "unknown"}`;
+  if (parts[parts.length - 1] !== tail) parts.push(tail);
+  return parts.join(" → ");
+}
+
 function buildSentryEvent(e: LogoErrorEvent) {
   const stage = e.stage ?? "unknown";
   const terminal = e.terminal === true;
@@ -105,6 +165,7 @@ function buildSentryEvent(e: LogoErrorEvent) {
       : stage === "fallback-cdn-full"
         ? "inline-svg"
         : "none";
+  const fallbackChain = buildFallbackChain(e);
   return {
     event_id: randomEventId(),
     timestamp: toEpochSeconds(e.clientTs),
@@ -115,14 +176,16 @@ function buildSentryEvent(e: LogoErrorEvent) {
     release: e.release,
     transaction: e.route,
     message: {
-      formatted: `header.logo.error [${stage}]${terminal ? " · terminal" : ""}`,
+      formatted: `header.logo.error [${stage}]${terminal ? " · terminal" : ""} · ${fallbackChain}`,
     },
-    fingerprint: ["header.logo.error", stage],
+    fingerprint: ["header.logo.error", stage, fallbackChain],
     tags: {
       stage,
       variant: e.variant ?? null,
       terminal: String(terminal),
       next_step: nextStep,
+      fallback_chain: fallbackChain,
+      chain_length: String((e.history?.length ?? 0) + 1),
       viewport_width: e.viewportWidth ?? null,
       online: typeof e.online === "boolean" ? String(e.online) : null,
       schema: e.schema ?? null,
@@ -139,28 +202,14 @@ function buildSentryEvent(e: LogoErrorEvent) {
       failedSrc: e.failedSrc,
       nextSrc: e.nextSrc,
       correlationId: e.correlationId,
+      fallbackChain,
+      history: e.history ?? [],
       payload: e.extra,
     },
-    breadcrumbs: {
-      values: [
-        {
-          type: "default",
-          category: "header.logo",
-          level: terminal ? "error" : "warning",
-          timestamp: toEpochSeconds(e.clientTs),
-          message: `stage=${stage} nextStep=${nextStep}`,
-          data: {
-            variant: e.variant,
-            failedSrc: e.failedSrc,
-            nextSrc: e.nextSrc,
-            viewportWidth: e.viewportWidth,
-            online: e.online,
-          },
-        },
-      ],
-    },
+    breadcrumbs: buildBreadcrumbs(e),
   };
 }
+
 
 function buildEnvelope(dsn: ParsedDsn, events: ReturnType<typeof buildSentryEvent>[]): string {
   const sentAt = new Date().toISOString();
