@@ -51,7 +51,7 @@ without needing to open the job log.
 """
 from __future__ import annotations
 from __future__ import annotations
-import os, re, sys, time, urllib.request, urllib.error
+import os, sys, time, urllib.request, urllib.error
 from pathlib import Path
 from urllib.parse import urlparse
 
