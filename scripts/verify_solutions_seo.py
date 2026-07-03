@@ -368,7 +368,12 @@ def render_html(base: str, results: list, failed: list) -> str:
     for r in sorted(results, key=lambda r: (bool(not r["failures"]), r["locale"], r["path"])):
         status = "FAIL" if r["failures"] else "PASS"
         cls = "fail" if r["failures"] else "pass"
-        issues = "".join(f"<li>{_esc(f)}</li>" for f in r["failures"]) or "<li class=ok>All checks passed</li>"
+        def _li(f: str) -> str:
+            hint = suggest_fix(f)
+            hint_html = f'<span class="hint">↳ fix: {_esc(hint)}</span>' if hint else ""
+            return f"<li>{_esc(f)}{hint_html}</li>"
+        issues = "".join(_li(f) for f in r["failures"]) or "<li class=ok>All checks passed</li>"
+
         rows.append(f"""
         <tr class="{cls}">
           <td><span class="badge {cls}">{status}</span></td>
