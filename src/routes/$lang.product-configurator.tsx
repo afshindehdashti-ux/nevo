@@ -560,6 +560,8 @@ function ProductConfiguratorPage() {
             <PanelStudio
               core={cfg.core}
               ratio="aspect-[16/10]"
+              tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
+              thicknessMm={cfg.thickness}
               className={cn(
                 "transition-all duration-700",
                 view3d === "exploded" && "shadow-[0_50px_120px_-30px_rgba(16,185,129,0.35)]",
