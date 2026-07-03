@@ -101,6 +101,15 @@ Env:
                          - `combo=http:5xx,timeout:none` — exact error_kind:status_class pairs
                        Multiple clauses may be combined with `;` (logical OR),
                        e.g. `RESULTS_INCLUDE="status_class=5xx;error_kind=timeout"`.
+  LATENCY_BUCKETS      explicit comma-separated upper-bound edges (ms) for
+                       the latency histogram/heatmap, e.g.
+                       `LATENCY_BUCKETS=50,100,250,500,1000,5000`.
+  LATENCY_BIN_SIZE     uniform bin width (ms); combine with LATENCY_MAX_MS
+                       to auto-generate evenly spaced buckets, e.g.
+                       `LATENCY_BIN_SIZE=250 LATENCY_MAX_MS=5000` →
+                       0–250, 250–500, …, 4750–5000, 5000+.
+  LATENCY_MAX_MS       highest finite edge for LATENCY_BIN_SIZE; slower
+                       samples land in the always-present `+` overflow bin.
 
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
@@ -778,16 +787,65 @@ def _render_headers_md(headers: dict[str, str]) -> str:
 
 # Latency buckets in ms. Chosen to separate "fast local", "healthy remote",
 # "slow", and "near-timeout" so infra-shaped failures stand out from content.
-_LATENCY_BUCKETS: list[tuple[str, float]] = [
-    ("0–100",      100.0),
-    ("100–250",    250.0),
-    ("250–500",    500.0),
-    ("500–1000",  1000.0),
-    ("1–2.5s",    2500.0),
-    ("2.5–5s",    5000.0),
-    ("5–10s",    10000.0),
-    ("10s+",   float("inf")),
-]
+def _fmt_ms_label(ms: float) -> str:
+    """Human-friendly bucket edge label — ms below 1000, seconds above."""
+    if ms >= 1000:
+        v = ms / 1000.0
+        s = f"{v:.1f}".rstrip("0").rstrip(".")
+        return f"{s}s"
+    return f"{int(ms)}"
+
+
+def _build_latency_buckets() -> list[tuple[str, float]]:
+    """Assemble the latency histogram edges from env.
+
+    Two mutually exclusive knobs, evaluated in order:
+      LATENCY_BUCKETS    explicit comma-separated upper bounds in ms
+                         (e.g. `50,100,250,500,1000,5000`). Wins if set.
+      LATENCY_BIN_SIZE   uniform bin width in ms; requires LATENCY_MAX_MS
+      LATENCY_MAX_MS     highest finite edge; anything slower falls into
+                         the always-present `+` overflow bucket
+    The overflow bucket (`float('inf')`) is always appended so no sample
+    is ever dropped from the histogram/heatmap.
+    """
+    raw = (os.environ.get("LATENCY_BUCKETS") or "").strip()
+    edges: list[float] = []
+    if raw:
+        for tok in raw.split(","):
+            tok = tok.strip()
+            if not tok:
+                continue
+            try:
+                v = float(tok)
+            except ValueError:
+                continue
+            if v > 0:
+                edges.append(v)
+    else:
+        bin_size = _num("LATENCY_BIN_SIZE", 0, minimum=0)
+        max_ms = _num("LATENCY_MAX_MS", 0, minimum=0)
+        if bin_size > 0 and max_ms > 0:
+            v = bin_size
+            while v <= max_ms + 1e-6:
+                edges.append(v)
+                v += bin_size
+
+    if not edges:
+        # Default kept in sync with the historical baseline so unchanged
+        # runs render exactly as before.
+        edges = [100, 250, 500, 1000, 2500, 5000, 10000]
+
+    edges = sorted(set(edges))
+    buckets: list[tuple[str, float]] = []
+    prev = 0.0
+    for e in edges:
+        buckets.append((f"{_fmt_ms_label(prev)}–{_fmt_ms_label(e)}", e))
+        prev = e
+    buckets.append((f"{_fmt_ms_label(prev)}+", float("inf")))
+    return buckets
+
+
+_LATENCY_BUCKETS: list[tuple[str, float]] = _build_latency_buckets()
 
 
 def _bucket_for(ms: float) -> int:
