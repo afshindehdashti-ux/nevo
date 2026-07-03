@@ -4,9 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LocalizedLink } from "@/components/site/LocalizedLink";
 import { ARTICLES } from "@/lib/knowledge-articles";
+import {
+  getKnowledgeHubPreview,
+  type SolutionsRouteKey,
+} from "@/lib/knowledge-hub-preview-config";
 
 type Props = {
-  slugs: string[];
+  /** Route key that resolves slugs + copy from knowledge-hub-preview-config. */
+  route?: SolutionsRouteKey;
+  /** Explicit slugs override (takes precedence over route mapping). */
+  slugs?: string[];
   eyebrow?: string;
   title?: string;
   lede?: string;
@@ -14,19 +21,30 @@ type Props = {
 };
 
 /**
- * Route-scoped Knowledge Hub preview. Each Solutions page picks 3 relevant
- * articles by slug; deep links open the full article on /knowledge-hub/{slug}
- * and the "See all" link leads to the master library. Single source of
- * truth — no duplicated article copy per route.
+ * Route-scoped Knowledge Hub preview. Pass `route` to pull slugs + copy from
+ * src/lib/knowledge-hub-preview-config.ts (config-driven, edit-in-one-place),
+ * or pass `slugs` directly for ad-hoc previews. Deep links open the full
+ * article on /knowledge-hub/{slug}.
  */
 export function KnowledgeHubPreview({
+  route,
   slugs,
-  eyebrow = "Knowledge hub",
-  title = "Read the engineering behind this scope.",
-  lede = "Handpicked technical articles and downloadable references from the NEVO engineering desk — matched to this solution.",
+  eyebrow,
+  title,
+  lede,
   loading = false,
 }: Props) {
-  const items = slugs
+  const config = route ? getKnowledgeHubPreview(route) : undefined;
+  const resolvedSlugs = slugs ?? config?.slugs ?? [];
+  const resolvedEyebrow = eyebrow ?? config?.eyebrow ?? "Knowledge hub";
+  const resolvedTitle =
+    title ?? config?.title ?? "Read the engineering behind this scope.";
+  const resolvedLede =
+    lede ??
+    config?.lede ??
+    "Handpicked technical articles and downloadable references from the NEVO engineering desk — matched to this solution.";
+
+  const items = resolvedSlugs
     .map((s) => ARTICLES.find((a) => a.slug === s))
     .filter((a): a is (typeof ARTICLES)[number] => Boolean(a));
 
@@ -36,7 +54,7 @@ export function KnowledgeHubPreview({
     <Section tone="default">
       <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-2xl">
-          <SectionHeader eyebrow={eyebrow} title={title} lede={lede} />
+          <SectionHeader eyebrow={resolvedEyebrow} title={resolvedTitle} lede={resolvedLede} />
         </div>
         <Button asChild variant="ghost" size="lg" className="self-start lg:self-end">
           <LocalizedLink to="/knowledge-hub">

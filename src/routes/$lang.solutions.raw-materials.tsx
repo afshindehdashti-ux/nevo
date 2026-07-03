@@ -175,7 +175,7 @@ function RawMaterialsPage() {
         <QualityAssurance />
         <DownloadsCTA />
         <FAQ />
-        <KnowledgeHubPreview slugs={["polyol-mdi", "rockwool-lamella", "pir-vs-rockwool"]} />
+        <KnowledgeHubPreview route="raw-materials" />
         <InquiryCTA
           source="raw-materials"
           eyebrow="Material inquiry"
