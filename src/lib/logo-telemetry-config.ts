@@ -101,3 +101,36 @@ export const LOGO_TELEMETRY_CONFIG = {
 } as const;
 
 export type LogoTelemetryConfig = typeof LOGO_TELEMETRY_CONFIG;
+
+/**
+ * QA helpers — flip the runtime debug flag from the devtools console without
+ * a rebuild. Persist in localStorage so the setting survives reloads.
+ *
+ *   __nevoLogoDebug.enable()   // start printing [nevo:logo-telemetry] lines
+ *   __nevoLogoDebug.disable()  // stop
+ *
+ * The mutation targets the same `debug` field the samplers read; because
+ * `LOGO_TELEMETRY_CONFIG` is a frozen `as const`, we mutate via a cast so
+ * the next sampler call sees the new value on the same reference.
+ */
+export function enableLogoDebug(): void {
+  try {
+    window.localStorage?.setItem("nevo:logo-debug", "1");
+  } catch {
+    /* storage unavailable — flag still lives on the config object */
+  }
+  (LOGO_TELEMETRY_CONFIG as { debug: boolean }).debug = true;
+}
+
+export function disableLogoDebug(): void {
+  try {
+    window.localStorage?.removeItem("nevo:logo-debug");
+  } catch {
+    /* ignore */
+  }
+  (LOGO_TELEMETRY_CONFIG as { debug: boolean }).debug = false;
+}
+
+export function isLogoDebugEnabled(): boolean {
+  return LOGO_TELEMETRY_CONFIG.debug;
+}
