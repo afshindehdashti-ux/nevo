@@ -287,16 +287,26 @@ function CrossSection({
           </linearGradient>
         </defs>
 
-        {/* Core */}
+        {/* Core — solid base color guarantees visibility; pattern overlay adds texture */}
+        <rect
+          x={padX}
+          y={coreTop}
+          width={panelW}
+          height={coreH}
+          fill={style.base}
+          stroke="rgba(0,0,0,0.35)"
+          strokeWidth={0.8}
+        />
         <rect
           x={padX}
           y={coreTop}
           width={panelW}
           height={coreH}
           fill={`url(#${patternId})`}
-          stroke="rgba(0,0,0,0.35)"
-          strokeWidth={0.8}
+          opacity={0.9}
+          pointerEvents="none"
         />
+
 
         {/* Exterior skin */}
         <rect
