@@ -400,6 +400,8 @@ export function attachLogoDebugUtil(): void {
       dumpAsJSON: (origin?: LogoTelemetryDump["origin"]) => string;
       /** Echo to console + write to clipboard when permitted. */
       copyDump: (origin?: LogoTelemetryDump["origin"]) => Promise<string>;
+      /** Save the dump to a .json file via a synthetic download. */
+      downloadDump: (origin?: LogoTelemetryDump["origin"]) => string;
     };
   };
   w.__nevoLogoDebug = {
