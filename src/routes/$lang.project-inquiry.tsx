@@ -302,15 +302,54 @@ function ProjectInquiryPage() {
     }
     setSubmitting(true);
     try {
-      // Simulate secure delivery to the NEVO engineering desk.
-      // A backend endpoint can replace this without touching UX.
-      await new Promise((r) => setTimeout(r, 650));
+      await submitInquiryFn({
+        data: {
+          name: form.contact.trim(),
+          email,
+          phone: form.phone.trim() || null,
+          company: form.company.trim() || null,
+          country: form.country.trim() || null,
+          application: form.industry.trim() || form.panelType.trim() || null,
+          message: JSON.stringify(
+            {
+              projectTypes: form.projectTypes,
+              location: form.location,
+              projectStatus: form.projectStatus,
+              capacity: form.capacity,
+              panelType: form.panelType,
+              coreType: form.coreType,
+              thickness: form.thickness,
+              steelType: form.steelType,
+              automation: form.automation,
+              shifts: form.shifts,
+              engineering: form.engineering,
+              budget: form.budget,
+              timeline: form.timeline,
+              investmentStage: form.investmentStage,
+              decision: form.decision,
+              startDate: form.startDate,
+              website: form.website,
+              whatsapp: form.whatsapp,
+              files: form.files.map((f) => f.name),
+              notes: form.notes,
+            },
+            null,
+            2,
+          ).slice(0, 4900),
+          source_page: typeof window !== "undefined" ? window.location.pathname : null,
+          calculator_state: attachedConfig ?? null,
+        },
+      });
       try { localStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
       setSubmitted(true);
       toast.success("Project inquiry submitted", {
         description: "A senior NEVO engineer will contact you within one business day.",
       });
       setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50);
+    } catch (err) {
+      toast.error("Submission failed", {
+        description: "We couldn't deliver your request. Please try again in a moment.",
+      });
     } finally {
       setSubmitting(false);
     }
