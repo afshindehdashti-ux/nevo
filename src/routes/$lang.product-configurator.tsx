@@ -109,67 +109,44 @@ const CONTEXT_IMAGES: Record<PanelType, string> = {
 
 
 /* --------------------------- Reusable studio frame --------------------------- */
-/*  White studio card that renders any panel render at true aspect —            */
-/*  never crops, never stretches. Soft engineering-software shadow.             */
+/*  White studio card that renders the dynamic SVG panel. Colour, thickness,    */
+/*  profile, core material and panel type all update in place — no photo swap.  */
 
 function PanelStudio({
-  core,
+  cfg,
   ratio = "aspect-[16/10]",
   className,
   caption,
   overlay,
-  tint,
-  thicknessMm,
+  showLabels = true,
+  showBadges = true,
 }: {
-  core: CoreMaterial;
+  cfg: Config;
   ratio?: string;
   className?: string;
   caption?: React.ReactNode;
   overlay?: React.ReactNode;
-  tint?: string;
-  thicknessMm?: number;
+  showLabels?: boolean;
+  showBadges?: boolean;
 }) {
   return (
-    <div
-      className={cn(
-        "group relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-white p-6 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.55)] md:p-10",
-        ratio,
-        className,
-      )}
-    >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-8 bottom-4 h-8 rounded-full bg-black/10 blur-2xl"
+    <div className={cn("relative w-full", ratio, className)}>
+      <DynamicPanelPreview
+        cfg={cfg}
+        ratio="absolute inset-0 h-full w-full"
+        showLabels={showLabels}
+        showBadges={showBadges}
       />
-      <div className="relative z-10 flex max-h-full max-w-full items-center justify-center">
-        <img
-          src={PANEL_IMAGES[core]}
-          alt={`${core} sandwich panel render`}
-          className="max-h-full max-w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]"
-          loading="lazy"
-        />
-        {tint && (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 mix-blend-multiply opacity-40 transition-colors duration-500"
-            style={{ background: tint }}
-          />
-        )}
-      </div>
-      {typeof thicknessMm === "number" && (
-        <div className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full border border-black/10 bg-white/90 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-black/70 backdrop-blur">
-          <Ruler className="size-3" /> {thicknessMm} mm
-        </div>
-      )}
       {overlay}
       {caption && (
-        <div className="absolute bottom-3 left-4 right-4 z-20 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-black/50">
+        <div className="pointer-events-none absolute bottom-3 left-4 right-4 z-20 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-black/60">
           {caption}
         </div>
       )}
     </div>
   );
 }
+
 
 /* --------------------------- Component --------------------------- */
 
