@@ -24,6 +24,7 @@ import k33 from "@/assets/knowledge/33_layout.jpg";
 import k36 from "@/assets/knowledge/36_investment_report.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
+import { WhyNevo as SharedWhyNevo } from "@/components/site/WhyNevo";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
