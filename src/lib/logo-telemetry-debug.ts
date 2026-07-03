@@ -263,6 +263,11 @@ export type LogoTelemetryDump = {
    * the blob isn't the raw wire format. Empty array = nothing matched.
    */
   redactions: string[];
+  /**
+   * True when the dump helper was called from a production bundle and
+   * refused to expose telemetry. Payload is empty in that case.
+   */
+  disabled?: boolean;
 };
 
 const REDACTED = "[redacted]";
@@ -420,9 +425,60 @@ export function redactLogoTelemetryDump(
   };
 }
 
+/**
+ * Runtime dev-build guard. Mirrors the check in `attachLogoDebugUtil()` so
+ * every publicly reachable helper refuses to expose telemetry from a
+ * published bundle — even if someone imports these functions directly
+ * (bypassing `window.__nevoLogoDebug`) or a future refactor drops the
+ * top-level attach guard. Tests run under Vitest with `DEV=true` so the
+ * suite is unaffected; escape hatch below is for the rare test that
+ * needs to exercise the disabled branch.
+ */
+function isLogoDebugBuildEnabled(): boolean {
+  if (
+    typeof globalThis !== "undefined" &&
+    (globalThis as { __NEVO_FORCE_DISABLE_LOGO_DEBUG__?: boolean })
+      .__NEVO_FORCE_DISABLE_LOGO_DEBUG__ === true
+  ) {
+    return false;
+  }
+  return import.meta.env.DEV === true;
+}
+
+/**
+ * Shape returned from every dump helper when running in a production
+ * bundle. The `disabled` flag lets callers (and QA reports) tell a real
+ * empty dump apart from "we refused to build one".
+ */
+function disabledDump(
+  origin: LogoTelemetryDump["origin"],
+): LogoTelemetryDump {
+  return {
+    schema: "nevo.logo-telemetry.dump/v1",
+    capturedAt: new Date().toISOString(),
+    origin,
+    url: null,
+    userAgent: null,
+    debugEnabled: false,
+    config: LOGO_TELEMETRY_CONFIG,
+    state: {
+      renderLogged: false,
+      renderSampled: null,
+      errorCount: 0,
+      lastErrorAt: 0,
+      lastErrorStage: "",
+    },
+    decisions: [],
+    decisionsTruncated: false,
+    redactions: ["disabled:production-build"],
+    disabled: true,
+  };
+}
+
 export function buildLogoTelemetryDump(
   origin: LogoTelemetryDump["origin"] = "console",
 ): LogoTelemetryDump {
+  if (!isLogoDebugBuildEnabled()) return disabledDump(origin);
   const decisions = getRecentLogoDecisions();
   const nav =
     typeof navigator !== "undefined" ? navigator.userAgent ?? null : null;
@@ -451,6 +507,7 @@ export function buildLogoTelemetryDump(
 export function dumpLogoTelemetryAsJSON(
   origin: LogoTelemetryDump["origin"] = "console",
 ): string {
+  if (!isLogoDebugBuildEnabled()) return "";
   return JSON.stringify(buildLogoTelemetryDump(origin), null, 2);
 }
 
@@ -462,6 +519,7 @@ export function dumpLogoTelemetryAsJSON(
 async function copyLogoTelemetryDump(
   origin: LogoTelemetryDump["origin"] = "console",
 ): Promise<string> {
+  if (!isLogoDebugBuildEnabled()) return "";
   const json = dumpLogoTelemetryAsJSON(origin);
   // Console echo first — clipboard may reject if the tab isn't focused.
   if (typeof console !== "undefined" && typeof console.log === "function") {
@@ -494,6 +552,7 @@ async function copyLogoTelemetryDump(
 export function downloadLogoTelemetryDump(
   origin: LogoTelemetryDump["origin"] = "console",
 ): string {
+  if (!isLogoDebugBuildEnabled()) return "";
   const json = dumpLogoTelemetryAsJSON(origin);
   if (typeof window === "undefined" || typeof document === "undefined") {
     return json;
@@ -532,7 +591,7 @@ export function downloadLogoTelemetryDump(
  * No-op in production so nothing ships to end users.
  */
 export function attachLogoDebugUtil(): void {
-  if (!import.meta.env.DEV) return;
+  if (!isLogoDebugBuildEnabled()) return;
   if (typeof window === "undefined") return;
   const w = window as unknown as {
     __nevoLogoDebug?: {
