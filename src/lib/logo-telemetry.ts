@@ -52,6 +52,8 @@ type Deps = {
   config?: LogoTelemetryConfig;
   now?: () => number;
   random?: () => number;
+  /** QA-only: attached to the debug line so a full page-load can be grepped. */
+  correlationId?: string;
 };
 
 /**
@@ -60,6 +62,21 @@ type Deps = {
  * VITE_LOGO_DEBUG=1, window.__nevoLogoDebug, localStorage 'nevo:logo-debug'=1,
  * or `?logoDebug=1` URL flag). Uses console.debug so it is silent by default
  * in production browsers unless the user explicitly opts in.
+ *
+ * Shape (single flat object — easy to grep, filter, or JSON-copy from devtools):
+ *
+ *   [nevo:logo-telemetry] {
+ *     kind: "error" | "render",
+ *     decision: "sampled-in" | "sampled-out",
+ *     reason: "first-render" | "sample-rate" | "already-logged"
+ *           | "accepted" | "terminal" | "throttle" | "session-cap",
+ *     stage:          string | null,       // "primary-light-png", "fallback-cdn-full", …
+ *     terminal:       boolean | undefined,
+ *     correlationId:  string | undefined,  // when the caller has one
+ *     counters: { renderLogged, renderSampled, errorCount, lastErrorStage, msSinceLastError },
+ *     limits:   { renderSampleRate, errorMaxPerSession, errorMinIntervalMs },
+ *     ts:             number,              // ms since epoch, from the sampler's clock
+ *   }
  */
 function debugLog(
   kind: "render" | "error",
@@ -67,7 +84,13 @@ function debugLog(
   reason: string,
   state: LogoRateState,
   config: LogoTelemetryConfig,
-  extra: Record<string, unknown> = {},
+  ctx: {
+    stage?: string;
+    terminal?: boolean;
+    correlationId?: string;
+    now: number;
+    msSinceLastError?: number;
+  },
 ): void {
   if (!config.debug) return;
   if (typeof console === "undefined" || typeof console.debug !== "function") return;
@@ -75,19 +98,24 @@ function debugLog(
     kind,
     decision,
     reason,
-    ...extra,
+    stage: ctx.stage ?? null,
+    terminal: ctx.terminal,
+    correlationId: ctx.correlationId,
     counters: {
       renderLogged: state.renderLogged,
       renderSampled: state.renderSampled,
       errorCount: state.errorCount,
       lastErrorStage: state.lastErrorStage,
-      lastErrorAt: state.lastErrorAt,
+      msSinceLastError:
+        ctx.msSinceLastError ??
+        (state.lastErrorAt ? ctx.now - state.lastErrorAt : null),
     },
-    config: {
+    limits: {
       renderSampleRate: config.renderSampleRate,
       errorMaxPerSession: config.errorMaxPerSession,
       errorMinIntervalMs: config.errorMinIntervalMs,
     },
+    ts: ctx.now,
   });
 }
 
@@ -96,19 +124,22 @@ export function shouldLogRender(deps: Deps = {}): boolean {
   const state = deps.state ?? getLogoRateState();
   const config = deps.config ?? LOGO_TELEMETRY_CONFIG;
   const random = deps.random ?? Math.random;
+  const nowFn = deps.now ?? Date.now;
+  const now = nowFn();
+  const dbgCtx = { correlationId: deps.correlationId, now };
   if (state.renderLogged) {
-    debugLog("render", "sampled-out", "already-logged", state, config);
+    debugLog("render", "sampled-out", "already-logged", state, config, dbgCtx);
     return false;
   }
   if (state.renderSampled === null) {
     state.renderSampled = random() < config.renderSampleRate;
   }
   if (!state.renderSampled) {
-    debugLog("render", "sampled-out", "sample-rate", state, config);
+    debugLog("render", "sampled-out", "sample-rate", state, config, dbgCtx);
     return false;
   }
   state.renderLogged = true;
-  debugLog("render", "sampled-in", "first-render", state, config);
+  debugLog("render", "sampled-in", "first-render", state, config, dbgCtx);
   return true;
 }
 
@@ -125,29 +156,27 @@ export function shouldLogError(
   const state = deps.state ?? getLogoRateState();
   const config = deps.config ?? LOGO_TELEMETRY_CONFIG;
   const nowFn = deps.now ?? Date.now;
+  const now = nowFn();
+  const base = { stage, terminal, correlationId: deps.correlationId, now };
   if (state.errorCount >= config.errorMaxPerSession) {
-    debugLog("error", "sampled-out", "session-cap", state, config, { stage, terminal });
+    debugLog("error", "sampled-out", "session-cap", state, config, base);
     return false;
   }
-  const now = nowFn();
   if (
     !terminal &&
     stage === state.lastErrorStage &&
     now - state.lastErrorAt < config.errorMinIntervalMs
   ) {
     debugLog("error", "sampled-out", "throttle", state, config, {
-      stage,
-      terminal,
-      msSinceLast: now - state.lastErrorAt,
+      ...base,
+      msSinceLastError: now - state.lastErrorAt,
     });
     return false;
   }
   state.errorCount += 1;
   state.lastErrorAt = now;
   state.lastErrorStage = stage;
-  debugLog("error", "sampled-in", terminal ? "terminal" : "accepted", state, config, {
-    stage,
-    terminal,
-  });
+  debugLog("error", "sampled-in", terminal ? "terminal" : "accepted", state, config, base);
   return true;
 }
+

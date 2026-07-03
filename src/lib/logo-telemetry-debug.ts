@@ -34,7 +34,13 @@
  *   // → array of decisions against a fresh session state.
  */
 
-import { LOGO_TELEMETRY_CONFIG, type LogoTelemetryConfig } from "./logo-telemetry-config";
+import {
+  LOGO_TELEMETRY_CONFIG,
+  disableLogoDebug,
+  enableLogoDebug,
+  isLogoDebugEnabled,
+  type LogoTelemetryConfig,
+} from "./logo-telemetry-config";
 import {
   createLogoRateState,
   getLogoRateState,
@@ -245,6 +251,12 @@ export function attachLogoDebugUtil(): void {
       simulate: typeof simulateLogoDecisions;
       state: () => LogoRateState;
       config: () => LogoTelemetryConfig;
+      /** Turn on live [nevo:logo-telemetry] console lines for QA. */
+      enable: () => void;
+      /** Turn them off (also clears the localStorage flag). */
+      disable: () => void;
+      /** Whether live debug logging is currently on. */
+      isEnabled: () => boolean;
     };
   };
   w.__nevoLogoDebug = {
@@ -252,6 +264,9 @@ export function attachLogoDebugUtil(): void {
     simulate: simulateLogoDecisions,
     state: () => cloneState(getLogoRateState()),
     config: () => LOGO_TELEMETRY_CONFIG,
+    enable: enableLogoDebug,
+    disable: disableLogoDebug,
+    isEnabled: isLogoDebugEnabled,
   };
 }
 
