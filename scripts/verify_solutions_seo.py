@@ -27,6 +27,7 @@ from pathlib import Path
 
 BASE = os.environ.get("BASE_URL", "http://127.0.0.1:8080").rstrip("/")
 WARN_ONLY = "--warn-only" in sys.argv
+GROUP_ANNOTATIONS = "--group-annotations" in sys.argv or os.environ.get("GROUP_ANNOTATIONS") == "true"
 
 LOCALES = ["en", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"]
 PATHS = [
