@@ -227,7 +227,22 @@ function ProjectInquiryPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [attachedConfig, setAttachedConfig] = useState<Record<string, unknown> | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const submitInquiryFn = useServerFn(submitInquiry);
+
+  // Read ?config=<base64 json> to attach calculator/configurator state.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = new URLSearchParams(window.location.search).get("config");
+      if (!raw) return;
+      const json = JSON.parse(
+        decodeURIComponent(escape(atob(raw.replace(/-/g, "+").replace(/_/g, "/")))),
+      );
+      if (json && typeof json === "object") setAttachedConfig(json as Record<string, unknown>);
+    } catch { /* ignore malformed config */ }
+  }, []);
 
   // hydrate
   useEffect(() => {
