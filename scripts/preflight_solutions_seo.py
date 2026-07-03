@@ -1374,6 +1374,9 @@ def export_results(results: list[dict]) -> None:
       RESULTS_INCLUDE      filter rows on disk (see grammar in module docstring)
       BREAKDOWN_CSV_PATH   write the error_kind × status_class breakdown as CSV
       BREAKDOWN_JSON_PATH  same breakdown as JSON (list of dicts)
+      HEATMAP_CSV_PATH     write the latency heatmap bin counts as CSV
+                           (one row per error_kind × status_class combo,
+                           one column per latency bucket)
     All files are also linked from $GITHUB_STEP_SUMMARY when set.
     """
     import csv
@@ -1383,7 +1386,8 @@ def export_results(results: list[dict]) -> None:
     json_path = os.environ.get("RESULTS_JSON_PATH", "").strip()
     bd_csv = os.environ.get("BREAKDOWN_CSV_PATH", "").strip()
     bd_json = os.environ.get("BREAKDOWN_JSON_PATH", "").strip()
-    if not any((csv_path, json_path, bd_csv, bd_json)):
+    heatmap_csv = os.environ.get("HEATMAP_CSV_PATH", "").strip()
+    if not any((csv_path, json_path, bd_csv, bd_json, heatmap_csv)):
         return
 
     raw_scope = (os.environ.get("RESULTS_INCLUDE") or "all").strip()
@@ -1429,8 +1433,35 @@ def export_results(results: list[dict]) -> None:
             breakdown_written.append(bd_json)
             print(f"Wrote breakdown JSON → {bd_json} ({len(breakdown)} row(s))")
 
+    # Heatmap CSV: one row per (error_kind, status_class), one column per
+    # latency bucket, plus a `total` column. Always derived from the FULL
+    # result set for the same reason as breakdown_written above.
+    heatmap_written: list[str] = []
+    if heatmap_csv:
+        from collections import defaultdict
+        grid: dict[tuple[str, str], list[int]] = defaultdict(
+            lambda: [0] * len(_LATENCY_BUCKETS))
+        for r in results:
+            kind = r.get("error_kind") or ("ok" if r.get("ok") else "unknown")
+            sc = r.get("status_class") or _classify_status(r.get("status"))
+            grid[(kind, sc)][_bucket_for(float(r.get("ms") or 0))] += 1
+        bucket_labels = [lbl for lbl, _ in _LATENCY_BUCKETS]
+        os.makedirs(os.path.dirname(heatmap_csv) or ".", exist_ok=True)
+        with open(heatmap_csv, "w", encoding="utf-8", newline="") as fh:
+            writer = csv.writer(fh)
+            writer.writerow(["error_kind", "status_class", *bucket_labels, "total"])
+            for (kind, sc), counts in sorted(
+                grid.items(),
+                key=lambda kv: (0 if kv[0][0] == "ok" else -1,
+                                -sum(kv[1]), kv[0][0], kv[0][1]),
+            ):
+                writer.writerow([kind, sc, *counts, sum(counts)])
+        heatmap_written.append(heatmap_csv)
+        print(f"Wrote heatmap CSV → {heatmap_csv} ({len(grid)} combo(s), "
+              f"{len(bucket_labels)} bucket(s))")
+
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
-    if summary_path and (written or breakdown_written):
+    if summary_path and (written or breakdown_written or heatmap_written):
         with open(summary_path, "a", encoding="utf-8") as fh:
             fh.write("\n### Result artifacts\n\n")
             if written:
@@ -1440,6 +1471,10 @@ def export_results(results: list[dict]) -> None:
             if breakdown_written:
                 fh.write("\n_Breakdown (error_kind × status_class, full result set):_\n\n")
                 for p in breakdown_written:
+                    fh.write(f"- `{p}`\n")
+            if heatmap_written:
+                fh.write("\n_Latency heatmap bin counts (error_kind × status_class × bucket):_\n\n")
+                for p in heatmap_written:
                     fh.write(f"- `{p}`\n")
             fh.write("\n")
 
