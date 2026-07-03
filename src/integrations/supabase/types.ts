@@ -14,16 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      header_logo_events: {
+        Row: {
+          client_ts: string | null
+          correlation_id: string | null
+          created_at: string
+          device_width: number | null
+          dpr: number | null
+          event_type: string
+          id: number
+          ip: string | null
+          natural_height: number | null
+          natural_width: number | null
+          next_src: string | null
+          online: boolean | null
+          release: string | null
+          route: string | null
+          sample_rate: number | null
+          src: string | null
+          stage: string | null
+          ua: string | null
+          url: string | null
+          variant: string | null
+        }
+        Insert: {
+          client_ts?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          device_width?: number | null
+          dpr?: number | null
+          event_type: string
+          id?: number
+          ip?: string | null
+          natural_height?: number | null
+          natural_width?: number | null
+          next_src?: string | null
+          online?: boolean | null
+          release?: string | null
+          route?: string | null
+          sample_rate?: number | null
+          src?: string | null
+          stage?: string | null
+          ua?: string | null
+          url?: string | null
+          variant?: string | null
+        }
+        Update: {
+          client_ts?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          device_width?: number | null
+          dpr?: number | null
+          event_type?: string
+          id?: number
+          ip?: string | null
+          natural_height?: number | null
+          natural_width?: number | null
+          next_src?: string | null
+          online?: boolean | null
+          release?: string | null
+          route?: string | null
+          sample_rate?: number | null
+          src?: string | null
+          stage?: string | null
+          ua?: string | null
+          url?: string | null
+          variant?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +245,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
