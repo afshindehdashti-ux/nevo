@@ -61,14 +61,14 @@ const SCOPE = [
 ];
 
 const PROCESS = [
-  "Discovery",
-  "Feasibility",
-  "Master Plan",
-  "Technology Selection",
-  "Supplier Coordination",
-  "Installation Planning",
-  "Commissioning",
-  "Ramp-Up Support",
+  "Site Assessment",
+  "Feasibility & Business Case",
+  "Master Planning",
+  "Building & Utility Design",
+  "Contractor Coordination",
+  "Construction Supervision",
+  "Handover & Commissioning",
+  "Operational Ramp-Up",
 ];
 
 const SYSTEMS = [
@@ -276,7 +276,7 @@ function DevelopmentProcess() {
     <Section tone="default">
       <div className="grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-4">
-          <SectionHeader eyebrow="Process" title="A controlled development path." lede="NEVO keeps project decisions traceable from early assumptions through commissioning." />
+          <SectionHeader eyebrow="Development lifecycle" title="From site to running plant." lede="The eight phases NEVO owns when developing a new factory — site, building, utilities, contractors and handover." />
         </div>
         <div className="lg:col-span-8">
           <ol className="grid gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-2">

@@ -707,24 +707,24 @@ function Services() {
 /* ---------- PROCESS ---------- */
 
 const STEPS = [
-  ["01", "Discovery", "Brief, market, site, capacity target."],
-  ["02", "Engineering Study", "Feasibility, ROI, technology options."],
-  ["03", "Concept Design", "Layout, capacity, chemistry, utilities."],
-  ["04", "Detailed Engineering", "P&ID, GA, structural, electrical, controls."],
-  ["05", "Supplier Selection", "Specification, bidding, decision matrix."],
-  ["06", "Manufacturing", "FAT witnessed at equipment builders."],
-  ["07", "Installation", "Site supervision, interface management."],
-  ["08", "Commissioning", "Cold, hot, chemistry, performance runs."],
-  ["09", "Training", "Operators, maintenance, quality, leadership."],
-  ["10", "After Sales Engineering", "Optimisation, audits, upgrade roadmap."],
+  ["01", "Engineering Brief", "Capacity, product mix, target markets, constraints."],
+  ["02", "Feasibility Study", "ROI model, CAPEX/OPEX envelope, technology options."],
+  ["03", "Concept Engineering", "Block layout, chemistry route, utility load estimate."],
+  ["04", "Basic Design Package", "PFD, mass & heat balance, single-line diagrams."],
+  ["05", "Detailed Engineering", "P&ID, GA drawings, structural, electrical, controls."],
+  ["06", "Tender Documents", "Specifications, scope splits, bidder decision matrix."],
+  ["07", "FAT Witnessing", "Factory acceptance tests at equipment builders."],
+  ["08", "SAT & Performance Runs", "Cold, hot, chemistry and performance validation."],
+  ["09", "Operator Training", "Line, maintenance, quality and management curricula."],
+  ["10", "Technical Audits", "Post-launch OEE audits, upgrade and retrofit roadmap."],
 ];
 
 function Process() {
   return (
     <Section tone="default">
       <SectionHeader
-        eyebrow="Engineering process"
-        title="Ten stages, one accountable path."
+        eyebrow="Engineering deliverables"
+        title="Ten engineered outputs — one accountable engineer per stage."
       />
       <ol className="relative grid gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-5">
         {STEPS.map(([n, t, d], i) => (
