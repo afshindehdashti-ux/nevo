@@ -186,6 +186,7 @@ function FactoryDevelopmentPage() {
         <InvestmentModel />
         <ConnectedSolutions />
         <KnowledgeHubPreview slugs={["factory-layout", "investment-model", "continuous-line-101"]} />
+        <FAQSection />
         <InquiryCTA
           source="new-factory"
           eyebrow="Factory inquiry"
