@@ -1072,6 +1072,12 @@ def write_step_summary(results: list[dict]) -> None:
              r.get("status_class") or _classify_status(r.get("status")))
             for r in display
         )
+        # Latency percentiles per combo — reuse _build_breakdown_rows so the
+        # summary numbers match the CSV/JSON export exactly.
+        pctile_index = {
+            (r["error_kind"], r["status_class"]): r
+            for r in _build_breakdown_rows(display)
+        }
         combo_rows = sorted(
             combo_all.items(),
             key=lambda kv: (0 if kv[0][0] == "ok" else -1,
@@ -1087,8 +1093,9 @@ def write_step_summary(results: list[dict]) -> None:
         )
         lines += [
             "",
-            "| Kind | Status class | Count | Failed | Success rate | % of all | % of failures |",
-            "| --- | :---: | ---: | ---: | ---: | ---: | ---: |",
+            "| Kind | Status class | Count | Failed | Success rate "
+            "| % of all | % of failures | p50 (ms) | p95 (ms) | p99 (ms) |",
+            "| --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
         ]
         for (kind, status_class), n in combo_rows:
             failed = combo.get((kind, status_class), 0) if kind != "ok" else 0
@@ -1097,10 +1104,13 @@ def write_step_summary(results: list[dict]) -> None:
             share_fail = 100.0 * failed / total_fail if failed else 0.0
             kind_label = _ERROR_KIND_LABELS.get(kind, kind)
             class_label = _STATUS_CLASS_LABELS.get(status_class, status_class)
+            pr = pctile_index.get((kind, status_class), {})
             lines.append(
                 f"| {kind_label} | {class_label} | {n} | {failed} "
                 f"| {success_pct:.1f}% | {share_all:.1f}% "
-                f"| {share_fail:.1f}% |"
+                f"| {share_fail:.1f}% "
+                f"| {pr.get('ms_p50', 0):.0f} | {pr.get('ms_p95', 0):.0f} "
+                f"| {pr.get('ms_p99', 0):.0f} |"
             )
         lines.append("")
 
