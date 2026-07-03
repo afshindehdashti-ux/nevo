@@ -78,6 +78,31 @@ function readDebugFlag(): boolean {
   return false;
 }
 
+function readLogLineFlag(): boolean {
+  // Default ON — historically every debug decision produced a console line.
+  // QA can silence just the console noise (while keeping the ring buffer
+  // and dump helpers intact) by setting this to "0".
+  if (typeof window !== "undefined") {
+    try {
+      if (
+        typeof window.localStorage !== "undefined" &&
+        window.localStorage.getItem("nevo:logo-debug-line") === "0"
+      ) {
+        return false;
+      }
+      if (
+        typeof window.location !== "undefined" &&
+        /[?&]logoDebugLine=0\b/.test(window.location.search)
+      ) {
+        return false;
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  return true;
+}
+
 export const LOGO_TELEMETRY_CONFIG = {
   renderSampleRate: clampNumber(
     rawEnv.VITE_LOGO_RENDER_SAMPLE_RATE,
@@ -98,6 +123,12 @@ export const LOGO_TELEMETRY_CONFIG = {
     60_000,
   ),
   debug: readDebugFlag(),
+  /**
+   * When false, the single-line grep-friendly `[nevo:logo-telemetry] ...`
+   * console output is suppressed even if `debug` is true. The ring buffer
+   * still records every decision so `dump()` / `getRecent()` stay useful.
+   */
+  logLine: readLogLineFlag(),
 } as const;
 
 export type LogoTelemetryConfig = typeof LOGO_TELEMETRY_CONFIG;
@@ -133,4 +164,41 @@ export function disableLogoDebug(): void {
 
 export function isLogoDebugEnabled(): boolean {
   return LOGO_TELEMETRY_CONFIG.debug;
+}
+
+/**
+ * Runtime toggle for the single-line grep-friendly console output.
+ * QA can silence noise mid-repro without losing dump data. Persists in
+ * localStorage (`nevo:logo-debug-line=0` silences) and honors the
+ * `?logoDebugLine=0` URL flag on first load.
+ *
+ *   __nevoLogoDebug.enableLogLine()   // print console lines (default)
+ *   __nevoLogoDebug.disableLogLine()  // silence, keep ring buffer
+ *   __nevoLogoDebug.setLogLine(on)    // programmatic
+ */
+export function enableLogoDebugLogLine(): void {
+  try {
+    window.localStorage?.removeItem("nevo:logo-debug-line");
+  } catch {
+    /* ignore */
+  }
+  (LOGO_TELEMETRY_CONFIG as { logLine: boolean }).logLine = true;
+}
+
+export function disableLogoDebugLogLine(): void {
+  try {
+    window.localStorage?.setItem("nevo:logo-debug-line", "0");
+  } catch {
+    /* ignore */
+  }
+  (LOGO_TELEMETRY_CONFIG as { logLine: boolean }).logLine = false;
+}
+
+export function setLogoDebugLogLine(on: boolean): void {
+  if (on) enableLogoDebugLogLine();
+  else disableLogoDebugLogLine();
+}
+
+export function isLogoDebugLogLineEnabled(): boolean {
+  return LOGO_TELEMETRY_CONFIG.logLine;
 }

@@ -37,8 +37,12 @@
 import {
   LOGO_TELEMETRY_CONFIG,
   disableLogoDebug,
+  disableLogoDebugLogLine,
   enableLogoDebug,
+  enableLogoDebugLogLine,
   isLogoDebugEnabled,
+  isLogoDebugLogLineEnabled,
+  setLogoDebugLogLine,
   type LogoTelemetryConfig,
 } from "./logo-telemetry-config";
 import {
@@ -606,6 +610,15 @@ export function attachLogoDebugUtil(): void {
       /** Whether live debug logging is currently on. */
       isEnabled: () => boolean;
       /**
+       * Toggle the single-line grep-friendly `[nevo:logo-telemetry] ...`
+       * console output at runtime. When disabled, the ring buffer keeps
+       * recording so `dump()` / `getRecent()` still return everything.
+       */
+      enableLogLine: () => void;
+      disableLogLine: () => void;
+      setLogLine: (on: boolean) => void;
+      isLogLineEnabled: () => boolean;
+      /**
        * Snapshot of the last ≤50 sampling decisions (oldest first). Safe to
        * `JSON.stringify` and paste into a bug report — the buffer records
        * every sampler call regardless of the debug flag.
@@ -633,6 +646,10 @@ export function attachLogoDebugUtil(): void {
     enable: enableLogoDebug,
     disable: disableLogoDebug,
     isEnabled: isLogoDebugEnabled,
+    enableLogLine: enableLogoDebugLogLine,
+    disableLogLine: disableLogoDebugLogLine,
+    setLogLine: setLogoDebugLogLine,
+    isLogLineEnabled: isLogoDebugLogLineEnabled,
     getRecent: getRecentLogoDecisions,
     getRecentAsJSON: () => JSON.stringify(getRecentLogoDecisions(), null, 2),
     clearRecent: clearLogoDecisions,
