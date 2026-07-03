@@ -101,6 +101,15 @@ Env:
                          - `combo=http:5xx,timeout:none` — exact error_kind:status_class pairs
                        Multiple clauses may be combined with `;` (logical OR),
                        e.g. `RESULTS_INCLUDE="status_class=5xx;error_kind=timeout"`.
+  LATENCY_BUCKETS      explicit comma-separated upper-bound edges (ms) for
+                       the latency histogram/heatmap, e.g.
+                       `LATENCY_BUCKETS=50,100,250,500,1000,5000`.
+  LATENCY_BIN_SIZE     uniform bin width (ms); combine with LATENCY_MAX_MS
+                       to auto-generate evenly spaced buckets, e.g.
+                       `LATENCY_BIN_SIZE=250 LATENCY_MAX_MS=5000` →
+                       0–250, 250–500, …, 4750–5000, 5000+.
+  LATENCY_MAX_MS       highest finite edge for LATENCY_BIN_SIZE; slower
+                       samples land in the always-present `+` overflow bin.
 
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
