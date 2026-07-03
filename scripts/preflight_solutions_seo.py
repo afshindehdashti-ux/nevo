@@ -1473,7 +1473,7 @@ def _sort_combo_rows(
 
     if _SORT_COMBOS_BY == "default":
         # Historical order: non-ok combos first, then largest count, then label.
-        rows.sort(key=lambda r: (0 if r[0] != "ok" else -1, -r[2], r[0], r[1]))
+        rows.sort(key=lambda r: (0 if r[0] == "ok" else -1, -r[2], r[0], r[1]))
     else:
         if _SORT_COMBOS_BY == "count":
             primary = lambda r: r[2]
