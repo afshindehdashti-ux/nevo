@@ -38,6 +38,12 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE =
@@ -84,6 +90,21 @@ const SYSTEMS = [
   "Finished goods, packing and dispatch systems",
 ];
 
+const FAQS: { q: string; a: string }[] = [
+  { q: "What does turnkey factory development actually include?", a: "A single-contract scope covering feasibility, master planning, building and utility engineering, production line and roll forming, raw material strategy, automation, commissioning and operational ramp-up — one accountable engineering partner from empty plot to first invoiced panel." },
+  { q: "What CAPEX range should I expect for a greenfield sandwich panel factory?", a: "A typical continuous PIR/PUR factory ranges from roughly USD 6M to USD 25M depending on capacity, automation, cores (PIR/PUR/rock wool), building status and country. We size CAPEX against your target output and product mix during the feasibility phase, not from a catalogue." },
+  { q: "How long does it take to build a factory from decision to first panel?", a: "12 to 20 months is the realistic window from signed feasibility to commissioning, assuming land is available and financing is in place. Building works and long-lead equipment are the two critical paths we schedule around." },
+  { q: "Do I already need land, or can NEVO help select the site?", a: "Both. We can start with market and site selection studies — evaluating logistics, utilities, incentives and labour — or plug into your existing plot with a site survey and constraints analysis in the first weeks." },
+  { q: "Which markets have you developed factories in?", a: "Active projects and references across the GCC (UAE, Saudi Arabia, Oman, Qatar), Turkey, Iraq, East and Central Africa, CIS and select LATAM markets. Codes we regularly engineer to include EN, ASTM, GOST, SASO and IBC." },
+  { q: "Can we phase the investment and expand later?", a: "Yes. Master planning defines expansion zones, utility headroom, and building spans so a second line, wider panel, or additional core (e.g. adding rock wool later) can be inserted without shutting down the existing operation." },
+  { q: "Do you help arrange financing or bankable documentation?", a: "We prepare the technical and financial deliverables banks and investment authorities require — feasibility study, CAPEX/OPEX model, layouts, production plan, cash flow and payback — that plug into your local bank, ECA or development-fund process." },
+  { q: "Does NEVO buy the production line for us, or do we contract it directly?", a: "Either. We can act as EPC and take single-point responsibility for the line, or run an independent tender and technical evaluation while you sign directly with the OEM. The engineering rigour is the same." },
+  { q: "How do you protect our production capacity target during ramp-up?", a: "Commissioning includes recipe stabilisation, operator training, OEE tracking and a written ramp-up plan tied to weekly targets. Payment milestones are aligned to real production KPIs, not just mechanical completion." },
+  { q: "How is your factory development priced?", a: "Feasibility is a fixed engineering fee scoped to your project. Development is quoted per module — building/utility engineering, procurement, supervision, commissioning — or as a single turnkey price. You see the split before you sign." },
+];
+
+
+
 export const Route = createFileRoute("/$lang/solutions/factory-development")({
   head: ({ params }) => {
     const canonical = `${SITE.url}/${params.lang}${URL_PATH}`;
@@ -124,6 +145,18 @@ export const Route = createFileRoute("/$lang/solutions/factory-development")({
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: FAQS.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            })),
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
               { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/${params.lang}` },
@@ -153,6 +186,7 @@ function FactoryDevelopmentPage() {
         <InvestmentModel />
         <ConnectedSolutions />
         <KnowledgeHubPreview slugs={["factory-layout", "investment-model", "continuous-line-101"]} />
+        <FAQSection />
         <InquiryCTA
           source="new-factory"
           eyebrow="Factory inquiry"
@@ -383,5 +417,31 @@ function FinalCTA() {
         </div>
       </div>
     </section>
+  );
+}
+
+function FAQSection() {
+  return (
+    <Section tone="surface">
+      <SectionHeader
+        eyebrow="FAQ"
+        title="Factory development questions from investors."
+        lede="Straight answers on CAPEX, timeline, financing, phasing and how NEVO takes responsibility from empty plot to first invoiced panel."
+      />
+      <div className="mx-auto mt-12 max-w-3xl">
+        <Accordion type="single" collapsible className="w-full divide-y divide-border border-y border-border">
+          {FAQS.map((f, i) => (
+            <AccordionItem key={f.q} value={`fd-${i}`} className="border-b-0">
+              <AccordionTrigger className="py-5 text-left text-base font-medium tracking-tight text-foreground hover:no-underline">
+                {f.q}
+              </AccordionTrigger>
+              <AccordionContent className="pb-6 pl-4 text-sm leading-relaxed text-muted-foreground">
+                {f.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+    </Section>
   );
 }
