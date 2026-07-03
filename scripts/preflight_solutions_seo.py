@@ -1289,7 +1289,6 @@ def _filter_results_for_export(
     return [r for r in results if matches(r)], scope
 
 
-def _build_breakdown_rows(results: list[dict]) -> list[dict]:
 def _percentile(sorted_values: list[float], pct: float) -> float:
     """Nearest-rank percentile over an already-sorted, non-empty list.
 
