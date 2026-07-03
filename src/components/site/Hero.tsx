@@ -162,14 +162,19 @@ function HeroMobile() {
   const { t } = useTranslation();
   return (
     <div className="relative block min-h-[100svh] overflow-hidden md:hidden">
-      <img
-        src={heroMobile}
-        alt="NEVO double-belt laminator producing a PIR sandwich panel with PPGI facings"
+      <video
+        src={heroVideo}
+        poster={heroMobile}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-label="NEVO double-belt laminator producing a PIR sandwich panel with PPGI facings"
         className="absolute inset-0 h-full w-full object-cover"
         style={{ objectPosition: "50% center" }}
-        fetchPriority="high"
-        decoding="async"
       />
+
       {/* Top + bottom readability washes */}
       <div
         aria-hidden
