@@ -6,6 +6,7 @@ import {
   listSolutionsInspection,
   runSolutionsInspection,
   type SolutionsInspectionRow,
+  type SolutionsInspectionList,
 } from "@/lib/solutions-inspection.functions";
 import { isCurrentUserAdmin } from "@/lib/logo-events.functions";
 import { supabase } from "@/integrations/supabase/client";
