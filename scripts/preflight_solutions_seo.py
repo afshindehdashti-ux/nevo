@@ -1261,21 +1261,71 @@ def _filter_results_for_export(
     return [r for r in results if matches(r)], scope
 
 
+def _build_breakdown_rows(results: list[dict]) -> list[dict]:
+    """Aggregate results into (error_kind, status_class) rows for export.
+
+    Each row carries counts, share (%), attempt totals, and latency stats
+    so the CSV/JSON is directly analyzable without re-deriving anything
+    from the per-URL export.
+    """
+    from collections import defaultdict
+    buckets: dict[tuple[str, str], dict] = defaultdict(
+        lambda: {"count": 0, "failed": 0, "attempts": 0,
+                 "ms_total": 0.0, "ms_max": 0.0})
+    for r in results:
+        kind = r.get("error_kind") or ("ok" if r.get("ok") else "unknown")
+        sc = r.get("status_class") or _classify_status(r.get("status"))
+        b = buckets[(kind, sc)]
+        b["count"] += 1
+        b["attempts"] += r.get("attempts") or 1
+        b["ms_total"] += float(r.get("ms") or 0)
+        b["ms_max"] = max(b["ms_max"], float(r.get("ms") or 0))
+        if not r.get("ok"):
+            b["failed"] += 1
+    total = max(len(results), 1)
+    rows = []
+    for (kind, sc), b in buckets.items():
+        rows.append({
+            "error_kind": kind,
+            "status_class": sc,
+            "count": b["count"],
+            "failed": b["failed"],
+            "share_pct": round(100 * b["count"] / total, 2),
+            "attempts_total": b["attempts"],
+            "attempts_avg": round(b["attempts"] / b["count"], 2),
+            "ms_avg": round(b["ms_total"] / b["count"], 1),
+            "ms_max": round(b["ms_max"], 1),
+        })
+    rows.sort(key=lambda r: (-r["failed"], -r["count"],
+                             r["error_kind"], r["status_class"]))
+    return rows
+
+
+_BREAKDOWN_COLUMNS = [
+    "error_kind", "status_class", "count", "failed", "share_pct",
+    "attempts_total", "attempts_avg", "ms_avg", "ms_max",
+]
+
+
 def export_results(results: list[dict]) -> None:
     """Write results as CSV / JSON artifacts for post-run analysis.
 
     Paths are opt-in via env so the script stays side-effect free by default:
-      RESULTS_CSV_PATH   write full per-URL CSV (recommended for CI artifacts)
-      RESULTS_JSON_PATH  write the raw list[dict] as pretty JSON
-      RESULTS_INCLUDE    `all` (default) or `failures` — filter rows on disk
-    Both files are also linked from $GITHUB_STEP_SUMMARY when set.
+      RESULTS_CSV_PATH     write full per-URL CSV (recommended for CI artifacts)
+      RESULTS_JSON_PATH    also write results as pretty JSON
+      RESULTS_INCLUDE      filter rows on disk (see grammar in module docstring)
+      BREAKDOWN_CSV_PATH   write the error_kind × status_class breakdown as CSV
+      BREAKDOWN_JSON_PATH  same breakdown as JSON (list of dicts)
+    All files are also linked from $GITHUB_STEP_SUMMARY when set.
     """
     import csv
     import json
 
     csv_path = os.environ.get("RESULTS_CSV_PATH", "").strip()
     json_path = os.environ.get("RESULTS_JSON_PATH", "").strip()
-    if not csv_path and not json_path:
+    bd_csv = os.environ.get("BREAKDOWN_CSV_PATH", "").strip()
+    bd_json = os.environ.get("BREAKDOWN_JSON_PATH", "").strip()
+    if not any((csv_path, json_path, bd_csv, bd_json)):
         return
 
     raw_scope = (os.environ.get("RESULTS_INCLUDE") or "all").strip()
@@ -1295,19 +1345,44 @@ def export_results(results: list[dict]) -> None:
     if json_path:
         os.makedirs(os.path.dirname(json_path) or ".", exist_ok=True)
         with open(json_path, "w", encoding="utf-8") as fh:
-            # default=str handles any stray non-serializable values (e.g.
-            # datetimes) without failing the whole export.
             json.dump(rows, fh, ensure_ascii=False, indent=2, default=str)
         written.append(json_path)
         print(f"Wrote results JSON → {json_path} ({len(rows)} row(s), scope={scope})")
 
+    # Breakdown artifacts are always derived from the FULL result set so the
+    # aggregate totals remain meaningful even when RESULTS_INCLUDE narrows
+    # the per-URL export to a subset.
+    breakdown_written: list[str] = []
+    if bd_csv or bd_json:
+        breakdown = _build_breakdown_rows(results)
+        if bd_csv:
+            os.makedirs(os.path.dirname(bd_csv) or ".", exist_ok=True)
+            with open(bd_csv, "w", encoding="utf-8", newline="") as fh:
+                writer = csv.DictWriter(fh, fieldnames=_BREAKDOWN_COLUMNS)
+                writer.writeheader()
+                for r in breakdown:
+                    writer.writerow(r)
+            breakdown_written.append(bd_csv)
+            print(f"Wrote breakdown CSV → {bd_csv} ({len(breakdown)} row(s))")
+        if bd_json:
+            os.makedirs(os.path.dirname(bd_json) or ".", exist_ok=True)
+            with open(bd_json, "w", encoding="utf-8") as fh:
+                json.dump(breakdown, fh, ensure_ascii=False, indent=2, default=str)
+            breakdown_written.append(bd_json)
+            print(f"Wrote breakdown JSON → {bd_json} ({len(breakdown)} row(s))")
+
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
-    if summary_path and written:
+    if summary_path and (written or breakdown_written):
         with open(summary_path, "a", encoding="utf-8") as fh:
             fh.write("\n### Result artifacts\n\n")
-            fh.write(f"_Scope: **{scope}** ({len(rows)} of {len(results)} row(s))._\n\n")
-            for p in written:
-                fh.write(f"- `{p}`\n")
+            if written:
+                fh.write(f"_Scope: **{scope}** ({len(rows)} of {len(results)} row(s))._\n\n")
+                for p in written:
+                    fh.write(f"- `{p}`\n")
+            if breakdown_written:
+                fh.write("\n_Breakdown (error_kind × status_class, full result set):_\n\n")
+                for p in breakdown_written:
+                    fh.write(f"- `{p}`\n")
             fh.write("\n")
 
 
