@@ -21,6 +21,15 @@ Env:
   MIN_BODY_BYTES_ROBOTS    min bytes for /robots.txt (default: 20)
   MIN_BODY_BYTES_OVERRIDES comma-separated `path=bytes` extras
                            (e.g. `/en/solutions=1500,/health=10`)
+  ACCEPT_STATUS        comma list of accepted HTTP codes / ranges
+                       (default: `200`; e.g. `200,204,301-399` or
+                       `200,403,404` for staging behind auth).
+  ACCEPT_STATUS_OVERRIDES  per-path overrides, `path=codes` entries
+                           (e.g. `/robots.txt=200,404;/admin=401,403`).
+                           Use `;` between entries so `,` can stay inside
+                           the code list.
+  FOLLOW_REDIRECTS     `true` (default) follows 3xx before checking status;
+                       set `false` to accept raw 3xx via ACCEPT_STATUS.
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
@@ -104,19 +113,86 @@ for item in (x.strip() for x in os.environ.get("MIN_BODY_BYTES_OVERRIDES", "").s
         print(f"preflight: warning: invalid byte count in override {item!r}", file=sys.stderr)
 
 
+def _parse_status_set(spec: str) -> set[int]:
+    """Parse `200,204,301-399` into a set of ints. Empty → empty set."""
+    out: set[int] = set()
+    for token in (t.strip() for t in spec.split(",") if t.strip()):
+        if "-" in token:
+            lo, _, hi = token.partition("-")
+            try:
+                a, b = int(lo), int(hi)
+                if a > b:
+                    a, b = b, a
+                out.update(range(a, b + 1))
+            except ValueError:
+                print(f"preflight: warning: skipping malformed status range {token!r}", file=sys.stderr)
+        else:
+            try:
+                out.add(int(token))
+            except ValueError:
+                print(f"preflight: warning: skipping malformed status code {token!r}", file=sys.stderr)
+    return out
+
+
+ACCEPT_STATUS: set[int] = _parse_status_set(os.environ.get("ACCEPT_STATUS", "200")) or {200}
+# Per-path overrides use `;` as entry separator so status lists can keep `,`.
+ACCEPT_STATUS_OVERRIDES: dict[str, set[int]] = {}
+for item in (x.strip() for x in os.environ.get("ACCEPT_STATUS_OVERRIDES", "").split(";") if x.strip()):
+    if "=" not in item:
+        print(f"preflight: warning: skipping malformed ACCEPT_STATUS_OVERRIDES entry {item!r}", file=sys.stderr)
+        continue
+    path, _, val = item.partition("=")
+    codes = _parse_status_set(val)
+    if codes:
+        ACCEPT_STATUS_OVERRIDES[path.strip()] = codes
+
+FOLLOW_REDIRECTS = os.environ.get("FOLLOW_REDIRECTS", "true").strip().lower() not in ("0", "false", "no")
+
+
+def _accepted_for(path: str) -> set[int]:
+    return ACCEPT_STATUS_OVERRIDES.get(path, ACCEPT_STATUS)
+
+
 def _backoff_delay(attempt: int) -> float:
     """Delay before retry `attempt+1`. attempt is 1-indexed."""
     return min(BACKOFF_MAX, BACKOFF_BASE * (BACKOFF_FACTOR ** (attempt - 1)))
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # type: ignore[override]
+        return None  # surface the 3xx as an HTTPError so caller can inspect it
+
+
+_NO_REDIRECT_OPENER = urllib.request.build_opener(_NoRedirect)
+
+
 
 def probe(url: str) -> dict:
     """Probe a URL with retries. Return a result dict with timing/status."""
+    path = urlparse(url).path
+    accepted = _accepted_for(path)
+    min_bytes = MIN_BODY_BYTES.get(path, DEFAULT_MIN_BYTES)
     last_err = ""
     last_status: int | None = None
     last_bytes = 0
     last_ms = 0.0
     attempts = 0
+
+    def _evaluate(status: int, body: bytes, ms: float) -> dict | None:
+        """Return a success dict when the response satisfies accept + min-bytes rules."""
+        nonlocal last_err, last_status, last_bytes, last_ms
+        last_status, last_bytes, last_ms = status, len(body), ms
+        if status not in accepted:
+            last_err = f"HTTP {status} not in accept set {sorted(accepted)}"
+            return None
+        # Only enforce min-bytes for 2xx — 3xx/4xx accepted-by-design often have empty bodies.
+        if 200 <= status < 300 and len(body) < min_bytes:
+            last_err = f"body {len(body)}B < min {min_bytes}B (likely error page)"
+            return None
+        last_err = ""
+        return {"url": url, "ok": True, "status": status, "bytes": len(body),
+                "ms": ms, "attempts": attempts, "error": ""}
+
     for attempt in range(1, RETRIES + 1):
         attempts = attempt
         t0 = time.perf_counter()
@@ -125,24 +201,24 @@ def probe(url: str) -> dict:
                 "User-Agent": "lovable-seo-preflight/1.0",
                 "Accept": "text/html,application/xml,text/plain;q=0.9,*/*;q=0.5",
             })
-            with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
-                status = r.status
+            opener = urllib.request.urlopen if FOLLOW_REDIRECTS else _NO_REDIRECT_OPENER.open
+            with opener(req, timeout=TIMEOUT) as r:
                 body = r.read()
-                last_ms = (time.perf_counter() - t0) * 1000
-                last_status = status
-                last_bytes = len(body)
-                min_bytes = MIN_BODY_BYTES.get(urlparse(url).path, DEFAULT_MIN_BYTES)
-                if status != 200:
-                    last_err = f"HTTP {status}"
-                elif len(body) < min_bytes:
-                    last_err = f"body {len(body)}B < min {min_bytes}B (likely error page)"
-                else:
-                    return {"url": url, "ok": True, "status": status, "bytes": len(body),
-                            "ms": last_ms, "attempts": attempt, "error": ""}
+                ms = (time.perf_counter() - t0) * 1000
+                ok = _evaluate(r.status, body, ms)
+                if ok:
+                    return ok
         except urllib.error.HTTPError as e:
-            last_ms = (time.perf_counter() - t0) * 1000
-            last_status = e.code
-            last_err = f"HTTP {e.code}"
+            ms = (time.perf_counter() - t0) * 1000
+            # Accepted non-2xx (e.g. 301, 403, 404) come through here — try to read
+            # whatever body was returned and evaluate against the accept set.
+            try:
+                body = e.read() or b""
+            except Exception:
+                body = b""
+            ok = _evaluate(e.code, body, ms)
+            if ok:
+                return ok
         except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
             last_ms = (time.perf_counter() - t0) * 1000
             last_err = f"{type(e).__name__}: {e}"
@@ -170,7 +246,8 @@ def write_step_summary(results: list[dict]) -> None:
         f"_Probed **{len(results)}** URL(s) at `{BASE}` "
         f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`, "
         f"backoff `{BACKOFF_BASE:g}s × {BACKOFF_FACTOR:g}` cap `{BACKOFF_MAX:g}s`, "
-        f"min body `{DEFAULT_MIN_BYTES}B`)._",
+        f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
+        f"follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
         "",
         f"- **{ok_count}/{len(results)}** healthy",
         f"- Total wall time: **{total_ms:.0f} ms**",
