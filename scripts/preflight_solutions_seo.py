@@ -1088,6 +1088,69 @@ def _flatten_for_csv(r: dict) -> dict:
     return row
 
 
+def _filter_results_for_export(
+    results: list[dict], raw_scope: str
+) -> tuple[list[dict], str]:
+    """Apply the RESULTS_INCLUDE grammar and return (rows, normalized_scope).
+
+    Grammar (clauses separated by `;`, matched with logical OR):
+      all                              → every row
+      failures                         → ok is false
+      status_class=4xx,5xx             → row["status_class"] in set
+      error_kind=timeout,tls           → row["error_kind"] in set
+      combo=http:5xx,timeout:none      → (error_kind, status_class) pair matches
+
+    Unknown clauses are ignored (fall through to matching nothing for that
+    clause); if every clause is unknown/empty the scope collapses to `all`
+    so we never silently emit an empty file.
+    """
+    scope = (raw_scope or "all").strip()
+    if not scope or scope.lower() == "all":
+        return list(results), "all"
+    if scope.lower() == "failures":
+        return [r for r in results if not r.get("ok")], "failures"
+
+    status_classes: set[str] = set()
+    error_kinds: set[str] = set()
+    combos: set[tuple[str, str]] = set()
+    known = False
+    for clause in scope.split(";"):
+        clause = clause.strip()
+        if not clause or "=" not in clause:
+            continue
+        key, _, value = clause.partition("=")
+        key = key.strip().lower()
+        parts = [v.strip().lower() for v in value.split(",") if v.strip()]
+        if key in ("status_class", "status"):
+            status_classes.update(parts)
+            known = True
+        elif key in ("error_kind", "kind"):
+            error_kinds.update(parts)
+            known = True
+        elif key == "combo":
+            for p in parts:
+                k, _, s = p.partition(":")
+                if k and s:
+                    combos.add((k.strip(), s.strip()))
+            known = True
+
+    if not known:
+        return list(results), "all"
+
+    def matches(r: dict) -> bool:
+        sc = str(r.get("status_class") or "").lower()
+        ek = str(r.get("error_kind") or "").lower()
+        if status_classes and sc in status_classes:
+            return True
+        if error_kinds and ek in error_kinds:
+            return True
+        if combos and (ek, sc) in combos:
+            return True
+        return False
+
+    return [r for r in results if matches(r)], scope
+
+
 def export_results(results: list[dict]) -> None:
     """Write results as CSV / JSON artifacts for post-run analysis.
 
