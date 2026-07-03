@@ -37,8 +37,12 @@
 import {
   LOGO_TELEMETRY_CONFIG,
   disableLogoDebug,
+  disableLogoDebugLogLine,
   enableLogoDebug,
+  enableLogoDebugLogLine,
   isLogoDebugEnabled,
+  isLogoDebugLogLineEnabled,
+  setLogoDebugLogLine,
   type LogoTelemetryConfig,
 } from "./logo-telemetry-config";
 import {
