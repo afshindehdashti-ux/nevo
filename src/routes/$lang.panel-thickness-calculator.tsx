@@ -5,6 +5,8 @@ import { motion } from "motion/react";
 import {
   AlertTriangle,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   CheckCircle2,
   Check,
   Download,
