@@ -23,6 +23,7 @@ describe("dump filter by correlationId", () => {
     }
     expect(dump.filter).toEqual({
       correlationId: "cid-alpha",
+      criteria: { correlationId: "cid-alpha" },
       matchedCount: 3,
       totalScanned: 5,
     });
@@ -34,6 +35,7 @@ describe("dump filter by correlationId", () => {
     expect(dump.decisions).toEqual([]);
     expect(dump.filter).toEqual({
       correlationId: "cid-missing",
+      criteria: { correlationId: "cid-missing" },
       matchedCount: 0,
       totalScanned: 5,
     });
