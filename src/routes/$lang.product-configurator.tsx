@@ -660,14 +660,10 @@ function ProductConfiguratorPage() {
               <span>Datasheet · NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness}</span>
               <span>REV 01</span>
             </div>
-            <div className="relative flex aspect-[4/3] items-center justify-center bg-white p-6">
-              <img
-                src={PANEL_IMAGES[cfg.core]}
-                alt="Datasheet preview"
-                className="max-h-full max-w-full object-contain"
-                loading="lazy"
-              />
+            <div className="relative aspect-[4/3] w-full bg-white p-4">
+              <DynamicPanelPreview cfg={cfg} ratio="absolute inset-0" showLabels />
             </div>
+
             <dl className="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-black/5 px-5 py-4 font-mono text-[11px]">
               <div className="flex justify-between text-black/60"><span>U-VALUE</span><span className="text-black">{results.uValue}</span></div>
               <div className="flex justify-between text-black/60"><span>FIRE</span><span className="text-black">{results.fireRating}</span></div>
@@ -745,7 +741,7 @@ function ProductConfiguratorPage() {
                   </div>
                   <div className="mt-1">
                     <span className="text-white/50">Steel:</span> {cfg.extSteel}/{cfg.intSteel}mm ·{" "}
-                    {cfg.coating} {cfg.color}
+                    {cfg.coating} · Ext {cfg.extColor} · Int {cfg.intColor} · Profile {cfg.profile}
                   </div>
                   <div className="mt-1">
                     <span className="text-white/50">Results:</span> U={results.uValue} W/m²K · Fire{" "}
