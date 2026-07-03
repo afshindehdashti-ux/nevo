@@ -279,15 +279,74 @@ BODY_SNIPPET_CHARS = int(_num("BODY_SNIPPET_CHARS", 200, int, minimum=0))
 BODY_HASH_ENABLED = os.environ.get("BODY_HASH", "true").strip().lower() not in ("0", "false", "no")
 
 
+# Toggle body-snippet sanitization. On by default: strips <script>/<style>,
+# collapses HTML tags to plain text, and redacts obvious secrets so a failed
+# response embedded in a GitHub summary doesn't leak tokens or dump a wall
+# of minified markup. Set BODY_SANITIZE=false to render the raw text
+# (still whitespace-collapsed + truncated).
+BODY_SANITIZE_ENABLED = os.environ.get("BODY_SANITIZE", "true").strip().lower() not in ("0", "false", "no")
+
+# Patterns for redaction. Order matters: match longer/structured secrets first
+# so an email inside a JWT payload doesn't get partially replaced.
+import re as _re_mod
+_REDACTION_PATTERNS: list[tuple[_re_mod.Pattern[str], str]] = [
+    # JWT-ish: three base64url segments separated by dots.
+    (_re_mod.compile(r"\beyJ[A-Za-z0-9_-]{6,}\.[A-Za-z0-9_-]{6,}\.[A-Za-z0-9_-]{6,}\b"), "[REDACTED_JWT]"),
+    # Bearer / Basic auth headers echoed into the body.
+    (_re_mod.compile(r"\b(Bearer|Basic)\s+[A-Za-z0-9._~+/=-]{8,}", _re_mod.IGNORECASE), r"\1 [REDACTED]"),
+    # Common secret-looking key=value pairs (api_key, token, secret, password, authorization).
+    (_re_mod.compile(
+        r"\b(api[_-]?key|access[_-]?token|refresh[_-]?token|secret|password|passwd|pwd|authorization|auth[_-]?token)\b"
+        r"\s*[:=]\s*['\"]?([^\s'\"&,}]{4,})['\"]?",
+        _re_mod.IGNORECASE,
+    ), r"\1=[REDACTED]"),
+    # Supabase-style publishable/secret keys.
+    (_re_mod.compile(r"\bsb_(?:secret|publishable)_[A-Za-z0-9_-]{10,}"), "[REDACTED_SB_KEY]"),
+    # AWS access key IDs.
+    (_re_mod.compile(r"\bAKIA[0-9A-Z]{16}\b"), "[REDACTED_AWS_KEY]"),
+    # Long hex strings (>=32 chars) — likely hashes/keys, not prose.
+    (_re_mod.compile(r"\b[a-fA-F0-9]{32,}\b"), "[REDACTED_HEX]"),
+    # Email addresses.
+    (_re_mod.compile(r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b"), "[REDACTED_EMAIL]"),
+]
+
+def _sanitize_snippet(text: str) -> str:
+    """Strip scripts/styles/tags and redact obvious secrets from a text blob.
+
+    Kept intentionally dependency-free (no bs4/lxml) so it runs in the same
+    minimal Actions container the rest of preflight uses.
+    """
+    # Drop <script>/<style>/<noscript> blocks entirely — they're never useful
+    # in an error preview and often contain inline JSON with tokens.
+    text = _re_mod.sub(r"<(script|style|noscript)\b[^>]*>.*?</\1\s*>", " ", text,
+                      flags=_re_mod.IGNORECASE | _re_mod.DOTALL)
+    # Drop HTML comments (may hide server debug info).
+    text = _re_mod.sub(r"<!--.*?-->", " ", text, flags=_re_mod.DOTALL)
+    # Collapse remaining tags to spaces so we keep the visible text.
+    text = _re_mod.sub(r"<[^>]+>", " ", text)
+    # Decode a handful of common entities so the snippet reads naturally.
+    for entity, char in (("&nbsp;", " "), ("&amp;", "&"), ("&lt;", "<"),
+                          ("&gt;", ">"), ("&quot;", '"'), ("&#39;", "'")):
+        text = text.replace(entity, char)
+    # Redact secrets after tag stripping so patterns match cleanly.
+    for pattern, replacement in _REDACTION_PATTERNS:
+        text = pattern.sub(replacement, text)
+    return text
+
+
 def _body_preview(body: bytes) -> tuple[str, str]:
     """Return (sha256_short, snippet) for a failed-response body.
 
     snippet is whitespace-collapsed, truncated to BODY_SNIPPET_CHARS chars.
-    Both are safe to embed in Markdown (backticks/pipes escaped).
+    When BODY_SANITIZE is enabled (default), scripts/styles/HTML tags are
+    stripped and obvious secrets are redacted so the preview is readable
+    and safe to paste into a public step summary.
     """
     import hashlib, re as _re
     if not body:
         return "", ""
+    # Hash the raw bytes — must stay stable across runs so we can spot
+    # "same error page as yesterday" regardless of sanitization changes.
     digest = hashlib.sha256(body).hexdigest()[:12] if BODY_HASH_ENABLED else ""
     if BODY_SNIPPET_CHARS <= 0:
         return digest, ""
@@ -295,6 +354,8 @@ def _body_preview(body: bytes) -> tuple[str, str]:
         text = body.decode("utf-8", errors="replace")
     except Exception:
         text = repr(body[:BODY_SNIPPET_CHARS * 2])
+    if BODY_SANITIZE_ENABLED:
+        text = _sanitize_snippet(text)
     text = _re.sub(r"\s+", " ", text).strip()
     if len(text) > BODY_SNIPPET_CHARS:
         text = text[:BODY_SNIPPET_CHARS] + "…"
