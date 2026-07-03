@@ -938,6 +938,12 @@ def write_step_summary(results: list[dict]) -> None:
     # errors have their own bimodal shape vs healthy `ok` responses.
     lines += _render_latency_histogram(results)
 
+    # Heatmap grouping latency by both error_kind and status_class: separates
+    # HTTP-level failures (4xx/5xx) from transport failures (none) so their
+    # latency shapes are not averaged together.
+    lines += _render_latency_heatmap(results)
+
+
 
     lines += [
         "",
