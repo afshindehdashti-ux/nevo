@@ -192,14 +192,20 @@ function LayoutSVG({
   onZoneSelect,
   selectedZoneId,
   isoTilt = false,
+  hiddenZones,
 }: {
   cfg: { capacity: Capacity; core: Core; automation: Automation; building: Building };
   view: ViewMode;
   onZoneSelect: (z: Zone) => void;
   selectedZoneId?: string;
   isoTilt?: boolean;
+  hiddenZones: Set<string>;
 }) {
   const layout = useMemo(() => computeFactoryLayout(cfg), [cfg]);
+  const visibleZones = useMemo(
+    () => layout.zones.filter((z) => !hiddenZones.has(z.id)),
+    [layout.zones, hiddenZones],
+  );
 
   // Which flow categories are visible for this view mode.
   const visibleFlows = useMemo(() => {
@@ -303,79 +309,105 @@ function LayoutSVG({
       </text>
 
       {/* Building envelope */}
-      <rect
-        x={layout.building.x - 4}
-        y={layout.building.y - 4}
-        width={layout.building.w + 8}
-        height={layout.building.h + 8}
+      <motion.rect
+        animate={{
+          x: layout.building.x - 4,
+          y: layout.building.y - 4,
+          width: layout.building.w + 8,
+          height: layout.building.h + 8,
+        }}
+        transition={{ type: "spring", damping: 24, stiffness: 180 }}
         fill="rgba(15,23,42,0.7)"
         stroke="rgba(255,255,255,0.35)"
         strokeWidth={1.5}
       />
-      {layout.hall2 && (
-        <rect
-          x={layout.hall2.x - 4}
-          y={layout.hall2.y - 4}
-          width={layout.hall2.w + 8}
-          height={layout.hall2.h + 8}
-          fill="rgba(15,23,42,0.7)"
-          stroke="rgba(255,255,255,0.35)"
-          strokeWidth={1.5}
-        />
-      )}
-      {layout.expansion && (
-        <rect
-          x={layout.expansion.x - 4}
-          y={layout.expansion.y - 4}
-          width={layout.expansion.w + 8}
-          height={layout.expansion.h + 8}
-          fill={expansionEmphasis ? "rgba(16,185,129,0.15)" : "rgba(16,185,129,0.05)"}
-          stroke="#10b981"
-          strokeWidth={expansionEmphasis ? 2.5 : 1.5}
-          strokeDasharray="8 6"
-        />
-      )}
+      <AnimatePresence>
+        {layout.hall2 && (
+          <motion.rect
+            key="hall2"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              x: layout.hall2.x - 4,
+              y: layout.hall2.y - 4,
+              width: layout.hall2.w + 8,
+              height: layout.hall2.h + 8,
+            }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ type: "spring", damping: 24, stiffness: 180 }}
+            fill="rgba(15,23,42,0.7)"
+            stroke="rgba(255,255,255,0.35)"
+            strokeWidth={1.5}
+          />
+        )}
+        {layout.expansion && (
+          <motion.rect
+            key="expansion"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              x: layout.expansion.x - 4,
+              y: layout.expansion.y - 4,
+              width: layout.expansion.w + 8,
+              height: layout.expansion.h + 8,
+            }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ type: "spring", damping: 24, stiffness: 180 }}
+            fill={expansionEmphasis ? "rgba(16,185,129,0.15)" : "rgba(16,185,129,0.05)"}
+            stroke="#10b981"
+            strokeWidth={expansionEmphasis ? 2.5 : 1.5}
+            strokeDasharray="8 6"
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Zones */}
-      {layout.zones.map((z) => {
-        const isSelected = z.id === selectedZoneId;
-        const dim = dimHighlight(z);
-        return (
-          <g
-            key={z.id}
-            onClick={() => onZoneSelect(z)}
-            style={{ cursor: "pointer" }}
-            opacity={dim ? 0.25 : 1}
-          >
-            <rect
-              x={z.x}
-              y={z.y}
-              width={z.w}
-              height={z.h}
-              fill={zoneFill(z.category)}
-              fillOpacity={z.dashed ? 0.15 : 0.85}
-              stroke={isSelected ? "#fde047" : "rgba(255,255,255,0.35)"}
-              strokeWidth={isSelected ? 2.5 : 1}
-              strokeDasharray={z.dashed ? "6 4" : undefined}
-              rx={4}
-            />
-            {z.w > 60 && z.h > 26 && (
-              <text
-                x={z.x + z.w / 2}
-                y={z.y + z.h / 2 + 4}
-                className="font-mono"
-                textAnchor="middle"
-                fontSize={Math.min(12, Math.max(9, z.w / 10))}
-                fill="white"
-                pointerEvents="none"
-                style={{ textShadow: "0 1px 2px rgba(0,0,0,0.7)" }}
-              >
-                {z.short}
-              </text>
-            )}
-          </g>
-        );
-      })}
+      {/* Zones — every rect is React state driven; capacity/core/automation/building
+          buttons re-run computeFactoryLayout(cfg) which re-emits x/y/w/h that
+          motion.rect springs to. Hidden zones drop out via AnimatePresence. */}
+      <AnimatePresence>
+        {visibleZones.map((z) => {
+          const isSelected = z.id === selectedZoneId;
+          const dim = dimHighlight(z);
+          return (
+            <motion.g
+              key={z.id}
+              onClick={() => onZoneSelect(z)}
+              style={{ cursor: "pointer" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: dim ? 0.25 : 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <motion.rect
+                animate={{ x: z.x, y: z.y, width: z.w, height: z.h }}
+                transition={{ type: "spring", damping: 26, stiffness: 220 }}
+                fill={zoneFill(z.category)}
+                fillOpacity={z.dashed ? 0.15 : 0.85}
+                stroke={isSelected ? "#fde047" : "rgba(255,255,255,0.35)"}
+                strokeWidth={isSelected ? 2.5 : 1}
+                strokeDasharray={z.dashed ? "6 4" : undefined}
+                rx={4}
+              />
+              {z.w > 60 && z.h > 26 && (
+                <motion.text
+                  animate={{ x: z.x + z.w / 2, y: z.y + z.h / 2 + 4 }}
+                  transition={{ type: "spring", damping: 26, stiffness: 220 }}
+                  className="font-mono"
+                  textAnchor="middle"
+                  fontSize={Math.min(12, Math.max(9, z.w / 10))}
+                  fill="white"
+                  pointerEvents="none"
+                  style={{ textShadow: "0 1px 2px rgba(0,0,0,0.7)" }}
+                >
+                  {z.short}
+                </motion.text>
+              )}
+            </motion.g>
+          );
+        })}
+      </AnimatePresence>
 
       {/* Flows */}
       {layout.flows
@@ -524,6 +556,15 @@ function FactoryLayoutPage() {
   const [zone, setZone] = useState<Zone | null>(null);
   const [tab, setTab] = useState<MobileTab>("layout");
   const [fullscreen, setFullscreen] = useState(false);
+  const [hiddenZones, setHiddenZones] = useState<Set<string>>(() => new Set());
+  const toggleZone = (id: string) =>
+    setHiddenZones((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const showAllZones = () => setHiddenZones(new Set());
 
   const cfg = { capacity, core, automation, building };
   const tech = useMemo(() => computeTechData(capacity, core, automation, building, shift), [
@@ -533,6 +574,7 @@ function FactoryLayoutPage() {
     building,
     shift,
   ]);
+  const layoutPreview = useMemo(() => computeFactoryLayout(cfg), [cfg]);
   const equipment = useMemo(() => computeEquipment(capacity, core, automation), [capacity, core, automation]);
   const expansionCopy = expansionRecommendation({ capacity, building });
   const bldRecommendation = recommendedBuildingCopy({ capacity, core });
@@ -683,6 +725,7 @@ function FactoryLayoutPage() {
             onZoneSelect={setZone}
             selectedZoneId={zone?.id}
             isoTilt={view === "iso"}
+            hiddenZones={hiddenZones}
           />
         </div>
         <div className="pointer-events-none absolute left-4 top-4 flex flex-wrap gap-1.5">
@@ -705,6 +748,53 @@ function FactoryLayoutPage() {
       </div>
 
       <FlowLegend view={view} />
+    </div>
+  );
+
+  const ZoneTogglesPanel = (
+    <div className="rounded-3xl border border-white/10 bg-white/[0.02]">
+      <div className="flex items-center justify-between border-b border-white/10 bg-black/40 px-4 py-3">
+        <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/60">
+          Zone Visibility — {layoutPreview.zones.length - hiddenZones.size}/
+          {layoutPreview.zones.length} shown
+        </div>
+        <button
+          type="button"
+          onClick={showAllZones}
+          disabled={hiddenZones.size === 0}
+          className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Show all
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-1.5 p-3">
+        {layoutPreview.zones.map((z) => {
+          const hidden = hiddenZones.has(z.id);
+          return (
+            <button
+              key={z.id}
+              type="button"
+              onClick={() => toggleZone(z.id)}
+              aria-pressed={!hidden}
+              className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] transition ${
+                hidden
+                  ? "border-white/10 bg-white/[0.02] text-white/40 line-through"
+                  : "border-white/15 bg-white/5 text-white hover:border-emerald-400/50"
+              }`}
+            >
+              <span
+                className="h-2.5 w-2.5 rounded-sm"
+                style={{ background: zoneFill(z.category), opacity: hidden ? 0.35 : 1 }}
+              />
+              {z.short}
+            </button>
+          );
+        })}
+      </div>
+      <div className="border-t border-white/5 px-4 py-2 font-mono text-[10px] text-white/40">
+        Each toggle is React state → filters <code>layout.zones</code> → SVG re-renders
+        with a spring animation.
+      </div>
     </div>
   );
 
@@ -848,6 +938,7 @@ function FactoryLayoutPage() {
             </aside>
             <div className="space-y-4 lg:col-span-8">
               {LayoutViewer}
+              {ZoneTogglesPanel}
               {RecommendationsPanel}
               {EquipmentPanel}
               {CTAPanel}
@@ -860,6 +951,7 @@ function FactoryLayoutPage() {
             {tab === "layout" && (
               <>
                 {LayoutViewer}
+                {ZoneTogglesPanel}
                 {RecommendationsPanel}
               </>
             )}
