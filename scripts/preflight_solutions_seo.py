@@ -409,7 +409,7 @@ def write_step_summary(results: list[dict]) -> None:
         f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`, "
         f"backoff `{BACKOFF_BASE:g}s × {BACKOFF_FACTOR:g}` cap `{BACKOFF_MAX:g}s`, "
         f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
-        f"follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
+        f"method `{METHOD}`, follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
         "",
         f"- UA: `{USER_AGENT}`",
         f"- Custom headers: {_render_headers_md(CUSTOM_HEADERS)}",
@@ -417,8 +417,8 @@ def write_step_summary(results: list[dict]) -> None:
         f"- Total wall time: **{total_ms:.0f} ms**",
         f"- Slowest response: **{slowest:.0f} ms**",
         "",
-        "| Status | URL | HTTP | Time (ms) | Size | Attempts | Notes |",
-        "| :---: | --- | ---: | ---: | ---: | ---: | --- |",
+        "| Status | URL | Method | HTTP | Time (ms) | Size | Attempts | Notes |",
+        "| :---: | --- | :---: | ---: | ---: | ---: | ---: | --- |",
     ]
     for r in sorted(results, key=lambda x: (x["ok"], -x["ms"])):
         marker = "✅" if r["ok"] else "❌"
@@ -426,8 +426,9 @@ def write_step_summary(results: list[dict]) -> None:
         http = r["status"] if r["status"] is not None else "—"
         size = f"{r['bytes']:,} B" if r["bytes"] else "—"
         note = _md_cell(r["error"]) if r["error"] else "ok"
+        meth = r.get("method") or METHOD
         lines.append(
-            f"| {marker} | [{_md_cell(rel)}]({r['url']}) "
+            f"| {marker} | [{_md_cell(rel)}]({r['url']}) | `{meth}` "
             f"| `{http}` | {r['ms']:.0f} | {size} | {r['attempts']} | {note} |"
         )
     lines.append("")
