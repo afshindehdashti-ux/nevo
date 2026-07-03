@@ -308,6 +308,8 @@ def write_step_summary(results: list[dict]) -> None:
         f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
         f"follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
         "",
+        f"- UA: `{USER_AGENT}`",
+        f"- Custom headers: {_render_headers_md(CUSTOM_HEADERS)}",
         f"- **{ok_count}/{len(results)}** healthy",
         f"- Total wall time: **{total_ms:.0f} ms**",
         f"- Slowest response: **{slowest:.0f} ms**",
