@@ -65,7 +65,15 @@ Env:
                        `Content-Type,Content-Length,Server,Retry-After,
                        Cache-Control,Age,Location,X-Cache,CF-Ray,Via`.
                        Sensitive values (Set-Cookie, Authorization, …) are
-                       masked.
+                        masked.
+  BODY_SNIPPET_CONTENT_TYPES
+                        comma-separated content types for which a body
+                        snippet is shown in the summary. Default:
+                        `text/*,application/json`. Binary responses
+                        (images, PDFs, archives, etc.) get an empty
+                        snippet to avoid dumping base64/null bytes.
+
+
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
