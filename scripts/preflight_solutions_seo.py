@@ -909,14 +909,17 @@ def write_step_summary(results: list[dict]) -> None:
         f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`, "
         f"backoff `{BACKOFF_BASE:g}s × {BACKOFF_FACTOR:g}` cap `{BACKOFF_MAX:g}s`, "
         f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
-        f"method `{METHOD}`, follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
+        f"method `{METHOD}`, follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`). _",
         "",
         f"- UA: `{USER_AGENT}`",
         f"- Custom headers: {_render_headers_md(CUSTOM_HEADERS)}",
         f"- **{ok_count}/{len(results)}** healthy",
         f"- Total wall time: **{total_ms:.0f} ms**",
         f"- Slowest response: **{slowest:.0f} ms**",
+        f"- Retry kinds: `{','.join(sorted(RETRYABLE_ERROR_KINDS)) or 'none'}` "
+        f"(status classes/codes: `{','.join(sorted(RETRYABLE_STATUS_CLASSES)) or 'none'}`)",
     ]
+
 
     # Failure-kind breakdown: shows at a glance whether the run is dominated
     # by timeouts (latency), DNS/TLS (infra) or HTTP errors (app/content).
