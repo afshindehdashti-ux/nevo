@@ -883,6 +883,14 @@ export function attachLogoDebugUtil(): void {
       copyLogoTelemetryDump(origin, { correlationId }),
     downloadDumpForCorrelationId: (correlationId, origin = "console") =>
       downloadLogoTelemetryDump(origin, { correlationId }),
+    dumpForFilter: (filter, origin = "console") =>
+      buildLogoTelemetryDump(origin, { filter }),
+    dumpForFilterAsJSON: (filter, origin = "console") =>
+      dumpLogoTelemetryAsJSON(origin, { filter }),
+    copyDumpForFilter: (filter, origin = "console") =>
+      copyLogoTelemetryDump(origin, { filter }),
+    downloadDumpForFilter: (filter, origin = "console") =>
+      downloadLogoTelemetryDump(origin, { filter }),
   };
 }
 
