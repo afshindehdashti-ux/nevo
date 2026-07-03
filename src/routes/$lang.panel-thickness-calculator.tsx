@@ -1568,26 +1568,42 @@ function PanelThicknessPage() {
               NEVO Engineering will validate the design against project-specific loads, fire and thermal requirements.
             </div>
           </div>
-          <Link
-            to={`/project-inquiry?${inquiryParams}` as never}
-            className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300"
-          >
-            Request Recommendation <ArrowRight className="size-4" />
-          </Link>
+          {hasErrors ? (
+            <span
+              aria-disabled="true"
+              className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white/40"
+            >
+              Request Recommendation <ArrowRight className="size-4" />
+            </span>
+          ) : (
+            <Link
+              to={`/project-inquiry?${inquiryParams}` as never}
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300"
+            >
+              Request Recommendation <ArrowRight className="size-4" />
+            </Link>
+          )}
           <button
             type="button"
             onClick={downloadReport}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+            disabled={hasErrors}
+            aria-disabled={hasErrors || undefined}
+            title={hasErrors ? "Resolve configuration issues to enable" : undefined}
+            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white/5"
           >
             <Download className="size-4" /> Download Report
           </button>
           <button
             type="button"
             onClick={downloadPdfReport}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+            disabled={hasErrors}
+            aria-disabled={hasErrors || undefined}
+            title={hasErrors ? "Resolve configuration issues to enable" : undefined}
+            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white/5"
           >
             <Download className="size-4" /> Download PDF
           </button>
+
           <Link
             to={"/contact" as never}
             className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
