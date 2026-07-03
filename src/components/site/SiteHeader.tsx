@@ -72,6 +72,38 @@ const LOGO_FALLBACK_SVG =
     </svg>`
   );
 
+/**
+ * Per-session correlation ID for header logo telemetry.
+ *
+ * Stored in sessionStorage (per tab) so every `header.logo.render` and
+ * `header.logo.error` event fired during a single page/tab session shares
+ * the same ID — letting us trace an end-to-end fallback chain in the log
+ * sink even when multiple errors and one render event arrive out of order.
+ */
+const LOGO_CID_KEY = "__nevoLogoCid";
+function getLogoCorrelationId(): string {
+  if (typeof window === "undefined") return "ssr";
+  try {
+    const existing = window.sessionStorage.getItem(LOGO_CID_KEY);
+    if (existing) return existing;
+    const cid =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `cid-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    window.sessionStorage.setItem(LOGO_CID_KEY, cid);
+    return cid;
+  } catch {
+    // sessionStorage blocked (private mode, cookie policy) — fall back to
+    // a per-tab in-memory ID hung off window so events still correlate.
+    const w = window as unknown as Record<string, string | undefined>;
+    if (!w[LOGO_CID_KEY]) {
+      w[LOGO_CID_KEY] = `cid-mem-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    }
+    return w[LOGO_CID_KEY]!;
+  }
+}
+
+
 /* ─────────────────────────────────────────────────────────────
    Navigation model
    ───────────────────────────────────────────────────────────── */
@@ -312,6 +344,7 @@ export function SiteHeader() {
                     if ((window as unknown as Record<string, unknown>)[flagKey]) return;
                     (window as unknown as Record<string, unknown>)[flagKey] = true;
                     logClientEvent("header.logo.render", {
+                      correlationId: getLogoCorrelationId(),
                       variant,
                       naturalWidth: img.naturalWidth,
                       naturalHeight: img.naturalHeight,
@@ -320,6 +353,7 @@ export function SiteHeader() {
                       dpr: window.devicePixelRatio,
                       src: img.currentSrc || img.src,
                     }, "info");
+
                   }}
                   onError={(event) => {
                     // Defensive fallback chain: if the bundled light logo
@@ -330,10 +364,12 @@ export function SiteHeader() {
                     const img = event.currentTarget;
                     const step = img.dataset.fallbackStep ?? "0";
                     const failedSrc = img.currentSrc || img.src;
+                    const correlationId = getLogoCorrelationId();
                     if (step === "0") {
                       img.dataset.fallbackStep = "1";
                       img.dataset.logoVariant = "fallback-cdn";
                       logClientEvent("header.logo.error", {
+                        correlationId,
                         stage: "primary-light-png",
                         failedSrc,
                         nextSrc: LOGO_FALLBACK_CDN,
@@ -345,6 +381,7 @@ export function SiteHeader() {
                       img.dataset.fallbackStep = "2";
                       img.dataset.logoVariant = "fallback-svg";
                       logClientEvent("header.logo.error", {
+                        correlationId,
                         stage: "fallback-cdn-full",
                         failedSrc,
                         nextSrc: "inline-svg",
@@ -354,11 +391,13 @@ export function SiteHeader() {
                       img.src = LOGO_FALLBACK_SVG;
                     } else {
                       logClientEvent("header.logo.error", {
+                        correlationId,
                         stage: "fallback-inline-svg",
                         failedSrc,
                         terminal: true,
                       }, "error");
                     }
+
                   }}
                 />
 
