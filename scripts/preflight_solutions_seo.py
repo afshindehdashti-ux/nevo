@@ -374,13 +374,35 @@ def _sanitize_snippet(text: str) -> str:
     return text
 
 
-def _body_preview(body: bytes) -> tuple[str, str]:
+def _content_type_allowed_for_snippet(content_type: str) -> bool:
+    """Return True if the response Content-Type is text-like enough to preview.
+
+    Empty/unknown content types are allowed (fail-open). Binary types such as
+    image/*, application/pdf, application/octet-stream, etc. return False so
+    the summary doesn't render a base64 or null-byte wall.
+    """
+    if not content_type:
+        return True
+    mt = content_type.split(";", 1)[0].strip().lower()
+    if not mt or "/" not in mt:
+        return True
+    main, sub = mt.split("/", 1)
+    for allowed_main, allowed_sub in BODY_SNIPPET_CONTENT_TYPES:
+        if main == allowed_main and (allowed_sub is None or sub == allowed_sub):
+            return True
+    return False
+
+
+def _body_preview(body: bytes, content_type: str = "") -> tuple[str, str]:
     """Return (sha256_short, snippet) for a failed-response body.
 
     snippet is whitespace-collapsed, truncated to BODY_SNIPPET_CHARS chars.
     When BODY_SANITIZE is enabled (default), scripts/styles/HTML tags are
     stripped and obvious secrets are redacted so the preview is readable
     and safe to paste into a public step summary.
+
+    The snippet is omitted (empty string) for binary responses whose
+    Content-Type is not in BODY_SNIPPET_CONTENT_TYPES.
     """
     import hashlib, re as _re
     if not body:
@@ -389,6 +411,8 @@ def _body_preview(body: bytes) -> tuple[str, str]:
     # "same error page as yesterday" regardless of sanitization changes.
     digest = hashlib.sha256(body).hexdigest()[:12] if BODY_HASH_ENABLED else ""
     if BODY_SNIPPET_CHARS <= 0:
+        return digest, ""
+    if not _content_type_allowed_for_snippet(content_type):
         return digest, ""
     try:
         text = body.decode("utf-8", errors="replace")
@@ -400,6 +424,7 @@ def _body_preview(body: bytes) -> tuple[str, str]:
     if len(text) > BODY_SNIPPET_CHARS:
         text = text[:BODY_SNIPPET_CHARS] + "…"
     return digest, text
+
 
 
 # Response headers surfaced for failed URLs in the step summary. Content-Type
