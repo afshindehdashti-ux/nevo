@@ -253,10 +253,13 @@ def probe(url: str) -> dict:
         attempts = attempt
         t0 = time.perf_counter()
         try:
-            req = urllib.request.Request(url, headers={
-                "User-Agent": "lovable-seo-preflight/1.0",
+            headers = {
+                "User-Agent": USER_AGENT,
                 "Accept": "text/html,application/xml,text/plain;q=0.9,*/*;q=0.5",
-            })
+            }
+            # CUSTOM_HEADERS wins so callers can override UA / Accept too.
+            headers.update(CUSTOM_HEADERS)
+            req = urllib.request.Request(url, headers=headers)
             opener = urllib.request.urlopen if FOLLOW_REDIRECTS else _NO_REDIRECT_OPENER.open
             with opener(req, timeout=TIMEOUT) as r:
                 body = r.read()
