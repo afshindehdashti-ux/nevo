@@ -658,6 +658,76 @@ def _render_headers_md(headers: dict[str, str]) -> str:
 
 
 
+# Latency buckets in ms. Chosen to separate "fast local", "healthy remote",
+# "slow", and "near-timeout" so infra-shaped failures stand out from content.
+_LATENCY_BUCKETS: list[tuple[str, float]] = [
+    ("0–100",      100.0),
+    ("100–250",    250.0),
+    ("250–500",    500.0),
+    ("500–1000",  1000.0),
+    ("1–2.5s",    2500.0),
+    ("2.5–5s",    5000.0),
+    ("5–10s",    10000.0),
+    ("10s+",   float("inf")),
+]
+
+
+def _bucket_for(ms: float) -> int:
+    for i, (_, hi) in enumerate(_LATENCY_BUCKETS):
+        if ms < hi:
+            return i
+    return len(_LATENCY_BUCKETS) - 1
+
+
+def _render_latency_histogram(results: list[dict]) -> list[str]:
+    """Return Markdown lines for a per-error_kind latency histogram.
+
+    One row per bucket, one column per observed kind. Cells show the count
+    and a short ASCII bar scaled to the max cell in the whole table so
+    distribution shape is visible at a glance.
+    """
+    if not results:
+        return []
+    from collections import defaultdict
+
+    # kind -> bucket_idx -> count
+    grid: dict[str, list[int]] = defaultdict(lambda: [0] * len(_LATENCY_BUCKETS))
+    for r in results:
+        kind = r.get("error_kind") or ("ok" if r["ok"] else "unknown")
+        grid[kind][_bucket_for(float(r.get("ms") or 0))] += 1
+
+    # Stable order: ok first, then by total count desc.
+    kinds = sorted(grid.keys(),
+                   key=lambda k: (k != "ok", -sum(grid[k]), k))
+    max_cell = max((max(row) for row in grid.values()), default=0)
+    if max_cell == 0:
+        return []
+
+    def bar(n: int) -> str:
+        if n <= 0:
+            return ""
+        width = max(1, round((n / max_cell) * 8))
+        return "█" * width
+
+    header_labels = [_ERROR_KIND_LABELS.get(k, k) for k in kinds]
+    lines = [
+        "",
+        "#### Latency distribution by error kind",
+        "",
+        "| Bucket (ms) | " + " | ".join(header_labels) + " |",
+        "| :--- | " + " | ".join([":---"] * len(kinds)) + " |",
+    ]
+    for i, (label, _) in enumerate(_LATENCY_BUCKETS):
+        cells = []
+        for k in kinds:
+            n = grid[k][i]
+            cells.append(f"{n} {bar(n)}".strip() if n else "·")
+        lines.append(f"| {label} | " + " | ".join(cells) + " |")
+    lines.append("")
+    return lines
+
+
+
 def write_step_summary(results: list[dict]) -> None:
     """Append a Markdown table of results to $GITHUB_STEP_SUMMARY."""
     path = os.environ.get("GITHUB_STEP_SUMMARY")
