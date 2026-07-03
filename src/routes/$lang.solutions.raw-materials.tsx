@@ -146,7 +146,13 @@ function RawMaterialsPage() {
         <QualityAssurance />
         <DownloadsCTA />
         <FAQ />
-        <InquiryCTA />
+        <InquiryCTA
+          source="raw-materials"
+          eyebrow="Material inquiry"
+          title="Source the right coil, chemistry and core — first time."
+          lede="Send your panel specification, target market and required volume. Our material specialists respond with a technical proposal, matched chemistry and indicative pricing within one business day."
+          ctaLabel="Start Material Inquiry"
+        />
         <FinalCTA />
       </main>
       <SiteFooter />
