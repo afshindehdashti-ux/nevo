@@ -205,10 +205,14 @@ def main() -> int:
             print(f"  ✗ {r['url']}")
             for f in r["failures"]:
                 print(f"      {f}")
+                hint = suggest_fix(f)
+                if hint:
+                    print(f"        ↳ fix: {hint}")
 
     # GitHub PR annotations — pinned to the route file.
     # Per-check annotations give the finest detail; grouping keeps PRs tidy when
-    # one page has many related issues.
+    # one page has many related issues. Each issue is followed by an inline
+    # "↳ fix:" hint so reviewers see the remediation next to the failure.
     level = "warning" if WARN_ONLY else "error"
     if GROUP_ANNOTATIONS:
         by_key: dict[tuple[str, str, str], list[dict]] = {}
@@ -218,23 +222,33 @@ def main() -> int:
             by_key.setdefault(key, []).append(r)
         for (file, path, locale), rs in by_key.items():
             urls = sorted({r["url"] for r in rs})
-            issues = "\n".join(f"• {f}" for r in rs for f in r["failures"])
+            lines_out = []
+            for r in rs:
+                for f in r["failures"]:
+                    hint = suggest_fix(f)
+                    lines_out.append(f"• {f}" + (f"\n    ↳ fix: {hint}" if hint else ""))
+            issues = "\n".join(lines_out)
             emit_annotation(
                 level,
                 file,
                 f"Solutions SEO [{locale}] {path}",
-                f"{len(rs)} issue(s) on {len(urls)} URL(s)\n{issues}",
+                f"{sum(len(r['failures']) for r in rs)} issue(s) on {len(urls)} URL(s)\n{issues}",
             )
     else:
         for r in failed:
             file = ROUTE_FILES.get(r["path"], "src/routes/__root.tsx")
             for f in r["failures"]:
+                hint = suggest_fix(f)
+                msg = f"{f} — {r['url']}"
+                if hint:
+                    msg += f"\n↳ fix: {hint}"
                 emit_annotation(
                     level,
                     file,
                     f"Solutions SEO [{r['locale']}] {r['path']}",
-                    f"{f} — {r['url']}",
+                    msg,
                 )
+
 
 
     # Machine JSON report
