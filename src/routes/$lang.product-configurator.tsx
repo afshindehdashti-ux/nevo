@@ -1350,17 +1350,16 @@ function StepResults({
       </div>
       <div className="mt-6 grid gap-6 md:grid-cols-2">
         <PanelStudio
-          core={cfg.core}
+          cfg={cfg}
           ratio="aspect-[4/3]"
-          tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
-          thicknessMm={cfg.thickness}
           caption={
             <>
-              <span>NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness} · {cfg.color}</span>
+              <span>NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness} · Ext {cfg.extColor}</span>
               <span>U {results.uValue} · Fire {results.fireRating}</span>
             </>
           }
         />
+
         <div className="relative overflow-hidden rounded-2xl border border-white/10 aspect-[4/3]">
           <img
             src={CONTEXT_IMAGES[cfg.panelType]}
