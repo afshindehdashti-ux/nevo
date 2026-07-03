@@ -1367,6 +1367,7 @@ function StepResults({
   results: ReturnType<typeof computeResults>;
   cfg: Config;
 }) {
+  const panelLabel = PANEL_TYPES.find((p) => p.id === cfg.panelType)!.label;
   return (
     <div>
       <StepHeader n={6} title="Results" desc="Review full technical results and confirm your specification." />
@@ -1377,18 +1378,24 @@ function StepResults({
         <MiniResult label="Panel Weight" value={`${results.weight} kg/m²`} />
         <MiniResult label="Core Density" value={`${results.coreDensity} kg/m³`} />
         <MiniResult label="Thermal Score" value={results.thermalScore} />
+        <MiniResult label="Indicative Price" value={`$${results.pricePerM2}/m²`} />
+        <MiniResult label="Panel Total" value={`$${results.totalPrice.toLocaleString()} · ${results.totalArea} m²`} />
+        <MiniResult label="Coating Warranty" value={`${results.warranty} yrs · ${results.coatingDurability}`} />
+        <MiniResult label="Lead Time" value={`${results.leadTime} weeks`} />
       </div>
       <div className="mt-6 rounded-2xl border border-accent/30 bg-accent/5 p-6">
         <div className="text-xs uppercase tracking-widest text-accent">Recommended Application</div>
         <div className="mt-2 text-lg font-medium text-white">{results.application}</div>
         <div className="mt-1 text-sm text-white/60">
-          Based on {cfg.core} core at {cfg.thickness}mm with {cfg.coating} finish.
+          Based on {cfg.core} core at {cfg.thickness}mm with {cfg.coating} finish for a {panelLabel.toLowerCase()} system.
         </div>
       </div>
-      <div className="mt-6">
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
         <PanelStudio
           core={cfg.core}
-          ratio="aspect-[16/9]"
+          ratio="aspect-[4/3]"
+          tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
+          thicknessMm={cfg.thickness}
           caption={
             <>
               <span>NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness} · {cfg.color}</span>
@@ -1396,6 +1403,22 @@ function StepResults({
             </>
           }
         />
+        <div className="relative overflow-hidden rounded-2xl border border-white/10 aspect-[4/3]">
+          <img
+            src={CONTEXT_IMAGES[cfg.panelType]}
+            alt={`${panelLabel} in-situ reference`}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            width={1024}
+            height={1024}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent">In-situ reference</div>
+            <div className="mt-1 text-lg font-semibold text-white">{panelLabel}</div>
+            <div className="text-sm text-white/70">{results.application}</div>
+          </div>
+        </div>
       </div>
     </div>
   );
