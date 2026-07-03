@@ -418,6 +418,7 @@ export function attachLogoDebugUtil(): void {
     dump: buildLogoTelemetryDump,
     dumpAsJSON: dumpLogoTelemetryAsJSON,
     copyDump: copyLogoTelemetryDump,
+    downloadDump: downloadLogoTelemetryDump,
   };
 }
 
