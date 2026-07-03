@@ -43,9 +43,21 @@ jobs:
           tail -n 200 vite.log || true
           exit 1
 
+      # Fail fast if the local dev server is up but serving broken routes /
+      # sitemap. Cheaper than running the 60-page snapshot against a broken
+      # build, and the error surfaces the exact failing URL in the run log.
+      - name: Preflight — site + sitemap reachable
+        env:
+          BASE_URL: http://127.0.0.1:4323
+          LOCALES: en,ar,tr
+          TIMEOUT_SECONDS: "10"
+          RETRIES: "2"
+        run: python3 scripts/preflight_solutions_seo.py
+
       # Run the SSR SEO snapshot. On failure, exit 1 fails the job -> red PR check.
       # Emits a JSON artifact and a Markdown block appended to the PR/run summary.
       - name: Verify Solutions SEO (SSR snapshot)
+
         env:
           BASE_URL: http://127.0.0.1:4323
           REPORT_JSON: reports/seo/solutions-seo.json
