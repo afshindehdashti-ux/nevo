@@ -74,6 +74,49 @@ def emit_annotation(level: str, file: str, title: str, message: str) -> None:
     )
 
 
+# --- Actionable fix hints -----------------------------------------------------
+# Map each failure category to a short, concrete remediation. Kept intentionally
+# terse so it fits inside a GitHub annotation / MD table cell without wrapping.
+FIX_HINTS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"^FETCH_ERROR"),
+     "Server unreachable — start dev server (npm run dev) or check BASE_URL."),
+    (re.compile(r"^canonical count"),
+     "Emit exactly one <link rel=\"canonical\"> in the route head() — remove duplicates from __root."),
+    (re.compile(r"^canonical not self-ref"),
+     "Set canonical to https://<host>/<locale><path> for THIS page (not the home URL)."),
+    (re.compile(r"^og:url not self-ref"),
+     "Set og:url to the same absolute URL as canonical (self-referencing)."),
+    (re.compile(r"^og:image not absolute"),
+     "Use an absolute https://… URL for og:image (1200×630 JPG/PNG, <300KB)."),
+    (re.compile(r"^twitter:card"),
+     "Set <meta name=\"twitter:card\" content=\"summary_large_image\">."),
+    (re.compile(r"^twitter:image not absolute"),
+     "Set twitter:image to the same absolute https:// URL as og:image."),
+    (re.compile(r"^missing <title>"),
+     "Add a unique <title> 30–60 chars including locale + primary keyword."),
+    (re.compile(r"^missing meta description"),
+     "Add <meta name=\"description\"> — 120–160 chars, localized, with a call to action."),
+    (re.compile(r"^description byte-length"),
+     "Rewrite meta description to ~120–160 chars (100–320 UTF-8 bytes)."),
+    (re.compile(r"^hreflang missing locales"),
+     "Emit <link rel=\"alternate\" hreflang=\"xx\"> for every active locale in LOCALES."),
+    (re.compile(r"^hreflang missing x-default"),
+     "Add <link rel=\"alternate\" hreflang=\"x-default\" href=…> pointing at the default locale URL."),
+    (re.compile(r"^hreflang has non-absolute"),
+     "All hreflang href values must be absolute https:// URLs."),
+]
+
+
+def suggest_fix(failure: str) -> str:
+    """Return a short actionable hint for a failure message, or '' if none."""
+    for pat, hint in FIX_HINTS:
+        if pat.search(failure):
+            return hint
+    return ""
+
+
+
+
 def fetch(url: str) -> str:
     req = urllib.request.Request(url, headers={"User-Agent": "Googlebot/2.1 (+http://www.google.com/bot.html)"})
     with urllib.request.urlopen(req, timeout=30) as r:
@@ -162,10 +205,14 @@ def main() -> int:
             print(f"  ✗ {r['url']}")
             for f in r["failures"]:
                 print(f"      {f}")
+                hint = suggest_fix(f)
+                if hint:
+                    print(f"        ↳ fix: {hint}")
 
     # GitHub PR annotations — pinned to the route file.
     # Per-check annotations give the finest detail; grouping keeps PRs tidy when
-    # one page has many related issues.
+    # one page has many related issues. Each issue is followed by an inline
+    # "↳ fix:" hint so reviewers see the remediation next to the failure.
     level = "warning" if WARN_ONLY else "error"
     if GROUP_ANNOTATIONS:
         by_key: dict[tuple[str, str, str], list[dict]] = {}
@@ -175,23 +222,33 @@ def main() -> int:
             by_key.setdefault(key, []).append(r)
         for (file, path, locale), rs in by_key.items():
             urls = sorted({r["url"] for r in rs})
-            issues = "\n".join(f"• {f}" for r in rs for f in r["failures"])
+            lines_out = []
+            for r in rs:
+                for f in r["failures"]:
+                    hint = suggest_fix(f)
+                    lines_out.append(f"• {f}" + (f"\n    ↳ fix: {hint}" if hint else ""))
+            issues = "\n".join(lines_out)
             emit_annotation(
                 level,
                 file,
                 f"Solutions SEO [{locale}] {path}",
-                f"{len(rs)} issue(s) on {len(urls)} URL(s)\n{issues}",
+                f"{sum(len(r['failures']) for r in rs)} issue(s) on {len(urls)} URL(s)\n{issues}",
             )
     else:
         for r in failed:
             file = ROUTE_FILES.get(r["path"], "src/routes/__root.tsx")
             for f in r["failures"]:
+                hint = suggest_fix(f)
+                msg = f"{f} — {r['url']}"
+                if hint:
+                    msg += f"\n↳ fix: {hint}"
                 emit_annotation(
                     level,
                     file,
                     f"Solutions SEO [{r['locale']}] {r['path']}",
-                    f"{f} — {r['url']}",
+                    msg,
                 )
+
 
 
     # Machine JSON report
@@ -275,15 +332,17 @@ def render_md(base: str, results: list, failed: list) -> str:
             f"",
             "### Failures",
             f"",
-            "| Status | Locale | Path | URL | Issue |",
-            "| --- | --- | --- | --- | --- |",
+            "| Status | Locale | Path | URL | Issue | Suggested fix |",
+            "| --- | --- | --- | --- | --- | --- |",
         ])
         for r in sorted(failed, key=lambda r: (r["locale"], r["path"])):
             rel_url = r["url"].replace(base, "") or r["path"]
             issues = "<br>".join(_md_cell(f) for f in r["failures"])
+            hints = "<br>".join(_md_cell(suggest_fix(f) or "—") for f in r["failures"])
             lines.append(
-                f"| ❌ | `{_md_cell(r['locale'])}` | `{_md_cell(r['path'])}` | `{_md_cell(rel_url)}` | {issues} |"
+                f"| ❌ | `{_md_cell(r['locale'])}` | `{_md_cell(r['path'])}` | `{_md_cell(rel_url)}` | {issues} | {hints} |"
             )
+
     else:
         lines.extend([f"", "### Result", f"", "✅ All pages passed."])
 
@@ -309,7 +368,12 @@ def render_html(base: str, results: list, failed: list) -> str:
     for r in sorted(results, key=lambda r: (bool(not r["failures"]), r["locale"], r["path"])):
         status = "FAIL" if r["failures"] else "PASS"
         cls = "fail" if r["failures"] else "pass"
-        issues = "".join(f"<li>{_esc(f)}</li>" for f in r["failures"]) or "<li class=ok>All checks passed</li>"
+        def _li(f: str) -> str:
+            hint = suggest_fix(f)
+            hint_html = f'<span class="hint">↳ fix: {_esc(hint)}</span>' if hint else ""
+            return f"<li>{_esc(f)}{hint_html}</li>"
+        issues = "".join(_li(f) for f in r["failures"]) or "<li class=ok>All checks passed</li>"
+
         rows.append(f"""
         <tr class="{cls}">
           <td><span class="badge {cls}">{status}</span></td>
@@ -358,6 +422,8 @@ def render_html(base: str, results: list, failed: list) -> str:
   .badge.fail {{ background:rgba(239,68,68,.15); color:var(--fail); }}
   ul.issues {{ margin:0; padding-left:16px; }} ul.issues li {{ margin:2px 0; }}
   ul.issues li.ok {{ color:var(--muted); list-style:none; margin-left:-16px; }}
+  .hint {{ display:block; color:var(--muted); font-size:12px; margin-top:2px; padding-left:12px; border-left:2px solid var(--accent); }}
+
   td.ok {{ color:var(--ok); }} td.fail {{ color:var(--fail); font-weight:600; }}
   .filters {{ margin:12px 0; display:flex; gap:8px; }}
   .filters button {{ background:var(--card); color:var(--text); border:1px solid var(--border);
