@@ -1175,11 +1175,8 @@ def write_step_summary(results: list[dict]) -> None:
             "| Rate bar | % of all | % of failures | p50 (ms) | p95 (ms) | p99 (ms) |",
             "| --- | :---: | ---: | ---: | ---: | :--- | ---: | ---: | ---: | ---: | ---: |",
         ]
-        for (kind, status_class), n in combo_rows:
-            failed = combo.get((kind, status_class), 0) if kind != "ok" else 0
-            success_pct = 100.0 * (n - failed) / n if n else 0.0
+        for kind, status_class, n, failed, success_pct, share_fail in combo_rows:
             share_all = 100.0 * n / total_all
-            share_fail = 100.0 * failed / total_fail if failed else 0.0
             kind_label = _ERROR_KIND_LABELS.get(kind, kind)
             class_label = _STATUS_CLASS_LABELS.get(status_class, status_class)
             pr = pctile_index.get((kind, status_class), {})
