@@ -662,21 +662,8 @@ function ProjectInquiryPage() {
       </section>
 
       {/* WHY NEVO */}
-      <Section className="bg-background">
-        <SectionHeader eyebrow="Why NEVO" title="A serious partner for a serious project." lede="Six reasons investors, contractors and OEMs choose NEVO from the first inquiry." />
-        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {WHY_NEVO.map((w) => {
-            const Icon = w.icon;
-            return (
-              <SurfaceCard key={w.title} className="p-8">
-                <Icon className="h-6 w-6 text-emerald-600" />
-                <h3 className="mt-6 text-lg font-semibold">{w.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{w.desc}</p>
-              </SurfaceCard>
-            );
-          })}
-        </div>
-      </Section>
+      <WhyNevo />
+
 
       {/* WHAT HAPPENS NEXT */}
       <section className="bg-[#0B0D10] py-24 text-white md:py-32">
