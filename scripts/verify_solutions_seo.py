@@ -201,6 +201,66 @@ def _esc(s: object) -> str:
     )
 
 
+def render_md(base: str, results: list, failed: list) -> str:
+    from datetime import datetime, timezone
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    total = len(results)
+    passed = total - len(failed)
+    pct = (passed / total * 100) if total else 0
+
+    # Per-locale aggregate
+    per_locale: dict[str, dict[str, int]] = {}
+    for r in results:
+        d = per_locale.setdefault(r["locale"], {"pass": 0, "fail": 0})
+        d["fail" if r["failures"] else "pass"] += 1
+
+    lines = [
+        "## Solutions SEO snapshot",
+        f"",
+        f"- Base: `{base}`",
+        f"- Generated: {ts}",
+        f"- Pages checked: **{total}** ({len(LOCALES)} locales × {len(PATHS)} routes)",
+        f"",
+        "### Summary",
+        f"",
+        "| Metric | Value |",
+        "| --- | --- |",
+        f"| Total pages | {total} |",
+        f"| Passing | {passed} |",
+        f"| Failing | {len(failed)} |",
+        f"| Pass rate | {pct:.1f}% |",
+        f"",
+        "### By locale",
+        f"",
+        "| Locale | Passing | Failing | Status |",
+        "| --- | --- | --- | --- |",
+    ]
+    for locale in sorted(per_locale.keys()):
+        d = per_locale[locale]
+        status = "✅" if d["fail"] == 0 else "❌"
+        lines.append(f"| `{locale}` | {d['pass']} | {d['fail']} | {status} |")
+
+    if failed:
+        lines.extend([
+            f"",
+            "### Failures",
+            f"",
+            "| Status | Locale | Path | URL | Issue |",
+            "| --- | --- | --- | --- | --- |",
+        ])
+        for r in sorted(failed, key=lambda r: (r["locale"], r["path"])):
+            rel_url = r["url"].replace(base, "") or r["path"]
+            issues = "<br>".join(str(f) for f in r["failures"])
+            lines.append(
+                f"| ❌ | `{r['locale']}` | `{r['path']}` | `{rel_url}` | {issues} |"
+            )
+    else:
+        lines.extend([f"", "### Result", f"", "✅ All pages passed."])
+
+    return "\n".join(lines)
+
+
+
 def render_html(base: str, results: list, failed: list) -> str:
     from datetime import datetime, timezone
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
