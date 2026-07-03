@@ -119,7 +119,6 @@ function getLogoCorrelationId(): string {
  * `LOGO_TELEMETRY_CONFIG`, so ops can retune sampling per environment
  * without touching component code. See `src/lib/logo-telemetry-config.ts`.
  */
-import { LOGO_TELEMETRY_CONFIG } from "@/lib/logo-telemetry-config";
 
 const LOGO_RENDER_SAMPLE_RATE = LOGO_TELEMETRY_CONFIG.renderSampleRate;
 const LOGO_ERROR_MAX_PER_SESSION = LOGO_TELEMETRY_CONFIG.errorMaxPerSession;
