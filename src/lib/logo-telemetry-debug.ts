@@ -673,6 +673,87 @@ export function buildLogoTelemetryDump(
   return redactLogoTelemetryDump(raw);
 }
 
+/**
+ * Aggregate counts over the ring buffer of sampling decisions. "Since
+ * page load" is bounded by `LOGO_DECISION_BUFFER_SIZE` (50) — when
+ * `decisionsTruncated` is true, older decisions have rolled off and the
+ * per-kind/per-reason counts only cover the tail. `errorCountSinceLoad`
+ * comes from the live sampler state and is NOT capped by the ring
+ * buffer, so it's the source of truth for "how many errors has this
+ * session actually emitted".
+ */
+export type LogoTelemetryStats = {
+  totalScanned: number;
+  decisionsTruncated: boolean;
+  byKind: { render: number; error: number };
+  byDecision: { "sampled-in": number; "sampled-out": number };
+  rendersEmitted: number;
+  rendersSuppressed: number;
+  errorsEmitted: number;
+  errorsSuppressed: number;
+  terminalErrors: number;
+  byReason: Record<string, number>;
+  /** Live sampler counter — total errors emitted this session (uncapped by the ring buffer). */
+  errorCountSinceLoad: number;
+  /** Set when a filter was applied; matchedCount is the size of the filtered subset. */
+  filter?: {
+    correlationId?: string;
+    criteria: LogoDumpFilter;
+    matchedCount: number;
+  };
+};
+
+export function buildLogoTelemetryStats(opts: LogoDumpOptions = {}): LogoTelemetryStats {
+  const all = getRecentLogoDecisions();
+  const totalScanned = all.length;
+  const criteria = resolveDumpFilter(opts);
+  const filtered = criteria ? all.filter((d) => matchesLogoDumpFilter(d, criteria)) : all;
+
+  const stats: LogoTelemetryStats = {
+    totalScanned,
+    decisionsTruncated: totalScanned >= 50,
+    byKind: { render: 0, error: 0 },
+    byDecision: { "sampled-in": 0, "sampled-out": 0 },
+    rendersEmitted: 0,
+    rendersSuppressed: 0,
+    errorsEmitted: 0,
+    errorsSuppressed: 0,
+    terminalErrors: 0,
+    byReason: {},
+    errorCountSinceLoad: getLogoRateState().errorCount,
+  };
+
+  for (const d of filtered) {
+    stats.byKind[d.kind] += 1;
+    stats.byDecision[d.decision] += 1;
+    stats.byReason[d.reason] = (stats.byReason[d.reason] ?? 0) + 1;
+    const emitted = d.decision === "sampled-in";
+    if (d.kind === "render") {
+      if (emitted) stats.rendersEmitted += 1;
+      else stats.rendersSuppressed += 1;
+    } else {
+      if (emitted) stats.errorsEmitted += 1;
+      else stats.errorsSuppressed += 1;
+      if (d.terminal === true) stats.terminalErrors += 1;
+    }
+  }
+
+  if (criteria) {
+    const legacyCid =
+      typeof criteria.correlationId === "string" && Object.keys(criteria).length === 1
+        ? criteria.correlationId
+        : undefined;
+    stats.filter = {
+      ...(legacyCid !== undefined ? { correlationId: legacyCid } : {}),
+      criteria,
+      matchedCount: filtered.length,
+    };
+  }
+
+  return stats;
+}
+
+
 export function dumpLogoTelemetryAsJSON(
   origin: LogoTelemetryDump["origin"] = "console",
   opts: LogoDumpOptions = {},
@@ -854,6 +935,13 @@ export function attachLogoDebugUtil(): void {
         filter: LogoDumpFilter,
         origin?: LogoTelemetryDump["origin"],
       ) => string;
+      /**
+       * Aggregate counts (totalScanned, matchedCount, emitted vs
+       * suppressed errors, by-reason breakdown) over the ring buffer.
+       * Optional `opts` accepts the same filter shape as `dump()`.
+       */
+      getStats: (opts?: LogoDumpOptions) => LogoTelemetryStats;
+      getStatsAsJSON: (opts?: LogoDumpOptions) => string;
     };
   };
   w.__nevoLogoDebug = {
@@ -891,6 +979,8 @@ export function attachLogoDebugUtil(): void {
       copyLogoTelemetryDump(origin, { filter }),
     downloadDumpForFilter: (filter, origin = "console") =>
       downloadLogoTelemetryDump(origin, { filter }),
+    getStats: buildLogoTelemetryStats,
+    getStatsAsJSON: (opts) => JSON.stringify(buildLogoTelemetryStats(opts), null, 2),
   };
 }
 
