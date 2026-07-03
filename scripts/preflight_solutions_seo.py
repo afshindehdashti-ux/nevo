@@ -724,10 +724,13 @@ def probe(url: str) -> dict:
         this_kind = _classify_error(err or last_err or "", status)
         attempt_kinds.append(this_kind)
 
-        if this_kind not in RETRYABLE_ERROR_KINDS:
+        if this_kind not in RETRYABLE_ERROR_KINDS and not _status_class_retryable(status):
             # Deterministic failure — stop burning retries and backoff time.
+            # A status class/code listed in RETRYABLE_STATUS_CLASSES overrides
+            # this so e.g. 429/503 can still be retried.
             stopped_early = True
             break
+
 
         if attempt < RETRIES:
             time.sleep(_backoff_delay(attempt))
