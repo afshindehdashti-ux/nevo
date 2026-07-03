@@ -19,7 +19,8 @@ The alerts below match that shape:
 | File | Fires when | Latency | Use for |
 | --- | --- | --- | --- |
 | [`header-logo-spike.json`](./header-logo-spike.json) | Any single Sentry issue tagged `logger:header.logo` receives **≥ 10 events in 5 min** (comparisonType `count`) | ~5 min | Regression / mass-fail (e.g. CDN outage on `fallback-cdn-full`) |
-| [`header-logo-terminal.json`](./header-logo-terminal.json) | A new or reappeared Sentry issue tagged `logger:header.logo` **and** `terminal:true` | immediate | Real user got no logo at all — page-load-blocking severity |
+| [`header-logo-terminal.json`](./header-logo-terminal.json) | A new or reappeared Sentry issue tagged `logger:header.logo` **and** `terminal:true` (any terminal stage) | immediate | Real user got no logo at all — page-load-blocking severity |
+| [`header-logo-svg-terminal.json`](./header-logo-svg-terminal.json) | Same as above, narrowed to `stage:fallback-inline-svg` — the last link in the chain | immediate | Actionable P1: the inline SVG (last-resort fallback) failed — investigate CSP / data-URI blocking / MIME issues |
 
 Because each stage has its own fingerprint segment
 (`["header.logo.error", stage, fallbackChain, correlationId]`) Sentry groups
