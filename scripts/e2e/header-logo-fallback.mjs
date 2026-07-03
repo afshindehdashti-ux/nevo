@@ -88,24 +88,16 @@ try {
 
   // The SSR-served HTML starts loading the <img> before React hydrates, so
   // the initial load error fires *before* React attaches its onError
-  // listener and gets dropped. Once React has hydrated, re-poke the src to
+  // listener and gets dropped. Wait for hydration, then re-poke the src to
   // trigger a fresh (still-intercepted) request that React can observe.
-  await page.waitForFunction(
-    () => {
-      const el = document.querySelector('[data-testid="header-logo"]');
-      return el instanceof HTMLImageElement && el.complete;
-    },
-    null,
-    { timeout: 15_000 },
-  );
-  await page.waitForTimeout(500); // let hydration attach listeners
+  await page.waitForTimeout(1500);
   await logo.evaluate((el) => {
     const img = /** @type {HTMLImageElement} */ (el);
-    if (img.dataset.logoVariant === "light" && img.naturalWidth === 0) {
-      const src = img.src;
-      img.src = "";
-      img.src = src;
-    }
+    const src = img.src;
+    img.removeAttribute("src");
+    // Force a fresh network request so React's onError listener (attached
+    // after hydration) actually observes the failure this time.
+    img.src = src;
   });
 
   await page.waitForFunction(
@@ -120,6 +112,7 @@ try {
     null,
     { timeout: 15_000 },
   );
+
 
   const state = await logo.evaluate((el) => {
     const img = /** @type {HTMLImageElement} */ (el);
