@@ -632,12 +632,18 @@ export function buildLogoTelemetryDump(
   // Filter BEFORE redaction so we match against raw ids (a sensitive id
   // gets rewritten to "[redacted]" and would never match a QA-supplied
   // value).
-  const filtered =
-    opts.correlationId !== undefined
-      ? allDecisions.filter((d) => d.correlationId === opts.correlationId)
-      : allDecisions;
+  const criteria = resolveDumpFilter(opts);
+  const filtered = criteria
+    ? allDecisions.filter((d) => matchesLogoDumpFilter(d, criteria))
+    : allDecisions;
   const nav = typeof navigator !== "undefined" ? (navigator.userAgent ?? null) : null;
   const url = typeof window !== "undefined" && window.location ? window.location.href : null;
+  const legacyCid =
+    criteria &&
+    typeof criteria.correlationId === "string" &&
+    Object.keys(criteria).length === 1
+      ? criteria.correlationId
+      : undefined;
   const raw: LogoTelemetryDump = {
     schema: "nevo.logo-telemetry.dump/v1",
     capturedAt: new Date().toISOString(),
@@ -653,10 +659,11 @@ export function buildLogoTelemetryDump(
     // about the filter — so still report against the raw capture.
     decisionsTruncated: totalScanned >= 50,
     redactions: [],
-    ...(opts.correlationId !== undefined
+    ...(criteria
       ? {
           filter: {
-            correlationId: opts.correlationId,
+            ...(legacyCid !== undefined ? { correlationId: legacyCid } : {}),
+            criteria,
             matchedCount: filtered.length,
             totalScanned,
           },
