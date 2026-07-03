@@ -1090,6 +1090,15 @@ function PanelThicknessPage() {
           <PhoneCall className="size-4" />
           Talk to an Engineer
         </Link>
+        <button
+          type="button"
+          onClick={copyShareLink}
+          aria-live="polite"
+          className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+        >
+          {copied ? <Check className="size-4 text-emerald-400" /> : <Link2 className="size-4" />}
+          {copied ? "Link copied" : "Copy share link"}
+        </button>
       </div>
     </div>
   );
