@@ -1682,14 +1682,34 @@ function MetricCard({
     amber: "text-amber-300",
     rose: "text-rose-300",
   }[tone];
+  const labelId = `metric-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
-      <div className="mb-1 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-white/50">
-        <Icon className="size-3.5" />
+    <div
+      role="group"
+      aria-labelledby={labelId}
+      className="rounded-xl border border-white/10 bg-white/[0.02] p-3"
+    >
+      <div
+        id={labelId}
+        className="mb-1 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-white/50"
+      >
+        <Icon className="size-3.5" aria-hidden="true" />
         {label}
       </div>
-      <div className={`font-mono text-lg font-semibold ${toneCls}`}>{value}</div>
-      {unit && <div className="font-mono text-[10px] text-white/50">{unit}</div>}
+      <div
+        className={`font-mono text-lg font-semibold ${toneCls}`}
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <span className="sr-only">{label}: </span>
+        {value}
+        {unit && <span className="sr-only"> {unit}</span>}
+      </div>
+      {unit && (
+        <div className="font-mono text-[10px] text-white/50" aria-hidden="true">
+          {unit}
+        </div>
+      )}
     </div>
   );
 }
@@ -1701,13 +1721,24 @@ function ScoreBadge({
   label: string;
   value: "Excellent" | "Very Good" | "Good" | "Limited" | "Not Recommended";
 }) {
+  const labelId = `score-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return (
-    <div className={`rounded-xl border p-3 ${performanceBadge(value)}`}>
-      <div className="font-mono text-[10px] uppercase tracking-[0.2em] opacity-70">{label}</div>
-      <div className="mt-1 text-sm font-semibold">{value}</div>
+    <div
+      role="group"
+      aria-labelledby={labelId}
+      className={`rounded-xl border p-3 ${performanceBadge(value)}`}
+    >
+      <div id={labelId} className="font-mono text-[10px] uppercase tracking-[0.2em] opacity-70">
+        {label}
+      </div>
+      <div className="mt-1 text-sm font-semibold" aria-live="polite" aria-atomic="true">
+        <span className="sr-only">{label} rating: </span>
+        {value}
+      </div>
     </div>
   );
 }
+
 
 function ReportRow({ k, v }: { k: string; v: string }) {
   return (
