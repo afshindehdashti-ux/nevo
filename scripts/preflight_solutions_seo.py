@@ -30,6 +30,15 @@ Env:
                            the code list.
   FOLLOW_REDIRECTS     `true` (default) follows 3xx before checking status;
                        set `false` to accept raw 3xx via ACCEPT_STATUS.
+  USER_AGENT           override the request UA (default:
+                       `lovable-seo-preflight/1.0`). Set to a real browser UA
+                       when a site blocks bot UAs.
+  CUSTOM_HEADERS       extra request headers, one `Name: value` per line OR
+                       `Name=value` entries separated by `;`. Example:
+                       `Authorization: Bearer $TOKEN;Accept-Language: fa`.
+                       `$VAR` / `${VAR}` are expanded from env so secrets
+                       stay in Actions secrets, not the YAML. Sensitive
+                       header values are masked in logs and the summary.
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
