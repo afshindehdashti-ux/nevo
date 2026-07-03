@@ -64,8 +64,15 @@ Env:
                        failed URLs in the step summary. Default:
                        `Content-Type,Content-Length,Server,Retry-After,
                        Cache-Control,Age,Location,X-Cache,CF-Ray,Via`.
-                       Sensitive values (Set-Cookie, Authorization, …) are
-                       masked.
+                        Sensitive values (Set-Cookie, Authorization, …) are
+                        masked.
+  BODY_SNIPPET_CONTENT_TYPES
+                        comma-separated content types for which a body
+                        snippet is shown in the summary. Default:
+                        `text/*,application/json`. Binary responses
+                        (images, PDFs, archives, etc.) get an empty
+                        snippet to avoid dumping base64/null bytes.
+
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
@@ -296,6 +303,28 @@ BODY_HASH_ENABLED = os.environ.get("BODY_HASH", "true").strip().lower() not in (
 # (still whitespace-collapsed + truncated).
 BODY_SANITIZE_ENABLED = os.environ.get("BODY_SANITIZE", "true").strip().lower() not in ("0", "false", "no")
 
+# Content types for which a body snippet is useful in the step summary.
+# Binary responses (image/*, application/pdf, application/zip, etc.) produce
+# an empty snippet so the summary doesn't dump a wall of base64 or null bytes.
+# Supports wildcards (`text/*`) and parameters are ignored (`application/json;
+# charset=utf-8` matches). Default: text/* and application/json.
+_DEFAULT_SNIPPET_CONTENT_TYPES = ["text/*", "application/json"]
+_BODY_SNIPPET_CONTENT_TYPES_RAW = os.environ.get(
+    "BODY_SNIPPET_CONTENT_TYPES", ",".join(_DEFAULT_SNIPPET_CONTENT_TYPES)
+)
+BODY_SNIPPET_CONTENT_TYPES: list[tuple[str, str | None]] = []
+for _ct in (x.strip() for x in _BODY_SNIPPET_CONTENT_TYPES_RAW.split(",") if x.strip()):
+    _ct = _ct.lower()
+    if _ct.endswith("/*"):
+        BODY_SNIPPET_CONTENT_TYPES.append((_ct[:-2], None))  # wildcard subtype
+    elif "/" in _ct:
+        _main, _sub = _ct.split("/", 1)
+        BODY_SNIPPET_CONTENT_TYPES.append((_main, _sub))
+    else:
+        print(f"preflight: warning: skipping malformed BODY_SNIPPET_CONTENT_TYPES entry {_ct!r}", file=sys.stderr)
+
+
+
 # Patterns for redaction. Order matters: match longer/structured secrets first
 # so an email inside a JWT payload doesn't get partially replaced.
 import re as _re_mod
@@ -344,13 +373,35 @@ def _sanitize_snippet(text: str) -> str:
     return text
 
 
-def _body_preview(body: bytes) -> tuple[str, str]:
+def _content_type_allowed_for_snippet(content_type: str) -> bool:
+    """Return True if the response Content-Type is text-like enough to preview.
+
+    Empty/unknown content types are allowed (fail-open). Binary types such as
+    image/*, application/pdf, application/octet-stream, etc. return False so
+    the summary doesn't render a base64 or null-byte wall.
+    """
+    if not content_type:
+        return True
+    mt = content_type.split(";", 1)[0].strip().lower()
+    if not mt or "/" not in mt:
+        return True
+    main, sub = mt.split("/", 1)
+    for allowed_main, allowed_sub in BODY_SNIPPET_CONTENT_TYPES:
+        if main == allowed_main and (allowed_sub is None or sub == allowed_sub):
+            return True
+    return False
+
+
+def _body_preview(body: bytes, content_type: str = "") -> tuple[str, str]:
     """Return (sha256_short, snippet) for a failed-response body.
 
     snippet is whitespace-collapsed, truncated to BODY_SNIPPET_CHARS chars.
     When BODY_SANITIZE is enabled (default), scripts/styles/HTML tags are
     stripped and obvious secrets are redacted so the preview is readable
     and safe to paste into a public step summary.
+
+    The snippet is omitted (empty string) for binary responses whose
+    Content-Type is not in BODY_SNIPPET_CONTENT_TYPES.
     """
     import hashlib, re as _re
     if not body:
@@ -359,6 +410,8 @@ def _body_preview(body: bytes) -> tuple[str, str]:
     # "same error page as yesterday" regardless of sanitization changes.
     digest = hashlib.sha256(body).hexdigest()[:12] if BODY_HASH_ENABLED else ""
     if BODY_SNIPPET_CHARS <= 0:
+        return digest, ""
+    if not _content_type_allowed_for_snippet(content_type):
         return digest, ""
     try:
         text = body.decode("utf-8", errors="replace")
@@ -370,6 +423,7 @@ def _body_preview(body: bytes) -> tuple[str, str]:
     if len(text) > BODY_SNIPPET_CHARS:
         text = text[:BODY_SNIPPET_CHARS] + "…"
     return digest, text
+
 
 
 # Response headers surfaced for failed URLs in the step summary. Content-Type
@@ -498,12 +552,14 @@ def probe(url: str) -> dict:
                 "ms": ms, "attempts": attempts, "error": "", "method": http_method,
                 "error_kind": "ok"}
 
-    def _do_request(http_method: str) -> tuple[int | None, int, float, str, bytes, dict[str, str]]:
-        """Issue one request. Returns (status, size_bytes, ms, error, body, headers).
+    def _do_request(http_method: str) -> tuple[int | None, int, float, str, bytes, dict[str, str], str]:
+        """Issue one request. Returns (status, size_bytes, ms, error, body, headers, content_type).
 
         For HEAD, body is always b"" (no body). For GET, body carries whatever
         the server returned so failed probes can surface a snippet + hash.
         `headers` is the filtered response-header dict (see RESPONSE_HEADERS).
+        `content_type` is the raw Content-Type response header (used to decide
+        whether a body snippet is safe to render).
         """
         t0 = time.perf_counter()
         try:
@@ -516,34 +572,39 @@ def probe(url: str) -> dict:
             opener = urllib.request.urlopen if FOLLOW_REDIRECTS else _NO_REDIRECT_OPENER.open
             with opener(req, timeout=TIMEOUT) as r:
                 resp_headers = _pick_response_headers(r.headers)
+                content_type = r.headers.get("Content-Type", "")
                 if http_method == "HEAD":
                     return r.status, int(r.headers.get("Content-Length") or 0), \
-                        (time.perf_counter() - t0) * 1000, "", b"", resp_headers
+                        (time.perf_counter() - t0) * 1000, "", b"", resp_headers, content_type
                 body = r.read()
-                return r.status, len(body), (time.perf_counter() - t0) * 1000, "", body, resp_headers
+                return r.status, len(body), (time.perf_counter() - t0) * 1000, "", body, resp_headers, content_type
         except urllib.error.HTTPError as e:
             ms = (time.perf_counter() - t0) * 1000
             resp_headers = _pick_response_headers(e.headers) if e.headers else {}
+            content_type = e.headers.get("Content-Type", "") if e.headers else ""
             if http_method == "HEAD":
                 size = int(e.headers.get("Content-Length") or 0) if e.headers else 0
-                return e.code, size, ms, f"HTTP {e.code}", b"", resp_headers
+                return e.code, size, ms, f"HTTP {e.code}", b"", resp_headers, content_type
             try:
                 body = e.read() or b""
             except Exception:
                 body = b""
-            return e.code, len(body), ms, f"HTTP {e.code}", body, resp_headers
+            return e.code, len(body), ms, f"HTTP {e.code}", body, resp_headers, content_type
         except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
             ms = (time.perf_counter() - t0) * 1000
-            return None, 0, ms, f"{type(e).__name__}: {e}", b"", {}
+            return None, 0, ms, f"{type(e).__name__}: {e}", b"", {}, ""
 
     last_headers: dict[str, str] = {}
+    last_content_type = ""
     for attempt in range(1, RETRIES + 1):
         attempts = attempt
 
         first_method = "HEAD" if method_mode in ("HEAD", "HEAD_THEN_GET") else "GET"
-        status, size, ms, err, body, resp_headers = _do_request(first_method)
+        status, size, ms, err, body, resp_headers, content_type = _do_request(first_method)
         if resp_headers:
             last_headers = resp_headers
+        if content_type:
+            last_content_type = content_type
 
         if status is not None:
             ok = _evaluate(status, size, ms, first_method, body)
@@ -551,9 +612,11 @@ def probe(url: str) -> dict:
                 return ok
 
         if method_mode == "HEAD_THEN_GET" and first_method == "HEAD":
-            status2, size2, ms2, err2, body2, resp_headers2 = _do_request("GET")
+            status2, size2, ms2, err2, body2, resp_headers2, content_type2 = _do_request("GET")
             if resp_headers2:
                 last_headers = resp_headers2
+            if content_type2:
+                last_content_type = content_type2
             if status2 is not None:
                 ok2 = _evaluate(status2, size2, ms2, "GET", body2)
                 if ok2:
@@ -568,7 +631,8 @@ def probe(url: str) -> dict:
         if attempt < RETRIES:
             time.sleep(_backoff_delay(attempt))
 
-    body_hash, body_snippet = _body_preview(last_body)
+    body_hash, body_snippet = _body_preview(last_body, last_content_type)
+
     err_msg = last_err or "unknown error"
     return {"url": url, "ok": False, "status": last_status, "bytes": last_bytes,
             "ms": last_ms, "attempts": attempts,
@@ -657,8 +721,9 @@ def write_step_summary(results: list[dict]) -> None:
         lines.append("### Failed response bodies")
         lines.append("")
         lines.append("_Preview of what the server actually returned. Same hash across"
-                     " runs = same error page; empty snippet = no body (transport error"
-                     " or HEAD request). Response headers help pinpoint the source"
+                     " runs = same error page; empty snippet = no body (transport error,"
+                     " HEAD request, or binary response). Response headers help pinpoint"
+                     " the source"
                      " (origin vs CDN, cache hit, Retry-After, redirect target)._")
         lines.append("")
         for r in failures_with_detail:
