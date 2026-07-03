@@ -11,11 +11,20 @@ Env:
   BASE_URL             site to probe (default: http://127.0.0.1:8080)
   LOCALES              comma-separated locales to sample (default: en,ar,tr)
   TIMEOUT_SECONDS      per-request timeout (default: 20)
-  RETRIES              attempts per URL (default: 3)
+  RETRIES              max attempts per URL (default: 3). A probe stops
+                       early when the attempt's classified error_kind is not
+                       in RETRYABLE_ERROR_KINDS — deterministic failures
+                       (TLS, 4xx, body-too-small) do not retry.
+  RETRYABLE_ERROR_KINDS  comma list of error_kind values that are worth
+                       retrying (default:
+                       `timeout,connection_reset,connection_refused,connection_error,dns`).
+                       Set to `''` to disable retries entirely, or add
+                       `http_status` to also retry HTTP 4xx/5xx.
   BACKOFF_BASE_SECONDS backoff base; wait = base * factor**(attempt-1),
                        capped at BACKOFF_MAX_SECONDS (default: 2)
   BACKOFF_FACTOR       exponential factor (default: 2 → 2s, 4s, 8s …)
   BACKOFF_MAX_SECONDS  cap between retries (default: 30)
+
   MIN_BODY_BYTES       default minimum body size for HTML pages (default: 500)
   MIN_BODY_BYTES_SITEMAP   min bytes for /sitemap.xml (default: 200)
   MIN_BODY_BYTES_ROBOTS    min bytes for /robots.txt (default: 20)
@@ -142,7 +151,19 @@ RETRIES = int(_num("RETRIES", 3, int, minimum=1))
 BACKOFF_BASE = _num("BACKOFF_BASE_SECONDS", 2.0, float, minimum=0.0)
 BACKOFF_FACTOR = _num("BACKOFF_FACTOR", 2.0, float, minimum=1.0)
 BACKOFF_MAX = _num("BACKOFF_MAX_SECONDS", 30.0, float, minimum=0.0)
+
+# Which error_kind values are worth retrying. Transient network faults
+# (timeouts, resets, refused, DNS blips) retry by default; deterministic
+# failures (TLS handshake mismatch, HTTP 4xx, body-too-small, unknown) do
+# not — retrying them just burns time and inflates latency stats.
+_DEFAULT_RETRYABLE = "timeout,connection_reset,connection_refused,connection_error,dns"
+RETRYABLE_ERROR_KINDS: set[str] = {
+    k.strip().lower()
+    for k in (os.environ.get("RETRYABLE_ERROR_KINDS") or _DEFAULT_RETRYABLE).split(",")
+    if k.strip()
+}
 IN_GHA = os.environ.get("GITHUB_ACTIONS") == "true"
+
 
 # Minimum body size (bytes) that indicates a real page vs. an SPA error shell.
 # All defaults are env-tunable so noisy / lightweight endpoints can be dialed in.
@@ -602,6 +623,8 @@ def probe(url: str) -> dict:
 
     last_headers: dict[str, str] = {}
     last_content_type = ""
+    attempt_kinds: list[str] = []
+    stopped_early = False
     for attempt in range(1, RETRIES + 1):
         attempts = attempt
 
@@ -615,6 +638,8 @@ def probe(url: str) -> dict:
         if status is not None:
             ok = _evaluate(status, size, ms, first_method, body)
             if ok:
+                ok["attempt_kinds"] = attempt_kinds + ["ok"]
+                ok["final_kind"] = "ok"
                 return ok
 
         if method_mode == "HEAD_THEN_GET" and first_method == "HEAD":
@@ -626,13 +651,29 @@ def probe(url: str) -> dict:
             if status2 is not None:
                 ok2 = _evaluate(status2, size2, ms2, "GET", body2)
                 if ok2:
+                    ok2["attempt_kinds"] = attempt_kinds + ["ok"]
+                    ok2["final_kind"] = "ok"
                     return ok2
+                # Use the GET result as the attempt's classified outcome.
+                status, err = status2, last_err
             elif err2:
                 last_err = err2
+                last_ms = ms2
+                status, err = None, err2
 
         elif status is None:
             last_err = err
             last_ms = ms
+
+        # Classify this attempt so we can (a) decide whether to retry and
+        # (b) show the per-attempt trail in the result.
+        this_kind = _classify_error(err or last_err or "", status)
+        attempt_kinds.append(this_kind)
+
+        if this_kind not in RETRYABLE_ERROR_KINDS:
+            # Deterministic failure — stop burning retries and backoff time.
+            stopped_early = True
+            break
 
         if attempt < RETRIES:
             time.sleep(_backoff_delay(attempt))
@@ -640,12 +681,17 @@ def probe(url: str) -> dict:
     body_hash, body_snippet = _body_preview(last_body, last_content_type)
 
     err_msg = last_err or "unknown error"
+    final_kind = _classify_error(err_msg, last_status)
     return {"url": url, "ok": False, "status": last_status, "bytes": last_bytes,
             "ms": last_ms, "attempts": attempts,
             "error": err_msg, "method": last_method or method_mode,
             "body_hash": body_hash, "body_snippet": body_snippet,
             "response_headers": last_headers,
-            "error_kind": _classify_error(err_msg, last_status)}
+            "error_kind": final_kind,
+            "final_kind": final_kind,
+            "attempt_kinds": attempt_kinds,
+            "stopped_early": stopped_early}
+
 
 
 
@@ -832,11 +878,12 @@ def write_step_summary(results: list[dict]) -> None:
 # Columns exported to CSV. Order is stable so downstream analysis (spreadsheet
 # pivots, `duckdb read_csv_auto`, pandas) sees the same schema across runs.
 _CSV_COLUMNS: list[str] = [
-    "url", "ok", "method", "status", "error_kind", "error",
-    "ms", "bytes", "attempts",
+    "url", "ok", "method", "status", "error_kind", "final_kind", "error",
+    "ms", "bytes", "attempts", "attempt_kinds", "stopped_early",
     "body_hash", "body_snippet", "content_type",
     "response_headers",
 ]
+
 
 
 def _flatten_for_csv(r: dict) -> dict:
@@ -853,10 +900,14 @@ def _flatten_for_csv(r: dict) -> dict:
         "method": r.get("method") or "",
         "status": "" if r.get("status") is None else r.get("status"),
         "error_kind": r.get("error_kind") or "",
+        "final_kind": r.get("final_kind") or r.get("error_kind") or "",
         "error": r.get("error") or "",
         "ms": f"{float(r.get('ms') or 0):.1f}",
         "bytes": r.get("bytes") or 0,
         "attempts": r.get("attempts") or 0,
+        "attempt_kinds": ">".join(r.get("attempt_kinds") or []),
+        "stopped_early": "true" if r.get("stopped_early") else "false",
+
         "body_hash": r.get("body_hash") or "",
         # Collapse newlines so the snippet stays in one CSV cell.
         "body_snippet": (r.get("body_snippet") or "").replace("\r", " ").replace("\n", " "),
@@ -932,7 +983,11 @@ def main() -> int:
         detail = r["error"] if r["error"] else f"{r['bytes']}B"
         meth = r.get("method") or METHOD
         kind = r.get("error_kind") or ("ok" if r["ok"] else "unknown")
-        print(f"  {marker} [{meth} {http} {kind}] {r['ms']:6.0f}ms  {r['url']} — {detail}")
+        trail = ">".join(r.get("attempt_kinds") or []) or "-"
+        stop = " (stopped early)" if r.get("stopped_early") else ""
+        print(f"  {marker} [{meth} {http} {kind}] {r['ms']:6.0f}ms "
+              f"attempts={r['attempts']} trail={trail}{stop}  {r['url']} — {detail}")
+
 
     write_step_summary(results)
     export_results(results)
