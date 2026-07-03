@@ -1374,6 +1374,9 @@ def export_results(results: list[dict]) -> None:
       RESULTS_INCLUDE      filter rows on disk (see grammar in module docstring)
       BREAKDOWN_CSV_PATH   write the error_kind × status_class breakdown as CSV
       BREAKDOWN_JSON_PATH  same breakdown as JSON (list of dicts)
+      HEATMAP_CSV_PATH     write the latency heatmap bin counts as CSV
+                           (one row per error_kind × status_class combo,
+                           one column per latency bucket)
     All files are also linked from $GITHUB_STEP_SUMMARY when set.
     """
     import csv
@@ -1383,7 +1386,8 @@ def export_results(results: list[dict]) -> None:
     json_path = os.environ.get("RESULTS_JSON_PATH", "").strip()
     bd_csv = os.environ.get("BREAKDOWN_CSV_PATH", "").strip()
     bd_json = os.environ.get("BREAKDOWN_JSON_PATH", "").strip()
-    if not any((csv_path, json_path, bd_csv, bd_json)):
+    heatmap_csv = os.environ.get("HEATMAP_CSV_PATH", "").strip()
+    if not any((csv_path, json_path, bd_csv, bd_json, heatmap_csv)):
         return
 
     raw_scope = (os.environ.get("RESULTS_INCLUDE") or "all").strip()
