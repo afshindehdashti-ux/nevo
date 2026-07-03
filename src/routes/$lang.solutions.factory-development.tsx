@@ -86,7 +86,23 @@ const SYSTEMS = [
 
 export const Route = createFileRoute("/$lang/solutions/factory-development")({
   head: ({ params }) => {
-    const seo = buildSeo({ title: TITLE, description: DESCRIPTION, path: URL_PATH, lang: params.lang });
+    const canonical = `${SITE.url}/${params.lang}${URL_PATH}`;
+    const seo = buildSeo({
+      title: TITLE,
+      description: DESCRIPTION,
+      path: URL_PATH,
+      lang: params.lang,
+      keywords: [
+        "turnkey sandwich panel factory",
+        "sandwich panel plant development",
+        "sandwich panel manufacturing plant",
+        "factory master planning",
+        "PIR panel factory",
+        "PUR panel factory setup",
+        "greenfield sandwich panel investment",
+        "sandwich panel factory Dubai",
+      ],
+    });
     return {
       ...seo,
       scripts: [
@@ -95,10 +111,13 @@ export const Route = createFileRoute("/$lang/solutions/factory-development")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Service",
-            name: "Sandwich Panel Factory Development",
-            provider: { "@type": "Organization", name: "NEVO Industrial" },
-            areaServed: ["AE", "SA", "OM", "TR", "IQ", "KE", "CM", "RU"],
+            name: "Turnkey Sandwich Panel Factory Development",
+            serviceType: "Turnkey industrial factory development",
+            provider: { "@type": "Organization", name: SITE.name, url: SITE.url },
+            areaServed: ["AE", "SA", "OM", "QA", "KW", "TR", "IQ", "KE", "CM", "RU"],
+            url: canonical,
             description: DESCRIPTION,
+            category: ["Feasibility", "Master planning", "Building & utilities", "Line procurement", "Commissioning", "Ramp-up"],
           }),
         },
         {
@@ -107,9 +126,9 @@ export const Route = createFileRoute("/$lang/solutions/factory-development")({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-              { "@type": "ListItem", position: 2, name: "Solutions", item: "/solutions" },
-              { "@type": "ListItem", position: 3, name: "Factory Development", item: URL_PATH },
+              { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/${params.lang}` },
+              { "@type": "ListItem", position: 2, name: "Solutions", item: `${SITE.url}/${params.lang}/solutions` },
+              { "@type": "ListItem", position: 3, name: "Factory Development", item: canonical },
             ],
           }),
         },
