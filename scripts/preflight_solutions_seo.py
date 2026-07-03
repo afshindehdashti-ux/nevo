@@ -60,6 +60,12 @@ Env:
                        from the snippet and redacts obvious secrets (JWTs,
                        bearer tokens, api_key=…, emails, long hex, AWS/SB
                        keys). Set `false` to render raw text.
+  RESPONSE_HEADERS     comma-separated response headers to surface for
+                       failed URLs in the step summary. Default:
+                       `Content-Type,Content-Length,Server,Retry-After,
+                       Cache-Control,Age,Location,X-Cache,CF-Ray,Via`.
+                       Sensitive values (Set-Cookie, Authorization, …) are
+                       masked.
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
