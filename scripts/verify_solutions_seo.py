@@ -278,10 +278,40 @@ def main() -> int:
 
 
 
-    # Machine JSON report
+    # Machine JSON report — enriched with a flat `issues` list carrying
+    # {url, path, locale, issue_code, message, fix, file_path} per failure so
+    # downstream analysis can group by code or file without re-parsing messages.
     if p := os.environ.get("REPORT_JSON"):
         Path(p).parent.mkdir(parents=True, exist_ok=True)
-        Path(p).write_text(json.dumps({"base": BASE, "total": len(results), "failed": len(failed), "results": results}, indent=2))
+        issues_flat = []
+        for r in failed:
+            file_path = ROUTE_FILES.get(r["path"], "src/routes/__root.tsx")
+            for f in r["failures"]:
+                issues_flat.append({
+                    "url": r["url"],
+                    "locale": r["locale"],
+                    "path": r["path"],
+                    "issue_code": issue_code(f),
+                    "message": f,
+                    "fix": suggest_fix(f),
+                    "file_path": file_path,
+                })
+        by_code: dict[str, int] = {}
+        for i in issues_flat:
+            by_code[i["issue_code"]] = by_code.get(i["issue_code"], 0) + 1
+        payload = {
+            "base": BASE,
+            "generated_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
+            "total": len(results),
+            "passed": len(results) - len(failed),
+            "failed": len(failed),
+            "issue_count": len(issues_flat),
+            "by_code": by_code,
+            "issues": issues_flat,
+            "results": results,
+        }
+        Path(p).write_text(json.dumps(payload, indent=2, ensure_ascii=False))
+
 
     # GitHub step summary markdown
     if p := os.environ.get("REPORT_MD"):
