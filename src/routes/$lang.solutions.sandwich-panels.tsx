@@ -159,7 +159,13 @@ function SandwichPanelsPage() {
         <Sustainability />
         <DownloadsCTA />
         <FAQSection />
-        <InquiryCTA />
+        <InquiryCTA
+          source="panels"
+          eyebrow="Panel inquiry"
+          title="Request a panel quotation."
+          lede="Share your panel specifications, quantities, application and destination. A NEVO panel specialist responds with a technical and commercial proposal within one business day."
+          ctaLabel="Request Panel Quotation"
+        />
         <FinalCTA />
       </main>
       <SiteFooter />
