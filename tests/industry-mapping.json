@@ -1,0 +1,17 @@
+{
+  "_comment": "Approved industry card mapping. Order MUST match INDUSTRY_IMGS / INDUSTRY_ICONS in src/routes/$lang.industries.tsx. sha256 pins the approved image for each slot so a mismatched image swap is caught in CI. After an intentional image change, update the sha256 here in the same commit.",
+  "industries": [
+    { "slot": 1,  "slug": "cold-storage",         "tile": "tile-01.jpg", "icon": "Snowflake",       "sha256": "032cc0f54d1cb24625e3cafa4cef89f5fbedb07bb348a4405976270411a860ae" },
+    { "slot": 2,  "slug": "pharma-labs",          "tile": "tile-02.jpg", "icon": "FlaskConical",    "sha256": "13e8c53ddf4c035b9fe562f0d4ac4d41ce68225d1a3e20bb2d5413349423bc90" },
+    { "slot": 3,  "slug": "food-processing",      "tile": "tile-03.jpg", "icon": "UtensilsCrossed", "sha256": "2b1bce1e2b5171d43fa016be013240c1831d1dd386c26e9d5db42cf79d7e541b" },
+    { "slot": 4,  "slug": "industrial-factories", "tile": "tile-04.jpg", "icon": "Factory",         "sha256": "79e3eb05e903ff7c7ed36c68fbb9ef4de8a8aaceba3152fc33d6c5af501e0d31" },
+    { "slot": 5,  "slug": "warehousing-logistics","tile": "tile-05.jpg", "icon": "Warehouse",       "sha256": "f93df930079431e711089ac3735e7ec3f87b175057c4b4aa957f55f025a64a1a" },
+    { "slot": 6,  "slug": "commercial-buildings", "tile": "tile-06.jpg", "icon": "Building2",       "sha256": "f0abb3c20cd902b7a095ec4eae548a62a04951fd4d092af129f76086538d4cfe" },
+    { "slot": 7,  "slug": "agriculture-poultry",  "tile": "tile-07.jpg", "icon": "Wheat",           "sha256": "b3a6897c1054a2b109a43351153145c0c0a2be6233765379ded3e6caa1a0876c" },
+    { "slot": 8,  "slug": "modular-portable",     "tile": "tile-08.jpg", "icon": "Container",       "sha256": "ef897860607741041647096ed193892bf9eba80492f1bd87cdd43f4e50ad183a" },
+    { "slot": 9,  "slug": "data-centers",         "tile": "tile-09.jpg", "icon": "Server",          "sha256": "1701820eb77628077b9589c50c25c75ee7c9908d2dd87d3c2d07a815b245e018" },
+    { "slot": 10, "slug": "retail-supermarkets",  "tile": "tile-10.jpg", "icon": "ShoppingBag",     "sha256": "2e0fbf16104e7bfc3ac6aa0304f95d6c32b910414c1c4c3fd433f394d9d01232" },
+    { "slot": 11, "slug": "sports-recreation",    "tile": "tile-11.jpg", "icon": "Trophy",          "sha256": "1c00a20130ab68140b8f264316c729df908de4cb9bff216ed61c386c96ae8551" },
+    { "slot": 12, "slug": "airports-hangars",     "tile": "tile-12.jpg", "icon": "Plane",           "sha256": "62172b5be7194ddf0238968ef5ee441eb95bca580f4372d4dafbb81e9b575792" }
+  ]
+}
