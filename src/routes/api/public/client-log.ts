@@ -119,6 +119,8 @@ export const Route = createFileRoute("/api/public/client-log")({
                 natural_width: num(extra.naturalWidth),
                 natural_height: num(extra.naturalHeight),
                 online: typeof extra.online === "boolean" ? extra.online : null,
+                schema: str(extra.schema, 64),
+                schema_version: num(extra.schemaVersion),
                 route: str(e.route, 200),
                 url: str(e.url, 400),
                 ua: str(e.ua, 240),
