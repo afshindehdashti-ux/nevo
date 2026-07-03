@@ -362,22 +362,72 @@ export type LogoTelemetryDump = {
    */
   disabled?: boolean;
   /**
-   * Set when the dump was scoped to a single correlationId so QA can
-   * share a minimal blob for one incident. `matchedCount` counts the
-   * raw ring-buffer entries that matched BEFORE redaction so a reporter
-   * can tell "0 matches" apart from "filter dropped everything".
+   * Set when the dump was scoped with any of the fields on
+   * `LogoDumpFilter` (kind, decision, reason, stage, terminal,
+   * correlationId). `matchedCount` counts raw ring-buffer entries that
+   * matched BEFORE redaction so a reporter can tell "0 matches" apart
+   * from "filter dropped everything". `correlationId` is kept as a
+   * top-level shortcut for back-compat with single-id dumps; the full
+   * criteria object is always exposed under `criteria`.
    */
   filter?: {
-    correlationId: string;
+    correlationId?: string;
+    criteria: LogoDumpFilter;
     matchedCount: number;
     totalScanned: number;
   };
 };
 
-export type LogoDumpOptions = {
-  /** Filter decisions to only those whose correlationId strictly equals this. */
-  correlationId?: string;
+/**
+ * Multi-field filter for `buildLogoTelemetryDump` and friends. Every
+ * field is optional; a scalar matches by equality and an array matches
+ * by "any of". A decision must satisfy ALL provided fields to be kept
+ * (AND across fields, OR within a field).
+ */
+export type LogoDumpFilter = {
+  kind?: LogoDecisionRecord["kind"] | Array<LogoDecisionRecord["kind"]>;
+  decision?: LogoDecisionRecord["decision"] | Array<LogoDecisionRecord["decision"]>;
+  reason?: string | string[];
+  stage?: string | string[];
+  terminal?: boolean;
+  correlationId?: string | string[];
 };
+
+export type LogoDumpOptions = {
+  /**
+   * Shortcut for `{ filter: { correlationId } }` — kept for back-compat
+   * with the single-incident dump helpers. If both are supplied,
+   * `filter` wins.
+   */
+  correlationId?: string;
+  /** Multi-field filter across kind/decision/reason/stage/terminal/correlationId. */
+  filter?: LogoDumpFilter;
+};
+
+function matchField<T>(want: T | T[] | undefined, actual: T): boolean {
+  if (want === undefined) return true;
+  return Array.isArray(want) ? (want as T[]).includes(actual) : want === actual;
+}
+
+export function matchesLogoDumpFilter(
+  d: LogoDecisionRecord,
+  f: LogoDumpFilter,
+): boolean {
+  return (
+    matchField(f.kind, d.kind) &&
+    matchField(f.decision, d.decision) &&
+    matchField(f.reason, d.reason) &&
+    matchField(f.stage as string | string[] | undefined, d.stage as string) &&
+    (f.terminal === undefined || d.terminal === f.terminal) &&
+    matchField(f.correlationId as string | string[] | undefined, d.correlationId as string)
+  );
+}
+
+function resolveDumpFilter(opts: LogoDumpOptions): LogoDumpFilter | undefined {
+  if (opts.filter) return opts.filter;
+  if (opts.correlationId !== undefined) return { correlationId: opts.correlationId };
+  return undefined;
+}
 
 const REDACTED = "[redacted]";
 
