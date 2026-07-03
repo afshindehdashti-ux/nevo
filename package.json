@@ -27,6 +27,7 @@
     "sitemap:status": "python3 scripts/submit_sitemap.py --skip-submit",
     "verify:solutions-seo": "python3 scripts/verify_solutions_seo.py",
     "verify:solutions-seo:warn": "python3 scripts/verify_solutions_seo.py --warn-only",
+    "verify:solutions-seo:group": "python3 scripts/verify_solutions_seo.py --group-annotations",
     "verify:solutions-seo:json": "python3 scripts/verify_solutions_seo.py --json",
     "verify:publish": "node scripts/verify-publish.mjs",
     "test": "vitest run",
