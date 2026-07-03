@@ -1416,11 +1416,20 @@ function PanelThicknessPage() {
         </p>
       </div>
 
+      {hasErrors && (
+        <p role="alert" className="flex items-start gap-2 text-xs text-rose-300">
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+          Resolve the {errors.length} configuration {errors.length === 1 ? "issue" : "issues"} in the Inputs tab before exporting a report or requesting an engineering recommendation.
+        </p>
+      )}
       <div className="flex flex-wrap gap-3">
         <button
           type="button"
           onClick={downloadReport}
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300"
+          disabled={hasErrors}
+          aria-disabled={hasErrors || undefined}
+          title={hasErrors ? "Resolve configuration issues to enable" : undefined}
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-400"
         >
           <Download className="size-4" />
           Download Calculation Report
@@ -1428,18 +1437,32 @@ function PanelThicknessPage() {
         <button
           type="button"
           onClick={downloadPdfReport}
-          className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90"
+          disabled={hasErrors}
+          aria-disabled={hasErrors || undefined}
+          title={hasErrors ? "Resolve configuration issues to enable" : undefined}
+          className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
         >
           <Download className="size-4" />
           Download PDF Report
         </button>
-        <Link
-          to={`/project-inquiry?${inquiryParams}` as never}
-          className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
-        >
-          <ArrowRight className="size-4" />
-          Request Engineering Recommendation
-        </Link>
+        {hasErrors ? (
+          <span
+            aria-disabled="true"
+            className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/40"
+          >
+            <ArrowRight className="size-4" />
+            Request Engineering Recommendation
+          </span>
+        ) : (
+          <Link
+            to={`/project-inquiry?${inquiryParams}` as never}
+            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+          >
+            <ArrowRight className="size-4" />
+            Request Engineering Recommendation
+          </Link>
+        )}
+
         <Link
           to={"/contact" as never}
           className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
