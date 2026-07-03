@@ -1466,6 +1466,21 @@ def main() -> int:
               f"attempts={r['attempts']} trail={trail}{stop}  {r['url']} — {detail}")
 
 
+    # Per-combo latency percentiles, printed regardless of failure state so
+    # trend data (p95/p99 regressions on healthy runs) is captured too.
+    breakdown = _build_breakdown_rows(results)
+    if breakdown:
+        print("\nLatency by error_kind × status_class "
+              "(count/failed  avg  p50 / p95 / p99  max):")
+        for row in breakdown:
+            print(f"  {row['error_kind']:>16s} × {row['status_class']:<4s} "
+                  f"{row['count']:>3d}/{row['failed']:<3d}  "
+                  f"avg {row['ms_avg']:>7.1f}ms  "
+                  f"p50 {row['ms_p50']:>7.1f}  "
+                  f"p95 {row['ms_p95']:>7.1f}  "
+                  f"p99 {row['ms_p99']:>7.1f}  "
+                  f"max {row['ms_max']:>7.1f}")
+
     write_step_summary(results)
     export_results(results)
 
