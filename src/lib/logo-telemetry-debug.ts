@@ -552,6 +552,7 @@ async function copyLogoTelemetryDump(
 export function downloadLogoTelemetryDump(
   origin: LogoTelemetryDump["origin"] = "console",
 ): string {
+  if (!isLogoDebugBuildEnabled()) return "";
   const json = dumpLogoTelemetryAsJSON(origin);
   if (typeof window === "undefined" || typeof document === "undefined") {
     return json;
