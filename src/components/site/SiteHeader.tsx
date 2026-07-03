@@ -406,23 +406,23 @@ export function SiteHeader() {
                       img.dataset.fallbackStep = "2";
                       img.dataset.logoVariant = "fallback-svg";
                       if (shouldLogError("fallback-cdn-full", false)) {
-                        logClientEvent("header.logo.error", {
+                        logClientEvent("header.logo.error", withLogoEventSchema({
                           correlationId,
                           stage: "fallback-cdn-full",
                           failedSrc,
                           nextSrc: "inline-svg",
                           viewportWidth: window.innerWidth,
                           online: navigator.onLine,
-                        }, "error");
+                        }), "error");
                       }
                       img.src = LOGO_FALLBACK_SVG;
                     } else if (shouldLogError("fallback-inline-svg", true)) {
-                      logClientEvent("header.logo.error", {
+                      logClientEvent("header.logo.error", withLogoEventSchema({
                         correlationId,
                         stage: "fallback-inline-svg",
                         failedSrc,
                         terminal: true,
-                      }, "error");
+                      }), "error");
                     }
 
 
