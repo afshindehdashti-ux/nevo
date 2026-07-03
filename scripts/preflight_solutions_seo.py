@@ -411,6 +411,65 @@ def _render_response_headers_md(headers: dict[str, str]) -> str:
     return " · ".join(parts)
 
 
+# Coarse error taxonomy so the summary distinguishes "server was slow" from
+# "server rejected us" from "we never reached the server". Kinds:
+#   timeout           — request exceeded TIMEOUT_SECONDS
+#   dns               — hostname failed to resolve
+#   tls               — SSL/TLS handshake or cert validation failed
+#   connection_reset  — peer sent RST mid-stream
+#   connection_refused— nothing listening on that port
+#   connection_error  — other socket-level failure (broken pipe, unreachable)
+#   http_status       — got an HTTP response but the code isn't in ACCEPT_STATUS
+#   body_too_small    — 2xx but body < MIN_BODY_BYTES (likely SPA error shell)
+#   ok                — probe succeeded
+#   unknown           — none of the above patterns matched
+def _classify_error(err: str, status: int | None) -> str:
+    if not err:
+        return "ok"
+    low = err.lower()
+    if "body" in low and "< min" in low:
+        return "body_too_small"
+    if status is not None and low.startswith("http "):
+        return "http_status"
+    if "timeout" in low or "timed out" in low:
+        return "timeout"
+    if any(s in low for s in (
+        "name or service not known", "nodename nor servname",
+        "getaddrinfo", "temporary failure in name resolution",
+        "no address associated", "name resolution",
+    )):
+        return "dns"
+    if any(s in low for s in (
+        "ssl", "tls", "certificate", "cert verify", "handshake",
+        "sslerror", "sslcertverificationerror",
+    )):
+        return "tls"
+    if "connection reset" in low or "connectionresete" in low:
+        return "connection_reset"
+    if "connection refused" in low or "connectionrefused" in low:
+        return "connection_refused"
+    if any(s in low for s in (
+        "connection", "broken pipe", "network is unreachable",
+        "no route to host", "host is down", "urlerror",
+    )):
+        return "connection_error"
+    return "unknown"
+
+
+_ERROR_KIND_LABELS: dict[str, str] = {
+    "ok": "✅ ok",
+    "timeout": "⏱ timeout",
+    "dns": "🌐 dns",
+    "tls": "🔒 tls",
+    "connection_reset": "🔌 reset",
+    "connection_refused": "🚫 refused",
+    "connection_error": "🔗 net",
+    "http_status": "📄 http",
+    "body_too_small": "📉 body",
+    "unknown": "❓ unknown",
+}
+
+
 def probe(url: str) -> dict:
     """Probe a URL with retries. Return a result dict with timing/status."""
     path = urlparse(url).path
@@ -436,7 +495,8 @@ def probe(url: str) -> dict:
             return None
         last_err = ""
         return {"url": url, "ok": True, "status": status, "bytes": body_bytes,
-                "ms": ms, "attempts": attempts, "error": "", "method": http_method}
+                "ms": ms, "attempts": attempts, "error": "", "method": http_method,
+                "error_kind": "ok"}
 
     def _do_request(http_method: str) -> tuple[int | None, int, float, str, bytes, dict[str, str]]:
         """Issue one request. Returns (status, size_bytes, ms, error, body, headers).
@@ -509,11 +569,13 @@ def probe(url: str) -> dict:
             time.sleep(_backoff_delay(attempt))
 
     body_hash, body_snippet = _body_preview(last_body)
+    err_msg = last_err or "unknown error"
     return {"url": url, "ok": False, "status": last_status, "bytes": last_bytes,
             "ms": last_ms, "attempts": attempts,
-            "error": last_err or "unknown error", "method": last_method or method_mode,
+            "error": err_msg, "method": last_method or method_mode,
             "body_hash": body_hash, "body_snippet": body_snippet,
-            "response_headers": last_headers}
+            "response_headers": last_headers,
+            "error_kind": _classify_error(err_msg, last_status)}
 
 
 
@@ -554,9 +616,22 @@ def write_step_summary(results: list[dict]) -> None:
         f"- **{ok_count}/{len(results)}** healthy",
         f"- Total wall time: **{total_ms:.0f} ms**",
         f"- Slowest response: **{slowest:.0f} ms**",
+    ]
+
+    # Failure-kind breakdown: shows at a glance whether the run is dominated
+    # by timeouts (latency), DNS/TLS (infra) or HTTP errors (app/content).
+    from collections import Counter
+    kinds = Counter(r.get("error_kind") or ("ok" if r["ok"] else "unknown")
+                    for r in results if not r["ok"])
+    if kinds:
+        parts = [f"{_ERROR_KIND_LABELS.get(k, k)} × **{n}**"
+                 for k, n in kinds.most_common()]
+        lines.append(f"- Failure kinds: {' · '.join(parts)}")
+
+    lines += [
         "",
-        "| Status | URL | Method | HTTP | Time (ms) | Size | Attempts | Notes |",
-        "| :---: | --- | :---: | ---: | ---: | ---: | ---: | --- |",
+        "| Status | Kind | URL | Method | HTTP | Time (ms) | Size | Attempts | Notes |",
+        "| :---: | :---: | --- | :---: | ---: | ---: | ---: | ---: | --- |",
     ]
     for r in sorted(results, key=lambda x: (x["ok"], -x["ms"])):
         marker = "✅" if r["ok"] else "❌"
@@ -565,8 +640,10 @@ def write_step_summary(results: list[dict]) -> None:
         size = f"{r['bytes']:,} B" if r["bytes"] else "—"
         note = _md_cell(r["error"]) if r["error"] else "ok"
         meth = r.get("method") or METHOD
+        kind = _ERROR_KIND_LABELS.get(r.get("error_kind") or ("ok" if r["ok"] else "unknown"),
+                                       r.get("error_kind") or "—")
         lines.append(
-            f"| {marker} | [{_md_cell(rel)}]({r['url']}) | `{meth}` "
+            f"| {marker} | {kind} | [{_md_cell(rel)}]({r['url']}) | `{meth}` "
             f"| `{http}` | {r['ms']:.0f} | {size} | {r['attempts']} | {note} |"
         )
     lines.append("")
@@ -619,7 +696,8 @@ def main() -> int:
         http = r["status"] if r["status"] is not None else "-"
         detail = r["error"] if r["error"] else f"{r['bytes']}B"
         meth = r.get("method") or METHOD
-        print(f"  {marker} [{meth} {http}] {r['ms']:6.0f}ms  {r['url']} — {detail}")
+        kind = r.get("error_kind") or ("ok" if r["ok"] else "unknown")
+        print(f"  {marker} [{meth} {http} {kind}] {r['ms']:6.0f}ms  {r['url']} — {detail}")
 
     write_step_summary(results)
 
@@ -627,8 +705,9 @@ def main() -> int:
     if failures:
         for r in failures:
             if IN_GHA:
+                kind = r.get("error_kind") or "unknown"
                 print(
-                    f"::error title=Preflight failure::{r['url']} "
+                    f"::error title=Preflight {kind}::{r['url']} "
                     f"[HTTP {r['status']}] {r['ms']:.0f}ms — {r['error']}",
                     flush=True,
                 )
