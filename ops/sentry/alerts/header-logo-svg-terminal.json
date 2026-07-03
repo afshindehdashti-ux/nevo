@@ -1,0 +1,66 @@
+{
+  "$schema": "https://docs.sentry.io/api/alerts/create-an-issue-alert-rule-for-a-project/",
+  "name": "header.logo.error · SVG fallback failed (terminal)",
+  "owner": null,
+  "environment": "production",
+  "actionMatch": "all",
+  "filterMatch": "all",
+  "frequency": 5,
+  "_notes": {
+    "why": "The inline-SVG fallback is the LAST link in the header logo chain. If it fires terminal=true the header is showing a broken/empty image to real users — nothing further will save it, so alert immediately.",
+    "fingerprint": "Events are grouped in the SDK by ['header.logo.error', stage, fallback_chain, correlationId] — see fingerprint block in src/lib/sentry-forwarder.server.ts. That means one Sentry issue per (stage, chain, page load); this rule notifies once per NEW issue and again if a resolved one reappears, so terminal SVG failures never sit unseen.",
+    "actionMatch": "all conditions must fire — first-seen OR reappeared triggers, both filters must match (logger + stage + terminal).",
+    "frequency_minutes": "Sentry re-notifies at most every 5 minutes per issue to avoid pager fatigue during a broad outage; the fingerprint already dedupes bursts.",
+    "install": "POST this JSON to /api/0/projects/{org}/{project}/rules/ or paste via Alerts → Create Alert → Issue Alert → View as JSON."
+  },
+  "conditions": [
+    {
+      "id": "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition"
+    },
+    {
+      "id": "sentry.rules.conditions.reappeared_event.ReappearedEventCondition"
+    },
+    {
+      "id": "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
+      "interval": "5m",
+      "value": 1,
+      "comparisonType": "count"
+    }
+  ],
+  "filters": [
+    {
+      "id": "sentry.rules.filters.tagged_event.TaggedEventFilter",
+      "key": "logger",
+      "match": "eq",
+      "value": "header.logo"
+    },
+    {
+      "id": "sentry.rules.filters.tagged_event.TaggedEventFilter",
+      "key": "stage",
+      "match": "eq",
+      "value": "fallback-inline-svg"
+    },
+    {
+      "id": "sentry.rules.filters.tagged_event.TaggedEventFilter",
+      "key": "terminal",
+      "match": "eq",
+      "value": "true"
+    },
+    {
+      "id": "sentry.rules.filters.level.LevelFilter",
+      "match": "gte",
+      "level": "40"
+    }
+  ],
+  "actions": [
+    {
+      "id": "sentry.mail.actions.NotifyEmailAction",
+      "targetType": "IssueOwners",
+      "targetIdentifier": null,
+      "fallthroughType": "ActiveMembers"
+    },
+    {
+      "id": "sentry.rules.actions.notify_event.NotifyEventAction"
+    }
+  ]
+}
