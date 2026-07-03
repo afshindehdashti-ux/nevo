@@ -1,0 +1,59 @@
+name: Submit sitemap to Google Search Console
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/routes/sitemap[.]xml.ts"
+      - "src/routeTree.gen.ts"
+      - ".github/workflows/submit-sitemap.yml"
+      - "scripts/submit_sitemap.py"
+  schedule:
+    # Weekly re-check to surface crawl / index drift even without a code push
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      skip_submit:
+        description: "Only check status, do not resubmit"
+        required: false
+        default: "false"
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    env:
+      LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
+      GOOGLE_SEARCH_CONSOLE_API_KEY: ${{ secrets.GOOGLE_SEARCH_CONSOLE_API_KEY }}
+      SITE_URL: https://nevo-engineering-hub.lovable.app/
+      SITEMAP_URL: https://nevo-engineering-hub.lovable.app/sitemap.xml
+      REPORT_JSON: sitemap-report.json
+      REPORT_MD: ${{ github.step_summary }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify required secrets
+        run: |
+          if [ -z "$LOVABLE_API_KEY" ] || [ -z "$GOOGLE_SEARCH_CONSOLE_API_KEY" ]; then
+            echo "::error::LOVABLE_API_KEY and GOOGLE_SEARCH_CONSOLE_API_KEY must be set as repository secrets."
+            echo "Link the Google Search Console connector in Lovable, then mirror the two secrets in GitHub → Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Submit sitemap and read status
+        run: |
+          if [ "${{ github.event.inputs.skip_submit }}" = "true" ]; then
+            python3 scripts/submit_sitemap.py --skip-submit
+          else
+            python3 scripts/submit_sitemap.py
+          fi
+
+      - name: Upload JSON snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sitemap-report
+          path: sitemap-report.json
+          if-no-files-found: warn
