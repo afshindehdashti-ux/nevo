@@ -3,59 +3,20 @@ import { Link } from "@/components/site/LocalizedLink";
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import {
+  AlertTriangle,
   ArrowRight,
-  Boxes,
-  Building2,
-  Calculator,
   CheckCircle2,
-  ChevronRight,
   Download,
-  Factory,
-  FileText,
   Flame,
-  Layers,
   MessageSquare,
   PhoneCall,
-  Ruler,
-  Snowflake,
-  ThermometerSun,
-  Volume2,
+  Thermometer,
   Weight,
-  Wind,
   Zap,
-  RotateCw,
-  ZoomIn,
-  Scan,
-  Sparkles,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
-
-import crossSection from "@/assets/thickness/cross-section.png.asset.json";
-import th40 from "@/assets/thickness/th-40.png.asset.json";
-import th50 from "@/assets/thickness/th-50.png.asset.json";
-import th60 from "@/assets/thickness/th-60.png.asset.json";
-import th80 from "@/assets/thickness/th-80.png.asset.json";
-import th100 from "@/assets/thickness/th-100.png.asset.json";
-import th120 from "@/assets/thickness/th-120.png.asset.json";
-import th150 from "@/assets/thickness/th-150.png.asset.json";
-import th200 from "@/assets/thickness/th-200.png.asset.json";
-import corePIR from "@/assets/thickness/core-pir.png.asset.json";
-import coreRW from "@/assets/thickness/core-rockwool.png.asset.json";
-import coreEPS from "@/assets/thickness/core-eps.png.asset.json";
-import corePUR from "@/assets/thickness/core-pur.png.asset.json";
-import appCold from "@/assets/thickness/app-cold.png.asset.json";
-import appFood from "@/assets/thickness/app-food.png.asset.json";
-import appWH from "@/assets/thickness/app-warehouse.png.asset.json";
-import appClean from "@/assets/thickness/app-cleanroom.png.asset.json";
-import appIndustrial from "@/assets/thickness/app-industrial.png.asset.json";
-import appCommercial from "@/assets/thickness/app-commercial.png.asset.json";
-import matPIR from "@/assets/thickness/mat-pir.png.asset.json";
-import matRW from "@/assets/thickness/mat-rockwool.png.asset.json";
-import matPPGI from "@/assets/thickness/mat-ppgi.png.asset.json";
-import matSteel from "@/assets/thickness/mat-steel.png.asset.json";
-import thermalCam from "@/assets/thickness/thermal-cam.png.asset.json";
 
 // ---------------- SEO ----------------
 export const Route = createFileRoute("/$lang/panel-thickness-calculator")({
@@ -65,7 +26,7 @@ export const Route = createFileRoute("/$lang/panel-thickness-calculator")({
       lang: params.lang,
       title: "Panel Thickness Calculator — Sandwich Panel Sizing Tool | NEVO",
       description:
-        "Choose the correct sandwich panel thickness. Live U-value, fire rating, weight, heat loss and cost. Engineered by NEVO Industrial for cold storage, food, clean rooms and industrial buildings.",
+        "Dynamic sandwich panel thickness calculator. Live U-value, fire rating, weight and heat loss for cold storage, freezers, food, clean rooms and industrial buildings.",
       path: "/panel-thickness-calculator",
     });
     return {
@@ -83,19 +44,6 @@ export const Route = createFileRoute("/$lang/panel-thickness-calculator")({
             ]),
           ),
         },
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            name: "NEVO Panel Thickness Calculator",
-            applicationCategory: "EngineeringApplication",
-            operatingSystem: "Web",
-            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-            description:
-              "Engineering decision-support tool that recommends sandwich panel thickness by application, core, climate, fire rating and design temperature.",
-          }),
-        },
       ],
     };
   },
@@ -103,119 +51,107 @@ export const Route = createFileRoute("/$lang/panel-thickness-calculator")({
 
 // ---------------- Domain ----------------
 type Application =
-  | "Cold Storage" | "Food Factory" | "Warehouse" | "Industrial Building"
-  | "Clean Room" | "Commercial Building" | "Freezer" | "Office";
-type Core = "PIR" | "PUR" | "Rock Wool" | "EPS";
+  | "Cold Storage"
+  | "Freezer Room"
+  | "Food Processing"
+  | "Warehouse"
+  | "Industrial Building"
+  | "Clean Room"
+  | "Commercial Building"
+  | "Agriculture"
+  | "Data Center";
+
+type Core = "PIR" | "PUR" | "Rock Wool" | "EPS" | "Glass Wool";
 type Climate = "Very Cold" | "Cold" | "Moderate" | "Hot" | "Very Hot";
-type Fire = "30 min" | "60 min" | "90 min" | "120 min" | "180 min";
-type Temp = "+20°C" | "+5°C" | "0°C" | "-18°C" | "-40°C";
-type Thickness = 40 | 50 | 60 | 80 | 100 | 120 | 150 | 200;
+type Fire = "None" | "30 min" | "60 min" | "90 min" | "120 min" | "180 min";
+type Temp = "+20°C" | "+5°C" | "0°C" | "-18°C" | "-25°C" | "-40°C";
 
-const THICKNESSES: Thickness[] = [40, 50, 60, 80, 100, 120, 150, 200];
+const THICKNESSES = [30, 40, 50, 60, 80, 100, 120, 150, 180, 200, 250, 300] as const;
+type Thickness = (typeof THICKNESSES)[number];
 
-const THICK_IMG: Record<Thickness, { url: string }> = {
-  40: th40, 50: th50, 60: th60, 80: th80,
-  100: th100, 120: th120, 150: th150, 200: th200,
-};
+const STEEL_GAUGES = [0.4, 0.45, 0.5, 0.6, 0.7, 0.8] as const;
 
-// Lambda (thermal conductivity W/m·K)
+// Thermal conductivity W/m·K (per spec)
 const LAMBDA: Record<Core, number> = {
   PIR: 0.022,
-  PUR: 0.024,
-  "Rock Wool": 0.041,
+  PUR: 0.026,
+  "Rock Wool": 0.038,
   EPS: 0.036,
+  "Glass Wool": 0.040,
 };
-// kg/m³ (typical density)
+
+// Density kg/m³ (per spec)
 const DENSITY: Record<Core, number> = {
-  PIR: 40, PUR: 40, "Rock Wool": 110, EPS: 20,
+  PIR: 40,
+  PUR: 38,
+  "Rock Wool": 110,
+  EPS: 22,
+  "Glass Wool": 55,
 };
 
-const FIRE_BY_CORE: Record<Core, Fire[]> = {
-  PIR: ["30 min", "60 min", "90 min"],
-  PUR: ["30 min", "60 min"],
-  "Rock Wool": ["60 min", "90 min", "120 min", "180 min"],
-  EPS: ["30 min"],
-};
+const STEEL_DENSITY = 7850; // kg/m³
 
-// steel skin thickness by application
-const STEEL_BY_APP: Record<Application, string> = {
-  "Cold Storage": "0.50 / 0.50 mm",
-  Freezer: "0.60 / 0.50 mm",
-  "Food Factory": "0.50 / 0.50 mm",
-  "Clean Room": "0.60 / 0.50 mm",
-  Warehouse: "0.50 / 0.40 mm",
-  "Industrial Building": "0.50 / 0.40 mm",
-  "Commercial Building": "0.50 / 0.50 mm",
-  Office: "0.50 / 0.40 mm",
-};
-
-// Target U-value (W/m²·K) by application + temperature
-function targetUValue(app: Application, temp: Temp): number {
-  const base: Record<Application, number> = {
-    "Cold Storage": 0.22,
-    Freezer: 0.16,
-    "Food Factory": 0.30,
-    "Clean Room": 0.25,
-    Warehouse: 0.45,
-    "Industrial Building": 0.45,
-    "Commercial Building": 0.35,
-    Office: 0.35,
-  };
-  const tShift: Record<Temp, number> = {
-    "+20°C": 0.08, "+5°C": 0.02, "0°C": 0, "-18°C": -0.06, "-40°C": -0.10,
-  };
-  return Math.max(0.09, base[app] + tShift[temp]);
-}
-
-function climateShift(c: Climate): number {
-  return { "Very Cold": -0.05, Cold: -0.02, Moderate: 0, Hot: 0.03, "Very Hot": 0.05 }[c];
-}
-
-function uValue(core: Core, thickness: Thickness): number {
-  // simplified: U = lambda / thickness(m). Ignore surface resistances for consistency.
-  return +(LAMBDA[core] / (thickness / 1000)).toFixed(2);
-}
-
-function weight(core: Core, thickness: Thickness): number {
-  // core weight + ~7.85 kg/m² for two steel skins
-  const skin = 7.85 * (0.5 + 0.5) / 1; // ~7.85 * 1 = ~7.85 kg/m² for 0.5+0.5
-  const coreKg = DENSITY[core] * (thickness / 1000);
-  return +(coreKg + skin).toFixed(1);
-}
-
-function heatLoss(core: Core, thickness: Thickness): number {
-  // kWh/m²·yr indicative (using U * degree-hours factor)
-  return +(uValue(core, thickness) * 300).toFixed(0);
-}
-
-function fireRatingFor(core: Core, thickness: Thickness): Fire {
-  // approximate mapping
-  if (core === "Rock Wool") {
-    if (thickness >= 150) return "180 min";
-    if (thickness >= 120) return "120 min";
-    if (thickness >= 100) return "90 min";
-    if (thickness >= 80) return "60 min";
-    return "60 min";
+// Fire minutes achievable per core at a thickness
+function fireMinutesOf(core: Core, thickness: number): number {
+  if (core === "Rock Wool" || core === "Glass Wool") {
+    if (thickness >= 150) return 180;
+    if (thickness >= 120) return 120;
+    if (thickness >= 100) return 90;
+    if (thickness >= 80) return 60;
+    return 30;
   }
   if (core === "PIR") {
-    if (thickness >= 100) return "90 min";
-    if (thickness >= 80) return "60 min";
-    return "30 min";
+    if (thickness >= 120) return 90;
+    if (thickness >= 80) return 60;
+    return 30;
   }
   if (core === "PUR") {
-    if (thickness >= 100) return "60 min";
-    return "30 min";
+    if (thickness >= 100) return 60;
+    return 30;
   }
-  return "30 min";
+  return 30; // EPS
 }
 
-function costLevel(core: Core, thickness: Thickness): string {
-  const base = { EPS: 1, PUR: 2, PIR: 2, "Rock Wool": 3 }[core];
-  const t = thickness <= 60 ? 0 : thickness <= 100 ? 1 : thickness <= 150 ? 2 : 3;
-  return "$".repeat(Math.min(5, base + t));
+function fireLabel(min: number): string {
+  return min <= 0 ? "No rating" : `${min} min`;
+}
+function fireRequirementMinutes(f: Fire): number {
+  if (f === "None") return 0;
+  return parseInt(f, 10);
 }
 
-function thermalPerformance(u: number): string {
+// Core visual palette for SVG cross-section
+const CORE_STYLE: Record<
+  Core,
+  { base: string; accent: string; pattern: "foam-yellow" | "foam-warm" | "wool" | "beads" | "fiber" }
+> = {
+  PIR: { base: "#F5E6A0", accent: "#D9BC55", pattern: "foam-yellow" },
+  PUR: { base: "#F1CE6E", accent: "#B98A2E", pattern: "foam-warm" },
+  "Rock Wool": { base: "#8C6A45", accent: "#4E3A22", pattern: "wool" },
+  EPS: { base: "#FAFAF6", accent: "#C9C9BE", pattern: "beads" },
+  "Glass Wool": { base: "#F0E2A5", accent: "#B89A45", pattern: "fiber" },
+};
+
+// ---------------- Calculations ----------------
+function calcUValue(core: Core, thickness_mm: number): number {
+  const R_core = thickness_mm / 1000 / LAMBDA[core];
+  const R_total = R_core + 0.17;
+  return +(1 / R_total).toFixed(2);
+}
+
+function calcWeight(core: Core, thickness_mm: number, extSteel_mm: number, intSteel_mm: number): number {
+  const coreKg = DENSITY[core] * (thickness_mm / 1000);
+  const steelKg =
+    (extSteel_mm / 1000) * STEEL_DENSITY + (intSteel_mm / 1000) * STEEL_DENSITY;
+  return +(coreKg + steelKg).toFixed(1);
+}
+
+function calcHeatLoss(uValue: number, deltaT_K: number): number {
+  // W/m² for a static delta-T
+  return +(uValue * deltaT_K).toFixed(1);
+}
+
+function thermalPerformance(u: number): "Excellent" | "Very Good" | "Good" | "Standard" | "Basic" {
   if (u <= 0.15) return "Excellent";
   if (u <= 0.22) return "Very Good";
   if (u <= 0.32) return "Good";
@@ -223,73 +159,355 @@ function thermalPerformance(u: number): string {
   return "Basic";
 }
 
-function soundInsulation(core: Core, thickness: Thickness): string {
-  if (core === "Rock Wool") return thickness >= 100 ? "Excellent" : "Very Good";
-  if (thickness >= 120) return "Very Good";
-  if (thickness >= 80) return "Good";
-  return "Standard";
+function tempToNumber(t: Temp): number {
+  return parseInt(t.replace("°C", "").replace("+", ""), 10);
 }
 
-function recommendThickness(
-  app: Application, core: Core, climate: Climate, fire: Fire, temp: Temp,
-): Thickness {
-  const target = targetUValue(app, temp) + climateShift(climate);
-  // pick the smallest thickness that meets both U-target and fire requirement
-  const fireMinutes = parseInt(fire);
-  for (const t of THICKNESSES) {
-    const u = uValue(core, t);
-    const fm = parseInt(fireRatingFor(core, t));
-    if (u <= target && fm >= fireMinutes) return t;
+// Recommended thickness range per spec
+function recommendRange(
+  app: Application,
+  core: Core,
+  temp: Temp,
+  fire: Fire,
+): { min: number; max: number; note: string } {
+  const t = tempToNumber(temp);
+
+  // High fire ratings force mineral cores
+  const fireMin = fireRequirementMinutes(fire);
+  if (fireMin >= 90 && (core === "PIR" || core === "PUR" || core === "EPS")) {
+    // still return a functional range but the warning surfaces separately
   }
-  return 200;
+
+  if (app === "Freezer Room" || t <= -30) return { min: 180, max: 200, note: "Deep-freeze envelope — minimise thermal bridging." };
+  if (t <= -15) return { min: 120, max: 150, note: "Freezer / low-temperature envelope." };
+  if (app === "Cold Storage" || t <= 5) return { min: 80, max: 100, note: "Cold storage envelope." };
+  if (app === "Clean Room") return { min: 60, max: 100, note: "Clean room hygienic envelope." };
+  if (app === "Data Center") return { min: 80, max: 120, note: "Controlled-environment data hall." };
+  if (app === "Food Processing") return { min: 80, max: 120, note: "Hygienic food processing envelope." };
+  if (app === "Industrial Building") return { min: 50, max: 100, note: "Industrial building envelope." };
+  if (app === "Warehouse") return { min: 40, max: 80, note: "Warehouse envelope." };
+  if (app === "Agriculture") return { min: 40, max: 60, note: "Agricultural building." };
+  return { min: 50, max: 80, note: "Commercial envelope." };
+}
+
+function performanceBadge(v: "Excellent" | "Very Good" | "Good" | "Limited" | "Not Recommended"): string {
+  return {
+    Excellent: "bg-emerald-400/15 text-emerald-300 border-emerald-400/40",
+    "Very Good": "bg-emerald-400/10 text-emerald-300 border-emerald-400/30",
+    Good: "bg-amber-400/10 text-amber-300 border-amber-400/30",
+    Limited: "bg-orange-400/10 text-orange-300 border-orange-400/30",
+    "Not Recommended": "bg-rose-400/10 text-rose-300 border-rose-400/30",
+  }[v];
 }
 
 // ---------------- UI atoms ----------------
 function Chip({
-  active, onClick, children, icon: Icon,
+  active,
+  onClick,
+  children,
 }: {
-  active?: boolean; onClick: () => void; children: React.ReactNode;
-  icon?: React.ComponentType<{ className?: string }>;
+  active?: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`flex w-full min-w-0 items-center justify-center gap-2 rounded-md border px-3 py-2 text-center text-xs font-medium leading-tight transition [overflow-wrap:anywhere] ${
+      className={`w-full rounded-md border px-3 py-2 text-center text-xs font-medium leading-tight transition ${
         active
-          ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-300"
-          : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/25 hover:text-white"
+          ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-200"
+          : "border-white/10 bg-white/[0.03] text-white/70 hover:border-white/20 hover:text-white"
       }`}
     >
-      {Icon ? <Icon className="h-3.5 w-3.5 shrink-0" /> : null}
-      <span className="min-w-0">{children}</span>
+      {children}
     </button>
   );
 }
 
-function StepHeader({ n, title, icon: Icon }: { n: number; title: string; icon: React.ComponentType<{ className?: string }> }) {
+function Section({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="mb-3 flex items-center gap-2">
-      <span className="grid h-6 w-6 place-items-center rounded-full bg-emerald-400/15 text-[11px] font-semibold text-emerald-300">{n}</span>
-      <Icon className="h-4 w-4 text-emerald-300/80" />
-      <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">{title}</span>
+    <div>
+      <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">{label}</div>
+      {children}
     </div>
   );
 }
 
-function Card({ title, icon: Icon, children, className = "" }: {
-  title?: string; icon?: React.ComponentType<{ className?: string }>;
-  children: React.ReactNode; className?: string;
+// ---------------- Dynamic SVG Cross-section ----------------
+function CrossSection({
+  core,
+  thickness,
+  extSteel,
+  intSteel,
+}: {
+  core: Core;
+  thickness: number;
+  extSteel: number;
+  intSteel: number;
 }) {
+  const W = 720;
+  const H = 360;
+  const padX = 90;
+  const panelW = W - padX * 2;
+
+  // Steel visual thickness
+  const skinExt = 5 + (extSteel - 0.4) * 5;
+  const skinInt = 5 + (intSteel - 0.4) * 5;
+
+  // Core thickness scales linearly with real mm across 30..300
+  const minCore = 20;
+  const maxCore = 240;
+  const coreH = minCore + ((thickness - 30) / (300 - 30)) * (maxCore - minCore);
+
+  const totalH = coreH + skinExt + skinInt;
+  const startY = (H - totalH) / 2;
+  const coreTop = startY + skinExt;
+  const intTop = coreTop + coreH;
+
+  const style = CORE_STYLE[core];
+  const patternId = `core-pattern-${core.replace(/\s+/g, "")}`;
+
   return (
-    <div className={`rounded-xl border border-white/10 bg-white/[0.02] p-5 ${className}`}>
-      {title ? (
-        <div className="mb-3 flex items-center gap-2">
-          {Icon ? <Icon className="h-4 w-4 text-emerald-300/80" /> : null}
-          <h3 className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/80">{title}</h3>
-        </div>
-      ) : null}
-      {children}
+    <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-4">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <CorePattern id={patternId} kind={style.pattern} base={style.base} accent={style.accent} />
+          <linearGradient id="skin-shade" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.5)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.35)" />
+          </linearGradient>
+        </defs>
+
+        {/* Core */}
+        <motion.rect
+          animate={{ y: coreTop, height: coreH }}
+          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+          x={padX}
+          width={panelW}
+          fill={`url(#${patternId})`}
+          stroke="rgba(0,0,0,0.35)"
+          strokeWidth={0.8}
+        />
+
+        {/* Exterior skin */}
+        <motion.rect
+          animate={{ y: startY, height: skinExt }}
+          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+          x={padX}
+          width={panelW}
+          fill="#B7BEC6"
+          stroke="rgba(0,0,0,0.5)"
+          strokeWidth={0.6}
+        />
+        <motion.rect
+          animate={{ y: startY, height: skinExt }}
+          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+          x={padX}
+          width={panelW}
+          fill="url(#skin-shade)"
+          opacity={0.6}
+        />
+
+        {/* Interior skin */}
+        <motion.rect
+          animate={{ y: intTop, height: skinInt }}
+          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+          x={padX}
+          width={panelW}
+          fill="#E7EBDA"
+          stroke="rgba(0,0,0,0.5)"
+          strokeWidth={0.6}
+        />
+        <motion.rect
+          animate={{ y: intTop, height: skinInt }}
+          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+          x={padX}
+          width={panelW}
+          fill="url(#skin-shade)"
+          opacity={0.4}
+        />
+
+        {/* Thickness dimension */}
+        <g stroke="rgba(255,255,255,0.7)" strokeWidth={0.8} fill="rgba(255,255,255,0.85)">
+          <line x1={padX + panelW + 28} y1={startY} x2={padX + panelW + 28} y2={intTop + skinInt} />
+          <line x1={padX + panelW + 22} y1={startY} x2={padX + panelW + 34} y2={startY} />
+          <line x1={padX + panelW + 22} y1={intTop + skinInt} x2={padX + panelW + 34} y2={intTop + skinInt} />
+          <text
+            x={padX + panelW + 40}
+            y={startY + totalH / 2 + 4}
+            fontSize={13}
+            fontFamily="ui-monospace, Menlo, monospace"
+            fontWeight={600}
+          >
+            {thickness} mm
+          </text>
+        </g>
+
+        {/* Labels */}
+        <g fontFamily="ui-monospace, Menlo, monospace" fill="rgba(255,255,255,0.75)" fontSize={11}>
+          <text x={padX} y={startY - 10}>
+            EXT STEEL · {extSteel.toFixed(2)} mm
+          </text>
+          <text x={padX} y={intTop + skinInt + 18}>
+            INT STEEL · {intSteel.toFixed(2)} mm
+          </text>
+          <text x={padX + panelW - 4} y={coreTop + coreH / 2 + 4} textAnchor="end" fill="rgba(0,0,0,0.7)" fontSize={12} fontWeight={600}>
+            CORE · {core}
+          </text>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function CorePattern({
+  id,
+  kind,
+  base,
+  accent,
+}: {
+  id: string;
+  kind: "foam-yellow" | "foam-warm" | "wool" | "beads" | "fiber";
+  base: string;
+  accent: string;
+}) {
+  if (kind === "foam-yellow" || kind === "foam-warm") {
+    return (
+      <pattern id={id} width="18" height="18" patternUnits="userSpaceOnUse">
+        <rect width="18" height="18" fill={base} />
+        <circle cx="4" cy="5" r="1.4" fill={accent} opacity="0.55" />
+        <circle cx="12" cy="9" r="1.9" fill={accent} opacity="0.45" />
+        <circle cx="7" cy="14" r="1.2" fill={accent} opacity="0.6" />
+        <circle cx="15" cy="15" r="0.9" fill={accent} opacity="0.5" />
+      </pattern>
+    );
+  }
+  if (kind === "wool") {
+    return (
+      <pattern id={id} width="26" height="12" patternUnits="userSpaceOnUse">
+        <rect width="26" height="12" fill={base} />
+        <path d="M0 4 Q6 1 13 4 T26 4" stroke={accent} strokeWidth="0.7" fill="none" opacity="0.8" />
+        <path d="M0 8 Q7 5 14 9 T26 8" stroke={accent} strokeWidth="0.6" fill="none" opacity="0.6" />
+      </pattern>
+    );
+  }
+  if (kind === "fiber") {
+    return (
+      <pattern id={id} width="16" height="16" patternUnits="userSpaceOnUse">
+        <rect width="16" height="16" fill={base} />
+        <line x1="0" y1="4" x2="16" y2="6" stroke={accent} strokeWidth="0.6" opacity="0.65" />
+        <line x1="0" y1="11" x2="16" y2="9" stroke={accent} strokeWidth="0.6" opacity="0.55" />
+      </pattern>
+    );
+  }
+  return (
+    <pattern id={id} width="16" height="16" patternUnits="userSpaceOnUse">
+      <rect width="16" height="16" fill={base} />
+      <circle cx="4" cy="4" r="2" fill="none" stroke={accent} strokeWidth="0.5" />
+      <circle cx="11" cy="9" r="2.4" fill="none" stroke={accent} strokeWidth="0.5" />
+      <circle cx="6" cy="13" r="1.6" fill="none" stroke={accent} strokeWidth="0.5" />
+      <circle cx="14" cy="14" r="1.2" fill="none" stroke={accent} strokeWidth="0.5" />
+    </pattern>
+  );
+}
+
+// ---------------- Charts ----------------
+function UValueChart({ core, selected }: { core: Core; selected: number }) {
+  const data = THICKNESSES.map((t) => ({ t, u: calcUValue(core, t) }));
+  const maxU = Math.max(...data.map((d) => d.u));
+  const W = 520;
+  const H = 180;
+  const padL = 42;
+  const padB = 30;
+  const padT = 10;
+  const padR = 10;
+  const cw = W - padL - padR;
+  const ch = H - padT - padB;
+  const points = data
+    .map((d, i) => {
+      const x = padL + (i / (data.length - 1)) * cw;
+      const y = padT + (1 - d.u / maxU) * ch;
+      return `${x},${y}`;
+    })
+    .join(" ");
+
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+      <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
+        U-Value vs Thickness · {core}
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
+        <line x1={padL} y1={padT} x2={padL} y2={padT + ch} stroke="rgba(255,255,255,0.2)" />
+        <line x1={padL} y1={padT + ch} x2={padL + cw} y2={padT + ch} stroke="rgba(255,255,255,0.2)" />
+        <polyline points={points} fill="none" stroke="rgb(52,211,153)" strokeWidth={1.8} />
+        {data.map((d, i) => {
+          const x = padL + (i / (data.length - 1)) * cw;
+          const y = padT + (1 - d.u / maxU) * ch;
+          const active = d.t === selected;
+          return (
+            <g key={d.t}>
+              <circle cx={x} cy={y} r={active ? 5 : 2.5} fill={active ? "rgb(52,211,153)" : "rgba(255,255,255,0.5)"} />
+              {active && (
+                <text x={x} y={y - 10} fontSize={10} fill="rgb(52,211,153)" textAnchor="middle" fontFamily="ui-monospace,Menlo,monospace">
+                  U={d.u}
+                </text>
+              )}
+              <text x={x} y={padT + ch + 14} fontSize={9} fill="rgba(255,255,255,0.5)" textAnchor="middle" fontFamily="ui-monospace,Menlo,monospace">
+                {d.t}
+              </text>
+            </g>
+          );
+        })}
+        <text x={4} y={padT + 6} fontSize={9} fill="rgba(255,255,255,0.5)" fontFamily="ui-monospace,Menlo,monospace">
+          W/m²K
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+function BarChart({
+  title,
+  data,
+  selectedIndex,
+  unit,
+}: {
+  title: string;
+  data: { label: string; value: number }[];
+  selectedIndex?: number;
+  unit: string;
+}) {
+  const max = Math.max(...data.map((d) => d.value), 1);
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+      <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">{title}</div>
+      <div className="space-y-2">
+        {data.map((d, i) => (
+          <div key={d.label} className="flex items-center gap-2">
+            <div className="w-14 shrink-0 font-mono text-[10px] text-white/50">{d.label}</div>
+            <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-white/5">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${(d.value / max) * 100}%` }}
+                transition={{ type: "spring", stiffness: 180, damping: 26 }}
+                className={`h-full rounded-full ${
+                  i === selectedIndex ? "bg-emerald-400" : "bg-white/25"
+                }`}
+              />
+            </div>
+            <div className={`w-16 shrink-0 text-right font-mono text-[10px] ${i === selectedIndex ? "text-emerald-300" : "text-white/60"}`}>
+              {d.value} {unit}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -298,497 +516,601 @@ function Card({ title, icon: Icon, children, className = "" }: {
 function PanelThicknessPage() {
   const [app, setApp] = useState<Application>("Cold Storage");
   const [core, setCore] = useState<Core>("PIR");
-  const [climate, setClimate] = useState<Climate>("Very Cold");
-  const [fire, setFire] = useState<Fire>("90 min");
-  const [temp, setTemp] = useState<Temp>("-18°C");
-  const [view, setView] = useState<"cross" | "exploded" | "3d" | "thermal">("cross");
-  const [compare, setCompare] = useState<Thickness[]>([60, 100, 150]);
-
-  const recommended = useMemo(
-    () => recommendThickness(app, core, climate, fire, temp),
-    [app, core, climate, fire, temp],
+  const [climate, setClimate] = useState<Climate>("Moderate");
+  const [temp, setTemp] = useState<Temp>("+5°C");
+  const [fire, setFire] = useState<Fire>("None");
+  const [thickness, setThickness] = useState<Thickness>(100);
+  const [extSteel, setExtSteel] = useState<number>(0.5);
+  const [intSteel, setIntSteel] = useState<number>(0.4);
+  const [compare, setCompare] = useState<number[]>([80, 100, 150]);
+  const [tab, setTab] = useState<"Inputs" | "Recommendation" | "Cross Section" | "Charts" | "Compare" | "Report">(
+    "Inputs",
   );
 
-  const u = uValue(core, recommended);
-  const w = weight(core, recommended);
-  const fr = fireRatingFor(core, recommended);
-  const perf = thermalPerformance(u);
-  const sound = soundInsulation(core, recommended);
-  const steel = STEEL_BY_APP[app];
+  // Live results
+  const u = useMemo(() => calcUValue(core, thickness), [core, thickness]);
+  const rTotal = useMemo(() => +(1 / u).toFixed(2), [u]);
+  const w = useMemo(() => calcWeight(core, thickness, extSteel, intSteel), [core, thickness, extSteel, intSteel]);
+  const deltaT = useMemo(() => Math.abs(20 - tempToNumber(temp)) + { "Very Cold": 15, Cold: 8, Moderate: 0, Hot: -3, "Very Hot": -6 }[climate], [temp, climate]);
+  const hLoss = useMemo(() => calcHeatLoss(u, Math.max(1, deltaT)), [u, deltaT]);
+  const perf = useMemo(() => thermalPerformance(u), [u]);
+  const fireAchieved = useMemo(() => fireMinutesOf(core, thickness), [core, thickness]);
+  const rec = useMemo(() => recommendRange(app, core, temp, fire), [app, core, temp, fire]);
+  const requiredFireMin = fireRequirementMinutes(fire);
+  const fireOk = fireAchieved >= requiredFireMin;
+  const fireWarn = requiredFireMin >= 120 && (core === "PIR" || core === "PUR" || core === "EPS");
 
-  const toggleCompare = (t: Thickness) => {
-    setCompare((prev) =>
-      prev.includes(t) ? prev.filter((x) => x !== t) : prev.length >= 4 ? [...prev.slice(1), t] : [...prev, t],
-    );
-  };
+  const meetsRec = thickness >= rec.min && thickness <= rec.max;
+  const belowRec = thickness < rec.min;
 
-  return (
-    <div className="min-h-screen bg-neutral-950 text-white">
-      <SiteHeader />
+  const performanceScores = useMemo(() => {
+    const thermal: "Excellent" | "Very Good" | "Good" | "Limited" | "Not Recommended" =
+      u <= 0.18 ? "Excellent" : u <= 0.28 ? "Very Good" : u <= 0.45 ? "Good" : "Limited";
+    const fireS: typeof thermal = requiredFireMin === 0
+      ? "Excellent"
+      : fireAchieved >= requiredFireMin
+        ? "Excellent"
+        : fireAchieved >= requiredFireMin - 30
+          ? "Limited"
+          : "Not Recommended";
+    const weightS: typeof thermal = w < 15 ? "Excellent" : w < 25 ? "Very Good" : w < 40 ? "Good" : "Limited";
+    const costS: typeof thermal = thickness <= 80 ? "Excellent" : thickness <= 120 ? "Very Good" : thickness <= 180 ? "Good" : "Limited";
+    const appFit: typeof thermal = meetsRec ? "Excellent" : belowRec ? "Not Recommended" : "Very Good";
+    return { thermal, fire: fireS, weight: weightS, cost: costS, appFit };
+  }, [u, w, thickness, meetsRec, belowRec, fireAchieved, requiredFireMin]);
 
-      {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumb" className="mx-auto max-w-[1440px] px-4 pt-24 text-[12px] text-white/50 md:px-8">
-        <ol className="flex items-center gap-1">
-          <li><Link to="/" className="hover:text-white">Home</Link></li>
-          <li><ChevronRight className="h-3.5 w-3.5" /></li>
-          <li><Link to="/solutions/sandwich-panels" className="hover:text-white">Sandwich Panels</Link></li>
-          <li><ChevronRight className="h-3.5 w-3.5" /></li>
-          <li className="text-white/80">Panel Thickness Calculator</li>
-        </ol>
-      </nav>
+  function toggleCompare(t: number) {
+    setCompare((prev) => {
+      if (prev.includes(t)) return prev.filter((x) => x !== t);
+      if (prev.length >= 3) return [...prev.slice(1), t];
+      return [...prev, t];
+    });
+  }
 
-      {/* Hero */}
-      <section className="mx-auto max-w-[1440px] px-4 pt-8 md:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-          className="flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between"
-        >
-          <div>
-            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-emerald-300">
-              <Sparkles className="h-3.5 w-3.5" /> Engineering Decision Tool
-            </div>
-            <h1 className="text-3xl font-semibold leading-tight tracking-tight md:text-5xl">
-              Panel Thickness <span className="text-emerald-400">Calculator</span>
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm text-white/60 md:text-base">
-              Choose the right sandwich panel thickness. Optimize performance. Reduce costs. Backed by
-              engineering data on U-value, fire rating, weight and lifecycle heat loss.
+  function downloadReport() {
+    const lines = [
+      "NEVO Panel Thickness Calculation Report",
+      "======================================",
+      "",
+      `Application:         ${app}`,
+      `Core Material:       ${core}`,
+      `Climate Zone:        ${climate}`,
+      `Internal Temp:       ${temp}`,
+      `Fire Requirement:    ${fire}`,
+      `Selected Thickness:  ${thickness} mm`,
+      `Exterior Steel:      ${extSteel.toFixed(2)} mm`,
+      `Interior Steel:      ${intSteel.toFixed(2)} mm`,
+      "",
+      "RESULTS",
+      "-------",
+      `U-Value:             ${u} W/m²K`,
+      `Thermal Resistance:  ${rTotal} m²K/W`,
+      `Panel Weight:        ${w} kg/m²`,
+      `Est. Heat Loss:      ${hLoss} W/m² (ΔT ${deltaT} K)`,
+      `Fire Achieved:       ${fireLabel(fireAchieved)} (required ${fire})`,
+      `Thermal Performance: ${perf}`,
+      "",
+      "RECOMMENDATION",
+      "--------------",
+      `Recommended range:   ${rec.min}–${rec.max} mm`,
+      `Note: ${rec.note}`,
+      fireWarn
+        ? "WARNING: For high fire resistance requirements, Rock Wool is usually recommended."
+        : "",
+      "",
+      "DISCLAIMER",
+      "----------",
+      "This calculator provides conceptual guidance only. Final sandwich panel",
+      "thickness must be verified by project-specific engineering, local",
+      "regulations, fire requirements and thermal performance calculations.",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    const blob = new Blob([lines], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `nevo-panel-thickness-${app.replace(/\s+/g, "-")}-${thickness}mm.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  const inquiryParams = new URLSearchParams({
+    subject: "Panel Thickness Recommendation",
+    application: app,
+    core,
+    thickness: String(thickness),
+    temp,
+    climate,
+    fire,
+    uValue: String(u),
+    weight: String(w),
+  }).toString();
+
+  const APPLICATIONS: Application[] = [
+    "Cold Storage",
+    "Freezer Room",
+    "Food Processing",
+    "Warehouse",
+    "Industrial Building",
+    "Clean Room",
+    "Commercial Building",
+    "Agriculture",
+    "Data Center",
+  ];
+  const CORES: Core[] = ["PIR", "PUR", "Rock Wool", "EPS", "Glass Wool"];
+  const CLIMATES: Climate[] = ["Very Cold", "Cold", "Moderate", "Hot", "Very Hot"];
+  const TEMPS: Temp[] = ["+20°C", "+5°C", "0°C", "-18°C", "-25°C", "-40°C"];
+  const FIRES: Fire[] = ["None", "30 min", "60 min", "90 min", "120 min", "180 min"];
+
+  const TABS = ["Inputs", "Recommendation", "Cross Section", "Charts", "Compare", "Report"] as const;
+
+  const InputsPanel = (
+    <div className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+      <Section label="Application">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {APPLICATIONS.map((a) => (
+            <Chip key={a} active={app === a} onClick={() => setApp(a)}>
+              {a}
+            </Chip>
+          ))}
+        </div>
+      </Section>
+
+      <Section label="Core Material">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+          {CORES.map((c) => (
+            <Chip key={c} active={core === c} onClick={() => setCore(c)}>
+              {c}
+            </Chip>
+          ))}
+        </div>
+      </Section>
+
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <Section label="Climate Zone">
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+            {CLIMATES.map((c) => (
+              <Chip key={c} active={climate === c} onClick={() => setClimate(c)}>
+                {c}
+              </Chip>
+            ))}
+          </div>
+        </Section>
+
+        <Section label="Required Internal Temperature">
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+            {TEMPS.map((t) => (
+              <Chip key={t} active={temp === t} onClick={() => setTemp(t)}>
+                {t}
+              </Chip>
+            ))}
+          </div>
+        </Section>
+      </div>
+
+      <Section label="Fire Rating Requirement">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+          {FIRES.map((f) => (
+            <Chip key={f} active={fire === f} onClick={() => setFire(f)}>
+              {f}
+            </Chip>
+          ))}
+        </div>
+      </Section>
+
+      <Section label="Panel Thickness (mm)">
+        <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-12">
+          {THICKNESSES.map((t) => (
+            <Chip key={t} active={thickness === t} onClick={() => setThickness(t)}>
+              {t}
+            </Chip>
+          ))}
+        </div>
+      </Section>
+
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <Section label="Exterior Steel (mm)">
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+            {STEEL_GAUGES.map((s) => (
+              <Chip key={s} active={extSteel === s} onClick={() => setExtSteel(s)}>
+                {s.toFixed(2)}
+              </Chip>
+            ))}
+          </div>
+        </Section>
+        <Section label="Interior Steel (mm)">
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+            {STEEL_GAUGES.map((s) => (
+              <Chip key={s} active={intSteel === s} onClick={() => setIntSteel(s)}>
+                {s.toFixed(2)}
+              </Chip>
+            ))}
+          </div>
+        </Section>
+      </div>
+    </div>
+  );
+
+  const ResultCards = (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <MetricCard icon={Thermometer} label="U-Value" value={`${u}`} unit="W/m²K" tone="emerald" />
+      <MetricCard icon={Zap} label="Thermal Perf." value={perf} unit="" tone="emerald" />
+      <MetricCard icon={Weight} label="Weight" value={`${w}`} unit="kg/m²" tone="white" />
+      <MetricCard icon={Flame} label="Fire Achieved" value={fireLabel(fireAchieved)} unit="" tone={fireOk ? "emerald" : "amber"} />
+      <MetricCard icon={Thermometer} label="R-Value" value={`${rTotal}`} unit="m²K/W" tone="white" />
+      <MetricCard icon={Zap} label="Heat Loss" value={`${hLoss}`} unit={`W/m² · ΔT ${deltaT}K`} tone="white" />
+      <MetricCard icon={Weight} label="Recommended" value={`${rec.min}–${rec.max}`} unit="mm" tone="emerald" />
+      <MetricCard icon={CheckCircle2} label="Selected" value={`${thickness}`} unit="mm" tone={meetsRec ? "emerald" : belowRec ? "rose" : "amber"} />
+    </div>
+  );
+
+  const RecommendationPanel = (
+    <div className="space-y-4">
+      {ResultCards}
+
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+        <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">Engineering Note</div>
+        <p className="text-sm text-white/80">
+          For <span className="text-emerald-300">{app}</span> at{" "}
+          <span className="text-emerald-300">{temp}</span> in a{" "}
+          <span className="text-emerald-300">{climate}</span> climate, NEVO Engineering recommends a{" "}
+          <span className="text-emerald-300">{rec.min}–{rec.max} mm {core}</span> panel. {rec.note}{" "}
+          Your selected {thickness} mm gives a U-value of <span className="text-emerald-300">{u} W/m²K</span>{" "}
+          ({perf.toLowerCase()}).
+        </p>
+        {fireWarn && (
+          <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-400/30 bg-amber-400/5 p-4">
+            <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-400" />
+            <p className="text-sm text-amber-200">
+              For high fire resistance requirements ({fire}), Rock Wool is usually recommended. Final selection must be verified according to local fire regulations.
             </p>
           </div>
-          <div className="text-right text-[11px] uppercase tracking-[0.18em] text-emerald-300/80">
-            Engineered for Performance<br />Built for Excellence
+        )}
+        {!fireOk && requiredFireMin > 0 && !fireWarn && (
+          <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-400/30 bg-amber-400/5 p-4">
+            <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-400" />
+            <p className="text-sm text-amber-200">
+              The selected {core} at {thickness} mm reaches ~{fireLabel(fireAchieved)}. Increase thickness or switch to Rock Wool to meet the {fire} requirement.
+            </p>
           </div>
-        </motion.div>
-      </section>
+        )}
+      </div>
 
-      {/* Steps + Result grid */}
-      <section className="mx-auto max-w-[1440px] px-4 py-10 md:px-8">
-        <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
-          {/* LEFT — steps */}
-          <div className="space-y-4">
-            <Card>
-              <StepHeader n={1} title="Application" icon={Building2} />
-              <div className="grid grid-cols-2 gap-2">
-                {(["Cold Storage","Food Factory","Warehouse","Industrial Building","Clean Room","Commercial Building","Freezer","Office"] as Application[]).map((a) => (
-                  <Chip key={a} active={app === a} onClick={() => setApp(a)}>{a}</Chip>
-                ))}
-              </div>
-            </Card>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        <ScoreBadge label="Thermal" value={performanceScores.thermal} />
+        <ScoreBadge label="Fire" value={performanceScores.fire} />
+        <ScoreBadge label="Weight" value={performanceScores.weight} />
+        <ScoreBadge label="Cost" value={performanceScores.cost} />
+        <ScoreBadge label="App Fit" value={performanceScores.appFit} />
+      </div>
+    </div>
+  );
 
-            <Card>
-              <StepHeader n={2} title="Core Material" icon={Layers} />
-              <div className="grid grid-cols-2 gap-2">
-                {(["PIR","PUR","Rock Wool","EPS"] as Core[]).map((c) => (
-                  <Chip key={c} active={core === c} onClick={() => {
-                    setCore(c);
-                    if (!FIRE_BY_CORE[c].includes(fire)) setFire(FIRE_BY_CORE[c][0]);
-                  }}>{c}</Chip>
-                ))}
-              </div>
-            </Card>
-
-            <Card>
-              <StepHeader n={3} title="Climate Zone" icon={Wind} />
-              <div className="grid grid-cols-3 gap-2">
-                {(["Very Cold","Cold","Moderate","Hot","Very Hot"] as Climate[]).map((c) => (
-                  <Chip key={c} active={climate === c} onClick={() => setClimate(c)}>{c}</Chip>
-                ))}
-              </div>
-            </Card>
-
-            <Card>
-              <StepHeader n={4} title="Fire Rating" icon={Flame} />
-              <div className="grid grid-cols-3 gap-2">
-                {(["30 min","60 min","90 min","120 min","180 min"] as Fire[]).map((f) => {
-                  const disabled = !FIRE_BY_CORE[core].includes(f);
-                  return (
-                    <button
-                      key={f}
-                      disabled={disabled}
-                      onClick={() => setFire(f)}
-                      className={`rounded-md border px-3 py-2 text-xs font-medium transition ${
-                        fire === f
-                          ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-300"
-                          : disabled
-                          ? "cursor-not-allowed border-white/5 bg-white/[0.01] text-white/25"
-                          : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/25 hover:text-white"
-                      }`}
-                    >
-                      {f}
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="mt-2 text-[11px] text-white/40">Availability depends on selected core.</p>
-            </Card>
-
-            <Card>
-              <StepHeader n={5} title="Design Temperature" icon={ThermometerSun} />
-              <div className="grid grid-cols-5 gap-2">
-                {(["+20°C","+5°C","0°C","-18°C","-40°C"] as Temp[]).map((t) => (
-                  <Chip key={t} active={temp === t} onClick={() => setTemp(t)}>{t}</Chip>
-                ))}
-              </div>
-            </Card>
-          </div>
-
-          {/* RIGHT — recommended + preview */}
-          <div className="space-y-6">
-            <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
-              {/* Recommended */}
-              <Card>
-                <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-300/80">Recommended Thickness</div>
-                <div className="mt-1 text-6xl font-semibold tracking-tight text-emerald-400">
-                  {recommended}<span className="text-2xl text-white/60"> mm</span>
-                </div>
-                <ul className="mt-4 space-y-2 text-[13px]">
-                  {[
-                    [Zap, "U-Value", `${u} W/m²·K`],
-                    [Flame, "Fire Rating", fr],
-                    [Sparkles, "Thermal Performance", perf],
-                    [Weight, "Weight", `${w} kg/m²`],
-                    [Volume2, "Sound Insulation", sound],
-                    [Ruler, "Steel Skin", steel],
-                  ].map(([Icon, k, v]) => (
-                    <li key={k as string} className="flex items-center justify-between border-b border-white/5 pb-2">
-                      <span className="flex items-center gap-2 text-white/60">
-                        {(() => { const I = Icon as React.ComponentType<{ className?: string }>; return <I className="h-3.5 w-3.5 text-emerald-300/80" />; })()}
-                        {k as string}
-                      </span>
-                      <span className="font-medium text-white">{v as string}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to="/project-inquiry"
-                  className="mt-4 flex items-center justify-between rounded-md border border-emerald-400/40 bg-emerald-500/15 px-3 py-2.5 text-[12px] font-semibold text-emerald-100 transition hover:bg-emerald-500/25"
+  const ChartsPanel = (
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <UValueChart core={core} selected={thickness} />
+      <BarChart
+        title={`Weight vs Thickness · ${core}`}
+        data={THICKNESSES.map((t) => ({ label: `${t}mm`, value: calcWeight(core, t, extSteel, intSteel) }))}
+        selectedIndex={THICKNESSES.indexOf(thickness)}
+        unit="kg/m²"
+      />
+      <BarChart
+        title="Heat Loss (relative)"
+        data={THICKNESSES.map((t) => ({ label: `${t}mm`, value: calcHeatLoss(calcUValue(core, t), Math.max(1, deltaT)) }))}
+        selectedIndex={THICKNESSES.indexOf(thickness)}
+        unit="W/m²"
+      />
+      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+        <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">Fire Suitability</div>
+        <div className="space-y-2">
+          {(["30 min", "60 min", "90 min", "120 min", "180 min"] as Fire[]).map((f) => {
+            const req = fireRequirementMinutes(f);
+            const ok = fireAchieved >= req;
+            return (
+              <div key={f} className="flex items-center justify-between rounded-md border border-white/5 bg-white/[0.02] px-3 py-2">
+                <span className="font-mono text-xs text-white/70">{f}</span>
+                <span
+                  className={`rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${
+                    ok
+                      ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
+                      : "border-rose-400/40 bg-rose-400/10 text-rose-300"
+                  }`}
                 >
-                  Request Engineering Consultation
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </Card>
-
-              {/* Preview */}
-              <Card>
-                <div className="mb-3 flex items-center gap-2 overflow-x-auto">
-                  {([
-                    ["cross", "Cross Section"],
-                    ["exploded", "Exploded View"],
-                    ["3d", "3D View"],
-                    ["thermal", "Thermal Viewer"],
-                  ] as const).map(([id, label]) => (
-                    <button
-                      key={id}
-                      onClick={() => setView(id)}
-                      className={`whitespace-nowrap rounded-md border px-3 py-1.5 text-[11px] font-medium uppercase tracking-wider transition ${
-                        view === id
-                          ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-300"
-                          : "border-white/10 bg-white/[0.02] text-white/60 hover:text-white"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <div className="relative overflow-hidden rounded-lg border border-white/10 bg-black">
-                  <img loading="lazy" decoding="async"
-                    src={crossSection.url}
-                    alt={`Sandwich panel ${recommended}mm ${core} cross section`}
-                    className={`w-full object-cover transition duration-500 ${
-                      view === "exploded" ? "scale-110 opacity-90" :
-                      view === "3d" ? "rotate-[-2deg] scale-105" :
-                      view === "thermal" ? "opacity-80 [filter:hue-rotate(300deg)_saturate(1.4)_contrast(1.1)]" :
-                      "scale-100"
-                    }`}
-                    style={{ aspectRatio: "16 / 9" }}
-                  />
-                  {/* thickness callout */}
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 rounded border border-emerald-400/50 bg-black/60 px-2 py-1 text-[10px] font-mono text-emerald-300 backdrop-blur">
-                    {recommended} mm
-                  </div>
-                  {/* controls */}
-                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 border-t border-white/10 bg-black/60 px-3 py-2 text-[10px] font-medium uppercase tracking-widest text-white/60 backdrop-blur">
-                    <span className="flex items-center gap-1"><RotateCw className="h-3 w-3 text-emerald-300/80" /> Rotate</span>
-                    <span className="flex items-center gap-1"><ZoomIn className="h-3 w-3 text-emerald-300/80" /> Zoom</span>
-                    <span className="flex items-center gap-1"><Boxes className="h-3 w-3 text-emerald-300/80" /> Explode</span>
-                    <span className="flex items-center gap-1"><Scan className="h-3 w-3 text-emerald-300/80" /> Measure</span>
-                  </div>
-                </div>
-
-                {/* Live metrics vs. target */}
-                <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-                  <div className="rounded-md border border-white/10 bg-white/[0.02] p-3">
-                    <div className="text-[10px] uppercase tracking-widest text-white/50">Target U</div>
-                    <div className="text-sm font-semibold text-white">{(targetUValue(app, temp) + climateShift(climate)).toFixed(2)}</div>
-                  </div>
-                  <div className="rounded-md border border-white/10 bg-white/[0.02] p-3">
-                    <div className="text-[10px] uppercase tracking-widest text-white/50">Achieved U</div>
-                    <div className="text-sm font-semibold text-emerald-300">{u}</div>
-                  </div>
-                  <div className="rounded-md border border-white/10 bg-white/[0.02] p-3">
-                    <div className="text-[10px] uppercase tracking-widest text-white/50">Heat Loss</div>
-                    <div className="text-sm font-semibold text-white">{heatLoss(core, recommended)} kWh/m²·yr</div>
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            {/* Thickness Options row */}
-            <Card title="Panel Thickness Options" icon={Ruler}>
-              <div className="grid grid-cols-4 gap-3 md:grid-cols-8">
-                {THICKNESSES.map((t) => {
-                  const active = t === recommended;
-                  return (
-                    <button
-                      key={t}
-                      onClick={() => toggleCompare(t)}
-                      className={`group overflow-hidden rounded-lg border text-left transition ${
-                        active ? "border-emerald-400/70 ring-1 ring-emerald-400/40"
-                               : compare.includes(t) ? "border-emerald-400/40"
-                               : "border-white/10 hover:border-white/25"
-                      } bg-black/40`}
-                    >
-                      <div className="border-b border-white/10 px-2 py-1 text-center text-[11px] font-semibold text-emerald-300">
-                        {t} mm
-                      </div>
-                      <img loading="lazy" decoding="async" src={THICK_IMG[t].url} alt={`${t} mm panel`} className="h-16 w-full object-cover" />
-                      <div className="px-2 py-1 text-[10px] text-white/50 group-hover:text-white/70">
-                        Tap to compare
-                      </div>
-                    </button>
-                  );
-                })}
+                  {ok ? "Suitable" : "Not suitable"}
+                </span>
               </div>
-              <p className="mt-2 text-[11px] text-white/40">
-                * Thickness availability depends on core type and project requirements.
-              </p>
-            </Card>
-
-            {/* Compare table */}
-            <Card title="Compare Thicknesses" icon={Boxes}>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[640px] text-left text-[12px]">
-                  <thead>
-                    <tr className="border-b border-white/10 text-[10px] uppercase tracking-widest text-white/50">
-                      <th className="py-2 pr-3">Metric</th>
-                      {compare.map((t) => (
-                        <th key={t} className={`px-3 py-2 text-center ${t === recommended ? "text-emerald-300" : "text-white/70"}`}>
-                          {t} mm{t === recommended ? " ★" : ""}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="text-white/80">
-                    {[
-                      { label: "U-Value (W/m²·K)", get: (t: Thickness) => uValue(core, t).toString() },
-                      { label: "Heat Loss (kWh/m²·yr)", get: (t: Thickness) => heatLoss(core, t).toString() },
-                      { label: "Weight (kg/m²)", get: (t: Thickness) => weight(core, t).toString() },
-                      { label: "Fire Rating", get: (t: Thickness) => fireRatingFor(core, t) },
-                      { label: "Cost Level", get: (t: Thickness) => costLevel(core, t) },
-                      { label: "Recommended Use", get: (t: Thickness) => "★".repeat(Math.min(5, 1 + Math.floor(t / 40))) },
-                    ].map((row) => (
-                      <tr key={row.label} className="border-b border-white/5">
-                        <td className="py-2 pr-3 text-white/60">{row.label}</td>
-                        {compare.map((t) => (
-                          <td key={t} className={`px-3 py-2 text-center ${t === recommended ? "font-semibold text-emerald-300" : ""}`}>
-                            {row.get(t)}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <p className="mt-2 text-[11px] text-white/40">Tap thickness tiles above to add/remove from comparison (max 4).</p>
-            </Card>
-          </div>
+            );
+          })}
         </div>
-      </section>
+      </div>
+    </div>
+  );
 
-      {/* Core Materials */}
-      <section className="mx-auto max-w-[1440px] px-4 pb-10 md:px-8">
-        <h2 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300/80">Core Materials</h2>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {[
-            { c: "PIR" as Core, img: corePIR.url, bullets: ["Best Thermal Performance", "High Fire Resistance", "Rigid & Durable", "Ideal for Cold Rooms"] },
-            { c: "Rock Wool" as Core, img: coreRW.url, bullets: ["Excellent Fire Resistance", "High Sound Insulation", "Non-Combustible", "Ideal for Industrial Buildings"] },
-            { c: "EPS" as Core, img: coreEPS.url, bullets: ["Cost Effective", "Lightweight", "Good Insulation", "General Purpose Use"] },
-            { c: "PUR" as Core, img: corePUR.url, bullets: ["High Insulation", "Good Fire Performance", "Moisture Resistant", "Versatile Applications"] },
-          ].map((m) => (
+  const ComparePanel = (
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+        <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
+          Pick up to 3 thicknesses to compare
+        </div>
+        <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-12">
+          {THICKNESSES.map((t) => (
+            <Chip key={t} active={compare.includes(t)} onClick={() => toggleCompare(t)}>
+              {t}
+            </Chip>
+          ))}
+        </div>
+      </div>
+
+      <div className="overflow-x-auto rounded-2xl border border-white/10">
+        <table className="w-full min-w-[560px] text-left text-sm">
+          <thead className="bg-white/[0.04] font-mono text-[10px] uppercase tracking-[0.2em] text-white/50">
+            <tr>
+              <th className="px-4 py-3">Thickness</th>
+              <th className="px-4 py-3">U-Value</th>
+              <th className="px-4 py-3">Weight</th>
+              <th className="px-4 py-3">Fire</th>
+              <th className="px-4 py-3">Cost</th>
+              <th className="px-4 py-3">Performance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {compare
+              .slice()
+              .sort((a, b) => a - b)
+              .map((t) => {
+                const cu = calcUValue(core, t);
+                const cw = calcWeight(core, t, extSteel, intSteel);
+                const cf = fireMinutesOf(core, t);
+                const perfC = thermalPerformance(cu);
+                const cost = t <= 60 ? "$" : t <= 100 ? "$$" : t <= 150 ? "$$$" : "$$$$";
+                return (
+                  <tr key={t} className="border-t border-white/5 text-white/80">
+                    <td className="px-4 py-3 font-mono">{t} mm</td>
+                    <td className="px-4 py-3 font-mono">{cu} W/m²K</td>
+                    <td className="px-4 py-3 font-mono">{cw} kg/m²</td>
+                    <td className="px-4 py-3 font-mono">{fireLabel(cf)}</td>
+                    <td className="px-4 py-3 font-mono">{cost}</td>
+                    <td className="px-4 py-3">{perfC}</td>
+                  </tr>
+                );
+              })}
+            {compare.length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-4 py-6 text-center text-white/50">
+                  Select thicknesses above to compare.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const ReportPanel = (
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+        <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">Calculation Report</div>
+        <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+          <ReportRow k="Application" v={app} />
+          <ReportRow k="Core Material" v={core} />
+          <ReportRow k="Climate" v={climate} />
+          <ReportRow k="Internal Temp" v={temp} />
+          <ReportRow k="Fire Requirement" v={fire} />
+          <ReportRow k="Panel Thickness" v={`${thickness} mm`} />
+          <ReportRow k="Exterior Steel" v={`${extSteel.toFixed(2)} mm`} />
+          <ReportRow k="Interior Steel" v={`${intSteel.toFixed(2)} mm`} />
+          <ReportRow k="U-Value" v={`${u} W/m²K`} />
+          <ReportRow k="R-Value" v={`${rTotal} m²K/W`} />
+          <ReportRow k="Weight" v={`${w} kg/m²`} />
+          <ReportRow k="Heat Loss" v={`${hLoss} W/m² (ΔT ${deltaT} K)`} />
+          <ReportRow k="Fire Achieved" v={fireLabel(fireAchieved)} />
+          <ReportRow k="Recommended" v={`${rec.min}–${rec.max} mm`} />
+        </dl>
+        <p className="mt-4 text-xs text-white/50">
+          This calculator provides conceptual guidance only. Final sandwich panel thickness must be verified by project-specific engineering, local regulations, fire requirements and thermal performance calculations.
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="button"
+          onClick={downloadReport}
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300"
+        >
+          <Download className="size-4" />
+          Download Calculation Report
+        </button>
+        <Link
+          to={`/project-inquiry?${inquiryParams}` as never}
+          className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+        >
+          <ArrowRight className="size-4" />
+          Request Engineering Recommendation
+        </Link>
+        <Link
+          to={"/contact" as never}
+          className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+        >
+          <PhoneCall className="size-4" />
+          Talk to an Engineer
+        </Link>
+      </div>
+    </div>
+  );
+
+  const CrossSectionPanel = (
+    <div className="space-y-4">
+      <CrossSection core={core} thickness={thickness} extSteel={extSteel} intSteel={intSteel} />
+      {ResultCards}
+    </div>
+  );
+
+  const tabContent = {
+    Inputs: InputsPanel,
+    Recommendation: RecommendationPanel,
+    "Cross Section": CrossSectionPanel,
+    Charts: ChartsPanel,
+    Compare: ComparePanel,
+    Report: ReportPanel,
+  }[tab];
+
+  return (
+    <div className="min-h-screen bg-[#0A0B0C] text-white">
+      <SiteHeader />
+
+      <main className="mx-auto max-w-7xl px-4 pb-24 pt-8 sm:px-6">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-emerald-400">
+            Engineering Decision Support
+          </div>
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            Panel Thickness Calculator
+          </h1>
+          <p className="mt-2 max-w-3xl text-sm text-white/60">
+            Dynamic sandwich panel sizing. Live U-value, weight, heat loss and fire suitability update as you change inputs. All values are computed in real time — no static tables, no images.
+          </p>
+        </div>
+
+        {/* Tabs — always visible, work on desktop and mobile */}
+        <div className="mb-6 flex flex-wrap gap-2 rounded-xl border border-white/10 bg-white/[0.02] p-1.5">
+          {TABS.map((t) => (
             <button
-              key={m.c}
-              onClick={() => setCore(m.c)}
-              className={`overflow-hidden rounded-lg border bg-white/[0.02] p-3 text-left transition ${
-                core === m.c ? "border-emerald-400/60" : "border-white/10 hover:border-white/25"
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={`rounded-lg px-3 py-2 text-xs font-medium transition ${
+                tab === t
+                  ? "bg-emerald-400 text-black"
+                  : "text-white/70 hover:bg-white/5 hover:text-white"
               }`}
             >
-              <div className="mb-2 text-[13px] font-semibold text-white">{m.c}</div>
-              <img loading="lazy" decoding="async" src={m.img} alt={`${m.c} core`} className="h-24 w-full rounded object-cover" />
-              <ul className="mt-2 space-y-0.5 text-[11px] text-white/60">
-                {m.bullets.map((b) => (
-                  <li key={b} className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-emerald-400/70" /> {b}</li>
-                ))}
-              </ul>
+              {t}
             </button>
           ))}
         </div>
-      </section>
 
-      {/* Applications */}
-      <section className="mx-auto max-w-[1440px] px-4 pb-10 md:px-8">
-        <h2 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300/80">Application Examples</h2>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-          {[
-            { label: "Cold Storage", img: appCold.url, target: "Cold Storage" as Application },
-            { label: "Food Factory", img: appFood.url, target: "Food Factory" as Application },
-            { label: "Warehouse", img: appWH.url, target: "Warehouse" as Application },
-            { label: "Clean Room", img: appClean.url, target: "Clean Room" as Application },
-            { label: "Industrial Building", img: appIndustrial.url, target: "Industrial Building" as Application },
-            { label: "Commercial Building", img: appCommercial.url, target: "Commercial Building" as Application },
-          ].map((a) => (
-            <button
-              key={a.label}
-              onClick={() => setApp(a.target)}
-              className={`group relative overflow-hidden rounded-lg border transition ${
-                app === a.target ? "border-emerald-400/60" : "border-white/10 hover:border-white/25"
-              }`}
-            >
-              <img loading="lazy" decoding="async" src={a.img} alt={a.label} className="h-24 w-full object-cover transition group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 px-2 py-1.5 text-left text-[11px] font-semibold uppercase tracking-wider text-white">
-                {a.label}
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Material details + Thermal inspection + Quality */}
-      <section className="mx-auto max-w-[1440px] px-4 pb-14 md:px-8">
-        <div className="grid gap-6 lg:grid-cols-3">
-          <Card title="Material Details" icon={Layers}>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { l: "PIR Foam", i: matPIR.url },
-                { l: "Rock Wool", i: matRW.url },
-                { l: "PPGI Coil", i: matPPGI.url },
-                { l: "Steel Surface", i: matSteel.url },
-              ].map((m) => (
-                <div key={m.l} className="overflow-hidden rounded-md border border-white/10 bg-black/30">
-                  <img loading="lazy" decoding="async" src={m.i} alt={m.l} className="h-20 w-full object-cover" />
-                  <div className="px-2 py-1 text-[11px] text-white/70">{m.l}</div>
-                </div>
-              ))}
+        {/* Desktop: side-by-side inputs + selected tab; Mobile: single column */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div className="lg:col-span-5">{tab === "Inputs" ? InputsPanel : (
+            <div className="hidden lg:block">{InputsPanel}</div>
+          )}
+          {tab === "Inputs" && (
+            <div className="mt-6 lg:hidden">
+              <CrossSection core={core} thickness={thickness} extSteel={extSteel} intSteel={intSteel} />
             </div>
-          </Card>
-
-          <Card title="Thermal Inspection" icon={ThermometerSun}>
-            <img loading="lazy" decoding="async" src={thermalCam.url} alt="Thermal inspection camera" className="mb-3 h-32 w-full rounded object-contain" />
-            <ul className="space-y-1.5 text-[12px] text-white/70">
-              {["Identify Heat Loss", "Improve Efficiency", "Ensure Quality", "Save Energy"].map((b) => (
-                <li key={b} className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400/80" /> {b}</li>
-              ))}
-            </ul>
-          </Card>
-
-          <Card title="Engineering & Quality" icon={Factory}>
-            <ul className="space-y-2 text-[12px] text-white/70">
-              {[
-                "High Quality Raw Materials",
-                "Advanced Production Lines",
-                "ISO 9001:2015 Certified",
-                "Strict Quality Control",
-              ].map((b) => (
-                <li key={b} className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-400" /> {b}
-                </li>
-              ))}
-            </ul>
-          </Card>
-        </div>
-      </section>
-
-      {/* Downloads + CTAs */}
-      <section className="mx-auto max-w-[1440px] px-4 pb-16 md:px-8">
-        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-          <Card title="Downloads" icon={Download}>
-            <ul className="grid gap-2 text-[12px] md:grid-cols-2">
-              {[
-                "Technical Datasheet (PDF)",
-                "Panel Specification (PDF)",
-                "Installation Guide (PDF)",
-                "Engineering Guide (PDF)",
-              ].map((r) => (
-                <li key={r}>
-                  <Link
-                    to="/project-inquiry"
-                    className="flex items-center justify-between rounded-md border border-white/10 bg-white/[0.02] px-3 py-2 text-white/70 transition hover:border-emerald-400/40 hover:text-white"
-                  >
-                    <span className="flex items-center gap-2">
-                      <FileText className="h-3.5 w-3.5 text-emerald-400/80" />
-                      {r}
-                    </span>
-                    <Download className="h-3.5 w-3.5" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Card>
-
-          <div className="grid gap-3">
-            <Link
-              to="/project-inquiry"
-              className="group flex items-center justify-between rounded-lg border border-emerald-400/50 bg-emerald-500/15 px-5 py-4 transition hover:bg-emerald-500/25"
-            >
-              <div>
-                <div className="text-[11px] uppercase tracking-[0.16em] text-emerald-300/80">Primary</div>
-                <div className="font-semibold text-white">Request Quotation</div>
-                <div className="text-[11px] text-white/60">Get a customized offer for your project</div>
+          )}
+          </div>
+          <div className="lg:col-span-7">
+            {tab === "Inputs" ? (
+              <div className="space-y-4">
+                <CrossSection core={core} thickness={thickness} extSteel={extSteel} intSteel={intSteel} />
+                {ResultCards}
               </div>
-              <ArrowRight className="h-4 w-4 text-emerald-300 transition group-hover:translate-x-1" />
-            </Link>
-            <Link
-              to="/ai-assistant"
-              className="group flex items-center justify-between rounded-lg border border-white/15 bg-white/[0.03] px-5 py-4 transition hover:border-white/30"
-            >
-              <div>
-                <div className="text-[11px] uppercase tracking-[0.16em] text-white/50">Engineer</div>
-                <div className="font-semibold text-white">Talk to an Engineer</div>
-                <div className="text-[11px] text-white/60">Discuss your project with our experts</div>
-              </div>
-              <MessageSquare className="h-4 w-4 text-white/60" />
-            </Link>
-            <Link
-              to="/project-inquiry"
-              className="group flex items-center justify-between rounded-lg border border-white/15 bg-white/[0.03] px-5 py-4 transition hover:border-white/30"
-            >
-              <div>
-                <div className="text-[11px] uppercase tracking-[0.16em] text-white/50">Consultation</div>
-                <div className="font-semibold text-white">Book Online Consultation</div>
-                <div className="text-[11px] text-white/60">Schedule a meeting at your convenience</div>
-              </div>
-              <PhoneCall className="h-4 w-4 text-white/60" />
-            </Link>
+            ) : (
+              tabContent
+            )}
           </div>
         </div>
 
-        {/* Internal links */}
-        <div className="mt-10 grid gap-3 border-t border-white/10 pt-6 text-[12px] text-white/60 md:grid-cols-4">
-          <Link to="/solutions/sandwich-panels" className="hover:text-white">Sandwich Panels →</Link>
-          <Link to="/product-configurator" className="hover:text-white">3D Panel Configurator →</Link>
-          <Link to="/investment-calculator" className="hover:text-white">Investment Calculator →</Link>
-          <Link to="/industries" className="hover:text-white">All Industries →</Link>
+        {/* CTA row */}
+        <div className="mt-10 flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-gradient-to-r from-emerald-500/10 via-white/[0.02] to-transparent p-5">
+          <div className="mr-auto">
+            <div className="text-sm font-semibold text-white">
+              Ready to lock in {thickness} mm {core}?
+            </div>
+            <div className="text-xs text-white/60">
+              NEVO Engineering will validate the design against project-specific loads, fire and thermal requirements.
+            </div>
+          </div>
+          <Link
+            to={`/project-inquiry?${inquiryParams}` as never}
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300"
+          >
+            Request Recommendation <ArrowRight className="size-4" />
+          </Link>
+          <button
+            type="button"
+            onClick={downloadReport}
+            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+          >
+            <Download className="size-4" /> Download Report
+          </button>
+          <Link
+            to={"/contact" as never}
+            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+          >
+            <MessageSquare className="size-4" /> Talk to Engineer
+          </Link>
         </div>
 
-        <div className="mt-8 grid gap-3 border-t border-white/10 pt-6 text-[11px] uppercase tracking-[0.16em] text-white/50 md:grid-cols-4">
-          <div className="flex items-center gap-2"><Snowflake className="h-3.5 w-3.5 text-emerald-400/70" /> Right Thickness · Better Performance</div>
-          <div className="flex items-center gap-2"><Zap className="h-3.5 w-3.5 text-emerald-400/70" /> Energy Saving · Lower Costs</div>
-          <div className="flex items-center gap-2"><Calculator className="h-3.5 w-3.5 text-emerald-400/70" /> Engineered Solutions · Global Support</div>
-          <div className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400/70" /> Built to Perform · Built to Last</div>
-        </div>
-      </section>
+        <p className="mt-6 text-xs text-white/40">
+          This calculator provides conceptual guidance only. Final sandwich panel thickness must be verified by project-specific engineering, local regulations, fire requirements and thermal performance calculations.
+        </p>
+      </main>
 
       <SiteFooter />
+    </div>
+  );
+}
+
+function MetricCard({
+  icon: Icon,
+  label,
+  value,
+  unit,
+  tone,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  unit: string;
+  tone: "emerald" | "white" | "amber" | "rose";
+}) {
+  const toneCls = {
+    emerald: "text-emerald-300",
+    white: "text-white",
+    amber: "text-amber-300",
+    rose: "text-rose-300",
+  }[tone];
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+      <div className="mb-1 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-white/50">
+        <Icon className="size-3.5" />
+        {label}
+      </div>
+      <div className={`font-mono text-lg font-semibold ${toneCls}`}>{value}</div>
+      {unit && <div className="font-mono text-[10px] text-white/50">{unit}</div>}
+    </div>
+  );
+}
+
+function ScoreBadge({
+  label,
+  value,
+}: {
+  label: string;
+  value: "Excellent" | "Very Good" | "Good" | "Limited" | "Not Recommended";
+}) {
+  return (
+    <div className={`rounded-xl border p-3 ${performanceBadge(value)}`}>
+      <div className="font-mono text-[10px] uppercase tracking-[0.2em] opacity-70">{label}</div>
+      <div className="mt-1 text-sm font-semibold">{value}</div>
+    </div>
+  );
+}
+
+function ReportRow({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex items-center justify-between rounded-md border border-white/5 bg-white/[0.02] px-3 py-2">
+      <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50">{k}</dt>
+      <dd className="font-mono text-sm text-white">{v}</dd>
     </div>
   );
 }
