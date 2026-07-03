@@ -179,10 +179,13 @@ def _parse_headers(spec: str) -> dict[str, str]:
     out: dict[str, str] = {}
     if not spec:
         return out
-    # Normalize: split on newlines AND on `;` so both styles work.
+    # Split on newlines first, then split each line on `;` ONLY where the
+    # following chunk looks like `Name:` or `Name=` — this keeps values like
+    # `Accept-Language: fa,en;q=0.8` intact.
+    _entry_split = re.compile(r";\s*(?=[A-Za-z][\w-]*\s*[:=])")
     parts: list[str] = []
     for line in spec.splitlines():
-        parts.extend(p for p in line.split(";"))
+        parts.extend(_entry_split.split(line))
     for raw in (p.strip() for p in parts if p.strip()):
         if ":" in raw:
             name, _, val = raw.partition(":")
