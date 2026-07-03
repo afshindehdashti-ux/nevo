@@ -791,7 +791,8 @@ def _fmt_ms_label(ms: float) -> str:
     """Human-friendly bucket edge label — ms below 1000, seconds above."""
     if ms >= 1000:
         v = ms / 1000.0
-        return f"{v:.1f}s".rstrip("0").rstrip(".") + ("s" if not str(v).endswith("s") else "")
+        s = f"{v:.1f}".rstrip("0").rstrip(".")
+        return f"{s}s"
     return f"{int(ms)}"
 
 
