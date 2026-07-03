@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { submitInquiry } from "@/lib/inquiries.functions";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -225,7 +227,22 @@ function ProjectInquiryPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [attachedConfig, setAttachedConfig] = useState<Record<string, unknown> | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const submitInquiryFn = useServerFn(submitInquiry);
+
+  // Read ?config=<base64 json> to attach calculator/configurator state.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = new URLSearchParams(window.location.search).get("config");
+      if (!raw) return;
+      const json = JSON.parse(
+        decodeURIComponent(escape(atob(raw.replace(/-/g, "+").replace(/_/g, "/")))),
+      );
+      if (json && typeof json === "object") setAttachedConfig(json as Record<string, unknown>);
+    } catch { /* ignore malformed config */ }
+  }, []);
 
   // hydrate
   useEffect(() => {
@@ -285,15 +302,54 @@ function ProjectInquiryPage() {
     }
     setSubmitting(true);
     try {
-      // Simulate secure delivery to the NEVO engineering desk.
-      // A backend endpoint can replace this without touching UX.
-      await new Promise((r) => setTimeout(r, 650));
+      await submitInquiryFn({
+        data: {
+          name: form.contact.trim(),
+          email,
+          phone: form.phone.trim() || null,
+          company: form.company.trim() || null,
+          country: form.country.trim() || null,
+          application: form.industry.trim() || form.panelType.trim() || null,
+          message: JSON.stringify(
+            {
+              projectTypes: form.projectTypes,
+              location: form.location,
+              projectStatus: form.projectStatus,
+              capacity: form.capacity,
+              panelType: form.panelType,
+              coreType: form.coreType,
+              thickness: form.thickness,
+              steelType: form.steelType,
+              automation: form.automation,
+              shifts: form.shifts,
+              engineering: form.engineering,
+              budget: form.budget,
+              timeline: form.timeline,
+              investmentStage: form.investmentStage,
+              decision: form.decision,
+              startDate: form.startDate,
+              website: form.website,
+              whatsapp: form.whatsapp,
+              files: form.files.map((f) => f.name),
+              notes: form.notes,
+            },
+            null,
+            2,
+          ).slice(0, 4900),
+          source_page: typeof window !== "undefined" ? window.location.pathname : null,
+          calculator_state: attachedConfig ?? null,
+        },
+      });
       try { localStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
       setSubmitted(true);
       toast.success("Project inquiry submitted", {
         description: "A senior NEVO engineer will contact you within one business day.",
       });
       setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50);
+    } catch (err) {
+      toast.error("Submission failed", {
+        description: "We couldn't deliver your request. Please try again in a moment.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -336,6 +392,32 @@ function ProjectInquiryPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* ATTACHED CONFIGURATION (from calculator/configurator) */}
+      {attachedConfig && (
+        <Section className="border-b border-border/60 bg-emerald-500/5 py-10">
+          <div className="mx-auto flex max-w-[1200px] flex-col gap-4 rounded-2xl border border-emerald-500/30 bg-background p-6 md:flex-row md:items-start md:justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-emerald-500">
+                <ClipboardCheck className="h-4 w-4" /> Attached configuration
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                We received your selections from the NEVO engineering tools. Our team will use this as the starting point for your recommendation.
+              </p>
+              <pre className="mt-3 max-h-48 overflow-auto rounded-lg bg-muted/50 p-3 text-xs leading-relaxed text-foreground/80">
+{JSON.stringify(attachedConfig, null, 2)}
+              </pre>
+            </div>
+            <button
+              type="button"
+              onClick={() => setAttachedConfig(null)}
+              className="text-xs font-medium text-muted-foreground underline underline-offset-2 hover:text-foreground"
+            >
+              Remove attachment
+            </button>
+          </div>
+        </Section>
+      )}
 
       {/* PROJECT TYPES */}
       <Section className="bg-background">

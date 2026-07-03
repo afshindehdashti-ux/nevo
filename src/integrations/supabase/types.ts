@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      download_events: {
+        Row: {
+          category: string | null
+          created_at: string
+          document_id: string
+          document_title: string | null
+          id: number
+          ip: string | null
+          source_page: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          document_id: string
+          document_title?: string | null
+          id?: number
+          ip?: string | null
+          source_page?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          document_id?: string
+          document_title?: string | null
+          id?: number
+          ip?: string | null
+          source_page?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       header_logo_events: {
         Row: {
           client_ts: string | null
@@ -86,6 +119,57 @@ export type Database = {
           ua?: string | null
           url?: string | null
           variant?: string | null
+        }
+        Relationships: []
+      }
+      project_inquiries: {
+        Row: {
+          application: string | null
+          calculator_state: Json | null
+          company: string | null
+          country: string | null
+          created_at: string
+          email: string
+          id: string
+          ip: string | null
+          message: string | null
+          name: string
+          phone: string | null
+          source_page: string | null
+          status: string
+          user_agent: string | null
+        }
+        Insert: {
+          application?: string | null
+          calculator_state?: Json | null
+          company?: string | null
+          country?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          ip?: string | null
+          message?: string | null
+          name: string
+          phone?: string | null
+          source_page?: string | null
+          status?: string
+          user_agent?: string | null
+        }
+        Update: {
+          application?: string | null
+          calculator_state?: Json | null
+          company?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          ip?: string | null
+          message?: string | null
+          name?: string
+          phone?: string | null
+          source_page?: string | null
+          status?: string
+          user_agent?: string | null
         }
         Relationships: []
       }
