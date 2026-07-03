@@ -94,10 +94,14 @@ try {
   await page.evaluate(() => {
     const img = document.querySelector('[data-testid="header-logo"]');
     if (!(img instanceof HTMLImageElement)) return;
-    const src = img.src;
+    // Cache-bust so the browser actually issues a fresh network request
+    // that React's post-hydration onError listener can observe (the initial
+    // SSR-driven load error fires before hydration and gets dropped).
+    const base = img.src.split("?")[0];
     img.removeAttribute("src");
-    img.src = src;
+    img.src = `${base}?e2e-force-fail=${Date.now()}`;
   });
+
 
   // Poll until the SVG fallback is present; on each miss dump the current
   // state so a debug run shows why the chain stalled.
