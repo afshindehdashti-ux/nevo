@@ -574,6 +574,7 @@ function FactoryLayoutPage() {
     building,
     shift,
   ]);
+  const layoutPreview = useMemo(() => computeFactoryLayout(cfg), [cfg]);
   const equipment = useMemo(() => computeEquipment(capacity, core, automation), [capacity, core, automation]);
   const expansionCopy = expansionRecommendation({ capacity, building });
   const bldRecommendation = recommendedBuildingCopy({ capacity, core });
