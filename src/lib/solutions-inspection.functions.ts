@@ -46,9 +46,9 @@ async function ensureAdmin(supabase: any, userId: string) {
 
 export const listSolutionsInspection = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .handler(async ({ context }): Promise<SolutionsInspectionList> => {
     await ensureAdmin(context.supabase, context.userId);
-    const { data, error } = await context.supabase
+    const { data, error } = await (context.supabase as any)
       .from("solutions_inspection")
       .select(
         "id, locale, path, url, verdict, coverage_state, indexing_state, mobile_verdict, rich_verdict, google_canonical, rich_detail, last_error, inspected_at",
