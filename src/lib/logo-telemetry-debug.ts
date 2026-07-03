@@ -519,6 +519,7 @@ export function dumpLogoTelemetryAsJSON(
 async function copyLogoTelemetryDump(
   origin: LogoTelemetryDump["origin"] = "console",
 ): Promise<string> {
+  if (!isLogoDebugBuildEnabled()) return "";
   const json = dumpLogoTelemetryAsJSON(origin);
   // Console echo first — clipboard may reject if the tab isn't focused.
   if (typeof console !== "undefined" && typeof console.log === "function") {
