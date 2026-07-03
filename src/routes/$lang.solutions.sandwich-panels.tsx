@@ -109,6 +109,7 @@ const FAQS: { q: string; a: string }[] = [
 
 export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
   head: ({ params }) => {
+    const canonical = `${SITE.url}/${params.lang}${URL_PATH}`;
     const faqLd = {
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -122,16 +123,47 @@ export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-        { "@type": "ListItem", position: 2, name: "Solutions", item: "/solutions" },
-        { "@type": "ListItem", position: 3, name: "Finished Sandwich Panels", item: URL_PATH },
+        { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/${params.lang}` },
+        { "@type": "ListItem", position: 2, name: "Solutions", item: `${SITE.url}/${params.lang}/solutions` },
+        { "@type": "ListItem", position: 3, name: "Finished Sandwich Panels", item: canonical },
       ],
     };
-    const seo = buildSeo({ title: TITLE, description: DESCRIPTION, path: URL_PATH, lang: params.lang });
+    const productLd = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: "NEVO Sandwich Panels — PIR, PUR & Rock Wool",
+      brand: { "@type": "Brand", name: SITE.name },
+      category: "Insulated sandwich panels",
+      description: DESCRIPTION,
+      url: canonical,
+      additionalProperty: [
+        { "@type": "PropertyValue", name: "Cores", value: "PIR, PUR, Rock wool, EPS" },
+        { "@type": "PropertyValue", name: "Standards", value: "EN 14509, EN 13501-1" },
+        { "@type": "PropertyValue", name: "Applications", value: "Roof, wall, cold room, clean room, industrial buildings" },
+      ],
+    };
+    const seo = buildSeo({
+      title: TITLE,
+      description: DESCRIPTION,
+      path: URL_PATH,
+      lang: params.lang,
+      type: "product",
+      keywords: [
+        "sandwich panels",
+        "PIR sandwich panels",
+        "PUR sandwich panels",
+        "rock wool sandwich panels",
+        "cold room panels",
+        "roof and wall panels",
+        "EN 14509 sandwich panels",
+        "insulated metal panels supplier",
+      ],
+    });
     return {
       ...seo,
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(faqLd) },
+        { type: "application/ld+json", children: JSON.stringify(productLd) },
         { type: "application/ld+json", children: JSON.stringify(crumbsLd) },
       ],
     };
