@@ -126,10 +126,10 @@ export const Route = createFileRoute("/$lang/solutions/")({
     return {
       ...seo,
       scripts: [
-        ...(seo.scripts ?? []),
         { type: "application/ld+json", children: JSON.stringify(crumbsLd) },
       ],
     };
+
   },
   component: SolutionsIndex,
 });
