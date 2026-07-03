@@ -853,6 +853,20 @@ def _build_latency_buckets() -> list[tuple[str, float]]:
 
 _LATENCY_BUCKETS: list[tuple[str, float]] = _build_latency_buckets()
 
+# Sort order for the summary error_kind × status_class combo table.
+# `default` keeps the historical view (non-ok rows first, then count desc).
+# Other fields are sorted by the configured metric with `desc` by default
+# (highest count / success rate / failure share at the top).
+_SORT_COMBOS_BY_OPTIONS = {"default", "count", "success_rate", "failures_pct"}
+_SORT_COMBOS_BY = (os.environ.get("SORT_COMBOS_BY") or "default").strip().lower()
+if _SORT_COMBOS_BY not in _SORT_COMBOS_BY_OPTIONS:
+    print(f"preflight: warning: invalid SORT_COMBOS_BY={_SORT_COMBOS_BY!r}; using default", file=sys.stderr)
+    _SORT_COMBOS_BY = "default"
+_SORT_COMBOS_ORDER = (os.environ.get("SORT_COMBOS_ORDER") or "desc").strip().lower()
+if _SORT_COMBOS_ORDER not in {"asc", "desc"}:
+    print(f"preflight: warning: invalid SORT_COMBOS_ORDER={_SORT_COMBOS_ORDER!r}; using desc", file=sys.stderr)
+    _SORT_COMBOS_ORDER = "desc"
+
 
 def _bucket_for(ms: float) -> int:
     for i, (_, hi) in enumerate(_LATENCY_BUCKETS):
