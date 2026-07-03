@@ -20,6 +20,7 @@
     "check:seo:json": "node scripts/check-seo-metadata.mjs --json",
     "check:all": "npm run check:i18n && npm run check:seo",
     "verify:publish": "node scripts/verify-publish.mjs",
+    "test": "vitest run",
     "test:visual": "node scripts/visual/header-logo.mjs",
     "test:visual:update": "node scripts/visual/header-logo.mjs --update",
     "test:e2e:logo-fallback": "node scripts/e2e/header-logo-fallback.mjs",
