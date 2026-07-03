@@ -25,12 +25,13 @@ export function KnowledgeHubPreview({
   eyebrow = "Knowledge hub",
   title = "Read the engineering behind this scope.",
   lede = "Handpicked technical articles and downloadable references from the NEVO engineering desk — matched to this solution.",
+  loading = false,
 }: Props) {
   const items = slugs
     .map((s) => ARTICLES.find((a) => a.slug === s))
     .filter((a): a is (typeof ARTICLES)[number] => Boolean(a));
 
-  if (items.length === 0) return null;
+  const hasMatches = items.length > 0;
 
   return (
     <Section tone="default">
