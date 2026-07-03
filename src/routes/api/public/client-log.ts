@@ -71,6 +71,24 @@ export const Route = createFileRoute("/api/public/client-log")({
           const ref = request.headers.get("referer") || "-";
 
           const logoRows: Array<any> = [];
+          const sentryEvents: Array<{
+            correlationId?: string;
+            stage?: string;
+            variant?: string;
+            failedSrc?: string;
+            nextSrc?: string;
+            viewportWidth?: number;
+            online?: boolean;
+            terminal?: boolean;
+            schema?: string;
+            schemaVersion?: number;
+            route?: string;
+            url?: string;
+            ua?: string;
+            release?: string;
+            clientTs?: string | number | null;
+            extra: Record<string, unknown>;
+          }> = [];
           for (const e of entries) {
             const line = [
               "[client-log]",
@@ -128,6 +146,27 @@ export const Route = createFileRoute("/api/public/client-log")({
                 ip: ip === "-" ? null : ip.slice(0, 64),
                 client_ts: clientTs && !isNaN(clientTs.getTime()) ? clientTs.toISOString() : null,
               });
+
+              if (msg === "header.logo.error") {
+                sentryEvents.push({
+                  correlationId: str(extra.correlationId, 64) ?? undefined,
+                  stage: str(extra.stage, 32) ?? undefined,
+                  variant: str(extra.variant, 64) ?? undefined,
+                  failedSrc: str(extra.failedSrc, 500) ?? undefined,
+                  nextSrc: str(extra.nextSrc, 500) ?? undefined,
+                  viewportWidth: num(extra.viewportWidth) ?? undefined,
+                  online: typeof extra.online === "boolean" ? extra.online : undefined,
+                  terminal: extra.terminal === true,
+                  schema: str(extra.schema, 64) ?? undefined,
+                  schemaVersion: num(extra.schemaVersion) ?? undefined,
+                  route: str(e.route, 200) ?? undefined,
+                  url: str(e.url, 400) ?? undefined,
+                  ua: str(e.ua, 240) ?? undefined,
+                  release: str(e.release, 40) ?? undefined,
+                  clientTs: clientTs && !isNaN(clientTs.getTime()) ? clientTs.toISOString() : null,
+                  extra,
+                });
+              }
             }
           }
 
@@ -140,6 +179,17 @@ export const Route = createFileRoute("/api/public/client-log")({
               console.error("[client-log] logo persist error:", err);
             }
           }
+
+          if (sentryEvents.length > 0) {
+            // Fire-and-forget — Sentry outages must not delay or fail the sink.
+            try {
+              const { forwardLogoErrorsToSentry } = await import("@/lib/sentry-forwarder.server");
+              void forwardLogoErrorsToSentry(sentryEvents);
+            } catch (err) {
+              console.error("[client-log] sentry forwarder load failed:", err);
+            }
+          }
+
 
           return Response.json({ ok: true, received: entries.length }, { headers: corsHeaders() });
         } catch (err) {
