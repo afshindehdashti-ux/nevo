@@ -551,6 +551,31 @@ _ERROR_KIND_LABELS: dict[str, str] = {
 }
 
 
+# HTTP status classification is orthogonal to error_kind: it says what the
+# server returned, while error_kind says why we treated the probe as failed
+# (a 200 with a tiny body still fails via `body_too_small`, and a transport
+# error has no status at all).
+_STATUS_CLASS_LABELS: dict[str, str] = {
+    "none": "🚧 none",   # transport failure — no HTTP response at all
+    "1xx": "ℹ️ 1xx",
+    "2xx": "🟢 2xx",
+    "3xx": "🔀 3xx",
+    "4xx": "🟠 4xx",
+    "5xx": "🔴 5xx",
+    "xxx": "❓ xxx",
+}
+
+
+def _classify_status(status: int | None) -> str:
+    """Bucket an HTTP status into `2xx`/`3xx`/`4xx`/`5xx`/`none`."""
+    if status is None:
+        return "none"
+    if 100 <= status < 600:
+        return f"{status // 100}xx"
+    return "xxx"
+
+
+
 def probe(url: str) -> dict:
     """Probe a URL with retries. Return a result dict with timing/status."""
     path = urlparse(url).path
