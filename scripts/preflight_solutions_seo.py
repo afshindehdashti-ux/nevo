@@ -8,10 +8,23 @@ locale) return HTTP 200 with a non-trivial body before spending time on the
 full SEO snapshot.
 
 Env:
-  BASE_URL          site to probe (default: http://127.0.0.1:8080)
-  LOCALES           comma-separated locales to sample (default: en,ar,tr)
-  TIMEOUT_SECONDS   per-request timeout (default: 20)
-  RETRIES           attempts per URL (default: 3, exponential 2/4/8s)
+  BASE_URL             site to probe (default: http://127.0.0.1:8080)
+  LOCALES              comma-separated locales to sample (default: en,ar,tr)
+  TIMEOUT_SECONDS      per-request timeout (default: 20)
+  RETRIES              attempts per URL (default: 3)
+  BACKOFF_BASE_SECONDS backoff base; wait = base * factor**(attempt-1),
+                       capped at BACKOFF_MAX_SECONDS (default: 2)
+  BACKOFF_FACTOR       exponential factor (default: 2 → 2s, 4s, 8s …)
+  BACKOFF_MAX_SECONDS  cap between retries (default: 30)
+  MIN_BODY_BYTES       default minimum body size for HTML pages (default: 500)
+  MIN_BODY_BYTES_SITEMAP   min bytes for /sitemap.xml (default: 200)
+  MIN_BODY_BYTES_ROBOTS    min bytes for /robots.txt (default: 20)
+  MIN_BODY_BYTES_OVERRIDES comma-separated `path=bytes` extras
+                           (e.g. `/en/solutions=1500,/health=10`)
+
+Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
+page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
+and `MIN_BODY_BYTES=2000`; a tiny status endpoint may need `=50`.
 
 Exits 0 when every probe returns 200. Exits 1 on any failure, printing a
 GitHub `::error::` line so the workflow surfaces the failing URL directly
@@ -51,16 +64,49 @@ def _select(env_name: str, default: list[str], universe: list[str]) -> list[str]
 
 LOCALES = _select("LOCALES", ALL_LOCALES[:3], ALL_LOCALES)
 LOCALIZED_PATHS = _select("PATHS", ALL_PATHS[:1], ALL_PATHS)
-TIMEOUT = int(os.environ.get("TIMEOUT_SECONDS", "20"))
-RETRIES = max(1, int(os.environ.get("RETRIES", "3")))
+def _num(env_name: str, default: float, cast=float, minimum: float | None = None) -> float:
+    raw = os.environ.get(env_name, "").strip()
+    if not raw:
+        return cast(default)
+    try:
+        val = cast(raw)
+    except ValueError:
+        print(f"preflight: warning: invalid {env_name}={raw!r}; using default {default}", file=sys.stderr)
+        return cast(default)
+    if minimum is not None and val < minimum:
+        print(f"preflight: warning: {env_name}={val} < {minimum}; clamping", file=sys.stderr)
+        return cast(minimum)
+    return val
+
+TIMEOUT = int(_num("TIMEOUT_SECONDS", 20, int, minimum=1))
+RETRIES = int(_num("RETRIES", 3, int, minimum=1))
+BACKOFF_BASE = _num("BACKOFF_BASE_SECONDS", 2.0, float, minimum=0.0)
+BACKOFF_FACTOR = _num("BACKOFF_FACTOR", 2.0, float, minimum=1.0)
+BACKOFF_MAX = _num("BACKOFF_MAX_SECONDS", 30.0, float, minimum=0.0)
 IN_GHA = os.environ.get("GITHUB_ACTIONS") == "true"
 
 # Minimum body size (bytes) that indicates a real page vs. an SPA error shell.
-MIN_BODY_BYTES = {
-    "/robots.txt": 20,
-    "/sitemap.xml": 200,
+# All defaults are env-tunable so noisy / lightweight endpoints can be dialed in.
+DEFAULT_MIN_BYTES = int(_num("MIN_BODY_BYTES", 500, int, minimum=0))
+MIN_BODY_BYTES: dict[str, int] = {
+    "/robots.txt": int(_num("MIN_BODY_BYTES_ROBOTS", 20, int, minimum=0)),
+    "/sitemap.xml": int(_num("MIN_BODY_BYTES_SITEMAP", 200, int, minimum=0)),
 }
-DEFAULT_MIN_BYTES = 500
+# Extra per-path overrides: MIN_BODY_BYTES_OVERRIDES="/en/solutions=1500,/health=10"
+for item in (x.strip() for x in os.environ.get("MIN_BODY_BYTES_OVERRIDES", "").split(",") if x.strip()):
+    if "=" not in item:
+        print(f"preflight: warning: skipping malformed MIN_BODY_BYTES_OVERRIDES entry {item!r}", file=sys.stderr)
+        continue
+    path, _, val = item.partition("=")
+    try:
+        MIN_BODY_BYTES[path.strip()] = max(0, int(val.strip()))
+    except ValueError:
+        print(f"preflight: warning: invalid byte count in override {item!r}", file=sys.stderr)
+
+
+def _backoff_delay(attempt: int) -> float:
+    """Delay before retry `attempt+1`. attempt is 1-indexed."""
+    return min(BACKOFF_MAX, BACKOFF_BASE * (BACKOFF_FACTOR ** (attempt - 1)))
 
 
 
@@ -101,7 +147,7 @@ def probe(url: str) -> dict:
             last_ms = (time.perf_counter() - t0) * 1000
             last_err = f"{type(e).__name__}: {e}"
         if attempt < RETRIES:
-            time.sleep(2 ** attempt)
+            time.sleep(_backoff_delay(attempt))
     return {"url": url, "ok": False, "status": last_status, "bytes": last_bytes,
             "ms": last_ms, "attempts": attempts, "error": last_err or "unknown error"}
 
@@ -122,7 +168,9 @@ def write_step_summary(results: list[dict]) -> None:
         "## Preflight — site + sitemap reachable",
         "",
         f"_Probed **{len(results)}** URL(s) at `{BASE}` "
-        f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`)._",
+        f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`, "
+        f"backoff `{BACKOFF_BASE:g}s × {BACKOFF_FACTOR:g}` cap `{BACKOFF_MAX:g}s`, "
+        f"min body `{DEFAULT_MIN_BYTES}B`)._",
         "",
         f"- **{ok_count}/{len(results)}** healthy",
         f"- Total wall time: **{total_ms:.0f} ms**",
