@@ -324,11 +324,32 @@ function CrossSection({
   const style = CORE_STYLE[core];
   const patternId = `core-pattern-${core.replace(/\s+/g, "")}`;
 
+  const titleId = "cross-section-title";
+  const descId = "cross-section-desc";
+  const totalMm = +(thickness + extSteel + intSteel).toFixed(2);
+  const description = `Panel cross-section: ${core} core ${thickness} millimetres thick between an exterior steel skin of ${extSteel.toFixed(2)} millimetres and an interior steel skin of ${intSteel.toFixed(2)} millimetres, for a total panel thickness of ${totalMm} millimetres.`;
+
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-4">
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" className="block w-full" style={{ aspectRatio: `${W} / ${H}` }} xmlns="http://www.w3.org/2000/svg">
+    <figure
+      className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-4"
+      aria-labelledby={titleId}
+      aria-describedby={descId}
+    >
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="xMidYMid meet"
+        className="block w-full"
+        style={{ aspectRatio: `${W} / ${H}` }}
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby={titleId}
+        aria-describedby={descId}
+      >
+        <title id={titleId}>Sandwich panel cross-section — {core}, {thickness} mm</title>
+        <desc id={descId}>{description}</desc>
         <defs>
           <CorePattern id={patternId} kind={style.pattern} base={style.base} accent={style.accent} />
+
           <linearGradient id="skin-shade" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" stopColor="rgba(255,255,255,0.5)" />
             <stop offset="100%" stopColor="rgba(0,0,0,0.35)" />
