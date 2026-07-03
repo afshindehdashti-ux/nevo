@@ -1461,6 +1461,40 @@ _BREAKDOWN_COLUMNS = [
 ]
 
 
+def _sort_combo_rows(
+    combo_all: Counter,
+    combo: Counter,
+    total_all: int,
+    total_fail: int,
+) -> list[tuple[str, str, int, int, float, float]]:
+    """Return the summary combo table rows in the configured sort order.
+
+    Each tuple is (kind, status_class, count, failed, success_pct, failures_pct).
+    """
+    rows: list[tuple[str, str, int, int, float, float]] = []
+    for (kind, status_class), n in combo_all.items():
+        failed = combo.get((kind, status_class), 0) if kind != "ok" else 0
+        success_pct = 100.0 * (n - failed) / n if n else 0.0
+        failures_pct = 100.0 * failed / total_fail if failed else 0.0
+        rows.append((kind, status_class, n, failed, success_pct, failures_pct))
+
+    if _SORT_COMBOS_BY == "default":
+        # Historical order: non-ok combos first, then largest count, then label.
+        rows.sort(key=lambda r: (0 if r[0] != "ok" else -1, -r[2], r[0], r[1]))
+    else:
+        if _SORT_COMBOS_BY == "count":
+            primary = lambda r: r[2]
+        elif _SORT_COMBOS_BY == "success_rate":
+            primary = lambda r: r[4]
+        else:  # failures_pct
+            primary = lambda r: r[5]
+        if _SORT_COMBOS_ORDER == "asc":
+            rows.sort(key=lambda r: (primary(r), r[0], r[1]))
+        else:
+            rows.sort(key=lambda r: (-primary(r), r[0], r[1]))
+    return rows
+
+
 def export_results(results: list[dict]) -> None:
     """Write results as CSV / JSON artifacts for post-run analysis.
 
