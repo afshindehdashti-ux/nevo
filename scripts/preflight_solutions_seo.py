@@ -19,6 +19,8 @@ without needing to open the job log.
 """
 from __future__ import annotations
 import os, sys, time, urllib.request, urllib.error
+from urllib.parse import urlparse
+
 
 
 BASE = os.environ.get("BASE_URL", "http://127.0.0.1:8080").rstrip("/")
