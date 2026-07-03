@@ -272,6 +272,22 @@ export type LogoTelemetryDump = {
    * refused to expose telemetry. Payload is empty in that case.
    */
   disabled?: boolean;
+  /**
+   * Set when the dump was scoped to a single correlationId so QA can
+   * share a minimal blob for one incident. `matchedCount` counts the
+   * raw ring-buffer entries that matched BEFORE redaction so a reporter
+   * can tell "0 matches" apart from "filter dropped everything".
+   */
+  filter?: {
+    correlationId: string;
+    matchedCount: number;
+    totalScanned: number;
+  };
+};
+
+export type LogoDumpOptions = {
+  /** Filter decisions to only those whose correlationId strictly equals this. */
+  correlationId?: string;
 };
 
 const REDACTED = "[redacted]";
@@ -481,9 +497,18 @@ function disabledDump(
 
 export function buildLogoTelemetryDump(
   origin: LogoTelemetryDump["origin"] = "console",
+  opts: LogoDumpOptions = {},
 ): LogoTelemetryDump {
   if (!isLogoDebugBuildEnabled()) return disabledDump(origin);
-  const decisions = getRecentLogoDecisions();
+  const allDecisions = getRecentLogoDecisions();
+  const totalScanned = allDecisions.length;
+  // Filter BEFORE redaction so we match against raw ids (a sensitive id
+  // gets rewritten to "[redacted]" and would never match a QA-supplied
+  // value).
+  const filtered =
+    opts.correlationId !== undefined
+      ? allDecisions.filter((d) => d.correlationId === opts.correlationId)
+      : allDecisions;
   const nav =
     typeof navigator !== "undefined" ? navigator.userAgent ?? null : null;
   const url =
@@ -499,20 +524,31 @@ export function buildLogoTelemetryDump(
     debugEnabled: isLogoDebugEnabled(),
     config: LOGO_TELEMETRY_CONFIG,
     state: cloneState(getLogoRateState()),
-    decisions,
-    // The buffer caps at 50 in logo-telemetry.ts — flag when we hit the wall
-    // so the reporter knows earlier decisions were dropped.
-    decisionsTruncated: decisions.length >= 50,
+    decisions: filtered,
+    // The buffer caps at 50 in logo-telemetry.ts. When filtering, the
+    // "did we drop earlier data?" question is about the ring buffer, not
+    // about the filter — so still report against the raw capture.
+    decisionsTruncated: totalScanned >= 50,
     redactions: [],
+    ...(opts.correlationId !== undefined
+      ? {
+          filter: {
+            correlationId: opts.correlationId,
+            matchedCount: filtered.length,
+            totalScanned,
+          },
+        }
+      : {}),
   };
   return redactLogoTelemetryDump(raw);
 }
 
 export function dumpLogoTelemetryAsJSON(
   origin: LogoTelemetryDump["origin"] = "console",
+  opts: LogoDumpOptions = {},
 ): string {
   if (!isLogoDebugBuildEnabled()) return "";
-  return JSON.stringify(buildLogoTelemetryDump(origin), null, 2);
+  return JSON.stringify(buildLogoTelemetryDump(origin, opts), null, 2);
 }
 
 /**
@@ -522,9 +558,10 @@ export function dumpLogoTelemetryAsJSON(
  */
 async function copyLogoTelemetryDump(
   origin: LogoTelemetryDump["origin"] = "console",
+  opts: LogoDumpOptions = {},
 ): Promise<string> {
   if (!isLogoDebugBuildEnabled()) return "";
-  const json = dumpLogoTelemetryAsJSON(origin);
+  const json = dumpLogoTelemetryAsJSON(origin, opts);
   // Console echo first — clipboard may reject if the tab isn't focused.
   if (typeof console !== "undefined" && typeof console.log === "function") {
     console.log("[nevo:logo-telemetry] dump", json);
@@ -555,9 +592,10 @@ async function copyLogoTelemetryDump(
  */
 export function downloadLogoTelemetryDump(
   origin: LogoTelemetryDump["origin"] = "console",
+  opts: LogoDumpOptions = {},
 ): string {
   if (!isLogoDebugBuildEnabled()) return "";
-  const json = dumpLogoTelemetryAsJSON(origin);
+  const json = dumpLogoTelemetryAsJSON(origin, opts);
   if (typeof window === "undefined" || typeof document === "undefined") {
     return json;
   }
@@ -568,7 +606,12 @@ export function downloadLogoTelemetryDump(
   }
   // ISO with `:` stripped so the filename is portable across OSes.
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const filename = `nevo-logo-telemetry-${origin}-${stamp}.json`;
+  // Include a filesystem-safe correlationId slug in the filename when the
+  // dump is scoped, so an attached incident file is self-describing.
+  const cidSlug = opts.correlationId
+    ? `-cid-${opts.correlationId.replace(/[^A-Za-z0-9._-]+/g, "_").slice(0, 40)}`
+    : "";
+  const filename = `nevo-logo-telemetry-${origin}${cidSlug}-${stamp}.json`;
   const blob = new BlobCtor([json], { type: "application/json" });
   const href = URLRef.createObjectURL(blob);
   try {
@@ -629,13 +672,45 @@ export function attachLogoDebugUtil(): void {
       /** Empty the ring buffer (useful before a fresh repro). */
       clearRecent: () => void;
       /** Full QA bug-report blob (metadata + config + state + decisions). */
-      dump: (origin?: LogoTelemetryDump["origin"]) => LogoTelemetryDump;
+      dump: (
+        origin?: LogoTelemetryDump["origin"],
+        opts?: LogoDumpOptions,
+      ) => LogoTelemetryDump;
       /** Same blob, pretty-printed JSON. */
-      dumpAsJSON: (origin?: LogoTelemetryDump["origin"]) => string;
+      dumpAsJSON: (
+        origin?: LogoTelemetryDump["origin"],
+        opts?: LogoDumpOptions,
+      ) => string;
       /** Echo to console + write to clipboard when permitted. */
-      copyDump: (origin?: LogoTelemetryDump["origin"]) => Promise<string>;
+      copyDump: (
+        origin?: LogoTelemetryDump["origin"],
+        opts?: LogoDumpOptions,
+      ) => Promise<string>;
       /** Save the dump to a .json file via a synthetic download. */
-      downloadDump: (origin?: LogoTelemetryDump["origin"]) => string;
+      downloadDump: (
+        origin?: LogoTelemetryDump["origin"],
+        opts?: LogoDumpOptions,
+      ) => string;
+      /**
+       * Scope a dump to a single correlationId — QA can share a minimal
+       * JSON blob for one incident without leaking unrelated decisions.
+       */
+      dumpForCorrelationId: (
+        correlationId: string,
+        origin?: LogoTelemetryDump["origin"],
+      ) => LogoTelemetryDump;
+      dumpForCorrelationIdAsJSON: (
+        correlationId: string,
+        origin?: LogoTelemetryDump["origin"],
+      ) => string;
+      copyDumpForCorrelationId: (
+        correlationId: string,
+        origin?: LogoTelemetryDump["origin"],
+      ) => Promise<string>;
+      downloadDumpForCorrelationId: (
+        correlationId: string,
+        origin?: LogoTelemetryDump["origin"],
+      ) => string;
     };
   };
   w.__nevoLogoDebug = {
@@ -657,6 +732,14 @@ export function attachLogoDebugUtil(): void {
     dumpAsJSON: dumpLogoTelemetryAsJSON,
     copyDump: copyLogoTelemetryDump,
     downloadDump: downloadLogoTelemetryDump,
+    dumpForCorrelationId: (correlationId, origin = "console") =>
+      buildLogoTelemetryDump(origin, { correlationId }),
+    dumpForCorrelationIdAsJSON: (correlationId, origin = "console") =>
+      dumpLogoTelemetryAsJSON(origin, { correlationId }),
+    copyDumpForCorrelationId: (correlationId, origin = "console") =>
+      copyLogoTelemetryDump(origin, { correlationId }),
+    downloadDumpForCorrelationId: (correlationId, origin = "console") =>
+      downloadLogoTelemetryDump(origin, { correlationId }),
   };
 }
 
