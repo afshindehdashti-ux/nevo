@@ -1393,6 +1393,7 @@ def _build_breakdown_rows(results: list[dict]) -> list[dict]:
         if not r.get("ok"):
             b["failed"] += 1
     total = max(len(results), 1)
+    total_failed = max(sum(b["failed"] for b in buckets.values()), 1)
     rows = []
     for (kind, sc), b in buckets.items():
         ms_sorted = sorted(b["ms"])
@@ -1402,7 +1403,14 @@ def _build_breakdown_rows(results: list[dict]) -> list[dict]:
             "status_class": sc,
             "count": b["count"],
             "failed": b["failed"],
+            # success_rate_pct + failures_pct mirror the summary combo table
+            # (Success rate / % of failures columns) so CSV consumers can
+            # reproduce the same view without recomputing.
+            "success_rate_pct": round(100 * (b["count"] - b["failed"]) / b["count"], 2)
+                if b["count"] else 0.0,
             "share_pct": round(100 * b["count"] / total, 2),
+            "failures_pct": round(100 * b["failed"] / total_failed, 2)
+                if b["failed"] else 0.0,
             "attempts_total": b["attempts"],
             "attempts_avg": round(b["attempts"] / b["count"], 2),
             "ms_avg": round(ms_total / b["count"], 1),
@@ -1417,7 +1425,8 @@ def _build_breakdown_rows(results: list[dict]) -> list[dict]:
 
 
 _BREAKDOWN_COLUMNS = [
-    "error_kind", "status_class", "count", "failed", "share_pct",
+    "error_kind", "status_class", "count", "failed",
+    "success_rate_pct", "share_pct", "failures_pct",
     "attempts_total", "attempts_avg",
     "ms_avg", "ms_p50", "ms_p95", "ms_p99", "ms_max",
 ]
