@@ -56,6 +56,7 @@ import t29 from "@/assets/panels/tile-29.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { InquiryCTA } from "@/components/site/InquiryCTA";
+import { DownloadsCTA } from "@/components/site/DownloadsCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
@@ -103,7 +104,7 @@ const FAQS: { q: string; a: string }[] = [
   { q: "Do you provide installation support?", a: "Yes. Method statements, on-site supervision by NEVO technical engineers, and installer training for the client's contractor are available as an integrated service." },
   { q: "Are the panels sustainable?", a: "PIR cores use HFC-free blowing agents. Rock wool is 100% recyclable. Steel facings contain up to 30% recycled content. EPDs and GWP declarations are available on request." },
   { q: "Do you offer OEM / private-label supply?", a: "Yes. Panels can be produced under distributor branding, with private-label documentation, packaging and technical datasheets for regional resellers." },
-  { q: "How do I request a technical proposal?", a: "Submit the inquiry form below with your panel specifications, quantities, application and destination. A NEVO panel specialist responds within one business day with a technical and commercial proposal." },
+  { q: "How do I request a technical proposal?", a: "Open the Project Inquiry page linked from the CTA above with your panel specifications, quantities, application and destination. A NEVO panel specialist responds within one business day with a technical and commercial proposal." },
 ];
 
 export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
@@ -157,7 +158,7 @@ function SandwichPanelsPage() {
         <WhyNevo />
         <TechSpecs />
         <Sustainability />
-        <Downloads />
+        <DownloadsCTA />
         <FAQSection />
         <InquiryCTA />
         <FinalCTA />

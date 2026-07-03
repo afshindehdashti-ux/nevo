@@ -45,6 +45,7 @@ import imgWhShip from "@/assets/raw-materials/warehouse-shipping.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { InquiryCTA } from "@/components/site/InquiryCTA";
+import { DownloadsCTA } from "@/components/site/DownloadsCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
@@ -75,7 +76,7 @@ const FAQS: { q: string; a: string }[] = [
   { q: "How is chemical compatibility guaranteed?", a: "Polyol and MDI are delivered as matched pairs from qualified producers, with batch reactivity profile, viscosity, hydroxyl number and NCO content reported on every certificate of analysis." },
   { q: "What is the shelf life of the chemicals?", a: "Polyol: 6 months in sealed original packaging at 15–25 °C. MDI: 6 months in sealed original packaging at 20–35 °C, protected from moisture. FIFO stock rotation is documented on every delivery." },
   { q: "What rock wool densities do you supply?", a: "Lamella density 90–130 kg/m³ for sandwich panels, slab density 40–100 kg/m³ for insulation applications. Fibre orientation, tensile strength and shear performance are certified per batch." },
-  { q: "What is the fire classification of your PIR panels?", a: "PIR sandwich panels typically achieve B-s2,d0 or B-s1,d0 to EN 13501-1 depending on facing and core recipe. Rock wool panels achieve A2-s1,d0 or A1. Test reports from notified bodies are provided." },
+  
   { q: "Can you supply materials to match my existing production line?", a: "Yes. Our engineers analyse your current line — decoiler width, foaming machine head, curing zone, cutting system — and specify facings and chemistry that run stably on your equipment." },
   { q: "What are the typical PPGI coil weights?", a: "Coil weight 3–10 tons, inner diameter 508 or 610 mm, coil width 1000–1250 mm slit to panel width. Coils are packed with steel straps, VCI paper and edge protectors." },
   { q: "How do you handle Aluzinc vs GI selection?", a: "Aluzinc (AZ150) offers 3–6× better corrosion resistance than GI in coastal, cold-storage and chemical environments. GI is preferred for cost-sensitive interior applications. We advise per project climate and lifespan target." },
@@ -90,7 +91,7 @@ const FAQS: { q: string; a: string }[] = [
   { q: "Can NEVO handle blended containers for small projects?", a: "Yes. LCL and consolidated FCL shipments combining steel, chemistry and consumables are available for pilot production runs and R&D orders." },
   { q: "What sustainability data can you share?", a: "EPDs for steel and rock wool, GWP declarations on chemistry, HFC-free blowing agents, and take-back programmes for IBCs and drums in select markets." },
   { q: "How does material selection affect panel quality?", a: "Facing paint chemistry drives corrosion life; steel yield strength drives panel stiffness; polyol reactivity drives foaming consistency; MDI index drives fire behaviour; core density drives compression strength. Materials define the panel — the line only assembles them." },
-  { q: "How do I request a technical quotation?", a: "Submit the inquiry form on this page with your panel specification, target market and required volume. A NEVO material specialist responds within one business day with a technical proposal and indicative pricing." },
+  { q: "How do I request a technical quotation?", a: "Open the Project Inquiry page (linked from every CTA on this site) with your panel specification, target market and required volume. A NEVO material specialist responds within one business day with a technical proposal and indicative pricing." },
 ];
 
 export const Route = createFileRoute("/$lang/solutions/raw-materials")({
@@ -144,7 +145,7 @@ function RawMaterialsPage() {
         <EngineeringBefore />
         <Logistics />
         <QualityAssurance />
-        <Downloads />
+        <DownloadsCTA />
         <FAQ />
         <InquiryCTA />
         <FinalCTA />
