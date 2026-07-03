@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
-import { SITE, buildSeo } from "@/lib/seo";
+import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -51,6 +51,18 @@ const TITLE =
 const DESCRIPTION =
   "NEVO Industrial develops complete sandwich panel factories: feasibility, master planning, layouts, production lines, raw materials, utilities, commissioning and ramp-up support from Dubai.";
 const URL_PATH = "/solutions/factory-development";
+
+// Route-scoped downloads list — surfaced as ItemList JSON-LD unique to this
+// Solutions page. Items resolve to /download-center.
+const DOWNLOADS_LD_ITEMS = [
+  "Turnkey Factory Development Brochure",
+  "Feasibility Study Template",
+  "CAPEX / OPEX Model Overview",
+  "Master Planning & Site Layout Guide",
+  "Commissioning & Ramp-Up Playbook",
+  "Bankable Documentation Checklist",
+];
+
 
 const PILLARS = [
   { icon: ClipboardList, title: "Feasibility & Business Case", body: "Market demand, product mix, target output, CAPEX model and launch roadmap before equipment selection." },
@@ -165,7 +177,18 @@ export const Route = createFileRoute("/$lang/solutions/factory-development")({
             ],
           }),
         },
+        ldScript(
+          downloadsItemListJsonLd({
+            path: URL_PATH,
+            lang: String(params.lang),
+            name: "Factory Development — Technical Downloads",
+            description:
+              "Turnkey factory brochure, feasibility template, CAPEX/OPEX overview and commissioning playbook from the NEVO Download Center.",
+            items: DOWNLOADS_LD_ITEMS,
+          }),
+        ),
       ],
+
     };
   },
   component: FactoryDevelopmentPage,

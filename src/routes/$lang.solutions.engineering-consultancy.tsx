@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SITE, buildSeo } from "@/lib/seo";
+import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -74,6 +74,18 @@ const TITLE =
 const DESCRIPTION =
   "Engineering beyond equipment. Feasibility, master planning, factory layout, process and utility engineering, automation, commissioning and long-term technical support for sandwich panel factories worldwide.";
 const URL_PATH = "/solutions/engineering-consultancy";
+
+// Route-scoped downloads list — surfaced as ItemList JSON-LD unique to this
+// Solutions page. Items resolve to /download-center.
+const DOWNLOADS_LD_ITEMS = [
+  "Engineering Capability Brochure",
+  "Factory Planning Guide",
+  "Process & Utility Engineering Checklist",
+  "Line Capacity Calculator",
+  "Automation Architecture Reference",
+  "Project Preparation Guide",
+];
+
 
 const FAQS: { q: string; a: string }[] = [
   { q: "What does NEVO's Engineering Consultancy actually cover?", a: "Everything upstream and around the machinery: feasibility, master planning, factory layout, process engineering, utility engineering, automation architecture, supplier selection, construction supervision, commissioning, operator training and long-term performance optimization." },
@@ -166,7 +178,18 @@ export const Route = createFileRoute("/$lang/solutions/engineering-consultancy")
         { type: "application/ld+json", children: JSON.stringify(faqLd) },
         { type: "application/ld+json", children: JSON.stringify(serviceLd) },
         { type: "application/ld+json", children: JSON.stringify(crumbsLd) },
+        ldScript(
+          downloadsItemListJsonLd({
+            path: URL_PATH,
+            lang: String(params.lang),
+            name: "Engineering Consultancy — Technical Downloads",
+            description:
+              "Engineering capability brochure, factory planning guide, process/utility checklist and capacity calculator from the NEVO Download Center.",
+            items: DOWNLOADS_LD_ITEMS,
+          }),
+        ),
       ],
+
     };
   },
   component: EngineeringConsultancyPage,

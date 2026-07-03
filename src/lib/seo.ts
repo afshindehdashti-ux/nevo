@@ -282,8 +282,53 @@ export const articleJsonLd = (a: {
   },
 });
 
+/**
+ * Downloads ItemList schema — one JSON-LD object per Solutions page listing
+ * the route-relevant technical documents. Every item points at the shared
+ * Download Center URL so crawlers still resolve to a single canonical
+ * library, while the per-route `name` + item names keep the schema unique.
+ */
+export const downloadsItemListJsonLd = (input: {
+  /** Route path without locale, e.g. "/solutions/production-lines". */
+  path: string;
+  /** Locale prefix, e.g. "en". */
+  lang: string;
+  /** ItemList name — usually "<Solution> — Downloads". */
+  name: string;
+  /** Short description of the download bundle. */
+  description: string;
+  /** Ordered document titles shown on this Solutions page. */
+  items: string[];
+}) => {
+  const downloadUrl = `${SITE.url}/${input.lang}/download-center`;
+  const pageUrl = `${SITE.url}/${input.lang}${input.path}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: input.name,
+    description: input.description,
+    url: pageUrl,
+    itemListOrder: "https://schema.org/ItemListOrderAscending",
+    numberOfItems: input.items.length,
+    itemListElement: input.items.map((title, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "DigitalDocument",
+        name: title,
+        encodingFormat: "application/pdf",
+        inLanguage: input.lang,
+        url: downloadUrl,
+        isPartOf: { "@type": "CollectionPage", name: "NEVO Download Center", url: downloadUrl },
+        publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
+      },
+    })),
+  };
+};
+
 /** Convert a JSON-LD object into a head().scripts entry. */
 export const ldScript = (data: unknown) => ({
   type: "application/ld+json",
   children: JSON.stringify(data),
 });
+

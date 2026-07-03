@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SITE, buildSeo } from "@/lib/seo";
+import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
 import { motion } from "motion/react";
 import { useRef, useState } from "react";
 import { submitLeadForm } from "@/lib/lead-submit";
@@ -65,6 +65,18 @@ const TITLE =
 const DESCRIPTION =
   "Engineered raw material solutions for sandwich panel manufacturing: PPGI/GI/Aluzinc steel coils, polyol and MDI chemical systems, PIR and rock wool cores, adhesives and finished panels — sourced, tested and delivered by NEVO Industrial, Dubai.";
 const URL_PATH = "/solutions/raw-materials";
+
+// Route-scoped downloads list — surfaced as ItemList JSON-LD unique to this
+// Solutions page. Items resolve to /download-center.
+const DOWNLOADS_LD_ITEMS = [
+  "PPGI & Aluzinc Steel Coil Specification",
+  "PIR Polyol & MDI System Datasheet",
+  "Rock Wool Lamella Datasheet",
+  "Structural PU Adhesive Datasheet",
+  "Raw Material Sourcing & Logistics Guide",
+  "Certificates of Analysis Sample Pack",
+];
+
 
 const FAQS: { q: string; a: string }[] = [
   { q: "What raw materials do you supply?", a: "Complete raw material systems for sandwich panel manufacturing: PPGI/GI/Aluzinc/prepainted aluminium coils, polyol and MDI chemical systems (IBC and drum), PIR and rock wool insulation cores, structural adhesives, sealants, release films and packaging consumables." },
@@ -148,7 +160,18 @@ export const Route = createFileRoute("/$lang/solutions/raw-materials")({
         { type: "application/ld+json", children: JSON.stringify(faqLd) },
         { type: "application/ld+json", children: JSON.stringify(serviceLd) },
         { type: "application/ld+json", children: JSON.stringify(crumbsLd) },
+        ldScript(
+          downloadsItemListJsonLd({
+            path: URL_PATH,
+            lang: String(params.lang),
+            name: "Sandwich Panel Raw Materials — Technical Downloads",
+            description:
+              "PPGI/Aluzinc coil specs, PIR polyol & MDI datasheets, rock wool lamella data and structural adhesive references from the NEVO Download Center.",
+            items: DOWNLOADS_LD_ITEMS,
+          }),
+        ),
       ],
+
     };
   },
   component: RawMaterialsPage,

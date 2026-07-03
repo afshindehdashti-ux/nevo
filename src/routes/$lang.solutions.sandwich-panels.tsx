@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SITE, buildSeo } from "@/lib/seo";
+import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -76,6 +76,18 @@ const TITLE =
 const DESCRIPTION =
   "Premium PIR and Rock Wool sandwich panels engineered for industrial, commercial, food processing and cold storage applications — up to 120 min fire rating, tongue-and-groove joints, EN 13501 certified. NEVO Industrial, Dubai.";
 const URL_PATH = "/solutions/sandwich-panels";
+
+// Route-scoped downloads list — surfaced as ItemList JSON-LD so the schema
+// stays unique to this Solutions page. Items resolve to /download-center.
+const DOWNLOADS_LD_ITEMS = [
+  "PIR Sandwich Panel Datasheet",
+  "Rock Wool Sandwich Panel Datasheet",
+  "Cold Storage Panel Selection Guide",
+  "EN 13501 Fire Classification Summary",
+  "Panel Colour & Coating Reference",
+  "Installation & Fixing Handbook",
+];
+
 
 const FAQS: { q: string; a: string }[] = [
   { q: "What panel types does NEVO supply?", a: "PIR (polyisocyanurate) wall panels, PIR roof panels, and rock wool wall/roof panels for industrial, commercial, food processing, cold storage and clean-room applications." },
@@ -165,7 +177,18 @@ export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
         { type: "application/ld+json", children: JSON.stringify(faqLd) },
         { type: "application/ld+json", children: JSON.stringify(productLd) },
         { type: "application/ld+json", children: JSON.stringify(crumbsLd) },
+        ldScript(
+          downloadsItemListJsonLd({
+            path: URL_PATH,
+            lang: String(params.lang),
+            name: "Finished Sandwich Panels — Technical Downloads",
+            description:
+              "PIR and rock wool sandwich panel datasheets, cold-storage selection guides and fire classification references from the NEVO Download Center.",
+            items: DOWNLOADS_LD_ITEMS,
+          }),
+        ),
       ],
+
     };
   },
   component: SandwichPanelsPage,

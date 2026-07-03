@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
-import { SITE, buildSeo } from "@/lib/seo";
+import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
 import { useRef, useState } from "react";
 import { motion } from "motion/react";
 import { submitLeadForm } from "@/lib/lead-submit";
@@ -69,6 +69,18 @@ const TITLE =
 const DESCRIPTION =
   "Complete continuous and discontinuous sandwich panel production lines — PIR, PUR and rock wool. Engineering, equipment selection, automation, installation and commissioning by NEVO Industrial, Dubai.";
 const URL_PATH = "/solutions/production-lines";
+
+// Route-scoped downloads list — surfaced as ItemList JSON-LD unique to this
+// Solutions page. Items resolve to /download-center.
+const DOWNLOADS_LD_ITEMS = [
+  "Continuous PIR/PUR Line Catalogue",
+  "Discontinuous Line Technical Brochure",
+  "Rock Wool Lamella Line Overview",
+  "Line Capacity & Speed Guide",
+  "Automation & SCADA Architecture",
+  "General Layout & Utility Requirements",
+];
+
 
 const FAQS = [
   { q: "How much production capacity do I need?", a: "Capacity is defined by your target market, panel spectrum and shift model. A typical entry continuous line runs 6–10 m/min, mid-range 12–18 m/min, and high-output above 20 m/min. Our engineers size the line against your 5-year demand forecast, not against a catalogue." },
@@ -155,7 +167,18 @@ export const Route = createFileRoute("/$lang/solutions/production-lines")({
             ],
           }),
         },
+        ldScript(
+          downloadsItemListJsonLd({
+            path: URL_PATH,
+            lang: String(params.lang),
+            name: "Sandwich Panel Production Lines — Technical Downloads",
+            description:
+              "Continuous PIR/PUR, discontinuous and rock wool lamella line brochures, capacity guides and automation references from the NEVO Download Center.",
+            items: DOWNLOADS_LD_ITEMS,
+          }),
+        ),
       ],
+
     };
   },
   component: ProductionLinesPage,
