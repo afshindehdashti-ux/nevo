@@ -161,7 +161,7 @@ function buildFallbackChain(e: LogoErrorEvent): string {
   return parts.join(" → ");
 }
 
-function buildSentryEvent(e: LogoErrorEvent, sampling?: import("./sentry-sampler.server").SamplingDecision) {
+export function buildSentryEvent(e: LogoErrorEvent, sampling?: import("./sentry-sampler.server").SamplingDecision) {
   const stage = e.stage ?? "unknown";
   const terminal = e.terminal === true;
   const nextStep =
