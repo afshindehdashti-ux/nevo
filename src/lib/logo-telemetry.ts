@@ -54,17 +54,61 @@ type Deps = {
   random?: () => number;
 };
 
+/**
+ * Emit a lightweight QA debug line describing a sampling decision.
+ * No-op unless `config.debug` is enabled (see `logo-telemetry-config`:
+ * VITE_LOGO_DEBUG=1, window.__nevoLogoDebug, localStorage 'nevo:logo-debug'=1,
+ * or `?logoDebug=1` URL flag). Uses console.debug so it is silent by default
+ * in production browsers unless the user explicitly opts in.
+ */
+function debugLog(
+  kind: "render" | "error",
+  decision: "sampled-in" | "sampled-out",
+  reason: string,
+  state: LogoRateState,
+  config: LogoTelemetryConfig,
+  extra: Record<string, unknown> = {},
+): void {
+  if (!config.debug) return;
+  if (typeof console === "undefined" || typeof console.debug !== "function") return;
+  console.debug("[nevo:logo-telemetry]", {
+    kind,
+    decision,
+    reason,
+    ...extra,
+    counters: {
+      renderLogged: state.renderLogged,
+      renderSampled: state.renderSampled,
+      errorCount: state.errorCount,
+      lastErrorStage: state.lastErrorStage,
+      lastErrorAt: state.lastErrorAt,
+    },
+    config: {
+      renderSampleRate: config.renderSampleRate,
+      errorMaxPerSession: config.errorMaxPerSession,
+      errorMinIntervalMs: config.errorMinIntervalMs,
+    },
+  });
+}
+
 /** Returns true when a render event should be sent to the log sink. */
 export function shouldLogRender(deps: Deps = {}): boolean {
   const state = deps.state ?? getLogoRateState();
   const config = deps.config ?? LOGO_TELEMETRY_CONFIG;
   const random = deps.random ?? Math.random;
-  if (state.renderLogged) return false;
+  if (state.renderLogged) {
+    debugLog("render", "sampled-out", "already-logged", state, config);
+    return false;
+  }
   if (state.renderSampled === null) {
     state.renderSampled = random() < config.renderSampleRate;
   }
-  if (!state.renderSampled) return false;
+  if (!state.renderSampled) {
+    debugLog("render", "sampled-out", "sample-rate", state, config);
+    return false;
+  }
   state.renderLogged = true;
+  debugLog("render", "sampled-in", "first-render", state, config);
   return true;
 }
 
@@ -81,17 +125,29 @@ export function shouldLogError(
   const state = deps.state ?? getLogoRateState();
   const config = deps.config ?? LOGO_TELEMETRY_CONFIG;
   const nowFn = deps.now ?? Date.now;
-  if (state.errorCount >= config.errorMaxPerSession) return false;
+  if (state.errorCount >= config.errorMaxPerSession) {
+    debugLog("error", "sampled-out", "session-cap", state, config, { stage, terminal });
+    return false;
+  }
   const now = nowFn();
   if (
     !terminal &&
     stage === state.lastErrorStage &&
     now - state.lastErrorAt < config.errorMinIntervalMs
   ) {
+    debugLog("error", "sampled-out", "throttle", state, config, {
+      stage,
+      terminal,
+      msSinceLast: now - state.lastErrorAt,
+    });
     return false;
   }
   state.errorCount += 1;
   state.lastErrorAt = now;
   state.lastErrorStage = stage;
+  debugLog("error", "sampled-in", terminal ? "terminal" : "accepted", state, config, {
+    stage,
+    terminal,
+  });
   return true;
 }
