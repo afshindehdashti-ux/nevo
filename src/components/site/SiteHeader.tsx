@@ -364,10 +364,12 @@ export function SiteHeader() {
                     const img = event.currentTarget;
                     const step = img.dataset.fallbackStep ?? "0";
                     const failedSrc = img.currentSrc || img.src;
+                    const correlationId = getLogoCorrelationId();
                     if (step === "0") {
                       img.dataset.fallbackStep = "1";
                       img.dataset.logoVariant = "fallback-cdn";
                       logClientEvent("header.logo.error", {
+                        correlationId,
                         stage: "primary-light-png",
                         failedSrc,
                         nextSrc: LOGO_FALLBACK_CDN,
@@ -379,6 +381,7 @@ export function SiteHeader() {
                       img.dataset.fallbackStep = "2";
                       img.dataset.logoVariant = "fallback-svg";
                       logClientEvent("header.logo.error", {
+                        correlationId,
                         stage: "fallback-cdn-full",
                         failedSrc,
                         nextSrc: "inline-svg",
@@ -388,11 +391,13 @@ export function SiteHeader() {
                       img.src = LOGO_FALLBACK_SVG;
                     } else {
                       logClientEvent("header.logo.error", {
+                        correlationId,
                         stage: "fallback-inline-svg",
                         failedSrc,
                         terminal: true,
                       }, "error");
                     }
+
                   }}
                 />
 
