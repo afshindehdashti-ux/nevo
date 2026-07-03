@@ -270,6 +270,7 @@ function RootComponent() {
         <Analytics />
         <ClientMonitor />
         <Toaster position="top-right" richColors closeButton />
+        <LogoTelemetryOverlay />
       </LanguageProvider>
     </QueryClientProvider>
   );
