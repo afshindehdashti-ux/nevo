@@ -184,11 +184,67 @@ export const Route = createFileRoute("/api/public/client-log")({
             // Fire-and-forget — Sentry outages must not delay or fail the sink.
             try {
               const { forwardLogoErrorsToSentry } = await import("@/lib/sentry-forwarder.server");
-              void forwardLogoErrorsToSentry(sentryEvents);
+              const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+              // Hydrate each error with its full fallback-chain timeline
+              // (render → primary-fail → cdn-fail → svg-fail) so Sentry gets
+              // end-to-end breadcrumbs for sticky logo breaks.
+              const uniqueIds = Array.from(
+                new Set(
+                  sentryEvents
+                    .map((ev) => ev.correlationId)
+                    .filter((id): id is string => !!id),
+                ),
+              );
+
+              const historyByCid = new Map<string, Array<{
+                eventType: "render" | "error";
+                stage: string | null;
+                variant: string | null;
+                src: string | null;
+                nextSrc: string | null;
+                online: boolean | null;
+                clientTs: string | null;
+              }>>();
+
+              if (uniqueIds.length > 0) {
+                const { data: hist, error: histErr } = await supabaseAdmin
+                  .from("header_logo_events")
+                  .select("correlation_id,event_type,stage,variant,src,next_src,online,client_ts")
+                  .in("correlation_id", uniqueIds)
+                  .order("client_ts", { ascending: true })
+                  .limit(200);
+                if (histErr) {
+                  console.error("[client-log] logo history fetch failed:", histErr.message);
+                } else if (hist) {
+                  for (const row of hist) {
+                    const cid = row.correlation_id;
+                    if (!cid) continue;
+                    const list = historyByCid.get(cid) ?? [];
+                    list.push({
+                      eventType: row.event_type === "error" ? "error" : "render",
+                      stage: row.stage ?? null,
+                      variant: row.variant ?? null,
+                      src: row.src ?? null,
+                      nextSrc: row.next_src ?? null,
+                      online: typeof row.online === "boolean" ? row.online : null,
+                      clientTs: row.client_ts ?? null,
+                    });
+                    historyByCid.set(cid, list);
+                  }
+                }
+              }
+
+              const hydrated = sentryEvents.map((ev) => ({
+                ...ev,
+                history: ev.correlationId ? historyByCid.get(ev.correlationId) ?? [] : [],
+              }));
+              void forwardLogoErrorsToSentry(hydrated);
             } catch (err) {
               console.error("[client-log] sentry forwarder load failed:", err);
             }
           }
+
 
 
           return Response.json({ ok: true, received: entries.length }, { headers: corsHeaders() });
