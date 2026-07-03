@@ -556,6 +556,15 @@ function FactoryLayoutPage() {
   const [zone, setZone] = useState<Zone | null>(null);
   const [tab, setTab] = useState<MobileTab>("layout");
   const [fullscreen, setFullscreen] = useState(false);
+  const [hiddenZones, setHiddenZones] = useState<Set<string>>(() => new Set());
+  const toggleZone = (id: string) =>
+    setHiddenZones((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const showAllZones = () => setHiddenZones(new Set());
 
   const cfg = { capacity, core, automation, building };
   const tech = useMemo(() => computeTechData(capacity, core, automation, building, shift), [
