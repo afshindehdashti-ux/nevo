@@ -1,0 +1,53 @@
+name: Solutions SEO weekly report
+
+on:
+  schedule:
+    # Every Monday at 06:00 UTC
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Base URL to audit (defaults to published site)"
+        required: false
+        default: "https://nevo-engineering-hub.lovable.app"
+
+permissions:
+  contents: read
+
+jobs:
+  weekly-snapshot:
+    name: Weekly SEO snapshot (production)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Run against the live published site — no local Vite boot required.
+      # --warn-only keeps the scheduled run green so a regression doesn't
+      # spam the team with failed-workflow emails; the report is the deliverable.
+      - name: Verify Solutions SEO (live)
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url || 'https://nevo-engineering-hub.lovable.app' }}
+          REPORT_JSON: reports/seo/solutions-seo.json
+          REPORT_HTML: reports/seo/solutions-seo.html
+          REPORT_MD: ${{ github.step_summary }}
+        run: python3 scripts/verify_solutions_seo.py --warn-only
+
+      - name: Stamp report filename with ISO week
+        run: |
+          WEEK="$(date -u +'%Y-W%V')"
+          echo "REPORT_WEEK=$WEEK" >> "$GITHUB_ENV"
+          cp reports/seo/solutions-seo.html "reports/seo/solutions-seo-${WEEK}.html"
+          cp reports/seo/solutions-seo.json "reports/seo/solutions-seo-${WEEK}.json"
+
+      # 90-day retention so the team can compare week-over-week.
+      - name: Upload weekly SEO report
+        uses: actions/upload-artifact@v4
+        with:
+          name: solutions-seo-weekly-${{ env.REPORT_WEEK }}
+          path: reports/seo/*
+          retention-days: 90
+          if-no-files-found: error
