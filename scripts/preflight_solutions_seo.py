@@ -304,6 +304,28 @@ BODY_HASH_ENABLED = os.environ.get("BODY_HASH", "true").strip().lower() not in (
 # (still whitespace-collapsed + truncated).
 BODY_SANITIZE_ENABLED = os.environ.get("BODY_SANITIZE", "true").strip().lower() not in ("0", "false", "no")
 
+# Content types for which a body snippet is useful in the step summary.
+# Binary responses (image/*, application/pdf, application/zip, etc.) produce
+# an empty snippet so the summary doesn't dump a wall of base64 or null bytes.
+# Supports wildcards (`text/*`) and parameters are ignored (`application/json;
+# charset=utf-8` matches). Default: text/* and application/json.
+_DEFAULT_SNIPPET_CONTENT_TYPES = ["text/*", "application/json"]
+_BODY_SNIPPET_CONTENT_TYPES_RAW = os.environ.get(
+    "BODY_SNIPPET_CONTENT_TYPES", ",".join(_DEFAULT_SNIPPET_CONTENT_TYPES)
+)
+BODY_SNIPPET_CONTENT_TYPES: list[tuple[str, str | None]] = []
+for _ct in (x.strip() for x in _BODY_SNIPPET_CONTENT_TYPES_RAW.split(",") if x.strip()):
+    _ct = _ct.lower()
+    if _ct.endswith("/*"):
+        BODY_SNIPPET_CONTENT_TYPES.append((_ct[:-2], None))  # wildcard subtype
+    elif "/" in _ct:
+        _main, _sub = _ct.split("/", 1)
+        BODY_SNIPPET_CONTENT_TYPES.append((_main, _sub))
+    else:
+        print(f"preflight: warning: skipping malformed BODY_SNIPPET_CONTENT_TYPES entry {_ct!r}", file=sys.stderr)
+
+
+
 # Patterns for redaction. Order matters: match longer/structured secrets first
 # so an email inside a JWT payload doesn't get partially replaced.
 import re as _re_mod
