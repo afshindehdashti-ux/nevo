@@ -275,63 +275,108 @@ def probe(url: str) -> dict:
     path = urlparse(url).path
     accepted = _accepted_for(path)
     min_bytes = MIN_BODY_BYTES.get(path, DEFAULT_MIN_BYTES)
+    method_mode = _method_for(path)
     last_err = ""
     last_status: int | None = None
     last_bytes = 0
     last_ms = 0.0
+    last_method = ""
     attempts = 0
 
-    def _evaluate(status: int, body: bytes, ms: float) -> dict | None:
-        """Return a success dict when the response satisfies accept + min-bytes rules."""
-        nonlocal last_err, last_status, last_bytes, last_ms
-        last_status, last_bytes, last_ms = status, len(body), ms
+    def _evaluate(status: int, body_bytes: int, ms: float, http_method: str) -> dict | None:
+        """Return a success dict when the response satisfies accept + min-bytes rules.
+
+        `body_bytes` is len(body) for GET, or Content-Length (0 when absent) for HEAD.
+        """
+        nonlocal last_err, last_status, last_bytes, last_ms, last_method
+        last_status, last_bytes, last_ms, last_method = status, body_bytes, ms, http_method
         if status not in accepted:
             last_err = f"HTTP {status} not in accept set {sorted(accepted)}"
             return None
-        # Only enforce min-bytes for 2xx — 3xx/4xx accepted-by-design often have empty bodies.
-        if 200 <= status < 300 and len(body) < min_bytes:
-            last_err = f"body {len(body)}B < min {min_bytes}B (likely error page)"
+        # Min-bytes only for accepted 2xx. On HEAD, we only enforce when we
+        # actually know the size (Content-Length > 0); otherwise skip so a
+        # missing Content-Length doesn't false-positive.
+        if 200 <= status < 300 and body_bytes > 0 and body_bytes < min_bytes:
+            last_err = f"body {body_bytes}B < min {min_bytes}B (likely error page)"
             return None
         last_err = ""
-        return {"url": url, "ok": True, "status": status, "bytes": len(body),
-                "ms": ms, "attempts": attempts, "error": ""}
+        return {"url": url, "ok": True, "status": status, "bytes": body_bytes,
+                "ms": ms, "attempts": attempts, "error": "", "method": http_method}
 
-    for attempt in range(1, RETRIES + 1):
-        attempts = attempt
+    def _do_request(http_method: str) -> tuple[int | None, int, float, str]:
+        """Issue one request. Returns (status, size_bytes, ms, error).
+
+        On success, error is "". On failure, status may be None.
+        """
         t0 = time.perf_counter()
         try:
             headers = {
                 "User-Agent": USER_AGENT,
                 "Accept": "text/html,application/xml,text/plain;q=0.9,*/*;q=0.5",
             }
-            # CUSTOM_HEADERS wins so callers can override UA / Accept too.
             headers.update(CUSTOM_HEADERS)
-            req = urllib.request.Request(url, headers=headers)
+            req = urllib.request.Request(url, headers=headers, method=http_method)
             opener = urllib.request.urlopen if FOLLOW_REDIRECTS else _NO_REDIRECT_OPENER.open
             with opener(req, timeout=TIMEOUT) as r:
-                body = r.read()
-                ms = (time.perf_counter() - t0) * 1000
-                ok = _evaluate(r.status, body, ms)
-                if ok:
-                    return ok
+                if http_method == "HEAD":
+                    size = int(r.headers.get("Content-Length") or 0)
+                else:
+                    size = len(r.read())
+                return r.status, size, (time.perf_counter() - t0) * 1000, ""
         except urllib.error.HTTPError as e:
             ms = (time.perf_counter() - t0) * 1000
-            # Accepted non-2xx (e.g. 301, 403, 404) come through here — try to read
-            # whatever body was returned and evaluate against the accept set.
-            try:
-                body = e.read() or b""
-            except Exception:
-                body = b""
-            ok = _evaluate(e.code, body, ms)
+            if http_method == "HEAD":
+                size = int(e.headers.get("Content-Length") or 0) if e.headers else 0
+            else:
+                try:
+                    size = len(e.read() or b"")
+                except Exception:
+                    size = 0
+            return e.code, size, ms, f"HTTP {e.code}"
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+            ms = (time.perf_counter() - t0) * 1000
+            return None, 0, ms, f"{type(e).__name__}: {e}"
+
+    for attempt in range(1, RETRIES + 1):
+        attempts = attempt
+
+        # Pick the first method to try, then optional fallback for HEAD_THEN_GET.
+        first_method = "HEAD" if method_mode in ("HEAD", "HEAD_THEN_GET") else "GET"
+        status, size, ms, err = _do_request(first_method)
+
+        if status is not None:
+            ok = _evaluate(status, size, ms, first_method)
             if ok:
                 return ok
-        except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
-            last_ms = (time.perf_counter() - t0) * 1000
-            last_err = f"{type(e).__name__}: {e}"
+
+        # HEAD_THEN_GET: if HEAD failed evaluation OR the transport errored,
+        # retry the SAME attempt with GET before backing off. Cheap upgrade.
+        if method_mode == "HEAD_THEN_GET" and first_method == "HEAD":
+            status2, size2, ms2, err2 = _do_request("GET")
+            if status2 is not None:
+                ok2 = _evaluate(status2, size2, ms2, "GET")
+                if ok2:
+                    return ok2
+            # Prefer the GET error for reporting (it's the authoritative attempt).
+            if status2 is not None or err2:
+                # _evaluate already updated last_* on the GET call above.
+                pass
+            elif err:
+                # HEAD transport error and GET transport error → keep GET's err message.
+                last_err = err2 or err
+
+        elif status is None:
+            # No HTTP response at all; record the transport error.
+            last_err = err
+            last_ms = ms
+
         if attempt < RETRIES:
             time.sleep(_backoff_delay(attempt))
+
     return {"url": url, "ok": False, "status": last_status, "bytes": last_bytes,
-            "ms": last_ms, "attempts": attempts, "error": last_err or "unknown error"}
+            "ms": last_ms, "attempts": attempts,
+            "error": last_err or "unknown error", "method": last_method or method_mode}
+
 
 
 def _md_cell(s: object) -> str:
