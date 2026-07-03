@@ -58,6 +58,18 @@ jobs:
         run: |
           if [ -f vite.pid ]; then kill "$(cat vite.pid)" || true; fi
 
+      # Notify Slack when there are failures. No-op if SLACK_WEBHOOK_URL is unset
+      # (feature is opt-in — add the webhook as a repo secret to enable).
+      - name: Notify Slack on failure
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          REPORT_JSON: reports/seo/solutions-seo.json
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_LABEL: ${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.pull_request.number) || format('{0}@{1}', github.ref_name, github.sha) }}
+        run: python3 scripts/notify_solutions_seo.py
+
+
       - name: Upload SEO snapshot report
         if: always()
         uses: actions/upload-artifact@v4

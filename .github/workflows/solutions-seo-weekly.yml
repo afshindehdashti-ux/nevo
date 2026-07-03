@@ -89,3 +89,15 @@ jobs:
           retention-days: 90
           if-no-files-found: error
 
+      # Notify Slack when the live snapshot finds regressions.
+      # Runs after upload so the "View run & artifacts" link resolves.
+      - name: Notify Slack on failure
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          REPORT_JSON: reports/seo/solutions-seo.json
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_LABEL: weekly ${{ env.REPORT_WEEK }}
+        run: python3 scripts/notify_solutions_seo.py
+
+
