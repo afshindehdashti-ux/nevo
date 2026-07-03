@@ -366,6 +366,45 @@ def _body_preview(body: bytes) -> tuple[str, str]:
     return digest, text
 
 
+# Response headers surfaced for failed URLs in the step summary. Content-Type
+# distinguishes an HTML error page from a JSON API error; Server / X-Cache /
+# CF-Ray / Age pinpoint which layer (origin vs CDN) served the response;
+# Retry-After tells us if the server is asking us to back off; Cache-Control
+# and Location explain stuck 3xx/304 loops. Comma-separated env override.
+_DEFAULT_RESPONSE_HEADERS = [
+    "Content-Type", "Content-Length", "Server", "Retry-After",
+    "Cache-Control", "Age", "Location", "X-Cache", "CF-Ray", "Via",
+]
+RESPONSE_HEADERS: list[str] = [
+    h.strip() for h in os.environ.get(
+        "RESPONSE_HEADERS", ",".join(_DEFAULT_RESPONSE_HEADERS)
+    ).split(",") if h.strip()
+]
+# Response header values that likely carry secrets — mask before rendering.
+_SENSITIVE_RESPONSE_HEADER_SUBSTR = ("set-cookie", "authorization", "token", "secret", "api-key", "apikey")
+
+def _pick_response_headers(headers) -> dict[str, str]:
+    """Extract the configured response headers, preserving the requested order."""
+    if not headers:
+        return {}
+    out: dict[str, str] = {}
+    for name in RESPONSE_HEADERS:
+        val = headers.get(name)
+        if val:
+            out[name] = val
+    return out
+
+def _render_response_headers_md(headers: dict[str, str]) -> str:
+    if not headers:
+        return ""
+    parts = []
+    for name, val in headers.items():
+        low = name.lower()
+        shown = _mask(val) if any(s in low for s in _SENSITIVE_RESPONSE_HEADER_SUBSTR) else val
+        parts.append(f"`{name}: {_md_cell(shown)}`")
+    return " · ".join(parts)
+
+
 def probe(url: str) -> dict:
     """Probe a URL with retries. Return a result dict with timing/status."""
     path = urlparse(url).path
