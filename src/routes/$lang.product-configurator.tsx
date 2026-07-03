@@ -250,12 +250,16 @@ function PanelStudio({
   className,
   caption,
   overlay,
+  tint,
+  thicknessMm,
 }: {
   core: CoreMaterial;
   ratio?: string;
   className?: string;
   caption?: React.ReactNode;
   overlay?: React.ReactNode;
+  tint?: string;
+  thicknessMm?: number;
 }) {
   return (
     <div
@@ -265,17 +269,30 @@ function PanelStudio({
         className,
       )}
     >
-      {/* subtle floor gradient — engineering studio */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-8 bottom-4 h-8 rounded-full bg-black/10 blur-2xl"
       />
-      <img
-        src={PANEL_IMAGES[core]}
-        alt={`${core} sandwich panel render`}
-        className="relative z-10 max-h-full max-w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]"
-        loading="lazy"
-      />
+      <div className="relative z-10 flex max-h-full max-w-full items-center justify-center">
+        <img
+          src={PANEL_IMAGES[core]}
+          alt={`${core} sandwich panel render`}
+          className="max-h-full max-w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]"
+          loading="lazy"
+        />
+        {tint && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 mix-blend-multiply opacity-40 transition-colors duration-500"
+            style={{ background: tint }}
+          />
+        )}
+      </div>
+      {typeof thicknessMm === "number" && (
+        <div className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full border border-black/10 bg-white/90 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-black/70 backdrop-blur">
+          <Ruler className="size-3" /> {thicknessMm} mm
+        </div>
+      )}
       {overlay}
       {caption && (
         <div className="absolute bottom-3 left-4 right-4 z-20 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-black/50">
