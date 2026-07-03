@@ -91,14 +91,14 @@ try {
   // listener and gets dropped. Wait for hydration, then re-poke the src to
   // trigger a fresh (still-intercepted) request that React can observe.
   await page.waitForTimeout(1500);
-  await logo.evaluate((el) => {
-    const img = /** @type {HTMLImageElement} */ (el);
+  await page.evaluate(() => {
+    const img = document.querySelector('[data-testid="header-logo"]');
+    if (!(img instanceof HTMLImageElement)) return;
     const src = img.src;
     img.removeAttribute("src");
-    // Force a fresh network request so React's onError listener (attached
-    // after hydration) actually observes the failure this time.
     img.src = src;
   });
+
 
   await page.waitForFunction(
     () => {
