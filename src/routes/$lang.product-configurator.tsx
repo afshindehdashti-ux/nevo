@@ -495,14 +495,15 @@ function ProductConfiguratorPage() {
                         : "border-black/5 hover:-translate-y-0.5",
                     )}
                   >
-                    <div className="relative flex aspect-[4/3] w-full items-center justify-center bg-white p-3">
-                      <img
-                        src={PANEL_IMAGES[c.id]}
-                        alt={`${c.id} panel render`}
-                        className="max-h-full max-w-full object-contain"
-                        loading="lazy"
+                    <div className="relative aspect-[4/3] w-full bg-white p-2">
+                      <DynamicPanelPreview
+                        cfg={{ ...cfg, core: c.id }}
+                        ratio="absolute inset-0"
+                        showLabels={false}
+                        showBadges={false}
                       />
                     </div>
+
                     <div className="border-t border-black/5 bg-white px-3 py-2.5">
                       <div className="flex items-center justify-between text-[11px] font-semibold text-black">
                         {c.id}
@@ -591,18 +592,14 @@ function ProductConfiguratorPage() {
               const r = computeResults(c);
               return (
                 <div key={i} className="relative overflow-hidden rounded-3xl border border-border bg-surface">
-                  <div className="relative flex aspect-[4/3] items-center justify-center bg-white p-6">
-                    <img
-                      src={PANEL_IMAGES[c.core]}
-                      alt={`${c.core} panel`}
-                      className="max-h-full max-w-full object-contain"
-                      loading="lazy"
-                    />
+                  <div className="relative aspect-[4/3] w-full bg-white p-4">
+                    <DynamicPanelPreview cfg={c} ratio="absolute inset-0" showLabels={false} />
                     <button
                       onClick={() => setComparisons(comparisons.filter((_, x) => x !== i))}
-                      className="absolute right-3 top-3 flex size-7 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 hover:text-black"
+                      className="absolute right-3 top-3 z-30 flex size-7 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 hover:text-black"
                       aria-label="Remove"
                     >
+
                       <X className="size-3.5" />
                     </button>
                   </div>
