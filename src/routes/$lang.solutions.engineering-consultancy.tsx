@@ -166,7 +166,13 @@ function EngineeringConsultancyPage() {
         <Process />
         <DownloadsCTA />
         <FAQ />
-        <InquiryCTA />
+        <InquiryCTA
+          source="consultancy"
+          eyebrow="Engineering inquiry"
+          title="Brief the NEVO engineering desk."
+          lede="Share your factory brief, feasibility question or engineering scope. The consultancy team responds with a scoped engineering package — feasibility, concept, detailed design or FAT/SAT support — within one business day."
+          ctaLabel="Start Engineering Inquiry"
+        />
         <FinalCTA />
       </main>
       <SiteFooter />

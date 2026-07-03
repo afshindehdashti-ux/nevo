@@ -151,7 +151,13 @@ function ProductionLinesPage() {
         <Applications />
         <DownloadsCTA />
         <FAQSection />
-        <InquiryCTA />
+        <InquiryCTA
+          source="production-line"
+          eyebrow="Production line inquiry"
+          title="Configure your continuous panel line."
+          lede="Share your target capacity, panel spectrum and site constraints. Our line specialists respond with a technical proposal covering equipment, layout, utilities and commissioning within one business day."
+          ctaLabel="Start Production Line Inquiry"
+        />
         <FinalCTA />
       </main>
       <SiteFooter />

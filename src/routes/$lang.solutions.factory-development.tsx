@@ -31,6 +31,7 @@ const heroImg = heroAsset.url;
 const investmentImg = boardroomAsset.url;
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
+import { InquiryCTA } from "@/components/site/InquiryCTA";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
@@ -131,6 +132,13 @@ function FactoryDevelopmentPage() {
         <DevelopmentProcess />
         <InvestmentModel />
         <ConnectedSolutions />
+        <InquiryCTA
+          source="new-factory"
+          eyebrow="Factory inquiry"
+          title="Start scoping your greenfield factory."
+          lede="Share your target market, capacity and site. We respond with a scoped development plan — feasibility, master plan, building, utilities and commissioning — within one business day."
+          ctaLabel="Start Factory Inquiry"
+        />
         <FinalCTA />
       </main>
       <SiteFooter />

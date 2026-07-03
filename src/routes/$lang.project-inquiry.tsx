@@ -245,12 +245,22 @@ function ProjectInquiryPage() {
     } catch { /* ignore malformed config */ }
   }, []);
 
-  // hydrate
+  // hydrate from localStorage, then apply `?source=<id>` preselect
   useEffect(() => {
+    let hydrated: FormState = EMPTY;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setForm({ ...EMPTY, ...JSON.parse(raw) });
+      if (raw) hydrated = { ...EMPTY, ...JSON.parse(raw) };
     } catch { /* noop */ }
+
+    if (typeof window !== "undefined") {
+      const source = new URLSearchParams(window.location.search).get("source");
+      const validIds = new Set(PROJECT_TYPES.map((t) => t.id));
+      if (source && validIds.has(source) && !hydrated.projectTypes.includes(source)) {
+        hydrated = { ...hydrated, projectTypes: [...hydrated.projectTypes, source] };
+      }
+    }
+    setForm(hydrated);
   }, []);
 
   // autosave
