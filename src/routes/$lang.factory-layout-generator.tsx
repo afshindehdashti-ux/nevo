@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { useMemo, useState } from "react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   ArrowRight,
   Boxes,
@@ -11,7 +11,6 @@ import {
   Factory,
   FileText,
   Layers,
-  MessageSquare,
   PhoneCall,
   Ruler,
   Scan,
@@ -23,96 +22,72 @@ import {
   Users,
   Truck,
   Forklift,
-  RotateCw,
-  ZoomIn,
   Maximize2,
   Eye,
   CheckCircle2,
-  Cog,
-  FlaskConical,
-  ShieldCheck,
-  Wrench,
-  Warehouse,
+  X,
+  Info,
   ClipboardList,
-  Play,
   CalendarClock,
+  Route as RouteIcon,
+  Flame,
+  Activity,
+  Radar,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import {
+  AUTOMATIONS,
+  BUILDINGS,
+  CAPACITIES,
+  CAPACITY_SPEC,
+  CORES,
+  SHIFTS,
+  type Automation,
+  type Building,
+  type Capacity,
+  type Core,
+  type Shift,
+  type Zone,
+  computeEquipment,
+  computeFactoryLayout,
+  computeTechData,
+  expansionRecommendation,
+  formatRange,
+  recommendedBuildingCopy,
+  zoneFill,
+} from "@/lib/factory-layout";
 
-import master3d from "@/assets/factory-layout/master-3d.png";
-import topView from "@/assets/factory-layout/top-view.png";
-import flowDiagram from "@/assets/factory-layout/flow-diagram.png";
-import materialFlow from "@/assets/factory-layout/material-flow.png";
-import rendering from "@/assets/factory-layout/rendering.png";
-import expansionImg from "@/assets/factory-layout/expansion.png";
-import lineLaminator from "@/assets/factory-layout/line-laminator.png";
-import lineMixing from "@/assets/factory-layout/line-mixing.png";
-import lineCutting from "@/assets/factory-layout/line-cutting.png";
-import linePacking from "@/assets/factory-layout/line-packing.png";
-import whCoil from "@/assets/factory-layout/wh-coil.png";
-import whFinished from "@/assets/factory-layout/wh-finished.png";
-import whTruck from "@/assets/factory-layout/wh-truck.png";
-import whForklift from "@/assets/factory-layout/wh-forklift.png";
+type ViewMode =
+  | "top"
+  | "iso"
+  | "material"
+  | "truck"
+  | "operator"
+  | "utility"
+  | "expansion"
+  | "equipment";
 
-// ---------------- Domain ----------------
-type Capacity = 3000 | 5000 | 8000 | 12000 | 20000;
-type Core = "PIR" | "PUR" | "Rock Wool" | "EPS" | "Hybrid";
-type Automation = "Semi Automatic" | "Automatic" | "Fully Automatic";
-type Building = "Single Hall" | "Dual Hall" | "Expansion Ready";
-type ViewMode = "top" | "3d" | "material" | "truck" | "operator" | "finished";
-
-const CAPACITIES: Capacity[] = [3000, 5000, 8000, 12000, 20000];
-const CORES: Core[] = ["PIR", "PUR", "Rock Wool", "EPS", "Hybrid"];
-const AUTOMATIONS: Automation[] = ["Semi Automatic", "Automatic", "Fully Automatic"];
-const BUILDINGS: Building[] = ["Single Hall", "Dual Hall", "Expansion Ready"];
-
-// scale factors relative to 10,000 m²/day baseline factory data from board
-function computeFactory(cap: Capacity, core: Core, auto: Automation, bld: Building) {
-  const scale = cap / 10000;
-  const coreFactor = core === "Rock Wool" ? 1.25 : core === "Hybrid" ? 1.15 : 1;
-  const bldFactor = bld === "Dual Hall" ? 1.35 : bld === "Expansion Ready" ? 1.5 : 1;
-  const autoOps = auto === "Fully Automatic" ? 0.75 : auto === "Automatic" ? 0.9 : 1.2;
-
-  const land = Math.round(25000 * scale * bldFactor);
-  const building = Math.round(11500 * scale * coreFactor);
-  const production = Math.round(8200 * scale * coreFactor);
-  const power = Math.round(2800 * scale * (core === "Rock Wool" ? 1.15 : 1));
-  const water = Math.round(18 * scale);
-  const air = Math.round(12 * scale);
-  const steam = Math.round(1500 * scale * (core === "Rock Wool" ? 1.2 : 1));
-  const operators = Math.round(50 * scale * autoOps);
-  const forklifts = Math.max(2, Math.round(3.5 * scale));
-  const trucks = Math.max(2, Math.round(2 * scale));
-
-  return { land, building, production, power, water, air, steam, operators, forklifts, trucks };
-}
-
-const AREAS = [
-  { key: "Production Line", icon: Cog },
-  { key: "Raw Material Warehouse", icon: Boxes },
-  { key: "Chemical Room", icon: FlaskConical },
-  { key: "Coil Warehouse", icon: Layers },
-  { key: "Finished Goods Warehouse", icon: Warehouse },
-  { key: "Laboratory", icon: FlaskConical },
-  { key: "Quality Control", icon: ShieldCheck },
-  { key: "Utilities", icon: Zap },
-  { key: "Maintenance", icon: Wrench },
-  { key: "Loading Area", icon: Truck },
-  { key: "Administration", icon: Building2 },
+const VIEW_MODES: { id: ViewMode; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: "top", label: "Top View", icon: Scan },
+  { id: "iso", label: "3D / Iso", icon: Boxes },
+  { id: "material", label: "Material Flow", icon: ArrowRight },
+  { id: "truck", label: "Truck Flow", icon: Truck },
+  { id: "operator", label: "Operator Flow", icon: Users },
+  { id: "utility", label: "Utility Layout", icon: Zap },
+  { id: "expansion", label: "Expansion", icon: Maximize2 },
+  { id: "equipment", label: "Highlight Equipment", icon: Eye },
 ];
 
-const VIEW_MODES: { id: ViewMode; label: string; img: string; icon: any }[] = [
-  { id: "3d", label: "3D View", img: master3d, icon: Boxes },
-  { id: "top", label: "Top View", img: topView, icon: Scan },
-  { id: "material", label: "Material Flow", img: materialFlow, icon: ArrowRight },
-  { id: "truck", label: "Truck Flow", img: materialFlow, icon: Truck },
-  { id: "operator", label: "Operator Flow", img: topView, icon: Users },
-  { id: "finished", label: "Finished Product", img: materialFlow, icon: Warehouse },
-];
+const FLOW_STYLES = {
+  material: { stroke: "#34d399", label: "Material" },
+  truck: { stroke: "#fb923c", label: "Truck" },
+  operator: { stroke: "#e5e7eb", label: "Operator" },
+  utility: { stroke: "#facc15", label: "Utility" },
+  finished: { stroke: "#3b82f6", label: "Finished" },
+} as const;
 
-// ---------------- SEO ----------------
 export const Route = createFileRoute("/$lang/factory-layout-generator")({
   component: FactoryLayoutPage,
   head: ({ params }) => {
@@ -120,7 +95,7 @@ export const Route = createFileRoute("/$lang/factory-layout-generator")({
       lang: params.lang,
       title: "Factory Layout Generator — Sandwich Panel Factory Design | NEVO",
       description:
-        "Visualize your future sandwich panel factory. Choose capacity, core, automation and building type — get instant land, building, utility and manpower requirements.",
+        "Interactive engineering tool. Choose capacity, core, automation and building configuration — see the factory layout, flows, equipment, utilities and area requirements update live.",
       path: "/factory-layout-generator",
     });
     return {
@@ -138,44 +113,31 @@ export const Route = createFileRoute("/$lang/factory-layout-generator")({
             ]),
           ),
         },
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            name: "NEVO Factory Layout Generator",
-            applicationCategory: "EngineeringApplication",
-            operatingSystem: "Web",
-            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-            description:
-              "Interactive layout generator that sizes land, building, utilities and manpower for a sandwich panel factory.",
-          }),
-        },
       ],
     };
   },
 });
 
-// ---------------- UI ----------------
-function Chip({ children, tone = "emerald" }: { children: React.ReactNode; tone?: "emerald" | "graphite" }) {
+// ─── Small UI primitives ────────────────────────────────────────────────
+function Chip({
+  children,
+  tone = "emerald",
+}: {
+  children: React.ReactNode;
+  tone?: "emerald" | "graphite" | "amber";
+}) {
   const cls =
     tone === "emerald"
       ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
-      : "border-white/10 bg-white/5 text-white/70";
+      : tone === "amber"
+        ? "border-amber-400/30 bg-amber-400/10 text-amber-200"
+        : "border-white/10 bg-white/5 text-white/70";
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-mono uppercase tracking-widest ${cls}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-mono uppercase tracking-widest ${cls}`}
+    >
       {children}
     </span>
-  );
-}
-
-function SectionTitle({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) {
-  return (
-    <div className="mb-10 max-w-3xl">
-      <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-emerald-300/80">{eyebrow}</div>
-      <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">{title}</h2>
-      {sub && <p className="mt-3 text-white/60">{sub}</p>}
-    </div>
   );
 }
 
@@ -185,19 +147,30 @@ function StepPill({ n, label }: { n: number; label: string }) {
       <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 font-mono text-[11px] font-bold text-black">
         {n}
       </span>
-      <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/60">{label}</span>
+      <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/60">
+        {label}
+      </span>
     </div>
   );
 }
 
 function Select<T extends string | number>({
-  value, options, onChange, format,
-}: { value: T; options: readonly T[]; onChange: (v: T) => void; format?: (v: T) => string }) {
+  value,
+  options,
+  onChange,
+  format,
+}: {
+  value: T;
+  options: readonly T[];
+  onChange: (v: T) => void;
+  format?: (v: T) => string;
+}) {
   return (
     <div className="flex flex-wrap gap-2">
       {options.map((o) => (
         <button
           key={String(o)}
+          type="button"
           onClick={() => onChange(o)}
           className={`rounded-lg border px-3 py-2 text-xs font-medium transition ${
             value === o
@@ -212,35 +185,608 @@ function Select<T extends string | number>({
   );
 }
 
-// ---------------- Page ----------------
+// ─── SVG Layout Renderer ───────────────────────────────────────────────
+function LayoutSVG({
+  cfg,
+  view,
+  onZoneSelect,
+  selectedZoneId,
+  isoTilt = false,
+}: {
+  cfg: { capacity: Capacity; core: Core; automation: Automation; building: Building };
+  view: ViewMode;
+  onZoneSelect: (z: Zone) => void;
+  selectedZoneId?: string;
+  isoTilt?: boolean;
+}) {
+  const layout = useMemo(() => computeFactoryLayout(cfg), [cfg]);
+
+  // Which flow categories are visible for this view mode.
+  const visibleFlows = useMemo(() => {
+    if (view === "material") return new Set(["material", "finished"]);
+    if (view === "truck") return new Set(["truck"]);
+    if (view === "operator") return new Set(["operator"]);
+    if (view === "utility") return new Set(["utility"]);
+    if (view === "top" || view === "iso" || view === "expansion" || view === "equipment")
+      return new Set(["material", "truck"]);
+    return new Set<string>();
+  }, [view]);
+
+  const dimHighlight = view === "equipment" ? (z: Zone) => z.category !== "production" && z.category !== "cutting" && z.category !== "stacking" && z.category !== "packaging" : () => false;
+
+  const expansionEmphasis = view === "expansion";
+
+  return (
+    <svg
+      viewBox={`0 0 ${layout.viewW} ${layout.viewH}`}
+      className="h-full w-full"
+      role="img"
+      aria-label="Live factory layout"
+      style={
+        isoTilt
+          ? {
+              transform: "perspective(1600px) rotateX(38deg) rotateZ(-6deg) scale(0.92)",
+              transformOrigin: "50% 60%",
+              transition: "transform 0.4s ease",
+            }
+          : { transition: "transform 0.4s ease" }
+      }
+    >
+      <defs>
+        {(Object.keys(FLOW_STYLES) as Array<keyof typeof FLOW_STYLES>).map((k) => (
+          <marker
+            key={k}
+            id={`arrow-${k}`}
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" fill={FLOW_STYLES[k].stroke} />
+          </marker>
+        ))}
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+        </pattern>
+        <pattern id="gridMinor" width="10" height="10" patternUnits="userSpaceOnUse">
+          <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="0.5" />
+        </pattern>
+      </defs>
+
+      {/* Site background + grid */}
+      <rect x={0} y={0} width={layout.viewW} height={layout.viewH} fill="#07090b" />
+      <rect x={0} y={0} width={layout.viewW} height={layout.viewH} fill="url(#gridMinor)" />
+      <rect x={0} y={0} width={layout.viewW} height={layout.viewH} fill="url(#grid)" />
+
+      {/* Site outline (property line) */}
+      <rect
+        x={20}
+        y={40}
+        width={layout.viewW - 40}
+        height={layout.viewH - 60}
+        fill="none"
+        stroke="rgba(52,211,153,0.35)"
+        strokeWidth={1.5}
+        strokeDasharray="6 4"
+      />
+      <text x={30} y={34} className="font-mono" fontSize={10} fill="rgba(52,211,153,0.6)">
+        SITE BOUNDARY
+      </text>
+
+      {/* Road */}
+      <rect
+        x={layout.road.x}
+        y={layout.road.y}
+        width={layout.road.w}
+        height={layout.road.h}
+        fill="#1a1d21"
+      />
+      <line
+        x1={layout.road.x}
+        y1={layout.road.y + layout.road.h / 2}
+        x2={layout.road.x + layout.road.w}
+        y2={layout.road.y + layout.road.h / 2}
+        stroke="rgba(250,204,21,0.5)"
+        strokeWidth={1}
+        strokeDasharray="10 8"
+      />
+      <text
+        x={layout.road.x + 8}
+        y={layout.road.y + layout.road.h - 8}
+        className="font-mono"
+        fontSize={9}
+        fill="rgba(255,255,255,0.35)"
+      >
+        SITE ACCESS ROAD
+      </text>
+
+      {/* Building envelope */}
+      <rect
+        x={layout.building.x - 4}
+        y={layout.building.y - 4}
+        width={layout.building.w + 8}
+        height={layout.building.h + 8}
+        fill="rgba(15,23,42,0.7)"
+        stroke="rgba(255,255,255,0.35)"
+        strokeWidth={1.5}
+      />
+      {layout.hall2 && (
+        <rect
+          x={layout.hall2.x - 4}
+          y={layout.hall2.y - 4}
+          width={layout.hall2.w + 8}
+          height={layout.hall2.h + 8}
+          fill="rgba(15,23,42,0.7)"
+          stroke="rgba(255,255,255,0.35)"
+          strokeWidth={1.5}
+        />
+      )}
+      {layout.expansion && (
+        <rect
+          x={layout.expansion.x - 4}
+          y={layout.expansion.y - 4}
+          width={layout.expansion.w + 8}
+          height={layout.expansion.h + 8}
+          fill={expansionEmphasis ? "rgba(16,185,129,0.15)" : "rgba(16,185,129,0.05)"}
+          stroke="#10b981"
+          strokeWidth={expansionEmphasis ? 2.5 : 1.5}
+          strokeDasharray="8 6"
+        />
+      )}
+
+      {/* Zones */}
+      {layout.zones.map((z) => {
+        const isSelected = z.id === selectedZoneId;
+        const dim = dimHighlight(z);
+        return (
+          <g
+            key={z.id}
+            onClick={() => onZoneSelect(z)}
+            style={{ cursor: "pointer" }}
+            opacity={dim ? 0.25 : 1}
+          >
+            <rect
+              x={z.x}
+              y={z.y}
+              width={z.w}
+              height={z.h}
+              fill={zoneFill(z.category)}
+              fillOpacity={z.dashed ? 0.15 : 0.85}
+              stroke={isSelected ? "#fde047" : "rgba(255,255,255,0.35)"}
+              strokeWidth={isSelected ? 2.5 : 1}
+              strokeDasharray={z.dashed ? "6 4" : undefined}
+              rx={4}
+            />
+            {z.w > 60 && z.h > 26 && (
+              <text
+                x={z.x + z.w / 2}
+                y={z.y + z.h / 2 + 4}
+                className="font-mono"
+                textAnchor="middle"
+                fontSize={Math.min(12, Math.max(9, z.w / 10))}
+                fill="white"
+                pointerEvents="none"
+                style={{ textShadow: "0 1px 2px rgba(0,0,0,0.7)" }}
+              >
+                {z.short}
+              </text>
+            )}
+          </g>
+        );
+      })}
+
+      {/* Flows */}
+      {layout.flows
+        .filter((f) => visibleFlows.has(f.category))
+        .map((f, i) => {
+          const s = FLOW_STYLES[f.category];
+          return (
+            <g key={i}>
+              <path
+                d={f.d}
+                fill="none"
+                stroke={s.stroke}
+                strokeWidth={f.category === "truck" ? 3 : 2.5}
+                strokeDasharray={f.category === "operator" ? "4 4" : undefined}
+                markerEnd={`url(#arrow-${f.category})`}
+                opacity={0.9}
+              />
+            </g>
+          );
+        })}
+
+      {/* Scale bar */}
+      <g transform={`translate(${layout.viewW - 220}, ${layout.viewH - 30})`}>
+        <line x1={0} y1={0} x2={100} y2={0} stroke="white" strokeWidth={2} />
+        <line x1={0} y1={-5} x2={0} y2={5} stroke="white" strokeWidth={2} />
+        <line x1={100} y1={-5} x2={100} y2={5} stroke="white" strokeWidth={2} />
+        <text x={50} y={-8} textAnchor="middle" fontSize={10} fill="white" className="font-mono">
+          ≈ {layout.gridDimM} m
+        </text>
+      </g>
+
+      {/* HUD */}
+      <g transform={`translate(30, ${layout.viewH - 30})`}>
+        <text fontSize={10} fill="rgba(255,255,255,0.5)" className="font-mono">
+          {cfg.capacity.toLocaleString()} m²/day · {cfg.core} · {cfg.automation} · {cfg.building}
+        </text>
+      </g>
+    </svg>
+  );
+}
+
+// ─── Zone details drawer ───────────────────────────────────────────────
+function ZoneDrawer({ zone, onClose }: { zone: Zone | null; onClose: () => void }) {
+  return (
+    <AnimatePresence>
+      {zone && (
+        <motion.div
+          key="drawer"
+          initial={{ x: 400, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: 400, opacity: 0 }}
+          transition={{ type: "spring", damping: 26, stiffness: 260 }}
+          className="pointer-events-auto fixed right-4 top-24 z-40 w-[320px] rounded-2xl border border-white/10 bg-black/90 p-5 shadow-2xl backdrop-blur"
+        >
+          <div className="mb-3 flex items-start justify-between gap-3">
+            <div>
+              <div
+                className="mb-1.5 inline-flex h-2 w-2 rounded-full"
+                style={{ background: zoneFill(zone.category) }}
+              />
+              <div className="text-sm font-semibold text-white">{zone.name}</div>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg p-1 text-white/40 hover:bg-white/10 hover:text-white"
+              aria-label="Close details"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="text-xs leading-relaxed text-white/70">{zone.fn}</p>
+          <dl className="mt-4 space-y-2 text-xs">
+            <div className="flex justify-between border-t border-white/5 pt-2">
+              <dt className="text-white/50">Approx. area</dt>
+              <dd className="font-mono text-white">{zone.approxAreaM2.toLocaleString()} m²</dd>
+            </div>
+            <div className="border-t border-white/5 pt-2">
+              <dt className="mb-1.5 text-white/50">Related equipment</dt>
+              <dd className="flex flex-wrap gap-1.5">
+                {zone.equipment.map((e) => (
+                  <span
+                    key={e}
+                    className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-white/70"
+                  >
+                    {e}
+                  </span>
+                ))}
+              </dd>
+            </div>
+            {zone.notes && (
+              <div className="border-t border-white/5 pt-2">
+                <dt className="mb-1 text-white/50">Notes</dt>
+                <dd className="text-white/70">{zone.notes}</dd>
+              </div>
+            )}
+          </dl>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// ─── Legend ────────────────────────────────────────────────────────────
+function FlowLegend({ view }: { view: ViewMode }) {
+  const rows: Array<{ k: keyof typeof FLOW_STYLES; visible: boolean }> = [
+    { k: "material", visible: view === "material" || view === "top" || view === "iso" || view === "equipment" || view === "expansion" },
+    { k: "truck", visible: view === "truck" || view === "top" || view === "iso" || view === "expansion" },
+    { k: "operator", visible: view === "operator" },
+    { k: "utility", visible: view === "utility" },
+  ];
+  return (
+    <div className="flex flex-wrap items-center gap-3 border-t border-white/10 bg-black/40 px-4 py-2.5 font-mono text-[10px] uppercase tracking-widest text-white/50">
+      {rows.map(({ k, visible }) => (
+        <span key={k} className={`inline-flex items-center gap-1.5 ${visible ? "" : "opacity-30"}`}>
+          <span className="h-[3px] w-6" style={{ background: FLOW_STYLES[k].stroke }} />
+          {FLOW_STYLES[k].label}
+        </span>
+      ))}
+      <span className="ml-auto inline-flex items-center gap-1.5 opacity-70">
+        <span className="h-3 w-3 rounded border border-emerald-400" style={{ background: "rgba(16,185,129,0.15)", borderStyle: "dashed" }} />
+        Expansion
+      </span>
+    </div>
+  );
+}
+
+// ─── Page ──────────────────────────────────────────────────────────────
+type MobileTab = "inputs" | "layout" | "flow" | "data" | "equipment" | "cta";
+const MOBILE_TABS: { id: MobileTab; label: string }[] = [
+  { id: "inputs", label: "Inputs" },
+  { id: "layout", label: "Layout" },
+  { id: "flow", label: "Flow" },
+  { id: "data", label: "Data" },
+  { id: "equipment", label: "Equipment" },
+  { id: "cta", label: "Request" },
+];
+
 function FactoryLayoutPage() {
   const [capacity, setCapacity] = useState<Capacity>(8000);
   const [core, setCore] = useState<Core>("PIR");
   const [automation, setAutomation] = useState<Automation>("Fully Automatic");
   const [building, setBuilding] = useState<Building>("Expansion Ready");
-  const [view, setView] = useState<ViewMode>("3d");
-  const [activeAreas, setActiveAreas] = useState<string[]>(AREAS.map((a) => a.key));
+  const [shift, setShift] = useState<Shift>("2 Shifts");
+  const [view, setView] = useState<ViewMode>("top");
+  const [zone, setZone] = useState<Zone | null>(null);
+  const [tab, setTab] = useState<MobileTab>("layout");
+  const [fullscreen, setFullscreen] = useState(false);
 
-  const data = useMemo(
-    () => computeFactory(capacity, core, automation, building),
-    [capacity, core, automation, building],
+  const cfg = { capacity, core, automation, building };
+  const tech = useMemo(() => computeTechData(capacity, core, automation, building, shift), [
+    capacity,
+    core,
+    automation,
+    building,
+    shift,
+  ]);
+  const equipment = useMemo(() => computeEquipment(capacity, core, automation), [capacity, core, automation]);
+  const expansionCopy = expansionRecommendation({ capacity, building });
+  const bldRecommendation = recommendedBuildingCopy({ capacity, core });
+
+  const InputsPanel = (
+    <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-6">
+      <div className="mb-6 font-mono text-[11px] uppercase tracking-[0.25em] text-emerald-300/80">
+        Configuration
+      </div>
+      <div className="space-y-6">
+        <div>
+          <StepPill n={1} label="Factory Capacity" />
+          <div className="mt-3">
+            <Select
+              value={capacity}
+              options={CAPACITIES}
+              onChange={(v) => setCapacity(v)}
+              format={(v) => `${(v as number).toLocaleString()} m²/day`}
+            />
+          </div>
+        </div>
+        <div className="border-t border-white/5 pt-6">
+          <StepPill n={2} label="Core Technology" />
+          <div className="mt-3">
+            <Select value={core} options={CORES} onChange={setCore} />
+          </div>
+        </div>
+        <div className="border-t border-white/5 pt-6">
+          <StepPill n={3} label="Automation Level" />
+          <div className="mt-3">
+            <Select value={automation} options={AUTOMATIONS} onChange={setAutomation} />
+          </div>
+        </div>
+        <div className="border-t border-white/5 pt-6">
+          <StepPill n={4} label="Building Configuration" />
+          <div className="mt-3">
+            <Select value={building} options={BUILDINGS} onChange={setBuilding} />
+          </div>
+        </div>
+        <div className="border-t border-white/5 pt-6">
+          <StepPill n={5} label="Shift Pattern" />
+          <div className="mt-3">
+            <Select value={shift} options={SHIFTS} onChange={setShift} />
+          </div>
+        </div>
+      </div>
+      <div className="mt-6 rounded-xl border border-amber-400/20 bg-amber-400/5 p-3 text-[11px] leading-relaxed text-amber-100/80">
+        <Info className="mb-1 inline h-3 w-3" /> Conceptual layout only. Final dimensions and utilities require detailed engineering review.
+      </div>
+    </div>
   );
 
-  const currentView = VIEW_MODES.find((v) => v.id === view)!;
+  const TechPanel = (
+    <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-6">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-emerald-300/80">
+          Technical Data
+        </div>
+        <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">Live</span>
+      </div>
+      <dl className="divide-y divide-white/5 text-sm">
+        {[
+          { i: Factory, l: "Production Lines", v: tech.lines },
+          { i: Ruler, l: "Land Area", v: tech.landM2 },
+          { i: Building2, l: "Building Area", v: tech.buildingM2 },
+          { i: Cog2, l: "Production Area", v: tech.productionM2 },
+          { i: Boxes, l: "Warehouse Area", v: tech.warehouseM2 },
+          { i: Zap, l: "Utility Area", v: tech.utilityM2 },
+          { i: Building2, l: "Office Area", v: tech.officeM2 },
+          { i: Zap, l: "Power Requirement", v: tech.powerKW },
+          { i: Droplets, l: "Water Consumption", v: tech.waterM3day },
+          { i: Wind, l: "Compressed Air", v: tech.compressedAirM3min },
+          { i: Gauge, l: "Steam Requirement", v: tech.steamKgH },
+          { i: Users, l: "Operators", v: tech.operators },
+          { i: Forklift, l: "Forklifts", v: tech.forklifts },
+          { i: Truck, l: "Loading Bays", v: tech.loadingBays },
+        ].map((r) => (
+          <div key={r.l} className="flex items-center justify-between py-2.5">
+            <span className="flex items-center gap-2 text-white/60">
+              <r.i className="h-3.5 w-3.5 text-emerald-300/80" /> {r.l}
+            </span>
+            <motion.span
+              key={r.v}
+              initial={{ opacity: 0, y: 3 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="font-mono text-white"
+            >
+              {r.v}
+            </motion.span>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
 
-  const toggleArea = (k: string) =>
-    setActiveAreas((prev) => (prev.includes(k) ? prev.filter((a) => a !== k) : [...prev, k]));
+  const RecommendationsPanel = (
+    <div className="grid gap-3 sm:grid-cols-2">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+        <div className="mb-1 font-mono text-[10px] uppercase tracking-widest text-emerald-300/80">
+          Recommended Building
+        </div>
+        <div className="text-sm text-white">{bldRecommendation}</div>
+      </div>
+      <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-4">
+        <div className="mb-1 font-mono text-[10px] uppercase tracking-widest text-emerald-300/80">
+          Expansion Recommendation
+        </div>
+        <div className="text-sm text-white">{expansionCopy}</div>
+      </div>
+    </div>
+  );
+
+  const LayoutViewer = (
+    <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-black/40 px-4 py-3">
+        <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-white/60">
+          <Radar className="h-3.5 w-3.5 text-emerald-300" /> Live Factory Layout
+        </div>
+        <div className="flex flex-wrap items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1">
+          {VIEW_MODES.map((m) => (
+            <button
+              type="button"
+              key={m.id}
+              onClick={() => setView(m.id)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium transition ${
+                view === m.id ? "bg-emerald-500 text-black" : "text-white/60 hover:text-white"
+              }`}
+            >
+              <m.icon className="h-3 w-3" /> {m.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setFullscreen((f) => !f)}
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium text-white/60 transition hover:text-white"
+            aria-label="Toggle fullscreen"
+          >
+            <Maximize2 className="h-3 w-3" /> {fullscreen ? "Exit" : "Fullscreen"}
+          </button>
+        </div>
+      </div>
+
+      <div className={`relative ${fullscreen ? "fixed inset-0 z-50 bg-[#07090b]" : ""}`}>
+        <div className={`${fullscreen ? "h-screen" : "aspect-[16/10]"} w-full overflow-hidden bg-[#07090b]`}>
+          <LayoutSVG
+            cfg={cfg}
+            view={view}
+            onZoneSelect={setZone}
+            selectedZoneId={zone?.id}
+            isoTilt={view === "iso"}
+          />
+        </div>
+        <div className="pointer-events-none absolute left-4 top-4 flex flex-wrap gap-1.5">
+          <Chip>{capacity.toLocaleString()} m²/day</Chip>
+          <Chip tone="graphite">{core}</Chip>
+          <Chip tone="graphite">{automation}</Chip>
+          <Chip tone="graphite">{building}</Chip>
+          <Chip tone="amber">{shift}</Chip>
+        </div>
+        {fullscreen && (
+          <button
+            type="button"
+            onClick={() => setFullscreen(false)}
+            className="absolute right-4 top-4 rounded-full border border-white/20 bg-black/60 p-2 text-white hover:bg-black"
+            aria-label="Close fullscreen"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
+      <FlowLegend view={view} />
+    </div>
+  );
+
+  const EquipmentPanel = (
+    <div className="rounded-3xl border border-white/10 bg-white/[0.02]">
+      <div className="flex items-center justify-between border-b border-white/10 bg-black/40 px-4 py-3">
+        <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/60">
+          Equipment List — {equipment.length} items
+        </div>
+        <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+          Auto-generated
+        </span>
+      </div>
+      <div className="grid gap-0 divide-y divide-white/5 md:grid-cols-2 md:divide-y-0">
+        {equipment.map((e) => (
+          <div key={e.name} className="flex items-start justify-between gap-3 p-4 md:border-b md:border-white/5">
+            <div className="flex items-start gap-3">
+              <CategoryIcon cat={e.category} />
+              <div>
+                <div className="text-sm font-medium text-white">{e.name}</div>
+                {e.reason && (
+                  <div className="mt-0.5 text-[11px] text-white/50">{e.reason}</div>
+                )}
+              </div>
+            </div>
+            <span className="whitespace-nowrap rounded-md border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[11px] text-white/70">
+              {e.qty}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const CTAPanel = (
+    <div className="rounded-3xl border border-emerald-400/30 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent p-6">
+      <Chip>
+        <ClipboardList className="h-3 w-3" /> Ready for next step
+      </Chip>
+      <h3 className="mt-4 text-2xl font-semibold text-white">Turn this concept into a real factory.</h3>
+      <p className="mt-2 text-sm text-white/60">
+        Send this configuration to NEVO engineering — you receive a complete masterplan, utilities layout, equipment list, CAPEX and delivery schedule.
+      </p>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Link
+          to="/project-inquiry"
+          search={{
+            capacity: String(capacity),
+            core,
+            automation,
+            building,
+            shift,
+            source: "factory-layout-generator",
+          }}
+          className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-2.5 text-sm font-medium text-black transition hover:bg-emerald-400"
+        >
+          <ClipboardList className="h-4 w-4" /> Request Complete Factory Engineering
+        </Link>
+        <Link
+          to="/contact"
+          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
+        >
+          <PhoneCall className="h-4 w-4" /> Talk to an Engineer
+        </Link>
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
+        >
+          <Download className="h-4 w-4" /> Download Concept Layout PDF
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-[#0A0C0E] text-white">
       <SiteHeader />
 
-      {/* Breadcrumb */}
       <nav aria-label="Breadcrumb" className="border-b border-white/5 bg-black/40">
         <div className="mx-auto flex max-w-[1440px] items-center gap-2 px-6 py-3 text-xs text-white/50">
           <Link to="/" className="hover:text-white">Home</Link>
-          <ChevronRight className="h-3 w-3" />
-          <Link to="/solutions" className="hover:text-white">Solutions</Link>
           <ChevronRight className="h-3 w-3" />
           <Link to="/solutions/factory-development" className="hover:text-white">Factory Development</Link>
           <ChevronRight className="h-3 w-3" />
@@ -248,7 +794,6 @@ function FactoryLayoutPage() {
         </div>
       </nav>
 
-      {/* HERO */}
       <section className="relative overflow-hidden border-b border-white/5">
         <div
           className="absolute inset-0 opacity-40"
@@ -257,325 +802,91 @@ function FactoryLayoutPage() {
               "radial-gradient(ellipse at 20% 0%, rgba(16,185,129,0.15), transparent 55%), radial-gradient(ellipse at 80% 100%, rgba(16,185,129,0.08), transparent 55%)",
           }}
         />
-        <div className="relative mx-auto max-w-[1440px] px-6 py-16 md:py-20">
+        <div className="relative mx-auto max-w-[1440px] px-6 py-12 md:py-16">
           <div className="mb-6 flex flex-wrap items-center gap-2">
-            <Chip><Sparkles className="h-3 w-3" /> Interactive Generator</Chip>
-            <Chip tone="graphite">v2.0 · Engineering Preview</Chip>
+            <Chip>
+              <Sparkles className="h-3 w-3" /> Interactive Engineering Tool
+            </Chip>
+            <Chip tone="graphite">v3.0 · Dynamic Generator</Chip>
           </div>
-          <h1 className="max-w-4xl text-5xl font-semibold leading-[1.05] tracking-tight text-white md:text-7xl">
+          <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-tight text-white md:text-6xl">
             Factory Layout <span className="text-emerald-400">Generator</span>
           </h1>
-          <p className="mt-6 max-w-2xl text-lg text-white/60">
-            Smart layout. Maximum efficiency. Higher profitability. Design your
-            sandwich panel factory in minutes — visualize, optimize, and build
-            better before a single foundation is poured.
+          <p className="mt-5 max-w-2xl text-base text-white/60 md:text-lg">
+            Choose capacity, core technology, automation and building configuration. The layout, flow diagrams, equipment list and utility requirements update instantly.
           </p>
         </div>
       </section>
 
-      {/* MAIN GENERATOR — Configuration + Live Layout */}
+      {/* Mobile tab bar */}
+      <div className="sticky top-0 z-30 border-b border-white/10 bg-black/80 backdrop-blur lg:hidden">
+        <div className="scrollbar-hide flex gap-1 overflow-x-auto px-3 py-2">
+          {MOBILE_TABS.map((t) => (
+            <button
+              type="button"
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`whitespace-nowrap rounded-full px-4 py-1.5 text-[11px] font-medium transition ${
+                tab === t.id
+                  ? "bg-emerald-500 text-black"
+                  : "border border-white/10 bg-white/5 text-white/60"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <section className="border-b border-white/5">
-        <div className="mx-auto max-w-[1440px] px-6 py-12">
-          <div className="grid gap-6 lg:grid-cols-12">
-            {/* CONFIGURATION PANEL */}
-            <aside className="lg:col-span-4 space-y-4">
-              <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-6">
-                <div className="mb-6 font-mono text-[11px] uppercase tracking-[0.25em] text-emerald-300/80">
-                  Configuration
-                </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <StepPill n={1} label="Factory Capacity" />
-                    <div className="mt-3">
-                      <Select
-                        value={capacity}
-                        options={CAPACITIES}
-                        onChange={(v) => setCapacity(v)}
-                        format={(v) => `${(v as number).toLocaleString()} m²/day`}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="border-t border-white/5 pt-6">
-                    <StepPill n={2} label="Core Material" />
-                    <div className="mt-3">
-                      <Select value={core} options={CORES} onChange={setCore} />
-                    </div>
-                  </div>
-
-                  <div className="border-t border-white/5 pt-6">
-                    <StepPill n={3} label="Automation" />
-                    <div className="mt-3">
-                      <Select value={automation} options={AUTOMATIONS} onChange={setAutomation} />
-                    </div>
-                  </div>
-
-                  <div className="border-t border-white/5 pt-6">
-                    <StepPill n={4} label="Building Type" />
-                    <div className="mt-3">
-                      <Select value={building} options={BUILDINGS} onChange={setBuilding} />
-                    </div>
-                  </div>
-                </div>
-
-                <button className="mt-8 flex w-full items-center justify-between rounded-2xl bg-emerald-500 px-5 py-4 text-sm font-medium text-black transition hover:bg-emerald-400">
-                  <span className="inline-flex items-center gap-2"><Play className="h-4 w-4" /> Generate Layout</span>
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* FACTORY DATA */}
-              <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-6">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-emerald-300/80">Factory Data</div>
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">Estimated</span>
-                </div>
-                <dl className="divide-y divide-white/5 text-sm">
-                  {[
-                    { i: Ruler, l: "Land Area", v: `${data.land.toLocaleString()} m²` },
-                    { i: Building2, l: "Building Area", v: `${data.building.toLocaleString()} m²` },
-                    { i: Factory, l: "Production Area", v: `${data.production.toLocaleString()} m²` },
-                    { i: Zap, l: "Power Requirement", v: `${data.power.toLocaleString()} kW` },
-                    { i: Droplets, l: "Water Consumption", v: `${data.water} m³/day` },
-                    { i: Wind, l: "Compressed Air", v: `${data.air} m³/min` },
-                    { i: Gauge, l: "Steam Requirement", v: `${data.steam.toLocaleString()} kg/h` },
-                    { i: Users, l: "Operators", v: `${data.operators}` },
-                    { i: Forklift, l: "Forklifts", v: `${data.forklifts}` },
-                    { i: Truck, l: "Trucks / Bays", v: `${data.trucks}` },
-                  ].map((r) => (
-                    <div key={r.l} className="flex items-center justify-between py-2.5">
-                      <span className="flex items-center gap-2 text-white/60">
-                        <r.i className="h-3.5 w-3.5 text-emerald-300/80" /> {r.l}
-                      </span>
-                      <motion.span
-                        key={r.v}
-                        initial={{ opacity: 0, y: 3 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="font-mono text-white"
-                      >
-                        {r.v}
-                      </motion.span>
-                    </div>
-                  ))}
-                </dl>
-              </div>
+        <div className="mx-auto max-w-[1440px] px-4 py-8 md:px-6 md:py-12">
+          {/* Desktop grid */}
+          <div className="hidden gap-6 lg:grid lg:grid-cols-12">
+            <aside className="space-y-4 lg:col-span-4">
+              {InputsPanel}
+              {TechPanel}
             </aside>
-
-            {/* LIVE LAYOUT */}
-            <div className="lg:col-span-8 space-y-4">
-              <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-black/40 px-4 py-3">
-                  <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-white/60">
-                    <Scan className="h-3.5 w-3.5 text-emerald-300" /> Live Factory Layout
-                  </div>
-                  <div className="flex flex-wrap items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1">
-                    {VIEW_MODES.map((m) => (
-                      <button
-                        key={m.id}
-                        onClick={() => setView(m.id)}
-                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium transition ${
-                          view === m.id ? "bg-emerald-500 text-black" : "text-white/60 hover:text-white"
-                        }`}
-                      >
-                        <m.icon className="h-3 w-3" /> {m.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="relative aspect-[16/10] overflow-hidden bg-black">
-                  <motion.img
-                    key={view + capacity + core}
-                    src={currentView.img}
-                    alt={`Factory ${currentView.label}`}
-                    initial={{ opacity: 0, scale: 1.02 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="h-full w-full object-cover"
-                  />
-                  {/* Overlay HUD */}
-                  <div className="pointer-events-none absolute inset-0">
-                    <div className="absolute left-4 top-4 flex flex-wrap gap-1.5">
-                      <Chip>{capacity.toLocaleString()} m²/day</Chip>
-                      <Chip tone="graphite">{core}</Chip>
-                      <Chip tone="graphite">{automation}</Chip>
-                      <Chip tone="graphite">{building}</Chip>
-                    </div>
-                    <div className="absolute right-4 top-4 rounded-lg border border-white/10 bg-black/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-white/70 backdrop-blur">
-                      {currentView.label}
-                    </div>
-                    <div className="absolute bottom-3 left-4 font-mono text-[10px] uppercase tracking-widest text-emerald-300/70">
-                      120 m × 160 m
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-4 border-t border-white/10 bg-black/40 px-4 py-3 font-mono text-[10px] uppercase tracking-widest text-white/40">
-                  <span className="inline-flex items-center gap-1"><RotateCw className="h-3 w-3" /> Rotate</span>
-                  <span className="inline-flex items-center gap-1"><ZoomIn className="h-3 w-3" /> Zoom</span>
-                  <span className="inline-flex items-center gap-1"><Maximize2 className="h-3 w-3" /> Fullscreen</span>
-                  <span className="inline-flex items-center gap-1"><Layers className="h-3 w-3" /> Exploded</span>
-                  <span className="inline-flex items-center gap-1"><Eye className="h-3 w-3" /> Highlight</span>
-                </div>
-              </div>
-
-              {/* PRODUCTION FLOW DIAGRAM */}
-              <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]">
-                <div className="border-b border-white/10 bg-black/40 px-4 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-white/60">
-                  Production Flow Diagram
-                </div>
-                <div className="bg-black">
-                  <img src={flowDiagram} alt="Production flow" className="h-full w-full object-cover" loading="lazy" />
-                </div>
-              </div>
-
-              {/* AREAS TOGGLES */}
-              <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-6">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-emerald-300/80">Show / Hide Zones</div>
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-white/40">
-                    {activeAreas.length} / {AREAS.length} visible
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {AREAS.map((a) => {
-                    const on = activeAreas.includes(a.key);
-                    return (
-                      <button
-                        key={a.key}
-                        onClick={() => toggleArea(a.key)}
-                        className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
-                          on
-                            ? "border-emerald-400/50 bg-emerald-500/10 text-emerald-200"
-                            : "border-white/10 bg-white/5 text-white/40 line-through"
-                        }`}
-                      >
-                        {on ? <CheckCircle2 className="h-3 w-3" /> : <a.icon className="h-3 w-3" />}
-                        {a.key}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+            <div className="space-y-4 lg:col-span-8">
+              {LayoutViewer}
+              {RecommendationsPanel}
+              {EquipmentPanel}
+              {CTAPanel}
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* PRODUCTION LINE HIGHLIGHTS */}
-      <section className="border-b border-white/5 bg-black/30">
-        <div className="mx-auto max-w-[1440px] px-6 py-16">
-          <SectionTitle
-            eyebrow="Production Line Highlights"
-            title="Engineered stations, integrated flow"
-          />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { title: "Double Belt Laminator", img: lineLaminator, desc: "High pressure, high speed laminating for perfect bonding." },
-              { title: "PIR Mixing Unit", img: lineMixing, desc: "Precision mixing with exact ratio and density control." },
-              { title: "Cutting Station", img: lineCutting, desc: "High accuracy cutting for perfect panel dimensions." },
-              { title: "Packing Line", img: linePacking, desc: "Automatic packing for safe transport and storage." },
-            ].map((s) => (
-              <div key={s.title} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
-                <div className="aspect-[4/3] bg-black">
-                  <img src={s.img} alt={s.title} className="h-full w-full object-cover" loading="lazy" />
-                </div>
-                <div className="p-4">
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-emerald-300/80">Station</div>
-                  <div className="mt-1 text-sm font-semibold text-white">{s.title}</div>
-                  <p className="mt-1.5 text-xs text-white/60">{s.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* WAREHOUSE & LOGISTICS */}
-      <section className="border-b border-white/5">
-        <div className="mx-auto max-w-[1440px] px-6 py-16">
-          <SectionTitle eyebrow="Warehouse & Logistics" title="Storage, dispatch, and material handling" />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { title: "Coil Warehouse", img: whCoil, desc: "Organized coil storage with easy access." },
-              { title: "Finished Goods", img: whFinished, desc: "Spacious storage for finished panels." },
-              { title: "Truck Loading", img: whTruck, desc: "Multiple loading bays for efficient dispatch." },
-              { title: "Forklift Operations", img: whForklift, desc: "Smooth material handling and product flow." },
-            ].map((s) => (
-              <div key={s.title} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
-                <div className="aspect-[4/3] bg-black">
-                  <img src={s.img} alt={s.title} className="h-full w-full object-cover" loading="lazy" />
-                </div>
-                <div className="p-4">
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-emerald-300/80">Zone</div>
-                  <div className="mt-1 text-sm font-semibold text-white">{s.title}</div>
-                  <p className="mt-1.5 text-xs text-white/60">{s.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* MATERIAL FLOW + RENDERING + EXPANSION */}
-      <section className="border-b border-white/5 bg-black/30">
-        <div className="mx-auto max-w-[1440px] px-6 py-16">
-          <SectionTitle
-            eyebrow="Master Planning"
-            title="Flow, façade & future expansion"
-            sub="A NEVO factory is planned holistically — raw material flow, finished product flow, external rendering, and space reserved for scaling capacity."
-          />
-          <div className="grid gap-4 lg:grid-cols-3">
-            {[
-              { title: "Material Flow", img: materialFlow, tag: "Optimized" },
-              { title: "Factory Rendering", img: rendering, tag: "Photorealistic" },
-              { title: "Expansion Ready Layout", img: expansionImg, tag: "Scalable" },
-            ].map((s) => (
-              <div key={s.title} className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]">
-                <div className="aspect-[16/10] bg-black">
-                  <img src={s.img} alt={s.title} className="h-full w-full object-cover" loading="lazy" />
-                </div>
-                <div className="flex items-center justify-between p-5">
-                  <div className="text-sm font-semibold text-white">{s.title}</div>
-                  <Chip>{s.tag}</Chip>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* DOWNLOADS */}
-      <section className="border-b border-white/5">
-        <div className="mx-auto max-w-[1440px] px-6 py-16">
-          <SectionTitle eyebrow="Downloads" title="Engineering documents" />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { title: "Factory Layout PDF", size: "PDF · 6.4 MB" },
-              { title: "Masterplan", size: "PDF · 4.1 MB" },
-              { title: "Utilities Layout", size: "PDF · 3.2 MB" },
-              { title: "Equipment List", size: "PDF · 1.8 MB" },
-            ].map((d) => (
-              <button
-                key={d.title}
-                className="group flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.02] p-5 text-left transition hover:border-emerald-400/40 hover:bg-white/[0.05]"
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-emerald-300/80" />
-                    <span className="text-sm font-medium text-white">{d.title}</span>
+          {/* Mobile stack (tab-controlled) */}
+          <div className="space-y-4 lg:hidden">
+            {tab === "inputs" && InputsPanel}
+            {tab === "layout" && (
+              <>
+                {LayoutViewer}
+                {RecommendationsPanel}
+              </>
+            )}
+            {tab === "flow" && (
+              <>
+                {LayoutViewer}
+                <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-xs text-white/60">
+                  <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-emerald-300/80">
+                    Flow guide
                   </div>
-                  <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-white/40">{d.size}</div>
+                  Switch view modes above to see Material, Truck, Operator or Utility flows overlaid on the layout.
                 </div>
-                <Download className="h-4 w-4 text-white/40 transition group-hover:text-emerald-300" />
-              </button>
-            ))}
+              </>
+            )}
+            {tab === "data" && (
+              <>
+                {TechPanel}
+                {RecommendationsPanel}
+              </>
+            )}
+            {tab === "equipment" && EquipmentPanel}
+            {tab === "cta" && CTAPanel}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Compact bottom CTA (desktop safety net) */}
       <section className="relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-50"
@@ -584,17 +895,19 @@ function FactoryLayoutPage() {
               "radial-gradient(ellipse at 50% 100%, rgba(16,185,129,0.2), transparent 60%)",
           }}
         />
-        <div className="relative mx-auto max-w-[1440px] px-6 py-24 text-center">
-          <Chip><ClipboardList className="h-3 w-3" /> Ready for the next step</Chip>
-          <h2 className="mx-auto mt-6 max-w-3xl text-4xl font-semibold tracking-tight text-white md:text-6xl">
-            Turn this layout into a <span className="text-emerald-400">real factory</span>.
+        <div className="relative mx-auto max-w-[1440px] px-6 py-16 text-center">
+          <Chip>
+            <ClipboardList className="h-3 w-3" /> From concept to reality
+          </Chip>
+          <h2 className="mx-auto mt-6 max-w-3xl text-3xl font-semibold tracking-tight text-white md:text-5xl">
+            One configuration away from a <span className="text-emerald-400">real factory</span>.
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-white/60">
-            Request a complete engineering proposal — masterplan, utilities, equipment list, CAPEX and delivery schedule — from NEVO Industrial.
+          <p className="mx-auto mt-4 max-w-xl text-white/60">
+            NEVO Industrial delivers the masterplan, utilities, equipment, CAPEX and delivery schedule.
           </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              to="/contact"
+              to="/project-inquiry"
               className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-black transition hover:bg-emerald-400"
             >
               <ClipboardList className="h-4 w-4" /> Request Full Factory Design
@@ -615,7 +928,48 @@ function FactoryLayoutPage() {
         </div>
       </section>
 
+      <ZoneDrawer zone={zone} onClose={() => setZone(null)} />
+
       <SiteFooter />
     </div>
   );
 }
+
+// small helpers
+function Cog2({ className }: { className?: string }) {
+  return <Layers className={className} />;
+}
+
+function CategoryIcon({ cat }: { cat: "production" | "handling" | "utility" | "safety" | "control" }) {
+  const I =
+    cat === "production"
+      ? Factory
+      : cat === "handling"
+        ? Forklift
+        : cat === "utility"
+          ? Zap
+          : cat === "safety"
+            ? Flame
+            : Activity;
+  const color =
+    cat === "production"
+      ? "text-emerald-300"
+      : cat === "handling"
+        ? "text-blue-300"
+        : cat === "utility"
+          ? "text-yellow-300"
+          : cat === "safety"
+            ? "text-red-300"
+            : "text-purple-300";
+  return (
+    <div className={`mt-0.5 rounded-lg border border-white/10 bg-white/5 p-2 ${color}`}>
+      <I className="h-3.5 w-3.5" />
+    </div>
+  );
+}
+
+// silence unused-icon lint (referenced conditionally)
+void RouteIcon;
+void CAPACITY_SPEC;
+void formatRange;
+void FileText;
