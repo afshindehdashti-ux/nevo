@@ -149,6 +149,7 @@ describe("logo telemetry redaction", () => {
         errorMaxPerSession: 1,
         errorMinIntervalMs: 0,
         debug: false,
+        logLine: true,
       },
       state: {
         renderLogged: false,
