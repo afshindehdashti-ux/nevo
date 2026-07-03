@@ -715,8 +715,10 @@ def probe(url: str) -> dict:
             "response_headers": last_headers,
             "error_kind": final_kind,
             "final_kind": final_kind,
+            "status_class": _classify_status(last_status),
             "attempt_kinds": attempt_kinds,
             "stopped_early": stopped_early}
+
 
 
 
