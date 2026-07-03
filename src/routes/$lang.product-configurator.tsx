@@ -364,7 +364,11 @@ function ProductConfiguratorPage() {
                   <Row label="Length" value={`Up to ${cfg.length} m`} />
                   <Row label="Steel Ext." value={`${cfg.extSteel} mm`} />
                   <Row label="Steel Int." value={`${cfg.intSteel} mm`} />
-                  <Row label="Coating" value={`${cfg.coating} / ${cfg.color}`} />
+                  <Row label="Profile" value={cfg.profile} />
+                  <Row label="Coating" value={cfg.coating} />
+                  <Row label="Exterior Colour" value={`${cfg.extColor} · ${findColor(cfg.extColor).name}`} />
+                  <Row label="Interior Colour" value={`${cfg.intColor} · ${findColor(cfg.intColor).name}`} />
+
                   <div className="my-3 border-t border-white/10" />
                   <Row label="U-Value" value={`${results.uValue} W/m²K`} accent />
                   <Row label="Fire Rating" value={results.fireRating} accent />
@@ -408,10 +412,8 @@ function ProductConfiguratorPage() {
           />
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
             <PanelStudio
-              core={cfg.core}
+              cfg={cfg}
               ratio="aspect-[16/10]"
-              tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
-              thicknessMm={cfg.thickness}
               className={cn(
                 "transition-all duration-700",
                 view3d === "exploded" && "shadow-[0_50px_120px_-30px_rgba(16,185,129,0.35)]",
@@ -419,7 +421,7 @@ function ProductConfiguratorPage() {
               )}
               caption={
                 <>
-                  <span>{cfg.core} · {cfg.thickness} mm · {cfg.color}</span>
+                  <span>{cfg.core} · {cfg.thickness} mm · Ext {cfg.extColor} · Int {cfg.intColor}</span>
                   <span>NEVO INDUSTRIAL · DUBAI</span>
                 </>
               }
@@ -428,6 +430,7 @@ function ProductConfiguratorPage() {
                   {[
                     { id: "solid", icon: RotateCw, label: "Rotate" },
                     { id: "exploded", icon: Move3d, label: "Explode" },
+
                     { id: "section", icon: Scissors, label: "Section" },
                   ].map((v) => (
                     <button
