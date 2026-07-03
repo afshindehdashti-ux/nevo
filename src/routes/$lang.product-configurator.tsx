@@ -35,17 +35,32 @@ import { Button } from "@/components/ui/button";
 import { buildSeo } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
-import panelPIR from "@/assets/configurator/panel-pir.jpg";
-import panelPUR from "@/assets/configurator/panel-pur.jpg";
-import panelRockwool from "@/assets/configurator/panel-rockwool.jpg";
-import panelGlasswool from "@/assets/configurator/panel-glasswool.jpg";
-import panelEPS from "@/assets/configurator/panel-eps.jpg";
 import heroImg from "@/assets/configurator/hero-configurator.jpg";
 import ctxWall from "@/assets/configurator/context-wall.jpg";
 import ctxRoof from "@/assets/configurator/context-roof.jpg";
 import ctxColdroom from "@/assets/configurator/context-coldroom.jpg";
 import ctxCleanroom from "@/assets/configurator/context-cleanroom.jpg";
 import ctxFire from "@/assets/configurator/context-fire.jpg";
+
+import { DynamicPanelPreview } from "@/components/configurator/DynamicPanelPreview";
+import {
+  type Config,
+  type PanelType,
+  type CoreMaterial,
+  type JointType,
+  type Coating,
+  type ProfileType,
+  CORES,
+  COATINGS,
+  JOINTS,
+  COLOR_SWATCHES,
+  PROFILES,
+  THICKNESSES,
+  STEEL_GAUGES,
+  DEFAULT_CONFIG,
+  computeResults,
+  findColor,
+} from "@/components/configurator/panel-data";
 
 export const Route = createFileRoute("/$lang/product-configurator")({
   head: ({ params }) => ({
@@ -70,11 +85,6 @@ export const Route = createFileRoute("/$lang/product-configurator")({
 
 /* --------------------------- Domain data --------------------------- */
 
-type PanelType = "wall" | "roof" | "coldroom" | "cleanroom" | "fire";
-type CoreMaterial = "PIR" | "PUR" | "Rock Wool" | "EPS" | "Glass Wool";
-type JointType = "Hidden Screw" | "Visible Screw" | "Tongue & Groove" | "Cam-Lock";
-type Coating = "PVDF" | "Polyester" | "Plastisol" | "HDP";
-
 const PANEL_TYPES: {
   id: PanelType;
   label: string;
@@ -88,28 +98,6 @@ const PANEL_TYPES: {
   { id: "fire", label: "Fire Rated Panel", desc: "EI 60 – EI 240 rated", icon: Flame },
 ];
 
-const CORES: {
-  id: CoreMaterial;
-  density: number;
-  lambda: number;
-  fire: string;
-  desc: string;
-}[] = [
-  { id: "PIR", density: 40, lambda: 0.022, fire: "B-s1,d0", desc: "Best thermal / weight ratio" },
-  { id: "PUR", density: 40, lambda: 0.023, fire: "B-s2,d0", desc: "Cost-optimised insulation" },
-  { id: "Rock Wool", density: 110, lambda: 0.041, fire: "A1", desc: "Non-combustible, acoustic" },
-  { id: "EPS", density: 15, lambda: 0.038, fire: "E", desc: "Lightweight, economical" },
-  { id: "Glass Wool", density: 90, lambda: 0.035, fire: "A1", desc: "Fire safety + acoustic" },
-];
-
-const PANEL_IMAGES: Record<CoreMaterial, string> = {
-  PIR: panelPIR,
-  PUR: panelPUR,
-  "Rock Wool": panelRockwool,
-  "Glass Wool": panelGlasswool,
-  EPS: panelEPS,
-};
-
 const CONTEXT_IMAGES: Record<PanelType, string> = {
   wall: ctxWall,
   roof: ctxRoof,
@@ -118,190 +106,47 @@ const CONTEXT_IMAGES: Record<PanelType, string> = {
   fire: ctxFire,
 };
 
-const COATING_META: Record<Coating, { warranty: number; durability: string; priceFactor: number }> = {
-  PVDF: { warranty: 25, durability: "Marine / harsh UV", priceFactor: 1.35 },
-  Polyester: { warranty: 10, durability: "Standard exterior", priceFactor: 1.0 },
-  Plastisol: { warranty: 15, durability: "Industrial / corrosive", priceFactor: 1.18 },
-  HDP: { warranty: 20, durability: "High-durability polymer", priceFactor: 1.22 },
-};
 
-const PANEL_TYPE_META: Record<PanelType, { fireBoost: string | null; premium: number }> = {
-  wall: { fireBoost: null, premium: 1.0 },
-  roof: { fireBoost: null, premium: 1.05 },
-  coldroom: { fireBoost: null, premium: 1.15 },
-  cleanroom: { fireBoost: null, premium: 1.25 },
-  fire: { fireBoost: "EI 120 (A1)", premium: 1.4 },
-};
-
-const JOINTS: JointType[] = ["Hidden Screw", "Visible Screw", "Tongue & Groove", "Cam-Lock"];
-const COATINGS: Coating[] = ["PVDF", "Polyester", "Plastisol", "HDP"];
-const COLOR_SWATCHES = [
-  { ral: "RAL 9002", hex: "#E7E7DE" },
-  { ral: "RAL 7016", hex: "#293133" },
-  { ral: "RAL 9010", hex: "#F1ECE1" },
-  { ral: "RAL 5010", hex: "#0E4C7E" },
-  { ral: "RAL 3020", hex: "#B81A1F" },
-  { ral: "RAL 6005", hex: "#114232" },
-];
-
-interface Config {
-  panelType: PanelType;
-  core: CoreMaterial;
-  thickness: number;
-  width: number;
-  length: number;
-  joint: JointType;
-  extSteel: number;
-  intSteel: number;
-  coating: Coating;
-  color: string;
-  accessories: string[];
-}
-
-const DEFAULT_CONFIG: Config = {
-  panelType: "wall",
-  core: "PIR",
-  thickness: 100,
-  width: 1000,
-  length: 6,
-  joint: "Hidden Screw",
-  extSteel: 0.5,
-  intSteel: 0.4,
-  coating: "PVDF",
-  color: "RAL 9002",
-  accessories: [],
-};
-
-/* ------------------ Engineering result calculations ------------------ */
-
-function computeResults(cfg: Config) {
-  const core = CORES.find((c) => c.id === cfg.core)!;
-  const coating = COATING_META[cfg.coating];
-  const ptype = PANEL_TYPE_META[cfg.panelType];
-  const thicknessM = cfg.thickness / 1000;
-
-  const uValue = core.lambda / thicknessM;
-  const steelKg = (cfg.extSteel + cfg.intSteel) * 7.85;
-  const coreKg = core.density * thicknessM;
-  const weight = +(steelKg + coreKg).toFixed(1);
-
-  // Fire rating: fire panel type upgrades non-A1 cores to a rated system
-  const fireRating =
-    ptype.fireBoost && core.fire !== "A1" ? ptype.fireBoost : core.fire;
-
-  // Rw acoustic: density + thickness contribution + steel gauge
-  const sound =
-    20 +
-    Math.round(core.density / 12) +
-    Math.round(cfg.thickness / 25) +
-    Math.round((cfg.extSteel + cfg.intSteel) * 4);
-
-  const thermalScore =
-    uValue < 0.2 ? "Excellent" : uValue < 0.3 ? "Very Good" : uValue < 0.45 ? "Good" : "Standard";
-
-  const app =
-    cfg.panelType === "coldroom"
-      ? "Cold storage, food processing, logistics"
-      : cfg.panelType === "cleanroom"
-        ? "Pharma, semiconductor, laboratories"
-        : cfg.panelType === "fire"
-          ? "Compartmentation, escape routes, industrial fire zones"
-          : cfg.panelType === "roof"
-            ? "Industrial roofs, warehouses, factories"
-            : "Facades, partitions, industrial envelopes";
-
-  // Indicative price per m² (USD) — deterministic, transparent
-  const basePrice =
-    12 + core.density * 0.11 + cfg.thickness * 0.14 + (cfg.extSteel + cfg.intSteel) * 8;
-  const pricePerM2 = +(basePrice * coating.priceFactor * ptype.premium).toFixed(1);
-  const totalArea = +((cfg.width / 1000) * cfg.length).toFixed(2);
-  const totalPrice = +(pricePerM2 * totalArea).toFixed(0);
-
-  // Lead time scales with core availability and accessories
-  const leadTime =
-    (core.id === "Rock Wool" || core.id === "Glass Wool" ? 5 : 3) +
-    Math.ceil(cfg.accessories.length / 2) +
-    (cfg.panelType === "cleanroom" || cfg.panelType === "fire" ? 2 : 0);
-
-  return {
-    uValue: +uValue.toFixed(3),
-    weight,
-    fireRating,
-    sound,
-    thermalScore,
-    application: app,
-    coreDensity: core.density,
-    warranty: coating.warranty,
-    coatingDurability: coating.durability,
-    pricePerM2,
-    totalArea,
-    totalPrice,
-    leadTime,
-  };
-}
 
 /* --------------------------- Reusable studio frame --------------------------- */
-/*  White studio card that renders any panel render at true aspect —            */
-/*  never crops, never stretches. Soft engineering-software shadow.             */
+/*  White studio card that renders the dynamic SVG panel. Colour, thickness,    */
+/*  profile, core material and panel type all update in place — no photo swap.  */
 
 function PanelStudio({
-  core,
+  cfg,
   ratio = "aspect-[16/10]",
   className,
   caption,
   overlay,
-  tint,
-  thicknessMm,
+  showLabels = true,
+  showBadges = true,
 }: {
-  core: CoreMaterial;
+  cfg: Config;
   ratio?: string;
   className?: string;
   caption?: React.ReactNode;
   overlay?: React.ReactNode;
-  tint?: string;
-  thicknessMm?: number;
+  showLabels?: boolean;
+  showBadges?: boolean;
 }) {
   return (
-    <div
-      className={cn(
-        "group relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-white p-6 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.55)] md:p-10",
-        ratio,
-        className,
-      )}
-    >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-8 bottom-4 h-8 rounded-full bg-black/10 blur-2xl"
+    <div className={cn("relative w-full", ratio, className)}>
+      <DynamicPanelPreview
+        cfg={cfg}
+        ratio="absolute inset-0 h-full w-full"
+        showLabels={showLabels}
+        showBadges={showBadges}
       />
-      <div className="relative z-10 flex max-h-full max-w-full items-center justify-center">
-        <img
-          src={PANEL_IMAGES[core]}
-          alt={`${core} sandwich panel render`}
-          className="max-h-full max-w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]"
-          loading="lazy"
-        />
-        {tint && (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 mix-blend-multiply opacity-40 transition-colors duration-500"
-            style={{ background: tint }}
-          />
-        )}
-      </div>
-      {typeof thicknessMm === "number" && (
-        <div className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full border border-black/10 bg-white/90 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-black/70 backdrop-blur">
-          <Ruler className="size-3" /> {thicknessMm} mm
-        </div>
-      )}
       {overlay}
       {caption && (
-        <div className="absolute bottom-3 left-4 right-4 z-20 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-black/50">
+        <div className="pointer-events-none absolute bottom-3 left-4 right-4 z-20 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-black/60">
           {caption}
         </div>
       )}
     </div>
   );
 }
+
 
 /* --------------------------- Component --------------------------- */
 
@@ -457,23 +302,22 @@ function ProductConfiguratorPage() {
             <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
               {step === 0 && (
                 <StepPanelType
-                  selected={cfg.panelType}
+                  cfg={cfg}
                   onSelect={(v) => update("panelType", v)}
-                  core={cfg.core}
                 />
               )}
               {step === 1 && (
-                <StepCore selected={cfg.core} onSelect={(v) => update("core", v)} />
+                <StepCore cfg={cfg} onSelect={(v) => update("core", v)} />
               )}
               {step === 2 && <StepDimensions cfg={cfg} update={update} />}
               {step === 3 && <StepSteel cfg={cfg} update={update} />}
               {step === 4 && (
                 <StepAccessories
-                  selected={cfg.accessories}
+                  cfg={cfg}
                   onToggle={toggleAccessory}
-                  core={cfg.core}
                 />
               )}
+
               {step === 5 && <StepResults results={results} cfg={cfg} />}
 
               <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-6">
@@ -519,7 +363,11 @@ function ProductConfiguratorPage() {
                   <Row label="Length" value={`Up to ${cfg.length} m`} />
                   <Row label="Steel Ext." value={`${cfg.extSteel} mm`} />
                   <Row label="Steel Int." value={`${cfg.intSteel} mm`} />
-                  <Row label="Coating" value={`${cfg.coating} / ${cfg.color}`} />
+                  <Row label="Profile" value={cfg.profile} />
+                  <Row label="Coating" value={cfg.coating} />
+                  <Row label="Exterior Colour" value={`${cfg.extColor} · ${findColor(cfg.extColor).name}`} />
+                  <Row label="Interior Colour" value={`${cfg.intColor} · ${findColor(cfg.intColor).name}`} />
+
                   <div className="my-3 border-t border-white/10" />
                   <Row label="U-Value" value={`${results.uValue} W/m²K`} accent />
                   <Row label="Fire Rating" value={results.fireRating} accent />
@@ -563,10 +411,8 @@ function ProductConfiguratorPage() {
           />
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
             <PanelStudio
-              core={cfg.core}
+              cfg={cfg}
               ratio="aspect-[16/10]"
-              tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
-              thicknessMm={cfg.thickness}
               className={cn(
                 "transition-all duration-700",
                 view3d === "exploded" && "shadow-[0_50px_120px_-30px_rgba(16,185,129,0.35)]",
@@ -574,7 +420,7 @@ function ProductConfiguratorPage() {
               )}
               caption={
                 <>
-                  <span>{cfg.core} · {cfg.thickness} mm · {cfg.color}</span>
+                  <span>{cfg.core} · {cfg.thickness} mm · Ext {cfg.extColor} · Int {cfg.intColor}</span>
                   <span>NEVO INDUSTRIAL · DUBAI</span>
                 </>
               }
@@ -583,6 +429,7 @@ function ProductConfiguratorPage() {
                   {[
                     { id: "solid", icon: RotateCw, label: "Rotate" },
                     { id: "exploded", icon: Move3d, label: "Explode" },
+
                     { id: "section", icon: Scissors, label: "Section" },
                   ].map((v) => (
                     <button
@@ -647,14 +494,15 @@ function ProductConfiguratorPage() {
                         : "border-black/5 hover:-translate-y-0.5",
                     )}
                   >
-                    <div className="relative flex aspect-[4/3] w-full items-center justify-center bg-white p-3">
-                      <img
-                        src={PANEL_IMAGES[c.id]}
-                        alt={`${c.id} panel render`}
-                        className="max-h-full max-w-full object-contain"
-                        loading="lazy"
+                    <div className="relative aspect-[4/3] w-full bg-white p-2">
+                      <DynamicPanelPreview
+                        cfg={{ ...cfg, core: c.id }}
+                        ratio="absolute inset-0"
+                        showLabels={false}
+                        showBadges={false}
                       />
                     </div>
+
                     <div className="border-t border-black/5 bg-white px-3 py-2.5">
                       <div className="flex items-center justify-between text-[11px] font-semibold text-black">
                         {c.id}
@@ -743,18 +591,14 @@ function ProductConfiguratorPage() {
               const r = computeResults(c);
               return (
                 <div key={i} className="relative overflow-hidden rounded-3xl border border-border bg-surface">
-                  <div className="relative flex aspect-[4/3] items-center justify-center bg-white p-6">
-                    <img
-                      src={PANEL_IMAGES[c.core]}
-                      alt={`${c.core} panel`}
-                      className="max-h-full max-w-full object-contain"
-                      loading="lazy"
-                    />
+                  <div className="relative aspect-[4/3] w-full bg-white p-4">
+                    <DynamicPanelPreview cfg={c} ratio="absolute inset-0" showLabels={false} />
                     <button
                       onClick={() => setComparisons(comparisons.filter((_, x) => x !== i))}
-                      className="absolute right-3 top-3 flex size-7 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 hover:text-black"
+                      className="absolute right-3 top-3 z-30 flex size-7 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 hover:text-black"
                       aria-label="Remove"
                     >
+
                       <X className="size-3.5" />
                     </button>
                   </div>
@@ -815,14 +659,10 @@ function ProductConfiguratorPage() {
               <span>Datasheet · NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness}</span>
               <span>REV 01</span>
             </div>
-            <div className="relative flex aspect-[4/3] items-center justify-center bg-white p-6">
-              <img
-                src={PANEL_IMAGES[cfg.core]}
-                alt="Datasheet preview"
-                className="max-h-full max-w-full object-contain"
-                loading="lazy"
-              />
+            <div className="relative aspect-[4/3] w-full bg-white p-4">
+              <DynamicPanelPreview cfg={cfg} ratio="absolute inset-0" showLabels />
             </div>
+
             <dl className="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-black/5 px-5 py-4 font-mono text-[11px]">
               <div className="flex justify-between text-black/60"><span>U-VALUE</span><span className="text-black">{results.uValue}</span></div>
               <div className="flex justify-between text-black/60"><span>FIRE</span><span className="text-black">{results.fireRating}</span></div>
@@ -900,7 +740,7 @@ function ProductConfiguratorPage() {
                   </div>
                   <div className="mt-1">
                     <span className="text-white/50">Steel:</span> {cfg.extSteel}/{cfg.intSteel}mm ·{" "}
-                    {cfg.coating} {cfg.color}
+                    {cfg.coating} · Ext {cfg.extColor} · Int {cfg.intColor} · Profile {cfg.profile}
                   </div>
                   <div className="mt-1">
                     <span className="text-white/50">Results:</span> U={results.uValue} W/m²K · Fire{" "}
@@ -1055,22 +895,20 @@ function ResultCard({
 /* --------------------------- Steps --------------------------- */
 
 function StepPanelType({
-  selected,
+  cfg,
   onSelect,
-  core,
 }: {
-  selected: PanelType;
+  cfg: Config;
   onSelect: (v: PanelType) => void;
-  core: CoreMaterial;
 }) {
   return (
     <div>
-      <StepHeader n={1} title="Panel Type" desc="Choose the type of panel that fits your application." />
+      <StepHeader n={1} title="Panel Type" desc="Choose the type of panel that fits your application — the preview shape updates instantly." />
       <div className="grid gap-6 md:grid-cols-[1fr_1.2fr]">
-        <PanelStudio core={core} ratio="aspect-[4/3]" />
+        <PanelStudio cfg={cfg} ratio="aspect-[4/3]" showLabels={false} />
         <div className="space-y-2">
           {PANEL_TYPES.map((p) => {
-            const active = p.id === selected;
+            const active = p.id === cfg.panelType;
             return (
               <button
                 key={p.id}
@@ -1105,18 +943,18 @@ function StepPanelType({
 }
 
 function StepCore({
-  selected,
+  cfg,
   onSelect,
 }: {
-  selected: CoreMaterial;
+  cfg: Config;
   onSelect: (v: CoreMaterial) => void;
 }) {
   return (
     <div>
-      <StepHeader n={2} title="Core Material" desc="Select the core material — each has its own dedicated studio render." />
+      <StepHeader n={2} title="Core Material" desc="Select the insulation core — only the core texture changes in the preview." />
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {CORES.map((c) => {
-          const active = c.id === selected;
+          const active = c.id === cfg.core;
           return (
             <button
               key={c.id}
@@ -1128,12 +966,12 @@ function StepCore({
                   : "border-black/5 hover:-translate-y-0.5",
               )}
             >
-              <div className="relative flex aspect-[4/3] items-center justify-center bg-white p-4">
-                <img
-                  src={PANEL_IMAGES[c.id]}
-                  alt={`${c.id} sandwich panel render`}
-                  className="max-h-full max-w-full object-contain"
-                  loading="lazy"
+              <div className="relative aspect-[4/3] w-full bg-white p-2">
+                <DynamicPanelPreview
+                  cfg={{ ...cfg, core: c.id }}
+                  ratio="absolute inset-0"
+                  showLabels={false}
+                  showBadges={false}
                 />
               </div>
               <div className="border-t border-black/5 bg-white p-4">
@@ -1164,17 +1002,33 @@ function StepDimensions({
 }) {
   return (
     <div>
-      <StepHeader n={3} title="Dimensions" desc="Define the exact dimensions of your panel." />
+      <StepHeader n={3} title="Dimensions & Profile" desc="Define exact dimensions, profile geometry and joint type." />
       <div className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
         <div className="grid gap-6 md:grid-cols-2">
-          <SliderField
-            label="Thickness (mm)"
-            value={cfg.thickness}
-            min={40}
-            max={250}
-            step={10}
-            onChange={(v) => update("thickness", v)}
-          />
+          <div className="md:col-span-2">
+            <label className="text-xs font-medium uppercase tracking-widest text-white/60">
+              Thickness (mm)
+            </label>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {THICKNESSES.map((t) => {
+                const active = cfg.thickness === t;
+                return (
+                  <button
+                    key={t}
+                    onClick={() => update("thickness", t)}
+                    className={cn(
+                      "rounded-xl border px-3 py-2 text-sm font-medium transition",
+                      active
+                        ? "border-accent bg-accent text-black"
+                        : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20",
+                    )}
+                  >
+                    {t}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           <SliderField
             label="Width (mm)"
             value={cfg.width}
@@ -1193,6 +1047,22 @@ function StepDimensions({
           />
           <div>
             <label className="text-xs font-medium uppercase tracking-widest text-white/60">
+              Profile Type
+            </label>
+            <select
+              value={cfg.profile}
+              onChange={(e) => update("profile", e.target.value as ProfileType)}
+              className="mt-2 w-full rounded-xl border border-white/10 bg-black/40 p-3 text-sm text-white focus:border-accent focus:outline-none"
+            >
+              {PROFILES.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-medium uppercase tracking-widest text-white/60">
               Joint Type
             </label>
             <select
@@ -1209,10 +1079,8 @@ function StepDimensions({
           </div>
         </div>
         <PanelStudio
-          core={cfg.core}
+          cfg={cfg}
           ratio="aspect-[4/3]"
-          tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
-          thicknessMm={cfg.thickness}
           caption={
             <>
               <span>{cfg.thickness} × {cfg.width} mm · {cfg.length} m</span>
@@ -1234,32 +1102,64 @@ function StepSteel({
 }) {
   return (
     <div>
-      <StepHeader n={4} title="Steel & Coating" desc="Select steel type and coating for each side." />
+      <StepHeader n={4} title="Steel, Coating & Colour" desc="Colour changes are applied only to the steel skins — the core is never affected." />
       <div className="grid gap-6 md:grid-cols-[1.2fr_1fr]">
-        <div className="space-y-5">
+        <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
-            <SliderField
-              label="Exterior Steel (mm)"
-              value={cfg.extSteel}
-              min={0.4}
-              max={0.8}
-              step={0.05}
-              onChange={(v) => update("extSteel", +v.toFixed(2))}
-            />
-            <SliderField
-              label="Interior Steel (mm)"
-              value={cfg.intSteel}
-              min={0.4}
-              max={0.8}
-              step={0.05}
-              onChange={(v) => update("intSteel", +v.toFixed(2))}
-            />
+            <div>
+              <label className="text-xs font-medium uppercase tracking-widest text-white/60">
+                Exterior Steel (mm)
+              </label>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {STEEL_GAUGES.map((g) => {
+                  const active = cfg.extSteel === g;
+                  return (
+                    <button
+                      key={g}
+                      onClick={() => update("extSteel", g)}
+                      className={cn(
+                        "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition",
+                        active
+                          ? "border-accent bg-accent text-black"
+                          : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20",
+                      )}
+                    >
+                      {g.toFixed(2)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-medium uppercase tracking-widest text-white/60">
+                Interior Steel (mm)
+              </label>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {STEEL_GAUGES.map((g) => {
+                  const active = cfg.intSteel === g;
+                  return (
+                    <button
+                      key={g}
+                      onClick={() => update("intSteel", g)}
+                      className={cn(
+                        "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition",
+                        active
+                          ? "border-accent bg-accent text-black"
+                          : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20",
+                      )}
+                    >
+                      {g.toFixed(2)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
           <div>
             <label className="text-xs font-medium uppercase tracking-widest text-white/60">
               Coating Type
             </label>
-            <div className="mt-2 grid grid-cols-4 gap-2">
+            <div className="mt-2 grid grid-cols-3 gap-2 md:grid-cols-5">
               {COATINGS.map((c) => {
                 const active = cfg.coating === c;
                 return (
@@ -1267,7 +1167,7 @@ function StepSteel({
                     key={c}
                     onClick={() => update("coating", c)}
                     className={cn(
-                      "rounded-xl border py-3 text-sm font-medium transition",
+                      "rounded-xl border py-2.5 text-sm font-medium transition",
                       active
                         ? "border-accent bg-accent text-black"
                         : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20",
@@ -1278,41 +1178,29 @@ function StepSteel({
                 );
               })}
             </div>
-          </div>
-          <div>
-            <label className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-white/60">
-              <Palette className="size-3.5" /> Color
-            </label>
-            <div className="mt-2 grid grid-cols-6 gap-2">
-              {COLOR_SWATCHES.map((c) => {
-                const active = cfg.color === c.ral;
-                return (
-                  <button
-                    key={c.ral}
-                    onClick={() => update("color", c.ral)}
-                    title={c.ral}
-                    className={cn(
-                      "aspect-square rounded-xl border-2 transition",
-                      active ? "border-accent scale-105" : "border-white/10 hover:border-white/30",
-                    )}
-                    style={{ background: c.hex }}
-                    aria-label={c.ral}
-                  />
-                );
-              })}
+            <div className="mt-2 text-[11px] text-white/50">
+              Coating affects durability, warranty and price — never the visual colour.
             </div>
-            <div className="mt-2 text-xs text-white/60">Selected: {cfg.color}</div>
           </div>
+
+          <ColorPicker
+            label="Exterior Steel Skin"
+            selected={cfg.extColor}
+            onSelect={(ral) => update("extColor", ral)}
+          />
+          <ColorPicker
+            label="Interior Steel Skin"
+            selected={cfg.intColor}
+            onSelect={(ral) => update("intColor", ral)}
+          />
         </div>
         <PanelStudio
-          core={cfg.core}
+          cfg={cfg}
           ratio="aspect-[4/5]"
-          tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
-          thicknessMm={cfg.thickness}
           caption={
             <>
-              <span>{cfg.coating}</span>
-              <span>{cfg.color}</span>
+              <span>{cfg.coating} · {cfg.profile}</span>
+              <span>Ext {cfg.extColor} · Int {cfg.intColor}</span>
             </>
           }
         />
@@ -1321,14 +1209,78 @@ function StepSteel({
   );
 }
 
-function StepAccessories({
+function ColorPicker({
+  label,
   selected,
-  onToggle,
-  core,
+  onSelect,
 }: {
-  selected: string[];
+  label: string;
+  selected: string;
+  onSelect: (ral: string) => void;
+}) {
+  const current = findColor(selected);
+  return (
+    <div>
+      <div className="flex items-center justify-between">
+        <label className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-white/60">
+          <Palette className="size-3.5" /> {label}
+        </label>
+        <div className="flex items-center gap-2 text-[11px] text-white/70">
+          <span
+            className="inline-block size-3 rounded-full border border-white/20"
+            style={{ background: current.hex }}
+          />
+          {current.ral} · {current.name}
+        </div>
+      </div>
+      <div className="mt-2 grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10">
+        {COLOR_SWATCHES.map((c) => {
+          const active = selected === c.ral;
+          return (
+            <button
+              key={c.ral}
+              onClick={() => onSelect(c.ral)}
+              title={`${c.ral} · ${c.name}`}
+              className={cn(
+                "group relative aspect-square rounded-lg border-2 transition",
+                active
+                  ? "border-accent scale-105 shadow-[0_0_0_2px_rgba(16,185,129,0.35)]"
+                  : "border-white/10 hover:border-white/40",
+              )}
+              style={{ background: c.hex }}
+              aria-label={`${c.ral} ${c.name}`}
+            >
+              {active && (
+                <Check
+                  className={cn(
+                    "absolute inset-0 m-auto size-4",
+                    isLight(c.hex) ? "text-black" : "text-white",
+                  )}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function isLight(hex: string): boolean {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 160;
+}
+
+function StepAccessories({
+  cfg,
+  onToggle,
+}: {
+  cfg: Config;
   onToggle: (a: string) => void;
-  core: CoreMaterial;
 }) {
   const items = ["Flashings", "Sealants", "Fasteners", "Ventilation", "Skylights", "Others"];
   return (
@@ -1337,7 +1289,7 @@ function StepAccessories({
       <div className="grid gap-6 md:grid-cols-[1fr_1fr]">
         <div className="grid grid-cols-2 gap-3">
           {items.map((a) => {
-            const active = selected.includes(a);
+            const active = cfg.accessories.includes(a);
             return (
               <button
                 key={a}
@@ -1359,11 +1311,12 @@ function StepAccessories({
             );
           })}
         </div>
-        <PanelStudio core={core} ratio="aspect-[4/3]" />
+        <PanelStudio cfg={cfg} ratio="aspect-[4/3]" />
       </div>
     </div>
   );
 }
+
 
 function StepResults({
   results,
@@ -1397,17 +1350,16 @@ function StepResults({
       </div>
       <div className="mt-6 grid gap-6 md:grid-cols-2">
         <PanelStudio
-          core={cfg.core}
+          cfg={cfg}
           ratio="aspect-[4/3]"
-          tint={COLOR_SWATCHES.find((c) => c.ral === cfg.color)?.hex}
-          thicknessMm={cfg.thickness}
           caption={
             <>
-              <span>NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness} · {cfg.color}</span>
+              <span>NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness} · Ext {cfg.extColor}</span>
               <span>U {results.uValue} · Fire {results.fireRating}</span>
             </>
           }
         />
+
         <div className="relative overflow-hidden rounded-2xl border border-white/10 aspect-[4/3]">
           <img
             src={CONTEXT_IMAGES[cfg.panelType]}
