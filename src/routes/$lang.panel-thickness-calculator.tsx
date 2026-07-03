@@ -232,17 +232,45 @@ function Chip({
 function Section({
   label,
   children,
+  issue,
 }: {
   label: string;
   children: React.ReactNode;
+  issue?: { severity: "error" | "warning"; message: string };
 }) {
+  const tone =
+    issue?.severity === "error"
+      ? "text-rose-300"
+      : issue?.severity === "warning"
+        ? "text-amber-300"
+        : "text-white/50";
   return (
     <div>
-      <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">{label}</div>
+      <div className={`mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] ${tone}`}>
+        <span>{label}</span>
+        {issue && (
+          <span aria-hidden="true">•</span>
+        )}
+        {issue && (
+          <span className="normal-case tracking-normal">{issue.severity === "error" ? "Invalid" : "Check"}</span>
+        )}
+      </div>
       {children}
+      {issue && (
+        <p
+          role={issue.severity === "error" ? "alert" : "status"}
+          className={`mt-2 flex items-start gap-1.5 text-xs ${
+            issue.severity === "error" ? "text-rose-300" : "text-amber-300"
+          }`}
+        >
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+          <span>{issue.message}</span>
+        </p>
+      )}
     </div>
   );
 }
+
 
 // ---------------- Dynamic SVG Cross-section ----------------
 function CrossSection({
@@ -528,6 +556,154 @@ function BarChart({
   );
 }
 
+// ---------------- Input validation / engineering guardrails ----------------
+type IssueField =
+  | "app"
+  | "core"
+  | "climate"
+  | "temp"
+  | "fire"
+  | "thickness"
+  | "extSteel"
+  | "intSteel";
+
+type Issue = {
+  field: IssueField;
+  severity: "error" | "warning";
+  message: string;
+};
+
+function validateInputs(input: {
+  app: Application;
+  core: Core;
+  climate: Climate;
+  temp: Temp;
+  fire: Fire;
+  thickness: Thickness;
+  extSteel: number;
+  intSteel: number;
+}): Issue[] {
+  const { app, core, climate, temp, fire, thickness, extSteel, intSteel } = input;
+  const issues: Issue[] = [];
+  const requiredFireMin = fireRequirementMinutes(fire);
+  const isCombustibleCore = core === "PIR" || core === "PUR" || core === "EPS";
+
+  // --- Hard errors: physically / regulatorily impossible combinations ---
+
+  if (requiredFireMin >= 120 && isCombustibleCore) {
+    issues.push({
+      field: "core",
+      severity: "error",
+      message: `${core} cannot achieve a ${fire} fire rating. Switch to Rock Wool or Glass Wool for ≥120 min.`,
+    });
+    issues.push({
+      field: "fire",
+      severity: "error",
+      message: `A ${fire} rating requires a mineral (non-combustible) core.`,
+    });
+  }
+
+  if (core === "EPS" && requiredFireMin >= 60) {
+    issues.push({
+      field: "core",
+      severity: "error",
+      message: `EPS cannot achieve a ${fire} fire rating; it is limited to short-duration ratings.`,
+    });
+  }
+
+  if (app === "Freezer Room" && core === "EPS") {
+    issues.push({
+      field: "core",
+      severity: "error",
+      message: "EPS is not suitable for freezer rooms (moisture absorption and thermal drift).",
+    });
+  }
+
+  if ((temp === "-25°C" || temp === "-40°C") && thickness < 120) {
+    issues.push({
+      field: "thickness",
+      severity: "error",
+      message: `Internal temperatures at ${temp} require ≥120 mm to prevent condensation and thermal loss.`,
+    });
+  }
+  if (temp === "-40°C" && thickness < 150) {
+    issues.push({
+      field: "thickness",
+      severity: "error",
+      message: "Blast freezer (-40°C) applications require at least 150 mm of insulation.",
+    });
+  }
+
+  if (app === "Clean Room" && (extSteel < 0.5 || intSteel < 0.5)) {
+    if (extSteel < 0.5)
+      issues.push({
+        field: "extSteel",
+        severity: "error",
+        message: "Clean rooms require ≥0.50 mm exterior skin for rigidity and hygiene compliance.",
+      });
+    if (intSteel < 0.5)
+      issues.push({
+        field: "intSteel",
+        severity: "error",
+        message: "Clean rooms require ≥0.50 mm interior skin for rigidity and hygiene compliance.",
+      });
+  }
+
+  // --- Warnings: unusual but not blocked ---
+
+  if (intSteel > extSteel) {
+    issues.push({
+      field: "extSteel",
+      severity: "warning",
+      message: "Interior skin is thicker than exterior. Exterior faces weather; typically ext ≥ int.",
+    });
+  }
+
+  if (climate === "Very Cold" && thickness < 100) {
+    issues.push({
+      field: "thickness",
+      severity: "warning",
+      message: "In very cold climates, ≥100 mm is usually recommended to control heat loss.",
+    });
+  }
+
+  if (core === "EPS" && thickness > 150) {
+    issues.push({
+      field: "thickness",
+      severity: "warning",
+      message: "EPS panels above 150 mm are rarely produced; consider PIR or Rock Wool.",
+    });
+  }
+
+  if (app === "Cold Storage" && thickness < 80) {
+    issues.push({
+      field: "thickness",
+      severity: "warning",
+      message: "Cold storage typically uses ≥80 mm to maintain stable interior temperatures.",
+    });
+  }
+
+  if ((core === "Rock Wool" || core === "Glass Wool") && thickness >= 250) {
+    issues.push({
+      field: "thickness",
+      severity: "warning",
+      message: `${core} at ${thickness} mm becomes very heavy; verify structural support and handling.`,
+    });
+  }
+
+  return issues;
+}
+
+function firstBy<T extends { field: IssueField; severity: "error" | "warning" }>(
+  issues: T[],
+  field: IssueField,
+): T | undefined {
+  return (
+    issues.find((i) => i.field === field && i.severity === "error") ??
+    issues.find((i) => i.field === field && i.severity === "warning")
+  );
+}
+
 // ---------------- Shareable state (URL query encoding) ----------------
 const APPLICATIONS_ALL: Application[] = [
   "Cold Storage",
@@ -709,6 +885,26 @@ function PanelThicknessPage() {
     return { thermal, fire: fireS, weight: weightS, cost: costS, appFit };
   }, [u, w, thickness, meetsRec, belowRec, fireAchieved, requiredFireMin]);
 
+  // ---------- Validation & guardrails ----------
+  const issues = useMemo(
+    () => validateInputs({ app, core, climate, temp, fire, thickness, extSteel, intSteel }),
+    [app, core, climate, temp, fire, thickness, extSteel, intSteel],
+  );
+  const errors = useMemo(() => issues.filter((i) => i.severity === "error"), [issues]);
+  const warnings = useMemo(() => issues.filter((i) => i.severity === "warning"), [issues]);
+  const hasErrors = errors.length > 0;
+  const fieldIssues: Partial<Record<IssueField, Issue>> = {
+    app: firstBy(issues, "app"),
+    core: firstBy(issues, "core"),
+    climate: firstBy(issues, "climate"),
+    temp: firstBy(issues, "temp"),
+    fire: firstBy(issues, "fire"),
+    thickness: firstBy(issues, "thickness"),
+    extSteel: firstBy(issues, "extSteel"),
+    intSteel: firstBy(issues, "intSteel"),
+  };
+
+
   function toggleCompare(t: number) {
     setCompare((prev) => {
       if (prev.includes(t)) return prev.filter((x) => x !== t);
@@ -718,6 +914,7 @@ function PanelThicknessPage() {
   }
 
   function downloadReport() {
+    if (hasErrors) return;
     const lines = [
       "NEVO Panel Thickness Calculation Report",
       "======================================",
@@ -769,6 +966,7 @@ function PanelThicknessPage() {
   }
 
   async function downloadPdfReport() {
+    if (hasErrors) return;
     const { default: jsPDF } = await import("jspdf");
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const pageW = doc.internal.pageSize.getWidth();
@@ -906,7 +1104,30 @@ function PanelThicknessPage() {
 
   const InputsPanel = (
     <div className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-      <Section label="Application">
+      {(errors.length > 0 || warnings.length > 0) && (
+        <div
+          role={errors.length > 0 ? "alert" : "status"}
+          className={`rounded-xl border p-4 text-sm ${
+            errors.length > 0
+              ? "border-rose-400/40 bg-rose-400/10 text-rose-100"
+              : "border-amber-400/40 bg-amber-400/5 text-amber-100"
+          }`}
+        >
+          <div className="mb-2 flex items-center gap-2 font-semibold">
+            <AlertTriangle className="size-4" aria-hidden="true" />
+            {errors.length > 0
+              ? `${errors.length} configuration ${errors.length === 1 ? "issue" : "issues"} — results are hidden until resolved`
+              : `${warnings.length} configuration ${warnings.length === 1 ? "warning" : "warnings"}`}
+          </div>
+          <ul className="ml-5 list-disc space-y-1 text-xs">
+            {[...errors, ...warnings].map((i, idx) => (
+              <li key={`${i.field}-${idx}`}>{i.message}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <Section label="Application" issue={fieldIssues.app}>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {APPLICATIONS.map((a) => (
             <Chip key={a} active={app === a} onClick={() => setApp(a)}>
@@ -916,7 +1137,7 @@ function PanelThicknessPage() {
         </div>
       </Section>
 
-      <Section label="Core Material">
+      <Section label="Core Material" issue={fieldIssues.core}>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
           {CORES.map((c) => (
             <Chip key={c} active={core === c} onClick={() => setCore(c)}>
@@ -927,7 +1148,7 @@ function PanelThicknessPage() {
       </Section>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <Section label="Climate Zone">
+        <Section label="Climate Zone" issue={fieldIssues.climate}>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
             {CLIMATES.map((c) => (
               <Chip key={c} active={climate === c} onClick={() => setClimate(c)}>
@@ -937,7 +1158,7 @@ function PanelThicknessPage() {
           </div>
         </Section>
 
-        <Section label="Required Internal Temperature">
+        <Section label="Required Internal Temperature" issue={fieldIssues.temp}>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
             {TEMPS.map((t) => (
               <Chip key={t} active={temp === t} onClick={() => setTemp(t)}>
@@ -948,7 +1169,7 @@ function PanelThicknessPage() {
         </Section>
       </div>
 
-      <Section label="Fire Rating Requirement">
+      <Section label="Fire Rating Requirement" issue={fieldIssues.fire}>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
           {FIRES.map((f) => (
             <Chip key={f} active={fire === f} onClick={() => setFire(f)}>
@@ -958,7 +1179,7 @@ function PanelThicknessPage() {
         </div>
       </Section>
 
-      <Section label="Panel Thickness (mm)">
+      <Section label="Panel Thickness (mm)" issue={fieldIssues.thickness}>
         <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-12">
           {THICKNESSES.map((t) => (
             <Chip key={t} active={thickness === t} onClick={() => setThickness(t)}>
@@ -969,7 +1190,7 @@ function PanelThicknessPage() {
       </Section>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <Section label="Exterior Steel (mm)">
+        <Section label="Exterior Steel (mm)" issue={fieldIssues.extSteel}>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
             {STEEL_GAUGES.map((s) => (
               <Chip key={s} active={extSteel === s} onClick={() => setExtSteel(s)}>
@@ -978,8 +1199,9 @@ function PanelThicknessPage() {
             ))}
           </div>
         </Section>
-        <Section label="Interior Steel (mm)">
+        <Section label="Interior Steel (mm)" issue={fieldIssues.intSteel}>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+
             {STEEL_GAUGES.map((s) => (
               <Chip key={s} active={intSteel === s} onClick={() => setIntSteel(s)}>
                 {s.toFixed(2)}
@@ -992,17 +1214,38 @@ function PanelThicknessPage() {
   );
 
   const ResultCards = (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-      <MetricCard icon={Thermometer} label="U-Value" value={`${u}`} unit="W/m²K" tone="emerald" />
-      <MetricCard icon={Zap} label="Thermal Perf." value={perf} unit="" tone="emerald" />
-      <MetricCard icon={Weight} label="Weight" value={`${w}`} unit="kg/m²" tone="white" />
-      <MetricCard icon={Flame} label="Fire Achieved" value={fireLabel(fireAchieved)} unit="" tone={fireOk ? "emerald" : "amber"} />
-      <MetricCard icon={Thermometer} label="R-Value" value={`${rTotal}`} unit="m²K/W" tone="white" />
-      <MetricCard icon={Zap} label="Heat Loss" value={`${hLoss}`} unit={`W/m² · ΔT ${deltaT}K`} tone="white" />
-      <MetricCard icon={Weight} label="Recommended" value={`${rec.min}–${rec.max}`} unit="mm" tone="emerald" />
-      <MetricCard icon={CheckCircle2} label="Selected" value={`${thickness}`} unit="mm" tone={meetsRec ? "emerald" : belowRec ? "rose" : "amber"} />
+    <div className="relative">
+      <div
+        className={`grid grid-cols-2 gap-3 transition sm:grid-cols-3 lg:grid-cols-4 ${
+          hasErrors ? "pointer-events-none blur-sm opacity-40" : ""
+        }`}
+        aria-hidden={hasErrors || undefined}
+      >
+        <MetricCard icon={Thermometer} label="U-Value" value={`${u}`} unit="W/m²K" tone="emerald" />
+        <MetricCard icon={Zap} label="Thermal Perf." value={perf} unit="" tone="emerald" />
+        <MetricCard icon={Weight} label="Weight" value={`${w}`} unit="kg/m²" tone="white" />
+        <MetricCard icon={Flame} label="Fire Achieved" value={fireLabel(fireAchieved)} unit="" tone={fireOk ? "emerald" : "amber"} />
+        <MetricCard icon={Thermometer} label="R-Value" value={`${rTotal}`} unit="m²K/W" tone="white" />
+        <MetricCard icon={Zap} label="Heat Loss" value={`${hLoss}`} unit={`W/m² · ΔT ${deltaT}K`} tone="white" />
+        <MetricCard icon={Weight} label="Recommended" value={`${rec.min}–${rec.max}`} unit="mm" tone="emerald" />
+        <MetricCard icon={CheckCircle2} label="Selected" value={`${thickness}`} unit="mm" tone={meetsRec ? "emerald" : belowRec ? "rose" : "amber"} />
+      </div>
+      {hasErrors && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="max-w-md rounded-xl border border-rose-400/40 bg-slate-950/85 p-4 text-center text-sm text-rose-100 backdrop-blur">
+            <div className="mb-1 flex items-center justify-center gap-2 font-semibold">
+              <AlertTriangle className="size-4" aria-hidden="true" />
+              Results unavailable
+            </div>
+            <p className="text-xs text-rose-100/80">
+              Resolve the {errors.length} configuration {errors.length === 1 ? "issue" : "issues"} above to see valid engineering results.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
+
 
   const RecommendationPanel = (
     <div className="space-y-4">
@@ -1173,11 +1416,20 @@ function PanelThicknessPage() {
         </p>
       </div>
 
+      {hasErrors && (
+        <p role="alert" className="flex items-start gap-2 text-xs text-rose-300">
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+          Resolve the {errors.length} configuration {errors.length === 1 ? "issue" : "issues"} in the Inputs tab before exporting a report or requesting an engineering recommendation.
+        </p>
+      )}
       <div className="flex flex-wrap gap-3">
         <button
           type="button"
           onClick={downloadReport}
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300"
+          disabled={hasErrors}
+          aria-disabled={hasErrors || undefined}
+          title={hasErrors ? "Resolve configuration issues to enable" : undefined}
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-400"
         >
           <Download className="size-4" />
           Download Calculation Report
@@ -1185,18 +1437,32 @@ function PanelThicknessPage() {
         <button
           type="button"
           onClick={downloadPdfReport}
-          className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90"
+          disabled={hasErrors}
+          aria-disabled={hasErrors || undefined}
+          title={hasErrors ? "Resolve configuration issues to enable" : undefined}
+          className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
         >
           <Download className="size-4" />
           Download PDF Report
         </button>
-        <Link
-          to={`/project-inquiry?${inquiryParams}` as never}
-          className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
-        >
-          <ArrowRight className="size-4" />
-          Request Engineering Recommendation
-        </Link>
+        {hasErrors ? (
+          <span
+            aria-disabled="true"
+            className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/40"
+          >
+            <ArrowRight className="size-4" />
+            Request Engineering Recommendation
+          </span>
+        ) : (
+          <Link
+            to={`/project-inquiry?${inquiryParams}` as never}
+            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+          >
+            <ArrowRight className="size-4" />
+            Request Engineering Recommendation
+          </Link>
+        )}
+
         <Link
           to={"/contact" as never}
           className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
@@ -1302,26 +1568,42 @@ function PanelThicknessPage() {
               NEVO Engineering will validate the design against project-specific loads, fire and thermal requirements.
             </div>
           </div>
-          <Link
-            to={`/project-inquiry?${inquiryParams}` as never}
-            className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300"
-          >
-            Request Recommendation <ArrowRight className="size-4" />
-          </Link>
+          {hasErrors ? (
+            <span
+              aria-disabled="true"
+              className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white/40"
+            >
+              Request Recommendation <ArrowRight className="size-4" />
+            </span>
+          ) : (
+            <Link
+              to={`/project-inquiry?${inquiryParams}` as never}
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300"
+            >
+              Request Recommendation <ArrowRight className="size-4" />
+            </Link>
+          )}
           <button
             type="button"
             onClick={downloadReport}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+            disabled={hasErrors}
+            aria-disabled={hasErrors || undefined}
+            title={hasErrors ? "Resolve configuration issues to enable" : undefined}
+            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white/5"
           >
             <Download className="size-4" /> Download Report
           </button>
           <button
             type="button"
             onClick={downloadPdfReport}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+            disabled={hasErrors}
+            aria-disabled={hasErrors || undefined}
+            title={hasErrors ? "Resolve configuration issues to enable" : undefined}
+            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white/5"
           >
             <Download className="size-4" /> Download PDF
           </button>
+
           <Link
             to={"/contact" as never}
             className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
