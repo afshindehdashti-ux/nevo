@@ -242,6 +242,84 @@ export function simulateLogoDecisions(
 }
 
 /**
+ * Full QA bug-report blob: everything a reporter needs to reproduce a sticky
+ * logo issue in one paste. Pure function — safe to call from tests and from
+ * the console. `origin` tags where the dump came from so we can grep server
+ * logs later ("console" vs "button" vs "auto").
+ */
+export type LogoTelemetryDump = {
+  schema: "nevo.logo-telemetry.dump/v1";
+  capturedAt: string; // ISO
+  origin: "console" | "button" | "auto";
+  url: string | null;
+  userAgent: string | null;
+  debugEnabled: boolean;
+  config: LogoTelemetryConfig;
+  state: LogoRateState;
+  decisions: LogoDecisionRecord[];
+  decisionsTruncated: boolean;
+};
+
+export function buildLogoTelemetryDump(
+  origin: LogoTelemetryDump["origin"] = "console",
+): LogoTelemetryDump {
+  const decisions = getRecentLogoDecisions();
+  const nav =
+    typeof navigator !== "undefined" ? navigator.userAgent ?? null : null;
+  const url =
+    typeof window !== "undefined" && window.location
+      ? window.location.href
+      : null;
+  return {
+    schema: "nevo.logo-telemetry.dump/v1",
+    capturedAt: new Date().toISOString(),
+    origin,
+    url,
+    userAgent: nav,
+    debugEnabled: isLogoDebugEnabled(),
+    config: LOGO_TELEMETRY_CONFIG,
+    state: cloneState(getLogoRateState()),
+    decisions,
+    // The buffer caps at 50 in logo-telemetry.ts — flag when we hit the wall
+    // so the reporter knows earlier decisions were dropped.
+    decisionsTruncated: decisions.length >= 50,
+  };
+}
+
+export function dumpLogoTelemetryAsJSON(
+  origin: LogoTelemetryDump["origin"] = "console",
+): string {
+  return JSON.stringify(buildLogoTelemetryDump(origin), null, 2);
+}
+
+/**
+ * Copy the dump to the clipboard when available; always echo the JSON to the
+ * console so the reporter can grab it either way. Returns the JSON string
+ * so callers can chain further (e.g., paste programmatically in a test).
+ */
+async function copyLogoTelemetryDump(
+  origin: LogoTelemetryDump["origin"] = "console",
+): Promise<string> {
+  const json = dumpLogoTelemetryAsJSON(origin);
+  // Console echo first — clipboard may reject if the tab isn't focused.
+  if (typeof console !== "undefined" && typeof console.log === "function") {
+    console.log("[nevo:logo-telemetry] dump", json);
+  }
+  try {
+    if (
+      typeof navigator !== "undefined" &&
+      navigator.clipboard &&
+      typeof navigator.clipboard.writeText === "function"
+    ) {
+      await navigator.clipboard.writeText(json);
+    }
+  } catch {
+    // clipboard blocked — the console echo above is the fallback
+  }
+  return json;
+}
+
+/**
  * Attach the debug utility to `window.__nevoLogoDebug` in dev builds only.
  * No-op in production so nothing ships to end users.
  */
@@ -270,6 +348,12 @@ export function attachLogoDebugUtil(): void {
       getRecentAsJSON: () => string;
       /** Empty the ring buffer (useful before a fresh repro). */
       clearRecent: () => void;
+      /** Full QA bug-report blob (metadata + config + state + decisions). */
+      dump: (origin?: LogoTelemetryDump["origin"]) => LogoTelemetryDump;
+      /** Same blob, pretty-printed JSON. */
+      dumpAsJSON: (origin?: LogoTelemetryDump["origin"]) => string;
+      /** Echo to console + write to clipboard when permitted. */
+      copyDump: (origin?: LogoTelemetryDump["origin"]) => Promise<string>;
     };
   };
   w.__nevoLogoDebug = {
@@ -283,6 +367,9 @@ export function attachLogoDebugUtil(): void {
     getRecent: getRecentLogoDecisions,
     getRecentAsJSON: () => JSON.stringify(getRecentLogoDecisions(), null, 2),
     clearRecent: clearLogoDecisions,
+    dump: buildLogoTelemetryDump,
+    dumpAsJSON: dumpLogoTelemetryAsJSON,
+    copyDump: copyLogoTelemetryDump,
   };
 }
 
