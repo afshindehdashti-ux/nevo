@@ -1065,16 +1065,44 @@ def write_step_summary(results: list[dict]) -> None:
              r.get("status_class") or _classify_status(r.get("status")))
             for r in display if not r["ok"]
         )
-        combo_rows = sorted(
-            combo.items(),
-            key=lambda kv: (kinds.get(kv[0][0], 0), -kv[1], kv[0][0], kv[0][1]),
-            reverse=True,
+        # Combos across ALL rows too, so ok/2xx appears with its success share
+        # and each failure combo is anchored against the full run.
+        combo_all = Counter(
+            (r.get("error_kind") or ("ok" if r["ok"] else "unknown"),
+             r.get("status_class") or _classify_status(r.get("status")))
+            for r in display
         )
-        lines.append("- Failure breakdown by kind × status class:")
+        combo_rows = sorted(
+            combo_all.items(),
+            key=lambda kv: (0 if kv[0][0] == "ok" else -1,
+                            -kv[1], kv[0][0], kv[0][1]),
+        )
+        total_all = max(len(display), 1)
+        total_fail = max(sum(combo.values()), 1)
+        overall_fail_pct = 100.0 * sum(combo.values()) / total_all
+        lines.append("")
+        lines.append(
+            f"- Breakdown by kind × status class "
+            f"(overall failure rate **{overall_fail_pct:.1f}%**):"
+        )
+        lines += [
+            "",
+            "| Kind | Status class | Count | Failed | Success rate | % of all | % of failures |",
+            "| --- | :---: | ---: | ---: | ---: | ---: | ---: |",
+        ]
         for (kind, status_class), n in combo_rows:
+            failed = combo.get((kind, status_class), 0) if kind != "ok" else 0
+            success_pct = 100.0 * (n - failed) / n if n else 0.0
+            share_all = 100.0 * n / total_all
+            share_fail = 100.0 * failed / total_fail if failed else 0.0
             kind_label = _ERROR_KIND_LABELS.get(kind, kind)
             class_label = _STATUS_CLASS_LABELS.get(status_class, status_class)
-            lines.append(f"  - {kind_label} + {class_label} × **{n}**")
+            lines.append(
+                f"| {kind_label} | {class_label} | {n} | {failed} "
+                f"| {success_pct:.1f}% | {share_all:.1f}% "
+                f"| {share_fail:.1f}% |"
+            )
+        lines.append("")
 
     # Latency histogram grouped by error_kind: makes it obvious whether e.g.
     # timeouts cluster at the timeout ceiling, TLS failures fail fast, or DNS
