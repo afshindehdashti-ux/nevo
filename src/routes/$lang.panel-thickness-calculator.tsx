@@ -288,68 +288,54 @@ function CrossSection({
         </defs>
 
         {/* Core */}
-        <motion.rect
-          initial={false}
-          animate={{ y: coreTop, height: coreH }}
-          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+        <rect
           x={padX}
           y={coreTop}
-          height={coreH}
           width={panelW}
+          height={coreH}
           fill={`url(#${patternId})`}
           stroke="rgba(0,0,0,0.35)"
           strokeWidth={0.8}
         />
 
         {/* Exterior skin */}
-        <motion.rect
-          initial={false}
-          animate={{ y: startY, height: skinExt }}
-          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+        <rect
           x={padX}
           y={startY}
-          height={skinExt}
           width={panelW}
+          height={skinExt}
           fill="#B7BEC6"
           stroke="rgba(0,0,0,0.5)"
           strokeWidth={0.6}
         />
-        <motion.rect
-          initial={false}
-          animate={{ y: startY, height: skinExt }}
-          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+        <rect
           x={padX}
           y={startY}
-          height={skinExt}
           width={panelW}
+          height={skinExt}
           fill="url(#skin-shade)"
           opacity={0.6}
         />
 
         {/* Interior skin */}
-        <motion.rect
-          initial={false}
-          animate={{ y: intTop, height: skinInt }}
-          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+        <rect
           x={padX}
           y={intTop}
-          height={skinInt}
           width={panelW}
+          height={skinInt}
           fill="#E7EBDA"
           stroke="rgba(0,0,0,0.5)"
           strokeWidth={0.6}
         />
-        <motion.rect
-          initial={false}
-          animate={{ y: intTop, height: skinInt }}
-          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+        <rect
           x={padX}
           y={intTop}
-          height={skinInt}
           width={panelW}
+          height={skinInt}
           fill="url(#skin-shade)"
           opacity={0.4}
         />
+
 
 
         {/* Thickness dimension */}
