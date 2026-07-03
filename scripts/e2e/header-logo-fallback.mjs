@@ -38,8 +38,12 @@ function assert(cond, msg) {
 
 let browser;
 try {
-  browser = await chromium.launch({ headless: true });
-  const context = await browser.new_context?.() ?? await browser.newContext({
+  const launchOpts = { headless: true };
+  if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH) {
+    launchOpts.executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+  }
+  browser = await chromium.launch(launchOpts);
+  const context = await browser.newContext({
     viewport: { width: 1280, height: 900 },
   });
   const page = await context.newPage();
