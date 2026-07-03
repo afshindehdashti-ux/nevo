@@ -56,6 +56,10 @@ Env:
   BODY_HASH            `true` (default) attaches a sha256[:12] of the failed
                        response body — quick way to tell "same error page as
                        yesterday" vs "new failure mode" without diffing text.
+  BODY_SANITIZE        `true` (default) strips <script>/<style>/HTML tags
+                       from the snippet and redacts obvious secrets (JWTs,
+                       bearer tokens, api_key=…, emails, long hex, AWS/SB
+                       keys). Set `false` to render raw text.
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
