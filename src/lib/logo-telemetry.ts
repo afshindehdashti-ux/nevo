@@ -63,20 +63,14 @@ type Deps = {
  * or `?logoDebug=1` URL flag). Uses console.debug so it is silent by default
  * in production browsers unless the user explicitly opts in.
  *
- * Shape (single flat object — easy to grep, filter, or JSON-copy from devtools):
+ * Shape (single flat key=value string — easy to grep and filter in QA logs):
  *
- *   [nevo:logo-telemetry] {
- *     kind: "error" | "render",
- *     decision: "sampled-in" | "sampled-out",
- *     reason: "first-render" | "sample-rate" | "already-logged"
- *           | "accepted" | "terminal" | "throttle" | "session-cap",
- *     stage:          string | null,       // "primary-light-png", "fallback-cdn-full", …
- *     terminal:       boolean | undefined,
- *     correlationId:  string | undefined,  // when the caller has one
- *     counters: { renderLogged, renderSampled, errorCount, lastErrorStage, msSinceLastError },
- *     limits:   { renderSampleRate, errorMaxPerSession, errorMinIntervalMs },
- *     ts:             number,              // ms since epoch, from the sampler's clock
- *   }
+ *   [nevo:logo-telemetry] kind=error decision=sampled-in reason=accepted
+ *     stage=primary-light-png terminal=false correlationId=cid-123
+ *     counters.renderLogged=false counters.renderSampled=true counters.errorCount=1
+ *     counters.lastErrorStage=primary-light-png counters.msSinceLastError=null
+ *     limits.renderSampleRate=0.01 limits.errorMaxPerSession=5 limits.errorMinIntervalMs=1000
+ *     ts=123456789
  */
 export type LogoDecisionRecord = {
   kind: "render" | "error";
@@ -126,6 +120,28 @@ export function clearLogoDecisions(): void {
   decisionBuffer.length = 0;
 }
 
+function formatLogoDecisionRecord(record: LogoDecisionRecord): string {
+  const c = record.counters;
+  const l = record.limits;
+  return [
+    `kind=${record.kind}`,
+    `decision=${record.decision}`,
+    `reason=${record.reason}`,
+    `stage=${record.stage === null ? "null" : record.stage}`,
+    `terminal=${record.terminal === undefined ? "undefined" : record.terminal}`,
+    `correlationId=${record.correlationId === undefined ? "undefined" : record.correlationId}`,
+    `counters.renderLogged=${c.renderLogged}`,
+    `counters.renderSampled=${c.renderSampled === null ? "null" : c.renderSampled}`,
+    `counters.errorCount=${c.errorCount}`,
+    `counters.lastErrorStage=${c.lastErrorStage}`,
+    `counters.msSinceLastError=${c.msSinceLastError === null ? "null" : c.msSinceLastError}`,
+    `limits.renderSampleRate=${l.renderSampleRate}`,
+    `limits.errorMaxPerSession=${l.errorMaxPerSession}`,
+    `limits.errorMinIntervalMs=${l.errorMinIntervalMs}`,
+    `ts=${record.ts}`,
+  ].join(" ");
+}
+
 function debugLog(
   kind: "render" | "error",
   decision: "sampled-in" | "sampled-out",
@@ -169,7 +185,7 @@ function debugLog(
   recordLogoDecision(record);
   if (!config.debug) return;
   if (typeof console === "undefined" || typeof console.debug !== "function") return;
-  console.debug("[nevo:logo-telemetry]", record);
+  console.debug("[nevo:logo-telemetry]", formatLogoDecisionRecord(record));
 }
 
 /** Returns true when a render event should be sent to the log sink. */
