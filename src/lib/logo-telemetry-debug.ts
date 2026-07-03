@@ -737,10 +737,14 @@ export function downloadLogoTelemetryDump(
   // ISO with `:` stripped so the filename is portable across OSes.
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   // Include a filesystem-safe correlationId slug in the filename when the
-  // dump is scoped, so an attached incident file is self-describing.
+  // dump is scoped to a single id, so an attached incident file is
+  // self-describing. For multi-field filters, tag the filename with
+  // "-filtered" instead — the full criteria live inside the JSON.
   const cidSlug = opts.correlationId
     ? `-cid-${opts.correlationId.replace(/[^A-Za-z0-9._-]+/g, "_").slice(0, 40)}`
-    : "";
+    : opts.filter
+      ? "-filtered"
+      : "";
   const filename = `nevo-logo-telemetry-${origin}${cidSlug}-${stamp}.json`;
   const blob = new BlobCtor([json], { type: "application/json" });
   const href = URLRef.createObjectURL(blob);
