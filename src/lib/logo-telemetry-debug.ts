@@ -260,6 +260,16 @@ export function attachLogoDebugUtil(): void {
       disable: () => void;
       /** Whether live debug logging is currently on. */
       isEnabled: () => boolean;
+      /**
+       * Snapshot of the last ≤50 sampling decisions (oldest first). Safe to
+       * `JSON.stringify` and paste into a bug report — the buffer records
+       * every sampler call regardless of the debug flag.
+       */
+      getRecent: () => LogoDecisionRecord[];
+      /** Same tail, pre-serialized for one-shot clipboard copy. */
+      getRecentAsJSON: () => string;
+      /** Empty the ring buffer (useful before a fresh repro). */
+      clearRecent: () => void;
     };
   };
   w.__nevoLogoDebug = {
@@ -270,6 +280,9 @@ export function attachLogoDebugUtil(): void {
     enable: enableLogoDebug,
     disable: disableLogoDebug,
     isEnabled: isLogoDebugEnabled,
+    getRecent: getRecentLogoDecisions,
+    getRecentAsJSON: () => JSON.stringify(getRecentLogoDecisions(), null, 2),
+    clearRecent: clearLogoDecisions,
   };
 }
 
