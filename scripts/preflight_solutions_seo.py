@@ -64,7 +64,7 @@ Env:
                        failed URLs in the step summary. Default:
                        `Content-Type,Content-Length,Server,Retry-After,
                        Cache-Control,Age,Location,X-Cache,CF-Ray,Via`.
-                       Sensitive values (Set-Cookie, Authorization, …) are
+                        Sensitive values (Set-Cookie, Authorization, …) are
                         masked.
   BODY_SNIPPET_CONTENT_TYPES
                         comma-separated content types for which a body
