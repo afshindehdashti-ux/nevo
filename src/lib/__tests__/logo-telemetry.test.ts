@@ -148,14 +148,17 @@ describe("shouldLogError — full fallback-chain scenario", () => {
     expect(shouldLogError("fallback-cdn-full", false, { state, config, now: c.now })).toBe(true);
     expect(shouldLogError("fallback-inline-svg", true, { state, config, now: c.now })).toBe(true);
 
-    // A flapping CDN retries the primary stage a moment later — throttled.
+    // A flapping SVG re-fires the terminal stage a moment later — throttle
+    // key is `lastErrorStage`, so same stage within the window is dropped.
     c.advance(200);
-    expect(shouldLogError("primary-light-png", false, { state, config, now: c.now })).toBe(false);
+    expect(shouldLogError("fallback-inline-svg", false, { state, config, now: c.now })).toBe(false);
 
-    // Enough time passes; primary is allowed again and hits the session cap.
+    // Enough time passes; the same stage is allowed again and hits the
+    // session cap at 4 events.
     c.advance(1000);
-    expect(shouldLogError("primary-light-png", false, { state, config, now: c.now })).toBe(true);
-    expect(shouldLogError("primary-light-png", false, { state, config, now: c.now })).toBe(false);
+    expect(shouldLogError("fallback-inline-svg", false, { state, config, now: c.now })).toBe(true);
+    expect(shouldLogError("fallback-inline-svg", true, { state, config, now: c.now })).toBe(false);
     expect(state.errorCount).toBe(4);
+
   });
 });
