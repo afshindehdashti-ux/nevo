@@ -1,13 +1,16 @@
 import { ArrowRight, Clock, FileText, Inbox } from "lucide-react";
+import { useParams } from "@tanstack/react-router";
 import { Section, SectionHeader } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LocalizedLink } from "@/components/site/LocalizedLink";
 import { ARTICLES } from "@/lib/knowledge-articles";
+import { SITE } from "@/lib/seo";
 import {
   getKnowledgeHubPreview,
   type SolutionsRouteKey,
 } from "@/lib/knowledge-hub-preview-config";
+
 
 type Props = {
   /** Route key that resolves slugs + copy from knowledge-hub-preview-config. */
