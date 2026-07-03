@@ -946,7 +946,7 @@ def write_step_summary(results: list[dict]) -> None:
     # by timeouts (latency), DNS/TLS (infra) or HTTP errors (app/content).
     from collections import Counter
     kinds = Counter(r.get("error_kind") or ("ok" if r["ok"] else "unknown")
-                    for r in results if not r["ok"])
+                    for r in display if not r["ok"])
     if kinds:
         parts = [f"{_ERROR_KIND_LABELS.get(k, k)} × **{n}**"
                  for k, n in kinds.most_common()]
@@ -975,7 +975,7 @@ def write_step_summary(results: list[dict]) -> None:
         combo = Counter(
             (r.get("error_kind") or "unknown",
              r.get("status_class") or _classify_status(r.get("status")))
-            for r in results if not r["ok"]
+            for r in display if not r["ok"]
         )
         combo_rows = sorted(
             combo.items(),
@@ -991,12 +991,12 @@ def write_step_summary(results: list[dict]) -> None:
     # Latency histogram grouped by error_kind: makes it obvious whether e.g.
     # timeouts cluster at the timeout ceiling, TLS failures fail fast, or DNS
     # errors have their own bimodal shape vs healthy `ok` responses.
-    lines += _render_latency_histogram(results)
+    lines += _render_latency_histogram(display)
 
     # Heatmap grouping latency by both error_kind and status_class: separates
     # HTTP-level failures (4xx/5xx) from transport failures (none) so their
     # latency shapes are not averaged together.
-    lines += _render_latency_heatmap(results)
+    lines += _render_latency_heatmap(display)
 
 
 
@@ -1005,7 +1005,7 @@ def write_step_summary(results: list[dict]) -> None:
         "| Status | Kind | URL | Method | HTTP | Time (ms) | Size | Attempts | Notes |",
         "| :---: | :---: | --- | :---: | ---: | ---: | ---: | ---: | --- |",
     ]
-    for r in sorted(results, key=lambda x: (x["ok"], -x["ms"])):
+    for r in sorted(display, key=lambda x: (x["ok"], -x["ms"])):
         marker = "✅" if r["ok"] else "❌"
         rel = r["url"].replace(BASE, "") or r["url"]
         http = r["status"] if r["status"] is not None else "—"
@@ -1023,7 +1023,7 @@ def write_step_summary(results: list[dict]) -> None:
     # Deep-dive block for failures: body hash + snippet so the reader can tell
     # "this is the CDN's HTML error page again" from "a new failure mode" or
     # "the request went through but latency was the killer".
-    failures_with_detail = [r for r in results if not r["ok"] and (
+    failures_with_detail = [r for r in display if not r["ok"] and (
         r.get("body_hash") or r.get("body_snippet") or r.get("response_headers"))]
     if failures_with_detail:
         lines.append("### Failed response bodies")
