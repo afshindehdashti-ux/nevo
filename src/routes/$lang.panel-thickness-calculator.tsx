@@ -190,7 +190,9 @@ function recommendRange(
   return { min: 50, max: 80, note: "Commercial envelope." };
 }
 
-function performanceBadge(v: "Excellent" | "Very Good" | "Good" | "Limited" | "Not Recommended"): string {
+type ScoreValue = "Excellent" | "Very Good" | "Good" | "Limited" | "Not Recommended";
+
+function performanceBadge(v: ScoreValue): string {
   return {
     Excellent: "bg-emerald-400/15 text-emerald-300 border-emerald-400/40",
     "Very Good": "bg-emerald-400/10 text-emerald-300 border-emerald-400/30",
