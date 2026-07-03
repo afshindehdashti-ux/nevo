@@ -1,5 +1,5 @@
 import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useTranslation } from "react-i18next";
 import heroDesktopAsset from "@/assets/premium/homepage-hero-desktop.jpg.asset.json";
 import heroMobileAsset from "@/assets/premium/homepage-hero-mobile.jpg.asset.json";
@@ -8,12 +8,7 @@ import { Button } from "@/components/ui/button";
 const heroDesktop = heroDesktopAsset.url;
 const heroMobile = heroMobileAsset.url;
 
-/**
- * Cinematic hero — original premium photography.
- * A single, subtle depth animation is applied to the existing image on load:
- * scale 1.03 → 1.00, opacity 0.95 → 1, with a slow ease-out. No overlays,
- * no extra panels, no video. Respects prefers-reduced-motion.
- */
+/** Original hero photography only: no video, no added panel, no duplicated object. */
 export function Hero() {
   const { t } = useTranslation();
   return (
@@ -34,6 +29,8 @@ export function Hero() {
 function HeroDesktop() {
   const { t } = useTranslation();
   const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll();
+  const imageY = useTransform(scrollYProgress, [0, 0.35], [0, 18]);
   return (
     <div className="relative hidden min-h-[85vh] md:block lg:min-h-[95vh]">
       <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -44,9 +41,10 @@ function HeroDesktop() {
           style={{ objectPosition: "72% center" }}
           fetchPriority="high"
           decoding="async"
-          initial={reduce ? false : { scale: 1.03, opacity: 0.95 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+          initial={reduce ? false : { scale: 1.015 }}
+          animate={reduce ? undefined : { scale: 1 }}
+          transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
+          style={{ objectPosition: "72% center", y: reduce ? 0 : imageY }}
         />
         {/* Left-side readability wash */}
         <div
@@ -64,42 +62,24 @@ function HeroDesktop() {
       </div>
 
       <div className="container-wide relative flex min-h-[85vh] flex-col justify-between px-6 pt-36 pb-12 md:px-6 lg:min-h-[95vh] lg:px-8 lg:pt-44 lg:pb-16">
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1] }}
-          className="max-w-3xl"
-        >
+        <div className="max-w-3xl">
           <div className="eyebrow mb-6 flex items-center gap-2 text-white/70">
             <span className="inline-flex size-1.5 rounded-full bg-accent" />
             Dubai · Factory Development · Production Lines · Raw Materials
           </div>
 
-          <motion.p
+          <p
             aria-hidden
-            initial={reduce ? false : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.25, 1, 0.5, 1], delay: 0.05 }}
             className="text-display text-balance text-white"
           >
             {t("home.heroTitle")}
-          </motion.p>
+          </p>
 
-          <motion.p
-            initial={reduce ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1], delay: 0.15 }}
-            className="text-body-lg mt-8 max-w-2xl leading-relaxed text-white/75"
-          >
+          <p className="text-body-lg mt-8 max-w-2xl leading-relaxed text-white/75">
             {t("home.heroSubtitle")}
-          </motion.p>
+          </p>
 
-          <motion.div
-            initial={reduce ? false : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1], delay: 0.25 }}
-            className="mt-10 flex flex-row items-center gap-3"
-          >
+          <div className="mt-10 flex flex-row items-center gap-3">
             <Button asChild size="lg">
               <a href="/project-inquiry">
                 {t("home.heroCtaPrimary")}
@@ -112,15 +92,10 @@ function HeroDesktop() {
                 <ArrowUpRight className="!size-4" />
               </a>
             </Button>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
-        <motion.div
-          initial={reduce ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="mt-16 flex flex-col gap-8 border-t border-white/15 pt-6 md:flex-row md:items-end md:justify-between"
-        >
+        <div className="mt-16 flex flex-col gap-8 border-t border-white/15 pt-6 md:flex-row md:items-end md:justify-between">
           <dl className="grid grid-cols-3 gap-x-8 gap-y-4">
             {[
               { k: "Top facing", v: "PPGI pre-painted steel" },
@@ -143,7 +118,7 @@ function HeroDesktop() {
             <span>Explore</span>
             <ChevronDown className="size-3.5 animate-bounce" />
           </a>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
@@ -156,18 +131,20 @@ function HeroDesktop() {
 function HeroMobile() {
   const { t } = useTranslation();
   const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll();
+  const imageY = useTransform(scrollYProgress, [0, 0.35], [0, 12]);
   return (
     <div className="relative block min-h-[100svh] overflow-hidden md:hidden">
       <motion.img
         src={heroMobile}
         alt="NEVO double-belt laminator producing a PIR sandwich panel with PPGI facings"
         className="absolute inset-0 h-full w-full object-cover will-change-transform"
-        style={{ objectPosition: "50% center" }}
+        style={{ objectPosition: "50% center", y: reduce ? 0 : imageY }}
         fetchPriority="high"
         decoding="async"
-        initial={reduce ? false : { scale: 1.02, opacity: 0.96 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
+        initial={reduce ? false : { scale: 1.012 }}
+        animate={reduce ? undefined : { scale: 1 }}
+        transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
       />
       {/* Top + bottom readability washes */}
       <div
@@ -180,11 +157,7 @@ function HeroMobile() {
       />
 
       <div className="relative flex min-h-[100svh] flex-col justify-between px-6 pt-32 pb-10">
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1] }}
-        >
+        <div>
           <div className="eyebrow mb-5 flex items-center gap-2 text-white/70">
             <span className="inline-flex size-1.5 rounded-full bg-accent" />
             {t("brand.location")} · {t("brand.sector")}
@@ -195,14 +168,9 @@ function HeroMobile() {
           <p className="mt-6 max-w-md text-base leading-relaxed text-white/75">
             {t("home.heroSubtitle")}
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1], delay: 0.2 }}
-          className="flex flex-col gap-3"
-        >
+        <div className="flex flex-col gap-3">
           <Button asChild size="lg" className="w-full">
             <a href="/project-inquiry">
               {t("home.heroCtaPrimary")}
@@ -215,7 +183,7 @@ function HeroMobile() {
               <ArrowUpRight className="!size-4" />
             </a>
           </Button>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
