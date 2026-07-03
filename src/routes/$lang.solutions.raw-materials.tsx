@@ -91,7 +91,6 @@ const FAQS: { q: string; a: string }[] = [
   { q: "Can NEVO handle blended containers for small projects?", a: "Yes. LCL and consolidated FCL shipments combining steel, chemistry and consumables are available for pilot production runs and R&D orders." },
   { q: "What sustainability data can you share?", a: "EPDs for steel and rock wool, GWP declarations on chemistry, HFC-free blowing agents, and take-back programmes for IBCs and drums in select markets." },
   { q: "How does material selection affect panel quality?", a: "Facing paint chemistry drives corrosion life; steel yield strength drives panel stiffness; polyol reactivity drives foaming consistency; MDI index drives fire behaviour; core density drives compression strength. Materials define the panel — the line only assembles them." },
-  { q: "How do I request a technical quotation?", a: "Open the Project Inquiry page (linked from every CTA on this site) with your panel specification, target market and required volume. A NEVO material specialist responds within one business day with a technical proposal and indicative pricing." },
 ];
 
 export const Route = createFileRoute("/$lang/solutions/raw-materials")({
