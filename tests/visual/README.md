@@ -1,27 +1,28 @@
 # Visual Regression — Industry Cards
 
-Screenshots every card on `/en/industries` at desktop (1280) and mobile (390) viewports and compares them to the approved baselines committed under `baselines/`.
+Screenshots every card on `/en/industries` at desktop (1280) and mobile (390) and compares them to the approved baselines in `baselines/`.
 
 ## Run
 
 ```bash
-# make sure the dev server is running (http://localhost:8080)
-node tests/visual/industry-cards.spec.mjs
+# dev server must be running at http://localhost:8080
+python tests/visual/industry_cards_test.py
 ```
 
-- First run (no baselines): writes `tests/visual/baselines/{desktop,mobile}/card-NN.png`. Commit those as the approved set.
-- Subsequent runs: fails if any card differs by more than 0.5% of pixels. Failing runs write the actual + diff PNGs under `tests/visual/diffs/`.
+- **First run** (no baselines): writes `tests/visual/baselines/{desktop,mobile}/card-NN.png`. Commit those as the approved set.
+- **Later runs**: fail if any card's mean per-channel pixel diff exceeds 2/255. Actual + diff PNGs land under `tests/visual/diffs/`.
 
-## Update baselines (after an intentional design/image change)
+## Update baselines after an intentional change
 
 ```bash
-UPDATE_BASELINES=1 node tests/visual/industry-cards.spec.mjs
+UPDATE_BASELINES=1 python tests/visual/industry_cards_test.py
 ```
 
-Then review the updated PNGs before committing.
+Review the updated baselines before committing.
 
 ## Notes
 
-- Animations and transitions are disabled during capture; motion-driven `opacity/transform` on cards is neutralized so offscreen cards render fully.
+- Animations and Framer Motion `opacity/transform` are neutralized during capture.
 - `prefers-reduced-motion` is forced via the Playwright context.
-- Each card is captured via its own `data-testid="industry-card"` element screenshot, so layout shifts elsewhere on the page don't cause false diffs.
+- Each card is captured through its own `data-testid="industry-card"` element, so unrelated layout shifts elsewhere on the page don't trigger diffs.
+- Baselines are viewport-specific because card widths differ between mobile and desktop.
