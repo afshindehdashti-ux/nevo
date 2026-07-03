@@ -724,6 +724,7 @@ function FactoryLayoutPage() {
             onZoneSelect={setZone}
             selectedZoneId={zone?.id}
             isoTilt={view === "iso"}
+            hiddenZones={hiddenZones}
           />
         </div>
         <div className="pointer-events-none absolute left-4 top-4 flex flex-wrap gap-1.5">
