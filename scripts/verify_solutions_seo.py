@@ -180,25 +180,9 @@ def main() -> int:
     # GitHub step summary markdown
     if p := os.environ.get("REPORT_MD"):
         Path(p).parent.mkdir(parents=True, exist_ok=True)
-        lines = [
-            f"## Solutions SEO snapshot",
-            f"- Base: `{BASE}`",
-            f"- Pages checked: **{len(results)}** ({len(LOCALES)} locales × {len(PATHS)} routes)",
-            f"- Failing: **{len(failed)}**",
-            "",
-        ]
-        if failed:
-            lines.append("### Failures")
-            lines.append("| URL | Issue |")
-            lines.append("| --- | --- |")
-            for r in failed:
-                for f in r["failures"]:
-                    lines.append(f"| `{r['url'].replace(BASE, '')}` | {f} |")
-        else:
-            lines.append("All pages passed ✅")
         # Append (GitHub step summary supports concatenation across steps)
         with Path(p).open("a", encoding="utf-8") as fh:
-            fh.write("\n".join(lines) + "\n")
+            fh.write(render_md(BASE, results, failed) + "\n")
 
     # Standalone HTML dashboard
     if p := os.environ.get("REPORT_HTML"):
