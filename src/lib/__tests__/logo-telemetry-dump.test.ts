@@ -87,18 +87,17 @@ describe("logo telemetry QA dump", () => {
   });
 
   it("__nevoLogoDebug.copyDump() echoes to console + writes to clipboard when available", async () => {
-    // Attach in a headless test env: import.meta.env.DEV is true under vitest,
-    // but window may not have the util yet since attach ran at import time in
-    // this module. Re-attach explicitly.
     const { attachLogoDebugUtil } = await import("../logo-telemetry-debug");
     const writeText = vi.fn().mockResolvedValue(undefined);
+    const fakeWindow = { location: { href: "http://test/" } };
+    vi.stubGlobal("window", fakeWindow);
     vi.stubGlobal("navigator", {
       clipboard: { writeText },
       userAgent: "vitest",
     });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     attachLogoDebugUtil();
-    const w = window as unknown as {
+    const w = fakeWindow as unknown as {
       __nevoLogoDebug?: { copyDump: (o?: string) => Promise<string> };
     };
     expect(w.__nevoLogoDebug).toBeDefined();
@@ -109,10 +108,12 @@ describe("logo telemetry QA dump", () => {
 
   it("copyDump() still resolves the JSON when clipboard is unavailable", async () => {
     const { attachLogoDebugUtil } = await import("../logo-telemetry-debug");
+    const fakeWindow = { location: { href: "http://test/" } };
+    vi.stubGlobal("window", fakeWindow);
     vi.stubGlobal("navigator", { userAgent: "vitest" }); // no clipboard
     vi.spyOn(console, "log").mockImplementation(() => {});
     attachLogoDebugUtil();
-    const w = window as unknown as {
+    const w = fakeWindow as unknown as {
       __nevoLogoDebug?: { copyDump: () => Promise<string> };
     };
     const json = await w.__nevoLogoDebug!.copyDump();
