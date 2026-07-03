@@ -446,9 +446,11 @@ function CrossSection({
           </text>
         </g>
       </svg>
-    </div>
+      <figcaption className="sr-only">{description}</figcaption>
+    </figure>
   );
 }
+
 
 function CorePattern({
   id,
