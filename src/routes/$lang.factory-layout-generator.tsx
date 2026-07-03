@@ -192,14 +192,20 @@ function LayoutSVG({
   onZoneSelect,
   selectedZoneId,
   isoTilt = false,
+  hiddenZones,
 }: {
   cfg: { capacity: Capacity; core: Core; automation: Automation; building: Building };
   view: ViewMode;
   onZoneSelect: (z: Zone) => void;
   selectedZoneId?: string;
   isoTilt?: boolean;
+  hiddenZones: Set<string>;
 }) {
   const layout = useMemo(() => computeFactoryLayout(cfg), [cfg]);
+  const visibleZones = useMemo(
+    () => layout.zones.filter((z) => !hiddenZones.has(z.id)),
+    [layout.zones, hiddenZones],
+  );
 
   // Which flow categories are visible for this view mode.
   const visibleFlows = useMemo(() => {
