@@ -543,19 +543,19 @@ function PanelThicknessPage() {
   const meetsRec = thickness >= rec.min && thickness <= rec.max;
   const belowRec = thickness < rec.min;
 
-  const performanceScores = useMemo(() => {
-    const thermal: "Excellent" | "Very Good" | "Good" | "Limited" | "Not Recommended" =
+  const performanceScores = useMemo((): Record<"thermal" | "fire" | "weight" | "cost" | "appFit", ScoreValue> => {
+    const thermal: ScoreValue =
       u <= 0.18 ? "Excellent" : u <= 0.28 ? "Very Good" : u <= 0.45 ? "Good" : "Limited";
-    const fireS: typeof thermal = requiredFireMin === 0
+    const fireS: ScoreValue = requiredFireMin === 0
       ? "Excellent"
       : fireAchieved >= requiredFireMin
         ? "Excellent"
         : fireAchieved >= requiredFireMin - 30
           ? "Limited"
           : "Not Recommended";
-    const weightS: typeof thermal = w < 15 ? "Excellent" : w < 25 ? "Very Good" : w < 40 ? "Good" : "Limited";
-    const costS: typeof thermal = thickness <= 80 ? "Excellent" : thickness <= 120 ? "Very Good" : thickness <= 180 ? "Good" : "Limited";
-    const appFit: typeof thermal = meetsRec ? "Excellent" : belowRec ? "Not Recommended" : "Very Good";
+    const weightS: ScoreValue = w < 15 ? "Excellent" : w < 25 ? "Very Good" : w < 40 ? "Good" : "Limited";
+    const costS: ScoreValue = thickness <= 80 ? "Excellent" : thickness <= 120 ? "Very Good" : thickness <= 180 ? "Good" : "Limited";
+    const appFit: ScoreValue = meetsRec ? "Excellent" : belowRec ? "Not Recommended" : "Very Good";
     return { thermal, fire: fireS, weight: weightS, cost: costS, appFit };
   }, [u, w, thickness, meetsRec, belowRec, fireAchieved, requiredFireMin]);
 
