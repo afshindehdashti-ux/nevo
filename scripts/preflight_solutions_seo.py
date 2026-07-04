@@ -2591,6 +2591,19 @@ def export_results(results: list[dict]) -> None:
                 '<button type="button" id="artifact-sort-dir" '
                 'class="artifact-sort-dir" onclick="toggleSortDirection()" '
                 'aria-label="Toggle sort direction">Asc</button></p>\n\n'
+                '<p><label for="artifact-item-sort">Sort items by:</label> '
+                '<select id="artifact-item-sort" class="artifact-item-sort" '
+                'onchange="sortArtifactItems()">'
+                '<option value="original">Original order</option>'
+                '<option value="filename">Filename</option>'
+                '<option value="group">Group</option>'
+                '<option value="type">Type</option>'
+                '<option value="mtime">Last updated</option>'
+                '</select> '
+                '<button type="button" id="artifact-item-sort-dir" '
+                'class="artifact-item-sort-dir" onclick="toggleItemSortDirection()" '
+                'aria-label="Toggle item sort direction">Asc</button></p>\n\n'
+
                 '<p><label for="artifact-filter">Show:</label> '
                 '<select id="artifact-filter" class="artifact-filter" '
                 'onchange="filterArtifactItems()">'
@@ -2689,6 +2702,60 @@ def export_results(results: list[dict]) -> None:
                  'if ((key && validKeys.indexOf(key) !== -1) || dir === "asc" || dir === "desc") sortArtifactGroups(); '
                  '} '
                  'if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", restoreArtifactSort); } else { restoreArtifactSort(); } '
+                 'function persistArtifactItemSort(key, dir) { '
+                 'try { localStorage.setItem("artifactItemSort", key); localStorage.setItem("artifactItemSortDir", dir); } catch (e) {} '
+                 'try { const url = new URL(window.location.href); '
+                 'if (key && key !== "original") { url.searchParams.set("isort", key); } else { url.searchParams.delete("isort"); } '
+                 'if (dir && dir !== "asc") { url.searchParams.set("idir", dir); } else { url.searchParams.delete("idir"); } '
+                 'window.history.replaceState({}, "", url); } catch (e) {} '
+                 '} '
+                 'function sortArtifactItems() { '
+                 'const sel = document.getElementById("artifact-item-sort"); '
+                 'const btn = document.getElementById("artifact-item-sort-dir"); '
+                 'if (!sel || !btn) return; '
+                 'const key = sel.value; '
+                 'const dir = btn.dataset.dir || "asc"; '
+                 'const container = document.querySelector(".artifact-index"); '
+                 'container.querySelectorAll(".artifact-group").forEach(g => { '
+                 'const items = Array.from(g.querySelectorAll(".artifact-item")); '
+                 'items.sort((a, b) => { '
+                 'let cmp = 0; '
+                 'if (key === "original") { cmp = (a.dataset.originalIndex || "").localeCompare(b.dataset.originalIndex || ""); } '
+                 'else if (key === "filename") { cmp = (a.dataset.filename || "").localeCompare(b.dataset.filename || "", undefined, {numeric: true, sensitivity: "base"}); } '
+                 'else if (key === "group") { cmp = (a.dataset.groupName || "").localeCompare(b.dataset.groupName || "") || (a.dataset.originalIndex || "").localeCompare(b.dataset.originalIndex || ""); } '
+                 'else if (key === "type") { cmp = (a.dataset.type || "").localeCompare(b.dataset.type || "") || (a.dataset.filename || "").localeCompare(b.dataset.filename || ""); } '
+                 'else if (key === "mtime") { cmp = (parseInt(a.dataset.mtime || "0", 10)) - (parseInt(b.dataset.mtime || "0", 10)); } '
+                 'return dir === "asc" ? cmp : -cmp; '
+                 '}); '
+                 'items.forEach(el => g.appendChild(el)); '
+                 '}); '
+                 'persistArtifactItemSort(key, dir); '
+                 '} '
+                 'function toggleItemSortDirection() { '
+                 'const btn = document.getElementById("artifact-item-sort-dir"); '
+                 'const current = btn.dataset.dir || "asc"; '
+                 'const next = current === "asc" ? "desc" : "asc"; '
+                 'btn.dataset.dir = next; '
+                 'btn.textContent = next === "asc" ? "Asc" : "Desc"; '
+                 'sortArtifactItems(); '
+                 '} '
+                 'function restoreArtifactItemSort() { '
+                 'const sel = document.getElementById("artifact-item-sort"); '
+                 'const btn = document.getElementById("artifact-item-sort-dir"); '
+                 'if (!sel || !btn) return; '
+                 'let key = null, dir = null; '
+                 'try { const params = new URLSearchParams(window.location.search); '
+                 'key = params.get("isort"); dir = params.get("idir"); } catch (e) {} '
+                 'try { if (!key) key = localStorage.getItem("artifactItemSort"); '
+                 'if (!dir) dir = localStorage.getItem("artifactItemSortDir"); } catch (e) {} '
+                 'const validKeys = ["original", "filename", "group", "type", "mtime"]; '
+                 'if (key && validKeys.indexOf(key) !== -1) sel.value = key; '
+                 'if (dir === "asc" || dir === "desc") { btn.dataset.dir = dir; btn.textContent = dir === "asc" ? "Asc" : "Desc"; } '
+                 'if ((key && validKeys.indexOf(key) !== -1) || dir === "asc" || dir === "desc") sortArtifactItems(); '
+                 '} '
+                 'if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", restoreArtifactItemSort); } else { restoreArtifactItemSort(); } '
+
+
 
                 'function filterArtifactItems() { '
                 'const mode = document.getElementById("artifact-filter").value; '
@@ -3068,13 +3135,24 @@ def export_results(results: list[dict]) -> None:
                         f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.markdownUrl ? this.dataset.markdownUrl : this.dataset.markdown){_CLIPBOARD_TOAST_MARKDOWN}" '
                         f'data-markdown="{html.escape(markdown_links, quote=True)}"{markdown_url_data_attr}>Copy as Markdown</button>\n\n'
                     )
-                for label, path in items:
+                for item_pos, (label, path) in enumerate(items):
                     file_type = os.path.splitext(path)[1].lower() or "none"
                     url = _artifact_url(path)
                     url_attr = f' data-url="{html.escape(url, quote=True)}"' if url else ""
                     exists = os.path.exists(path)
                     if not exists:
                         missing_artifacts.append((label, path))
+                    filename = os.path.basename(path)
+                    try:
+                        item_mtime = int(os.path.getmtime(path)) if exists else 0
+                    except OSError:
+                        item_mtime = 0
+                    sort_attrs = (
+                        f' data-filename="{html.escape(filename, quote=True)}"'
+                        f' data-mtime="{item_mtime}"'
+                        f' data-group-name="{html.escape(aria_title, quote=True)}"'
+                        f' data-original-index="{group_index}-{item_pos:06d}"'
+                    )
                     if is_heatmap_group:
                         if exists:
                             try:
@@ -3093,7 +3171,7 @@ def export_results(results: list[dict]) -> None:
                                 f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
-                                f'data-existing="true"{url_attr}>\n'
+                                f'data-existing="true"{url_attr}{sort_attrs}>\n'
                                 f'<label class="artifact-select-label" aria-label="Select {html.escape(label, quote=True)}">'
                                 f'<input type="checkbox" class="artifact-select"> </label>'
                                 f'<a href="{html.escape(path, quote=True)}" target="_blank" rel="noopener noreferrer">'
@@ -3117,7 +3195,7 @@ def export_results(results: list[dict]) -> None:
                                 f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
-                                f'data-existing="false">\n'
+                                f'data-existing="false"{sort_attrs}>\n'
                                 f"⚠️ <code>{html.escape(label)}</code> (missing) — expected at "
                                 f"<code>{html.escape(path)}</code>\n"
                                 "</div>\n"
@@ -3130,7 +3208,7 @@ def export_results(results: list[dict]) -> None:
                                 f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
-                                f'data-existing="true"{url_attr}>\n'
+                                f'data-existing="true"{url_attr}{sort_attrs}>\n'
                                 f'<label class="artifact-select-label" aria-label="Select {html.escape(label, quote=True)}">'
                                 f'<input type="checkbox" class="artifact-select"> </label>'
                                 f'<a href="{html.escape(path, quote=True)}" target="_blank" rel="noopener noreferrer">'
@@ -3154,9 +3232,10 @@ def export_results(results: list[dict]) -> None:
                                 f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
-                                f'data-existing="false">\n'
+                                f'data-existing="false"{sort_attrs}>\n'
                                 f"⚠️ <code>{html.escape(label)}</code> (missing) — expected at "
                                 f"<code>{html.escape(path)}</code>\n"
+
                                 "</div>\n"
                             )
                 fh.write("</div>\n")
