@@ -2508,6 +2508,16 @@ def export_results(results: list[dict]) -> None:
                 '}'
                 '</style>\n\n'
             )
+            total_existing_count = len(all_existing_paths)
+            total_existing_size = sum(
+                os.path.getsize(p) for p in all_existing_paths
+            )
+            total_size_str = _human_size(total_existing_size)
+            fh.write(
+                f'<p><strong>{total_existing_count} file'
+                f'{"s" if total_existing_count != 1 else ""}</strong>, '
+                f'<strong>{total_size_str}</strong> total</p>\n\n'
+            )
             if all_existing_paths:
                 all_links = "\n".join(all_existing_paths)
                 fh.write(
