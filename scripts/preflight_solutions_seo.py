@@ -269,7 +269,7 @@ import io, os, sys, time, urllib.request, urllib.error
 import hashlib
 
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 import html
 import json
 import csv
