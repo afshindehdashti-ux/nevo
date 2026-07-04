@@ -3001,7 +3001,6 @@ def export_results(results: list[dict]) -> None:
                 'updateSelectionCount(); '
                 'try { localStorage.removeItem(ARTIFACT_SELECTION_KEY); } catch (e) {} '
                 '} '
-                '} '
                 'var ARTIFACT_LAST_OPENED_KEY = "preflight.artifact.lastOpened.v1"; '
                 'function saveLastOpenedArtifact(path) { '
                 'try { if (path) localStorage.setItem(ARTIFACT_LAST_OPENED_KEY, path); } catch (e) {} '
