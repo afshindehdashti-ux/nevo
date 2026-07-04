@@ -2166,7 +2166,7 @@ def _artifact_url(path: str) -> str | None:
 # Inline JS toast shown after copying a single artifact link. Self-contained so
 # it works in any markdown viewer that executes onclick handlers.
 _CLIPBOARD_TOAST_SINGLE = (
-    ".then(() => { showCopyToast('Copied link'); })"
+    ".then(() => { showCopyToast('Copied link' + (this.dataset.label ? ' for ' + this.dataset.label : '')); })"
     ".catch(() => { showCopyToast('Could not copy — check clipboard permissions'); })"
 )
 
