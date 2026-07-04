@@ -2618,6 +2618,8 @@ def export_results(results: list[dict]) -> None:
                  '.artifact-url-toggle:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; border-radius: 4px; }'
                  '.artifact-sort-dir:focus-visible, .artifact-item-sort-dir:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; border-radius: 4px; }'
                  '.artifact-search:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }'
+                 '.artifact-bulk-action[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }'
+                 '.artifact-bulk-action[aria-disabled="true"]:focus-visible { outline: 2px dashed #6b7280; outline-offset: 2px; }'
                  '</style>\n'
                 '<div id="artifact-drawer-backdrop" onclick="closeArtifactDrawer()"></div>\n'
                 '<aside id="artifact-drawer" role="dialog" aria-modal="true" aria-labelledby="artifact-drawer-title" tabindex="-1">\n'
