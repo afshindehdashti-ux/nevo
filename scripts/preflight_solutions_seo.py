@@ -2850,7 +2850,7 @@ def export_results(results: list[dict]) -> None:
                  'const q = readFor("q", "artifactSearch"); '
                  'if (search && q !== null) search.value = q; '
                  'const absVal = readFor("abs", "artifactAbsUrl"); '
-                 'if (abs && absVal !== null) { abs.checked = absVal === "1" || absVal === "true"; if (typeof updateArtifactUrlMode === "function") updateArtifactUrlMode(); } '
+                 'if (abs && absVal !== null) { abs.checked = absVal === "1" || absVal === "true"; document.querySelectorAll(".artifact-url-mode").forEach(el => { el.textContent = abs.checked ? "absolute URLs" : "file paths"; }); } '
                  'if (typeof filterArtifactItems === "function") filterArtifactItems(); '
                  '} '
                  'if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", restoreArtifactFilters); } else { restoreArtifactFilters(); } '
