@@ -1367,7 +1367,16 @@ def write_step_summary(results: list[dict]) -> None:
             # block chars so the ratio is legible in monospace summaries.
             success_cells = int(round(success_pct / 100 * bar_w))
             fail_cells = bar_w - success_cells
-            bar = "🟩" * success_cells + "🟥" * fail_cells
+            failure_pct = 100.0 - success_pct
+            # Wrap in <span title="..."> so GitHub renders a hover tooltip
+            # with the exact success/failure percentages plus raw counts —
+            # the rounded blocks in the bar always lose precision.
+            bar_glyphs = "🟩" * success_cells + "🟥" * fail_cells
+            tooltip = (
+                f"Success rate: {success_pct:.2f}% ({n - failed}/{n})"
+                f" • Failure rate: {failure_pct:.2f}% ({failed}/{n})"
+            )
+            bar = f'<span title="{tooltip}">{bar_glyphs}</span>'
             row = (
                 f"| {kind_label} | {class_label} | {n} | {failed} "
                 f"| {success_pct:.1f}% | {bar} | {share_all:.1f}% "
