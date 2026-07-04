@@ -29,6 +29,20 @@ When you cannot answer with confidence, or the user has a real project:
 
 Always answer in the user's language (English, Arabic, Turkish, Russian, German if requested). Default to English.`;
 
+const MAX_MESSAGES = 20;
+const MAX_TOTAL_CHARS = 8_000;
+const MAX_SINGLE_MESSAGE_CHARS = 4_000;
+
+function totalChars(messages: UIMessage[]): number {
+  let n = 0;
+  for (const m of messages) {
+    for (const p of m.parts ?? []) {
+      if (p.type === "text" && typeof p.text === "string") n += p.text.length;
+    }
+  }
+  return n;
+}
+
 export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
@@ -37,6 +51,20 @@ export const Route = createFileRoute("/api/chat")({
         if (!Array.isArray(body.messages)) {
           return new Response("Messages are required", { status: 400 });
         }
+        const messages = body.messages as UIMessage[];
+        if (messages.length === 0 || messages.length > MAX_MESSAGES) {
+          return new Response("Too many messages", { status: 413 });
+        }
+        for (const m of messages) {
+          for (const p of m.parts ?? []) {
+            if (p.type === "text" && typeof p.text === "string" && p.text.length > MAX_SINGLE_MESSAGE_CHARS) {
+              return new Response("Message too long", { status: 413 });
+            }
+          }
+        }
+        if (totalChars(messages) > MAX_TOTAL_CHARS) {
+          return new Response("Conversation too long", { status: 413 });
+        }
         const key = process.env.LOVABLE_API_KEY;
         if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
@@ -44,11 +72,11 @@ export const Route = createFileRoute("/api/chat")({
         const result = streamText({
           model: gateway("google/gemini-3-flash-preview"),
           system: SYSTEM_PROMPT,
-          messages: await convertToModelMessages(body.messages as UIMessage[]),
+          messages: await convertToModelMessages(messages),
         });
 
         return result.toUIMessageStreamResponse({
-          originalMessages: body.messages as UIMessage[],
+          originalMessages: messages,
         });
       },
     },

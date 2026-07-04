@@ -12,13 +12,16 @@ export type LogoEventFilters = {
 };
 
 async function ensureAdmin(supabase: any, userId: string) {
-  const { data, error } = await supabase.rpc("has_role", {
-    _user_id: userId,
-    _role: "admin",
-  });
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
   if (error) throw new Error("Role check failed");
   if (!data) throw new Error("Forbidden: admin role required");
 }
+
 
 function normalize(input: unknown): Required<LogoEventFilters> {
   const i = (input && typeof input === "object" ? input : {}) as LogoEventFilters;
@@ -79,10 +82,12 @@ export const getLogoEvents = createServerFn({ method: "POST" })
 export const isCurrentUserAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
+    const { data, error } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId)
+      .eq("role", "admin")
+      .maybeSingle();
     if (error) return { admin: false };
     return { admin: !!data };
   });
