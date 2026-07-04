@@ -281,6 +281,7 @@ from solutions_seo_config import (  # noqa: E402
 
 
 BASE = os.environ.get("BASE_URL", "http://127.0.0.1:8080").rstrip("/")
+ARTIFACT_BASE_URL = os.environ.get("ARTIFACT_BASE_URL", "").rstrip("/")
 
 # LOCALES / PATHS env overrides are validated against the shared matrix:
 # any value not in the shared list is dropped with a warning so we can't
