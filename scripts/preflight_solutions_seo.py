@@ -2845,12 +2845,19 @@ def export_results(results: list[dict]) -> None:
                 ]
                 if existing_items:
                     all_links = "\n".join(path for _, path in existing_items)
+                    all_links_url = "\n".join(
+                        _artifact_url(path) or path for _, path in existing_items
+                    )
+                    url_data_attr = (
+                        f' data-links-url="{html.escape(all_links_url, quote=True)}"'
+                        if ARTIFACT_BASE_URL else ""
+                    )
                     fh.write(
                         '<button type="button" '
                         f'aria-label="Copy links for {html.escape(aria_title, quote=True)}" '
                         f'data-context="{html.escape(aria_title, quote=True)}" '
-                        f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}" '
-                        f'data-links="{html.escape(all_links, quote=True)}">Copy links</button> '
+                        f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.linksUrl ? this.dataset.linksUrl : this.dataset.links){_CLIPBOARD_TOAST_MULTI}" '
+                        f'data-links="{html.escape(all_links, quote=True)}"{url_data_attr}>Copy links</button> '
                     )
                     group_zip_path = os.path.join(
                         summary_dir, f"artifacts_group_{group_index}.zip"
