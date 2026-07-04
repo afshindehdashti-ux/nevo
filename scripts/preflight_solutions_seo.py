@@ -2662,7 +2662,7 @@ def export_results(results: list[dict]) -> None:
                 'const paths = visible.map(el => el.dataset.path).filter(Boolean); '
                 'navigator.clipboard.writeText(paths.join("\\n")).then(() => { '
                 'showCopyToast("Copied " + paths.length + " link" + (paths.length === 1 ? "" : "s")); '
-                '}).catch(() => {}); '
+                '}).catch(() => { showCopyToast("Could not copy — check clipboard permissions"); }); '
                 '}'
                 '</script>\n\n'
             )
