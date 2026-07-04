@@ -2479,7 +2479,10 @@ def export_results(results: list[dict]) -> None:
                         except OSError:
                             meta = ""
                         fh.write(
-                            f"- [`{label}`]({path}) {meta} "
+                            f'- <a href="{html.escape(path, quote=True)}" '
+                            f'download="{html.escape(label, quote=True)}">'
+                            f'<button type="button">Download {html.escape(label)}</button></a> '
+                            f'{meta} '
                             '<button type="button" '
                             'onclick="navigator.clipboard.writeText(this.dataset.link).catch(() => {})" '
                             f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
