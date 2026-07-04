@@ -1702,7 +1702,8 @@ def export_results(results: list[dict]) -> None:
     bd_csv = os.environ.get("BREAKDOWN_CSV_PATH", "").strip()
     bd_json = os.environ.get("BREAKDOWN_JSON_PATH", "").strip()
     heatmap_csv = os.environ.get("HEATMAP_CSV_PATH", "").strip()
-    if not any((csv_path, json_path, bd_csv, bd_json, heatmap_csv)):
+    heatmap_json = os.environ.get("HEATMAP_JSON_PATH", "").strip()
+    if not any((csv_path, json_path, bd_csv, bd_json, heatmap_csv, heatmap_json)):
         return
 
     raw_scope = (os.environ.get("RESULTS_INCLUDE") or "all").strip()
