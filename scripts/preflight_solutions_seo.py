@@ -3761,7 +3761,7 @@ def export_results(results: list[dict]) -> None:
                                 f'data-path="{html.escape(path, quote=True)}" '
                                 f'data-existing="true"{url_attr}{sort_attrs}>\n'
                                 f'<label class="artifact-select-label" aria-label="Select {html.escape(label, quote=True)}">'
-                                f'<input type="checkbox" class="artifact-select"> </label>'
+                                f'<input type="checkbox" class="artifact-select" aria-checked="false" aria-describedby="artifact-select-desc"> </label>'
                                 f'<a href="{html.escape(path, quote=True)}" target="_blank" rel="noopener noreferrer">'
                                 f'<button type="button" aria-label="Open {html.escape(label, quote=True)}">Open</button></a> '
                                 '<button type="button" '
