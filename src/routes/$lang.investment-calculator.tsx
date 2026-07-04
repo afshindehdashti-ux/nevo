@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
+  Loader2,
   Factory,
   Gauge,
   Layers,
@@ -48,6 +49,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { downloadInvestmentReport } from "@/lib/investment-pdf";
+import { toast } from "sonner";
 
 // ---------------- SEO ----------------
 export const Route = createFileRoute("/$lang/investment-calculator")({
@@ -399,9 +401,40 @@ function Card({
 function InvestmentCalculatorPage() {
   const [i, setI] = useState<Inputs>(DEFAULTS);
   const [step, setStep] = useState(0);
+  const [pendingKind, setPendingKind] = useState<
+    "investment" | "roi" | "cashflow" | "specification" | "summary" | null
+  >(null);
   const m = useMemo(() => computeModel(i), [i]);
   const set = <K extends keyof Inputs>(k: K, v: Inputs[K]) =>
     setI((s) => ({ ...s, [k]: v }));
+
+  async function handleDownloadReport(
+    kind: "investment" | "roi" | "cashflow" | "specification" | "summary",
+    label: string,
+  ) {
+    if (pendingKind) return;
+    setPendingKind(kind);
+    const toastId = toast.loading(`Generating ${label}…`, {
+      description: "Preparing your PDF for download.",
+    });
+    try {
+      // Yield to the browser so the loading state paints before the sync PDF work.
+      await new Promise((r) => setTimeout(r, 0));
+      const filename = downloadInvestmentReport(kind, i, m);
+      toast.success(`${label} downloaded`, {
+        id: toastId,
+        description: filename ?? "Check your downloads folder.",
+      });
+    } catch (err) {
+      console.error("Investment PDF generation failed", err);
+      toast.error(`${label} failed`, {
+        id: toastId,
+        description: "Please try again or contact support if the issue persists.",
+      });
+    } finally {
+      setPendingKind(null);
+    }
+  }
 
   const steps = [
     { id: "inputs", label: "Inputs" },
@@ -1059,21 +1092,32 @@ function InvestmentCalculatorPage() {
                       ["cashflow", "Cash Flow Report (PDF)"],
                       ["specification", "Factory Specification (PDF)"],
                       ["summary", "Project Summary (PDF)"],
-                    ] as const).map(([kind, label]) => (
-                      <li key={kind}>
-                        <button
-                          type="button"
-                          onClick={() => downloadInvestmentReport(kind, i, m)}
-                          className="flex w-full items-center justify-between rounded-md border border-white/10 bg-white/[0.02] px-3 py-2 text-left text-white/70 transition hover:border-emerald-400/40 hover:text-white"
-                        >
-                          <span className="flex items-center gap-2">
-                            <FileText className="h-3.5 w-3.5 text-emerald-400/80" />
-                            {label}
-                          </span>
-                          <Download className="h-3.5 w-3.5" />
-                        </button>
-                      </li>
-                    ))}
+                    ] as const).map(([kind, label]) => {
+                      const isPending = pendingKind === kind;
+                      const anyPending = pendingKind !== null;
+                      return (
+                        <li key={kind}>
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadReport(kind, label)}
+                            disabled={anyPending}
+                            aria-busy={isPending || undefined}
+                            aria-disabled={anyPending || undefined}
+                            className="flex w-full items-center justify-between rounded-md border border-white/10 bg-white/[0.02] px-3 py-2 text-left text-white/70 transition hover:border-emerald-400/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-white/10 disabled:hover:text-white/70"
+                          >
+                            <span className="flex items-center gap-2">
+                              <FileText className="h-3.5 w-3.5 text-emerald-400/80" aria-hidden="true" />
+                              {isPending ? `Generating ${label}…` : label}
+                            </span>
+                            {isPending ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                            ) : (
+                              <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                            )}
+                          </button>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </Card>
               </div>

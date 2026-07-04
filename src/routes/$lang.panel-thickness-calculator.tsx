@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
+import { toast } from "sonner";
 import {
   AlertTriangle,
   ArrowRight,
@@ -12,6 +13,7 @@ import {
   Download,
   Flame,
   Link2,
+  Loader2,
   MessageSquare,
   PhoneCall,
   Thermometer,
@@ -856,6 +858,7 @@ function PanelThicknessPage() {
     "Inputs",
   );
   const [copied, setCopied] = useState(false);
+  const [pdfPending, setPdfPending] = useState(false);
 
   const shareQuery = useMemo(
     () => buildSharedQuery({ app, core, climate, temp, fire, thickness, extSteel, intSteel, compare }),
@@ -958,9 +961,14 @@ function PanelThicknessPage() {
 
 
   async function downloadPdfReport() {
-    if (hasErrors) return;
-    const { default: jsPDF } = await import("jspdf");
-    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    if (hasErrors || pdfPending) return;
+    setPdfPending(true);
+    const toastId = toast.loading("Generating PDF report…", {
+      description: "Preparing your panel thickness calculation.",
+    });
+    try {
+      const { default: jsPDF } = await import("jspdf");
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
     const pageW = doc.internal.pageSize.getWidth();
     const marginX = 48;
     let y = 56;
@@ -1061,7 +1069,21 @@ function PanelThicknessPage() {
     doc.text("NEVO Engineering · Panel Thickness Calculator", marginX, pageH - 24);
     doc.text("nevo.engineering", pageW - marginX, pageH - 24, { align: "right" });
 
-    doc.save(`nevo-panel-thickness-${app.replace(/\s+/g, "-")}-${core.replace(/\s+/g, "-")}-${thickness}mm.pdf`);
+      const filename = `nevo-panel-thickness-${app.replace(/\s+/g, "-")}-${core.replace(/\s+/g, "-")}-${thickness}mm.pdf`;
+      doc.save(filename);
+      toast.success("PDF report downloaded", {
+        id: toastId,
+        description: filename,
+      });
+    } catch (err) {
+      console.error("PDF generation failed", err);
+      toast.error("PDF download failed", {
+        id: toastId,
+        description: "Please try again or contact support if the issue persists.",
+      });
+    } finally {
+      setPdfPending(false);
+    }
   }
 
   const inquiryParams = new URLSearchParams({
@@ -1418,13 +1440,18 @@ function PanelThicknessPage() {
         <button
           type="button"
           onClick={downloadPdfReport}
-          disabled={hasErrors}
-          aria-disabled={hasErrors || undefined}
+          disabled={hasErrors || pdfPending}
+          aria-disabled={hasErrors || pdfPending || undefined}
+          aria-busy={pdfPending || undefined}
           title={hasErrors ? "Resolve configuration issues to enable" : undefined}
           className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-400"
         >
-          <Download className="size-4" />
-          Download PDF Report
+          {pdfPending ? (
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <Download className="size-4" aria-hidden="true" />
+          )}
+          {pdfPending ? "Generating PDF…" : "Download PDF Report"}
         </button>
         {hasErrors ? (
           <span
@@ -1576,12 +1603,18 @@ function PanelThicknessPage() {
           <button
             type="button"
             onClick={downloadPdfReport}
-            disabled={hasErrors}
-            aria-disabled={hasErrors || undefined}
+            disabled={hasErrors || pdfPending}
+            aria-disabled={hasErrors || pdfPending || undefined}
+            aria-busy={pdfPending || undefined}
             title={hasErrors ? "Resolve configuration issues to enable" : undefined}
             className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white/5"
           >
-            <Download className="size-4" /> Download PDF Report
+            {pdfPending ? (
+              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <Download className="size-4" aria-hidden="true" />
+            )}
+            {pdfPending ? "Generating PDF…" : "Download PDF Report"}
           </button>
 
           <Link
