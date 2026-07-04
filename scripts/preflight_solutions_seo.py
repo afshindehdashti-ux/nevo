@@ -2681,9 +2681,9 @@ def export_results(results: list[dict]) -> None:
                     f'onclick="navigator.clipboard.writeText(this.dataset.json){_CLIPBOARD_TOAST_JSON}.catch(() => {{}})" '
                     f'data-json="{html.escape(json_str, quote=True)}">Copy links (JSON)</button>\n\n'
                 )
-            if all_existing_paths:
+                summary_dir = os.path.dirname(summary_path) or "."
                 bundle_path = os.path.join(
-                    os.path.dirname(summary_path) or ".",
+                    summary_dir,
                     "artifacts_bundle.zip",
                 )
                 try:
