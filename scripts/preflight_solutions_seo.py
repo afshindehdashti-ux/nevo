@@ -2725,6 +2725,17 @@ def export_results(results: list[dict]) -> None:
                         )
                     except OSError:
                         pass
+                    markdown_links = "\n".join(
+                        f"- [{label}]({path})"
+                        for label, path in existing_items
+                    )
+                    fh.write(
+                        '<button type="button" '
+                        f'aria-label="Copy Markdown links for {html.escape(aria_title, quote=True)}" '
+                        f'data-context="{html.escape(aria_title, quote=True)}" '
+                        f'onclick="navigator.clipboard.writeText(this.dataset.markdown){_CLIPBOARD_TOAST_MARKDOWN}.catch(() => {{}})" '
+                        f'data-markdown="{html.escape(markdown_links, quote=True)}">Copy as Markdown</button>\n\n'
+                    )
                 for label, path in items:
                     exists = os.path.exists(path)
                     if not exists:
