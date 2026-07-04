@@ -3043,7 +3043,7 @@ def export_results(results: list[dict]) -> None:
                 'function copySelectedArtifacts(format) { '
                 'const useUrl = document.getElementById("artifact-url-toggle") && document.getElementById("artifact-url-toggle").checked; '
                 'const items = getSelectedArtifactItems(); '
-                'if (items.length === 0) { showCopyToast("No artifacts selected"); return; } '
+                'if (items.length === 0) { showCopyToast("No artifacts selected — select items first, then copy"); return; } '
                 'const rows = items.map(el => ({ '
                 'label: el.dataset.label || "", '
                 'path: (useUrl && el.dataset.url) ? el.dataset.url : (el.dataset.path || "") '
