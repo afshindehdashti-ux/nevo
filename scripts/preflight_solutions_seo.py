@@ -2777,7 +2777,7 @@ def export_results(results: list[dict]) -> None:
                  'btn.dataset.dir = dir; '
                  'btn.textContent = dir === "asc" ? "Asc" : "Desc"; '
                  'btn.setAttribute("aria-pressed", dir === "desc" ? "true" : "false"); '
-                 'btn.setAttribute("aria-label", kind + " sort direction: " + label + ". Activate to sort " + opposite + "."); '
+                 'btn.setAttribute("aria-label", kind + ": " + label + ". Activate to sort " + opposite + "."); '
                  '} '
                  'function toggleSortDirection() { '
                  'const btn = document.getElementById("artifact-sort-dir"); '
