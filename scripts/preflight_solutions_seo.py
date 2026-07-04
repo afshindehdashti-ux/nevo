@@ -132,10 +132,38 @@ Env:
                        preset name, if unique) to apply a saved preset.
 
 
+  Output / Summary:
 
-Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
-page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
-and `MIN_BODY_BYTES=2000`; a tiny status endpoint may need `=50`.
+  The console prints a "Latency by error_kind × status_class" block showing,
+  for each (error_kind, status_class) combo: count, failed, avg, p50, p95,
+  p99, and max latency — all in milliseconds. This is always derived from the
+  full result set so regressions are visible even when RESULTS_INCLUDE narrows
+  the per-URL export.
+
+  The GitHub step summary renders the same combos in a Markdown table plus a
+  small bar chart of success/failure rate so patterns stand out without reading
+  raw numbers.
+
+  BREAKDOWN_CSV_PATH / BREAKDOWN_JSON_PATH export one aggregate row per combo
+  with these columns:
+    error_kind, status_class, count, failed,
+    success_rate_pct, share_pct, failures_pct,
+    attempts_total, attempts_avg,
+    ms_avg, ms_p50, ms_p95, ms_p99, ms_max
+
+  Latency percentile fields (ms):
+    ms_avg   arithmetic mean latency for the combo
+    ms_p50   median (50th percentile); half the samples were ≤ this value
+    ms_p95   95th percentile; 95% of samples were ≤ this value
+    ms_p99   99th percentile; tail latency used to spot rare stalls
+    ms_max   highest observed latency in the combo
+  Percentiles are computed with nearest-rank over the observed samples, so the
+  reported value is always a real request latency, not an interpolated estimate.
+
+
+  Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
+  page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
+  and `MIN_BODY_BYTES=2000`; a tiny status endpoint may need `=50`.
 
 Exits 0 when every probe returns 200. Exits 1 on any failure, printing a
 GitHub `::error::` line so the workflow surfaces the failing URL directly
@@ -1725,6 +1753,9 @@ def export_results(results: list[dict]) -> None:
 
 
 def main() -> int:
+    if "--help" in sys.argv or "-h" in sys.argv:
+        print(__doc__)
+        return 0
 
     urls: list[str] = [f"{BASE}{p}" for p in CORE_PATHS]
     for locale in LOCALES:
