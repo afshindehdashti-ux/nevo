@@ -132,14 +132,21 @@ Env:
                        preset name, if unique) to apply a saved preset.
 
   DISABLE_PERCENTILES  `true` to skip percentile latency calculations and the
-                       `BREAKDOWN_CSV_PATH` / `BREAKDOWN_JSON_PATH` exports. This
-                       reduces runtime and summary size when only pass/fail
-                       data matters. Same effect as passing `--disable-percentiles`
-                       on the command line.
+                        `BREAKDOWN_CSV_PATH` / `BREAKDOWN_JSON_PATH` exports. This
+                        reduces runtime and summary size when only pass/fail
+                        data matters. Same effect as passing `--disable-percentiles`
+                        on the command line.
+
+  DISABLE_HEATMAP_EXPORT  `true` to skip the `HEATMAP_CSV_PATH` / `HEATMAP_JSON_PATH`
+                        exports and the heatmap/breakdown consistency validation.
+                        Use this when heatmaps are not needed to speed up the run.
+                        Same effect as passing `--disable-heatmap-export` on the
+                        command line.
 
   CLI flags:
-    --help, -h             Print this help text and exit.
-    --disable-percentiles  Skip p50/p95/p99 latency breakdowns and exports.
+    --help, -h                Print this help text and exit.
+    --disable-percentiles     Skip p50/p95/p99 latency breakdowns and exports.
+    --disable-heatmap-export  Skip heatmap CSV/JSON export and validation.
 
 
   Output / Summary:
@@ -263,6 +270,13 @@ IN_GHA = os.environ.get("GITHUB_ACTIONS") == "true"
 # when only pass/fail data is needed. Set env DISABLE_PERCENTILES=true or pass
 # the --disable-percentiles CLI flag.
 _DISABLE_PERCENTILES = os.environ.get("DISABLE_PERCENTILES", "").strip().lower() in (
+    "1", "true", "yes", "on"
+)
+
+# Disable heatmap CSV/JSON export (and the related heatmap/breakdown consistency
+# validation) to make the run faster when the heatmap artifact is not needed.
+# Set env DISABLE_HEATMAP_EXPORT=true or pass the --disable-heatmap-export flag.
+_DISABLE_HEATMAP_EXPORT = os.environ.get("DISABLE_HEATMAP_EXPORT", "").strip().lower() in (
     "1", "true", "yes", "on"
 )
 
@@ -1914,8 +1928,14 @@ def export_results(results: list[dict]) -> None:
     # Heatmap CSV: one row per (error_kind, status_class), one column per
     # latency bucket, plus a `total` column. Always derived from the FULL
     # result set for the same reason as breakdown_written above.
+    #
+    # Skipped entirely when DISABLE_HEATMAP_EXPORT is set to avoid the extra
+    # binning work and the heatmap/breakdown consistency validation.
     heatmap_written: list[str] = []
-    if heatmap_csv or heatmap_json:
+    if _DISABLE_HEATMAP_EXPORT:
+        if heatmap_csv or heatmap_json:
+            print("preflight: heatmap export skipped because DISABLE_HEATMAP_EXPORT is set")
+    elif heatmap_csv or heatmap_json:
         from collections import defaultdict
         grid: dict[tuple[str, str], list[int]] = defaultdict(
             lambda: [0] * len(_LATENCY_BUCKETS))
@@ -2050,6 +2070,11 @@ def main() -> int:
     if "--disable-percentiles" in sys.argv:
         _DISABLE_PERCENTILES = True
         sys.argv.remove("--disable-percentiles")
+
+    global _DISABLE_HEATMAP_EXPORT
+    if "--disable-heatmap-export" in sys.argv:
+        _DISABLE_HEATMAP_EXPORT = True
+        sys.argv.remove("--disable-heatmap-export")
 
     urls: list[str] = [f"{BASE}{p}" for p in CORE_PATHS]
     for locale in LOCALES:
