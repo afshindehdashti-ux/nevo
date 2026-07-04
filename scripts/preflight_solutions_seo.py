@@ -269,7 +269,7 @@ import io, os, sys, time, urllib.request, urllib.error
 import hashlib
 
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 import html
 import json
 import csv
@@ -287,8 +287,42 @@ from solutions_seo_config import (  # noqa: E402
 )
 
 
+def _normalize_artifact_base_url(raw: str) -> str:
+    """Validate and normalize ARTIFACT_BASE_URL so absolute links are well-formed.
+
+    Removes whitespace, collapses repeated path slashes, strips trailing slashes,
+    and rejects values that are not a valid http/https URL. Returns an empty
+    string when the value is missing or invalid, which disables absolute links.
+    """
+    url = raw.strip()
+    if not url:
+        return ""
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        print(
+            f"preflight: warning: ARTIFACT_BASE_URL has no http/https scheme ({raw!r}); "
+            "absolute artifact links disabled",
+            file=sys.stderr,
+        )
+        return ""
+    if not parsed.netloc:
+        print(
+            f"preflight: warning: ARTIFACT_BASE_URL has no host ({raw!r}); "
+            "absolute artifact links disabled",
+            file=sys.stderr,
+        )
+        return ""
+    # Collapse repeated slashes in the path while keeping a single leading slash.
+    path_parts = [part for part in parsed.path.split("/") if part]
+    path = "/" + "/".join(path_parts) if path_parts else ""
+    normalized = urlunparse(
+        (parsed.scheme, parsed.netloc, path, parsed.params, parsed.query, parsed.fragment)
+    )
+    return normalized.rstrip("/")
+
+
 BASE = os.environ.get("BASE_URL", "http://127.0.0.1:8080").rstrip("/")
-ARTIFACT_BASE_URL = os.environ.get("ARTIFACT_BASE_URL", "").rstrip("/")
+ARTIFACT_BASE_URL = _normalize_artifact_base_url(os.environ.get("ARTIFACT_BASE_URL", ""))
 
 # LOCALES / PATHS env overrides are validated against the shared matrix:
 # any value not in the shared list is dropped with a warning so we can't
