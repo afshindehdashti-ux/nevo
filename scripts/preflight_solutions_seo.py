@@ -1689,6 +1689,9 @@ def export_results(results: list[dict]) -> None:
       HEATMAP_CSV_PATH     write the latency heatmap bin counts as CSV
                            (one row per error_kind × status_class combo,
                            one column per latency bucket)
+      HEATMAP_JSON_PATH    same heatmap as JSON for offline analysis; each
+                           entry is {error_kind, status_class, total,
+                           buckets: [{label, lo_ms, hi_ms, count}, ...]}
     All files are also linked from $GITHUB_STEP_SUMMARY when set.
     """
     import csv
