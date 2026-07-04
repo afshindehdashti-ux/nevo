@@ -11,7 +11,7 @@ export const SITE = {
   legalName: "NEVO Industrial LLC",
   titleSuffix: "NEVO Industrial",
   defaultDescription:
-    "Dubai-based industrial engineering. Factory development, sandwich panel production lines, PIR/PUR raw materials, engineering consultancy & finished panels for global markets.",
+    "Dubai-based engineering consultancy for sandwich panel factory development, production lines, and PIR/PUR raw materials worldwide.",
   url: "https://nevoindustrial.com",
   logo: "/favicon.ico",
   sameAs: [
