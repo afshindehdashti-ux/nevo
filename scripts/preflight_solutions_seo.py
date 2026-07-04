@@ -2106,15 +2106,7 @@ def _human_size(size: int) -> str:
 # Inline JS toast shown after copying a single artifact link. Self-contained so
 # it works in any markdown viewer that executes onclick handlers.
 _CLIPBOARD_TOAST_SINGLE = (
-    ".then(() => { "
-    "const t = document.createElement('div'); "
-    "t.textContent = 'Copied link'; "
-    "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
-    "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
-    "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
-    "document.body.appendChild(t); "
-    "setTimeout(() => t.remove(), 2000); "
-    "})"
+    ".then(() => { showCopyToast('Copied link'); })"
 )
 
 # Inline JS toast shown after copying multiple artifact links. The count is
@@ -2124,13 +2116,7 @@ _CLIPBOARD_TOAST_MULTI = (
     ".then(() => { "
     "const ctx = this.dataset.context || ''; "
     "const n = this.dataset.links.split('\\n').length; "
-    "const t = document.createElement('div'); "
-    "t.textContent = 'Copied ' + n + ' link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : ''); "
-    "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
-    "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
-    "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
-    "document.body.appendChild(t); "
-    "setTimeout(() => t.remove(), 2000); "
+    "showCopyToast('Copied ' + n + ' link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : '')); "
     "})"
 )
 
@@ -2141,13 +2127,7 @@ _CLIPBOARD_TOAST_MARKDOWN = (
     ".then(() => { "
     "const ctx = this.dataset.context || ''; "
     "const n = this.dataset.markdown.split('\\n').length; "
-    "const t = document.createElement('div'); "
-    "t.textContent = 'Copied ' + n + ' markdown link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : ''); "
-    "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
-    "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
-    "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
-    "document.body.appendChild(t); "
-    "setTimeout(() => t.remove(), 2000); "
+    "showCopyToast('Copied ' + n + ' markdown link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : '')); "
     "})"
 )
 
@@ -2157,13 +2137,7 @@ _CLIPBOARD_TOAST_MARKDOWN = (
 _CLIPBOARD_TOAST_JSON = (
     ".then(() => { "
     "const n = parseInt(this.dataset.count || '0', 10); "
-    "const t = document.createElement('div'); "
-    "t.textContent = 'Copied ' + n + ' artifact path' + (n === 1 ? '' : 's') + ' as JSON'; "
-    "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
-    "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
-    "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
-    "document.body.appendChild(t); "
-    "setTimeout(() => t.remove(), 2000); "
+    "showCopyToast('Copied ' + n + ' artifact path' + (n === 1 ? '' : 's') + ' as JSON'); "
     "})"
 )
 
@@ -2543,6 +2517,9 @@ def export_results(results: list[dict]) -> None:
             ]
             fh.write(
                 '<div class="artifact-index">\n'
+                '<div id="artifact-copy-live" aria-live="polite" aria-atomic="true" '
+                'style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;">\n'
+                '</div>\n'
                 '<style>'
                 '.artifact-index button:focus-visible, '
                 '.artifact-index input:focus-visible, '
@@ -2607,6 +2584,15 @@ def export_results(results: list[dict]) -> None:
                 f'{type_filter_options}'
                 '</select></p>\n\n'
                 '<script>'
+                'function showCopyToast(message) { '
+                'const live = document.getElementById("artifact-copy-live"); '
+                'if (live) { live.textContent = message; setTimeout(() => { live.textContent = ""; }, 1000); } '
+                'const t = document.createElement("div"); '
+                't.textContent = message; '
+                't.style.cssText = "position:fixed;bottom:20px;right:20px;background:#1f2937;color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);"; '
+                'document.body.appendChild(t); '
+                'setTimeout(() => t.remove(), 2000); '
+                '} '
                 'function artifactDownload(href) { '
                 'const a = document.createElement("a"); '
                 'a.href = href; '
@@ -2665,18 +2651,13 @@ def export_results(results: list[dict]) -> None:
                 '}); '
                 'g.style.display = visible > 0 ? "" : "none"; '
                 '}); '
-                '}'
+                '} '
                 'function copyDisplayedArtifactLinks() { '
                 'const container = document.querySelector(".artifact-index"); '
                 'const visible = Array.from(container.querySelectorAll(".artifact-item")).filter(el => el.style.display !== "none"); '
                 'const paths = visible.map(el => el.dataset.path).filter(Boolean); '
                 'navigator.clipboard.writeText(paths.join("\\n")).then(() => { '
-                'const n = paths.length; '
-                'const t = document.createElement("div"); '
-                't.textContent = "Copied " + n + " link" + (n === 1 ? "" : "s"); '
-                't.style.cssText = "position:fixed;bottom:20px;right:20px;background:#1f2937;color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);"; '
-                'document.body.appendChild(t); '
-                'setTimeout(() => t.remove(), 2000); '
+                'showCopyToast("Copied " + paths.length + " link" + (paths.length === 1 ? "" : "s")); '
                 '}).catch(() => {}); '
                 '}'
                 '</script>\n\n'
