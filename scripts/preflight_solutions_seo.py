@@ -1322,11 +1322,14 @@ def write_step_summary(results: list[dict]) -> None:
             for r in display
         )
         # Latency percentiles per combo — reuse _build_breakdown_rows so the
-        # summary numbers match the CSV/JSON export exactly.
-        pctile_index = {
-            (r["error_kind"], r["status_class"]): r
-            for r in _build_breakdown_rows(display)
-        }
+        # summary numbers match the CSV/JSON export exactly. Skipped when
+        # percentiles are disabled.
+        pctile_index = {}
+        if not _DISABLE_PERCENTILES:
+            pctile_index = {
+                (r["error_kind"], r["status_class"]): r
+                for r in _build_breakdown_rows(display)
+            }
         total_all = max(len(display), 1)
         total_fail = max(sum(combo.values()), 1)
         combo_rows = _sort_combo_rows(combo_all, combo, total_all, total_fail)
@@ -1340,12 +1343,21 @@ def write_step_summary(results: list[dict]) -> None:
         # 10 keeps each 10% ≈ 1 block so a reader can eyeball the split at
         # a glance without the column dominating the table.
         bar_w = 10
-        lines += [
-            "",
-            "| Kind | Status class | Count | Failed | Success rate "
-            "| Rate bar | % of all | % of failures | p50 (ms) | p95 (ms) | p99 (ms) |",
-            "| --- | :---: | ---: | ---: | ---: | :--- | ---: | ---: | ---: | ---: | ---: |",
-        ]
+        if _DISABLE_PERCENTILES:
+            header = (
+                "| Kind | Status class | Count | Failed | Success rate "
+                "| Rate bar | % of all | % of failures |"
+            )
+            separator = "| --- | :---: | ---: | ---: | ---: | :--- | ---: | ---: |"
+        else:
+            header = (
+                "| Kind | Status class | Count | Failed | Success rate "
+                "| Rate bar | % of all | % of failures | p50 (ms) | p95 (ms) | p99 (ms) |"
+            )
+            separator = (
+                "| --- | :---: | ---: | ---: | ---: | :--- | ---: | ---: | ---: | ---: | ---: |"
+            )
+        lines += ["", header, separator]
         for kind, status_class, n, failed, success_pct, share_fail in combo_rows:
             share_all = 100.0 * n / total_all
             kind_label = _ERROR_KIND_LABELS.get(kind, kind)
@@ -1356,13 +1368,19 @@ def write_step_summary(results: list[dict]) -> None:
             success_cells = int(round(success_pct / 100 * bar_w))
             fail_cells = bar_w - success_cells
             bar = "🟩" * success_cells + "🟥" * fail_cells
-            lines.append(
+            row = (
                 f"| {kind_label} | {class_label} | {n} | {failed} "
                 f"| {success_pct:.1f}% | {bar} | {share_all:.1f}% "
-                f"| {share_fail:.1f}% "
-                f"| {pr.get('ms_p50', 0):.0f} | {pr.get('ms_p95', 0):.0f} "
-                f"| {pr.get('ms_p99', 0):.0f} |"
+                f"| {share_fail:.1f}%"
             )
+            if not _DISABLE_PERCENTILES:
+                row += (
+                    f" | {pr.get('ms_p50', 0):.0f} | {pr.get('ms_p95', 0):.0f} "
+                    f"| {pr.get('ms_p99', 0):.0f} |"
+                )
+            else:
+                row += " |"
+            lines.append(row)
         lines.append("")
 
     # Latency histogram grouped by error_kind: makes it obvious whether e.g.
