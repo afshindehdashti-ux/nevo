@@ -174,6 +174,10 @@ Env:
     --heatmap-preview-top=N   Number of top non-zero buckets to preview per combo
                               (default 3; set 0 to disable).
     --validation-json=PATH    Write per-combo expected-vs-actual validation report.
+    --reset-filters           Clear every quick combo filter (`COMBO_FILTERS` /
+                              `--combo-filter=`) and `SUMMARY_FILTER`, restoring
+                              the full unfiltered breakdown table. Env equivalent:
+                              `RESET_FILTERS=true`.
 
 
 
