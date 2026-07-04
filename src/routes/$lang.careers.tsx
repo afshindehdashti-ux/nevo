@@ -349,7 +349,39 @@ function CareersPage() {
               )}
             </Button>
 
+            {confirmation && (
+              <div className="mt-2 rounded-xl border border-emerald-500/40 bg-emerald-500/5 p-5">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600">
+                    <FileDown className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-foreground">
+                      Application confirmation ready
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Reference <span className="font-mono">{confirmation.reference}</span> · {confirmation.filename}
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => void handleDownloadConfirmation()}
+                        disabled={downloading}
+                      >
+                        {downloading ? (
+                          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Preparing…</>
+                        ) : (
+                          <><FileDown className="mr-2 h-4 w-4" /> Download PDF Report</>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </form>
+
         </div>
       </Section>
 
