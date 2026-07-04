@@ -2499,15 +2499,24 @@ def export_results(results: list[dict]) -> None:
                 for _, path in items
                 if os.path.exists(path)
             ]
+            fh.write(
+                '<div class="artifact-index">\n'
+                '<style>'
+                '.artifact-index button:focus-visible, '
+                '.artifact-index input:focus-visible { '
+                'outline: 2px solid #3b82f6; outline-offset: 2px; '
+                '}'
+                '</style>\n\n'
+            )
             if all_existing_paths:
                 all_links = "\n".join(all_existing_paths)
                 fh.write(
                     '<button type="button" '
+                    'aria-label="Copy all artifact links" '
                     f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                     f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
                 )
             fh.write(
-                '<div class="artifact-index">\n'
                 '<input type="text" class="artifact-search" '
                 'placeholder="Search artifacts by name or path..." '
                 'oninput="'
@@ -2549,8 +2558,10 @@ def export_results(results: list[dict]) -> None:
                 ]
                 if existing_items:
                     all_links = "\n".join(path for _, path in existing_items)
+                    aria_title = title.replace("**", "").replace("_", "")
                     fh.write(
                         '<button type="button" '
+                        f'aria-label="Copy links for {html.escape(aria_title, quote=True)}" '
                         f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                         f'data-links="{html.escape(all_links, quote=True)}">Copy links</button>\n\n'
                     )
@@ -2581,6 +2592,7 @@ def export_results(results: list[dict]) -> None:
                                 f'<button type="button">Download {html.escape(label)}</button></a> '
                                 f'{meta} '
                                 '<button type="button" '
+                                f'aria-label="Copy link for {html.escape(label, quote=True)}" '
                                 f'onclick="navigator.clipboard.writeText(this.dataset.link){_CLIPBOARD_TOAST_SINGLE}.catch(() => {{}})" '
                                 f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
                                 "</div>\n"
@@ -2604,6 +2616,7 @@ def export_results(results: list[dict]) -> None:
                                 f'<button type="button">Open</button></a> '
                                 f'<a href="{html.escape(path, quote=True)}">{html.escape(label)}</a> '
                                 '<button type="button" '
+                                f'aria-label="Copy link for {html.escape(label, quote=True)}" '
                                 f'onclick="navigator.clipboard.writeText(this.dataset.link){_CLIPBOARD_TOAST_SINGLE}.catch(() => {{}})" '
                                 f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
                                 "</div>\n"
