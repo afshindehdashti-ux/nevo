@@ -430,6 +430,12 @@ function InvestmentCalculatorPage() {
       toast.error(`${label} failed`, {
         id: toastId,
         description: "Please try again or contact support if the issue persists.",
+        action: {
+          label: "Retry",
+          onClick: () => {
+            void handleDownloadReport(kind, label);
+          },
+        },
       });
     } finally {
       setPendingKind(null);
