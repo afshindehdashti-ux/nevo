@@ -58,27 +58,41 @@ function CareersPage() {
   const cvFormRef = useRef<HTMLFormElement>(null);
   const [busy, setBusy] = useState(false);
   const [cvName, setCvName] = useState<string>("");
+  const [cvSize, setCvSize] = useState<number>(0);
 
   async function handleApplication(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (busy) return;
     setBusy(true);
-    const ok = await submitLeadForm(e.currentTarget, {
-      source: "careers-application",
-      rules: [
-        { field: "name", label: "Full name" },
-        { field: "email", label: "Email", type: "email" },
-        { field: "phone", label: "Phone", type: "phone" },
-      ],
-      successTitle: "Application received",
-      successDescription: "Our talent team will review your profile and respond within 5 business days.",
-    });
-    setBusy(false);
-    if (ok) {
-      cvFormRef.current?.reset();
-      setCvName("");
+    const { toast } = await import("sonner");
+    const loadingId = toast.loading(
+      cvName ? `Uploading CV — ${cvName}…` : "Submitting application…",
+      { description: "Please keep this tab open while we transmit your application." },
+    );
+    try {
+      const ok = await submitLeadForm(e.currentTarget, {
+        source: "careers-application",
+        rules: [
+          { field: "name", label: "Full name" },
+          { field: "email", label: "Email", type: "email" },
+          { field: "phone", label: "Phone", type: "phone" },
+        ],
+        successTitle: "Application received",
+        successDescription: cvName
+          ? `CV "${cvName}" uploaded successfully. Our talent team will review your profile and respond within 5 business days.`
+          : "Our talent team will review your profile and respond within 5 business days.",
+      });
+      if (ok) {
+        cvFormRef.current?.reset();
+        setCvName("");
+        setCvSize(0);
+      }
+    } finally {
+      toast.dismiss(loadingId);
+      setBusy(false);
     }
   }
+
 
   return (
     <>
@@ -190,31 +204,58 @@ function CareersPage() {
               <option>Graduate / Intern</option>
             </select>
             <label className="flex cursor-pointer items-center justify-between rounded-md border border-dashed border-input bg-muted/40 px-4 py-6 text-sm text-muted-foreground hover:bg-muted">
-              <span className="flex items-center gap-3"><Upload className="h-5 w-5" /> {cvName || "Upload CV (PDF, DOCX — max 8 MB)"}</span>
-              <span className="text-xs">{cvName ? "Change" : "Click to browse"}</span>
+              <span className="flex items-center gap-3">
+                {busy && cvName ? <Loader2 className="h-5 w-5 animate-spin text-emerald-600" /> : <Upload className="h-5 w-5" />}
+                <span>
+                  {cvName || "Upload CV (PDF, DOCX — max 8 MB)"}
+                  {cvName && cvSize > 0 && (
+                    <span className="ml-2 text-xs text-emerald-600">
+                      · {(cvSize / (1024 * 1024)).toFixed(2)} MB {busy ? "uploading…" : "ready"}
+                    </span>
+                  )}
+                </span>
+              </span>
+              <span className="text-xs">{cvName ? (busy ? "Uploading…" : "Change") : "Click to browse"}</span>
               <input
                 name="cv"
                 type="file"
                 className="hidden"
                 accept=".pdf,.doc,.docx"
+                disabled={busy}
                 onChange={(e) => {
                   const f = e.target.files?.[0];
-                  if (!f) return setCvName("");
+                  if (!f) {
+                    setCvName("");
+                    setCvSize(0);
+                    return;
+                  }
                   if (f.size > 8 * 1024 * 1024) {
                     e.target.value = "";
                     setCvName("");
+                    setCvSize(0);
                     import("sonner").then(({ toast }) => toast.error("File too large", { description: "CV must be under 8 MB." }));
                     return;
                   }
                   setCvName(f.name);
+                  setCvSize(f.size);
+                  import("sonner").then(({ toast }) =>
+                    toast.success("CV attached", {
+                      description: `${f.name} · ${(f.size / (1024 * 1024)).toFixed(2)} MB ready to submit.`,
+                    }),
+                  );
                 }}
               />
             </label>
             <textarea name="note" rows={4} placeholder="Why NEVO? (optional)"
                       className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
             <Button type="submit" size="lg" disabled={busy}>
-              {busy ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting…</>) : (<>Submit Application <ArrowRight className="ml-2 h-4 w-4" /></>)}
+              {busy ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {cvName ? "Uploading CV…" : "Submitting…"}</>
+              ) : (
+                <>Submit Application <ArrowRight className="ml-2 h-4 w-4" /></>
+              )}
             </Button>
+
           </form>
         </div>
       </Section>
