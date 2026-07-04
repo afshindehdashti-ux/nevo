@@ -2592,6 +2592,40 @@ def export_results(results: list[dict]) -> None:
                     f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                     f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
                 )
+                import zipfile as _zipfile
+                bundle_path = os.path.join(
+                    os.path.dirname(summary_path) or ".",
+                    "artifacts_bundle.zip",
+                )
+                try:
+                    seen_arcnames: set[str] = set()
+                    with _zipfile.ZipFile(
+                        bundle_path, "w", _zipfile.ZIP_DEFLATED
+                    ) as zf:
+                        for p in all_existing_paths:
+                            arc = os.path.basename(p)
+                            base, ext = os.path.splitext(arc)
+                            i = 1
+                            while arc in seen_arcnames:
+                                arc = f"{base}_{i}{ext}"
+                                i += 1
+                            seen_arcnames.add(arc)
+                            zf.write(p, arcname=arc)
+                    bundle_size_str = _human_size(
+                        os.path.getsize(bundle_path)
+                    )
+                    bundle_href = html.escape(
+                        os.path.basename(bundle_path), quote=True
+                    )
+                    fh.write(
+                        f'<p><a href="{bundle_href}" download '
+                        f'aria-label="Download all available artifacts as a zip archive">'
+                        f'Download all available ({total_existing_count} '
+                        f'file{"s" if total_existing_count != 1 else ""}, '
+                        f'{bundle_size_str} zip)</a></p>\n\n'
+                    )
+                except OSError:
+                    pass
             fh.write(
                 '<input type="text" class="artifact-search" '
                 'placeholder="Search artifacts by name or path..." '
