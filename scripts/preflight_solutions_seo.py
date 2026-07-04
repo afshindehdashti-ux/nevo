@@ -3175,6 +3175,7 @@ def export_results(results: list[dict]) -> None:
                 'el.classList.add("is-active"); '
                 'const label = el.dataset.label || el.dataset.filename || "Artifact"; '
                 'const path = el.dataset.path || ""; '
+                'saveLastOpenedArtifact(path); '
                 'const filename = el.dataset.filename || ""; '
                 'const group = el.dataset.groupName || ""; '
                 'const type = el.dataset.type || ""; '
