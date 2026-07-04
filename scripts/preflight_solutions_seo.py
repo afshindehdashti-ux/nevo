@@ -131,6 +131,16 @@ Env:
   SUMMARY_FILTER       set to `preset:<name>` or `@<name>` (or just the
                        preset name, if unique) to apply a saved preset.
 
+  DISABLE_PERCENTILES  `true` to skip percentile latency calculations and the
+                       `BREAKDOWN_CSV_PATH` / `BREAKDOWN_JSON_PATH` exports. This
+                       reduces runtime and summary size when only pass/fail
+                       data matters. Same effect as passing `--disable-percentiles`
+                       on the command line.
+
+  CLI flags:
+    --help, -h             Print this help text and exit.
+    --disable-percentiles  Skip p50/p95/p99 latency breakdowns and exports.
+
 
   Output / Summary:
 
@@ -150,6 +160,8 @@ Env:
     success_rate_pct, share_pct, failures_pct,
     attempts_total, attempts_avg,
     ms_avg, ms_p50, ms_p95, ms_p99, ms_max
+  When DISABLE_PERCENTILES is set, these exports and the percentile columns are
+  skipped entirely.
 
   Latency percentile fields (ms):
     ms_avg   arithmetic mean latency for the combo
@@ -245,6 +257,15 @@ RETRYABLE_STATUS_CLASSES: set[str] = {
     if s.strip()
 }
 IN_GHA = os.environ.get("GITHUB_ACTIONS") == "true"
+
+
+# Disable percentile-based latency breakdowns to reduce runtime / summary size
+# when only pass/fail data is needed. Set env DISABLE_PERCENTILES=true or pass
+# the --disable-percentiles CLI flag.
+_DISABLE_PERCENTILES = os.environ.get("DISABLE_PERCENTILES", "").strip().lower() in (
+    "1", "true", "yes", "on"
+)
+
 
 
 
@@ -1301,11 +1322,14 @@ def write_step_summary(results: list[dict]) -> None:
             for r in display
         )
         # Latency percentiles per combo — reuse _build_breakdown_rows so the
-        # summary numbers match the CSV/JSON export exactly.
-        pctile_index = {
-            (r["error_kind"], r["status_class"]): r
-            for r in _build_breakdown_rows(display)
-        }
+        # summary numbers match the CSV/JSON export exactly. Skipped when
+        # percentiles are disabled.
+        pctile_index = {}
+        if not _DISABLE_PERCENTILES:
+            pctile_index = {
+                (r["error_kind"], r["status_class"]): r
+                for r in _build_breakdown_rows(display)
+            }
         total_all = max(len(display), 1)
         total_fail = max(sum(combo.values()), 1)
         combo_rows = _sort_combo_rows(combo_all, combo, total_all, total_fail)
@@ -1319,12 +1343,21 @@ def write_step_summary(results: list[dict]) -> None:
         # 10 keeps each 10% ≈ 1 block so a reader can eyeball the split at
         # a glance without the column dominating the table.
         bar_w = 10
-        lines += [
-            "",
-            "| Kind | Status class | Count | Failed | Success rate "
-            "| Rate bar | % of all | % of failures | p50 (ms) | p95 (ms) | p99 (ms) |",
-            "| --- | :---: | ---: | ---: | ---: | :--- | ---: | ---: | ---: | ---: | ---: |",
-        ]
+        if _DISABLE_PERCENTILES:
+            header = (
+                "| Kind | Status class | Count | Failed | Success rate "
+                "| Rate bar | % of all | % of failures |"
+            )
+            separator = "| --- | :---: | ---: | ---: | ---: | :--- | ---: | ---: |"
+        else:
+            header = (
+                "| Kind | Status class | Count | Failed | Success rate "
+                "| Rate bar | % of all | % of failures | p50 (ms) | p95 (ms) | p99 (ms) |"
+            )
+            separator = (
+                "| --- | :---: | ---: | ---: | ---: | :--- | ---: | ---: | ---: | ---: | ---: |"
+            )
+        lines += ["", header, separator]
         for kind, status_class, n, failed, success_pct, share_fail in combo_rows:
             share_all = 100.0 * n / total_all
             kind_label = _ERROR_KIND_LABELS.get(kind, kind)
@@ -1335,13 +1368,19 @@ def write_step_summary(results: list[dict]) -> None:
             success_cells = int(round(success_pct / 100 * bar_w))
             fail_cells = bar_w - success_cells
             bar = "🟩" * success_cells + "🟥" * fail_cells
-            lines.append(
+            row = (
                 f"| {kind_label} | {class_label} | {n} | {failed} "
                 f"| {success_pct:.1f}% | {bar} | {share_all:.1f}% "
-                f"| {share_fail:.1f}% "
-                f"| {pr.get('ms_p50', 0):.0f} | {pr.get('ms_p95', 0):.0f} "
-                f"| {pr.get('ms_p99', 0):.0f} |"
+                f"| {share_fail:.1f}%"
             )
+            if not _DISABLE_PERCENTILES:
+                row += (
+                    f" | {pr.get('ms_p50', 0):.0f} | {pr.get('ms_p95', 0):.0f} "
+                    f"| {pr.get('ms_p99', 0):.0f} |"
+                )
+            else:
+                row += " |"
+            lines.append(row)
         lines.append("")
 
     # Latency histogram grouped by error_kind: makes it obvious whether e.g.
@@ -1686,25 +1725,29 @@ def export_results(results: list[dict]) -> None:
 
     # Breakdown artifacts are always derived from the FULL result set so the
     # aggregate totals remain meaningful even when RESULTS_INCLUDE narrows
-    # the per-URL export to a subset.
+    # the per-URL export to a subset. Skipped entirely when percentiles are
+    # disabled, because the breakdown's primary value is the p50/p95/p99 data.
     breakdown_written: list[str] = []
     if bd_csv or bd_json:
-        breakdown = _build_breakdown_rows(results)
-        if bd_csv:
-            os.makedirs(os.path.dirname(bd_csv) or ".", exist_ok=True)
-            with open(bd_csv, "w", encoding="utf-8", newline="") as fh:
-                writer = csv.DictWriter(fh, fieldnames=_BREAKDOWN_COLUMNS)
-                writer.writeheader()
-                for r in breakdown:
-                    writer.writerow(r)
-            breakdown_written.append(bd_csv)
-            print(f"Wrote breakdown CSV → {bd_csv} ({len(breakdown)} row(s))")
-        if bd_json:
-            os.makedirs(os.path.dirname(bd_json) or ".", exist_ok=True)
-            with open(bd_json, "w", encoding="utf-8") as fh:
-                json.dump(breakdown, fh, ensure_ascii=False, indent=2, default=str)
-            breakdown_written.append(bd_json)
-            print(f"Wrote breakdown JSON → {bd_json} ({len(breakdown)} row(s))")
+        if _DISABLE_PERCENTILES:
+            print("preflight: breakdown export skipped because DISABLE_PERCENTILES is set")
+        else:
+            breakdown = _build_breakdown_rows(results)
+            if bd_csv:
+                os.makedirs(os.path.dirname(bd_csv) or ".", exist_ok=True)
+                with open(bd_csv, "w", encoding="utf-8", newline="") as fh:
+                    writer = csv.DictWriter(fh, fieldnames=_BREAKDOWN_COLUMNS)
+                    writer.writeheader()
+                    for r in breakdown:
+                        writer.writerow(r)
+                breakdown_written.append(bd_csv)
+                print(f"Wrote breakdown CSV → {bd_csv} ({len(breakdown)} row(s))")
+            if bd_json:
+                os.makedirs(os.path.dirname(bd_json) or ".", exist_ok=True)
+                with open(bd_json, "w", encoding="utf-8") as fh:
+                    json.dump(breakdown, fh, ensure_ascii=False, indent=2, default=str)
+                breakdown_written.append(bd_json)
+                print(f"Wrote breakdown JSON → {bd_json} ({len(breakdown)} row(s))")
 
     # Heatmap CSV: one row per (error_kind, status_class), one column per
     # latency bucket, plus a `total` column. Always derived from the FULL
@@ -1757,6 +1800,11 @@ def main() -> int:
         print(__doc__)
         return 0
 
+    global _DISABLE_PERCENTILES
+    if "--disable-percentiles" in sys.argv:
+        _DISABLE_PERCENTILES = True
+        sys.argv.remove("--disable-percentiles")
+
     urls: list[str] = [f"{BASE}{p}" for p in CORE_PATHS]
     for locale in LOCALES:
         for path in LOCALIZED_PATHS:
@@ -1777,20 +1825,22 @@ def main() -> int:
               f"attempts={r['attempts']} trail={trail}{stop}  {r['url']} — {detail}")
 
 
-    # Per-combo latency percentiles, printed regardless of failure state so
-    # trend data (p95/p99 regressions on healthy runs) is captured too.
-    breakdown = _build_breakdown_rows(results)
-    if breakdown:
-        print("\nLatency by error_kind × status_class "
-              "(count/failed  avg  p50 / p95 / p99  max):")
-        for row in breakdown:
-            print(f"  {row['error_kind']:>16s} × {row['status_class']:<4s} "
-                  f"{row['count']:>3d}/{row['failed']:<3d}  "
-                  f"avg {row['ms_avg']:>7.1f}ms  "
-                  f"p50 {row['ms_p50']:>7.1f}  "
-                  f"p95 {row['ms_p95']:>7.1f}  "
-                  f"p99 {row['ms_p99']:>7.1f}  "
-                  f"max {row['ms_max']:>7.1f}")
+    # Per-combo latency percentiles, printed unless explicitly disabled.
+    # Disabling saves a small amount of runtime and keeps the summary shorter
+    # when only pass/fail data is needed.
+    if not _DISABLE_PERCENTILES:
+        breakdown = _build_breakdown_rows(results)
+        if breakdown:
+            print("\nLatency by error_kind × status_class "
+                  "(count/failed  avg  p50 / p95 / p99  max):")
+            for row in breakdown:
+                print(f"  {row['error_kind']:>16s} × {row['status_class']:<4s} "
+                      f"{row['count']:>3d}/{row['failed']:<3d}  "
+                      f"avg {row['ms_avg']:>7.1f}ms  "
+                      f"p50 {row['ms_p50']:>7.1f}  "
+                      f"p95 {row['ms_p95']:>7.1f}  "
+                      f"p99 {row['ms_p99']:>7.1f}  "
+                      f"max {row['ms_max']:>7.1f}")
 
     write_step_summary(results)
     export_results(results)
