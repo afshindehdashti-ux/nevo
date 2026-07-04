@@ -106,6 +106,11 @@ Env:
                         summary shows a "Copy absolute URLs" toggle that copies
                         `${ARTIFACT_BASE_URL}/${artifact_filename}` instead of the
                         local file path. The local file path remains the default.
+  ARTIFACT_CSV_INCLUDE_URL
+                       opt-in ("1"/"true"/"yes"/"on"): when ARTIFACT_BASE_URL is
+                       also set, the "Copy links (CSV)" export gains a third
+                       `url` column carrying the absolute URL alongside the
+                       existing `label` and `path` columns.
   LATENCY_BUCKETS      explicit comma-separated upper-bound edges (ms) for
                        the latency histogram/heatmap, e.g.
                        `LATENCY_BUCKETS=50,100,250,500,1000,5000`.
