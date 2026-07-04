@@ -1201,8 +1201,18 @@ def write_step_summary(results: list[dict]) -> None:
         f"(status classes/codes: `{','.join(sorted(RETRYABLE_STATUS_CLASSES)) or 'none'}`)",
     ]
     if filter_scope != "all":
-        lines.append(f"- Summary filter: `{filter_scope}` "
+        preset_note = f" _(preset `{active_preset}`)_" if active_preset else ""
+        lines.append(f"- Summary filter: `{filter_scope}`{preset_note} "
                      f"(showing {len(display)} of {total} row(s))")
+    if presets:
+        preset_list = ", ".join(
+            f"`{name}` → `{expr}`" for name, expr in sorted(presets.items())
+        )
+        lines.append(
+            f"- Saved filter presets ({len(presets)}): {preset_list}. "
+            f"Select with `SUMMARY_FILTER=preset:<name>` or `@<name>`."
+        )
+
 
 
     # Failure-kind breakdown: shows at a glance whether the run is dominated
