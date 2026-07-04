@@ -2451,9 +2451,29 @@ def export_results(results: list[dict]) -> None:
                 f"\n### Artifacts index ({total_files} file"
                 f"{'s' if total_files != 1 else ''})\n\n"
             )
+            fh.write(
+                '<div class="artifact-index">\n'
+                '<input type="text" class="artifact-search" '
+                'placeholder="Search artifacts by name or path..." '
+                'oninput="'
+                "const q = this.value.toLowerCase(); "
+                "this.closest('.artifact-index').querySelectorAll('.artifact-group').forEach(g => { "
+                "let visible = 0; "
+                "g.querySelectorAll('.artifact-item').forEach(el => { "
+                "const label = (el.dataset.label || '').toLowerCase(); "
+                "const path = (el.dataset.path || '').toLowerCase(); "
+                "const match = !q || label.includes(q) || path.includes(q) || el.textContent.toLowerCase().includes(q); "
+                "el.style.display = match ? '' : 'none'; "
+                "if (match) visible++; "
+                "}); "
+                "g.style.display = visible > 0 || !q ? '' : 'none'; "
+                "});"
+                '">\n\n'
+            )
             missing_artifacts: list[tuple[str, str]] = []
             for title, items in groups:
                 is_heatmap_group = "Latency heatmap" in title
+                fh.write(f'<div class="artifact-group">\n<p><em>{title}</em></p>\n\n')
                 if is_heatmap_group:
                     existing_heatmap = [
                         (label, path) for label, path in items if os.path.exists(path)
@@ -2465,7 +2485,6 @@ def export_results(results: list[dict]) -> None:
                             'onclick="navigator.clipboard.writeText(this.dataset.links).catch(() => {})" '
                             f'data-links="{html.escape(all_links, quote=True)}">Copy heatmap links</button>\n\n'
                         )
-                fh.write(f"_{title}:_\n\n")
                 for label, path in items:
                     exists = os.path.exists(path)
                     if not exists:
@@ -2488,26 +2507,47 @@ def export_results(results: list[dict]) -> None:
                             except OSError:
                                 meta = ""
                             fh.write(
-                                f'- <a href="{html.escape(path, quote=True)}" '
+                                f'<div class="artifact-item" '
+                                f'data-label="{html.escape(label, quote=True)}" '
+                                f'data-path="{html.escape(path, quote=True)}">\n'
+                                f'<a href="{html.escape(path, quote=True)}" '
                                 f'download="{html.escape(label, quote=True)}">'
                                 f'<button type="button">Download {html.escape(label)}</button></a> '
                                 f'{meta} '
                                 '<button type="button" '
                                 'onclick="navigator.clipboard.writeText(this.dataset.link).catch(() => {})" '
                                 f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
+                                "</div>\n"
                             )
                         else:
                             fh.write(
-                                f"- ⚠️ `{label}` (missing) — expected at `{path}`\n"
+                                f'<div class="artifact-item" '
+                                f'data-label="{html.escape(label, quote=True)}" '
+                                f'data-path="{html.escape(path, quote=True)}">\n'
+                                f"⚠️ <code>{html.escape(label)}</code> (missing) — expected at "
+                                f"<code>{html.escape(path)}</code>\n"
+                                "</div>\n"
                             )
                     else:
                         if exists:
-                            fh.write(f"- [`{label}`]({path})\n")
+                            fh.write(
+                                f'<div class="artifact-item" '
+                                f'data-label="{html.escape(label, quote=True)}" '
+                                f'data-path="{html.escape(path, quote=True)}">\n'
+                                f'<a href="{html.escape(path, quote=True)}">{html.escape(label)}</a>\n'
+                                "</div>\n"
+                            )
                         else:
                             fh.write(
-                                f"- ⚠️ `{label}` (missing) — expected at `{path}`\n"
+                                f'<div class="artifact-item" '
+                                f'data-label="{html.escape(label, quote=True)}" '
+                                f'data-path="{html.escape(path, quote=True)}">\n'
+                                f"⚠️ <code>{html.escape(label)}</code> (missing) — expected at "
+                                f"<code>{html.escape(path)}</code>\n"
+                                "</div>\n"
                             )
-                fh.write("\n")
+                fh.write("</div>\n")
+            fh.write("</div>\n\n")
             if missing_artifacts:
                 fh.write(
                     "> ⚠️ _The following artifact(s) were not found on disk and may need to be regenerated:_\n"
