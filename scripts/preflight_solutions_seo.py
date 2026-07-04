@@ -2974,8 +2974,15 @@ def export_results(results: list[dict]) -> None:
                     '<button type="button" aria-label="Copy selected artifact links as JSON" '
                     'onclick="copySelectedArtifacts(\'json\')">Copy selected (JSON)</button> '
                     '<button type="button" aria-label="Copy selected artifact links as CSV" '
-                    'onclick="copySelectedArtifacts(\'csv\')">Copy selected (CSV)</button>\n'
+                    'onclick="copySelectedArtifacts(\'csv\')">Copy selected (CSV)</button> '
+                    '<button type="button" aria-label="Export manifest for selected artifacts as CSV" '
+                    'onclick="exportSelectedManifest(\'csv\')">Export selected manifest (CSV)</button> '
+                    '<button type="button" aria-label="Export manifest for selected artifacts as JSON" '
+                    'onclick="exportSelectedManifest(\'json\')">Export selected manifest (JSON)</button> '
+                    '<button type="button" aria-label="Download selected artifact files" '
+                    'onclick="downloadSelectedArtifacts()">Download selected files</button>\n'
                     '</div>\n\n'
+
                 )
 
             summary_dir = os.path.dirname(summary_path) or "."
