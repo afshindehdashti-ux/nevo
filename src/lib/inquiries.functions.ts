@@ -25,6 +25,10 @@ const DownloadSchema = z.object({
   document_title: z.string().trim().max(300).optional().nullable(),
   category: z.string().trim().max(100).optional().nullable(),
   source_page: z.string().trim().max(300).optional().nullable(),
+  status: z.enum(["start", "success", "failure"]).default("success"),
+  filename: z.string().trim().max(300).optional().nullable(),
+  duration_ms: z.number().int().min(0).max(600_000).optional().nullable(),
+  error_message: z.string().trim().max(500).optional().nullable(),
 });
 
 // ---------- Helpers ----------
@@ -99,6 +103,10 @@ export const logDownload = createServerFn({ method: "POST" })
       document_title: data.document_title ?? null,
       category: data.category ?? null,
       source_page: data.source_page ?? null,
+      status: data.status,
+      filename: data.filename ?? null,
+      duration_ms: data.duration_ms ?? null,
+      error_message: data.error_message ?? null,
       ip: meta.ip,
       user_agent: meta.ua,
     });
