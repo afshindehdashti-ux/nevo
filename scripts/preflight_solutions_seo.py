@@ -2666,7 +2666,6 @@ def export_results(results: list[dict]) -> None:
                 'g.style.display = visible > 0 ? "" : "none"; '
                 '}); '
                 '}'
-                '}'
                 'function copyDisplayedArtifactLinks() { '
                 'const container = document.querySelector(".artifact-index"); '
                 'const visible = Array.from(container.querySelectorAll(".artifact-item")).filter(el => el.style.display !== "none"); '
