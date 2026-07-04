@@ -302,6 +302,22 @@ _DISABLE_HEATMAP_EXPORT = os.environ.get("DISABLE_HEATMAP_EXPORT", "").strip().l
     "1", "true", "yes", "on"
 )
 
+# Disable heatmap/breakdown consistency validation only (the heatmap CSV/JSON
+# files are still exported). Use this when the export is needed but the
+# validation step is too slow or not required. Set env
+# DISABLE_HEATMAP_VALIDATION=true or pass --disable-heatmap-validation.
+_DISABLE_HEATMAP_VALIDATION = os.environ.get(
+    "DISABLE_HEATMAP_VALIDATION", ""
+).strip().lower() in ("1", "true", "yes", "on")
+
+# Number of top non-zero latency buckets to preview in stdout for each combo.
+# Env HEATMAP_PREVIEW_TOP (default 3); set to 0 to disable the preview entirely.
+# The --heatmap-preview-top=N CLI flag overrides the env var.
+try:
+    _HEATMAP_PREVIEW_TOP = int(os.environ.get("HEATMAP_PREVIEW_TOP", "3"))
+except ValueError:
+    _HEATMAP_PREVIEW_TOP = 3
+
 
 
 
