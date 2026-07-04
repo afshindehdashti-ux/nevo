@@ -2452,9 +2452,25 @@ def export_results(results: list[dict]) -> None:
                 f"{'s' if total_files != 1 else ''})\n\n"
             )
             for title, items in groups:
+                is_heatmap_group = "Latency heatmap" in title
+                if is_heatmap_group and len(items) > 1:
+                    all_links = "\n".join(path for _, path in items)
+                    fh.write(
+                        '<button type="button" '
+                        'onclick="navigator.clipboard.writeText(this.dataset.links).catch(() => {})" '
+                        f'data-links="{html.escape(all_links, quote=True)}">Copy heatmap links</button>\n\n'
+                    )
                 fh.write(f"_{title}:_\n\n")
                 for label, path in items:
-                    fh.write(f"- [`{label}`]({path})\n")
+                    if is_heatmap_group:
+                        fh.write(
+                            f"- [`{label}`]({path}) "
+                            '<button type="button" '
+                            'onclick="navigator.clipboard.writeText(this.dataset.link).catch(() => {})" '
+                            f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
+                        )
+                    else:
+                        fh.write(f"- [`{label}`]({path})\n")
                 fh.write("\n")
             if heatmap_expected_but_disabled and not heatmap_written:
                 fh.write(
