@@ -151,7 +151,7 @@ function EngineeringToolsCenter() {
             {[
               { k: "20", v: "Engineering Tools" },
               { k: "< 200 ms", v: "Real-time Compute" },
-              { k: "PDF · CSV", v: "Exportable Reports" },
+              { k: "PDF", v: "Exportable Reports" },
               { k: "AI", v: "Senior Engineer Review" },
             ].map((m) => (
               <div key={m.v} className="bg-[#0a0d10] p-6">
@@ -307,7 +307,7 @@ function EngineeringToolsCenter() {
               { q: "Are the NEVO engineering tools free to use?", a: "Yes. All 20 engineering calculators are free. You can export PDF reports, share results and request a full engineering proposal at no cost." },
               { q: "How accurate are the calculations?", a: "The tools use industry-standard formulas (EN 14509, EN 13501-1, ASTM) calibrated against NEVO's production data. Results are engineering estimates suitable for feasibility and pre-design; final design is validated by our engineering team." },
               { q: "Can I get an engineer to review my results?", a: "Yes — after any calculation you can request a proposal and a senior industrial engineer will review your inputs and reply within 24 hours." },
-              { q: "Can I export and share the results?", a: "Yes. Every tool supports PDF export, CSV export, share links and email reports." },
+              { q: "Can I export and share the results?", a: "Yes. Every tool supports PDF export, share links and email reports." },
             ].map((f) => (
               <details key={f.q} className="group py-5">
                 <summary className="flex cursor-pointer items-center justify-between gap-4 list-none">
