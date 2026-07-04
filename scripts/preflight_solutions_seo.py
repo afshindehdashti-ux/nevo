@@ -2979,7 +2979,7 @@ def export_results(results: list[dict]) -> None:
                                 '<button type="button" '
                                 f'aria-label="Copy link for {html.escape(label, quote=True)}" '
                                 f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.url ? this.dataset.url : this.dataset.link){_CLIPBOARD_TOAST_SINGLE}" '
-                                f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
+                                f'data-link="{html.escape(path, quote=True)}"{url_attr}>Copy link</button>\n'
                                 "</div>\n"
                             )
                         else:
