@@ -2595,6 +2595,7 @@ def export_results(results: list[dict]) -> None:
                 fh.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links" '
+                    'data-context="all artifacts" '
                     f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                     f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
                 )
