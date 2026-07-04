@@ -950,6 +950,78 @@ def _resolve_rate_bar_mode() -> str:
     return v
 _RATE_BAR_MODE = _resolve_rate_bar_mode()
 
+# Combo-table quick filters. Grammar (predicates AND-combined):
+#   <metric><op><value>   metric ∈ {success, failure}
+#                         op     ∈ {>=, <=, >, <, =, ==}
+#                         value  ∈ [0, 100]
+# Predicates come from env `COMBO_FILTERS` (";"- or ","-separated) and
+# repeated CLI `--combo-filter=...` flags; both sources merge. Example:
+#   COMBO_FILTERS="success>=80;failure<=20"  → only combos with
+#   success ≥ 80% AND failure ≤ 20%. An empty spec means "no filter".
+_COMBO_FILTER_OPS = {
+    ">=": lambda a, b: a >= b,
+    "<=": lambda a, b: a <= b,
+    ">":  lambda a, b: a >  b,
+    "<":  lambda a, b: a <  b,
+    "==": lambda a, b: abs(a - b) < 1e-9,
+    "=":  lambda a, b: abs(a - b) < 1e-9,
+}
+def _parse_combo_filters() -> list[tuple[str, str, float, str]]:
+    """Return list of (metric, op, value, raw) predicates. Invalid entries
+    are warned to stderr and skipped so a typo never silently hides rows."""
+    raw_specs: list[str] = []
+    env = (os.environ.get("COMBO_FILTERS") or "").strip()
+    if env:
+        raw_specs += [p for p in env.replace(",", ";").split(";") if p.strip()]
+    for arg in sys.argv[1:]:
+        if arg.startswith("--combo-filter="):
+            raw_specs.append(arg.split("=", 1)[1])
+    parsed: list[tuple[str, str, float, str]] = []
+    for spec in raw_specs:
+        s = spec.strip().lower().replace(" ", "")
+        if not s:
+            continue
+        op_found = None
+        # Longest op first so ">=" is not shadowed by ">".
+        for op in (">=", "<=", "==", ">", "<", "="):
+            idx = s.find(op)
+            if idx > 0:
+                op_found = (op, idx)
+                break
+        if not op_found:
+            print(f"preflight: warning: ignoring COMBO filter {spec!r} (no operator)", file=sys.stderr)
+            continue
+        op, idx = op_found
+        metric = s[:idx]
+        val_s = s[idx + len(op):]
+        if metric not in {"success", "failure"}:
+            print(f"preflight: warning: ignoring COMBO filter {spec!r} "
+                  f"(metric must be success|failure, got {metric!r})", file=sys.stderr)
+            continue
+        try:
+            val = float(val_s.rstrip("%"))
+        except ValueError:
+            print(f"preflight: warning: ignoring COMBO filter {spec!r} "
+                  f"(value {val_s!r} is not numeric)", file=sys.stderr)
+            continue
+        if not (0.0 <= val <= 100.0):
+            print(f"preflight: warning: ignoring COMBO filter {spec!r} "
+                  f"(value must be in [0, 100])", file=sys.stderr)
+            continue
+        parsed.append((metric, op, val, spec.strip()))
+    return parsed
+_COMBO_FILTERS = _parse_combo_filters()
+
+def _combo_row_matches_filters(success_pct: float) -> bool:
+    """AND-combine every configured predicate. Empty filter list = keep all."""
+    failure_pct = 100.0 - success_pct
+    for metric, op, val, _raw in _COMBO_FILTERS:
+        actual = success_pct if metric == "success" else failure_pct
+        if not _COMBO_FILTER_OPS[op](actual, val):
+            return False
+    return True
+
+
 
 def _bucket_for(ms: float) -> int:
     for i, (_, hi) in enumerate(_LATENCY_BUCKETS):
@@ -1351,13 +1423,35 @@ def write_step_summary(results: list[dict]) -> None:
             }
         total_all = max(len(display), 1)
         total_fail = max(sum(combo.values()), 1)
-        combo_rows = _sort_combo_rows(combo_all, combo, total_all, total_fail)
+        combo_rows_all = _sort_combo_rows(combo_all, combo, total_all, total_fail)
+        # Quick filters: keep only combos whose success/failure rate matches
+        # every configured predicate (see _parse_combo_filters). Applied here
+        # rather than at aggregation time so overall_fail_pct and totals stay
+        # anchored to the full run — the filter only hides table rows.
+        if _COMBO_FILTERS:
+            combo_rows = [r for r in combo_rows_all
+                          if _combo_row_matches_filters(r[4])]
+            hidden = len(combo_rows_all) - len(combo_rows)
+            filter_desc = ", ".join(f"`{raw}`" for _, _, _, raw in _COMBO_FILTERS)
+        else:
+            combo_rows = combo_rows_all
+            hidden = 0
+            filter_desc = ""
         overall_fail_pct = 100.0 * sum(combo.values()) / total_all
         lines.append("")
-        lines.append(
+        heading = (
             f"- Breakdown by kind × status class "
-            f"(overall failure rate **{overall_fail_pct:.1f}%**):"
+            f"(overall failure rate **{overall_fail_pct:.1f}%**)"
         )
+        if _COMBO_FILTERS:
+            heading += (
+                f" — filters: {filter_desc} "
+                f"(showing {len(combo_rows)} of {len(combo_rows_all)} combo(s)"
+                f"{f', {hidden} hidden' if hidden else ''}):"
+            )
+        else:
+            heading += ":"
+        lines.append(heading)
         # Inline sparkline width (chars) for the success/failure bar column.
         # 10 keeps each 10% ≈ 1 block so a reader can eyeball the split at
         # a glance without the column dominating the table.
@@ -1377,6 +1471,12 @@ def write_step_summary(results: list[dict]) -> None:
                 "| --- | :---: | ---: | ---: | ---: | :--- | ---: | ---: | ---: | ---: | ---: |"
             )
         lines += ["", header, separator]
+        if not combo_rows:
+            # Placeholder row keeps the table syntactically valid when every
+            # combo is filtered out — otherwise GFM renders a broken table.
+            empty_cells = 8 if _DISABLE_PERCENTILES else 11
+            lines.append("| " + " | ".join(["_no combo matches active filters_"]
+                                            + ["—"] * (empty_cells - 1)) + " |")
         for kind, status_class, n, failed, success_pct, share_fail in combo_rows:
             share_all = 100.0 * n / total_all
             kind_label = _ERROR_KIND_LABELS.get(kind, kind)
