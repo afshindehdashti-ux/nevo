@@ -3058,6 +3058,7 @@ def export_results(results: list[dict]) -> None:
                 '} '
                 'if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", restoreArtifactSelection); } else { restoreArtifactSelection(); } '
                 'function updateSelectionCount() { '
+                'document.querySelectorAll(".artifact-select").forEach(cb => { cb.setAttribute("aria-checked", cb.checked ? "true" : "false"); }); '
                 'const n = document.querySelectorAll(".artifact-select:checked").length; '
                 'const total = document.querySelectorAll(".artifact-item[data-existing=\\"true\\"] .artifact-select").length; '
                 'const text = total > 0 ? (n + " of " + total + " artifact" + (total === 1 ? "" : "s") + " selected") : (n + " selected"); '
