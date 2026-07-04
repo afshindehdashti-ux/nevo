@@ -197,6 +197,7 @@ async def _run(html_path: Path) -> None:
               return navigator.clipboard.readText();
             }"""
         )
+        print("DEBUG csv_payload =", repr(csv_payload))
         assert "\r\n" in csv_payload, (
             f"CSV clipboard payload lost CRLF line terminators:\n{csv_payload!r}"
         )
