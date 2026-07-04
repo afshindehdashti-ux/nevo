@@ -2532,6 +2532,8 @@ def export_results(results: list[dict]) -> None:
                                 f'<div class="artifact-item" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}">\n'
+                                f'<a href="{html.escape(path, quote=True)}">'
+                                f'<button type="button">Open</button></a> '
                                 f'<a href="{html.escape(path, quote=True)}" '
                                 f'download="{html.escape(label, quote=True)}">'
                                 f'<button type="button">Download {html.escape(label)}</button></a> '
@@ -2556,6 +2558,8 @@ def export_results(results: list[dict]) -> None:
                                 f'<div class="artifact-item" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}">\n'
+                                f'<a href="{html.escape(path, quote=True)}">'
+                                f'<button type="button">Open</button></a> '
                                 f'<a href="{html.escape(path, quote=True)}">{html.escape(label)}</a>\n'
                                 "</div>\n"
                             )
