@@ -594,19 +594,22 @@ function RequestDialog({
       parsed.data.message ? `\n${parsed.data.message}` : "",
     ].filter(Boolean).join("\n");
 
-    const { error: dbError } = await supabase.from("project_inquiries").insert({
-      name: parsed.data.name,
-      email: parsed.data.email,
-      phone: parsed.data.phone,
-      company: parsed.data.company,
-      country: parsed.data.country,
-      application: parsed.data.projectType || null,
-      message: composedMessage,
-      source_page: "/download-center",
-      status: "new",
-    });
-    setSubmitting(false);
-    if (dbError) {
+    try {
+      await submitInquiry({
+        data: {
+          name: parsed.data.name,
+          email: parsed.data.email,
+          phone: parsed.data.phone,
+          company: parsed.data.company,
+          country: parsed.data.country,
+          application: parsed.data.projectType || null,
+          message: composedMessage,
+          source_page: "/download-center",
+        },
+      });
+      setSubmitting(false);
+    } catch {
+      setSubmitting(false);
       setError("Something went wrong. Please try again or email us directly.");
       return;
     }
