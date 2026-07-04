@@ -183,6 +183,17 @@ Env:
                               show rows matching any selected range). Aliases:
                               `and`/`intersection`, `or`/`union`. Env equivalent:
                               `COMBO_FILTER_MODE=any|all`.
+    --filtered-combos-csv=PATH
+                              Export ONLY the currently filtered combo rows
+                              (post `COMBO_FILTERS` / `--combo-filter-mode` /
+                              `--reset-filters`) to CSV with columns:
+                              error_kind, status_class, count, failed,
+                              success_pct, failure_pct, share_all_pct,
+                              share_failures_pct (+ ms_avg/p50/p95/p99/max
+                              unless `--disable-percentiles`). Distinct from
+                              `BREAKDOWN_CSV_PATH`, which always exports the
+                              full unfiltered aggregation. Env equivalent:
+                              `FILTERED_COMBOS_CSV_PATH=PATH`.
 
 
 
@@ -1601,6 +1612,55 @@ def write_step_summary(results: list[dict]) -> None:
             hidden = 0
             filter_desc = ""
         overall_fail_pct = 100.0 * sum(combo.values()) / total_all
+
+        # Export the CURRENTLY FILTERED combo rows on demand. Distinct from
+        # BREAKDOWN_CSV_PATH (which always exports the full unfiltered
+        # aggregation) — this reflects exactly what the on-screen table shows
+        # so an operator can share a spreadsheet matching the filtered view.
+        filtered_csv_path = (
+            os.environ.get("FILTERED_COMBOS_CSV_PATH") or ""
+        ).strip()
+        if filtered_csv_path:
+            import csv as _csv
+            os.makedirs(os.path.dirname(filtered_csv_path) or ".", exist_ok=True)
+            base_cols = [
+                "error_kind", "status_class", "count", "failed",
+                "success_pct", "failure_pct",
+                "share_all_pct", "share_failures_pct",
+            ]
+            extra_cols = [] if _DISABLE_PERCENTILES else [
+                "ms_avg", "ms_p50", "ms_p95", "ms_p99", "ms_max",
+            ]
+            with open(filtered_csv_path, "w", encoding="utf-8", newline="") as _fh:
+                _w = _csv.writer(_fh)
+                _w.writerow(base_cols + extra_cols)
+                for kind, status_class, n, failed, success_pct, share_fail in combo_rows:
+                    share_all = 100.0 * n / total_all
+                    failure_pct = 100.0 - success_pct
+                    row = [
+                        kind, status_class, n, failed,
+                        f"{success_pct:.2f}", f"{failure_pct:.2f}",
+                        f"{share_all:.2f}", f"{share_fail:.2f}",
+                    ]
+                    if not _DISABLE_PERCENTILES:
+                        pr = pctile_index.get((kind, status_class), {})
+                        row += [
+                            f"{pr.get('ms_avg', 0):.2f}",
+                            f"{pr.get('ms_p50', 0):.2f}",
+                            f"{pr.get('ms_p95', 0):.2f}",
+                            f"{pr.get('ms_p99', 0):.2f}",
+                            f"{pr.get('ms_max', 0):.2f}",
+                        ]
+                    _w.writerow(row)
+            active = (
+                f"{len(_COMBO_FILTERS)} filter(s), mode={_COMBO_FILTER_MODE}"
+                if _COMBO_FILTERS else "no filters (full view)"
+            )
+            print(
+                f"Wrote filtered combos CSV → {filtered_csv_path} "
+                f"({len(combo_rows)} row(s); {active})"
+            )
+
         lines.append("")
         heading = (
             f"- Breakdown by kind × status class "
@@ -2409,6 +2469,28 @@ def main() -> int:
             print("preflight: --validation-json path must not be empty", file=sys.stderr)
             return 2
         os.environ["VALIDATION_JSON_PATH"] = validation_json_value
+
+    filtered_combos_value: str | None = None
+    for i, arg in enumerate(list(sys.argv)):
+        if arg.startswith("--filtered-combos-csv="):
+            filtered_combos_value = arg.split("=", 1)[1]
+            sys.argv.remove(arg)
+            break
+        elif arg == "--filtered-combos-csv":
+            if i + 1 >= len(sys.argv):
+                print("preflight: --filtered-combos-csv requires a value", file=sys.stderr)
+                return 2
+            filtered_combos_value = sys.argv[i + 1]
+            sys.argv.pop(i + 1)
+            sys.argv.pop(i)
+            break
+    if filtered_combos_value is not None:
+        if not filtered_combos_value.strip():
+            print("preflight: --filtered-combos-csv path must not be empty", file=sys.stderr)
+            return 2
+        os.environ["FILTERED_COMBOS_CSV_PATH"] = filtered_combos_value
+
+
 
 
     urls: list[str] = [f"{BASE}{p}" for p in CORE_PATHS]
