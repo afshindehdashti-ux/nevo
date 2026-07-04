@@ -264,6 +264,7 @@ import os, sys, time, urllib.request, urllib.error
 from pathlib import Path
 from urllib.parse import urlparse
 import html
+import json
 import zipfile as _zipfile
 
 
@@ -2149,6 +2150,22 @@ _CLIPBOARD_TOAST_MARKDOWN = (
     "})"
 )
 
+# Inline JS toast shown after copying all artifact paths as a JSON array. The
+# count is read from a data-count attribute; the actual JSON payload lives in
+# data-json.
+_CLIPBOARD_TOAST_JSON = (
+    ".then(() => { "
+    "const n = parseInt(this.dataset.count || '0', 10); "
+    "const t = document.createElement('div'); "
+    "t.textContent = 'Copied ' + n + ' artifact path' + (n === 1 ? '' : 's') + ' as JSON'; "
+    "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
+    "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
+    "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
+    "document.body.appendChild(t); "
+    "setTimeout(() => t.remove(), 2000); "
+    "})"
+)
+
 
 def export_results(results: list[dict]) -> None:
     """Write results as CSV / JSON artifacts for post-run analysis.
@@ -2643,12 +2660,25 @@ def export_results(results: list[dict]) -> None:
             )
             if all_paths:
                 all_links = "\n".join(all_paths)
+                all_items_json = [
+                    {"label": label, "path": path}
+                    for _, items in groups
+                    for label, path in items
+                ]
+                json_str = json.dumps(all_items_json)
                 fh.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links" '
                     'data-context="all artifacts" '
                     f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                     f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
+                )
+                fh.write(
+                    '<button type="button" '
+                    'aria-label="Copy all artifact paths as JSON" '
+                    f'data-count="{len(all_items_json)}" '
+                    f'onclick="navigator.clipboard.writeText(this.dataset.json){_CLIPBOARD_TOAST_JSON}.catch(() => {{}})" '
+                    f'data-json="{html.escape(json_str, quote=True)}">Copy links (JSON)</button>\n\n'
                 )
             if all_existing_paths:
                 bundle_path = os.path.join(
