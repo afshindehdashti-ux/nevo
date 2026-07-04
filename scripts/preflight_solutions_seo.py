@@ -1602,8 +1602,10 @@ def write_step_summary(results: list[dict]) -> None:
             f"(overall failure rate **{overall_fail_pct:.1f}%**)"
         )
         if _COMBO_FILTERS:
+            join_word = "OR" if _COMBO_FILTER_MODE == "any" else "AND"
             heading += (
-                f" — filters: {filter_desc} "
+                f" — filters ({join_word}-combined, mode `{_COMBO_FILTER_MODE}`): "
+                f"{filter_desc} "
                 f"(showing {len(combo_rows)} of {len(combo_rows_all)} combo(s)"
                 f"{f', {hidden} hidden' if hidden else ''}):"
             )
