@@ -323,6 +323,12 @@ def _normalize_artifact_base_url(raw: str) -> str:
 
 BASE = os.environ.get("BASE_URL", "http://127.0.0.1:8080").rstrip("/")
 ARTIFACT_BASE_URL = _normalize_artifact_base_url(os.environ.get("ARTIFACT_BASE_URL", ""))
+# Opt-in: when ARTIFACT_BASE_URL is set, include an extra `url` column in the
+# "Copy links (CSV)" export alongside the relative `path` column so downstream
+# tools get both the on-disk path and the shareable URL in one row.
+ARTIFACT_CSV_INCLUDE_URL = os.environ.get(
+    "ARTIFACT_CSV_INCLUDE_URL", ""
+).strip().lower() in ("1", "true", "yes", "on")
 
 # LOCALES / PATHS env overrides are validated against the shared matrix:
 # any value not in the shared list is dropped with a warning so we can't
