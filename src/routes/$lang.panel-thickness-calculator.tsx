@@ -858,6 +858,7 @@ function PanelThicknessPage() {
     "Inputs",
   );
   const [copied, setCopied] = useState(false);
+  const [pdfPending, setPdfPending] = useState(false);
 
   const shareQuery = useMemo(
     () => buildSharedQuery({ app, core, climate, temp, fire, thickness, extSteel, intSteel, compare }),
