@@ -132,14 +132,21 @@ Env:
                        preset name, if unique) to apply a saved preset.
 
   DISABLE_PERCENTILES  `true` to skip percentile latency calculations and the
-                       `BREAKDOWN_CSV_PATH` / `BREAKDOWN_JSON_PATH` exports. This
-                       reduces runtime and summary size when only pass/fail
-                       data matters. Same effect as passing `--disable-percentiles`
-                       on the command line.
+                        `BREAKDOWN_CSV_PATH` / `BREAKDOWN_JSON_PATH` exports. This
+                        reduces runtime and summary size when only pass/fail
+                        data matters. Same effect as passing `--disable-percentiles`
+                        on the command line.
+
+  DISABLE_HEATMAP_EXPORT  `true` to skip the `HEATMAP_CSV_PATH` / `HEATMAP_JSON_PATH`
+                        exports and the heatmap/breakdown consistency validation.
+                        Use this when heatmaps are not needed to speed up the run.
+                        Same effect as passing `--disable-heatmap-export` on the
+                        command line.
 
   CLI flags:
-    --help, -h             Print this help text and exit.
-    --disable-percentiles  Skip p50/p95/p99 latency breakdowns and exports.
+    --help, -h                Print this help text and exit.
+    --disable-percentiles     Skip p50/p95/p99 latency breakdowns and exports.
+    --disable-heatmap-export  Skip heatmap CSV/JSON export and validation.
 
 
   Output / Summary:
