@@ -3192,7 +3192,7 @@ def export_results(results: list[dict]) -> None:
                 'actions.appendChild(open); '
                 'const dl = document.createElement("button"); '
                 'dl.type = "button"; dl.textContent = "Download"; '
-                'dl.onclick = () => artifactDownload(path); '
+                'dl.onclick = () => { artifactDownload(path); showCopyToast("Downloading " + (label || path.split("/").pop() || "file")); }; '
                 'actions.appendChild(dl); '
                 'const cp = document.createElement("button"); '
                 'cp.type = "button"; cp.textContent = "Copy link"; '
