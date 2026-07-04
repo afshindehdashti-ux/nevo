@@ -2011,31 +2011,68 @@ def export_results(results: list[dict]) -> None:
         # loudly so the exported artifacts are never silently inconsistent.
         # Skipped when percentiles are disabled (breakdown is not built) or
         # when heatmap validation is explicitly disabled via env/CLI.
-        if not _DISABLE_PERCENTILES and not _DISABLE_HEATMAP_VALIDATION:
+        if not _DISABLE_PERCENTILES and (not _DISABLE_HEATMAP_VALIDATION or validation_json):
             breakdown_by_combo = {
                 (r["error_kind"], r["status_class"]): r["count"]
                 for r in _build_breakdown_rows(results)
             }
             heatmap_by_combo = {k: sum(v) for k, v in grid.items()}
             mismatches: list[str] = []
-            for combo, hcount in heatmap_by_combo.items():
+            combo_report: list[dict] = []
+            all_combos = set(heatmap_by_combo) | set(breakdown_by_combo)
+            for combo in sorted(all_combos):
+                hcount = heatmap_by_combo.get(combo)
                 bcount = breakdown_by_combo.get(combo)
-                if bcount is None:
+                if hcount is None:
+                    status = "missing_in_heatmap"
+                    mismatches.append(
+                        f"{combo[0]}×{combo[1]}: heatmap=<missing>, breakdown={bcount}")
+                elif bcount is None:
+                    status = "missing_in_breakdown"
                     mismatches.append(
                         f"{combo[0]}×{combo[1]}: heatmap={hcount}, breakdown=<missing>")
                 elif bcount != hcount:
+                    status = "mismatch"
                     mismatches.append(
                         f"{combo[0]}×{combo[1]}: heatmap={hcount}, breakdown={bcount}")
-            for combo in breakdown_by_combo.keys() - heatmap_by_combo.keys():
-                mismatches.append(
-                    f"{combo[0]}×{combo[1]}: heatmap=<missing>, breakdown={breakdown_by_combo[combo]}")
-            if mismatches:
-                msg = ("preflight: heatmap/breakdown totals mismatch:\n  "
-                       + "\n  ".join(mismatches))
-                print(msg, file=sys.stderr)
-                raise AssertionError(msg)
-            print(f"Heatmap validation OK: {len(heatmap_by_combo)} combo(s) "
-                  f"match breakdown totals ({sum(heatmap_by_combo.values())} row(s))")
+                else:
+                    status = "ok"
+                combo_report.append({
+                    "error_kind": combo[0],
+                    "status_class": combo[1],
+                    "expected": bcount,
+                    "actual": hcount,
+                    "delta": (None if hcount is None or bcount is None
+                              else hcount - bcount),
+                    "status": status,
+                })
+
+            if validation_json:
+                from datetime import datetime, timezone
+                payload = {
+                    "ok": not mismatches,
+                    "generated_at": datetime.now(timezone.utc).isoformat(),
+                    "total_combos": len(combo_report),
+                    "mismatch_count": len(mismatches),
+                    "combos": combo_report,
+                }
+                os.makedirs(os.path.dirname(validation_json) or ".", exist_ok=True)
+                with open(validation_json, "w", encoding="utf-8") as fh:
+                    json.dump(payload, fh, ensure_ascii=False, indent=2, default=str)
+                print(f"Wrote validation JSON → {validation_json} "
+                      f"({len(combo_report)} combo(s), {len(mismatches)} mismatch(es))")
+
+            if not _DISABLE_HEATMAP_VALIDATION:
+                if mismatches:
+                    msg = ("preflight: heatmap/breakdown totals mismatch:\n  "
+                           + "\n  ".join(mismatches))
+                    print(msg, file=sys.stderr)
+                    raise AssertionError(msg)
+                print(f"Heatmap validation OK: {len(heatmap_by_combo)} combo(s) "
+                      f"match breakdown totals ({sum(heatmap_by_combo.values())} row(s))")
+        elif validation_json:
+            print("preflight: VALIDATION_JSON_PATH set but breakdown is disabled "
+                  "(DISABLE_PERCENTILES); skipping validation JSON")
         if heatmap_csv:
             os.makedirs(os.path.dirname(heatmap_csv) or ".", exist_ok=True)
             with open(heatmap_csv, "w", encoding="utf-8", newline="") as fh:
