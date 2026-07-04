@@ -950,6 +950,78 @@ def _resolve_rate_bar_mode() -> str:
     return v
 _RATE_BAR_MODE = _resolve_rate_bar_mode()
 
+# Combo-table quick filters. Grammar (predicates AND-combined):
+#   <metric><op><value>   metric ∈ {success, failure}
+#                         op     ∈ {>=, <=, >, <, =, ==}
+#                         value  ∈ [0, 100]
+# Predicates come from env `COMBO_FILTERS` (";"- or ","-separated) and
+# repeated CLI `--combo-filter=...` flags; both sources merge. Example:
+#   COMBO_FILTERS="success>=80;failure<=20"  → only combos with
+#   success ≥ 80% AND failure ≤ 20%. An empty spec means "no filter".
+_COMBO_FILTER_OPS = {
+    ">=": lambda a, b: a >= b,
+    "<=": lambda a, b: a <= b,
+    ">":  lambda a, b: a >  b,
+    "<":  lambda a, b: a <  b,
+    "==": lambda a, b: abs(a - b) < 1e-9,
+    "=":  lambda a, b: abs(a - b) < 1e-9,
+}
+def _parse_combo_filters() -> list[tuple[str, str, float, str]]:
+    """Return list of (metric, op, value, raw) predicates. Invalid entries
+    are warned to stderr and skipped so a typo never silently hides rows."""
+    raw_specs: list[str] = []
+    env = (os.environ.get("COMBO_FILTERS") or "").strip()
+    if env:
+        raw_specs += [p for p in env.replace(",", ";").split(";") if p.strip()]
+    for arg in sys.argv[1:]:
+        if arg.startswith("--combo-filter="):
+            raw_specs.append(arg.split("=", 1)[1])
+    parsed: list[tuple[str, str, float, str]] = []
+    for spec in raw_specs:
+        s = spec.strip().lower().replace(" ", "")
+        if not s:
+            continue
+        op_found = None
+        # Longest op first so ">=" is not shadowed by ">".
+        for op in (">=", "<=", "==", ">", "<", "="):
+            idx = s.find(op)
+            if idx > 0:
+                op_found = (op, idx)
+                break
+        if not op_found:
+            print(f"preflight: warning: ignoring COMBO filter {spec!r} (no operator)", file=sys.stderr)
+            continue
+        op, idx = op_found
+        metric = s[:idx]
+        val_s = s[idx + len(op):]
+        if metric not in {"success", "failure"}:
+            print(f"preflight: warning: ignoring COMBO filter {spec!r} "
+                  f"(metric must be success|failure, got {metric!r})", file=sys.stderr)
+            continue
+        try:
+            val = float(val_s.rstrip("%"))
+        except ValueError:
+            print(f"preflight: warning: ignoring COMBO filter {spec!r} "
+                  f"(value {val_s!r} is not numeric)", file=sys.stderr)
+            continue
+        if not (0.0 <= val <= 100.0):
+            print(f"preflight: warning: ignoring COMBO filter {spec!r} "
+                  f"(value must be in [0, 100])", file=sys.stderr)
+            continue
+        parsed.append((metric, op, val, spec.strip()))
+    return parsed
+_COMBO_FILTERS = _parse_combo_filters()
+
+def _combo_row_matches_filters(success_pct: float) -> bool:
+    """AND-combine every configured predicate. Empty filter list = keep all."""
+    failure_pct = 100.0 - success_pct
+    for metric, op, val, _raw in _COMBO_FILTERS:
+        actual = success_pct if metric == "success" else failure_pct
+        if not _COMBO_FILTER_OPS[op](actual, val):
+            return False
+    return True
+
+
 
 def _bucket_for(ms: float) -> int:
     for i, (_, hi) in enumerate(_LATENCY_BUCKETS):
