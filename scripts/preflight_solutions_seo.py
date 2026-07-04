@@ -3068,13 +3068,24 @@ def export_results(results: list[dict]) -> None:
                         f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.markdownUrl ? this.dataset.markdownUrl : this.dataset.markdown){_CLIPBOARD_TOAST_MARKDOWN}" '
                         f'data-markdown="{html.escape(markdown_links, quote=True)}"{markdown_url_data_attr}>Copy as Markdown</button>\n\n'
                     )
-                for label, path in items:
+                for item_pos, (label, path) in enumerate(items):
                     file_type = os.path.splitext(path)[1].lower() or "none"
                     url = _artifact_url(path)
                     url_attr = f' data-url="{html.escape(url, quote=True)}"' if url else ""
                     exists = os.path.exists(path)
                     if not exists:
                         missing_artifacts.append((label, path))
+                    filename = os.path.basename(path)
+                    try:
+                        item_mtime = int(os.path.getmtime(path)) if exists else 0
+                    except OSError:
+                        item_mtime = 0
+                    sort_attrs = (
+                        f' data-filename="{html.escape(filename, quote=True)}"'
+                        f' data-mtime="{item_mtime}"'
+                        f' data-group-name="{html.escape(aria_title, quote=True)}"'
+                        f' data-original-index="{group_index}-{item_pos:06d}"'
+                    )
                     if is_heatmap_group:
                         if exists:
                             try:
@@ -3093,7 +3104,7 @@ def export_results(results: list[dict]) -> None:
                                 f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
-                                f'data-existing="true"{url_attr}>\n'
+                                f'data-existing="true"{url_attr}{sort_attrs}>\n'
                                 f'<label class="artifact-select-label" aria-label="Select {html.escape(label, quote=True)}">'
                                 f'<input type="checkbox" class="artifact-select"> </label>'
                                 f'<a href="{html.escape(path, quote=True)}" target="_blank" rel="noopener noreferrer">'
@@ -3117,7 +3128,7 @@ def export_results(results: list[dict]) -> None:
                                 f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
-                                f'data-existing="false">\n'
+                                f'data-existing="false"{sort_attrs}>\n'
                                 f"⚠️ <code>{html.escape(label)}</code> (missing) — expected at "
                                 f"<code>{html.escape(path)}</code>\n"
                                 "</div>\n"
@@ -3130,7 +3141,7 @@ def export_results(results: list[dict]) -> None:
                                 f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
-                                f'data-existing="true"{url_attr}>\n'
+                                f'data-existing="true"{url_attr}{sort_attrs}>\n'
                                 f'<label class="artifact-select-label" aria-label="Select {html.escape(label, quote=True)}">'
                                 f'<input type="checkbox" class="artifact-select"> </label>'
                                 f'<a href="{html.escape(path, quote=True)}" target="_blank" rel="noopener noreferrer">'
@@ -3154,9 +3165,10 @@ def export_results(results: list[dict]) -> None:
                                 f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
-                                f'data-existing="false">\n'
+                                f'data-existing="false"{sort_attrs}>\n'
                                 f"⚠️ <code>{html.escape(label)}</code> (missing) — expected at "
                                 f"<code>{html.escape(path)}</code>\n"
+
                                 "</div>\n"
                             )
                 fh.write("</div>\n")
