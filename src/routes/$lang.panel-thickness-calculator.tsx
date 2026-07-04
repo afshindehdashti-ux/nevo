@@ -1069,7 +1069,21 @@ function PanelThicknessPage() {
     doc.text("NEVO Engineering · Panel Thickness Calculator", marginX, pageH - 24);
     doc.text("nevo.engineering", pageW - marginX, pageH - 24, { align: "right" });
 
-    doc.save(`nevo-panel-thickness-${app.replace(/\s+/g, "-")}-${core.replace(/\s+/g, "-")}-${thickness}mm.pdf`);
+      const filename = `nevo-panel-thickness-${app.replace(/\s+/g, "-")}-${core.replace(/\s+/g, "-")}-${thickness}mm.pdf`;
+      doc.save(filename);
+      toast.success("PDF report downloaded", {
+        id: toastId,
+        description: filename,
+      });
+    } catch (err) {
+      console.error("PDF generation failed", err);
+      toast.error("PDF download failed", {
+        id: toastId,
+        description: "Please try again or contact support if the issue persists.",
+      });
+    } finally {
+      setPdfPending(false);
+    }
   }
 
   const inquiryParams = new URLSearchParams({
