@@ -1677,6 +1677,32 @@ def write_step_summary(results: list[dict]) -> None:
         else:
             heading += ":"
         lines.append(heading)
+
+        # Aggregated rollup over ONLY the visible (post-filter) combo rows so
+        # readers can see the success/failure rate of the subset they're
+        # actually looking at — the heading's overall_fail_pct is anchored to
+        # the full run and does not change when filters narrow the table.
+        visible_count = sum(r[2] for r in combo_rows)
+        visible_failed = sum(r[3] for r in combo_rows)
+        visible_ok = visible_count - visible_failed
+        if visible_count > 0:
+            vis_success_pct = 100.0 * visible_ok / visible_count
+            vis_failure_pct = 100.0 - vis_success_pct
+        else:
+            vis_success_pct = 0.0
+            vis_failure_pct = 0.0
+        scope_note = (
+            f"{len(combo_rows)} of {len(combo_rows_all)} combo(s) visible"
+            if _COMBO_FILTERS else
+            f"all {len(combo_rows_all)} combo(s)"
+        )
+        lines.append(
+            f"  - _Visible rollup ({scope_note}): "
+            f"**{visible_count}** row(s), **{visible_ok}** ok / "
+            f"**{visible_failed}** failed — "
+            f"success **{vis_success_pct:.1f}%**, "
+            f"failure **{vis_failure_pct:.1f}%**._"
+        )
         # Inline sparkline width (chars) for the success/failure bar column.
         # 10 keeps each 10% ≈ 1 block so a reader can eyeball the split at
         # a glance without the column dominating the table.
