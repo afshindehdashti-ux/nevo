@@ -1423,13 +1423,35 @@ def write_step_summary(results: list[dict]) -> None:
             }
         total_all = max(len(display), 1)
         total_fail = max(sum(combo.values()), 1)
-        combo_rows = _sort_combo_rows(combo_all, combo, total_all, total_fail)
+        combo_rows_all = _sort_combo_rows(combo_all, combo, total_all, total_fail)
+        # Quick filters: keep only combos whose success/failure rate matches
+        # every configured predicate (see _parse_combo_filters). Applied here
+        # rather than at aggregation time so overall_fail_pct and totals stay
+        # anchored to the full run — the filter only hides table rows.
+        if _COMBO_FILTERS:
+            combo_rows = [r for r in combo_rows_all
+                          if _combo_row_matches_filters(r[4])]
+            hidden = len(combo_rows_all) - len(combo_rows)
+            filter_desc = ", ".join(f"`{raw}`" for _, _, _, raw in _COMBO_FILTERS)
+        else:
+            combo_rows = combo_rows_all
+            hidden = 0
+            filter_desc = ""
         overall_fail_pct = 100.0 * sum(combo.values()) / total_all
         lines.append("")
-        lines.append(
+        heading = (
             f"- Breakdown by kind × status class "
-            f"(overall failure rate **{overall_fail_pct:.1f}%**):"
+            f"(overall failure rate **{overall_fail_pct:.1f}%**)"
         )
+        if _COMBO_FILTERS:
+            heading += (
+                f" — filters: {filter_desc} "
+                f"(showing {len(combo_rows)} of {len(combo_rows_all)} combo(s)"
+                f"{f', {hidden} hidden' if hidden else ''}):"
+            )
+        else:
+            heading += ":"
+        lines.append(heading)
         # Inline sparkline width (chars) for the success/failure bar column.
         # 10 keeps each 10% ≈ 1 block so a reader can eyeball the split at
         # a glance without the column dominating the table.
