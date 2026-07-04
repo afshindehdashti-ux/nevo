@@ -2935,6 +2935,7 @@ def export_results(results: list[dict]) -> None:
                 'const container = document.querySelector(".artifact-index"); '
                 'const visible = Array.from(container.querySelectorAll(".artifact-item")).filter(el => el.style.display !== "none"); '
                 'const paths = visible.map(el => useUrl && el.dataset.url ? el.dataset.url : el.dataset.path).filter(Boolean); '
+                'if (paths.length === 0) { showCopyToast("No visible artifact links — adjust filters or select items"); return; } '
                 'navigator.clipboard.writeText(paths.join("\\n")).then(() => { '
                 'showCopyToast("Copied " + paths.length + " link" + (paths.length === 1 ? "" : "s")); '
                 '}).catch(() => { showCopyToast("Could not copy — check clipboard permissions"); }); '
