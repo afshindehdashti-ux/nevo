@@ -181,7 +181,15 @@ async def _run(html_path: Path) -> None:
         csv_payload = await page.evaluate(
             r"""async () => {
               const btn = document.querySelector("button[aria-label='Copy all artifact links as CSV']");
-              const tricky = 'label,path\r\n"weird, name","path with ""quotes"""\r\n"multi\nline",x\r\n';
+              const q = String.fromCharCode(34);   // "
+              const cr = String.fromCharCode(13);  // \r
+              const lf = String.fromCharCode(10);  // \n
+              const nl = cr + lf;
+              // label,path\r\n"weird, name","path with ""quotes"""\r\n"multi\nline",x\r\n
+              const tricky =
+                "label,path" + nl +
+                q + "weird, name" + q + "," + q + "path with " + q+q + "quotes" + q+q + q + nl +
+                q + "multi" + lf + "line" + q + ",x" + nl;
               btn.dataset.csv = tricky;
               await navigator.clipboard.writeText('');
               btn.click();
