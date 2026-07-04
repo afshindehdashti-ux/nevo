@@ -2493,10 +2493,14 @@ def export_results(results: list[dict]) -> None:
                 f"\n### Artifacts index ({total_files} file"
                 f"{'s' if total_files != 1 else ''})\n\n"
             )
-            all_existing_paths = [
+            all_paths = [
                 path
                 for _, items in groups
                 for _, path in items
+            ]
+            all_existing_paths = [
+                path
+                for path in all_paths
                 if os.path.exists(path)
             ]
             fh.write(
@@ -2584,14 +2588,15 @@ def export_results(results: list[dict]) -> None:
                 '}'
                 '</script>\n\n'
             )
-            if all_existing_paths:
-                all_links = "\n".join(all_existing_paths)
+            if all_paths:
+                all_links = "\n".join(all_paths)
                 fh.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links" '
                     f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                     f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
                 )
+            if all_existing_paths:
                 import zipfile as _zipfile
                 bundle_path = os.path.join(
                     os.path.dirname(summary_path) or ".",
