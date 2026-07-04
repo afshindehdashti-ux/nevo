@@ -266,6 +266,8 @@ without needing to open the job log.
 from __future__ import annotations
 from __future__ import annotations
 import io, os, sys, time, urllib.request, urllib.error
+import hashlib
+
 from pathlib import Path
 from urllib.parse import urlparse
 import html
