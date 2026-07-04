@@ -481,6 +481,48 @@ function CareersPage() {
               </div>
             )}
 
+            {uploadError && !busy && (
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="mt-2 rounded-xl border border-destructive/40 bg-destructive/5 p-5"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-destructive/15 text-destructive">
+                    <Upload className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-destructive">{uploadError.title}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">{uploadError.description}</div>
+                    {uploadError.detail && (
+                      <div className="mt-2 rounded-md border border-destructive/20 bg-background/60 px-3 py-2 font-mono text-[11px] text-muted-foreground">
+                        {uploadError.detail}
+                      </div>
+                    )}
+                    <div className="mt-1 text-[11px] text-muted-foreground">
+                      Failed at {uploadError.at.toLocaleTimeString()} · Attempt {uploadError.attempt}
+                      {cvName && ` · File still attached: ${cvName}`}
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button type="button" size="sm" onClick={handleRetryUpload} disabled={busy}>
+                        <ArrowRight className="mr-2 h-4 w-4" /> Retry upload
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={handleDismissUploadError}
+                      >
+                        Dismiss
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+
+
 
             {confirmation && (
               <div className="mt-2 rounded-xl border border-emerald-500/40 bg-emerald-500/5 p-5">
