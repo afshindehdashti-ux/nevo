@@ -1470,6 +1470,12 @@ def write_step_summary(results: list[dict]) -> None:
         f"- Retry kinds: `{','.join(sorted(RETRYABLE_ERROR_KINDS)) or 'none'}` "
         f"(status classes/codes: `{','.join(sorted(RETRYABLE_STATUS_CLASSES)) or 'none'}`)",
     ]
+    if _FILTERS_RESET:
+        lines.append(
+            "- 🔄 Filters reset: quick combo filters and summary filter cleared "
+            "(via `--reset-filters` / `RESET_FILTERS=true`) — showing the full "
+            f"unfiltered table ({total} row(s))."
+        )
     if filter_scope != "all":
         preset_note = f" _(preset `{active_preset}`)_" if active_preset else ""
         lines.append(f"- Summary filter: `{filter_scope}`{preset_note} "
