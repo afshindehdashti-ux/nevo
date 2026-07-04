@@ -2459,6 +2459,28 @@ def main() -> int:
             return 2
         os.environ["VALIDATION_JSON_PATH"] = validation_json_value
 
+    filtered_combos_value: str | None = None
+    for i, arg in enumerate(list(sys.argv)):
+        if arg.startswith("--filtered-combos-csv="):
+            filtered_combos_value = arg.split("=", 1)[1]
+            sys.argv.remove(arg)
+            break
+        elif arg == "--filtered-combos-csv":
+            if i + 1 >= len(sys.argv):
+                print("preflight: --filtered-combos-csv requires a value", file=sys.stderr)
+                return 2
+            filtered_combos_value = sys.argv[i + 1]
+            sys.argv.pop(i + 1)
+            sys.argv.pop(i)
+            break
+    if filtered_combos_value is not None:
+        if not filtered_combos_value.strip():
+            print("preflight: --filtered-combos-csv path must not be empty", file=sys.stderr)
+            return 2
+        os.environ["FILTERED_COMBOS_CSV_PATH"] = filtered_combos_value
+
+
+
 
     urls: list[str] = [f"{BASE}{p}" for p in CORE_PATHS]
     for locale in LOCALES:
