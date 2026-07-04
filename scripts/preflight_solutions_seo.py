@@ -2224,6 +2224,27 @@ def main() -> int:
             )
             return 2
 
+    validation_json_value: str | None = None
+    for i, arg in enumerate(list(sys.argv)):
+        if arg.startswith("--validation-json="):
+            validation_json_value = arg.split("=", 1)[1]
+            sys.argv.remove(arg)
+            break
+        elif arg == "--validation-json":
+            if i + 1 >= len(sys.argv):
+                print("preflight: --validation-json requires a value", file=sys.stderr)
+                return 2
+            validation_json_value = sys.argv[i + 1]
+            sys.argv.pop(i + 1)
+            sys.argv.pop(i)
+            break
+    if validation_json_value is not None:
+        if not validation_json_value.strip():
+            print("preflight: --validation-json path must not be empty", file=sys.stderr)
+            return 2
+        os.environ["VALIDATION_JSON_PATH"] = validation_json_value
+
+
     urls: list[str] = [f"{BASE}{p}" for p in CORE_PATHS]
     for locale in LOCALES:
         for path in LOCALIZED_PATHS:
