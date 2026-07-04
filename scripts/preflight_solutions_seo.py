@@ -1725,25 +1725,29 @@ def export_results(results: list[dict]) -> None:
 
     # Breakdown artifacts are always derived from the FULL result set so the
     # aggregate totals remain meaningful even when RESULTS_INCLUDE narrows
-    # the per-URL export to a subset.
+    # the per-URL export to a subset. Skipped entirely when percentiles are
+    # disabled, because the breakdown's primary value is the p50/p95/p99 data.
     breakdown_written: list[str] = []
     if bd_csv or bd_json:
-        breakdown = _build_breakdown_rows(results)
-        if bd_csv:
-            os.makedirs(os.path.dirname(bd_csv) or ".", exist_ok=True)
-            with open(bd_csv, "w", encoding="utf-8", newline="") as fh:
-                writer = csv.DictWriter(fh, fieldnames=_BREAKDOWN_COLUMNS)
-                writer.writeheader()
-                for r in breakdown:
-                    writer.writerow(r)
-            breakdown_written.append(bd_csv)
-            print(f"Wrote breakdown CSV → {bd_csv} ({len(breakdown)} row(s))")
-        if bd_json:
-            os.makedirs(os.path.dirname(bd_json) or ".", exist_ok=True)
-            with open(bd_json, "w", encoding="utf-8") as fh:
-                json.dump(breakdown, fh, ensure_ascii=False, indent=2, default=str)
-            breakdown_written.append(bd_json)
-            print(f"Wrote breakdown JSON → {bd_json} ({len(breakdown)} row(s))")
+        if _DISABLE_PERCENTILES:
+            print("preflight: breakdown export skipped because DISABLE_PERCENTILES is set")
+        else:
+            breakdown = _build_breakdown_rows(results)
+            if bd_csv:
+                os.makedirs(os.path.dirname(bd_csv) or ".", exist_ok=True)
+                with open(bd_csv, "w", encoding="utf-8", newline="") as fh:
+                    writer = csv.DictWriter(fh, fieldnames=_BREAKDOWN_COLUMNS)
+                    writer.writeheader()
+                    for r in breakdown:
+                        writer.writerow(r)
+                breakdown_written.append(bd_csv)
+                print(f"Wrote breakdown CSV → {bd_csv} ({len(breakdown)} row(s))")
+            if bd_json:
+                os.makedirs(os.path.dirname(bd_json) or ".", exist_ok=True)
+                with open(bd_json, "w", encoding="utf-8") as fh:
+                    json.dump(breakdown, fh, ensure_ascii=False, indent=2, default=str)
+                breakdown_written.append(bd_json)
+                print(f"Wrote breakdown JSON → {bd_json} ({len(breakdown)} row(s))")
 
     # Heatmap CSV: one row per (error_kind, status_class), one column per
     # latency bucket, plus a `total` column. Always derived from the FULL
