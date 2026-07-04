@@ -20,9 +20,9 @@ type PerLocale = Record<LocaleCode, LocalizedMeta>;
 export const SEO_META: Record<string, PerLocale> = {
   "/": {
     en: {
-      title: "NEVO Industrial — Sandwich Panel Engineering & Factory Development",
+      title: "NEVO Industrial — Sandwich Panel Engineering & Supply",
       description:
-        "Dubai-based industrial engineering group: turnkey sandwich panel factories, PIR/PUR production lines, raw materials and consultancy for global manufacturers.",
+        "Dubai-based engineering group: turnkey sandwich panel factories, PIR/PUR production lines and raw materials for global manufacturers.",
     },
     ar: {
       title: "نيفو الصناعية — هندسة ألواح الساندويتش وتطوير المصانع",

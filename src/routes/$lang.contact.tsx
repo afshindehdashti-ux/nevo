@@ -267,10 +267,77 @@ function ContactPage() {
   );
 }
 
+// LocalBusiness JSON-LD — one node per operating NEVO office so search
+// engines can surface each location individually in local results.
+const OFFICE_SCHEMAS = [
+  {
+    name: "NEVO Industrial — Dubai (Global HQ)",
+    email: "solutions@nevoindustrial.com",
+    telephone: SITE.contact.phone,
+    address: {
+      streetAddress: "Business Bay",
+      addressLocality: "Dubai",
+      addressCountry: "AE",
+    },
+    openingHours: "Su-Th 08:30-18:00",
+    areaServed: ["AE", "GCC", "MENA"],
+  },
+  {
+    name: "NEVO Industrial — Düsseldorf (European Engineering Hub)",
+    email: "europe@nevoindustrial.com",
+    address: {
+      streetAddress: "Königsallee",
+      addressLocality: "Düsseldorf",
+      addressCountry: "DE",
+    },
+    openingHours: "Mo-Fr 09:00-18:00",
+    areaServed: ["DE", "EU"],
+  },
+  {
+    name: "NEVO Industrial — Istanbul (Manufacturing & Sourcing)",
+    email: "turkey@nevoindustrial.com",
+    address: {
+      streetAddress: "Levent",
+      addressLocality: "Istanbul",
+      addressCountry: "TR",
+    },
+    openingHours: "Mo-Fr 09:00-18:00",
+    areaServed: ["TR"],
+  },
+  {
+    name: "NEVO Industrial — Muscat (GCC Projects Office)",
+    email: "oman@nevoindustrial.com",
+    address: {
+      streetAddress: "Al Khuwair",
+      addressLocality: "Muscat",
+      addressCountry: "OM",
+    },
+    openingHours: "Su-Th 08:30-17:30",
+    areaServed: ["OM", "GCC"],
+  },
+] as const;
+
+const contactScripts = OFFICE_SCHEMAS.map((o) => ({
+  type: "application/ld+json",
+  children: JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: o.name,
+    parentOrganization: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    url: `${SITE.url}/contact`,
+    email: o.email,
+    ...("telephone" in o && o.telephone ? { telephone: o.telephone } : {}),
+    address: { "@type": "PostalAddress", ...o.address },
+    openingHours: o.openingHours,
+    areaServed: o.areaServed,
+  }),
+}));
+
 export const Route = createFileRoute("/$lang/contact")({
   head: ({ params }) => {
     const { title, description } = localizedMeta(URL_PATH, params.lang);
-    return buildSeo({ title, description, path: URL_PATH, lang: params.lang });
+    const seo = buildSeo({ title, description, path: URL_PATH, lang: params.lang });
+    return { ...seo, scripts: contactScripts };
   },
   component: ContactPage,
 });

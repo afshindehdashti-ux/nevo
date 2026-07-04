@@ -58,4 +58,4 @@ Allow: /
 User-agent: cohere-ai
 Allow: /
 
-# Sitemap directive is intentionally omitted until a production domain is set.
+Sitemap: https://nevoindustrial.com/sitemap.xml
