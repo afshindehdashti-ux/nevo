@@ -2586,7 +2586,7 @@ def export_results(results: list[dict]) -> None:
                 '">\n\n'
             )
             missing_artifacts: list[tuple[str, str]] = []
-            for title, items in groups:
+            for group_index, (title, items) in enumerate(groups):
                 is_heatmap_group = "Latency heatmap" in title
                 group_count = 0
                 group_size = 0
@@ -2598,8 +2598,13 @@ def export_results(results: list[dict]) -> None:
                         except OSError:
                             pass
                 group_size_str = _human_size(group_size)
+                aria_title = title.replace("**", "").replace("_", "")
                 fh.write(
-                    f'<div class="artifact-group">\n'
+                    f'<div class="artifact-group" '
+                    f'data-index="{group_index}" '
+                    f'data-name="{html.escape(aria_title, quote=True)}" '
+                    f'data-count="{group_count}" '
+                    f'data-size="{group_size}">\n'
                     f'<p><em>{title}</em> — '
                     f'<strong>{group_count} file{"s" if group_count != 1 else ""}</strong>, '
                     f'<strong>{group_size_str}</strong></p>\n\n'
