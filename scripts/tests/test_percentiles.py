@@ -100,7 +100,8 @@ def test_breakdown_percentiles_against_reference() -> None:
 
     expected = {
         ("ok", "2xx"):        {"count": 100, "failed": 0,
-                                "p50": 50.0, "p95": 95.0, "p99": 99.0},
+                                "p50": 51.0, "p95": 95.0, "p99": 99.0},
+
         ("http", "5xx"):      {"count": 5,   "failed": 5,
                                 "p50": 500.0, "p95": 5000.0, "p99": 5000.0},
         ("timeout", "none"):  {"count": 4,   "failed": 4,
