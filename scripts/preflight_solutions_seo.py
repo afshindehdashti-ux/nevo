@@ -3054,6 +3054,8 @@ def export_results(results: list[dict]) -> None:
                 '} else if (format === "json") { '
                 'payload = JSON.stringify(rows, null, 2); '
                 '} else if (format === "csv") { '
+                'const delimSel = document.getElementById("artifact-csv-delimiter"); '
+                'const delim = (delimSel && delimSel.value === ";") ? ";" : ","; '
                 'const esc = v => { const s = String(v == null ? "" : v); return /[",\\n\\r]/.test(s) ? "\\"" + s.replace(/"/g, "\\"\\"") + "\\"" : s; }; '
                 'payload = "label" + delim + "path\\r\\n" + rows.map(r => esc(r.label) + delim + esc(r.path)).join("\\r\\n") + "\\r\\n"; '
                 '} else { return; } '
