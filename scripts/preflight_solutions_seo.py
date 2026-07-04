@@ -265,6 +265,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 import html
 import json
+import csv
 import zipfile as _zipfile
 
 
@@ -2606,6 +2607,15 @@ def export_results(results: list[dict]) -> None:
                 f'{type_filter_options}'
                 '</select></p>\n\n'
                 '<script>'
+                'function artifactDownload(href) { '
+                'const a = document.createElement("a"); '
+                'a.href = href; '
+                'a.download = href; '
+                'a.style.display = "none"; '
+                'document.body.appendChild(a); '
+                'a.click(); '
+                'a.remove(); '
+                '} '
                 'function sortArtifactGroups() { '
                 'const key = document.getElementById("artifact-sort").value; '
                 'const dirBtn = document.getElementById("artifact-sort-dir"); '
@@ -2680,9 +2690,10 @@ def export_results(results: list[dict]) -> None:
                     f'onclick="navigator.clipboard.writeText(this.dataset.json){_CLIPBOARD_TOAST_JSON}.catch(() => {{}})" '
                     f'data-json="{html.escape(json_str, quote=True)}">Copy links (JSON)</button>\n\n'
                 )
+            summary_dir = os.path.dirname(summary_path) or "."
             if all_existing_paths:
                 bundle_path = os.path.join(
-                    os.path.dirname(summary_path) or ".",
+                    summary_dir,
                     "artifacts_bundle.zip",
                 )
                 try:
@@ -2709,17 +2720,76 @@ def export_results(results: list[dict]) -> None:
                         '<button type="button" '
                         f'aria-label="Download all available artifacts as a zip archive" '
                         f'data-href="{bundle_href}" '
-                        f'data-download="{bundle_href}" '
-                        'onclick="const a = document.createElement(\'a\'); '
-                        'a.href = this.dataset.href; '
-                        'a.download = this.dataset.download; '
-                        'a.style.display = \'none\'; '
-                        'document.body.appendChild(a); '
-                        'a.click(); '
-                        'a.remove();">'
+                        f'onclick="artifactDownload(this.dataset.href)">'
                         f'Download all ({total_existing_count} '
                         f'file{"s" if total_existing_count != 1 else ""}, '
                         f'{bundle_size_str} zip)</button>\n\n'
+                    )
+                except OSError:
+                    pass
+                manifest_rows = []
+                for title, items in groups:
+                    for label, path in items:
+                        if not os.path.exists(path):
+                            continue
+                        try:
+                            size = os.path.getsize(path)
+                            mtime = os.path.getmtime(path)
+                        except OSError:
+                            size = 0
+                            mtime = 0
+                        manifest_rows.append(
+                            {
+                                "group": title,
+                                "filename": os.path.basename(path),
+                                "size": size,
+                                "mtime": time.strftime(
+                                    "%Y-%m-%d %H:%M:%S", time.localtime(mtime)
+                                ) if mtime else "",
+                            }
+                        )
+                try:
+                    csv_manifest_path = os.path.join(
+                        summary_dir, "artifacts_manifest.csv"
+                    )
+                    with open(
+                        csv_manifest_path, "w", newline="", encoding="utf-8"
+                    ) as f:
+                        writer = csv.writer(f)
+                        writer.writerow(["group", "filename", "size", "mtime"])
+                        for row in manifest_rows:
+                            writer.writerow(
+                                [
+                                    row["group"],
+                                    row["filename"],
+                                    row["size"],
+                                    row["mtime"],
+                                ]
+                            )
+                    json_manifest_path = os.path.join(
+                        summary_dir, "artifacts_manifest.json"
+                    )
+                    with open(json_manifest_path, "w", encoding="utf-8") as f:
+                        json.dump(manifest_rows, f, indent=2)
+                    csv_href = html.escape(
+                        os.path.basename(csv_manifest_path), quote=True
+                    )
+                    json_href = html.escape(
+                        os.path.basename(json_manifest_path), quote=True
+                    )
+                    fh.write(
+                        '<button type="button" '
+                        f'aria-label="Download artifact manifest as CSV" '
+                        f'data-href="{csv_href}" '
+                        'onclick="artifactDownload(this.dataset.href)">'
+                        'Export manifest CSV</button> '
+                    )
+                    fh.write(
+                        '<button type="button" '
+                        f'aria-label="Download artifact manifest as JSON" '
+                        f'data-href="{json_href}" '
+                        'onclick="artifactDownload(this.dataset.href)">'
+                        'Export manifest JSON</button>\n\n'
                     )
                 except OSError:
                     pass
@@ -2728,7 +2798,6 @@ def export_results(results: list[dict]) -> None:
                 'placeholder="Search artifacts by name or path..." '
                 'oninput="filterArtifactItems()">\n\n'
             )
-            summary_dir = os.path.dirname(summary_path) or "."
             missing_artifacts: list[tuple[str, str]] = []
             for group_index, (title, items) in enumerate(groups):
                 is_heatmap_group = "Latency heatmap" in title
