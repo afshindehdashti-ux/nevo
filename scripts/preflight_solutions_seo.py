@@ -2503,7 +2503,8 @@ def export_results(results: list[dict]) -> None:
                 '<div class="artifact-index">\n'
                 '<style>'
                 '.artifact-index button:focus-visible, '
-                '.artifact-index input:focus-visible { '
+                '.artifact-index input:focus-visible, '
+                '.artifact-index select:focus-visible { '
                 'outline: 2px solid #3b82f6; outline-offset: 2px; '
                 '}'
                 '</style>\n\n'
@@ -2517,6 +2518,46 @@ def export_results(results: list[dict]) -> None:
                 f'<p><strong>{total_existing_count} file'
                 f'{"s" if total_existing_count != 1 else ""}</strong>, '
                 f'<strong>{total_size_str}</strong> total</p>\n\n'
+                '<p><label for="artifact-sort">Sort by:</label> '
+                '<select id="artifact-sort" class="artifact-sort" '
+                'onchange="sortArtifactGroups()">'
+                '<option value="original">Original order</option>'
+                '<option value="name">Name</option>'
+                '<option value="count">File count</option>'
+                '<option value="size">Total size</option>'
+                '</select> '
+                '<button type="button" id="artifact-sort-dir" '
+                'class="artifact-sort-dir" onclick="toggleSortDirection()" '
+                'aria-label="Toggle sort direction">Asc</button></p>\n\n'
+                '<script>'
+                'function sortArtifactGroups() { '
+                'const key = document.getElementById("artifact-sort").value; '
+                'const dirBtn = document.getElementById("artifact-sort-dir"); '
+                'const dir = dirBtn.dataset.dir || "asc"; '
+                'const container = document.querySelector(".artifact-index"); '
+                'const groups = Array.from(container.querySelectorAll(".artifact-group")); '
+                'if (key === "original") { '
+                'groups.sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index)); '
+                '} else { '
+                'groups.sort((a, b) => { '
+                'let cmp = 0; '
+                'if (key === "name") cmp = a.dataset.name.localeCompare(b.dataset.name); '
+                'else if (key === "count") cmp = parseInt(a.dataset.count) - parseInt(b.dataset.count); '
+                'else if (key === "size") cmp = parseInt(a.dataset.size) - parseInt(b.dataset.size); '
+                'return dir === "asc" ? cmp : -cmp; '
+                '}); '
+                '} '
+                'groups.forEach(g => container.appendChild(g)); '
+                '} '
+                'function toggleSortDirection() { '
+                'const btn = document.getElementById("artifact-sort-dir"); '
+                'const current = btn.dataset.dir || "asc"; '
+                'const next = current === "asc" ? "desc" : "asc"; '
+                'btn.dataset.dir = next; '
+                'btn.textContent = next === "asc" ? "Asc" : "Desc"; '
+                'sortArtifactGroups(); '
+                '}'
+                '</script>\n\n'
             )
             if all_existing_paths:
                 all_links = "\n".join(all_existing_paths)
@@ -2545,7 +2586,7 @@ def export_results(results: list[dict]) -> None:
                 '">\n\n'
             )
             missing_artifacts: list[tuple[str, str]] = []
-            for title, items in groups:
+            for group_index, (title, items) in enumerate(groups):
                 is_heatmap_group = "Latency heatmap" in title
                 group_count = 0
                 group_size = 0
@@ -2557,8 +2598,13 @@ def export_results(results: list[dict]) -> None:
                         except OSError:
                             pass
                 group_size_str = _human_size(group_size)
+                aria_title = title.replace("**", "").replace("_", "")
                 fh.write(
-                    f'<div class="artifact-group">\n'
+                    f'<div class="artifact-group" '
+                    f'data-index="{group_index}" '
+                    f'data-name="{html.escape(aria_title, quote=True)}" '
+                    f'data-count="{group_count}" '
+                    f'data-size="{group_size}">\n'
                     f'<p><em>{title}</em> — '
                     f'<strong>{group_count} file{"s" if group_count != 1 else ""}</strong>, '
                     f'<strong>{group_size_str}</strong></p>\n\n'
@@ -2568,7 +2614,6 @@ def export_results(results: list[dict]) -> None:
                 ]
                 if existing_items:
                     all_links = "\n".join(path for _, path in existing_items)
-                    aria_title = title.replace("**", "").replace("_", "")
                     fh.write(
                         '<button type="button" '
                         f'aria-label="Copy links for {html.escape(aria_title, quote=True)}" '
