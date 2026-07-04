@@ -191,6 +191,9 @@ jobs:
             reports/seo/solutions-seo.json
             reports/seo/solutions-seo.html
             reports/seo/solutions-seo-index.md
+            reports/seo/heatmap.csv
+            reports/seo/heatmap.json
+            reports/seo/heatmap-validation.json
             vite.log
           if-no-files-found: warn
           retention-days: 30
