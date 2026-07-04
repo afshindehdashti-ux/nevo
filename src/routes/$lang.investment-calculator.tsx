@@ -401,9 +401,40 @@ function Card({
 function InvestmentCalculatorPage() {
   const [i, setI] = useState<Inputs>(DEFAULTS);
   const [step, setStep] = useState(0);
+  const [pendingKind, setPendingKind] = useState<
+    "investment" | "roi" | "cashflow" | "specification" | "summary" | null
+  >(null);
   const m = useMemo(() => computeModel(i), [i]);
   const set = <K extends keyof Inputs>(k: K, v: Inputs[K]) =>
     setI((s) => ({ ...s, [k]: v }));
+
+  async function handleDownloadReport(
+    kind: "investment" | "roi" | "cashflow" | "specification" | "summary",
+    label: string,
+  ) {
+    if (pendingKind) return;
+    setPendingKind(kind);
+    const toastId = toast.loading(`Generating ${label}…`, {
+      description: "Preparing your PDF for download.",
+    });
+    try {
+      // Yield to the browser so the loading state paints before the sync PDF work.
+      await new Promise((r) => setTimeout(r, 0));
+      const filename = downloadInvestmentReport(kind, i, m);
+      toast.success(`${label} downloaded`, {
+        id: toastId,
+        description: filename ?? "Check your downloads folder.",
+      });
+    } catch (err) {
+      console.error("Investment PDF generation failed", err);
+      toast.error(`${label} failed`, {
+        id: toastId,
+        description: "Please try again or contact support if the issue persists.",
+      });
+    } finally {
+      setPendingKind(null);
+    }
+  }
 
   const steps = [
     { id: "inputs", label: "Inputs" },
