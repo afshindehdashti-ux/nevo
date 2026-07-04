@@ -70,16 +70,14 @@ function CareersPage() {
     blobUrl: string;
   } | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   async function handleApplication(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (busy) return;
     setBusy(true);
+    setProgress(0);
     const { toast } = await import("sonner");
-    const loadingId = toast.loading(
-      cvName ? `Uploading CV — ${cvName}…` : "Submitting application…",
-      { description: "Please keep this tab open while we transmit your application." },
-    );
     const form = e.currentTarget;
     const fd = new FormData(form);
     const snapshot: CvConfirmationInput = {
@@ -93,6 +91,41 @@ function CareersPage() {
       cvSize: cvSize || undefined,
       submittedAt: new Date(),
     };
+
+    // Estimate upload duration from file size (~1 MB / 400ms), min 1.2s max 6s.
+    const targetMs = cvSize
+      ? Math.min(6000, Math.max(1200, Math.round((cvSize / (1024 * 1024)) * 400) + 800))
+      : 1200;
+    const sizeLabel = cvSize ? ` (${(cvSize / (1024 * 1024)).toFixed(2)} MB)` : "";
+    const loadingId = toast.loading(
+      cvName ? `Uploading CV — ${cvName}${sizeLabel} · 0%` : "Submitting application… 0%",
+      { description: "Please keep this tab open while we transmit your application." },
+    );
+
+    const startedAt = performance.now();
+    let uploadDone = false;
+    const tick = () => {
+      if (uploadDone) return;
+      const elapsed = performance.now() - startedAt;
+      // Cap simulated progress at 92% until the real submission resolves.
+      const pct = Math.min(92, Math.round((elapsed / targetMs) * 92));
+      setProgress(pct);
+      const uploadedMb = cvSize ? ((cvSize * pct) / 100 / (1024 * 1024)).toFixed(2) : null;
+      const totalMb = cvSize ? (cvSize / (1024 * 1024)).toFixed(2) : null;
+      toast.loading(
+        cvName
+          ? `Uploading CV — ${cvName} · ${pct}%`
+          : `Submitting application… ${pct}%`,
+        {
+          id: loadingId,
+          description: uploadedMb && totalMb
+            ? `${uploadedMb} MB of ${totalMb} MB uploaded`
+            : "Please keep this tab open while we transmit your application.",
+        },
+      );
+    };
+    const interval = window.setInterval(tick, 120);
+
     try {
       const ok = await submitLeadForm(form, {
         source: "careers-application",
@@ -106,6 +139,15 @@ function CareersPage() {
           ? `CV "${cvName}" uploaded successfully. Generating your PDF confirmation…`
           : "Generating your PDF confirmation…",
       });
+
+      uploadDone = true;
+      window.clearInterval(interval);
+      setProgress(100);
+      toast.loading(
+        cvName ? `CV uploaded — ${cvName} · 100%` : "Application submitted · 100%",
+        { id: loadingId, description: "Finalising your confirmation…" },
+      );
+
       if (ok) {
         // Generate PDF confirmation
         try {
@@ -114,22 +156,30 @@ function CareersPage() {
           const blobUrl = URL.createObjectURL(blob);
           setConfirmation({ input: snapshot, filename, reference, blobUrl });
           toast.success("PDF confirmation ready", {
+            id: loadingId,
             description: `Reference ${reference} — download your confirmation below.`,
           });
         } catch (err) {
           toast.error("Could not generate PDF confirmation", {
+            id: loadingId,
             description: err instanceof Error ? err.message : "Please try again.",
           });
         }
         cvFormRef.current?.reset();
         setCvName("");
         setCvSize(0);
+      } else {
+        toast.dismiss(loadingId);
       }
     } finally {
-      toast.dismiss(loadingId);
+      uploadDone = true;
+      window.clearInterval(interval);
       setBusy(false);
+      // Leave progress at 100 briefly, then reset.
+      window.setTimeout(() => setProgress(0), 800);
     }
   }
+
 
   async function handleDownloadConfirmation() {
     if (!confirmation || downloading) return;
