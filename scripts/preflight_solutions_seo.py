@@ -155,6 +155,16 @@ Env:
                         to disable the preview. Same effect as passing
                         `--heatmap-preview-top=N` on the command line.
 
+  VALIDATION_JSON_PATH  path to write a JSON report of the heatmap/breakdown
+                        consistency check. Contains every error_kind × status_class
+                        combo with `expected` (breakdown count), `actual` (heatmap
+                        count), `delta`, and per-combo `status`
+                        (`ok`/`mismatch`/`missing_in_heatmap`/`missing_in_breakdown`),
+                        plus top-level `ok`, `mismatch_count`, and `total_combos`.
+                        Written even when `--disable-heatmap-validation` is set
+                        (the AssertionError is still skipped). Same effect as
+                        passing `--validation-json=PATH` on the command line.
+
   CLI flags:
     --help, -h                Print this help text and exit.
     --disable-percentiles     Skip p50/p95/p99 latency breakdowns and exports.
@@ -163,6 +173,8 @@ Env:
                               Skip heatmap/breakdown consistency validation only.
     --heatmap-preview-top=N   Number of top non-zero buckets to preview per combo
                               (default 3; set 0 to disable).
+    --validation-json=PATH    Write per-combo expected-vs-actual validation report.
+
 
 
   Output / Summary:
