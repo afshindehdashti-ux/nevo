@@ -2708,8 +2708,6 @@ def export_results(results: list[dict]) -> None:
                         )
                     except OSError:
                         pass
-                    else:
-                        fh.write("\n")
                 for label, path in items:
                     exists = os.path.exists(path)
                     if not exists:
