@@ -2560,6 +2560,7 @@ def export_results(results: list[dict]) -> None:
                     all_links = "\n".join(path for _, path in existing_items)
                     fh.write(
                         '<button type="button" '
+                        f'aria-label="Copy links for {html.escape(title, quote=True)}" '
                         f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                         f'data-links="{html.escape(all_links, quote=True)}">Copy links</button>\n\n'
                     )
