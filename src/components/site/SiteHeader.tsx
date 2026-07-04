@@ -467,15 +467,33 @@ export function SiteHeader() {
               <PrimaryCTA solid={solid} />
 
               <button
+                type="button"
                 aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")}
+                aria-expanded={open}
+                aria-controls="mobile-menu-drawer"
                 className={cn(
-                  "inline-flex size-11 items-center justify-center rounded-md transition-colors lg:hidden",
+                  "inline-flex size-11 touch-manipulation items-center justify-center rounded-md transition-colors lg:hidden",
                   solid ? "text-foreground hover:bg-surface" : "text-white hover:bg-white/10",
                 )}
-                onClick={() => setOpen((v) => !v)}
+                onPointerDown={(e) => {
+                  // Open on pointerdown so the first tap after hydration is
+                  // never lost to a cancelled click (scroll, layout shift, or
+                  // React 19 discrete-event replay racing the touch).
+                  if (e.pointerType === "touch" || e.pointerType === "pen") {
+                    e.preventDefault();
+                    setOpen((v) => !v);
+                  }
+                }}
+                onClick={(e) => {
+                  // Mouse + keyboard path. Touch is handled in onPointerDown.
+                  const nativeType = (e.nativeEvent as PointerEvent).pointerType;
+                  if (nativeType === "touch" || nativeType === "pen") return;
+                  setOpen((v) => !v);
+                }}
               >
                 {open ? <X className="size-6" strokeWidth={1.75} /> : <Menu className="size-6" strokeWidth={1.75} />}
               </button>
+
             </div>
           </div>
 
