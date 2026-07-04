@@ -2499,15 +2499,24 @@ def export_results(results: list[dict]) -> None:
                 for _, path in items
                 if os.path.exists(path)
             ]
+            fh.write(
+                '<div class="artifact-index">\n'
+                '<style>'
+                '.artifact-index button:focus-visible, '
+                '.artifact-index input:focus-visible { '
+                'outline: 2px solid #3b82f6; outline-offset: 2px; '
+                '}'
+                '</style>\n\n'
+            )
             if all_existing_paths:
                 all_links = "\n".join(all_existing_paths)
                 fh.write(
                     '<button type="button" '
+                    'aria-label="Copy all artifact links" '
                     f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                     f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
                 )
             fh.write(
-                '<div class="artifact-index">\n'
                 '<input type="text" class="artifact-search" '
                 'placeholder="Search artifacts by name or path..." '
                 'oninput="'
