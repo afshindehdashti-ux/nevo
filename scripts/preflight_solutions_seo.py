@@ -263,6 +263,8 @@ from __future__ import annotations
 import os, sys, time, urllib.request, urllib.error
 from pathlib import Path
 from urllib.parse import urlparse
+import html
+
 
 # Shared source of truth for locales / paths — same list drives
 # verify_solutions_seo.py, so preflight coverage tracks the audit matrix.
