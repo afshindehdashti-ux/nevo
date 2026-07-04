@@ -1067,6 +1067,38 @@ def _render_top_offenders(results: list[dict], top_n: int) -> list[str]:
     return lines
 
 
+def _overall_rate_line(
+    display: list[dict],
+    results: list[dict],
+    filter_scope: str,
+) -> str:
+    """Single-line overall success/failure rate, with delta vs unfiltered."""
+    display_total = len(display)
+    ok_count = sum(1 for r in display if r["ok"])
+    if not display_total:
+        return "**Overall:** no rows in filtered view"
+    display_success_rate = 100.0 * ok_count / display_total
+    display_failure_rate = 100.0 - display_success_rate
+    line = (
+        f"**Overall:** {display_success_rate:.1f}% success rate, "
+        f"{display_failure_rate:.1f}% failure rate"
+    )
+    if filter_scope != "all" and results:
+        total = len(results)
+        total_ok = sum(1 for r in results if r["ok"])
+        total_success_rate = 100.0 * total_ok / total
+        total_failure_rate = 100.0 - total_success_rate
+        d_success = display_success_rate - total_success_rate
+        d_failure = display_failure_rate - total_failure_rate
+        sign_s = "+" if d_success >= 0 else ""
+        sign_f = "+" if d_failure >= 0 else ""
+        line += (
+            f" · Δ vs unfiltered: success {sign_s}{d_success:.1f}pp, "
+            f"failure {sign_f}{d_failure:.1f}pp"
+        )
+    return line
+
+
 def write_step_summary(results: list[dict]) -> None:
     """Append a Markdown table of results to $GITHUB_STEP_SUMMARY."""
     path = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -1087,11 +1119,14 @@ def write_step_summary(results: list[dict]) -> None:
     lines = [
         "## Preflight — site + sitemap reachable",
         "",
+        _overall_rate_line(display, results, filter_scope),
+        "",
         f"_Probed **{total}** URL(s) at `{BASE}` "
         f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`, "
         f"backoff `{BACKOFF_BASE:g}s × {BACKOFF_FACTOR:g}` cap `{BACKOFF_MAX:g}s`, "
         f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
         f"method `{METHOD}`, follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
+
 
         "",
         f"- UA: `{USER_AGENT}`",
