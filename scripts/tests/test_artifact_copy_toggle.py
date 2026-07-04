@@ -185,7 +185,7 @@ async def _run(html_path: Path) -> None:
               const cr = String.fromCharCode(13);  // \r
               const lf = String.fromCharCode(10);  // \n
               const nl = cr + lf;
-              // label,path\r\n"weird, name","path with ""quotes"""\r\n"multi\nline",x\r\n
+              // Build tricky payload from char codes to avoid embedding a triple-quote.
               const tricky =
                 "label,path" + nl +
                 q + "weird, name" + q + "," + q + "path with " + q+q + "quotes" + q+q + q + nl +
