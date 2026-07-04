@@ -2043,7 +2043,11 @@ def export_results(results: list[dict]) -> None:
                 print(f"  {kind:<10} {sc:<4} n={total:<4} {bins}")
 
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
-    if summary_path and (written or breakdown_written or heatmap_written):
+    heatmap_expected_but_disabled = _DISABLE_HEATMAP_EXPORT and (
+        os.environ.get("HEATMAP_CSV_PATH", "").strip()
+        or os.environ.get("HEATMAP_JSON_PATH", "").strip()
+    )
+    if summary_path and (written or breakdown_written or heatmap_written or heatmap_expected_but_disabled):
         with open(summary_path, "a", encoding="utf-8") as fh:
             fh.write("\n### Result artifacts\n\n")
             if written:
