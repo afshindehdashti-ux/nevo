@@ -1771,6 +1771,37 @@ def export_results(results: list[dict]) -> None:
             key=lambda kv: (0 if kv[0][0] == "ok" else -1,
                             -sum(kv[1]), kv[0][0], kv[0][1]),
         )
+
+        # Validation: bucket counts per (error_kind, status_class) must sum
+        # to the same total as the corresponding breakdown row `count`.
+        # Mismatches indicate a classification/bucketing bug — surface them
+        # loudly so the exported artifacts are never silently inconsistent.
+        # Skipped when percentiles are disabled (breakdown is not built).
+        if not _DISABLE_PERCENTILES:
+            breakdown_by_combo = {
+                (r["error_kind"], r["status_class"]): r["count"]
+                for r in _build_breakdown_rows(results)
+            }
+            heatmap_by_combo = {k: sum(v) for k, v in grid.items()}
+            mismatches: list[str] = []
+            for combo, hcount in heatmap_by_combo.items():
+                bcount = breakdown_by_combo.get(combo)
+                if bcount is None:
+                    mismatches.append(
+                        f"{combo[0]}×{combo[1]}: heatmap={hcount}, breakdown=<missing>")
+                elif bcount != hcount:
+                    mismatches.append(
+                        f"{combo[0]}×{combo[1]}: heatmap={hcount}, breakdown={bcount}")
+            for combo in breakdown_by_combo.keys() - heatmap_by_combo.keys():
+                mismatches.append(
+                    f"{combo[0]}×{combo[1]}: heatmap=<missing>, breakdown={breakdown_by_combo[combo]}")
+            if mismatches:
+                msg = ("preflight: heatmap/breakdown totals mismatch:\n  "
+                       + "\n  ".join(mismatches))
+                print(msg, file=sys.stderr)
+                raise AssertionError(msg)
+            print(f"Heatmap validation OK: {len(heatmap_by_combo)} combo(s) "
+                  f"match breakdown totals ({sum(heatmap_by_combo.values())} row(s))")
         if heatmap_csv:
             os.makedirs(os.path.dirname(heatmap_csv) or ".", exist_ok=True)
             with open(heatmap_csv, "w", encoding="utf-8", newline="") as fh:
