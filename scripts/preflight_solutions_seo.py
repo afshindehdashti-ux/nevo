@@ -2156,12 +2156,13 @@ def export_results(results: list[dict]) -> None:
 
             if not _DISABLE_HEATMAP_VALIDATION:
                 if mismatches:
-                    msg = ("preflight: heatmap/breakdown totals mismatch:\n  "
+                    msg = ("preflight: heatmap/breakdown/raw totals mismatch:\n  "
                            + "\n  ".join(mismatches))
                     print(msg, file=sys.stderr)
                     raise AssertionError(msg)
                 print(f"Heatmap validation OK: {len(heatmap_by_combo)} combo(s) "
-                      f"match breakdown totals ({sum(heatmap_by_combo.values())} row(s))")
+                      f"match breakdown and raw totals "
+                      f"({sum(heatmap_by_combo.values())} row(s))")
         elif validation_json:
             print("preflight: VALIDATION_JSON_PATH set but breakdown is disabled "
                   "(DISABLE_PERCENTILES); skipping validation JSON")
