@@ -111,6 +111,12 @@ Env:
   LATENCY_MAX_MS       highest finite edge for LATENCY_BIN_SIZE; slower
                        samples land in the always-present `+` overflow bin.
 
+  SORT_COMBOS_BY       sort the summary error_kind × status_class breakdown by
+                       `default` (ok rows first, then count descending),
+                       `count`, `success_rate`, or `failures_pct`.
+  SORT_COMBOS_ORDER    `asc` or `desc`; default is `desc` for `count`,
+                       `success_rate`, and `failures_pct`. Ignored for `default`.
+
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
@@ -847,6 +853,20 @@ def _build_latency_buckets() -> list[tuple[str, float]]:
 
 _LATENCY_BUCKETS: list[tuple[str, float]] = _build_latency_buckets()
 
+# Sort order for the summary error_kind × status_class combo table.
+# `default` keeps the historical view (non-ok rows first, then count desc).
+# Other fields are sorted by the configured metric with `desc` by default
+# (highest count / success rate / failure share at the top).
+_SORT_COMBOS_BY_OPTIONS = {"default", "count", "success_rate", "failures_pct"}
+_SORT_COMBOS_BY = (os.environ.get("SORT_COMBOS_BY") or "default").strip().lower()
+if _SORT_COMBOS_BY not in _SORT_COMBOS_BY_OPTIONS:
+    print(f"preflight: warning: invalid SORT_COMBOS_BY={_SORT_COMBOS_BY!r}; using default", file=sys.stderr)
+    _SORT_COMBOS_BY = "default"
+_SORT_COMBOS_ORDER = (os.environ.get("SORT_COMBOS_ORDER") or "desc").strip().lower()
+if _SORT_COMBOS_ORDER not in {"asc", "desc"}:
+    print(f"preflight: warning: invalid SORT_COMBOS_ORDER={_SORT_COMBOS_ORDER!r}; using desc", file=sys.stderr)
+    _SORT_COMBOS_ORDER = "desc"
+
 
 def _bucket_for(ms: float) -> int:
     for i, (_, hi) in enumerate(_LATENCY_BUCKETS):
@@ -1136,13 +1156,9 @@ def write_step_summary(results: list[dict]) -> None:
             (r["error_kind"], r["status_class"]): r
             for r in _build_breakdown_rows(display)
         }
-        combo_rows = sorted(
-            combo_all.items(),
-            key=lambda kv: (0 if kv[0][0] == "ok" else -1,
-                            -kv[1], kv[0][0], kv[0][1]),
-        )
         total_all = max(len(display), 1)
         total_fail = max(sum(combo.values()), 1)
+        combo_rows = _sort_combo_rows(combo_all, combo, total_all, total_fail)
         overall_fail_pct = 100.0 * sum(combo.values()) / total_all
         lines.append("")
         lines.append(
@@ -1159,11 +1175,8 @@ def write_step_summary(results: list[dict]) -> None:
             "| Rate bar | % of all | % of failures | p50 (ms) | p95 (ms) | p99 (ms) |",
             "| --- | :---: | ---: | ---: | ---: | :--- | ---: | ---: | ---: | ---: | ---: |",
         ]
-        for (kind, status_class), n in combo_rows:
-            failed = combo.get((kind, status_class), 0) if kind != "ok" else 0
-            success_pct = 100.0 * (n - failed) / n if n else 0.0
+        for kind, status_class, n, failed, success_pct, share_fail in combo_rows:
             share_all = 100.0 * n / total_all
-            share_fail = 100.0 * failed / total_fail if failed else 0.0
             kind_label = _ERROR_KIND_LABELS.get(kind, kind)
             class_label = _STATUS_CLASS_LABELS.get(status_class, status_class)
             pr = pctile_index.get((kind, status_class), {})
@@ -1439,6 +1452,40 @@ _BREAKDOWN_COLUMNS = [
     "attempts_total", "attempts_avg",
     "ms_avg", "ms_p50", "ms_p95", "ms_p99", "ms_max",
 ]
+
+
+def _sort_combo_rows(
+    combo_all: Counter,
+    combo: Counter,
+    total_all: int,
+    total_fail: int,
+) -> list[tuple[str, str, int, int, float, float]]:
+    """Return the summary combo table rows in the configured sort order.
+
+    Each tuple is (kind, status_class, count, failed, success_pct, failures_pct).
+    """
+    rows: list[tuple[str, str, int, int, float, float]] = []
+    for (kind, status_class), n in combo_all.items():
+        failed = combo.get((kind, status_class), 0) if kind != "ok" else 0
+        success_pct = 100.0 * (n - failed) / n if n else 0.0
+        failures_pct = 100.0 * failed / total_fail if failed else 0.0
+        rows.append((kind, status_class, n, failed, success_pct, failures_pct))
+
+    if _SORT_COMBOS_BY == "default":
+        # Historical order: non-ok combos first, then largest count, then label.
+        rows.sort(key=lambda r: (0 if r[0] == "ok" else -1, -r[2], r[0], r[1]))
+    else:
+        if _SORT_COMBOS_BY == "count":
+            primary = lambda r: r[2]
+        elif _SORT_COMBOS_BY == "success_rate":
+            primary = lambda r: r[4]
+        else:  # failures_pct
+            primary = lambda r: r[5]
+        if _SORT_COMBOS_ORDER == "asc":
+            rows.sort(key=lambda r: (primary(r), r[0], r[1]))
+        else:
+            rows.sort(key=lambda r: (-primary(r), r[0], r[1]))
+    return rows
 
 
 def export_results(results: list[dict]) -> None:
