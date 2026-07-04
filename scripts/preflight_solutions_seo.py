@@ -143,10 +143,26 @@ Env:
                         Same effect as passing `--disable-heatmap-export` on the
                         command line.
 
+  DISABLE_HEATMAP_VALIDATION
+                        `true` to skip the heatmap/breakdown consistency check
+                        while still exporting `HEATMAP_CSV_PATH` / `HEATMAP_JSON_PATH`.
+                        Use this when the export is needed but the validation
+                        step is too slow or not required. Same effect as passing
+                        `--disable-heatmap-validation` on the command line.
+
+  HEATMAP_PREVIEW_TOP   number of top non-zero latency buckets to print in the
+                        compact stdout preview per combo (default 3). Set to `0`
+                        to disable the preview. Same effect as passing
+                        `--heatmap-preview-top=N` on the command line.
+
   CLI flags:
     --help, -h                Print this help text and exit.
     --disable-percentiles     Skip p50/p95/p99 latency breakdowns and exports.
     --disable-heatmap-export  Skip heatmap CSV/JSON export and validation.
+    --disable-heatmap-validation
+                              Skip heatmap/breakdown consistency validation only.
+    --heatmap-preview-top=N   Number of top non-zero buckets to preview per combo
+                              (default 3; set 0 to disable).
 
 
   Output / Summary:
@@ -301,6 +317,22 @@ _DISABLE_PERCENTILES = os.environ.get("DISABLE_PERCENTILES", "").strip().lower()
 _DISABLE_HEATMAP_EXPORT = os.environ.get("DISABLE_HEATMAP_EXPORT", "").strip().lower() in (
     "1", "true", "yes", "on"
 )
+
+# Disable heatmap/breakdown consistency validation only (the heatmap CSV/JSON
+# files are still exported). Use this when the export is needed but the
+# validation step is too slow or not required. Set env
+# DISABLE_HEATMAP_VALIDATION=true or pass --disable-heatmap-validation.
+_DISABLE_HEATMAP_VALIDATION = os.environ.get(
+    "DISABLE_HEATMAP_VALIDATION", ""
+).strip().lower() in ("1", "true", "yes", "on")
+
+# Number of top non-zero latency buckets to preview in stdout for each combo.
+# Env HEATMAP_PREVIEW_TOP (default 3); set to 0 to disable the preview entirely.
+# The --heatmap-preview-top=N CLI flag overrides the env var.
+try:
+    _HEATMAP_PREVIEW_TOP = int(os.environ.get("HEATMAP_PREVIEW_TOP", "3"))
+except ValueError:
+    _HEATMAP_PREVIEW_TOP = 3
 
 
 
@@ -1976,8 +2008,9 @@ def export_results(results: list[dict]) -> None:
         # to the same total as the corresponding breakdown row `count`.
         # Mismatches indicate a classification/bucketing bug — surface them
         # loudly so the exported artifacts are never silently inconsistent.
-        # Skipped when percentiles are disabled (breakdown is not built).
-        if not _DISABLE_PERCENTILES:
+        # Skipped when percentiles are disabled (breakdown is not built) or
+        # when heatmap validation is explicitly disabled via env/CLI.
+        if not _DISABLE_PERCENTILES and not _DISABLE_HEATMAP_VALIDATION:
             breakdown_by_combo = {
                 (r["error_kind"], r["status_class"]): r["count"]
                 for r in _build_breakdown_rows(results)
@@ -2043,12 +2076,9 @@ def export_results(results: list[dict]) -> None:
                   f"{len(bucket_labels)} bucket(s))")
 
         # Compact stdout preview: top-N non-zero bins per combo so operators
-        # can sanity-check the export without opening the CSV/JSON. Tunable
-        # via HEATMAP_PREVIEW_TOP (default 3, set to 0 to disable).
-        try:
-            preview_top = int(os.environ.get("HEATMAP_PREVIEW_TOP", "3"))
-        except ValueError:
-            preview_top = 3
+        # can sanity-check the export without opening the CSV/JSON. Defaults to
+        # _HEATMAP_PREVIEW_TOP (3); set to 0 to disable the preview entirely.
+        preview_top = _HEATMAP_PREVIEW_TOP
         if preview_top > 0 and sorted_grid:
             print(f"Heatmap preview (top {preview_top} bin(s) per combo):")
             for (kind, sc), counts in sorted_grid:
@@ -2107,6 +2137,42 @@ def main() -> int:
     if "--disable-heatmap-export" in sys.argv:
         _DISABLE_HEATMAP_EXPORT = True
         sys.argv.remove("--disable-heatmap-export")
+
+    global _DISABLE_HEATMAP_VALIDATION
+    if "--disable-heatmap-validation" in sys.argv:
+        _DISABLE_HEATMAP_VALIDATION = True
+        sys.argv.remove("--disable-heatmap-validation")
+
+    global _HEATMAP_PREVIEW_TOP
+    preview_top_value: str | None = None
+    for i, arg in enumerate(list(sys.argv)):
+        if arg.startswith("--heatmap-preview-top="):
+            preview_top_value = arg.split("=", 1)[1]
+            sys.argv.remove(arg)
+            break
+        elif arg == "--heatmap-preview-top":
+            if i + 1 >= len(sys.argv):
+                print("preflight: --heatmap-preview-top requires a value", file=sys.stderr)
+                return 2
+            preview_top_value = sys.argv[i + 1]
+            sys.argv.pop(i + 1)
+            sys.argv.pop(i)
+            break
+    if preview_top_value is not None:
+        try:
+            _HEATMAP_PREVIEW_TOP = int(preview_top_value)
+            if _HEATMAP_PREVIEW_TOP < 0:
+                print(
+                    f"preflight: --heatmap-preview-top must be >= 0, got {preview_top_value}",
+                    file=sys.stderr,
+                )
+                return 2
+        except ValueError:
+            print(
+                f"preflight: --heatmap-preview-top must be an integer, got {preview_top_value}",
+                file=sys.stderr,
+            )
+            return 2
 
     urls: list[str] = [f"{BASE}{p}" for p in CORE_PATHS]
     for locale in LOCALES:
