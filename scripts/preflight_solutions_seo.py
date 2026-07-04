@@ -3060,7 +3060,7 @@ def export_results(results: list[dict]) -> None:
                 'payload = "label" + delim + "path\\r\\n" + rows.map(r => esc(r.label) + delim + esc(r.path)).join("\\r\\n") + "\\r\\n"; '
                 '} else { return; } '
                 'navigator.clipboard.writeText(payload).then(() => { '
-                'showCopyToast("Copied " + rows.length + " selected link" + (rows.length === 1 ? "" : "s") + " as " + format.toUpperCase()); '
+                'showCopyToast("Copied " + rows.length + " selected artifact" + (rows.length === 1 ? "" : "s") + " as " + format.toUpperCase()); '
                 '}).catch(() => { showCopyToast("Could not copy — check clipboard permissions"); }); '
                 '} '
                 'document.addEventListener("change", function(e) { '
