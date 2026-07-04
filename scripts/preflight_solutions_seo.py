@@ -2666,6 +2666,19 @@ def export_results(results: list[dict]) -> None:
                 'g.style.display = visible > 0 ? "" : "none"; '
                 '}); '
                 '}'
+                'function copyDisplayedArtifactLinks() { '
+                'const container = document.querySelector(".artifact-index"); '
+                'const visible = Array.from(container.querySelectorAll(".artifact-item")).filter(el => el.style.display !== "none"); '
+                'const paths = visible.map(el => el.dataset.path).filter(Boolean); '
+                'navigator.clipboard.writeText(paths.join("\\n")).then(() => { '
+                'const n = paths.length; '
+                'const t = document.createElement("div"); '
+                't.textContent = "Copied " + n + " link" + (n === 1 ? "" : "s"); '
+                't.style.cssText = "position:fixed;bottom:20px;right:20px;background:#1f2937;color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);"; '
+                'document.body.appendChild(t); '
+                'setTimeout(() => t.remove(), 2000); '
+                '}).catch(() => {}); '
+                '}'
                 '</script>\n\n'
             )
             if all_paths:
@@ -2682,6 +2695,11 @@ def export_results(results: list[dict]) -> None:
                     'data-context="all artifacts" '
                     f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                     f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
+                )
+                fh.write(
+                    '<button type="button" '
+                    'aria-label="Copy all displayed artifact links" '
+                    'onclick="copyDisplayedArtifactLinks()">Copy all displayed links</button>\n\n'
                 )
                 fh.write(
                     '<button type="button" '
