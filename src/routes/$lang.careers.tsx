@@ -230,7 +230,7 @@ function CareersPage() {
     setUploadError(null);
   }
 
-  }
+
 
 
   async function handleDownloadConfirmation() {
