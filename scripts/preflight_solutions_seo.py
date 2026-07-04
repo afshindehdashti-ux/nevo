@@ -2115,12 +2115,14 @@ _CLIPBOARD_TOAST_SINGLE = (
 )
 
 # Inline JS toast shown after copying multiple artifact links. The count is
-# derived from the data-links attribute at click time.
+# derived from the data-links attribute at click time; data-context supplies an
+# optional label such as the group title or "all artifacts".
 _CLIPBOARD_TOAST_MULTI = (
     ".then(() => { "
+    "const ctx = this.dataset.context || ''; "
     "const n = this.dataset.links.split('\\n').length; "
     "const t = document.createElement('div'); "
-    "t.textContent = 'Copied ' + n + ' link' + (n === 1 ? '' : 's'); "
+    "t.textContent = 'Copied ' + n + ' link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : ''); "
     "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
     "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
     "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
@@ -2593,6 +2595,7 @@ def export_results(results: list[dict]) -> None:
                 fh.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links" '
+                    'data-context="all artifacts" '
                     f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                     f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
                 )
@@ -2668,6 +2671,7 @@ def export_results(results: list[dict]) -> None:
                     fh.write(
                         '<button type="button" '
                         f'aria-label="Copy links for {html.escape(aria_title, quote=True)}" '
+                        f'data-context="{html.escape(aria_title, quote=True)}" '
                         f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                         f'data-links="{html.escape(all_links, quote=True)}">Copy links</button>\n\n'
                     )
