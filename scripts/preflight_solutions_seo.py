@@ -183,6 +183,17 @@ Env:
                               show rows matching any selected range). Aliases:
                               `and`/`intersection`, `or`/`union`. Env equivalent:
                               `COMBO_FILTER_MODE=any|all`.
+    --filtered-combos-csv=PATH
+                              Export ONLY the currently filtered combo rows
+                              (post `COMBO_FILTERS` / `--combo-filter-mode` /
+                              `--reset-filters`) to CSV with columns:
+                              error_kind, status_class, count, failed,
+                              success_pct, failure_pct, share_all_pct,
+                              share_failures_pct (+ ms_avg/p50/p95/p99/max
+                              unless `--disable-percentiles`). Distinct from
+                              `BREAKDOWN_CSV_PATH`, which always exports the
+                              full unfiltered aggregation. Env equivalent:
+                              `FILTERED_COMBOS_CSV_PATH=PATH`.
 
 
 
