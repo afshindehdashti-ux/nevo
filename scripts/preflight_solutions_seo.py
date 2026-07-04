@@ -2463,6 +2463,19 @@ def export_results(results: list[dict]) -> None:
                 f"\n### Artifacts index ({total_files} file"
                 f"{'s' if total_files != 1 else ''})\n\n"
             )
+            all_existing_paths = [
+                path
+                for _, items in groups
+                for _, path in items
+                if os.path.exists(path)
+            ]
+            if all_existing_paths:
+                all_links = "\n".join(all_existing_paths)
+                fh.write(
+                    '<button type="button" '
+                    'onclick="navigator.clipboard.writeText(this.dataset.links).catch(() => {})" '
+                    f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
+                )
             fh.write(
                 '<div class="artifact-index">\n'
                 '<input type="text" class="artifact-search" '
