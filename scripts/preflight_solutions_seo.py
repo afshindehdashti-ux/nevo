@@ -2721,7 +2721,14 @@ def export_results(results: list[dict]) -> None:
                 't.style.cssText = "position:fixed;" + position + "left:50%;transform:translateX(-50%);max-width:calc(100vw - 32px);width:max-content;background:#1f2937;color:#fff;padding:10px 14px;border-radius:6px;z-index:9999;font-family:sans-serif;font-size:14px;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,0.25);pointer-events:none;"; '
                 'document.body.appendChild(t); '
                 'setTimeout(() => t.remove(), 2000); '
-                '} '
+                "} "
+                "let _artifactAnnounceTimer = null; "
+                "function announceArtifact(message) { "
+                'const live = document.getElementById("artifact-copy-live"); '
+                "if (!live) return; "
+                "if (_artifactAnnounceTimer) clearTimeout(_artifactAnnounceTimer); "
+                '_artifactAnnounceTimer = setTimeout(() => { live.textContent = ""; live.textContent = message; }, 150); '
+                "} "
                 'function artifactDownload(href) { '
                 'const a = document.createElement("a"); '
                 'a.href = href; '
