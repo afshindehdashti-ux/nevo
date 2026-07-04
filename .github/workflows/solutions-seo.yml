@@ -67,7 +67,55 @@ jobs:
           LOCALES: en,ar,tr
           TIMEOUT_SECONDS: "10"
           RETRIES: "2"
+          # Enable heatmap export so the built-in heatmap × breakdown × raw
+          # cross-check runs. The validation JSON is inspected in a dedicated
+          # gate step below so a mismatch fails the build even when
+          # skip_on_preflight_failure=true.
+          HEATMAP_CSV_PATH: reports/seo/heatmap.csv
+          HEATMAP_JSON_PATH: reports/seo/heatmap.json
+          VALIDATION_JSON_PATH: reports/seo/heatmap-validation.json
         run: python3 scripts/preflight_solutions_seo.py
+
+      # Hard-fail on any heatmap/breakdown/raw mismatch, regardless of the
+      # skip_on_preflight_failure toggle — a divergence is a classification bug
+      # in the tooling itself, not a transient site outage.
+      - name: Enforce heatmap validation
+        if: always() && hashFiles('reports/seo/heatmap-validation.json') != ''
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+          path = "reports/seo/heatmap-validation.json"
+          with open(path) as fh:
+              data = json.load(fh)
+          summary = os.environ.get("GITHUB_STEP_SUMMARY")
+          lines = [
+              "## Heatmap validation",
+              "",
+              f"- combos: **{data['total_combos']}**",
+              f"- mismatches: **{data['mismatch_count']}**",
+              f"- status: {'✅ ok' if data['ok'] else '❌ mismatch'}",
+              "",
+          ]
+          if not data["ok"]:
+              lines.append("| error_kind | status_class | heatmap | breakdown | raw | status |")
+              lines.append("|---|---|---:|---:|---:|---|")
+              for c in data["combos"]:
+                  if c["status"] == "ok":
+                      continue
+                  lines.append(
+                      f"| `{c['error_kind']}` | `{c['status_class']}` | "
+                      f"{c['actual']} | {c['expected']} | {c['raw']} | {c['status']} |"
+                  )
+          if summary:
+              with open(summary, "a") as fh:
+                  fh.write("\n".join(lines) + "\n")
+          if not data["ok"]:
+              print(f"::error::Heatmap validation failed: {data['mismatch_count']} mismatch(es). "
+                    f"See {path} artifact.", file=sys.stderr)
+              sys.exit(1)
+          print(f"Heatmap validation OK ({data['total_combos']} combo(s)).")
+          PY
+
 
       - name: Evaluate preflight outcome
         id: preflight_gate
