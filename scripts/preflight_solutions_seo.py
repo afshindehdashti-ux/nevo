@@ -2595,20 +2595,7 @@ def export_results(results: list[dict]) -> None:
             fh.write(
                 '<input type="text" class="artifact-search" '
                 'placeholder="Search artifacts by name or path..." '
-                'oninput="'
-                "const q = this.value.toLowerCase(); "
-                "this.closest('.artifact-index').querySelectorAll('.artifact-group').forEach(g => { "
-                "let visible = 0; "
-                "g.querySelectorAll('.artifact-item').forEach(el => { "
-                "const label = (el.dataset.label || '').toLowerCase(); "
-                "const path = (el.dataset.path || '').toLowerCase(); "
-                "const match = !q || label.includes(q) || path.includes(q) || el.textContent.toLowerCase().includes(q); "
-                "el.style.display = match ? '' : 'none'; "
-                "if (match) visible++; "
-                "}); "
-                "g.style.display = visible > 0 || !q ? '' : 'none'; "
-                "});"
-                '">\n\n'
+                'oninput="filterArtifactItems()">\n\n'
             )
             missing_artifacts: list[tuple[str, str]] = []
             for group_index, (title, items) in enumerate(groups):
