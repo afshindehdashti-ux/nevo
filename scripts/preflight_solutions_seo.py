@@ -2615,6 +2615,7 @@ def export_results(results: list[dict]) -> None:
                                 f'<button type="button">Open</button></a> '
                                 f'<a href="{html.escape(path, quote=True)}">{html.escape(label)}</a> '
                                 '<button type="button" '
+                                f'aria-label="Copy link for {html.escape(label, quote=True)}" '
                                 f'onclick="navigator.clipboard.writeText(this.dataset.link){_CLIPBOARD_TOAST_SINGLE}.catch(() => {{}})" '
                                 f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
                                 "</div>\n"
