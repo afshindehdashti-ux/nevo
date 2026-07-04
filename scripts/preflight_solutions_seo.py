@@ -2674,8 +2674,42 @@ def export_results(results: list[dict]) -> None:
                         f'aria-label="Copy links for {html.escape(aria_title, quote=True)}" '
                         f'data-context="{html.escape(aria_title, quote=True)}" '
                         f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
-                        f'data-links="{html.escape(all_links, quote=True)}">Copy links</button>\n\n'
+                        f'data-links="{html.escape(all_links, quote=True)}">Copy links</button> '
                     )
+                    group_zip_path = os.path.join(
+                        summary_dir, f"artifacts_group_{group_index}.zip"
+                    )
+                    try:
+                        seen_arcnames: set[str] = set()
+                        with _zipfile.ZipFile(
+                            group_zip_path, "w", _zipfile.ZIP_DEFLATED
+                        ) as zf:
+                            for _, p in existing_items:
+                                arc = os.path.basename(p)
+                                base, ext = os.path.splitext(arc)
+                                i = 1
+                                while arc in seen_arcnames:
+                                    arc = f"{base}_{i}{ext}"
+                                    i += 1
+                                seen_arcnames.add(arc)
+                                zf.write(p, arcname=arc)
+                        group_zip_size_str = _human_size(
+                            os.path.getsize(group_zip_path)
+                        )
+                        group_zip_href = html.escape(
+                            os.path.basename(group_zip_path), quote=True
+                        )
+                        fh.write(
+                            f'<a href="{group_zip_href}" download '
+                            f'aria-label="Download ZIP for {html.escape(aria_title, quote=True)}">'
+                            f'Download ZIP ({len(existing_items)} '
+                            f'file{"s" if len(existing_items) != 1 else ""}, '
+                            f'{group_zip_size_str})</a>\n\n'
+                        )
+                    except OSError:
+                        pass
+                    else:
+                        fh.write("\n")
                 for label, path in items:
                     exists = os.path.exists(path)
                     if not exists:
