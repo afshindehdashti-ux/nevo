@@ -2895,12 +2895,20 @@ def export_results(results: list[dict]) -> None:
                         f"- [{label}]({path})"
                         for label, path in existing_items
                     )
+                    markdown_links_url = "\n".join(
+                        f"- [{label}]({_artifact_url(path) or path})"
+                        for label, path in existing_items
+                    )
+                    markdown_url_data_attr = (
+                        f' data-markdown-url="{html.escape(markdown_links_url, quote=True)}"'
+                        if ARTIFACT_BASE_URL else ""
+                    )
                     fh.write(
                         '<button type="button" '
                         f'aria-label="Copy Markdown links for {html.escape(aria_title, quote=True)}" '
                         f'data-context="{html.escape(aria_title, quote=True)}" '
-                        f'onclick="navigator.clipboard.writeText(this.dataset.markdown){_CLIPBOARD_TOAST_MARKDOWN}" '
-                        f'data-markdown="{html.escape(markdown_links, quote=True)}">Copy as Markdown</button>\n\n'
+                        f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.markdownUrl ? this.dataset.markdownUrl : this.dataset.markdown){_CLIPBOARD_TOAST_MARKDOWN}" '
+                        f'data-markdown="{html.escape(markdown_links, quote=True)}"{markdown_url_data_attr}>Copy as Markdown</button>\n\n'
                     )
                 for label, path in items:
                     file_type = os.path.splitext(path)[1].lower() or "none"
