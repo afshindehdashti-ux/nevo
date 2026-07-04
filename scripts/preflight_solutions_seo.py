@@ -2701,6 +2701,11 @@ def export_results(results: list[dict]) -> None:
                 )
                 fh.write(
                     '<button type="button" '
+                    'aria-label="Copy all displayed artifact links" '
+                    'onclick="copyDisplayedArtifactLinks()">Copy all displayed links</button>\n\n'
+                )
+                fh.write(
+                    '<button type="button" '
                     'aria-label="Copy all artifact paths as JSON" '
                     f'data-count="{len(all_items_json)}" '
                     f'onclick="navigator.clipboard.writeText(this.dataset.json){_CLIPBOARD_TOAST_JSON}.catch(() => {{}})" '
