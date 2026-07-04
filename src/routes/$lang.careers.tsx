@@ -394,11 +394,41 @@ function CareersPage() {
                       className="rounded-md border border-input bg-background px-4 py-3 text-sm" />
             <Button type="submit" size="lg" disabled={busy}>
               {busy ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {cvName ? "Uploading CV…" : "Submitting…"}</>
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {cvName ? `Uploading CV… ${progress}%` : `Submitting… ${progress}%`}</>
               ) : (
                 <>Submit Application <ArrowRight className="ml-2 h-4 w-4" /></>
               )}
             </Button>
+
+            {(busy || progress > 0) && (
+              <div
+                className="mt-1 space-y-2"
+                role="status"
+                aria-live="polite"
+                aria-label={`Upload progress ${progress}%`}
+              >
+                <Progress value={progress} className="h-2" />
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>
+                    {cvName
+                      ? progress >= 100
+                        ? `CV uploaded — ${cvName}`
+                        : `Uploading ${cvName}…`
+                      : progress >= 100
+                        ? "Application submitted"
+                        : "Submitting application…"}
+                  </span>
+                  <span className="font-mono tabular-nums text-foreground">{progress}%</span>
+                </div>
+                {cvSize > 0 && (
+                  <div className="text-[11px] text-muted-foreground">
+                    {((cvSize * progress) / 100 / (1024 * 1024)).toFixed(2)} MB of{" "}
+                    {(cvSize / (1024 * 1024)).toFixed(2)} MB
+                  </div>
+                )}
+              </div>
+            )}
+
 
             {confirmation && (
               <div className="mt-2 rounded-xl border border-emerald-500/40 bg-emerald-500/5 p-5">
