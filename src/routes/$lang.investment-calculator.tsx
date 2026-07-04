@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
+  Loader2,
   Factory,
   Gauge,
   Layers,
