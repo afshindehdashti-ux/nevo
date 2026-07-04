@@ -2907,7 +2907,6 @@ def export_results(results: list[dict]) -> None:
                   'abs.checked = absVal === "1" || absVal === "true"; '
                   'abs.setAttribute("aria-checked", abs.checked ? "true" : "false"); '
                   'document.querySelectorAll(".artifact-url-mode").forEach(el => { el.textContent = abs.checked ? "absolute URLs" : "file paths"; }); '
-                  '} '
                    '} '
                    'const delimSel = document.getElementById("artifact-csv-delimiter"); '
                    'const delimVal = readFor("csvdelim", "artifactCsvDelim"); '
