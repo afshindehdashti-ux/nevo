@@ -2864,14 +2864,17 @@ def export_results(results: list[dict]) -> None:
                  'setOrDelete("group", group ? group.value : "", "all"); '
                  'setOrDelete("type", type ? type.value : "", "all"); '
                  'setOrDelete("q", search ? search.value : "", ""); '
-                 'if (abs && abs.checked) url.searchParams.set("abs", "1"); else url.searchParams.delete("abs"); '
+                  'if (abs && abs.checked) url.searchParams.set("abs", "1"); else url.searchParams.delete("abs"); '
+                  'const delimSel = document.getElementById("artifact-csv-delimiter"); '
+                  'if (delimSel) { if (delimSel.value === ";") url.searchParams.set("csvdelim", ";"); else url.searchParams.delete("csvdelim"); } '
                  'window.history.replaceState({}, "", url); '
                  'try { '
                  'if (mode) localStorage.setItem("artifactFilter", mode.value); '
                  'if (group) localStorage.setItem("artifactGroupFilter", group.value); '
                  'if (type) localStorage.setItem("artifactTypeFilter", type.value); '
                  'if (search) localStorage.setItem("artifactSearch", search.value); '
-                 'if (abs) localStorage.setItem("artifactAbsUrl", abs.checked ? "1" : "0"); '
+                  'if (abs) localStorage.setItem("artifactAbsUrl", abs.checked ? "1" : "0"); '
+                  'if (delimSel) localStorage.setItem("artifactCsvDelim", delimSel.value); '
                  '} catch (e) {} '
                  '} catch (e) {} '
                  '} '
@@ -2904,8 +2907,11 @@ def export_results(results: list[dict]) -> None:
                   'abs.checked = absVal === "1" || absVal === "true"; '
                   'abs.setAttribute("aria-checked", abs.checked ? "true" : "false"); '
                   'document.querySelectorAll(".artifact-url-mode").forEach(el => { el.textContent = abs.checked ? "absolute URLs" : "file paths"; }); '
-                  '} '
-                  'if (typeof filterArtifactItems === "function") filterArtifactItems(); '
+                   '} '
+                   'const delimSel = document.getElementById("artifact-csv-delimiter"); '
+                   'const delimVal = readFor("csvdelim", "artifactCsvDelim"); '
+                   'if (delimSel && delimVal !== null) { setSel(delimSel, delimVal); } '
+                   'if (typeof filterArtifactItems === "function") filterArtifactItems(); '
                   '} catch (e) {} finally { _artifactRestoring = false; } '
                   '} '
                  'if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", restoreArtifactFilters); } else { restoreArtifactFilters(); } '
@@ -2930,9 +2936,19 @@ def export_results(results: list[dict]) -> None:
                 'showCopyToast("Copied " + paths.length + " link" + (paths.length === 1 ? "" : "s")); '
                 '}).catch(() => { showCopyToast("Could not copy — check clipboard permissions"); }); '
                 '} '
-                'function downloadArtifactCsv(btn) { '
+                'function pickArtifactCsvPayload(btn) { '
                 'const useUrl = document.getElementById("artifact-url-toggle") && document.getElementById("artifact-url-toggle").checked; '
-                'const raw = useUrl && btn.dataset.csvUrl ? btn.dataset.csvUrl : btn.dataset.csv; '
+                'const delimSel = document.getElementById("artifact-csv-delimiter"); '
+                'const useSemi = delimSel && delimSel.value === ";"; '
+                'let key; '
+                'if (useUrl && useSemi && btn.dataset.csvUrlSemi) key = "csvUrlSemi"; '
+                'else if (useUrl && btn.dataset.csvUrl) key = "csvUrl"; '
+                'else if (useSemi && btn.dataset.csvSemi) key = "csvSemi"; '
+                'else key = "csv"; '
+                'return btn.dataset[key] || ""; '
+                '} '
+                'function downloadArtifactCsv(btn) { '
+                'const raw = pickArtifactCsvPayload(btn); '
                 'if (!raw) return; '
                 'const csv = raw.replace(/\\r?\\n/g, "\\r\\n"); '
                 'const blob = new Blob([csv], { type: "text/csv;charset=utf-8" }); '
@@ -3145,24 +3161,33 @@ def export_results(results: list[dict]) -> None:
                 json_url_str = json.dumps(all_items_json_url)
                 csv_include_url = bool(ARTIFACT_BASE_URL) and ARTIFACT_CSV_INCLUDE_URL
                 csv_columns = ["label", "path", "url"] if csv_include_url else ["label", "path"]
-                csv_io = io.StringIO()
-                csv_writer = csv.writer(csv_io)
-                csv_writer.writerow(csv_columns)
-                for rel_item, abs_item in zip(all_items_json, all_items_json_url):
-                    if csv_include_url:
-                        csv_writer.writerow([rel_item["label"], rel_item["path"], abs_item["path"]])
-                    else:
-                        csv_writer.writerow([rel_item["label"], rel_item["path"]])
-                csv_str = csv_io.getvalue()
-                csv_io_url = io.StringIO()
-                csv_writer_url = csv.writer(csv_io_url)
-                csv_writer_url.writerow(csv_columns)
-                for abs_item in all_items_json_url:
-                    if csv_include_url:
-                        csv_writer_url.writerow([abs_item["label"], abs_item["path"], abs_item["path"]])
-                    else:
-                        csv_writer_url.writerow([abs_item["label"], abs_item["path"]])
-                csv_url_str = csv_io_url.getvalue()
+
+                def _render_csv(items_rel, items_abs, delim):
+                    buf = io.StringIO()
+                    w = csv.writer(buf, delimiter=delim)
+                    w.writerow(csv_columns)
+                    for rel_item, abs_item in zip(items_rel, items_abs):
+                        if csv_include_url:
+                            w.writerow([rel_item["label"], rel_item["path"], abs_item["path"]])
+                        else:
+                            w.writerow([rel_item["label"], rel_item["path"]])
+                    return buf.getvalue()
+
+                def _render_csv_abs(items_abs, delim):
+                    buf = io.StringIO()
+                    w = csv.writer(buf, delimiter=delim)
+                    w.writerow(csv_columns)
+                    for abs_item in items_abs:
+                        if csv_include_url:
+                            w.writerow([abs_item["label"], abs_item["path"], abs_item["path"]])
+                        else:
+                            w.writerow([abs_item["label"], abs_item["path"]])
+                    return buf.getvalue()
+
+                csv_str = _render_csv(all_items_json, all_items_json_url, ",")
+                csv_url_str = _render_csv_abs(all_items_json_url, ",")
+                csv_semi_str = _render_csv(all_items_json, all_items_json_url, ";")
+                csv_url_semi_str = _render_csv_abs(all_items_json_url, ";")
                 links_url_data_attr = (
                     f' data-links-url="{html.escape(all_links_url, quote=True)}"'
                     if ARTIFACT_BASE_URL else ""
@@ -3173,8 +3198,10 @@ def export_results(results: list[dict]) -> None:
                 )
                 csv_url_data_attr = (
                     f' data-csv-url="{html.escape(csv_url_str, quote=True)}"'
+                    f' data-csv-url-semi="{html.escape(csv_url_semi_str, quote=True)}"'
                     if ARTIFACT_BASE_URL else ""
                 )
+                csv_semi_data_attr = f' data-csv-semi="{html.escape(csv_semi_str, quote=True)}"'
                 fh.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links" '
@@ -3195,11 +3222,21 @@ def export_results(results: list[dict]) -> None:
                     f'data-json="{html.escape(json_str, quote=True)}"{json_url_data_attr}>Copy links (JSON)</button>\n\n'
                 )
                 fh.write(
+                    '<label for="artifact-csv-delimiter" style="margin-right:6px;">CSV delimiter:</label>'
+                    '<select id="artifact-csv-delimiter" '
+                    'aria-label="CSV delimiter for Copy links (CSV) and Download CSV" '
+                    'onchange="persistArtifactFilters()">'
+                    '<option value=",">Comma (,)</option>'
+                    '<option value=";">Semicolon (;)</option>'
+                    '</select> '
+                )
+                fh.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links as CSV" '
                     f'data-count="{len(all_items_json)}" '
-                    f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; const raw = useUrl && this.dataset.csvUrl ? this.dataset.csvUrl : this.dataset.csv; navigator.clipboard.writeText(raw.replace(/\\r?\\n/g, \'\\r\\n\')){_CLIPBOARD_TOAST_CSV}" '
-                    f'data-csv="{html.escape(csv_str, quote=True)}"{csv_url_data_attr}>Copy links (CSV)</button>\n\n'
+                    'onclick="const raw = pickArtifactCsvPayload(this); '
+                    f'navigator.clipboard.writeText(raw.replace(/\\r?\\n/g, \'\\r\\n\')){_CLIPBOARD_TOAST_CSV}" '
+                    f'data-csv="{html.escape(csv_str, quote=True)}"{csv_semi_data_attr}{csv_url_data_attr}>Copy links (CSV)</button>\n\n'
                 )
                 fh.write(
                     '<button type="button" '
@@ -3207,7 +3244,7 @@ def export_results(results: list[dict]) -> None:
                     f'data-count="{len(all_items_json)}" '
                     'data-filename="artifact-links.csv" '
                     'onclick="downloadArtifactCsv(this)" '
-                    f'data-csv="{html.escape(csv_str, quote=True)}"{csv_url_data_attr}>Download CSV</button>\n\n'
+                    f'data-csv="{html.escape(csv_str, quote=True)}"{csv_semi_data_attr}{csv_url_data_attr}>Download CSV</button>\n\n'
                 )
                 fh.write(
                     '<div class="artifact-selection-controls" style="margin-top:8px;">\n'
