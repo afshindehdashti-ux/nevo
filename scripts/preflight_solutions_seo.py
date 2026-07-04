@@ -2521,12 +2521,7 @@ def export_results(results: list[dict]) -> None:
                             try:
                                 size = os.path.getsize(path)
                                 mtime = os.path.getmtime(path)
-                                if size < 1024:
-                                    size_str = f"{size} B"
-                                elif size < 1024 * 1024:
-                                    size_str = f"{size / 1024:.1f} KB"
-                                else:
-                                    size_str = f"{size / (1024 * 1024):.1f} MB"
+                                size_str = _human_size(size)
                                 mtime_str = time.strftime(
                                     "%Y-%m-%d %H:%M:%S", time.localtime(mtime)
                                 )
