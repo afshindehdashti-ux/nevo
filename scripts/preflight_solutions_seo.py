@@ -2683,18 +2683,35 @@ def export_results(results: list[dict]) -> None:
             )
             if all_paths:
                 all_links = "\n".join(all_paths)
+                all_links_url = "\n".join(
+                    _artifact_url(path) or path for path in all_paths
+                )
                 all_items_json = [
                     {"label": label, "path": path}
                     for _, items in groups
                     for label, path in items
                 ]
+                all_items_json_url = [
+                    {"label": label, "path": _artifact_url(path) or path}
+                    for _, items in groups
+                    for label, path in items
+                ]
                 json_str = json.dumps(all_items_json)
+                json_url_str = json.dumps(all_items_json_url)
+                links_url_data_attr = (
+                    f' data-links-url="{html.escape(all_links_url, quote=True)}"'
+                    if ARTIFACT_BASE_URL else ""
+                )
+                json_url_data_attr = (
+                    f' data-json-url="{html.escape(json_url_str, quote=True)}"'
+                    if ARTIFACT_BASE_URL else ""
+                )
                 fh.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links" '
                     'data-context="all artifacts" '
-                    f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}" '
-                    f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
+                    f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.linksUrl ? this.dataset.linksUrl : this.dataset.links){_CLIPBOARD_TOAST_MULTI}" '
+                    f'data-links="{html.escape(all_links, quote=True)}"{links_url_data_attr}>Copy all links</button>\n\n'
                 )
                 fh.write(
                     '<button type="button" '
@@ -2705,8 +2722,8 @@ def export_results(results: list[dict]) -> None:
                     '<button type="button" '
                     'aria-label="Copy all artifact paths as JSON" '
                     f'data-count="{len(all_items_json)}" '
-                    f'onclick="navigator.clipboard.writeText(this.dataset.json){_CLIPBOARD_TOAST_JSON}" '
-                    f'data-json="{html.escape(json_str, quote=True)}">Copy links (JSON)</button>\n\n'
+                    f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.jsonUrl ? this.dataset.jsonUrl : this.dataset.json){_CLIPBOARD_TOAST_JSON}" '
+                    f'data-json="{html.escape(json_str, quote=True)}"{json_url_data_attr}>Copy links (JSON)</button>\n\n'
                 )
             summary_dir = os.path.dirname(summary_path) or "."
             if all_existing_paths:
