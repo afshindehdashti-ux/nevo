@@ -2104,6 +2104,13 @@ def _human_size(size: int) -> str:
         return f"{size / (1024 * 1024 * 1024):.1f} GB"
 
 
+def _artifact_url(path: str) -> str | None:
+    """Return an absolute artifact URL if ARTIFACT_BASE_URL is set, else None."""
+    if not ARTIFACT_BASE_URL:
+        return None
+    return f"{ARTIFACT_BASE_URL}/{os.path.basename(path)}"
+
+
 # Inline JS toast shown after copying a single artifact link. Self-contained so
 # it works in any markdown viewer that executes onclick handlers.
 _CLIPBOARD_TOAST_SINGLE = (
