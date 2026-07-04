@@ -131,6 +131,16 @@ Env:
   SUMMARY_FILTER       set to `preset:<name>` or `@<name>` (or just the
                        preset name, if unique) to apply a saved preset.
 
+  DISABLE_PERCENTILES  `true` to skip percentile latency calculations and the
+                       `BREAKDOWN_CSV_PATH` / `BREAKDOWN_JSON_PATH` exports. This
+                       reduces runtime and summary size when only pass/fail
+                       data matters. Same effect as passing `--disable-percentiles`
+                       on the command line.
+
+  CLI flags:
+    --help, -h             Print this help text and exit.
+    --disable-percentiles  Skip p50/p95/p99 latency breakdowns and exports.
+
 
   Output / Summary:
 
