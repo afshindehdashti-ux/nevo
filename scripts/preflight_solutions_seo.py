@@ -2596,6 +2596,7 @@ def export_results(results: list[dict]) -> None:
                     f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                     f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
                 )
+            if all_existing_paths:
                 import zipfile as _zipfile
                 bundle_path = os.path.join(
                     os.path.dirname(summary_path) or ".",
