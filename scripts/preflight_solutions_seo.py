@@ -2065,39 +2065,74 @@ def export_results(results: list[dict]) -> None:
                         f"{b['label']} ({_fmt_edge(b['lo_ms'])}–{hi}ms)={b['count']}")
                 return ", ".join(parts) if parts else "<no non-zero buckets>"
 
+            # Third source of truth: recount combos directly from `results`
+            # using the same fallback logic as the heatmap grid. This catches
+            # divergences that agree between heatmap and breakdown but drift
+            # from the actual per-row data (e.g. a classification helper that
+            # silently changed).
+            from collections import defaultdict as _dd
+            raw_by_combo: dict[tuple[str, str], int] = _dd(int)
+            for r in results:
+                _kind = r.get("error_kind") or ("ok" if r.get("ok") else "unknown")
+                _sc = r.get("status_class") or _classify_status(r.get("status"))
+                raw_by_combo[(_kind, _sc)] += 1
+
             mismatches: list[str] = []
             combo_report: list[dict] = []
-            all_combos = set(heatmap_by_combo) | set(breakdown_by_combo)
+            all_combos = (set(heatmap_by_combo)
+                          | set(breakdown_by_combo)
+                          | set(raw_by_combo))
             for combo in sorted(all_combos):
                 hcount = heatmap_by_combo.get(combo)
                 bcount = breakdown_by_combo.get(combo)
+                rcount = raw_by_combo.get(combo)
                 buckets_hint = (_fmt_bucket_hint(grid[combo])
                                 if combo in grid else "<no heatmap buckets>")
-                if hcount is None:
-                    status = "missing_in_heatmap"
-                    mismatches.append(
-                        f"{combo[0]}×{combo[1]}: heatmap=<missing>, "
-                        f"breakdown={bcount} — heatmap buckets: {buckets_hint}")
-                elif bcount is None:
-                    status = "missing_in_breakdown"
-                    mismatches.append(
-                        f"{combo[0]}×{combo[1]}: heatmap={hcount}, "
-                        f"breakdown=<missing> — heatmap buckets: {buckets_hint}")
-                elif bcount != hcount:
+                sources = {
+                    "heatmap": hcount,
+                    "breakdown": bcount,
+                    "raw": rcount,
+                }
+                present_values = {v for v in sources.values() if v is not None}
+                missing = [name for name, v in sources.items() if v is None]
+
+                if missing:
+                    status = "missing_" + "_".join(missing)
+                elif len(present_values) > 1:
                     status = "mismatch"
-                    mismatches.append(
-                        f"{combo[0]}×{combo[1]}: heatmap={hcount}, "
-                        f"breakdown={bcount} (delta={hcount - bcount}) — "
-                        f"heatmap buckets: {buckets_hint}")
                 else:
                     status = "ok"
+
+                if status != "ok":
+                    parts = [
+                        f"heatmap={hcount if hcount is not None else '<missing>'}",
+                        f"breakdown={bcount if bcount is not None else '<missing>'}",
+                        f"raw={rcount if rcount is not None else '<missing>'}",
+                    ]
+                    deltas = []
+                    if hcount is not None and bcount is not None and hcount != bcount:
+                        deltas.append(f"heatmap-breakdown={hcount - bcount}")
+                    if hcount is not None and rcount is not None and hcount != rcount:
+                        deltas.append(f"heatmap-raw={hcount - rcount}")
+                    if bcount is not None and rcount is not None and bcount != rcount:
+                        deltas.append(f"breakdown-raw={bcount - rcount}")
+                    delta_hint = f" ({', '.join(deltas)})" if deltas else ""
+                    mismatches.append(
+                        f"{combo[0]}×{combo[1]}: {', '.join(parts)}{delta_hint} — "
+                        f"heatmap buckets: {buckets_hint}")
+
                 entry = {
                     "error_kind": combo[0],
                     "status_class": combo[1],
                     "expected": bcount,
                     "actual": hcount,
+                    "raw": rcount,
                     "delta": (None if hcount is None or bcount is None
                               else hcount - bcount),
+                    "delta_vs_raw": (None if hcount is None or rcount is None
+                                     else hcount - rcount),
+                    "breakdown_vs_raw": (None if bcount is None or rcount is None
+                                         else bcount - rcount),
                     "status": status,
                 }
                 if status != "ok" and combo in grid:
@@ -2121,12 +2156,13 @@ def export_results(results: list[dict]) -> None:
 
             if not _DISABLE_HEATMAP_VALIDATION:
                 if mismatches:
-                    msg = ("preflight: heatmap/breakdown totals mismatch:\n  "
+                    msg = ("preflight: heatmap/breakdown/raw totals mismatch:\n  "
                            + "\n  ".join(mismatches))
                     print(msg, file=sys.stderr)
                     raise AssertionError(msg)
                 print(f"Heatmap validation OK: {len(heatmap_by_combo)} combo(s) "
-                      f"match breakdown totals ({sum(heatmap_by_combo.values())} row(s))")
+                      f"match breakdown and raw totals "
+                      f"({sum(heatmap_by_combo.values())} row(s))")
         elif validation_json:
             print("preflight: VALIDATION_JSON_PATH set but breakdown is disabled "
                   "(DISABLE_PERCENTILES); skipping validation JSON")
