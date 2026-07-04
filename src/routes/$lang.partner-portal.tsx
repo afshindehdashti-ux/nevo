@@ -320,8 +320,8 @@ function PartnerPortalPage() {
                 Become a <span className="text-emerald-400">NEVO Partner</span>.
               </h2>
               <p className="mt-4 max-w-xl text-white/70">
-                Join a premium global industrial engineering network with world-class technical,
-                commercial and marketing resources. Let's build the future together.
+                Join a global industrial engineering network with the technical, commercial
+                and marketing support you need to close larger projects — faster.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
@@ -335,7 +335,7 @@ function PartnerPortalPage() {
           </div>
           <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-5">
             {[
-              { l: "World-Class Quality", s: "Certified & Compliant", i: BadgeCheck },
+              { l: "Certified Quality", s: "ISO & Fire-Rated", i: BadgeCheck },
               { l: "Innovative Technology", s: "Advanced Engineering", i: Sparkles },
               { l: "Global Presence", s: "Local Support", i: Globe2 },
               { l: "Strong Partnership", s: "Shared Growth", i: Handshake },
