@@ -2529,6 +2529,13 @@ def export_results(results: list[dict]) -> None:
                 '<button type="button" id="artifact-sort-dir" '
                 'class="artifact-sort-dir" onclick="toggleSortDirection()" '
                 'aria-label="Toggle sort direction">Asc</button></p>\n\n'
+                '<p><label for="artifact-filter">Show:</label> '
+                '<select id="artifact-filter" class="artifact-filter" '
+                'onchange="filterArtifactItems()">'
+                '<option value="all">All</option>'
+                '<option value="existing">Only existing</option>'
+                '<option value="missing">Only missing</option>'
+                '</select></p>\n\n'
                 '<script>'
                 'function sortArtifactGroups() { '
                 'const key = document.getElementById("artifact-sort").value; '
@@ -2556,6 +2563,24 @@ def export_results(results: list[dict]) -> None:
                 'btn.dataset.dir = next; '
                 'btn.textContent = next === "asc" ? "Asc" : "Desc"; '
                 'sortArtifactGroups(); '
+                '} '
+                'function filterArtifactItems() { '
+                'const mode = document.getElementById("artifact-filter").value; '
+                'const q = document.querySelector(".artifact-search").value.toLowerCase(); '
+                'const container = document.querySelector(".artifact-index"); '
+                'container.querySelectorAll(".artifact-group").forEach(g => { '
+                'let visible = 0; '
+                'g.querySelectorAll(".artifact-item").forEach(el => { '
+                'const label = (el.dataset.label || "").toLowerCase(); '
+                'const path = (el.dataset.path || "").toLowerCase(); '
+                'const matchesSearch = !q || label.includes(q) || path.includes(q) || el.textContent.toLowerCase().includes(q); '
+                'const matchesMode = mode === "all" || (mode === "existing" && el.dataset.existing === "true") || (mode === "missing" && el.dataset.existing === "false"); '
+                'const show = matchesSearch && matchesMode; '
+                'el.style.display = show ? "" : "none"; '
+                'if (show) visible++; '
+                '}); '
+                'g.style.display = visible > 0 ? "" : "none"; '
+                '}); '
                 '}'
                 '</script>\n\n'
             )
@@ -2570,20 +2595,7 @@ def export_results(results: list[dict]) -> None:
             fh.write(
                 '<input type="text" class="artifact-search" '
                 'placeholder="Search artifacts by name or path..." '
-                'oninput="'
-                "const q = this.value.toLowerCase(); "
-                "this.closest('.artifact-index').querySelectorAll('.artifact-group').forEach(g => { "
-                "let visible = 0; "
-                "g.querySelectorAll('.artifact-item').forEach(el => { "
-                "const label = (el.dataset.label || '').toLowerCase(); "
-                "const path = (el.dataset.path || '').toLowerCase(); "
-                "const match = !q || label.includes(q) || path.includes(q) || el.textContent.toLowerCase().includes(q); "
-                "el.style.display = match ? '' : 'none'; "
-                "if (match) visible++; "
-                "}); "
-                "g.style.display = visible > 0 || !q ? '' : 'none'; "
-                "});"
-                '">\n\n'
+                'oninput="filterArtifactItems()">\n\n'
             )
             missing_artifacts: list[tuple[str, str]] = []
             for group_index, (title, items) in enumerate(groups):
@@ -2639,7 +2651,8 @@ def export_results(results: list[dict]) -> None:
                             fh.write(
                                 f'<div class="artifact-item" '
                                 f'data-label="{html.escape(label, quote=True)}" '
-                                f'data-path="{html.escape(path, quote=True)}">\n'
+                                f'data-path="{html.escape(path, quote=True)}" '
+                                f'data-existing="true">\n'
                                 f'<a href="{html.escape(path, quote=True)}">'
                                 f'<button type="button">Open</button></a> '
                                 f'<a href="{html.escape(path, quote=True)}" '
@@ -2656,7 +2669,8 @@ def export_results(results: list[dict]) -> None:
                             fh.write(
                                 f'<div class="artifact-item" '
                                 f'data-label="{html.escape(label, quote=True)}" '
-                                f'data-path="{html.escape(path, quote=True)}">\n'
+                                f'data-path="{html.escape(path, quote=True)}" '
+                                f'data-existing="false">\n'
                                 f"⚠️ <code>{html.escape(label)}</code> (missing) — expected at "
                                 f"<code>{html.escape(path)}</code>\n"
                                 "</div>\n"
@@ -2666,7 +2680,8 @@ def export_results(results: list[dict]) -> None:
                             fh.write(
                                 f'<div class="artifact-item" '
                                 f'data-label="{html.escape(label, quote=True)}" '
-                                f'data-path="{html.escape(path, quote=True)}">\n'
+                                f'data-path="{html.escape(path, quote=True)}" '
+                                f'data-existing="true">\n'
                                 f'<a href="{html.escape(path, quote=True)}">'
                                 f'<button type="button">Open</button></a> '
                                 f'<a href="{html.escape(path, quote=True)}">{html.escape(label)}</a> '
@@ -2680,7 +2695,8 @@ def export_results(results: list[dict]) -> None:
                             fh.write(
                                 f'<div class="artifact-item" '
                                 f'data-label="{html.escape(label, quote=True)}" '
-                                f'data-path="{html.escape(path, quote=True)}">\n'
+                                f'data-path="{html.escape(path, quote=True)}" '
+                                f'data-existing="false">\n'
                                 f"⚠️ <code>{html.escape(label)}</code> (missing) — expected at "
                                 f"<code>{html.escape(path)}</code>\n"
                                 "</div>\n"
