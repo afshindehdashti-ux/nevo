@@ -2603,7 +2603,7 @@ def export_results(results: list[dict]) -> None:
                     '(<span class="artifact-url-mode">file paths</span>)</p>\n\n'
                     if ARTIFACT_BASE_URL else ""
                 )
-                '<script>'
+                + '<script>'
                 'function showCopyToast(message) { '
                 'const live = document.getElementById("artifact-copy-live"); '
                 'if (live) { live.textContent = message; setTimeout(() => { live.textContent = ""; }, 1000); } '
