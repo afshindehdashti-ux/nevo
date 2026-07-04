@@ -2499,13 +2499,13 @@ def export_results(results: list[dict]) -> None:
                 for _, path in items
                 if os.path.exists(path)
             ]
-            if all_existing_paths:
-                all_links = "\n".join(all_existing_paths)
-                fh.write(
-                    '<button type="button" '
-                    'onclick="navigator.clipboard.writeText(this.dataset.links).catch(() => {})" '
-                    f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
-                )
+                if all_existing_paths:
+                    all_links = "\n".join(all_existing_paths)
+                    fh.write(
+                        '<button type="button" '
+                        f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
+                        f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
+                    )
             fh.write(
                 '<div class="artifact-index">\n'
                 '<input type="text" class="artifact-search" '
