@@ -2710,6 +2710,10 @@ def export_results(results: list[dict]) -> None:
                     'When enabled, copied links use the full site URL instead of relative file paths.</span></p>\n\n'
                     if ARTIFACT_BASE_URL else ""
                 )
+                + '<p><input type="text" class="artifact-search" '
+                  'aria-label="Search artifacts by name or path" '
+                  'placeholder="Search artifacts by name or path..." '
+                  'oninput="filterArtifactItems()"></p>\n\n'
                 + '<script>'
                 'function showCopyToast(message) { '
                 'const live = document.getElementById("artifact-copy-live"); '
@@ -3397,26 +3401,27 @@ def export_results(results: list[dict]) -> None:
                     if ARTIFACT_BASE_URL else ""
                 )
                 csv_semi_data_attr = f' data-csv-semi="{html.escape(csv_semi_str, quote=True)}"'
-                fh.write(
+                bulk_buf = io.StringIO()
+                bulk_buf.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links" '
                     'data-context="all artifacts" '
                     f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.linksUrl ? this.dataset.linksUrl : this.dataset.links){_CLIPBOARD_TOAST_MULTI}" '
                     f'data-links="{html.escape(all_links, quote=True)}"{links_url_data_attr}>Copy all links</button>\n\n'
                 )
-                fh.write(
+                bulk_buf.write(
                     '<button type="button" '
                     'aria-label="Copy all displayed artifact links" '
                     'onclick="copyDisplayedArtifactLinks()">Copy all displayed links</button>\n\n'
                 )
-                fh.write(
+                bulk_buf.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact paths as JSON" '
                     f'data-count="{len(all_items_json)}" '
                     f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.jsonUrl ? this.dataset.jsonUrl : this.dataset.json){_CLIPBOARD_TOAST_JSON}" '
                     f'data-json="{html.escape(json_str, quote=True)}"{json_url_data_attr}>Copy links (JSON)</button>\n\n'
                 )
-                fh.write(
+                bulk_buf.write(
                     '<label for="artifact-csv-delimiter" style="margin-right:6px;">CSV delimiter:</label>'
                     '<select id="artifact-csv-delimiter" '
                     'aria-label="CSV delimiter for Copy links (CSV) and Download CSV" '
@@ -3425,7 +3430,7 @@ def export_results(results: list[dict]) -> None:
                     '<option value=";">Semicolon (;)</option>'
                     '</select> '
                 )
-                fh.write(
+                bulk_buf.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links as CSV" '
                     f'data-count="{len(all_items_json)}" '
@@ -3433,7 +3438,7 @@ def export_results(results: list[dict]) -> None:
                     f'navigator.clipboard.writeText(raw.replace(/\\r?\\n/g, \'\\r\\n\')){_CLIPBOARD_TOAST_CSV}" '
                     f'data-csv="{html.escape(csv_str, quote=True)}"{csv_semi_data_attr}{csv_url_data_attr}>Copy links (CSV)</button>\n\n'
                 )
-                fh.write(
+                bulk_buf.write(
                     '<button type="button" '
                     'aria-label="Download all artifact links as CSV file" '
                     f'data-count="{len(all_items_json)}" '
@@ -3441,7 +3446,7 @@ def export_results(results: list[dict]) -> None:
                     'onclick="downloadArtifactCsv(this)" '
                     f'data-csv="{html.escape(csv_str, quote=True)}"{csv_semi_data_attr}{csv_url_data_attr}>Download CSV</button>\n\n'
                 )
-                fh.write(
+                bulk_buf.write(
                     '<div class="artifact-selection-controls" role="group" '
                     'aria-label="Artifact selection actions" '
                     'aria-describedby="artifact-selection-help" '
@@ -3648,12 +3653,6 @@ def export_results(results: list[dict]) -> None:
 
                 except OSError:
                     pass
-            fh.write(
-                '<input type="text" class="artifact-search" '
-                'aria-label="Search artifacts by name or path" '
-                'placeholder="Search artifacts by name or path..." '
-                'oninput="filterArtifactItems()">\n\n'
-            )
             missing_artifacts: list[tuple[str, str]] = []
             for group_index, (title, items) in enumerate(groups):
                 is_heatmap_group = "Latency heatmap" in title
@@ -3855,6 +3854,14 @@ def export_results(results: list[dict]) -> None:
                             )
                 fh.write("</div>\n")
             fh.write("</div>\n\n")
+            try:
+                _bulk_html = bulk_buf.getvalue()
+            except NameError:
+                _bulk_html = ""
+            if _bulk_html:
+                fh.write('<div class="artifact-bulk-actions" role="region" aria-label="Bulk artifact actions" style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.1);">\n')
+                fh.write(_bulk_html)
+                fh.write("</div>\n\n")
             if missing_artifacts:
                 fh.write(
                     "> ⚠️ _The following artifact(s) were not found on disk and may need to be regenerated:_\n"
