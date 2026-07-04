@@ -117,6 +117,21 @@ Env:
   SORT_COMBOS_ORDER    `asc` or `desc`; default is `desc` for `count`,
                        `success_rate`, and `failures_pct`. Ignored for `default`.
 
+  SUMMARY_FILTER_PRESETS
+                       named filter presets to switch between scenarios in
+                       the summary without re-typing full expressions.
+                       Format: `name::expr||name::expr`, e.g.
+                       `server::status_class=5xx||transport::error_kind=timeout,tls,dns`.
+                       Each `expr` uses the same grammar as SUMMARY_FILTER /
+                       RESULTS_INCLUDE.
+  SUMMARY_FILTER_PRESETS_JSON
+                       same as above but as a JSON object
+                       `{"server":"status_class=5xx", ...}`; JSON takes
+                       precedence when both are set.
+  SUMMARY_FILTER       set to `preset:<name>` or `@<name>` (or just the
+                       preset name, if unique) to apply a saved preset.
+
+
 
 Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
 page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
