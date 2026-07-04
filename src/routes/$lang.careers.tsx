@@ -71,11 +71,20 @@ function CareersPage() {
   } | null>(null);
   const [downloading, setDownloading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<{
+    title: string;
+    description: string;
+    detail?: string;
+    at: Date;
+    attempt: number;
+  } | null>(null);
+  const attemptRef = useRef(0);
 
   async function handleApplication(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (busy) return;
     setBusy(true);
+    setUploadError(null);
     setProgress(0);
     const { toast } = await import("sonner");
     const form = e.currentTarget;
@@ -91,6 +100,8 @@ function CareersPage() {
       cvSize: cvSize || undefined,
       submittedAt: new Date(),
     };
+    attemptRef.current += 1;
+    const attempt = attemptRef.current;
 
     // Estimate upload duration from file size (~1 MB / 400ms), min 1.2s max 6s.
     const targetMs = cvSize
@@ -107,7 +118,6 @@ function CareersPage() {
     const tick = () => {
       if (uploadDone) return;
       const elapsed = performance.now() - startedAt;
-      // Cap simulated progress at 92% until the real submission resolves.
       const pct = Math.min(92, Math.round((elapsed / targetMs) * 92));
       setProgress(pct);
       const uploadedMb = cvSize ? ((cvSize * pct) / 100 / (1024 * 1024)).toFixed(2) : null;
@@ -126,58 +136,100 @@ function CareersPage() {
     };
     const interval = window.setInterval(tick, 120);
 
+    const recordFailure = (title: string, description: string, detail?: string) => {
+      setUploadError({ title, description, detail, at: new Date(), attempt });
+    };
+
     try {
-      const ok = await submitLeadForm(form, {
-        source: "careers-application",
-        rules: [
-          { field: "name", label: "Full name" },
-          { field: "email", label: "Email", type: "email" },
-          { field: "phone", label: "Phone", type: "phone" },
-        ],
-        successTitle: "Application received",
-        successDescription: cvName
-          ? `CV "${cvName}" uploaded successfully. Generating your PDF confirmation…`
-          : "Generating your PDF confirmation…",
-      });
+      let ok = false;
+      let caughtDetail: string | undefined;
+      try {
+        ok = await submitLeadForm(form, {
+          source: "careers-application",
+          rules: [
+            { field: "name", label: "Full name" },
+            { field: "email", label: "Email", type: "email" },
+            { field: "phone", label: "Phone", type: "phone" },
+          ],
+          successTitle: "Application received",
+          successDescription: cvName
+            ? `CV "${cvName}" uploaded successfully. Generating your PDF confirmation…`
+            : "Generating your PDF confirmation…",
+        });
+      } catch (err) {
+        caughtDetail = err instanceof Error ? err.message : String(err);
+        ok = false;
+      }
 
       uploadDone = true;
       window.clearInterval(interval);
+
+      if (!ok) {
+        setProgress(0);
+        const online = typeof navigator === "undefined" || navigator.onLine !== false;
+        const title = online ? "Upload failed" : "You appear to be offline";
+        const description = online
+          ? "We couldn't finish sending your application. Your file is still attached — retry to resend without re-selecting it."
+          : "Reconnect to the internet, then retry. Your file is still attached.";
+        const detail = caughtDetail
+          ?? (cvName
+            ? `File: ${cvName}${cvSize ? ` (${(cvSize / (1024 * 1024)).toFixed(2)} MB)` : ""} · Attempt ${attempt}`
+            : `Attempt ${attempt}`);
+        recordFailure(title, description, detail);
+        toast.error(title, {
+          id: loadingId,
+          description,
+          action: {
+            label: "Retry upload",
+            onClick: () => cvFormRef.current?.requestSubmit(),
+          },
+        });
+        return;
+      }
+
       setProgress(100);
       toast.loading(
         cvName ? `CV uploaded — ${cvName} · 100%` : "Application submitted · 100%",
         { id: loadingId, description: "Finalising your confirmation…" },
       );
 
-      if (ok) {
-        // Generate PDF confirmation
-        try {
-          if (confirmation?.blobUrl) URL.revokeObjectURL(confirmation.blobUrl);
-          const { blob, filename, reference } = generateCvConfirmationPdf(snapshot);
-          const blobUrl = URL.createObjectURL(blob);
-          setConfirmation({ input: snapshot, filename, reference, blobUrl });
-          toast.success("PDF confirmation ready", {
-            id: loadingId,
-            description: `Reference ${reference} — download your confirmation below.`,
-          });
-        } catch (err) {
-          toast.error("Could not generate PDF confirmation", {
-            id: loadingId,
-            description: err instanceof Error ? err.message : "Please try again.",
-          });
-        }
-        cvFormRef.current?.reset();
-        setCvName("");
-        setCvSize(0);
-      } else {
-        toast.dismiss(loadingId);
+      // Generate PDF confirmation
+      try {
+        if (confirmation?.blobUrl) URL.revokeObjectURL(confirmation.blobUrl);
+        const { blob, filename, reference } = generateCvConfirmationPdf(snapshot);
+        const blobUrl = URL.createObjectURL(blob);
+        setConfirmation({ input: snapshot, filename, reference, blobUrl });
+        toast.success("PDF confirmation ready", {
+          id: loadingId,
+          description: `Reference ${reference} — download your confirmation below.`,
+        });
+      } catch (err) {
+        toast.error("Could not generate PDF confirmation", {
+          id: loadingId,
+          description: err instanceof Error ? err.message : "Please try again.",
+        });
       }
+      cvFormRef.current?.reset();
+      setCvName("");
+      setCvSize(0);
     } finally {
       uploadDone = true;
       window.clearInterval(interval);
       setBusy(false);
-      // Leave progress at 100 briefly, then reset.
       window.setTimeout(() => setProgress(0), 800);
     }
+  }
+
+  function handleRetryUpload() {
+    if (busy) return;
+    setUploadError(null);
+    cvFormRef.current?.requestSubmit();
+  }
+
+  function handleDismissUploadError() {
+    setUploadError(null);
+  }
+
   }
 
 
