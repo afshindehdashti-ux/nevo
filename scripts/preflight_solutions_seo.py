@@ -2008,8 +2008,9 @@ def export_results(results: list[dict]) -> None:
         # to the same total as the corresponding breakdown row `count`.
         # Mismatches indicate a classification/bucketing bug — surface them
         # loudly so the exported artifacts are never silently inconsistent.
-        # Skipped when percentiles are disabled (breakdown is not built).
-        if not _DISABLE_PERCENTILES:
+        # Skipped when percentiles are disabled (breakdown is not built) or
+        # when heatmap validation is explicitly disabled via env/CLI.
+        if not _DISABLE_PERCENTILES and not _DISABLE_HEATMAP_VALIDATION:
             breakdown_by_combo = {
                 (r["error_kind"], r["status_class"]): r["count"]
                 for r in _build_breakdown_rows(results)
