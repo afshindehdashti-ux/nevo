@@ -2029,27 +2029,69 @@ def export_results(results: list[dict]) -> None:
                 for r in _build_breakdown_rows(results)
             }
             heatmap_by_combo = {k: sum(v) for k, v in grid.items()}
+            # Precompute bucket edges (lo_ms, hi_ms) once so mismatch reports
+            # can point at the specific buckets whose counts contribute to a
+            # divergence — the total-only message doesn't tell an operator
+            # where the offending rows landed.
+            bucket_edges: list[tuple[str, float, float | None]] = []
+            _prev = 0.0
+            for _i, (_lbl, _upper) in enumerate(_LATENCY_BUCKETS):
+                _is_last = _i == len(_LATENCY_BUCKETS) - 1
+                bucket_edges.append(
+                    (_lbl, _prev, None if _is_last else float(_upper)))
+                _prev = float(_upper)
+
+            def _fmt_edge(v: float) -> str:
+                # Integer-ish edges render without trailing ".0" for readability.
+                return f"{int(v)}" if float(v).is_integer() else f"{v}"
+
+            def _nonzero_bucket_report(counts: list[int]) -> list[dict]:
+                out: list[dict] = []
+                for i, (lbl, lo, hi) in enumerate(bucket_edges):
+                    if counts[i]:
+                        out.append({
+                            "label": lbl,
+                            "lo_ms": lo,
+                            "hi_ms": hi,
+                            "count": counts[i],
+                        })
+                return out
+
+            def _fmt_bucket_hint(counts: list[int]) -> str:
+                parts = []
+                for b in _nonzero_bucket_report(counts):
+                    hi = "∞" if b["hi_ms"] is None else _fmt_edge(b["hi_ms"])
+                    parts.append(
+                        f"{b['label']} ({_fmt_edge(b['lo_ms'])}–{hi}ms)={b['count']}")
+                return ", ".join(parts) if parts else "<no non-zero buckets>"
+
             mismatches: list[str] = []
             combo_report: list[dict] = []
             all_combos = set(heatmap_by_combo) | set(breakdown_by_combo)
             for combo in sorted(all_combos):
                 hcount = heatmap_by_combo.get(combo)
                 bcount = breakdown_by_combo.get(combo)
+                buckets_hint = (_fmt_bucket_hint(grid[combo])
+                                if combo in grid else "<no heatmap buckets>")
                 if hcount is None:
                     status = "missing_in_heatmap"
                     mismatches.append(
-                        f"{combo[0]}×{combo[1]}: heatmap=<missing>, breakdown={bcount}")
+                        f"{combo[0]}×{combo[1]}: heatmap=<missing>, "
+                        f"breakdown={bcount} — heatmap buckets: {buckets_hint}")
                 elif bcount is None:
                     status = "missing_in_breakdown"
                     mismatches.append(
-                        f"{combo[0]}×{combo[1]}: heatmap={hcount}, breakdown=<missing>")
+                        f"{combo[0]}×{combo[1]}: heatmap={hcount}, "
+                        f"breakdown=<missing> — heatmap buckets: {buckets_hint}")
                 elif bcount != hcount:
                     status = "mismatch"
                     mismatches.append(
-                        f"{combo[0]}×{combo[1]}: heatmap={hcount}, breakdown={bcount}")
+                        f"{combo[0]}×{combo[1]}: heatmap={hcount}, "
+                        f"breakdown={bcount} (delta={hcount - bcount}) — "
+                        f"heatmap buckets: {buckets_hint}")
                 else:
                     status = "ok"
-                combo_report.append({
+                entry = {
                     "error_kind": combo[0],
                     "status_class": combo[1],
                     "expected": bcount,
@@ -2057,7 +2099,10 @@ def export_results(results: list[dict]) -> None:
                     "delta": (None if hcount is None or bcount is None
                               else hcount - bcount),
                     "status": status,
-                })
+                }
+                if status != "ok" and combo in grid:
+                    entry["diverging_buckets"] = _nonzero_bucket_report(grid[combo])
+                combo_report.append(entry)
 
             if validation_json:
                 from datetime import datetime, timezone
