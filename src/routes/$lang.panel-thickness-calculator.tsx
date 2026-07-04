@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
+import { toast } from "sonner";
 import {
   AlertTriangle,
   ArrowRight,
@@ -12,6 +13,7 @@ import {
   Download,
   Flame,
   Link2,
+  Loader2,
   MessageSquare,
   PhoneCall,
   Thermometer,
