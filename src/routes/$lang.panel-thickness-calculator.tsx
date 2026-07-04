@@ -956,57 +956,6 @@ function PanelThicknessPage() {
     });
   }
 
-  function downloadReport() {
-    if (hasErrors) return;
-    const lines = [
-      "NEVO Panel Thickness Calculation Report",
-      "======================================",
-      "",
-      `Application:         ${app}`,
-      `Core Material:       ${core}`,
-      `Climate Zone:        ${climate}`,
-      `Internal Temp:       ${temp}`,
-      `Fire Requirement:    ${fire}`,
-      `Selected Thickness:  ${thickness} mm`,
-      `Exterior Steel:      ${extSteel.toFixed(2)} mm`,
-      `Interior Steel:      ${intSteel.toFixed(2)} mm`,
-      "",
-      "RESULTS",
-      "-------",
-      `U-Value:             ${u} W/m²K`,
-      `Thermal Resistance:  ${rTotal} m²K/W`,
-      `Panel Weight:        ${w} kg/m²`,
-      `Est. Heat Loss:      ${hLoss} W/m² (ΔT ${deltaT} K)`,
-      `Fire Achieved:       ${fireLabel(fireAchieved)} (required ${fire})`,
-      `Thermal Performance: ${perf}`,
-      "",
-      "RECOMMENDATION",
-      "--------------",
-      `Recommended range:   ${rec.min}–${rec.max} mm`,
-      `Note: ${rec.note}`,
-      fireWarn
-        ? "WARNING: For high fire resistance requirements, Rock Wool is usually recommended."
-        : "",
-      "",
-      "DISCLAIMER",
-      "----------",
-      "This calculator provides conceptual guidance only. Final sandwich panel",
-      "thickness must be verified by project-specific engineering, local",
-      "regulations, fire requirements and thermal performance calculations.",
-    ]
-      .filter(Boolean)
-      .join("\n");
-
-    const blob = new Blob([lines], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `nevo-panel-thickness-${app.replace(/\s+/g, "-")}-${thickness}mm.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
 
   async function downloadPdfReport() {
     if (hasErrors) return;
