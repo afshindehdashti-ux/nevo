@@ -2643,11 +2643,20 @@ def export_results(results: list[dict]) -> None:
                         os.path.basename(bundle_path), quote=True
                     )
                     fh.write(
-                        f'<p><a href="{bundle_href}" download '
-                        f'aria-label="Download all available artifacts as a zip archive">'
-                        f'Download all available ({total_existing_count} '
+                        '<button type="button" '
+                        f'aria-label="Download all available artifacts as a zip archive" '
+                        f'data-href="{bundle_href}" '
+                        f'data-download="{bundle_href}" '
+                        'onclick="const a = document.createElement(\'a\'); '
+                        'a.href = this.dataset.href; '
+                        'a.download = this.dataset.download; '
+                        'a.style.display = \'none\'; '
+                        'document.body.appendChild(a); '
+                        'a.click(); '
+                        'a.remove();">'
+                        f'Download all ({total_existing_count} '
                         f'file{"s" if total_existing_count != 1 else ""}, '
-                        f'{bundle_size_str} zip)</a></p>\n\n'
+                        f'{bundle_size_str} zip)</button>\n\n'
                     )
                 except OSError:
                     pass
