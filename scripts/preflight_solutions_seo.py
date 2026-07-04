@@ -2730,7 +2730,6 @@ def export_results(results: list[dict]) -> None:
                 'placeholder="Search artifacts by name or path..." '
                 'oninput="filterArtifactItems()">\n\n'
             )
-            summary_dir = os.path.dirname(summary_path) or "."
             missing_artifacts: list[tuple[str, str]] = []
             for group_index, (title, items) in enumerate(groups):
                 is_heatmap_group = "Latency heatmap" in title
