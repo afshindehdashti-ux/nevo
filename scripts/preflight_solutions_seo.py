@@ -2158,8 +2158,18 @@ _CLIPBOARD_TOAST_JSON = (
     ".catch(() => { showCopyToast('Could not copy — check clipboard permissions'); })"
 )
 
+# Inline JS toast shown after copying all artifact links as CSV. The count is
+# read from a data-count attribute; the actual CSV payload lives in data-csv.
+_CLIPBOARD_TOAST_CSV = (
+    ".then(() => { "
+    "const n = parseInt(this.dataset.count || '0', 10); "
+    "showCopyToast('Copied ' + n + ' link' + (n === 1 ? '' : 's') + ' as CSV'); "
+    "})"
+    ".catch(() => { showCopyToast('Could not copy — check clipboard permissions'); })"
+)
 
-def export_results(results: list[dict]) -> None:
+
+
     """Write results as CSV / JSON artifacts for post-run analysis.
 
     Paths are opt-in via env so the script stays side-effect free by default:
