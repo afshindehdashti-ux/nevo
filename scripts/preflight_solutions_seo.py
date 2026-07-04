@@ -931,6 +931,25 @@ if _SORT_COMBOS_ORDER not in {"asc", "desc"}:
     print(f"preflight: warning: invalid SORT_COMBOS_ORDER={_SORT_COMBOS_ORDER!r}; using desc", file=sys.stderr)
     _SORT_COMBOS_ORDER = "desc"
 
+# Rate bar rendering mode. `success` (default) fills cells left-to-right with
+# 🟩 up to success%; `failure` fills them with 🟥 up to failure%. Also accepts
+# CLI flags --rate-bar=success|failure so the toggle is discoverable from --help.
+_RATE_BAR_MODE_OPTIONS = {"success", "failure"}
+def _resolve_rate_bar_mode() -> str:
+    for arg in sys.argv[1:]:
+        if arg.startswith("--rate-bar="):
+            v = arg.split("=", 1)[1].strip().lower()
+            if v in _RATE_BAR_MODE_OPTIONS:
+                return v
+            print(f"preflight: warning: invalid --rate-bar={v!r}; using success", file=sys.stderr)
+            return "success"
+    v = (os.environ.get("RATE_BAR_MODE") or "success").strip().lower()
+    if v not in _RATE_BAR_MODE_OPTIONS:
+        print(f"preflight: warning: invalid RATE_BAR_MODE={v!r}; using success", file=sys.stderr)
+        return "success"
+    return v
+_RATE_BAR_MODE = _resolve_rate_bar_mode()
+
 
 def _bucket_for(ms: float) -> int:
     for i, (_, hi) in enumerate(_LATENCY_BUCKETS):
