@@ -106,6 +106,11 @@ Env:
                         summary shows a "Copy absolute URLs" toggle that copies
                         `${ARTIFACT_BASE_URL}/${artifact_filename}` instead of the
                         local file path. The local file path remains the default.
+  ARTIFACT_CSV_INCLUDE_URL
+                       opt-in ("1"/"true"/"yes"/"on"): when ARTIFACT_BASE_URL is
+                       also set, the "Copy links (CSV)" export gains a third
+                       `url` column carrying the absolute URL alongside the
+                       existing `label` and `path` columns.
   LATENCY_BUCKETS      explicit comma-separated upper-bound edges (ms) for
                        the latency histogram/heatmap, e.g.
                        `LATENCY_BUCKETS=50,100,250,500,1000,5000`.
@@ -323,6 +328,12 @@ def _normalize_artifact_base_url(raw: str) -> str:
 
 BASE = os.environ.get("BASE_URL", "http://127.0.0.1:8080").rstrip("/")
 ARTIFACT_BASE_URL = _normalize_artifact_base_url(os.environ.get("ARTIFACT_BASE_URL", ""))
+# Opt-in: when ARTIFACT_BASE_URL is set, include an extra `url` column in the
+# "Copy links (CSV)" export alongside the relative `path` column so downstream
+# tools get both the on-disk path and the shareable URL in one row.
+ARTIFACT_CSV_INCLUDE_URL = os.environ.get(
+    "ARTIFACT_CSV_INCLUDE_URL", ""
+).strip().lower() in ("1", "true", "yes", "on")
 
 # LOCALES / PATHS env overrides are validated against the shared matrix:
 # any value not in the shared list is dropped with a warning so we can't
@@ -3117,17 +3128,25 @@ def export_results(results: list[dict]) -> None:
                 ]
                 json_str = json.dumps(all_items_json)
                 json_url_str = json.dumps(all_items_json_url)
+                csv_include_url = bool(ARTIFACT_BASE_URL) and ARTIFACT_CSV_INCLUDE_URL
+                csv_columns = ["label", "path", "url"] if csv_include_url else ["label", "path"]
                 csv_io = io.StringIO()
                 csv_writer = csv.writer(csv_io)
-                csv_writer.writerow(["label", "path"])
-                for item in all_items_json:
-                    csv_writer.writerow([item["label"], item["path"]])
+                csv_writer.writerow(csv_columns)
+                for rel_item, abs_item in zip(all_items_json, all_items_json_url):
+                    if csv_include_url:
+                        csv_writer.writerow([rel_item["label"], rel_item["path"], abs_item["path"]])
+                    else:
+                        csv_writer.writerow([rel_item["label"], rel_item["path"]])
                 csv_str = csv_io.getvalue()
                 csv_io_url = io.StringIO()
                 csv_writer_url = csv.writer(csv_io_url)
-                csv_writer_url.writerow(["label", "path"])
-                for item in all_items_json_url:
-                    csv_writer_url.writerow([item["label"], item["path"]])
+                csv_writer_url.writerow(csv_columns)
+                for abs_item in all_items_json_url:
+                    if csv_include_url:
+                        csv_writer_url.writerow([abs_item["label"], abs_item["path"], abs_item["path"]])
+                    else:
+                        csv_writer_url.writerow([abs_item["label"], abs_item["path"]])
                 csv_url_str = csv_io_url.getvalue()
                 links_url_data_attr = (
                     f' data-links-url="{html.escape(all_links_url, quote=True)}"'
