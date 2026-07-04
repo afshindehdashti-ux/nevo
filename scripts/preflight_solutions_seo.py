@@ -2797,6 +2797,8 @@ def export_results(results: list[dict]) -> None:
                                 meta = ""
                             fh.write(
                                 f'<div class="artifact-item" '
+                                f'data-group="{group_index}" '
+                                f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
                                 f'data-existing="true">\n'
