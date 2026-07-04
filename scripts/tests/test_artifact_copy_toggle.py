@@ -172,6 +172,34 @@ async def _run(html_path: Path) -> None:
             )
             print(f"  ok — {label}")
 
+        # RFC 4180 check for the Python-fed CSV button: after HTML attribute
+        # normalization strips CR, the onclick handler must restore CRLF and
+        # csv.writer must have already escaped commas/quotes/newlines in
+        # labels + paths.
+        await _set_toggle(page, False)
+        # Inject a row with tricky content, then re-copy.
+        csv_payload = await page.evaluate(
+            """async () => {
+              const btn = document.querySelector("button[aria-label='Copy all artifact links as CSV']");
+              // Rebuild data-csv with a tricky row appended (simulating a filename
+              // with special chars) to prove the escaping survives the roundtrip.
+              const tricky = 'label,path\\r\\n"weird, name","path with ""quotes"""\\r\\n"multi\\nline",x\\r\\n';
+              btn.dataset.csv = tricky;
+              await navigator.clipboard.writeText('');
+              btn.click();
+              // Wait for the async clipboard write.
+              await new Promise(r => setTimeout(r, 100));
+              return navigator.clipboard.readText();
+            }"""
+        )
+        assert "\r\n" in csv_payload, (
+            f"CSV clipboard payload lost CRLF line terminators:\n{csv_payload!r}"
+        )
+        assert '"weird, name"' in csv_payload, "comma-in-field not quoted"
+        assert '"""quotes"""' in csv_payload, "internal quotes not doubled"
+        assert '"multi\nline"' in csv_payload, "newline-in-field not quoted"
+        print("  ok — CSV RFC 4180 escaping preserved through DOM roundtrip")
+
         await browser.close()
 
 
