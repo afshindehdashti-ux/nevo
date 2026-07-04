@@ -15,7 +15,24 @@ const InquirySchema = z.object({
   application: z.string().trim().max(200).optional().nullable(),
   message: z.string().trim().max(5000).optional().nullable(),
   source_page: z.string().trim().max(300).optional().nullable(),
-  calculator_state: z.unknown().optional().nullable(),
+  calculator_state: z
+    .unknown()
+    .optional()
+    .nullable()
+    .superRefine((val, ctx) => {
+      if (val === null || val === undefined) return;
+      let serialized: string;
+      try {
+        serialized = JSON.stringify(val);
+      } catch {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "calculator_state not serializable" });
+        return;
+      }
+      if (!serialized) return;
+      if (serialized.length > 32_000) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "calculator_state too large" });
+      }
+    }),
   // Honeypot — must be empty
   website: z.string().max(0).optional().nullable(),
 });
