@@ -2779,6 +2779,7 @@ def export_results(results: list[dict]) -> None:
                         f'data-markdown="{html.escape(markdown_links, quote=True)}">Copy as Markdown</button>\n\n'
                     )
                 for label, path in items:
+                    file_type = os.path.splitext(path)[1].lower() or "none"
                     exists = os.path.exists(path)
                     if not exists:
                         missing_artifacts.append((label, path))
