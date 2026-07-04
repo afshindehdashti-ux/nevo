@@ -70,7 +70,11 @@ export const Route = createFileRoute("/$lang/knowledge-hub/$slug")({
             headline: a.title,
             description: a.excerpt,
             image: a.cover,
-            author: { "@type": "Organization", name: a.author },
+            // Person when the byline is an individual (first + last name);
+            // Organization for group/desk/team bylines like "NEVO Engineering Desk".
+            author: /\b(Desk|Team|Group|Editors|Editorial|Industrial|Engineering Desk)\b/i.test(a.author)
+              ? { "@type": "Organization", name: a.author }
+              : { "@type": "Person", name: a.author },
             publisher: { "@type": "Organization", name: "NEVO Industrial" },
             datePublished: a.date,
             mainEntityOfPage: url,
