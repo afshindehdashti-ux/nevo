@@ -2088,6 +2088,18 @@ def _sort_combo_rows(
     return rows
 
 
+def _human_size(size: int) -> str:
+    """Return a human-readable byte size string."""
+    if size < 1024:
+        return f"{size} B"
+    elif size < 1024 * 1024:
+        return f"{size / 1024:.1f} KB"
+    elif size < 1024 * 1024 * 1024:
+        return f"{size / (1024 * 1024):.1f} MB"
+    else:
+        return f"{size / (1024 * 1024 * 1024):.1f} GB"
+
+
 def export_results(results: list[dict]) -> None:
     """Write results as CSV / JSON artifacts for post-run analysis.
 
@@ -2473,7 +2485,22 @@ def export_results(results: list[dict]) -> None:
             missing_artifacts: list[tuple[str, str]] = []
             for title, items in groups:
                 is_heatmap_group = "Latency heatmap" in title
-                fh.write(f'<div class="artifact-group">\n<p><em>{title}</em></p>\n\n')
+                group_count = 0
+                group_size = 0
+                for _, path in items:
+                    if os.path.exists(path):
+                        group_count += 1
+                        try:
+                            group_size += os.path.getsize(path)
+                        except OSError:
+                            pass
+                group_size_str = _human_size(group_size)
+                fh.write(
+                    f'<div class="artifact-group">\n'
+                    f'<p><em>{title}</em> — '
+                    f'<strong>{group_count} file{"s" if group_count != 1 else ""}</strong>, '
+                    f'<strong>{group_size_str}</strong></p>\n\n'
+                )
                 if is_heatmap_group:
                     existing_heatmap = [
                         (label, path) for label, path in items if os.path.exists(path)
@@ -2494,12 +2521,7 @@ def export_results(results: list[dict]) -> None:
                             try:
                                 size = os.path.getsize(path)
                                 mtime = os.path.getmtime(path)
-                                if size < 1024:
-                                    size_str = f"{size} B"
-                                elif size < 1024 * 1024:
-                                    size_str = f"{size / 1024:.1f} KB"
-                                else:
-                                    size_str = f"{size / (1024 * 1024):.1f} MB"
+                                size_str = _human_size(size)
                                 mtime_str = time.strftime(
                                     "%Y-%m-%d %H:%M:%S", time.localtime(mtime)
                                 )
