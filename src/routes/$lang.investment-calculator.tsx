@@ -1084,7 +1084,7 @@ function InvestmentCalculatorPage() {
                   </p>
                 </Card>
 
-                <Card title="Download Report" icon={FileText}>
+                <Card title="Download PDF Report" icon={FileText}>
                   <ul className="grid gap-2 text-[12px]">
                     {([
                       ["investment", "Investment Report (PDF)"],
