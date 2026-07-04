@@ -2983,6 +2983,15 @@ def export_results(results: list[dict]) -> None:
                         except OSError:
                             size = 0
                             mtime = 0
+                        sha256 = ""
+                        try:
+                            h = hashlib.sha256()
+                            with open(path, "rb") as _fh:
+                                for chunk in iter(lambda: _fh.read(65536), b""):
+                                    h.update(chunk)
+                            sha256 = h.hexdigest()
+                        except OSError:
+                            sha256 = ""
                         manifest_rows.append(
                             {
                                 "group": title,
@@ -2991,6 +3000,7 @@ def export_results(results: list[dict]) -> None:
                                 "mtime": time.strftime(
                                     "%Y-%m-%d %H:%M:%S", time.localtime(mtime)
                                 ) if mtime else "",
+                                "sha256": sha256,
                             }
                         )
                 try:
@@ -3001,7 +3011,7 @@ def export_results(results: list[dict]) -> None:
                         csv_manifest_path, "w", newline="", encoding="utf-8"
                     ) as f:
                         writer = csv.writer(f)
-                        writer.writerow(["group", "filename", "size", "mtime"])
+                        writer.writerow(["group", "filename", "size", "mtime", "sha256"])
                         for row in manifest_rows:
                             writer.writerow(
                                 [
@@ -3009,7 +3019,9 @@ def export_results(results: list[dict]) -> None:
                                     row["filename"],
                                     row["size"],
                                     row["mtime"],
+                                    row["sha256"],
                                 ]
+
                             )
                     json_manifest_path = os.path.join(
                         summary_dir, "artifacts_manifest.json"
