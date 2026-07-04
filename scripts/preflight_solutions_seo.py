@@ -2697,9 +2697,12 @@ def export_results(results: list[dict]) -> None:
                     '<p><label for="artifact-url-toggle">'
                     '<input type="checkbox" id="artifact-url-toggle" class="artifact-url-toggle" '
                     'role="switch" aria-checked="false" '
+                    'aria-describedby="artifact-url-toggle-desc" '
                     'onchange="updateArtifactUrlMode()"> '
                     'Copy absolute URLs</label> '
-                    '(<span class="artifact-url-mode">file paths</span>)</p>\n\n'
+                    '(<span class="artifact-url-mode">file paths</span>)'
+                    '<span id="artifact-url-toggle-desc" class="visually-hidden"> '
+                    'When enabled, copied links use the full site URL instead of relative file paths.</span></p>\n\n'
                     if ARTIFACT_BASE_URL else ""
                 )
                 + '<script>'
