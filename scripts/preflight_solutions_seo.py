@@ -1126,9 +1126,42 @@ def _parse_combo_filters() -> list[tuple[str, str, float, str]]:
 _COMBO_FILTERS = _parse_combo_filters()
 _FILTERS_RESET = _reset_filters_requested()
 
+
+def _parse_combo_filter_mode() -> str:
+    """Return `"any"` or `"all"`. Default `"all"` (AND-combine predicates).
+    Trigger OR-combine via env `COMBO_FILTER_MODE=any` or CLI
+    `--combo-filter-mode=any` (aliases: `or`, `union`)."""
+    raw = (os.environ.get("COMBO_FILTER_MODE") or "").strip().lower()
+    for arg in sys.argv[1:]:
+        if arg.startswith("--combo-filter-mode="):
+            raw = arg.split("=", 1)[1].strip().lower()
+    if raw in ("any", "or", "union"):
+        return "any"
+    if raw in ("", "all", "and", "intersection"):
+        return "all"
+    print(
+        f"preflight: warning: unknown COMBO_FILTER_MODE {raw!r} — "
+        "expected any|or|union or all|and|intersection; falling back to 'all'",
+        file=sys.stderr,
+    )
+    return "all"
+_COMBO_FILTER_MODE = _parse_combo_filter_mode()
+
+
 def _combo_row_matches_filters(success_pct: float) -> bool:
-    """AND-combine every configured predicate. Empty filter list = keep all."""
+    """Combine every configured predicate per `_COMBO_FILTER_MODE`. Empty
+    filter list = keep all. `all` = AND (default), `any` = OR — a row is
+    kept when at least one predicate matches, so overlapping ranges act as
+    a union rather than an intersection."""
+    if not _COMBO_FILTERS:
+        return True
     failure_pct = 100.0 - success_pct
+    if _COMBO_FILTER_MODE == "any":
+        for metric, op, val, _raw in _COMBO_FILTERS:
+            actual = success_pct if metric == "success" else failure_pct
+            if _COMBO_FILTER_OPS[op](actual, val):
+                return True
+        return False
     for metric, op, val, _raw in _COMBO_FILTERS:
         actual = success_pct if metric == "success" else failure_pct
         if not _COMBO_FILTER_OPS[op](actual, val):
