@@ -2166,7 +2166,7 @@ def _artifact_url(path: str) -> str | None:
 # Inline JS toast shown after copying a single artifact link. Self-contained so
 # it works in any markdown viewer that executes onclick handlers.
 _CLIPBOARD_TOAST_SINGLE = (
-    ".then(() => { showCopyToast('Copied link'); })"
+    ".then(() => { showCopyToast('Copied link' + (this.dataset.label ? ' for ' + this.dataset.label : '')); })"
     ".catch(() => { showCopyToast('Could not copy — check clipboard permissions'); })"
 )
 
@@ -2723,6 +2723,10 @@ def export_results(results: list[dict]) -> None:
                 'a.click(); '
                 'a.remove(); '
                 '} '
+                'function artifactDownloadWithToast(href, label) { '
+                'artifactDownload(href); '
+                'showCopyToast("Downloading " + (label || href.split("/").pop() || "file")); '
+                '} '
                  'function persistArtifactSort(key, dir) { '
                  'try { localStorage.setItem("artifactSort", key); localStorage.setItem("artifactSortDir", dir); } catch (e) {} '
                  'try { const url = new URL(window.location.href); '
@@ -3188,14 +3192,14 @@ def export_results(results: list[dict]) -> None:
                 'actions.appendChild(open); '
                 'const dl = document.createElement("button"); '
                 'dl.type = "button"; dl.textContent = "Download"; '
-                'dl.onclick = () => artifactDownload(path); '
+                'dl.onclick = () => { artifactDownload(path); showCopyToast("Downloading " + (label || path.split("/").pop() || "file")); }; '
                 'actions.appendChild(dl); '
                 'const cp = document.createElement("button"); '
                 'cp.type = "button"; cp.textContent = "Copy link"; '
                 'cp.onclick = () => { '
                 'const useUrl = document.getElementById("artifact-url-toggle") && document.getElementById("artifact-url-toggle").checked; '
                 'const val = (useUrl && url) ? url : path; '
-                'navigator.clipboard.writeText(val).then(() => showCopyToast("Copied link")).catch(() => showCopyToast("Could not copy — check clipboard permissions")); '
+                'navigator.clipboard.writeText(val).then(() => showCopyToast("Copied link" + (label ? " for " + label : ""))).catch(() => showCopyToast("Could not copy — check clipboard permissions")); '
                 '}; '
                 'actions.appendChild(cp); '
                 'const share = document.createElement("button"); '
@@ -3427,7 +3431,8 @@ def export_results(results: list[dict]) -> None:
                         '<button type="button" '
                         f'aria-label="Download all available artifacts as a zip archive" '
                         f'data-href="{bundle_href}" '
-                        f'onclick="artifactDownload(this.dataset.href)">'
+                        f'data-label="all artifacts" '
+                        f'onclick="artifactDownloadWithToast(this.dataset.href, this.dataset.label)">'
                         f'Download all ({total_existing_count} '
                         f'file{"s" if total_existing_count != 1 else ""}, '
                         f'{bundle_size_str} zip)</button>\n\n'
@@ -3534,14 +3539,16 @@ def export_results(results: list[dict]) -> None:
                         '<button type="button" '
                         f'aria-label="Download artifact manifest as CSV" '
                         f'data-href="{csv_href}" '
-                        'onclick="artifactDownload(this.dataset.href)">'
+                        f'data-label="manifest CSV" '
+                        'onclick="artifactDownloadWithToast(this.dataset.href, this.dataset.label)">'
                         'Export manifest CSV</button> '
                     )
                     fh.write(
                         '<button type="button" '
                         f'aria-label="Download artifact manifest as JSON" '
                         f'data-href="{json_href}" '
-                        'onclick="artifactDownload(this.dataset.href)">'
+                        f'data-label="manifest JSON" '
+                        'onclick="artifactDownloadWithToast(this.dataset.href, this.dataset.label)">'
                         'Export manifest JSON</button> '
                     )
                     if xlsx_written:
@@ -3552,7 +3559,8 @@ def export_results(results: list[dict]) -> None:
                             '<button type="button" '
                             f'aria-label="Download artifact manifest as XLSX" '
                             f'data-href="{xlsx_href}" '
-                            'onclick="artifactDownload(this.dataset.href)">'
+                            f'data-label="manifest XLSX" '
+                            'onclick="artifactDownloadWithToast(this.dataset.href, this.dataset.label)">'
                             'Export manifest XLSX</button>\n\n'
                         )
                     else:
@@ -3703,13 +3711,14 @@ def export_results(results: list[dict]) -> None:
                                 '<button type="button" '
                                 f'aria-label="Download {html.escape(label, quote=True)}" '
                                 f'data-href="{html.escape(path, quote=True)}" '
-                                'onclick="artifactDownload(this.dataset.href)">'
+                                f'data-label="{html.escape(label, quote=True)}" '
+                                'onclick="artifactDownloadWithToast(this.dataset.href, this.dataset.label)">'
                                 f'Download {html.escape(label)}</button> '
                                 f'{meta} '
                                 '<button type="button" '
                                 f'aria-label="Copy link for {html.escape(label, quote=True)}" '
                                 f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.url ? this.dataset.url : this.dataset.link){_CLIPBOARD_TOAST_SINGLE}" '
-                                f'data-link="{html.escape(path, quote=True)}"{url_attr}>Copy link</button>\n'
+                                f'data-link="{html.escape(path, quote=True)}" data-label="{html.escape(label, quote=True)}"{url_attr}>Copy link</button>\n'
                                 "</div>\n"
                             )
                         else:
@@ -3741,12 +3750,13 @@ def export_results(results: list[dict]) -> None:
                                 '<button type="button" '
                                 f'aria-label="Download {html.escape(label, quote=True)}" '
                                 f'data-href="{html.escape(path, quote=True)}" '
-                                'onclick="artifactDownload(this.dataset.href)">'
+                                f'data-label="{html.escape(label, quote=True)}" '
+                                'onclick="artifactDownloadWithToast(this.dataset.href, this.dataset.label)">'
                                 'Download</button> '
                                 '<button type="button" '
                                 f'aria-label="Copy link for {html.escape(label, quote=True)}" '
                                 f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.url ? this.dataset.url : this.dataset.link){_CLIPBOARD_TOAST_SINGLE}" '
-                                f'data-link="{html.escape(path, quote=True)}"{url_attr}>Copy link</button>\n'
+                                f'data-link="{html.escape(path, quote=True)}" data-label="{html.escape(label, quote=True)}"{url_attr}>Copy link</button>\n'
                                 "</div>\n"
                             )
                         else:
