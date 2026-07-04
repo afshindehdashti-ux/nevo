@@ -3264,6 +3264,8 @@ def export_results(results: list[dict]) -> None:
                     '<span class="artifact-selection-count">0 selected</span> '
                     '<button type="button" aria-label="Select all visible artifacts" '
                     'onclick="selectAllVisibleArtifacts(true)">Select all visible</button> '
+                    '<button type="button" aria-label="Select all artifact results across every page, ignoring filters and pagination" '
+                    'onclick="selectAllArtifacts(true)">Select all results</button> '
                     '<button type="button" aria-label="Clear artifact selection" '
                     'onclick="clearArtifactSelection()">Clear selection</button> '
                     '<button type="button" aria-label="Copy selected artifact links as Markdown" '
