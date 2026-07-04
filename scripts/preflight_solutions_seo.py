@@ -2100,6 +2100,36 @@ def _human_size(size: int) -> str:
         return f"{size / (1024 * 1024 * 1024):.1f} GB"
 
 
+# Inline JS toast shown after copying a single artifact link. Self-contained so
+# it works in any markdown viewer that executes onclick handlers.
+_CLIPBOARD_TOAST_SINGLE = (
+    ".then(() => { "
+    "const t = document.createElement('div'); "
+    "t.textContent = 'Copied link'; "
+    "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
+    "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
+    "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
+    "document.body.appendChild(t); "
+    "setTimeout(() => t.remove(), 2000); "
+    "})"
+)
+
+# Inline JS toast shown after copying multiple artifact links. The count is
+# derived from the data-links attribute at click time.
+_CLIPBOARD_TOAST_MULTI = (
+    ".then(() => { "
+    "const n = this.dataset.links.split('\\n').length; "
+    "const t = document.createElement('div'); "
+    "t.textContent = 'Copied ' + n + ' link' + (n === 1 ? '' : 's'); "
+    "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
+    "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
+    "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
+    "document.body.appendChild(t); "
+    "setTimeout(() => t.remove(), 2000); "
+    "})"
+)
+
+
 def export_results(results: list[dict]) -> None:
     """Write results as CSV / JSON artifacts for post-run analysis.
 
