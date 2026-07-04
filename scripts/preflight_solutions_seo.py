@@ -247,6 +247,15 @@ RETRYABLE_STATUS_CLASSES: set[str] = {
 IN_GHA = os.environ.get("GITHUB_ACTIONS") == "true"
 
 
+# Disable percentile-based latency breakdowns to reduce runtime / summary size
+# when only pass/fail data is needed. Set env DISABLE_PERCENTILES=true or pass
+# the --disable-percentiles CLI flag.
+_DISABLE_PERCENTILES = os.environ.get("DISABLE_PERCENTILES", "").strip().lower() in (
+    "1", "true", "yes", "on"
+)
+
+
+
 
 # Minimum body size (bytes) that indicates a real page vs. an SPA error shell.
 # All defaults are env-tunable so noisy / lightweight endpoints can be dialed in.
