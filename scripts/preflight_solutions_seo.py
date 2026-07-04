@@ -2595,11 +2595,13 @@ def export_results(results: list[dict]) -> None:
                 '<option value="all">All types</option>'
                 f'{type_filter_options}'
                 '</select></p>\n\n'
-                f'{"" if not ARTIFACT_BASE_URL else ""}'
-                '<p><label for="artifact-url-toggle">'
-                '<input type="checkbox" id="artifact-url-toggle" class="artifact-url-toggle" '
-                'onchange="updateArtifactUrlMode()"> '
-                'Copy absolute URLs</label></p>\n\n'
+                + (
+                    '<p><label for="artifact-url-toggle">'
+                    '<input type="checkbox" id="artifact-url-toggle" class="artifact-url-toggle" '
+                    'onchange="updateArtifactUrlMode()"> '
+                    'Copy absolute URLs</label></p>\n\n'
+                    if ARTIFACT_BASE_URL else ""
+                )
                 '<script>'
                 'function showCopyToast(message) { '
                 'const live = document.getElementById("artifact-copy-live"); '
