@@ -2071,6 +2071,11 @@ def main() -> int:
         _DISABLE_PERCENTILES = True
         sys.argv.remove("--disable-percentiles")
 
+    global _DISABLE_HEATMAP_EXPORT
+    if "--disable-heatmap-export" in sys.argv:
+        _DISABLE_HEATMAP_EXPORT = True
+        sys.argv.remove("--disable-heatmap-export")
+
     urls: list[str] = [f"{BASE}{p}" for p in CORE_PATHS]
     for locale in LOCALES:
         for path in LOCALIZED_PATHS:
