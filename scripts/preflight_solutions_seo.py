@@ -178,6 +178,11 @@ Env:
                               `--combo-filter=`) and `SUMMARY_FILTER`, restoring
                               the full unfiltered breakdown table. Env equivalent:
                               `RESET_FILTERS=true`.
+    --combo-filter-mode=MODE  How to combine multiple combo predicates. `all`
+                              (default) = AND (intersection); `any` = OR (union,
+                              show rows matching any selected range). Aliases:
+                              `and`/`intersection`, `or`/`union`. Env equivalent:
+                              `COMBO_FILTER_MODE=any|all`.
 
 
 
