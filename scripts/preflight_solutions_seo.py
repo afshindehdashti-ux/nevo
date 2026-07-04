@@ -1795,7 +1795,7 @@ def _build_breakdown_rows(results: list[dict]) -> list[dict]:
 
 _BREAKDOWN_COLUMNS = [
     "error_kind", "status_class", "count", "failed",
-    "success_rate_pct", "share_pct", "failures_pct",
+    "success_rate_pct", "failure_rate_pct", "share_pct", "failures_pct",
     "attempts_total", "attempts_avg",
     "ms_avg", "ms_p50", "ms_p95", "ms_p99", "ms_max",
 ]
