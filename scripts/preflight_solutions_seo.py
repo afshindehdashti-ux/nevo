@@ -2572,7 +2572,10 @@ def export_results(results: list[dict]) -> None:
                                 f'data-path="{html.escape(path, quote=True)}">\n'
                                 f'<a href="{html.escape(path, quote=True)}">'
                                 f'<button type="button">Open</button></a> '
-                                f'<a href="{html.escape(path, quote=True)}">{html.escape(label)}</a>\n'
+                                f'<a href="{html.escape(path, quote=True)}">{html.escape(label)}</a> '
+                                '<button type="button" '
+                                'onclick="navigator.clipboard.writeText(this.dataset.link).catch(() => {})" '
+                                f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
                                 "</div>\n"
                             )
                         else:
