@@ -1417,22 +1417,11 @@ function PanelThicknessPage() {
       <div className="flex flex-wrap gap-3">
         <button
           type="button"
-          onClick={downloadReport}
-          disabled={hasErrors}
-          aria-disabled={hasErrors || undefined}
-          title={hasErrors ? "Resolve configuration issues to enable" : undefined}
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-400"
-        >
-          <Download className="size-4" />
-          Download Calculation Report
-        </button>
-        <button
-          type="button"
           onClick={downloadPdfReport}
           disabled={hasErrors}
           aria-disabled={hasErrors || undefined}
           title={hasErrors ? "Resolve configuration issues to enable" : undefined}
-          className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-400"
         >
           <Download className="size-4" />
           Download PDF Report
