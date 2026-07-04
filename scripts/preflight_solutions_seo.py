@@ -1119,11 +1119,14 @@ def write_step_summary(results: list[dict]) -> None:
     lines = [
         "## Preflight — site + sitemap reachable",
         "",
+        _overall_rate_line(display, results, filter_scope),
+        "",
         f"_Probed **{total}** URL(s) at `{BASE}` "
         f"(timeout `{TIMEOUT}s`, retries `{RETRIES}`, "
         f"backoff `{BACKOFF_BASE:g}s × {BACKOFF_FACTOR:g}` cap `{BACKOFF_MAX:g}s`, "
         f"min body `{DEFAULT_MIN_BYTES}B`, accept `{','.join(str(s) for s in sorted(ACCEPT_STATUS))}`, "
         f"method `{METHOD}`, follow-redirects `{str(FOLLOW_REDIRECTS).lower()}`)._",
+
 
         "",
         f"- UA: `{USER_AGENT}`",
