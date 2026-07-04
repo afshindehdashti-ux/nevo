@@ -1080,6 +1080,12 @@ function PanelThicknessPage() {
       toast.error("PDF download failed", {
         id: toastId,
         description: "Please try again or contact support if the issue persists.",
+        action: {
+          label: "Retry",
+          onClick: () => {
+            void downloadPdfReport();
+          },
+        },
       });
     } finally {
       setPdfPending(false);
