@@ -1390,7 +1390,18 @@ def write_step_summary(results: list[dict]) -> None:
             else:
                 row += " |"
             lines.append(row)
-        lines.append("")
+        # Legend under the table so readers understand what the Rate bar
+        # encodes without reverse-engineering the glyphs. The threshold line
+        # documents the rounding rule used above (`round(pct/100 * bar_w)`),
+        # which is what turns e.g. 94.9% into 9🟩/1🟥.
+        lines += [
+            "",
+            f"<sub>Rate bar legend: 🟩 = successful requests, 🟥 = failed requests. "
+            f"Each bar is {bar_w} cell(s); one cell ≈ {100 // bar_w}% "
+            f"(cells = round(success% / {100 // bar_w})). "
+            f"Hover a bar to see the exact success/failure rate and raw counts.</sub>",
+            "",
+        ]
 
     # Latency histogram grouped by error_kind: makes it obvious whether e.g.
     # timeouts cluster at the timeout ceiling, TLS failures fail fast, or DNS
