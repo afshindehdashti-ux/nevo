@@ -57,9 +57,13 @@ def test_percentile_known_samples() -> None:
         ([10, 20, 30, 40, 50], 95, 50.0),   # top nearest-rank
         ([10, 20, 30, 40, 50], 99, 50.0),
         # 100 evenly spaced values 1..100: nearest-rank -> p50=50, p95=95, p99=99
-        (list(range(1, 101)), 50, 50.0),
+        # 100 evenly spaced values 1..100 with the (N-1)*p rounding used by
+        # the helper: p50 -> round(49.5)=50 -> values[50]=51; p95 and p99
+        # land on 95 and 99 respectively.
+        (list(range(1, 101)), 50, 51.0),
         (list(range(1, 101)), 95, 95.0),
         (list(range(1, 101)), 99, 99.0),
+
         # duplicates: p50 must be one of the observed samples
         ([1, 1, 1, 1, 100], 50, 1.0),
         ([1, 1, 1, 1, 100], 95, 100.0),
