@@ -335,7 +335,7 @@ function PartnerPortalPage() {
           </div>
           <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-5">
             {[
-              { l: "World-Class Quality", s: "Certified & Compliant", i: BadgeCheck },
+              { l: "Certified Quality", s: "ISO & Fire-Rated", i: BadgeCheck },
               { l: "Innovative Technology", s: "Advanced Engineering", i: Sparkles },
               { l: "Global Presence", s: "Local Support", i: Globe2 },
               { l: "Strong Partnership", s: "Shared Growth", i: Handshake },
