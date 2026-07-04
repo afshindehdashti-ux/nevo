@@ -2138,6 +2138,42 @@ def main() -> int:
         _DISABLE_HEATMAP_EXPORT = True
         sys.argv.remove("--disable-heatmap-export")
 
+    global _DISABLE_HEATMAP_VALIDATION
+    if "--disable-heatmap-validation" in sys.argv:
+        _DISABLE_HEATMAP_VALIDATION = True
+        sys.argv.remove("--disable-heatmap-validation")
+
+    global _HEATMAP_PREVIEW_TOP
+    preview_top_value: str | None = None
+    for i, arg in enumerate(list(sys.argv)):
+        if arg.startswith("--heatmap-preview-top="):
+            preview_top_value = arg.split("=", 1)[1]
+            sys.argv.remove(arg)
+            break
+        elif arg == "--heatmap-preview-top":
+            if i + 1 >= len(sys.argv):
+                print("preflight: --heatmap-preview-top requires a value", file=sys.stderr)
+                return 2
+            preview_top_value = sys.argv[i + 1]
+            sys.argv.pop(i + 1)
+            sys.argv.pop(i)
+            break
+    if preview_top_value is not None:
+        try:
+            _HEATMAP_PREVIEW_TOP = int(preview_top_value)
+            if _HEATMAP_PREVIEW_TOP < 0:
+                print(
+                    f"preflight: --heatmap-preview-top must be >= 0, got {preview_top_value}",
+                    file=sys.stderr,
+                )
+                return 2
+        except ValueError:
+            print(
+                f"preflight: --heatmap-preview-top must be an integer, got {preview_top_value}",
+                file=sys.stderr,
+            )
+            return 2
+
     urls: list[str] = [f"{BASE}{p}" for p in CORE_PATHS]
     for locale in LOCALES:
         for path in LOCALIZED_PATHS:
