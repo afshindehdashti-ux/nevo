@@ -2169,7 +2169,7 @@ _CLIPBOARD_TOAST_CSV = (
 )
 
 
-
+def export_results(results: list[dict]) -> None:
     """Write results as CSV / JSON artifacts for post-run analysis.
 
     Paths are opt-in via env so the script stays side-effect free by default:
