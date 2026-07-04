@@ -2614,7 +2614,6 @@ def export_results(results: list[dict]) -> None:
                 ]
                 if existing_items:
                     all_links = "\n".join(path for _, path in existing_items)
-                    aria_title = title.replace("**", "").replace("_", "")
                     fh.write(
                         '<button type="button" '
                         f'aria-label="Copy links for {html.escape(aria_title, quote=True)}" '
