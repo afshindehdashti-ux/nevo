@@ -99,8 +99,13 @@ Env:
                          - `status_class=4xx,5xx` — rows whose status_class matches
                          - `error_kind=timeout,tls` — rows whose error_kind matches
                          - `combo=http:5xx,timeout:none` — exact error_kind:status_class pairs
-                       Multiple clauses may be combined with `;` (logical OR),
-                       e.g. `RESULTS_INCLUDE="status_class=5xx;error_kind=timeout"`.
+                        Multiple clauses may be combined with `;` (logical OR),
+                        e.g. `RESULTS_INCLUDE="status_class=5xx;error_kind=timeout"`.
+
+  ARTIFACT_BASE_URL    optional base URL for the artifact index. When set, the
+                        summary shows a "Copy absolute URLs" toggle that copies
+                        `${ARTIFACT_BASE_URL}/${artifact_filename}` instead of the
+                        local file path. The local file path remains the default.
   LATENCY_BUCKETS      explicit comma-separated upper-bound edges (ms) for
                        the latency histogram/heatmap, e.g.
                        `LATENCY_BUCKETS=50,100,250,500,1000,5000`.
