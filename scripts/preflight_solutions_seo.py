@@ -3028,6 +3028,40 @@ def export_results(results: list[dict]) -> None:
                     )
                     with open(json_manifest_path, "w", encoding="utf-8") as f:
                         json.dump(manifest_rows, f, indent=2)
+                    xlsx_manifest_path = os.path.join(
+                        summary_dir, "artifacts_manifest.xlsx"
+                    )
+                    xlsx_written = False
+                    try:
+                        from openpyxl import Workbook as _Workbook
+                        from openpyxl.styles import Font as _Font
+                        wb = _Workbook()
+                        ws = wb.active
+                        ws.title = "Artifacts"
+                        headers = ["group", "filename", "size", "mtime", "sha256"]
+                        ws.append(headers)
+                        for c in ws[1]:
+                            c.font = _Font(bold=True)
+                        for row in manifest_rows:
+                            ws.append([
+                                row["group"],
+                                row["filename"],
+                                row["size"],
+                                row["mtime"],
+                                row["sha256"],
+                            ])
+                        widths = {"A": 32, "B": 40, "C": 12, "D": 22, "E": 66}
+                        for col, w in widths.items():
+                            ws.column_dimensions[col].width = w
+                        ws.freeze_panes = "A2"
+                        try:
+                            ws.auto_filter.ref = ws.dimensions
+                        except Exception:
+                            pass
+                        wb.save(xlsx_manifest_path)
+                        xlsx_written = True
+                    except Exception:
+                        xlsx_written = False
                     csv_href = html.escape(
                         os.path.basename(csv_manifest_path), quote=True
                     )
@@ -3046,8 +3080,22 @@ def export_results(results: list[dict]) -> None:
                         f'aria-label="Download artifact manifest as JSON" '
                         f'data-href="{json_href}" '
                         'onclick="artifactDownload(this.dataset.href)">'
-                        'Export manifest JSON</button>\n\n'
+                        'Export manifest JSON</button> '
                     )
+                    if xlsx_written:
+                        xlsx_href = html.escape(
+                            os.path.basename(xlsx_manifest_path), quote=True
+                        )
+                        fh.write(
+                            '<button type="button" '
+                            f'aria-label="Download artifact manifest as XLSX" '
+                            f'data-href="{xlsx_href}" '
+                            'onclick="artifactDownload(this.dataset.href)">'
+                            'Export manifest XLSX</button>\n\n'
+                        )
+                    else:
+                        fh.write("\n\n")
+
                 except OSError:
                     pass
             fh.write(
