@@ -2538,6 +2538,22 @@ def export_results(results: list[dict]) -> None:
                 os.path.getsize(p) for p in all_existing_paths
             )
             total_size_str = _human_size(total_existing_size)
+            group_filter_options = "".join(
+                f'<option value="{group_index}">'
+                f'{html.escape(title.replace("**", "").replace("_", ""), quote=True)}</option>'
+                for group_index, (title, _) in enumerate(groups)
+            )
+            type_filter_options = "".join(
+                f'<option value="{html.escape(ext, quote=True)}">'
+                f'{html.escape(ext, quote=True)}</option>'
+                for ext in sorted(
+                    {
+                        (os.path.splitext(path)[1].lower() or "none")
+                        for _, items in groups
+                        for _, path in items
+                    }
+                )
+            )
             fh.write(
                 f'<p><strong>{total_existing_count} file'
                 f'{"s" if total_existing_count != 1 else ""}</strong>, '
