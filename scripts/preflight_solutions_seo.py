@@ -2538,6 +2538,22 @@ def export_results(results: list[dict]) -> None:
                 os.path.getsize(p) for p in all_existing_paths
             )
             total_size_str = _human_size(total_existing_size)
+            group_filter_options = "".join(
+                f'<option value="{group_index}">'
+                f'{html.escape(title.replace("**", "").replace("_", ""), quote=True)}</option>'
+                for group_index, (title, _) in enumerate(groups)
+            )
+            type_filter_options = "".join(
+                f'<option value="{html.escape(ext, quote=True)}">'
+                f'{html.escape(ext, quote=True)}</option>'
+                for ext in sorted(
+                    {
+                        (os.path.splitext(path)[1].lower() or "none")
+                        for _, items in groups
+                        for _, path in items
+                    }
+                )
+            )
             fh.write(
                 f'<p><strong>{total_existing_count} file'
                 f'{"s" if total_existing_count != 1 else ""}</strong>, '
@@ -2559,6 +2575,18 @@ def export_results(results: list[dict]) -> None:
                 '<option value="all">All</option>'
                 '<option value="existing">Only existing</option>'
                 '<option value="missing">Only missing</option>'
+                '</select></p>\n\n'
+                '<p><label for="artifact-group-filter">Group:</label> '
+                '<select id="artifact-group-filter" class="artifact-group-filter" '
+                'onchange="filterArtifactItems()">'
+                '<option value="all">All groups</option>'
+                f'{group_filter_options}'
+                '</select></p>\n\n'
+                '<p><label for="artifact-type-filter">Type:</label> '
+                '<select id="artifact-type-filter" class="artifact-type-filter" '
+                'onchange="filterArtifactItems()">'
+                '<option value="all">All types</option>'
+                f'{type_filter_options}'
                 '</select></p>\n\n'
                 '<script>'
                 'function sortArtifactGroups() { '
@@ -2590,16 +2618,21 @@ def export_results(results: list[dict]) -> None:
                 '} '
                 'function filterArtifactItems() { '
                 'const mode = document.getElementById("artifact-filter").value; '
+                'const group = document.getElementById("artifact-group-filter").value; '
+                'const type = document.getElementById("artifact-type-filter").value; '
                 'const q = document.querySelector(".artifact-search").value.toLowerCase(); '
                 'const container = document.querySelector(".artifact-index"); '
                 'container.querySelectorAll(".artifact-group").forEach(g => { '
                 'let visible = 0; '
+                'const matchesGroup = group === "all" || g.dataset.index === group; '
                 'g.querySelectorAll(".artifact-item").forEach(el => { '
                 'const label = (el.dataset.label || "").toLowerCase(); '
                 'const path = (el.dataset.path || "").toLowerCase(); '
+                'const itemType = (el.dataset.type || "").toLowerCase(); '
                 'const matchesSearch = !q || label.includes(q) || path.includes(q) || el.textContent.toLowerCase().includes(q); '
                 'const matchesMode = mode === "all" || (mode === "existing" && el.dataset.existing === "true") || (mode === "missing" && el.dataset.existing === "false"); '
-                'const show = matchesSearch && matchesMode; '
+                'const matchesType = type === "all" || itemType === type; '
+                'const show = matchesGroup && matchesSearch && matchesMode && matchesType; '
                 'el.style.display = show ? "" : "none"; '
                 'if (show) visible++; '
                 '}); '
@@ -2746,6 +2779,7 @@ def export_results(results: list[dict]) -> None:
                         f'data-markdown="{html.escape(markdown_links, quote=True)}">Copy as Markdown</button>\n\n'
                     )
                 for label, path in items:
+                    file_type = os.path.splitext(path)[1].lower() or "none"
                     exists = os.path.exists(path)
                     if not exists:
                         missing_artifacts.append((label, path))
@@ -2763,6 +2797,8 @@ def export_results(results: list[dict]) -> None:
                                 meta = ""
                             fh.write(
                                 f'<div class="artifact-item" '
+                                f'data-group="{group_index}" '
+                                f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
                                 f'data-existing="true">\n'
@@ -2781,6 +2817,8 @@ def export_results(results: list[dict]) -> None:
                         else:
                             fh.write(
                                 f'<div class="artifact-item" '
+                                f'data-group="{group_index}" '
+                                f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
                                 f'data-existing="false">\n'
@@ -2792,6 +2830,8 @@ def export_results(results: list[dict]) -> None:
                         if exists:
                             fh.write(
                                 f'<div class="artifact-item" '
+                                f'data-group="{group_index}" '
+                                f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
                                 f'data-existing="true">\n'
@@ -2807,6 +2847,8 @@ def export_results(results: list[dict]) -> None:
                         else:
                             fh.write(
                                 f'<div class="artifact-item" '
+                                f'data-group="{group_index}" '
+                                f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
                                 f'data-existing="false">\n'
