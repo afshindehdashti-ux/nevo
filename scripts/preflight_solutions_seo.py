@@ -179,6 +179,28 @@ Env:
   Percentiles are computed with nearest-rank over the observed samples, so the
   reported value is always a real request latency, not an interpolated estimate.
 
+  When $GITHUB_STEP_SUMMARY is set, the script appends a "Result artifacts"
+  section that links every produced file. For example, after setting
+  BREAKDOWN_CSV_PATH, BREAKDOWN_JSON_PATH, HEATMAP_CSV_PATH and HEATMAP_JSON_PATH:
+
+  ```text
+  ### Result artifacts
+
+  _Scope: **all** (12 of 12 row(s))._
+
+  - `results.csv`
+  - `results.json`
+
+  _Breakdown (error_kind × status_class, full result set):_
+
+  - `breakdown.csv`
+  - `breakdown.json`
+
+  _Latency heatmap bin counts (error_kind × status_class × bucket):_
+
+  - [`heatmap.csv`](heatmap.csv)
+  - [`heatmap.json`](heatmap.json)
+  ```
 
   Tune the *_BYTES / TIMEOUT / BACKOFF_* vars per site: a static marketing
   page ships >5KB in <200ms, a heavy SSR dashboard may need `TIMEOUT=45`
