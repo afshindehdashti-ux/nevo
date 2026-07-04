@@ -2501,17 +2501,16 @@ def export_results(results: list[dict]) -> None:
                     f'<strong>{group_count} file{"s" if group_count != 1 else ""}</strong>, '
                     f'<strong>{group_size_str}</strong></p>\n\n'
                 )
-                if is_heatmap_group:
-                    existing_heatmap = [
-                        (label, path) for label, path in items if os.path.exists(path)
-                    ]
-                    if len(existing_heatmap) > 1:
-                        all_links = "\n".join(path for _, path in existing_heatmap)
-                        fh.write(
-                            '<button type="button" '
-                            'onclick="navigator.clipboard.writeText(this.dataset.links).catch(() => {})" '
-                            f'data-links="{html.escape(all_links, quote=True)}">Copy heatmap links</button>\n\n'
-                        )
+                existing_items = [
+                    (label, path) for label, path in items if os.path.exists(path)
+                ]
+                if existing_items:
+                    all_links = "\n".join(path for _, path in existing_items)
+                    fh.write(
+                        '<button type="button" '
+                        'onclick="navigator.clipboard.writeText(this.dataset.links).catch(() => {})" '
+                        f'data-links="{html.escape(all_links, quote=True)}">Copy links</button>\n\n'
+                    )
                 for label, path in items:
                     exists = os.path.exists(path)
                     if not exists:
