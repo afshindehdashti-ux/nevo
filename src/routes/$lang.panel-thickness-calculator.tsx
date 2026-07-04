@@ -23,6 +23,7 @@ import {
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import { trackPdfEvent } from "@/lib/pdf-analytics";
 
 // ---------------- SEO ----------------
 export const Route = createFileRoute("/$lang/panel-thickness-calculator")({
