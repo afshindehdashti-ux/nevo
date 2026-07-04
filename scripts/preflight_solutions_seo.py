@@ -2749,12 +2749,28 @@ _CLIPBOARD_TOAST_CSV = (
                 ]
                 json_str = json.dumps(all_items_json)
                 json_url_str = json.dumps(all_items_json_url)
+                csv_io = io.StringIO()
+                csv_writer = csv.writer(csv_io)
+                csv_writer.writerow(["label", "path"])
+                for item in all_items_json:
+                    csv_writer.writerow([item["label"], item["path"]])
+                csv_str = csv_io.getvalue()
+                csv_io_url = io.StringIO()
+                csv_writer_url = csv.writer(csv_io_url)
+                csv_writer_url.writerow(["label", "path"])
+                for item in all_items_json_url:
+                    csv_writer_url.writerow([item["label"], item["path"]])
+                csv_url_str = csv_io_url.getvalue()
                 links_url_data_attr = (
                     f' data-links-url="{html.escape(all_links_url, quote=True)}"'
                     if ARTIFACT_BASE_URL else ""
                 )
                 json_url_data_attr = (
                     f' data-json-url="{html.escape(json_url_str, quote=True)}"'
+                    if ARTIFACT_BASE_URL else ""
+                )
+                csv_url_data_attr = (
+                    f' data-csv-url="{html.escape(csv_url_str, quote=True)}"'
                     if ARTIFACT_BASE_URL else ""
                 )
                 fh.write(
@@ -2775,6 +2791,13 @@ _CLIPBOARD_TOAST_CSV = (
                     f'data-count="{len(all_items_json)}" '
                     f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.jsonUrl ? this.dataset.jsonUrl : this.dataset.json){_CLIPBOARD_TOAST_JSON}" '
                     f'data-json="{html.escape(json_str, quote=True)}"{json_url_data_attr}>Copy links (JSON)</button>\n\n'
+                )
+                fh.write(
+                    '<button type="button" '
+                    'aria-label="Copy all artifact links as CSV" '
+                    f'data-count="{len(all_items_json)}" '
+                    f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.csvUrl ? this.dataset.csvUrl : this.dataset.csv){_CLIPBOARD_TOAST_CSV}" '
+                    f'data-csv="{html.escape(csv_str, quote=True)}"{csv_url_data_attr}>Copy links (CSV)</button>\n\n'
                 )
             summary_dir = os.path.dirname(summary_path) or "."
             if all_existing_paths:
