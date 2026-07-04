@@ -2107,6 +2107,7 @@ def _human_size(size: int) -> str:
 # it works in any markdown viewer that executes onclick handlers.
 _CLIPBOARD_TOAST_SINGLE = (
     ".then(() => { showCopyToast('Copied link'); })"
+    ".catch(() => { showCopyToast('Could not copy — check clipboard permissions'); })"
 )
 
 # Inline JS toast shown after copying multiple artifact links. The count is
@@ -2118,6 +2119,7 @@ _CLIPBOARD_TOAST_MULTI = (
     "const n = this.dataset.links.split('\\n').length; "
     "showCopyToast('Copied ' + n + ' link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : '')); "
     "})"
+    ".catch(() => { showCopyToast('Could not copy — check clipboard permissions'); })"
 )
 
 # Inline JS toast shown after copying a Markdown bullet list. The count is
@@ -2129,6 +2131,7 @@ _CLIPBOARD_TOAST_MARKDOWN = (
     "const n = this.dataset.markdown.split('\\n').length; "
     "showCopyToast('Copied ' + n + ' markdown link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : '')); "
     "})"
+    ".catch(() => { showCopyToast('Could not copy — check clipboard permissions'); })"
 )
 
 # Inline JS toast shown after copying all artifact paths as a JSON array. The
@@ -2139,6 +2142,7 @@ _CLIPBOARD_TOAST_JSON = (
     "const n = parseInt(this.dataset.count || '0', 10); "
     "showCopyToast('Copied ' + n + ' artifact path' + (n === 1 ? '' : 's') + ' as JSON'); "
     "})"
+    ".catch(() => { showCopyToast('Could not copy — check clipboard permissions'); })"
 )
 
 
