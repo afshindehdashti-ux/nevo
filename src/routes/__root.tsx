@@ -193,26 +193,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-const SITE_TITLE =
-  "NEVO Industrial — Sandwich Panel Engineering, Raw Materials & Production Lines";
+const SITE_TITLE = "NEVO Industrial — Sandwich Panel Engineering & Supply";
 const SITE_DESCRIPTION =
-  "Dubai-based industrial engineering & supply company. Factory development, engineering consultancy, PIR/PUR raw materials, production lines and finished sandwich panels for global markets.";
+  "Dubai-based engineering consultancy for sandwich panel factory development, production lines, and PIR/PUR raw materials worldwide.";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      // Sitewide defaults only — per-route head() overrides title, description,
+      // og:title, og:description, twitter:title, and twitter:description.
+      // Do not add og:title / og:description / twitter:title / twitter:description here:
+      // TanStack Router concatenates meta so duplicates from root + route ship both.
       { title: SITE_TITLE },
       { name: "description", content: SITE_DESCRIPTION },
       { name: "author", content: "NEVO Industrial" },
       { property: "og:site_name", content: "NEVO Industrial" },
-      { property: "og:title", content: SITE_TITLE },
-      { property: "og:description", content: SITE_DESCRIPTION },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: SITE_TITLE },
-      { name: "twitter:description", content: SITE_DESCRIPTION },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
