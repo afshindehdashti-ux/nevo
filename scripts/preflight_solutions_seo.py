@@ -2675,9 +2675,7 @@ def export_results(results: list[dict]) -> None:
                 'const n = paths.length; '
                 'const t = document.createElement("div"); '
                 't.textContent = "Copied " + n + " link" + (n === 1 ? "" : "s"); '
-                't.style.cssText = "position:fixed;bottom:20px;right:20px;background:#1f2937;"
-                "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
-                "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);"; '
+                't.style.cssText = "position:fixed;bottom:20px;right:20px;background:#1f2937;color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);"; '
                 'document.body.appendChild(t); '
                 'setTimeout(() => t.remove(), 2000); '
                 '}).catch(() => {}); '
