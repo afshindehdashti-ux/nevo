@@ -264,6 +264,7 @@ import os, sys, time, urllib.request, urllib.error
 from pathlib import Path
 from urllib.parse import urlparse
 import html
+import zipfile as _zipfile
 
 
 # Shared source of truth for locales / paths — same list drives
