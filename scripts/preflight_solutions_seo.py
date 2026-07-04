@@ -143,10 +143,26 @@ Env:
                         Same effect as passing `--disable-heatmap-export` on the
                         command line.
 
+  DISABLE_HEATMAP_VALIDATION
+                        `true` to skip the heatmap/breakdown consistency check
+                        while still exporting `HEATMAP_CSV_PATH` / `HEATMAP_JSON_PATH`.
+                        Use this when the export is needed but the validation
+                        step is too slow or not required. Same effect as passing
+                        `--disable-heatmap-validation` on the command line.
+
+  HEATMAP_PREVIEW_TOP   number of top non-zero latency buckets to print in the
+                        compact stdout preview per combo (default 3). Set to `0`
+                        to disable the preview. Same effect as passing
+                        `--heatmap-preview-top=N` on the command line.
+
   CLI flags:
     --help, -h                Print this help text and exit.
     --disable-percentiles     Skip p50/p95/p99 latency breakdowns and exports.
     --disable-heatmap-export  Skip heatmap CSV/JSON export and validation.
+    --disable-heatmap-validation
+                              Skip heatmap/breakdown consistency validation only.
+    --heatmap-preview-top=N   Number of top non-zero buckets to preview per combo
+                              (default 3; set 0 to disable).
 
 
   Output / Summary:
