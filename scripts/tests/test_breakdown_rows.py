@@ -62,6 +62,7 @@ EXPECTED = {
     ("ok", "2xx"): {
         "count": 5, "failed": 0,
         "success_rate_pct": 100.00,
+        "failure_rate_pct": 0.0,
         "share_pct": round(100 * 5 / 14, 2),
         "failures_pct": 0.0,
         "attempts_total": 5, "attempts_avg": 1.0,
@@ -71,6 +72,7 @@ EXPECTED = {
     ("http", "5xx"): {
         "count": 5, "failed": 5,
         "success_rate_pct": 0.0,
+        "failure_rate_pct": 100.00,
         "share_pct": round(100 * 5 / 14, 2),
         "failures_pct": round(100 * 5 / 9, 2),
         "attempts_total": 10, "attempts_avg": 2.0,
@@ -80,6 +82,7 @@ EXPECTED = {
     ("timeout", "none"): {
         "count": 4, "failed": 4,
         "success_rate_pct": 0.0,
+        "failure_rate_pct": 100.00,
         "share_pct": round(100 * 4 / 14, 2),
         "failures_pct": round(100 * 4 / 9, 2),
         "attempts_total": 4, "attempts_avg": 1.0,
