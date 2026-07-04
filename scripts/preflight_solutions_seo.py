@@ -2680,7 +2680,8 @@ def export_results(results: list[dict]) -> None:
                             fh.write(
                                 f'<div class="artifact-item" '
                                 f'data-label="{html.escape(label, quote=True)}" '
-                                f'data-path="{html.escape(path, quote=True)}">\n'
+                                f'data-path="{html.escape(path, quote=True)}" '
+                                f'data-existing="true">\n'
                                 f'<a href="{html.escape(path, quote=True)}">'
                                 f'<button type="button">Open</button></a> '
                                 f'<a href="{html.escape(path, quote=True)}">{html.escape(label)}</a> '
@@ -2694,7 +2695,8 @@ def export_results(results: list[dict]) -> None:
                             fh.write(
                                 f'<div class="artifact-item" '
                                 f'data-label="{html.escape(label, quote=True)}" '
-                                f'data-path="{html.escape(path, quote=True)}">\n'
+                                f'data-path="{html.escape(path, quote=True)}" '
+                                f'data-existing="false">\n'
                                 f"⚠️ <code>{html.escape(label)}</code> (missing) — expected at "
                                 f"<code>{html.escape(path)}</code>\n"
                                 "</div>\n"
