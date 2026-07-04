@@ -2058,6 +2058,15 @@ def export_results(results: list[dict]) -> None:
                 fh.write("\n_Latency heatmap bin counts (error_kind × status_class × bucket):_\n\n")
                 for p in heatmap_written:
                     fh.write(f"- [`{p}`]({p})\n")
+            elif _DISABLE_HEATMAP_EXPORT and (
+                os.environ.get("HEATMAP_CSV_PATH", "").strip()
+                or os.environ.get("HEATMAP_JSON_PATH", "").strip()
+            ):
+                fh.write(
+                    "\n⚠️ _Latency heatmap export was **disabled** "
+                    "(`DISABLE_HEATMAP_EXPORT=true` or `--disable-heatmap-export`). "
+                    "HEATMAP CSV/JSON files were not generated._\n"
+                )
             fh.write("\n")
 
 
