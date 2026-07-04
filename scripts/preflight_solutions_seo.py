@@ -2401,28 +2401,66 @@ def export_results(results: list[dict]) -> None:
         os.environ.get("HEATMAP_CSV_PATH", "").strip()
         or os.environ.get("HEATMAP_JSON_PATH", "").strip()
     )
-    if summary_path and (written or breakdown_written or heatmap_written or heatmap_expected_but_disabled):
+    # Extra artifacts written outside this function; picked up by path so the
+    # index reflects everything the run produced in one place.
+    validation_json_path = os.environ.get("VALIDATION_JSON_PATH", "").strip()
+    filtered_combos_path = os.environ.get("FILTERED_COMBOS_CSV_PATH", "").strip()
+    extra_written: list[tuple[str, str]] = []
+    if validation_json_path and os.path.exists(validation_json_path):
+        extra_written.append(("Heatmap validation report (JSON)", validation_json_path))
+    if filtered_combos_path and os.path.exists(filtered_combos_path):
+        extra_written.append(("Filtered combos (post-filter CSV)", filtered_combos_path))
+
+    any_artifact = bool(
+        written or breakdown_written or heatmap_written
+        or heatmap_expected_but_disabled or extra_written
+    )
+    if summary_path and any_artifact:
+        # Group each artifact under a labeled section, always as clickable
+        # links (`[label](path)`) so operators can jump straight to a file
+        # from the PR summary. Every group also reports its count so the
+        # index doubles as a per-run manifest.
+        groups: list[tuple[str, list[tuple[str, str]]]] = []
+        if written:
+            groups.append((
+                f"Per-URL results — _scope: **{scope}** "
+                f"({len(rows)} of {len(results)} row(s))_",
+                [(os.path.basename(p), p) for p in written],
+            ))
+        if breakdown_written:
+            groups.append((
+                "Breakdown (error_kind × status_class, full result set)",
+                [(os.path.basename(p), p) for p in breakdown_written],
+            ))
+        if heatmap_written:
+            groups.append((
+                "Latency heatmap bin counts (error_kind × status_class × bucket)",
+                [(os.path.basename(p), p) for p in heatmap_written],
+            ))
+        if extra_written:
+            groups.append((
+                "Validation & filtered exports",
+                [(label, p) for label, p in extra_written],
+            ))
+
+        total_files = sum(len(items) for _, items in groups)
         with open(summary_path, "a", encoding="utf-8") as fh:
-            fh.write("\n### Result artifacts\n\n")
-            if written:
-                fh.write(f"_Scope: **{scope}** ({len(rows)} of {len(results)} row(s))._\n\n")
-                for p in written:
-                    fh.write(f"- `{p}`\n")
-            if breakdown_written:
-                fh.write("\n_Breakdown (error_kind × status_class, full result set):_\n\n")
-                for p in breakdown_written:
-                    fh.write(f"- `{p}`\n")
-            if heatmap_written:
-                fh.write("\n_Latency heatmap bin counts (error_kind × status_class × bucket):_\n\n")
-                for p in heatmap_written:
-                    fh.write(f"- [`{p}`]({p})\n")
-            elif heatmap_expected_but_disabled:
+            fh.write(
+                f"\n### Artifacts index ({total_files} file"
+                f"{'s' if total_files != 1 else ''})\n\n"
+            )
+            for title, items in groups:
+                fh.write(f"_{title}:_\n\n")
+                for label, path in items:
+                    fh.write(f"- [`{label}`]({path})\n")
+                fh.write("\n")
+            if heatmap_expected_but_disabled and not heatmap_written:
                 fh.write(
-                    "\n⚠️ _Latency heatmap export was **disabled** "
+                    "> ⚠️ _Latency heatmap export was **disabled** "
                     "(`DISABLE_HEATMAP_EXPORT=true` or `--disable-heatmap-export`). "
-                    "HEATMAP CSV/JSON files were not generated._\n"
+                    "HEATMAP CSV/JSON files were not generated._\n\n"
                 )
-            fh.write("\n")
+
 
 
 def main() -> int:
