@@ -2463,8 +2463,23 @@ def export_results(results: list[dict]) -> None:
                 fh.write(f"_{title}:_\n\n")
                 for label, path in items:
                     if is_heatmap_group:
+                        try:
+                            size = os.path.getsize(path)
+                            mtime = os.path.getmtime(path)
+                            if size < 1024:
+                                size_str = f"{size} B"
+                            elif size < 1024 * 1024:
+                                size_str = f"{size / 1024:.1f} KB"
+                            else:
+                                size_str = f"{size / (1024 * 1024):.1f} MB"
+                            mtime_str = time.strftime(
+                                "%Y-%m-%d %H:%M:%S", time.localtime(mtime)
+                            )
+                            meta = f"({size_str} · {mtime_str})"
+                        except OSError:
+                            meta = ""
                         fh.write(
-                            f"- [`{label}`]({path}) "
+                            f"- [`{label}`]({path}) {meta} "
                             '<button type="button" '
                             'onclick="navigator.clipboard.writeText(this.dataset.link).catch(() => {})" '
                             f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
