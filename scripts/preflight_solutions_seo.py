@@ -99,8 +99,13 @@ Env:
                          - `status_class=4xx,5xx` — rows whose status_class matches
                          - `error_kind=timeout,tls` — rows whose error_kind matches
                          - `combo=http:5xx,timeout:none` — exact error_kind:status_class pairs
-                       Multiple clauses may be combined with `;` (logical OR),
-                       e.g. `RESULTS_INCLUDE="status_class=5xx;error_kind=timeout"`.
+                        Multiple clauses may be combined with `;` (logical OR),
+                        e.g. `RESULTS_INCLUDE="status_class=5xx;error_kind=timeout"`.
+
+  ARTIFACT_BASE_URL    optional base URL for the artifact index. When set, the
+                        summary shows a "Copy absolute URLs" toggle that copies
+                        `${ARTIFACT_BASE_URL}/${artifact_filename}` instead of the
+                        local file path. The local file path remains the default.
   LATENCY_BUCKETS      explicit comma-separated upper-bound edges (ms) for
                        the latency histogram/heatmap, e.g.
                        `LATENCY_BUCKETS=50,100,250,500,1000,5000`.
@@ -281,6 +286,7 @@ from solutions_seo_config import (  # noqa: E402
 
 
 BASE = os.environ.get("BASE_URL", "http://127.0.0.1:8080").rstrip("/")
+ARTIFACT_BASE_URL = os.environ.get("ARTIFACT_BASE_URL", "").rstrip("/")
 
 # LOCALES / PATHS env overrides are validated against the shared matrix:
 # any value not in the shared list is dropped with a warning so we can't
@@ -2103,6 +2109,13 @@ def _human_size(size: int) -> str:
         return f"{size / (1024 * 1024 * 1024):.1f} GB"
 
 
+def _artifact_url(path: str) -> str | None:
+    """Return an absolute artifact URL if ARTIFACT_BASE_URL is set, else None."""
+    if not ARTIFACT_BASE_URL:
+        return None
+    return f"{ARTIFACT_BASE_URL}/{os.path.basename(path)}"
+
+
 # Inline JS toast shown after copying a single artifact link. Self-contained so
 # it works in any markdown viewer that executes onclick handlers.
 _CLIPBOARD_TOAST_SINGLE = (
@@ -2587,7 +2600,15 @@ def export_results(results: list[dict]) -> None:
                 '<option value="all">All types</option>'
                 f'{type_filter_options}'
                 '</select></p>\n\n'
-                '<script>'
+                + (
+                    '<p><label for="artifact-url-toggle">'
+                    '<input type="checkbox" id="artifact-url-toggle" class="artifact-url-toggle" '
+                    'onchange="updateArtifactUrlMode()"> '
+                    'Copy absolute URLs</label> '
+                    '(<span class="artifact-url-mode">file paths</span>)</p>\n\n'
+                    if ARTIFACT_BASE_URL else ""
+                )
+                + '<script>'
                 'function showCopyToast(message) { '
                 'const live = document.getElementById("artifact-copy-live"); '
                 'if (live) { live.textContent = message; setTimeout(() => { live.textContent = ""; }, 1000); } '
@@ -2656,10 +2677,19 @@ def export_results(results: list[dict]) -> None:
                 'g.style.display = visible > 0 ? "" : "none"; '
                 '}); '
                 '} '
+                'function updateArtifactUrlMode() { '
+                'const toggle = document.getElementById("artifact-url-toggle"); '
+                'if (toggle) { '
+                'document.querySelectorAll(".artifact-url-mode").forEach(el => { '
+                'el.textContent = toggle.checked ? "absolute URLs" : "file paths"; '
+                '}); '
+                '} '
+                '} '
                 'function copyDisplayedArtifactLinks() { '
+                'const useUrl = document.getElementById("artifact-url-toggle") && document.getElementById("artifact-url-toggle").checked; '
                 'const container = document.querySelector(".artifact-index"); '
                 'const visible = Array.from(container.querySelectorAll(".artifact-item")).filter(el => el.style.display !== "none"); '
-                'const paths = visible.map(el => el.dataset.path).filter(Boolean); '
+                'const paths = visible.map(el => useUrl && el.dataset.url ? el.dataset.url : el.dataset.path).filter(Boolean); '
                 'navigator.clipboard.writeText(paths.join("\\n")).then(() => { '
                 'showCopyToast("Copied " + paths.length + " link" + (paths.length === 1 ? "" : "s")); '
                 '}).catch(() => { showCopyToast("Could not copy — check clipboard permissions"); }); '
@@ -2668,18 +2698,35 @@ def export_results(results: list[dict]) -> None:
             )
             if all_paths:
                 all_links = "\n".join(all_paths)
+                all_links_url = "\n".join(
+                    _artifact_url(path) or path for path in all_paths
+                )
                 all_items_json = [
                     {"label": label, "path": path}
                     for _, items in groups
                     for label, path in items
                 ]
+                all_items_json_url = [
+                    {"label": label, "path": _artifact_url(path) or path}
+                    for _, items in groups
+                    for label, path in items
+                ]
                 json_str = json.dumps(all_items_json)
+                json_url_str = json.dumps(all_items_json_url)
+                links_url_data_attr = (
+                    f' data-links-url="{html.escape(all_links_url, quote=True)}"'
+                    if ARTIFACT_BASE_URL else ""
+                )
+                json_url_data_attr = (
+                    f' data-json-url="{html.escape(json_url_str, quote=True)}"'
+                    if ARTIFACT_BASE_URL else ""
+                )
                 fh.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links" '
                     'data-context="all artifacts" '
-                    f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}" '
-                    f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
+                    f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.linksUrl ? this.dataset.linksUrl : this.dataset.links){_CLIPBOARD_TOAST_MULTI}" '
+                    f'data-links="{html.escape(all_links, quote=True)}"{links_url_data_attr}>Copy all links</button>\n\n'
                 )
                 fh.write(
                     '<button type="button" '
@@ -2690,8 +2737,8 @@ def export_results(results: list[dict]) -> None:
                     '<button type="button" '
                     'aria-label="Copy all artifact paths as JSON" '
                     f'data-count="{len(all_items_json)}" '
-                    f'onclick="navigator.clipboard.writeText(this.dataset.json){_CLIPBOARD_TOAST_JSON}" '
-                    f'data-json="{html.escape(json_str, quote=True)}">Copy links (JSON)</button>\n\n'
+                    f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.jsonUrl ? this.dataset.jsonUrl : this.dataset.json){_CLIPBOARD_TOAST_JSON}" '
+                    f'data-json="{html.escape(json_str, quote=True)}"{json_url_data_attr}>Copy links (JSON)</button>\n\n'
                 )
             summary_dir = os.path.dirname(summary_path) or "."
             if all_existing_paths:
@@ -2830,12 +2877,19 @@ def export_results(results: list[dict]) -> None:
                 ]
                 if existing_items:
                     all_links = "\n".join(path for _, path in existing_items)
+                    all_links_url = "\n".join(
+                        _artifact_url(path) or path for _, path in existing_items
+                    )
+                    url_data_attr = (
+                        f' data-links-url="{html.escape(all_links_url, quote=True)}"'
+                        if ARTIFACT_BASE_URL else ""
+                    )
                     fh.write(
                         '<button type="button" '
                         f'aria-label="Copy links for {html.escape(aria_title, quote=True)}" '
                         f'data-context="{html.escape(aria_title, quote=True)}" '
-                        f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}" '
-                        f'data-links="{html.escape(all_links, quote=True)}">Copy links</button> '
+                        f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.linksUrl ? this.dataset.linksUrl : this.dataset.links){_CLIPBOARD_TOAST_MULTI}" '
+                        f'data-links="{html.escape(all_links, quote=True)}"{url_data_attr}>Copy links</button> '
                     )
                     group_zip_path = os.path.join(
                         summary_dir, f"artifacts_group_{group_index}.zip"
@@ -2873,15 +2927,25 @@ def export_results(results: list[dict]) -> None:
                         f"- [{label}]({path})"
                         for label, path in existing_items
                     )
+                    markdown_links_url = "\n".join(
+                        f"- [{label}]({_artifact_url(path) or path})"
+                        for label, path in existing_items
+                    )
+                    markdown_url_data_attr = (
+                        f' data-markdown-url="{html.escape(markdown_links_url, quote=True)}"'
+                        if ARTIFACT_BASE_URL else ""
+                    )
                     fh.write(
                         '<button type="button" '
                         f'aria-label="Copy Markdown links for {html.escape(aria_title, quote=True)}" '
                         f'data-context="{html.escape(aria_title, quote=True)}" '
-                        f'onclick="navigator.clipboard.writeText(this.dataset.markdown){_CLIPBOARD_TOAST_MARKDOWN}" '
-                        f'data-markdown="{html.escape(markdown_links, quote=True)}">Copy as Markdown</button>\n\n'
+                        f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.markdownUrl ? this.dataset.markdownUrl : this.dataset.markdown){_CLIPBOARD_TOAST_MARKDOWN}" '
+                        f'data-markdown="{html.escape(markdown_links, quote=True)}"{markdown_url_data_attr}>Copy as Markdown</button>\n\n'
                     )
                 for label, path in items:
                     file_type = os.path.splitext(path)[1].lower() or "none"
+                    url = _artifact_url(path)
+                    url_attr = f' data-url="{html.escape(url, quote=True)}"' if url else ""
                     exists = os.path.exists(path)
                     if not exists:
                         missing_artifacts.append((label, path))
@@ -2903,7 +2967,7 @@ def export_results(results: list[dict]) -> None:
                                 f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
-                                f'data-existing="true">\n'
+                                f'data-existing="true"{url_attr}>\n'
                                 f'<a href="{html.escape(path, quote=True)}" target="_blank" rel="noopener noreferrer">'
                                 f'<button type="button" aria-label="Open {html.escape(label, quote=True)}">Open</button></a> '
                                 '<button type="button" '
@@ -2914,8 +2978,8 @@ def export_results(results: list[dict]) -> None:
                                 f'{meta} '
                                 '<button type="button" '
                                 f'aria-label="Copy link for {html.escape(label, quote=True)}" '
-                                f'onclick="navigator.clipboard.writeText(this.dataset.link){_CLIPBOARD_TOAST_SINGLE}" '
-                                f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
+                                f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.url ? this.dataset.url : this.dataset.link){_CLIPBOARD_TOAST_SINGLE}" '
+                                f'data-link="{html.escape(path, quote=True)}"{url_attr}>Copy link</button>\n'
                                 "</div>\n"
                             )
                         else:
@@ -2938,7 +3002,7 @@ def export_results(results: list[dict]) -> None:
                                 f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
-                                f'data-existing="true">\n'
+                                f'data-existing="true"{url_attr}>\n'
                                 f'<a href="{html.escape(path, quote=True)}" target="_blank" rel="noopener noreferrer">'
                                 f'<button type="button" aria-label="Open {html.escape(label, quote=True)}">Open</button></a> '
                                 f'<a href="{html.escape(path, quote=True)}">{html.escape(label)}</a> '
@@ -2949,8 +3013,8 @@ def export_results(results: list[dict]) -> None:
                                 'Download</button> '
                                 '<button type="button" '
                                 f'aria-label="Copy link for {html.escape(label, quote=True)}" '
-                                f'onclick="navigator.clipboard.writeText(this.dataset.link){_CLIPBOARD_TOAST_SINGLE}" '
-                                f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
+                                f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.url ? this.dataset.url : this.dataset.link){_CLIPBOARD_TOAST_SINGLE}" '
+                                f'data-link="{html.escape(path, quote=True)}"{url_attr}>Copy link</button>\n'
                                 "</div>\n"
                             )
                         else:
