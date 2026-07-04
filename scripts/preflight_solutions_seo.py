@@ -3206,11 +3206,21 @@ def export_results(results: list[dict]) -> None:
                     f'data-json="{html.escape(json_str, quote=True)}"{json_url_data_attr}>Copy links (JSON)</button>\n\n'
                 )
                 fh.write(
+                    '<label for="artifact-csv-delimiter" style="margin-right:6px;">CSV delimiter:</label>'
+                    '<select id="artifact-csv-delimiter" '
+                    'aria-label="CSV delimiter for Copy links (CSV) and Download CSV" '
+                    'onchange="persistArtifactFilters()">'
+                    '<option value=",">Comma (,)</option>'
+                    '<option value=";">Semicolon (;)</option>'
+                    '</select> '
+                )
+                fh.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links as CSV" '
                     f'data-count="{len(all_items_json)}" '
-                    f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; const raw = useUrl && this.dataset.csvUrl ? this.dataset.csvUrl : this.dataset.csv; navigator.clipboard.writeText(raw.replace(/\\r?\\n/g, \'\\r\\n\')){_CLIPBOARD_TOAST_CSV}" '
-                    f'data-csv="{html.escape(csv_str, quote=True)}"{csv_url_data_attr}>Copy links (CSV)</button>\n\n'
+                    'onclick="const raw = pickArtifactCsvPayload(this); '
+                    f'navigator.clipboard.writeText(raw.replace(/\\r?\\n/g, \'\\r\\n\')){_CLIPBOARD_TOAST_CSV}" '
+                    f'data-csv="{html.escape(csv_str, quote=True)}"{csv_semi_data_attr}{csv_url_data_attr}>Copy links (CSV)</button>\n\n'
                 )
                 fh.write(
                     '<button type="button" '
@@ -3218,7 +3228,7 @@ def export_results(results: list[dict]) -> None:
                     f'data-count="{len(all_items_json)}" '
                     'data-filename="artifact-links.csv" '
                     'onclick="downloadArtifactCsv(this)" '
-                    f'data-csv="{html.escape(csv_str, quote=True)}"{csv_url_data_attr}>Download CSV</button>\n\n'
+                    f'data-csv="{html.escape(csv_str, quote=True)}"{csv_semi_data_attr}{csv_url_data_attr}>Download CSV</button>\n\n'
                 )
                 fh.write(
                     '<div class="artifact-selection-controls" style="margin-top:8px;">\n'
