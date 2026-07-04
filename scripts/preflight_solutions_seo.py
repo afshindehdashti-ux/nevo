@@ -1778,6 +1778,11 @@ def main() -> int:
         print(__doc__)
         return 0
 
+    global _DISABLE_PERCENTILES
+    if "--disable-percentiles" in sys.argv:
+        _DISABLE_PERCENTILES = True
+        sys.argv.remove("--disable-percentiles")
+
     urls: list[str] = [f"{BASE}{p}" for p in CORE_PATHS]
     for locale in LOCALES:
         for path in LOCALIZED_PATHS:
