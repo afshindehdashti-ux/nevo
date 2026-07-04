@@ -3195,7 +3195,7 @@ def export_results(results: list[dict]) -> None:
                 'cp.onclick = () => { '
                 'const useUrl = document.getElementById("artifact-url-toggle") && document.getElementById("artifact-url-toggle").checked; '
                 'const val = (useUrl && url) ? url : path; '
-                'navigator.clipboard.writeText(val).then(() => showCopyToast("Copied link")).catch(() => showCopyToast("Could not copy — check clipboard permissions")); '
+                'navigator.clipboard.writeText(val).then(() => showCopyToast("Copied link" + (label ? " for " + label : ""))).catch(() => showCopyToast("Could not copy — check clipboard permissions")); '
                 '}; '
                 'actions.appendChild(cp); '
                 'const share = document.createElement("button"); '
