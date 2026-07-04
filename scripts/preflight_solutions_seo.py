@@ -1433,8 +1433,13 @@ def write_step_summary(results: list[dict]) -> None:
     # with `SUMMARY_FILTER=preset:<name>` (or `@<name>`) so users switch
     # between saved scenarios without re-typing the whole expression.
     presets = _parse_summary_filter_presets()
-    raw_filter = (os.environ.get("SUMMARY_FILTER") or "all").strip()
-    resolved_filter, active_preset = _resolve_summary_filter(raw_filter, presets)
+    if _FILTERS_RESET:
+        raw_filter = "all"
+        active_preset = None
+        resolved_filter = "all"
+    else:
+        raw_filter = (os.environ.get("SUMMARY_FILTER") or "all").strip()
+        resolved_filter, active_preset = _resolve_summary_filter(raw_filter, presets)
     filtered, filter_scope = _filter_results_for_export(results, resolved_filter)
     total = len(results)
     display = filtered if filter_scope != "all" else results
