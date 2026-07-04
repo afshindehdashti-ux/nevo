@@ -1757,7 +1757,7 @@ def export_results(results: list[dict]) -> None:
     # latency bucket, plus a `total` column. Always derived from the FULL
     # result set for the same reason as breakdown_written above.
     heatmap_written: list[str] = []
-    if heatmap_csv:
+    if heatmap_csv or heatmap_json:
         from collections import defaultdict
         grid: dict[tuple[str, str], list[int]] = defaultdict(
             lambda: [0] * len(_LATENCY_BUCKETS))
@@ -1766,19 +1766,50 @@ def export_results(results: list[dict]) -> None:
             sc = r.get("status_class") or _classify_status(r.get("status"))
             grid[(kind, sc)][_bucket_for(float(r.get("ms") or 0))] += 1
         bucket_labels = [lbl for lbl, _ in _LATENCY_BUCKETS]
-        os.makedirs(os.path.dirname(heatmap_csv) or ".", exist_ok=True)
-        with open(heatmap_csv, "w", encoding="utf-8", newline="") as fh:
-            writer = csv.writer(fh)
-            writer.writerow(["error_kind", "status_class", *bucket_labels, "total"])
-            for (kind, sc), counts in sorted(
-                grid.items(),
-                key=lambda kv: (0 if kv[0][0] == "ok" else -1,
-                                -sum(kv[1]), kv[0][0], kv[0][1]),
-            ):
-                writer.writerow([kind, sc, *counts, sum(counts)])
-        heatmap_written.append(heatmap_csv)
-        print(f"Wrote heatmap CSV → {heatmap_csv} ({len(grid)} combo(s), "
-              f"{len(bucket_labels)} bucket(s))")
+        sorted_grid = sorted(
+            grid.items(),
+            key=lambda kv: (0 if kv[0][0] == "ok" else -1,
+                            -sum(kv[1]), kv[0][0], kv[0][1]),
+        )
+        if heatmap_csv:
+            os.makedirs(os.path.dirname(heatmap_csv) or ".", exist_ok=True)
+            with open(heatmap_csv, "w", encoding="utf-8", newline="") as fh:
+                writer = csv.writer(fh)
+                writer.writerow(["error_kind", "status_class", *bucket_labels, "total"])
+                for (kind, sc), counts in sorted_grid:
+                    writer.writerow([kind, sc, *counts, sum(counts)])
+            heatmap_written.append(heatmap_csv)
+            print(f"Wrote heatmap CSV → {heatmap_csv} ({len(grid)} combo(s), "
+                  f"{len(bucket_labels)} bucket(s))")
+        if heatmap_json:
+            # Bucket edges come from _LATENCY_BUCKETS: [(label, upper_ms), ...]
+            # in ascending order; lo_ms is the previous bucket's upper (0 for
+            # the first). The final bucket is open-ended so hi_ms is null.
+            bucket_meta: list[tuple[str, float, float | None]] = []
+            prev = 0.0
+            for i, (lbl, upper) in enumerate(_LATENCY_BUCKETS):
+                is_last = i == len(_LATENCY_BUCKETS) - 1
+                hi = None if is_last else float(upper)
+                bucket_meta.append((lbl, prev, hi))
+                prev = float(upper)
+            payload = [
+                {
+                    "error_kind": kind,
+                    "status_class": sc,
+                    "total": sum(counts),
+                    "buckets": [
+                        {"label": lbl, "lo_ms": lo, "hi_ms": hi, "count": counts[i]}
+                        for i, (lbl, lo, hi) in enumerate(bucket_meta)
+                    ],
+                }
+                for (kind, sc), counts in sorted_grid
+            ]
+            os.makedirs(os.path.dirname(heatmap_json) or ".", exist_ok=True)
+            with open(heatmap_json, "w", encoding="utf-8") as fh:
+                json.dump(payload, fh, ensure_ascii=False, indent=2, default=str)
+            heatmap_written.append(heatmap_json)
+            print(f"Wrote heatmap JSON → {heatmap_json} ({len(grid)} combo(s), "
+                  f"{len(bucket_labels)} bucket(s))")
 
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary_path and (written or breakdown_written or heatmap_written):
