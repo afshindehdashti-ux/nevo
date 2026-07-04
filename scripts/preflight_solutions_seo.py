@@ -2588,8 +2588,8 @@ def export_results(results: list[dict]) -> None:
                 '}'
                 '</script>\n\n'
             )
-            if all_existing_paths:
-                all_links = "\n".join(all_existing_paths)
+            if all_paths:
+                all_links = "\n".join(all_paths)
                 fh.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links" '
