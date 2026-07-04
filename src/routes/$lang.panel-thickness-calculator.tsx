@@ -961,9 +961,14 @@ function PanelThicknessPage() {
 
 
   async function downloadPdfReport() {
-    if (hasErrors) return;
-    const { default: jsPDF } = await import("jspdf");
-    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    if (hasErrors || pdfPending) return;
+    setPdfPending(true);
+    const toastId = toast.loading("Generating PDF report…", {
+      description: "Preparing your panel thickness calculation.",
+    });
+    try {
+      const { default: jsPDF } = await import("jspdf");
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
     const pageW = doc.internal.pageSize.getWidth();
     const marginX = 48;
     let y = 56;
