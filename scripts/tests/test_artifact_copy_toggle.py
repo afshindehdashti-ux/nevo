@@ -179,15 +179,12 @@ async def _run(html_path: Path) -> None:
         await _set_toggle(page, False)
         # Inject a row with tricky content, then re-copy.
         csv_payload = await page.evaluate(
-            """async () => {
+            r"""async () => {
               const btn = document.querySelector("button[aria-label='Copy all artifact links as CSV']");
-              // Rebuild data-csv with a tricky row appended (simulating a filename
-              // with special chars) to prove the escaping survives the roundtrip.
-              const tricky = 'label,path\\r\\n"weird, name","path with ""quotes"""\\r\\n"multi\\nline",x\\r\\n';
+              const tricky = 'label,path\r\n"weird, name","path with ""quotes"""\r\n"multi\nline",x\r\n';
               btn.dataset.csv = tricky;
               await navigator.clipboard.writeText('');
               btn.click();
-              // Wait for the async clipboard write.
               await new Promise(r => setTimeout(r, 100));
               return navigator.clipboard.readText();
             }"""
