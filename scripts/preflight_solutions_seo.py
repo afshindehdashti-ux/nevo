@@ -2517,6 +2517,9 @@ def export_results(results: list[dict]) -> None:
             ]
             fh.write(
                 '<div class="artifact-index">\n'
+                '<div id="artifact-copy-live" aria-live="polite" aria-atomic="true" '
+                'style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;">\n'
+                '</div>\n'
                 '<style>'
                 '.artifact-index button:focus-visible, '
                 '.artifact-index input:focus-visible, '
