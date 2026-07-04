@@ -359,4 +359,5 @@ export function downloadInvestmentReport(
 
   footer(page);
   doc.save(meta.file);
+  return meta.file;
 }
