@@ -2870,6 +2870,8 @@ def export_results(results: list[dict]) -> None:
                 'g.style.display = visible > 0 ? "" : "none"; '
                  '}); '
                  'persistArtifactFilters(); '
+                 'const totalVisible = Array.from(container.querySelectorAll(".artifact-item")).filter(el => el.style.display !== "none").length; '
+                 'announceArtifact(totalVisible + " artifact" + (totalVisible === 1 ? "" : "s") + " shown"); '
                   '} '
                   'let _artifactRestoring = false; '
                   'function persistArtifactFilters() { '
