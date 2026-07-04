@@ -2555,7 +2555,27 @@ def export_results(results: list[dict]) -> None:
                 '.artifact-index select:focus-visible { '
                 'outline: 2px solid #3b82f6; outline-offset: 2px; '
                 '}'
-                '</style>\n\n'
+                '.artifact-item { cursor: pointer; }'
+                '.artifact-item.is-active { outline: 2px solid #3b82f6; outline-offset: 2px; border-radius: 4px; }'
+                '#artifact-drawer-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:9998; }'
+                '#artifact-drawer { display:none; position:fixed; top:0; right:0; height:100vh; width:min(420px, 100vw); background:#fff; color:#111; box-shadow:-4px 0 16px rgba(0,0,0,0.2); z-index:9999; overflow:auto; padding:16px 18px; font-family:sans-serif; font-size:14px; line-height:1.45; box-sizing:border-box; }'
+                '#artifact-drawer.is-open, #artifact-drawer-backdrop.is-open { display:block; }'
+                '#artifact-drawer h3 { margin:0 0 8px; font-size:16px; word-break:break-word; }'
+                '#artifact-drawer dl { display:grid; grid-template-columns:auto 1fr; gap:6px 12px; margin:12px 0; }'
+                '#artifact-drawer dt { font-weight:600; color:#374151; }'
+                '#artifact-drawer dd { margin:0; word-break:break-all; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px; }'
+                '#artifact-drawer .artifact-drawer-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }'
+                '#artifact-drawer .artifact-drawer-close { position:absolute; top:10px; right:12px; background:transparent; border:0; font-size:22px; line-height:1; cursor:pointer; }'
+                '@media (prefers-color-scheme: dark) { #artifact-drawer { background:#111827; color:#f3f4f6; } #artifact-drawer dt { color:#d1d5db; } }'
+                '</style>\n'
+                '<div id="artifact-drawer-backdrop" onclick="closeArtifactDrawer()"></div>\n'
+                '<aside id="artifact-drawer" role="dialog" aria-modal="true" aria-labelledby="artifact-drawer-title" tabindex="-1">\n'
+                '<button type="button" class="artifact-drawer-close" aria-label="Close preview" onclick="closeArtifactDrawer()">×</button>\n'
+                '<h3 id="artifact-drawer-title">Artifact preview</h3>\n'
+                '<dl id="artifact-drawer-meta"></dl>\n'
+                '<div class="artifact-drawer-actions" id="artifact-drawer-actions"></div>\n'
+                '</aside>\n\n'
+
             )
             total_existing_count = len(all_existing_paths)
             total_existing_size = sum(
