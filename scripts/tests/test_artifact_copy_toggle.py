@@ -209,6 +209,39 @@ async def _run(html_path: Path) -> None:
         )
         print("  ok — CSV RFC 4180 escaping preserved through DOM roundtrip")
 
+        # Delimiter toggle: switching to ';' must produce a semicolon-delimited
+        # CSV payload and back to ',' must restore the comma variant.
+        async def _copy_csv_with(delim: str) -> str:
+            await page.evaluate(
+                f"const s=document.getElementById('artifact-csv-delimiter');"
+                f"s.value={delim!r}; s.dispatchEvent(new Event('change'));"
+                "navigator.clipboard.writeText('');"
+            )
+            await page.locator(
+                "button[aria-label='Copy all artifact links as CSV']"
+            ).click()
+            for _ in range(20):
+                text = await _read_clipboard(page)
+                if text:
+                    return text
+                await asyncio.sleep(0.05)
+            return await _read_clipboard(page)
+
+        await _set_toggle(page, False)
+        comma_payload = await _copy_csv_with(",")
+        semi_payload = await _copy_csv_with(";")
+        header_line = semi_payload.split("\r\n", 1)[0]
+        assert header_line.startswith("label;path"), (
+            f"semicolon delimiter not applied to header: {header_line!r}"
+        )
+        assert "," not in header_line, (
+            f"header still contains comma after semicolon switch: {header_line!r}"
+        )
+        assert comma_payload.split("\r\n", 1)[0].startswith("label,path"), (
+            "comma delimiter regressed"
+        )
+        print("  ok — CSV delimiter toggle (comma ↔ semicolon)")
+
         await browser.close()
 
 
