@@ -172,6 +172,43 @@ async def _run(html_path: Path) -> None:
             )
             print(f"  ok — {label}")
 
+        # RFC 4180 check for the Python-fed CSV button: after HTML attribute
+        # normalization strips CR, the onclick handler must restore CRLF and
+        # csv.writer must have already escaped commas/quotes/newlines in
+        # labels + paths.
+        await _set_toggle(page, False)
+        # Inject a row with tricky content, then re-copy.
+        csv_payload = await page.evaluate(
+            r"""async () => {
+              const btn = document.querySelector("button[aria-label='Copy all artifact links as CSV']");
+              const q = String.fromCharCode(34);   // "
+              const cr = String.fromCharCode(13);  // \r
+              const lf = String.fromCharCode(10);  // \n
+              const nl = cr + lf;
+              // Build tricky payload from char codes to avoid embedding a triple-quote.
+              const tricky =
+                "label,path" + nl +
+                q + "weird, name" + q + "," + q + "path with " + q+q + "quotes" + q+q + q + nl +
+                q + "multi" + lf + "line" + q + ",x" + nl;
+              btn.dataset.csv = tricky;
+              await navigator.clipboard.writeText('');
+              btn.click();
+              await new Promise(r => setTimeout(r, 100));
+              return navigator.clipboard.readText();
+            }"""
+        )
+        assert "\r\n" in csv_payload, (
+            f"CSV clipboard payload lost CRLF line terminators:\n{csv_payload!r}"
+        )
+        assert '"weird, name"' in csv_payload, "comma-in-field not quoted"
+        # Doubled internal quotes: field `path with "quotes"` becomes
+        # `"path with ""quotes"""` (two-quote before "quotes", three-quote after).
+        assert '""quotes"""' in csv_payload, "internal quotes not doubled"
+        assert '"multi' in csv_payload and 'line"' in csv_payload, (
+            "newline-in-field not quoted"
+        )
+        print("  ok — CSV RFC 4180 escaping preserved through DOM roundtrip")
+
         await browser.close()
 
 

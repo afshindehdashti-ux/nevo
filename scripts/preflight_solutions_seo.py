@@ -2932,8 +2932,9 @@ def export_results(results: list[dict]) -> None:
                 '} '
                 'function downloadArtifactCsv(btn) { '
                 'const useUrl = document.getElementById("artifact-url-toggle") && document.getElementById("artifact-url-toggle").checked; '
-                'const csv = useUrl && btn.dataset.csvUrl ? btn.dataset.csvUrl : btn.dataset.csv; '
-                'if (!csv) return; '
+                'const raw = useUrl && btn.dataset.csvUrl ? btn.dataset.csvUrl : btn.dataset.csv; '
+                'if (!raw) return; '
+                'const csv = raw.replace(/\\r?\\n/g, "\\r\\n"); '
                 'const blob = new Blob([csv], { type: "text/csv;charset=utf-8" }); '
                 'const url = URL.createObjectURL(blob); '
                 'const a = document.createElement("a"); '
@@ -3197,7 +3198,7 @@ def export_results(results: list[dict]) -> None:
                     '<button type="button" '
                     'aria-label="Copy all artifact links as CSV" '
                     f'data-count="{len(all_items_json)}" '
-                    f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.csvUrl ? this.dataset.csvUrl : this.dataset.csv){_CLIPBOARD_TOAST_CSV}" '
+                    f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; const raw = useUrl && this.dataset.csvUrl ? this.dataset.csvUrl : this.dataset.csv; navigator.clipboard.writeText(raw.replace(/\\r?\\n/g, \'\\r\\n\')){_CLIPBOARD_TOAST_CSV}" '
                     f'data-csv="{html.escape(csv_str, quote=True)}"{csv_url_data_attr}>Copy links (CSV)</button>\n\n'
                 )
                 fh.write(
