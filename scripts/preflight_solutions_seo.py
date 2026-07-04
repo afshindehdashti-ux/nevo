@@ -160,6 +160,8 @@ Env:
     success_rate_pct, share_pct, failures_pct,
     attempts_total, attempts_avg,
     ms_avg, ms_p50, ms_p95, ms_p99, ms_max
+  When DISABLE_PERCENTILES is set, these exports and the percentile columns are
+  skipped entirely.
 
   Latency percentile fields (ms):
     ms_avg   arithmetic mean latency for the combo
