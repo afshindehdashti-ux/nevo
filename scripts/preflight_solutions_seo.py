@@ -3627,6 +3627,7 @@ def export_results(results: list[dict]) -> None:
                     pass
             fh.write(
                 '<input type="text" class="artifact-search" '
+                'aria-label="Search artifacts by name or path" '
                 'placeholder="Search artifacts by name or path..." '
                 'oninput="filterArtifactItems()">\n\n'
             )
