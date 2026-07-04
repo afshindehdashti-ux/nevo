@@ -13,6 +13,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { submitLeadForm } from "@/lib/lead-submit";
 import { ogImageMeta } from "@/lib/og-images";
 import { generateCvConfirmationPdf, type CvConfirmationInput } from "@/lib/cv-confirmation-pdf";
