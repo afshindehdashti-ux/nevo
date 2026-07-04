@@ -2132,6 +2132,23 @@ _CLIPBOARD_TOAST_MULTI = (
     "})"
 )
 
+# Inline JS toast shown after copying a Markdown bullet list. The count is
+# derived from the data-markdown attribute at click time; data-context supplies
+# an optional group label.
+_CLIPBOARD_TOAST_MARKDOWN = (
+    ".then(() => { "
+    "const ctx = this.dataset.context || ''; "
+    "const n = this.dataset.markdown.split('\\n').length; "
+    "const t = document.createElement('div'); "
+    "t.textContent = 'Copied ' + n + ' markdown link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : ''); "
+    "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
+    "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
+    "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
+    "document.body.appendChild(t); "
+    "setTimeout(() => t.remove(), 2000); "
+    "})"
+)
+
 
 def export_results(results: list[dict]) -> None:
     """Write results as CSV / JSON artifacts for post-run analysis.
