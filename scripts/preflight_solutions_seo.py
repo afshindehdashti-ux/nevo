@@ -2897,6 +2897,8 @@ def export_results(results: list[dict]) -> None:
                     )
                 for label, path in items:
                     file_type = os.path.splitext(path)[1].lower() or "none"
+                    url = _artifact_url(path)
+                    url_attr = f' data-url="{html.escape(url, quote=True)}"' if url else ""
                     exists = os.path.exists(path)
                     if not exists:
                         missing_artifacts.append((label, path))
@@ -2918,7 +2920,7 @@ def export_results(results: list[dict]) -> None:
                                 f'data-type="{html.escape(file_type, quote=True)}" '
                                 f'data-label="{html.escape(label, quote=True)}" '
                                 f'data-path="{html.escape(path, quote=True)}" '
-                                f'data-existing="true">\n'
+                                f'data-existing="true"{url_attr}>\n'
                                 f'<a href="{html.escape(path, quote=True)}" target="_blank" rel="noopener noreferrer">'
                                 f'<button type="button" aria-label="Open {html.escape(label, quote=True)}">Open</button></a> '
                                 '<button type="button" '
@@ -2929,7 +2931,7 @@ def export_results(results: list[dict]) -> None:
                                 f'{meta} '
                                 '<button type="button" '
                                 f'aria-label="Copy link for {html.escape(label, quote=True)}" '
-                                f'onclick="navigator.clipboard.writeText(this.dataset.link){_CLIPBOARD_TOAST_SINGLE}" '
+                                f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.url ? this.dataset.url : this.dataset.link){_CLIPBOARD_TOAST_SINGLE}" '
                                 f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
                                 "</div>\n"
                             )
