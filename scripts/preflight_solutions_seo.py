@@ -1471,6 +1471,12 @@ def write_step_summary(results: list[dict]) -> None:
                 "| --- | :---: | ---: | ---: | ---: | :--- | ---: | ---: | ---: | ---: | ---: |"
             )
         lines += ["", header, separator]
+        if not combo_rows:
+            # Placeholder row keeps the table syntactically valid when every
+            # combo is filtered out — otherwise GFM renders a broken table.
+            empty_cells = 8 if _DISABLE_PERCENTILES else 11
+            lines.append("| " + " | ".join(["_no combo matches active filters_"]
+                                            + ["—"] * (empty_cells - 1)) + " |")
         for kind, status_class, n, failed, success_pct, share_fail in combo_rows:
             share_all = 100.0 * n / total_all
             kind_label = _ERROR_KIND_LABELS.get(kind, kind)
