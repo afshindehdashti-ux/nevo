@@ -174,6 +174,10 @@ Env:
     --heatmap-preview-top=N   Number of top non-zero buckets to preview per combo
                               (default 3; set 0 to disable).
     --validation-json=PATH    Write per-combo expected-vs-actual validation report.
+    --reset-filters           Clear every quick combo filter (`COMBO_FILTERS` /
+                              `--combo-filter=`) and `SUMMARY_FILTER`, restoring
+                              the full unfiltered breakdown table. Env equivalent:
+                              `RESET_FILTERS=true`.
 
 
 
@@ -1046,9 +1050,38 @@ _COMBO_FILTER_OPS = {
     "==": lambda a, b: abs(a - b) < 1e-9,
     "=":  lambda a, b: abs(a - b) < 1e-9,
 }
+def _reset_filters_requested() -> bool:
+    """Return True when the user asked to clear every quick combo filter and
+    the summary filter, restoring the full unfiltered table. Trigger via env
+    `RESET_FILTERS=true|1|yes|on` or CLI `--reset-filters`."""
+    if os.environ.get("RESET_FILTERS", "").strip().lower() in ("1", "true", "yes", "on"):
+        return True
+    return "--reset-filters" in sys.argv
+
+
 def _parse_combo_filters() -> list[tuple[str, str, float, str]]:
     """Return list of (metric, op, value, raw) predicates. Invalid entries
-    are warned to stderr and skipped so a typo never silently hides rows."""
+    are warned to stderr and skipped so a typo never silently hides rows.
+
+    When `--reset-filters` / `RESET_FILTERS=true` is set, every configured
+    combo filter is dropped so the full unfiltered table is restored."""
+    if _reset_filters_requested():
+        # Consume any --combo-filter= args so they don't pollute later parsing,
+        # and print a note so the operator can see why filters were ignored.
+        dropped: list[str] = []
+        env = (os.environ.get("COMBO_FILTERS") or "").strip()
+        if env:
+            dropped.append(f"COMBO_FILTERS={env!r}")
+        for arg in list(sys.argv[1:]):
+            if arg.startswith("--combo-filter="):
+                dropped.append(arg)
+        if dropped:
+            print(
+                "preflight: --reset-filters active — clearing combo filters: "
+                + ", ".join(dropped),
+                file=sys.stderr,
+            )
+        return []
     raw_specs: list[str] = []
     env = (os.environ.get("COMBO_FILTERS") or "").strip()
     if env:
@@ -1091,6 +1124,7 @@ def _parse_combo_filters() -> list[tuple[str, str, float, str]]:
         parsed.append((metric, op, val, spec.strip()))
     return parsed
 _COMBO_FILTERS = _parse_combo_filters()
+_FILTERS_RESET = _reset_filters_requested()
 
 def _combo_row_matches_filters(success_pct: float) -> bool:
     """AND-combine every configured predicate. Empty filter list = keep all."""
@@ -1403,8 +1437,13 @@ def write_step_summary(results: list[dict]) -> None:
     # with `SUMMARY_FILTER=preset:<name>` (or `@<name>`) so users switch
     # between saved scenarios without re-typing the whole expression.
     presets = _parse_summary_filter_presets()
-    raw_filter = (os.environ.get("SUMMARY_FILTER") or "all").strip()
-    resolved_filter, active_preset = _resolve_summary_filter(raw_filter, presets)
+    if _FILTERS_RESET:
+        raw_filter = "all"
+        active_preset = None
+        resolved_filter = "all"
+    else:
+        raw_filter = (os.environ.get("SUMMARY_FILTER") or "all").strip()
+        resolved_filter, active_preset = _resolve_summary_filter(raw_filter, presets)
     filtered, filter_scope = _filter_results_for_export(results, resolved_filter)
     total = len(results)
     display = filtered if filter_scope != "all" else results
@@ -1435,6 +1474,12 @@ def write_step_summary(results: list[dict]) -> None:
         f"- Retry kinds: `{','.join(sorted(RETRYABLE_ERROR_KINDS)) or 'none'}` "
         f"(status classes/codes: `{','.join(sorted(RETRYABLE_STATUS_CLASSES)) or 'none'}`)",
     ]
+    if _FILTERS_RESET:
+        lines.append(
+            "- 🔄 Filters reset: quick combo filters and summary filter cleared "
+            "(via `--reset-filters` / `RESET_FILTERS=true`) — showing the full "
+            f"unfiltered table ({total} row(s))."
+        )
     if filter_scope != "all":
         preset_note = f" _(preset `{active_preset}`)_" if active_preset else ""
         lines.append(f"- Summary filter: `{filter_scope}`{preset_note} "
