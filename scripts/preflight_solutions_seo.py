@@ -3201,6 +3201,14 @@ def export_results(results: list[dict]) -> None:
                     f'data-csv="{html.escape(csv_str, quote=True)}"{csv_url_data_attr}>Copy links (CSV)</button>\n\n'
                 )
                 fh.write(
+                    '<button type="button" '
+                    'aria-label="Download all artifact links as CSV file" '
+                    f'data-count="{len(all_items_json)}" '
+                    'data-filename="artifact-links.csv" '
+                    'onclick="downloadArtifactCsv(this)" '
+                    f'data-csv="{html.escape(csv_str, quote=True)}"{csv_url_data_attr}>Download CSV</button>\n\n'
+                )
+                fh.write(
                     '<div class="artifact-selection-controls" style="margin-top:8px;">\n'
                     '<strong>Selected:</strong> '
                     '<span class="artifact-selection-count">0 selected</span> '
