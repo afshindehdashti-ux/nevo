@@ -3055,7 +3055,7 @@ def export_results(results: list[dict]) -> None:
                 'payload = JSON.stringify(rows, null, 2); '
                 '} else if (format === "csv") { '
                 'const esc = v => { const s = String(v == null ? "" : v); return /[",\\n\\r]/.test(s) ? "\\"" + s.replace(/"/g, "\\"\\"") + "\\"" : s; }; '
-                'payload = "label,path\\r\\n" + rows.map(r => esc(r.label) + "," + esc(r.path)).join("\\r\\n") + "\\r\\n"; '
+                'payload = "label" + delim + "path\\r\\n" + rows.map(r => esc(r.label) + delim + esc(r.path)).join("\\r\\n") + "\\r\\n"; '
                 '} else { return; } '
                 'navigator.clipboard.writeText(payload).then(() => { '
                 'showCopyToast("Copied " + rows.length + " selected link" + (rows.length === 1 ? "" : "s") + " as " + format.toUpperCase()); '
