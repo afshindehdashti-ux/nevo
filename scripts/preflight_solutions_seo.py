@@ -3539,14 +3539,16 @@ def export_results(results: list[dict]) -> None:
                         '<button type="button" '
                         f'aria-label="Download artifact manifest as CSV" '
                         f'data-href="{csv_href}" '
-                        'onclick="artifactDownload(this.dataset.href)">'
+                        f'data-label="manifest CSV" '
+                        'onclick="artifactDownloadWithToast(this.dataset.href, this.dataset.label)">'
                         'Export manifest CSV</button> '
                     )
                     fh.write(
                         '<button type="button" '
                         f'aria-label="Download artifact manifest as JSON" '
                         f'data-href="{json_href}" '
-                        'onclick="artifactDownload(this.dataset.href)">'
+                        f'data-label="manifest JSON" '
+                        'onclick="artifactDownloadWithToast(this.dataset.href, this.dataset.label)">'
                         'Export manifest JSON</button> '
                     )
                     if xlsx_written:
@@ -3557,7 +3559,8 @@ def export_results(results: list[dict]) -> None:
                             '<button type="button" '
                             f'aria-label="Download artifact manifest as XLSX" '
                             f'data-href="{xlsx_href}" '
-                            'onclick="artifactDownload(this.dataset.href)">'
+                            f'data-label="manifest XLSX" '
+                            'onclick="artifactDownloadWithToast(this.dataset.href, this.dataset.label)">'
                             'Export manifest XLSX</button>\n\n'
                         )
                     else:
