@@ -2937,6 +2937,8 @@ def export_results(results: list[dict]) -> None:
                                 f'<a href="{html.escape(path, quote=True)}" target="_blank" rel="noopener noreferrer">'
                                 f'<button type="button" aria-label="Open {html.escape(label, quote=True)}">Open</button></a> '
                                 f'<a href="{html.escape(path, quote=True)}">{html.escape(label)}</a> '
+                                f'<a href="{html.escape(path, quote=True)}" download="{html.escape(os.path.basename(path), quote=True)}">'
+                                f'<button type="button" aria-label="Download {html.escape(label, quote=True)}">Download</button></a> '
                                 '<button type="button" '
                                 f'aria-label="Copy link for {html.escape(label, quote=True)}" '
                                 f'onclick="navigator.clipboard.writeText(this.dataset.link){_CLIPBOARD_TOAST_SINGLE}.catch(() => {{}})" '
