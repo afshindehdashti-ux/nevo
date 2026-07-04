@@ -2037,7 +2037,7 @@ def export_results(results: list[dict]) -> None:
             if heatmap_written:
                 fh.write("\n_Latency heatmap bin counts (error_kind × status_class × bucket):_\n\n")
                 for p in heatmap_written:
-                    fh.write(f"- `{p}`\n")
+                    fh.write(f"- [`{p}`]({p})\n")
             fh.write("\n")
 
 
