@@ -3058,7 +3058,7 @@ def export_results(results: list[dict]) -> None:
                 '}).catch(() => { showCopyToast("Could not copy — check clipboard permissions"); }); '
                 '} '
                 'document.addEventListener("change", function(e) { '
-                'if (e.target && e.target.classList && e.target.classList.contains("artifact-select")) { updateSelectionCount(); } '
+                'if (e.target && e.target.classList && e.target.classList.contains("artifact-select")) { updateSelectionCount(); saveArtifactSelection(); } '
                 '}); '
                 'function downloadBlobPayload(filename, mime, payload) { '
                 'const blob = new Blob([payload], {type: mime}); '
