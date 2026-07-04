@@ -1811,6 +1811,28 @@ def export_results(results: list[dict]) -> None:
             print(f"Wrote heatmap JSON → {heatmap_json} ({len(grid)} combo(s), "
                   f"{len(bucket_labels)} bucket(s))")
 
+        # Compact stdout preview: top-N non-zero bins per combo so operators
+        # can sanity-check the export without opening the CSV/JSON. Tunable
+        # via HEATMAP_PREVIEW_TOP (default 3, set to 0 to disable).
+        try:
+            preview_top = int(os.environ.get("HEATMAP_PREVIEW_TOP", "3"))
+        except ValueError:
+            preview_top = 3
+        if preview_top > 0 and sorted_grid:
+            print(f"Heatmap preview (top {preview_top} bin(s) per combo):")
+            for (kind, sc), counts in sorted_grid:
+                total = sum(counts)
+                if not total:
+                    continue
+                ranked = sorted(
+                    ((counts[i], bucket_labels[i]) for i in range(len(counts)) if counts[i]),
+                    key=lambda x: (-x[0], x[1]),
+                )[:preview_top]
+                bins = ", ".join(
+                    f"{lbl}={c} ({c * 100.0 / total:.0f}%)" for c, lbl in ranked
+                )
+                print(f"  {kind:<10} {sc:<4} n={total:<4} {bins}")
+
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary_path and (written or breakdown_written or heatmap_written):
         with open(summary_path, "a", encoding="utf-8") as fh:
