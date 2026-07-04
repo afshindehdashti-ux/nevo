@@ -956,57 +956,6 @@ function PanelThicknessPage() {
     });
   }
 
-  function downloadReport() {
-    if (hasErrors) return;
-    const lines = [
-      "NEVO Panel Thickness Calculation Report",
-      "======================================",
-      "",
-      `Application:         ${app}`,
-      `Core Material:       ${core}`,
-      `Climate Zone:        ${climate}`,
-      `Internal Temp:       ${temp}`,
-      `Fire Requirement:    ${fire}`,
-      `Selected Thickness:  ${thickness} mm`,
-      `Exterior Steel:      ${extSteel.toFixed(2)} mm`,
-      `Interior Steel:      ${intSteel.toFixed(2)} mm`,
-      "",
-      "RESULTS",
-      "-------",
-      `U-Value:             ${u} W/m²K`,
-      `Thermal Resistance:  ${rTotal} m²K/W`,
-      `Panel Weight:        ${w} kg/m²`,
-      `Est. Heat Loss:      ${hLoss} W/m² (ΔT ${deltaT} K)`,
-      `Fire Achieved:       ${fireLabel(fireAchieved)} (required ${fire})`,
-      `Thermal Performance: ${perf}`,
-      "",
-      "RECOMMENDATION",
-      "--------------",
-      `Recommended range:   ${rec.min}–${rec.max} mm`,
-      `Note: ${rec.note}`,
-      fireWarn
-        ? "WARNING: For high fire resistance requirements, Rock Wool is usually recommended."
-        : "",
-      "",
-      "DISCLAIMER",
-      "----------",
-      "This calculator provides conceptual guidance only. Final sandwich panel",
-      "thickness must be verified by project-specific engineering, local",
-      "regulations, fire requirements and thermal performance calculations.",
-    ]
-      .filter(Boolean)
-      .join("\n");
-
-    const blob = new Blob([lines], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `nevo-panel-thickness-${app.replace(/\s+/g, "-")}-${thickness}mm.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
 
   async function downloadPdfReport() {
     if (hasErrors) return;
@@ -1468,22 +1417,11 @@ function PanelThicknessPage() {
       <div className="flex flex-wrap gap-3">
         <button
           type="button"
-          onClick={downloadReport}
-          disabled={hasErrors}
-          aria-disabled={hasErrors || undefined}
-          title={hasErrors ? "Resolve configuration issues to enable" : undefined}
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-400"
-        >
-          <Download className="size-4" />
-          Download Calculation Report
-        </button>
-        <button
-          type="button"
           onClick={downloadPdfReport}
           disabled={hasErrors}
           aria-disabled={hasErrors || undefined}
           title={hasErrors ? "Resolve configuration issues to enable" : undefined}
-          className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-400"
         >
           <Download className="size-4" />
           Download PDF Report
@@ -1637,23 +1575,13 @@ function PanelThicknessPage() {
           )}
           <button
             type="button"
-            onClick={downloadReport}
-            disabled={hasErrors}
-            aria-disabled={hasErrors || undefined}
-            title={hasErrors ? "Resolve configuration issues to enable" : undefined}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white/5"
-          >
-            <Download className="size-4" /> Download Report
-          </button>
-          <button
-            type="button"
             onClick={downloadPdfReport}
             disabled={hasErrors}
             aria-disabled={hasErrors || undefined}
             title={hasErrors ? "Resolve configuration issues to enable" : undefined}
             className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white/5"
           >
-            <Download className="size-4" /> Download PDF
+            <Download className="size-4" /> Download PDF Report
           </button>
 
           <Link
