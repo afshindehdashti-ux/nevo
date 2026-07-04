@@ -2660,12 +2660,25 @@ def export_results(results: list[dict]) -> None:
             )
             if all_paths:
                 all_links = "\n".join(all_paths)
+                all_items_json = [
+                    {"label": label, "path": path}
+                    for _, items in groups
+                    for label, path in items
+                ]
+                json_str = json.dumps(all_items_json)
                 fh.write(
                     '<button type="button" '
                     'aria-label="Copy all artifact links" '
                     'data-context="all artifacts" '
                     f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
                     f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
+                )
+                fh.write(
+                    '<button type="button" '
+                    'aria-label="Copy all artifact paths as JSON" '
+                    f'data-count="{len(all_items_json)}" '
+                    f'onclick="navigator.clipboard.writeText(this.dataset.json){_CLIPBOARD_TOAST_JSON}.catch(() => {{}})" '
+                    f'data-json="{html.escape(json_str, quote=True)}">Copy links (JSON)</button>\n\n'
                 )
             if all_existing_paths:
                 bundle_path = os.path.join(
