@@ -3234,6 +3234,7 @@ def export_results(results: list[dict]) -> None:
                 'if (drawer) drawer.classList.remove("is-open"); '
                 'if (backdrop) backdrop.classList.remove("is-open"); '
                 'document.querySelectorAll(".artifact-item.is-active").forEach(x => x.classList.remove("is-active")); '
+                'clearLastOpenedArtifact(); '
                 'if (_artifactDrawerPrevFocus && _artifactDrawerPrevFocus.focus) { try { _artifactDrawerPrevFocus.focus(); } catch (e) {} } '
                 '} '
                 'document.addEventListener("keydown", function(e) { '
