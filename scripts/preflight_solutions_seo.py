@@ -931,6 +931,25 @@ if _SORT_COMBOS_ORDER not in {"asc", "desc"}:
     print(f"preflight: warning: invalid SORT_COMBOS_ORDER={_SORT_COMBOS_ORDER!r}; using desc", file=sys.stderr)
     _SORT_COMBOS_ORDER = "desc"
 
+# Rate bar rendering mode. `success` (default) fills cells left-to-right with
+# 🟩 up to success%; `failure` fills them with 🟥 up to failure%. Also accepts
+# CLI flags --rate-bar=success|failure so the toggle is discoverable from --help.
+_RATE_BAR_MODE_OPTIONS = {"success", "failure"}
+def _resolve_rate_bar_mode() -> str:
+    for arg in sys.argv[1:]:
+        if arg.startswith("--rate-bar="):
+            v = arg.split("=", 1)[1].strip().lower()
+            if v in _RATE_BAR_MODE_OPTIONS:
+                return v
+            print(f"preflight: warning: invalid --rate-bar={v!r}; using success", file=sys.stderr)
+            return "success"
+    v = (os.environ.get("RATE_BAR_MODE") or "success").strip().lower()
+    if v not in _RATE_BAR_MODE_OPTIONS:
+        print(f"preflight: warning: invalid RATE_BAR_MODE={v!r}; using success", file=sys.stderr)
+        return "success"
+    return v
+_RATE_BAR_MODE = _resolve_rate_bar_mode()
+
 
 def _bucket_for(ms: float) -> int:
     for i, (_, hi) in enumerate(_LATENCY_BUCKETS):
@@ -1363,15 +1382,21 @@ def write_step_summary(results: list[dict]) -> None:
             kind_label = _ERROR_KIND_LABELS.get(kind, kind)
             class_label = _STATUS_CLASS_LABELS.get(status_class, status_class)
             pr = pctile_index.get((kind, status_class), {})
-            # Bar: green = success share, red = failure share. Uses solid
-            # block chars so the ratio is legible in monospace summaries.
-            success_cells = int(round(success_pct / 100 * bar_w))
-            fail_cells = bar_w - success_cells
+            # Bar: mode-dependent fill. In `success` mode 🟩 grows left→right
+            # to success%; in `failure` mode 🟥 grows left→right to failure%.
+            # Rounding rule is symmetric so both modes agree on cell counts.
             failure_pct = 100.0 - success_pct
+            if _RATE_BAR_MODE == "failure":
+                fail_cells = int(round(failure_pct / 100 * bar_w))
+                success_cells = bar_w - fail_cells
+                bar_glyphs = "🟥" * fail_cells + "🟩" * success_cells
+            else:
+                success_cells = int(round(success_pct / 100 * bar_w))
+                fail_cells = bar_w - success_cells
+                bar_glyphs = "🟩" * success_cells + "🟥" * fail_cells
             # Wrap in <span title="..."> so GitHub renders a hover tooltip
             # with the exact success/failure percentages plus raw counts —
             # the rounded blocks in the bar always lose precision.
-            bar_glyphs = "🟩" * success_cells + "🟥" * fail_cells
             tooltip = (
                 f"Success rate: {success_pct:.2f}% ({n - failed}/{n})"
                 f" • Failure rate: {failure_pct:.2f}% ({failed}/{n})"
@@ -1392,13 +1417,19 @@ def write_step_summary(results: list[dict]) -> None:
             lines.append(row)
         # Legend under the table so readers understand what the Rate bar
         # encodes without reverse-engineering the glyphs. The threshold line
-        # documents the rounding rule used above (`round(pct/100 * bar_w)`),
-        # which is what turns e.g. 94.9% into 9🟩/1🟥.
+        # documents the rounding rule used above, which is what turns e.g.
+        # 94.9% into 9🟩/1🟥.
+        mode_label = "failure rate" if _RATE_BAR_MODE == "failure" else "success rate"
+        fill_glyph = "🟥" if _RATE_BAR_MODE == "failure" else "🟩"
+        rest_glyph = "🟩" if _RATE_BAR_MODE == "failure" else "🟥"
         lines += [
             "",
-            f"<sub>Rate bar legend: 🟩 = successful requests, 🟥 = failed requests. "
+            f"<sub>Rate bar legend (mode: **{_RATE_BAR_MODE}** — "
+            f"set `RATE_BAR_MODE=success|failure` or `--rate-bar=success|failure` to switch): "
+            f"{fill_glyph} fills left→right to {mode_label}; "
+            f"{rest_glyph} fills the remainder. "
             f"Each bar is {bar_w} cell(s); one cell ≈ {100 // bar_w}% "
-            f"(cells = round(success% / {100 // bar_w})). "
+            f"(cells = round({mode_label.split()[0]}% / {100 // bar_w})). "
             f"Hover a bar to see the exact success/failure rate and raw counts.</sub>",
             "",
         ]
