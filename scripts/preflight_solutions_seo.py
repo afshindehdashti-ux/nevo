@@ -273,6 +273,13 @@ _DISABLE_PERCENTILES = os.environ.get("DISABLE_PERCENTILES", "").strip().lower()
     "1", "true", "yes", "on"
 )
 
+# Disable heatmap CSV/JSON export (and the related heatmap/breakdown consistency
+# validation) to make the run faster when the heatmap artifact is not needed.
+# Set env DISABLE_HEATMAP_EXPORT=true or pass the --disable-heatmap-export flag.
+_DISABLE_HEATMAP_EXPORT = os.environ.get("DISABLE_HEATMAP_EXPORT", "").strip().lower() in (
+    "1", "true", "yes", "on"
+)
+
 
 
 
