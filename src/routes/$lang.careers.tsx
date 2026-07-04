@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import { useRef, useState } from "react";
 import {
   Briefcase, MapPin, Clock, Users, GraduationCap, Rocket,
-  Cpu, Wrench, Zap, Megaphone, Globe2, Building2, ArrowRight, Upload, Heart, Loader2,
+  Cpu, Wrench, Zap, Megaphone, Globe2, Building2, ArrowRight, Upload, Heart, Loader2, FileDown,
 } from "lucide-react";
 
 import heroImg from "@/assets/corporate/careers-hero.jpg";
@@ -15,6 +15,9 @@ import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
 import { submitLeadForm } from "@/lib/lead-submit";
 import { ogImageMeta } from "@/lib/og-images";
+import { generateCvConfirmationPdf, type CvConfirmationInput } from "@/lib/cv-confirmation-pdf";
+import { trackPdfEvent } from "@/lib/pdf-analytics";
+
 
 const TITLE = "Careers — Build the Future With NEVO Industrial | Dubai · Germany · Türkiye";
 const DESCRIPTION =
@@ -59,6 +62,13 @@ function CareersPage() {
   const [busy, setBusy] = useState(false);
   const [cvName, setCvName] = useState<string>("");
   const [cvSize, setCvSize] = useState<number>(0);
+  const [confirmation, setConfirmation] = useState<{
+    input: CvConfirmationInput;
+    filename: string;
+    reference: string;
+    blobUrl: string;
+  } | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   async function handleApplication(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -69,8 +79,21 @@ function CareersPage() {
       cvName ? `Uploading CV — ${cvName}…` : "Submitting application…",
       { description: "Please keep this tab open while we transmit your application." },
     );
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const snapshot: CvConfirmationInput = {
+      name: String(fd.get("name") || ""),
+      email: String(fd.get("email") || ""),
+      phone: String(fd.get("phone") || ""),
+      linkedin: String(fd.get("linkedin") || "") || undefined,
+      team: String(fd.get("team") || "") || undefined,
+      note: String(fd.get("note") || "") || undefined,
+      cvName: cvName || undefined,
+      cvSize: cvSize || undefined,
+      submittedAt: new Date(),
+    };
     try {
-      const ok = await submitLeadForm(e.currentTarget, {
+      const ok = await submitLeadForm(form, {
         source: "careers-application",
         rules: [
           { field: "name", label: "Full name" },
@@ -79,10 +102,24 @@ function CareersPage() {
         ],
         successTitle: "Application received",
         successDescription: cvName
-          ? `CV "${cvName}" uploaded successfully. Our talent team will review your profile and respond within 5 business days.`
-          : "Our talent team will review your profile and respond within 5 business days.",
+          ? `CV "${cvName}" uploaded successfully. Generating your PDF confirmation…`
+          : "Generating your PDF confirmation…",
       });
       if (ok) {
+        // Generate PDF confirmation
+        try {
+          if (confirmation?.blobUrl) URL.revokeObjectURL(confirmation.blobUrl);
+          const { blob, filename, reference } = generateCvConfirmationPdf(snapshot);
+          const blobUrl = URL.createObjectURL(blob);
+          setConfirmation({ input: snapshot, filename, reference, blobUrl });
+          toast.success("PDF confirmation ready", {
+            description: `Reference ${reference} — download your confirmation below.`,
+          });
+        } catch (err) {
+          toast.error("Could not generate PDF confirmation", {
+            description: err instanceof Error ? err.message : "Please try again.",
+          });
+        }
         cvFormRef.current?.reset();
         setCvName("");
         setCvSize(0);
@@ -92,6 +129,62 @@ function CareersPage() {
       setBusy(false);
     }
   }
+
+  async function handleDownloadConfirmation() {
+    if (!confirmation || downloading) return;
+    setDownloading(true);
+    const { toast } = await import("sonner");
+    const startedAt = performance.now();
+    const loadingId = toast.loading("Preparing PDF download…");
+    trackPdfEvent({
+      document_id: "cv-application-confirmation",
+      document_title: "CV Application Confirmation",
+      category: "careers",
+      source_page: "/careers",
+      filename: confirmation.filename,
+      status: "start",
+    });
+    try {
+      const a = document.createElement("a");
+      a.href = confirmation.blobUrl;
+      a.download = confirmation.filename;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast.success("Download started", {
+        description: confirmation.filename,
+      });
+      trackPdfEvent({
+        document_id: "cv-application-confirmation",
+        document_title: "CV Application Confirmation",
+        category: "careers",
+        source_page: "/careers",
+        filename: confirmation.filename,
+        status: "success",
+        duration_ms: Math.round(performance.now() - startedAt),
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Please try again.";
+      toast.error("Download failed", {
+        description: message,
+        action: { label: "Retry", onClick: () => void handleDownloadConfirmation() },
+      });
+      trackPdfEvent({
+        document_id: "cv-application-confirmation",
+        category: "careers",
+        source_page: "/careers",
+        filename: confirmation.filename,
+        status: "failure",
+        duration_ms: Math.round(performance.now() - startedAt),
+        error_message: message,
+      });
+    } finally {
+      toast.dismiss(loadingId);
+      setDownloading(false);
+    }
+  }
+
 
 
   return (
@@ -256,7 +349,39 @@ function CareersPage() {
               )}
             </Button>
 
+            {confirmation && (
+              <div className="mt-2 rounded-xl border border-emerald-500/40 bg-emerald-500/5 p-5">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600">
+                    <FileDown className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-foreground">
+                      Application confirmation ready
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Reference <span className="font-mono">{confirmation.reference}</span> · {confirmation.filename}
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => void handleDownloadConfirmation()}
+                        disabled={downloading}
+                      >
+                        {downloading ? (
+                          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Preparing…</>
+                        ) : (
+                          <><FileDown className="mr-2 h-4 w-4" /> Download PDF Report</>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </form>
+
         </div>
       </Section>
 
