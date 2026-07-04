@@ -2107,6 +2107,7 @@ def _human_size(size: int) -> str:
 # it works in any markdown viewer that executes onclick handlers.
 _CLIPBOARD_TOAST_SINGLE = (
     ".then(() => { showCopyToast('Copied link'); })"
+    ".catch(() => { showCopyToast('Could not copy — check clipboard permissions'); })"
 )
 
 # Inline JS toast shown after copying multiple artifact links. The count is
@@ -2118,6 +2119,7 @@ _CLIPBOARD_TOAST_MULTI = (
     "const n = this.dataset.links.split('\\n').length; "
     "showCopyToast('Copied ' + n + ' link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : '')); "
     "})"
+    ".catch(() => { showCopyToast('Could not copy — check clipboard permissions'); })"
 )
 
 # Inline JS toast shown after copying a Markdown bullet list. The count is
@@ -2129,6 +2131,7 @@ _CLIPBOARD_TOAST_MARKDOWN = (
     "const n = this.dataset.markdown.split('\\n').length; "
     "showCopyToast('Copied ' + n + ' markdown link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : '')); "
     "})"
+    ".catch(() => { showCopyToast('Could not copy — check clipboard permissions'); })"
 )
 
 # Inline JS toast shown after copying all artifact paths as a JSON array. The
@@ -2139,6 +2142,7 @@ _CLIPBOARD_TOAST_JSON = (
     "const n = parseInt(this.dataset.count || '0', 10); "
     "showCopyToast('Copied ' + n + ' artifact path' + (n === 1 ? '' : 's') + ' as JSON'); "
     "})"
+    ".catch(() => { showCopyToast('Could not copy — check clipboard permissions'); })"
 )
 
 
@@ -2658,7 +2662,7 @@ def export_results(results: list[dict]) -> None:
                 'const paths = visible.map(el => el.dataset.path).filter(Boolean); '
                 'navigator.clipboard.writeText(paths.join("\\n")).then(() => { '
                 'showCopyToast("Copied " + paths.length + " link" + (paths.length === 1 ? "" : "s")); '
-                '}).catch(() => {}); '
+                '}).catch(() => { showCopyToast("Could not copy — check clipboard permissions"); }); '
                 '}'
                 '</script>\n\n'
             )
@@ -2674,7 +2678,7 @@ def export_results(results: list[dict]) -> None:
                     '<button type="button" '
                     'aria-label="Copy all artifact links" '
                     'data-context="all artifacts" '
-                    f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
+                    f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}" '
                     f'data-links="{html.escape(all_links, quote=True)}">Copy all links</button>\n\n'
                 )
                 fh.write(
@@ -2686,7 +2690,7 @@ def export_results(results: list[dict]) -> None:
                     '<button type="button" '
                     'aria-label="Copy all artifact paths as JSON" '
                     f'data-count="{len(all_items_json)}" '
-                    f'onclick="navigator.clipboard.writeText(this.dataset.json){_CLIPBOARD_TOAST_JSON}.catch(() => {{}})" '
+                    f'onclick="navigator.clipboard.writeText(this.dataset.json){_CLIPBOARD_TOAST_JSON}" '
                     f'data-json="{html.escape(json_str, quote=True)}">Copy links (JSON)</button>\n\n'
                 )
             summary_dir = os.path.dirname(summary_path) or "."
@@ -2830,7 +2834,7 @@ def export_results(results: list[dict]) -> None:
                         '<button type="button" '
                         f'aria-label="Copy links for {html.escape(aria_title, quote=True)}" '
                         f'data-context="{html.escape(aria_title, quote=True)}" '
-                        f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}.catch(() => {{}})" '
+                        f'onclick="navigator.clipboard.writeText(this.dataset.links){_CLIPBOARD_TOAST_MULTI}" '
                         f'data-links="{html.escape(all_links, quote=True)}">Copy links</button> '
                     )
                     group_zip_path = os.path.join(
@@ -2873,7 +2877,7 @@ def export_results(results: list[dict]) -> None:
                         '<button type="button" '
                         f'aria-label="Copy Markdown links for {html.escape(aria_title, quote=True)}" '
                         f'data-context="{html.escape(aria_title, quote=True)}" '
-                        f'onclick="navigator.clipboard.writeText(this.dataset.markdown){_CLIPBOARD_TOAST_MARKDOWN}.catch(() => {{}})" '
+                        f'onclick="navigator.clipboard.writeText(this.dataset.markdown){_CLIPBOARD_TOAST_MARKDOWN}" '
                         f'data-markdown="{html.escape(markdown_links, quote=True)}">Copy as Markdown</button>\n\n'
                     )
                 for label, path in items:
@@ -2910,7 +2914,7 @@ def export_results(results: list[dict]) -> None:
                                 f'{meta} '
                                 '<button type="button" '
                                 f'aria-label="Copy link for {html.escape(label, quote=True)}" '
-                                f'onclick="navigator.clipboard.writeText(this.dataset.link){_CLIPBOARD_TOAST_SINGLE}.catch(() => {{}})" '
+                                f'onclick="navigator.clipboard.writeText(this.dataset.link){_CLIPBOARD_TOAST_SINGLE}" '
                                 f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
                                 "</div>\n"
                             )
@@ -2945,7 +2949,7 @@ def export_results(results: list[dict]) -> None:
                                 'Download</button> '
                                 '<button type="button" '
                                 f'aria-label="Copy link for {html.escape(label, quote=True)}" '
-                                f'onclick="navigator.clipboard.writeText(this.dataset.link){_CLIPBOARD_TOAST_SINGLE}.catch(() => {{}})" '
+                                f'onclick="navigator.clipboard.writeText(this.dataset.link){_CLIPBOARD_TOAST_SINGLE}" '
                                 f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
                                 "</div>\n"
                             )
