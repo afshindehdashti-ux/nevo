@@ -2493,10 +2493,14 @@ def export_results(results: list[dict]) -> None:
                 f"\n### Artifacts index ({total_files} file"
                 f"{'s' if total_files != 1 else ''})\n\n"
             )
-            all_existing_paths = [
+            all_paths = [
                 path
                 for _, items in groups
                 for _, path in items
+            ]
+            all_existing_paths = [
+                path
+                for path in all_paths
                 if os.path.exists(path)
             ]
             fh.write(
