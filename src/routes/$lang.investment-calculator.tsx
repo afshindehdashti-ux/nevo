@@ -1092,21 +1092,32 @@ function InvestmentCalculatorPage() {
                       ["cashflow", "Cash Flow Report (PDF)"],
                       ["specification", "Factory Specification (PDF)"],
                       ["summary", "Project Summary (PDF)"],
-                    ] as const).map(([kind, label]) => (
-                      <li key={kind}>
-                        <button
-                          type="button"
-                          onClick={() => downloadInvestmentReport(kind, i, m)}
-                          className="flex w-full items-center justify-between rounded-md border border-white/10 bg-white/[0.02] px-3 py-2 text-left text-white/70 transition hover:border-emerald-400/40 hover:text-white"
-                        >
-                          <span className="flex items-center gap-2">
-                            <FileText className="h-3.5 w-3.5 text-emerald-400/80" />
-                            {label}
-                          </span>
-                          <Download className="h-3.5 w-3.5" />
-                        </button>
-                      </li>
-                    ))}
+                    ] as const).map(([kind, label]) => {
+                      const isPending = pendingKind === kind;
+                      const anyPending = pendingKind !== null;
+                      return (
+                        <li key={kind}>
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadReport(kind, label)}
+                            disabled={anyPending}
+                            aria-busy={isPending || undefined}
+                            aria-disabled={anyPending || undefined}
+                            className="flex w-full items-center justify-between rounded-md border border-white/10 bg-white/[0.02] px-3 py-2 text-left text-white/70 transition hover:border-emerald-400/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-white/10 disabled:hover:text-white/70"
+                          >
+                            <span className="flex items-center gap-2">
+                              <FileText className="h-3.5 w-3.5 text-emerald-400/80" aria-hidden="true" />
+                              {isPending ? `Generating ${label}…` : label}
+                            </span>
+                            {isPending ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                            ) : (
+                              <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                            )}
+                          </button>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </Card>
               </div>
