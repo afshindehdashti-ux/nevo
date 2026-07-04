@@ -1928,8 +1928,14 @@ def export_results(results: list[dict]) -> None:
     # Heatmap CSV: one row per (error_kind, status_class), one column per
     # latency bucket, plus a `total` column. Always derived from the FULL
     # result set for the same reason as breakdown_written above.
+    #
+    # Skipped entirely when DISABLE_HEATMAP_EXPORT is set to avoid the extra
+    # binning work and the heatmap/breakdown consistency validation.
     heatmap_written: list[str] = []
-    if heatmap_csv or heatmap_json:
+    if _DISABLE_HEATMAP_EXPORT:
+        if heatmap_csv or heatmap_json:
+            print("preflight: heatmap export skipped because DISABLE_HEATMAP_EXPORT is set")
+    elif heatmap_csv or heatmap_json:
         from collections import defaultdict
         grid: dict[tuple[str, str], list[int]] = defaultdict(
             lambda: [0] * len(_LATENCY_BUCKETS))
