@@ -1098,6 +1098,62 @@ def _overall_rate_line(
         )
     return line
 
+def _parse_summary_filter_presets() -> dict[str, str]:
+    """Return {name: filter_expression} from SUMMARY_FILTER_PRESETS.
+
+    Two accepted formats (JSON wins if both are present):
+      SUMMARY_FILTER_PRESETS_JSON='{"server":"status_class=5xx",
+                                    "transport":"error_kind=timeout,tls,dns"}'
+      SUMMARY_FILTER_PRESETS='server::status_class=5xx
+                              ||transport::error_kind=timeout,tls,dns'
+    Preset names are lower-cased; empty entries are dropped.
+    """
+    raw_json = (os.environ.get("SUMMARY_FILTER_PRESETS_JSON") or "").strip()
+    presets: dict[str, str] = {}
+    if raw_json:
+        try:
+            import json as _json
+            data = _json.loads(raw_json)
+            if isinstance(data, dict):
+                for k, v in data.items():
+                    if isinstance(k, str) and isinstance(v, str) and k.strip() and v.strip():
+                        presets[k.strip().lower()] = v.strip()
+        except Exception:
+            pass
+    raw = (os.environ.get("SUMMARY_FILTER_PRESETS") or "").strip()
+    if raw:
+        for entry in raw.split("||"):
+            name, sep, expr = entry.partition("::")
+            if sep and name.strip() and expr.strip():
+                presets.setdefault(name.strip().lower(), expr.strip())
+    return presets
+
+
+def _resolve_summary_filter(raw_filter: str,
+                            presets: dict[str, str]) -> tuple[str, str | None]:
+    """Expand a preset reference into a real filter expression.
+
+    Returns (expression, preset_name_or_None). Accepted preset references:
+      SUMMARY_FILTER="preset:server"   → looks up presets["server"]
+      SUMMARY_FILTER="@server"         → same, shorthand
+      SUMMARY_FILTER="server"          → resolved if it matches a preset name
+                                         AND is not a reserved keyword.
+    """
+    expr = (raw_filter or "all").strip()
+    if not expr:
+        return "all", None
+    low = expr.lower()
+    preset_name: str | None = None
+    if low.startswith("preset:"):
+        preset_name = low[len("preset:"):].strip()
+    elif low.startswith("@"):
+        preset_name = low[1:].strip()
+    elif low in presets and low not in ("all", "failures"):
+        preset_name = low
+    if preset_name and preset_name in presets:
+        return presets[preset_name], preset_name
+    return expr, None
+
 
 def write_step_summary(results: list[dict]) -> None:
     """Append a Markdown table of results to $GITHUB_STEP_SUMMARY."""
@@ -1107,11 +1163,17 @@ def write_step_summary(results: list[dict]) -> None:
 
     # SUMMARY_FILTER reuses the RESULTS_INCLUDE grammar so the on-screen
     # breakdown and per-URL table can be narrowed to specific error_kinds
-    # / status_classes without affecting the exported CSV/JSON.
+    # / status_classes without affecting the exported CSV/JSON. Named
+    # presets defined via SUMMARY_FILTER_PRESETS[_JSON] can be selected
+    # with `SUMMARY_FILTER=preset:<name>` (or `@<name>`) so users switch
+    # between saved scenarios without re-typing the whole expression.
+    presets = _parse_summary_filter_presets()
     raw_filter = (os.environ.get("SUMMARY_FILTER") or "all").strip()
-    filtered, filter_scope = _filter_results_for_export(results, raw_filter)
+    resolved_filter, active_preset = _resolve_summary_filter(raw_filter, presets)
+    filtered, filter_scope = _filter_results_for_export(results, resolved_filter)
     total = len(results)
     display = filtered if filter_scope != "all" else results
+
 
     ok_count = sum(1 for r in display if r["ok"])
     total_ms = sum(r["ms"] for r in display)
