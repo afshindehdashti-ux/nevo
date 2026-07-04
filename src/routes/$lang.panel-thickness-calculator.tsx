@@ -23,6 +23,7 @@ import {
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import { trackPdfEvent } from "@/lib/pdf-analytics";
 
 // ---------------- SEO ----------------
 export const Route = createFileRoute("/$lang/panel-thickness-calculator")({
@@ -966,6 +967,14 @@ function PanelThicknessPage() {
     const toastId = toast.loading("Generating PDF report…", {
       description: "Preparing your panel thickness calculation.",
     });
+    const analyticsBase = {
+      document_id: "panel-thickness-report",
+      document_title: "Panel Thickness Calculator Report",
+      category: "engineering-tool",
+      source_page: "/panel-thickness-calculator",
+    } as const;
+    const startedAt = performance.now();
+    trackPdfEvent({ ...analyticsBase, status: "start" });
     try {
       const { default: jsPDF } = await import("jspdf");
       const doc = new jsPDF({ unit: "pt", format: "a4" });
@@ -1071,12 +1080,24 @@ function PanelThicknessPage() {
 
       const filename = `nevo-panel-thickness-${app.replace(/\s+/g, "-")}-${core.replace(/\s+/g, "-")}-${thickness}mm.pdf`;
       doc.save(filename);
+      trackPdfEvent({
+        ...analyticsBase,
+        status: "success",
+        filename,
+        duration_ms: Math.round(performance.now() - startedAt),
+      });
       toast.success("PDF report downloaded", {
         id: toastId,
         description: filename,
       });
     } catch (err) {
       console.error("PDF generation failed", err);
+      trackPdfEvent({
+        ...analyticsBase,
+        status: "failure",
+        duration_ms: Math.round(performance.now() - startedAt),
+        error_message: err instanceof Error ? err.message.slice(0, 500) : "unknown",
+      });
       toast.error("PDF download failed", {
         id: toastId,
         description: "Please try again or contact support if the issue persists.",

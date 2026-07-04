@@ -50,6 +50,7 @@ import { Button } from "@/components/ui/button";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { downloadInvestmentReport } from "@/lib/investment-pdf";
 import { toast } from "sonner";
+import { trackPdfEvent } from "@/lib/pdf-analytics";
 
 // ---------------- SEO ----------------
 export const Route = createFileRoute("/$lang/investment-calculator")({
@@ -417,16 +418,36 @@ function InvestmentCalculatorPage() {
     const toastId = toast.loading(`Generating ${label}…`, {
       description: "Preparing your PDF for download.",
     });
+    const analyticsBase = {
+      document_id: `investment-${kind}`,
+      document_title: label,
+      category: "investment-calculator",
+      source_page: "/investment-calculator",
+    } as const;
+    const startedAt = performance.now();
+    trackPdfEvent({ ...analyticsBase, status: "start" });
     try {
       // Yield to the browser so the loading state paints before the sync PDF work.
       await new Promise((r) => setTimeout(r, 0));
       const filename = downloadInvestmentReport(kind, i, m);
+      trackPdfEvent({
+        ...analyticsBase,
+        status: "success",
+        filename: filename ?? undefined,
+        duration_ms: Math.round(performance.now() - startedAt),
+      });
       toast.success(`${label} downloaded`, {
         id: toastId,
         description: filename ?? "Check your downloads folder.",
       });
     } catch (err) {
       console.error("Investment PDF generation failed", err);
+      trackPdfEvent({
+        ...analyticsBase,
+        status: "failure",
+        duration_ms: Math.round(performance.now() - startedAt),
+        error_message: err instanceof Error ? err.message.slice(0, 500) : "unknown",
+      });
       toast.error(`${label} failed`, {
         id: toastId,
         description: "Please try again or contact support if the issue persists.",

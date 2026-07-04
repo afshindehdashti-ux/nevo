@@ -20,9 +20,13 @@ export type Database = {
           created_at: string
           document_id: string
           document_title: string | null
+          duration_ms: number | null
+          error_message: string | null
+          filename: string | null
           id: number
           ip: string | null
           source_page: string | null
+          status: string
           user_agent: string | null
         }
         Insert: {
@@ -30,9 +34,13 @@ export type Database = {
           created_at?: string
           document_id: string
           document_title?: string | null
+          duration_ms?: number | null
+          error_message?: string | null
+          filename?: string | null
           id?: number
           ip?: string | null
           source_page?: string | null
+          status?: string
           user_agent?: string | null
         }
         Update: {
@@ -40,9 +48,13 @@ export type Database = {
           created_at?: string
           document_id?: string
           document_title?: string | null
+          duration_ms?: number | null
+          error_message?: string | null
+          filename?: string | null
           id?: number
           ip?: string | null
           source_page?: string | null
+          status?: string
           user_agent?: string | null
         }
         Relationships: []
