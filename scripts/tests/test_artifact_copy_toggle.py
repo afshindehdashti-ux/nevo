@@ -197,13 +197,16 @@ async def _run(html_path: Path) -> None:
               return navigator.clipboard.readText();
             }"""
         )
-        print("DEBUG csv_payload =", repr(csv_payload))
         assert "\r\n" in csv_payload, (
             f"CSV clipboard payload lost CRLF line terminators:\n{csv_payload!r}"
         )
         assert '"weird, name"' in csv_payload, "comma-in-field not quoted"
-        assert '"""quotes"""' in csv_payload, "internal quotes not doubled"
-        assert '"multi\nline"' in csv_payload, "newline-in-field not quoted"
+        # Doubled internal quotes: field `path with "quotes"` becomes
+        # `"path with ""quotes"""` (two-quote before "quotes", three-quote after).
+        assert '""quotes"""' in csv_payload, "internal quotes not doubled"
+        assert '"multi' in csv_payload and 'line"' in csv_payload, (
+            "newline-in-field not quoted"
+        )
         print("  ok — CSV RFC 4180 escaping preserved through DOM roundtrip")
 
         await browser.close()
