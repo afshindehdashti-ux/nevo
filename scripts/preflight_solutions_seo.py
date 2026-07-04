@@ -2849,6 +2849,23 @@ def export_results(results: list[dict]) -> None:
                     f'onclick="const useUrl = document.getElementById(\'artifact-url-toggle\')?.checked; navigator.clipboard.writeText(useUrl && this.dataset.csvUrl ? this.dataset.csvUrl : this.dataset.csv){_CLIPBOARD_TOAST_CSV}" '
                     f'data-csv="{html.escape(csv_str, quote=True)}"{csv_url_data_attr}>Copy links (CSV)</button>\n\n'
                 )
+                fh.write(
+                    '<div class="artifact-selection-controls" style="margin-top:8px;">\n'
+                    '<strong>Selected:</strong> '
+                    '<span class="artifact-selection-count">0 selected</span> '
+                    '<button type="button" aria-label="Select all visible artifacts" '
+                    'onclick="selectAllVisibleArtifacts(true)">Select all visible</button> '
+                    '<button type="button" aria-label="Clear artifact selection" '
+                    'onclick="clearArtifactSelection()">Clear selection</button> '
+                    '<button type="button" aria-label="Copy selected artifact links as Markdown" '
+                    'onclick="copySelectedArtifacts(\'markdown\')">Copy selected (Markdown)</button> '
+                    '<button type="button" aria-label="Copy selected artifact links as JSON" '
+                    'onclick="copySelectedArtifacts(\'json\')">Copy selected (JSON)</button> '
+                    '<button type="button" aria-label="Copy selected artifact links as CSV" '
+                    'onclick="copySelectedArtifacts(\'csv\')">Copy selected (CSV)</button>\n'
+                    '</div>\n\n'
+                )
+
             summary_dir = os.path.dirname(summary_path) or "."
             if all_existing_paths:
                 bundle_path = os.path.join(
