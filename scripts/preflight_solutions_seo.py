@@ -2451,44 +2451,69 @@ def export_results(results: list[dict]) -> None:
                 f"\n### Artifacts index ({total_files} file"
                 f"{'s' if total_files != 1 else ''})\n\n"
             )
+            missing_artifacts: list[tuple[str, str]] = []
             for title, items in groups:
                 is_heatmap_group = "Latency heatmap" in title
-                if is_heatmap_group and len(items) > 1:
-                    all_links = "\n".join(path for _, path in items)
-                    fh.write(
-                        '<button type="button" '
-                        'onclick="navigator.clipboard.writeText(this.dataset.links).catch(() => {})" '
-                        f'data-links="{html.escape(all_links, quote=True)}">Copy heatmap links</button>\n\n'
-                    )
+                if is_heatmap_group:
+                    existing_heatmap = [
+                        (label, path) for label, path in items if os.path.exists(path)
+                    ]
+                    if len(existing_heatmap) > 1:
+                        all_links = "\n".join(path for _, path in existing_heatmap)
+                        fh.write(
+                            '<button type="button" '
+                            'onclick="navigator.clipboard.writeText(this.dataset.links).catch(() => {})" '
+                            f'data-links="{html.escape(all_links, quote=True)}">Copy heatmap links</button>\n\n'
+                        )
                 fh.write(f"_{title}:_\n\n")
                 for label, path in items:
+                    exists = os.path.exists(path)
+                    if not exists:
+                        missing_artifacts.append((label, path))
                     if is_heatmap_group:
-                        try:
-                            size = os.path.getsize(path)
-                            mtime = os.path.getmtime(path)
-                            if size < 1024:
-                                size_str = f"{size} B"
-                            elif size < 1024 * 1024:
-                                size_str = f"{size / 1024:.1f} KB"
-                            else:
-                                size_str = f"{size / (1024 * 1024):.1f} MB"
-                            mtime_str = time.strftime(
-                                "%Y-%m-%d %H:%M:%S", time.localtime(mtime)
+                        if exists:
+                            try:
+                                size = os.path.getsize(path)
+                                mtime = os.path.getmtime(path)
+                                if size < 1024:
+                                    size_str = f"{size} B"
+                                elif size < 1024 * 1024:
+                                    size_str = f"{size / 1024:.1f} KB"
+                                else:
+                                    size_str = f"{size / (1024 * 1024):.1f} MB"
+                                mtime_str = time.strftime(
+                                    "%Y-%m-%d %H:%M:%S", time.localtime(mtime)
+                                )
+                                meta = f"({size_str} · {mtime_str})"
+                            except OSError:
+                                meta = ""
+                            fh.write(
+                                f'- <a href="{html.escape(path, quote=True)}" '
+                                f'download="{html.escape(label, quote=True)}">'
+                                f'<button type="button">Download {html.escape(label)}</button></a> '
+                                f'{meta} '
+                                '<button type="button" '
+                                'onclick="navigator.clipboard.writeText(this.dataset.link).catch(() => {})" '
+                                f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
                             )
-                            meta = f"({size_str} · {mtime_str})"
-                        except OSError:
-                            meta = ""
-                        fh.write(
-                            f'- <a href="{html.escape(path, quote=True)}" '
-                            f'download="{html.escape(label, quote=True)}">'
-                            f'<button type="button">Download {html.escape(label)}</button></a> '
-                            f'{meta} '
-                            '<button type="button" '
-                            'onclick="navigator.clipboard.writeText(this.dataset.link).catch(() => {})" '
-                            f'data-link="{html.escape(path, quote=True)}">Copy link</button>\n'
-                        )
+                        else:
+                            fh.write(
+                                f"- ⚠️ `{label}` (missing) — expected at `{path}`\n"
+                            )
                     else:
-                        fh.write(f"- [`{label}`]({path})\n")
+                        if exists:
+                            fh.write(f"- [`{label}`]({path})\n")
+                        else:
+                            fh.write(
+                                f"- ⚠️ `{label}` (missing) — expected at `{path}`\n"
+                            )
+                fh.write("\n")
+            if missing_artifacts:
+                fh.write(
+                    "> ⚠️ _The following artifact(s) were not found on disk and may need to be regenerated:_\n"
+                )
+                for label, path in missing_artifacts:
+                    fh.write(f"> - `{label}` → `{path}`\n")
                 fh.write("\n")
             if heatmap_expected_but_disabled and not heatmap_written:
                 fh.write(
