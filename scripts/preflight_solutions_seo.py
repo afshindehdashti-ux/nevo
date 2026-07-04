@@ -2106,15 +2106,7 @@ def _human_size(size: int) -> str:
 # Inline JS toast shown after copying a single artifact link. Self-contained so
 # it works in any markdown viewer that executes onclick handlers.
 _CLIPBOARD_TOAST_SINGLE = (
-    ".then(() => { "
-    "const t = document.createElement('div'); "
-    "t.textContent = 'Copied link'; "
-    "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
-    "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
-    "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
-    "document.body.appendChild(t); "
-    "setTimeout(() => t.remove(), 2000); "
-    "})"
+    ".then(() => { showCopyToast('Copied link'); })"
 )
 
 # Inline JS toast shown after copying multiple artifact links. The count is
@@ -2124,13 +2116,7 @@ _CLIPBOARD_TOAST_MULTI = (
     ".then(() => { "
     "const ctx = this.dataset.context || ''; "
     "const n = this.dataset.links.split('\\n').length; "
-    "const t = document.createElement('div'); "
-    "t.textContent = 'Copied ' + n + ' link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : ''); "
-    "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
-    "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
-    "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
-    "document.body.appendChild(t); "
-    "setTimeout(() => t.remove(), 2000); "
+    "showCopyToast('Copied ' + n + ' link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : '')); "
     "})"
 )
 
@@ -2141,13 +2127,7 @@ _CLIPBOARD_TOAST_MARKDOWN = (
     ".then(() => { "
     "const ctx = this.dataset.context || ''; "
     "const n = this.dataset.markdown.split('\\n').length; "
-    "const t = document.createElement('div'); "
-    "t.textContent = 'Copied ' + n + ' markdown link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : ''); "
-    "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
-    "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
-    "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
-    "document.body.appendChild(t); "
-    "setTimeout(() => t.remove(), 2000); "
+    "showCopyToast('Copied ' + n + ' markdown link' + (n === 1 ? '' : 's') + (ctx ? ' for ' + ctx : '')); "
     "})"
 )
 
@@ -2157,13 +2137,7 @@ _CLIPBOARD_TOAST_MARKDOWN = (
 _CLIPBOARD_TOAST_JSON = (
     ".then(() => { "
     "const n = parseInt(this.dataset.count || '0', 10); "
-    "const t = document.createElement('div'); "
-    "t.textContent = 'Copied ' + n + ' artifact path' + (n === 1 ? '' : 's') + ' as JSON'; "
-    "t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1f2937;"
-    "color:#fff;padding:8px 12px;border-radius:4px;z-index:9999;"
-    "font-family:sans-serif;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; "
-    "document.body.appendChild(t); "
-    "setTimeout(() => t.remove(), 2000); "
+    "showCopyToast('Copied ' + n + ' artifact path' + (n === 1 ? '' : 's') + ' as JSON'); "
     "})"
 )
 
