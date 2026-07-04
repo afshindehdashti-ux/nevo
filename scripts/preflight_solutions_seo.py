@@ -3123,17 +3123,25 @@ def export_results(results: list[dict]) -> None:
                 ]
                 json_str = json.dumps(all_items_json)
                 json_url_str = json.dumps(all_items_json_url)
+                csv_include_url = bool(ARTIFACT_BASE_URL) and ARTIFACT_CSV_INCLUDE_URL
+                csv_columns = ["label", "path", "url"] if csv_include_url else ["label", "path"]
                 csv_io = io.StringIO()
                 csv_writer = csv.writer(csv_io)
-                csv_writer.writerow(["label", "path"])
-                for item in all_items_json:
-                    csv_writer.writerow([item["label"], item["path"]])
+                csv_writer.writerow(csv_columns)
+                for rel_item, abs_item in zip(all_items_json, all_items_json_url):
+                    if csv_include_url:
+                        csv_writer.writerow([rel_item["label"], rel_item["path"], abs_item["path"]])
+                    else:
+                        csv_writer.writerow([rel_item["label"], rel_item["path"]])
                 csv_str = csv_io.getvalue()
                 csv_io_url = io.StringIO()
                 csv_writer_url = csv.writer(csv_io_url)
-                csv_writer_url.writerow(["label", "path"])
-                for item in all_items_json_url:
-                    csv_writer_url.writerow([item["label"], item["path"]])
+                csv_writer_url.writerow(csv_columns)
+                for abs_item in all_items_json_url:
+                    if csv_include_url:
+                        csv_writer_url.writerow([abs_item["label"], abs_item["path"], abs_item["path"]])
+                    else:
+                        csv_writer_url.writerow([abs_item["label"], abs_item["path"]])
                 csv_url_str = csv_io_url.getvalue()
                 links_url_data_attr = (
                     f' data-links-url="{html.escape(all_links_url, quote=True)}"'
