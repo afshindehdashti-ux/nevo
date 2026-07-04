@@ -2599,7 +2599,8 @@ def export_results(results: list[dict]) -> None:
                     '<p><label for="artifact-url-toggle">'
                     '<input type="checkbox" id="artifact-url-toggle" class="artifact-url-toggle" '
                     'onchange="updateArtifactUrlMode()"> '
-                    'Copy absolute URLs</label></p>\n\n'
+                    'Copy absolute URLs</label> '
+                    '(<span class="artifact-url-mode">file paths</span>)</p>\n\n'
                     if ARTIFACT_BASE_URL else ""
                 )
                 '<script>'
