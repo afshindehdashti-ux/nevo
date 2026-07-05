@@ -14,6 +14,168 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          metadata: Json
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          metadata?: Json
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          metadata?: Json
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      company_settings: {
+        Row: {
+          address: string | null
+          bank_account_name: string | null
+          bank_account_number: string | null
+          bank_branch: string | null
+          bank_iban: string | null
+          bank_name: string | null
+          bank_swift: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          default_terms: string | null
+          email: string | null
+          id: string
+          is_active: boolean
+          legal_name: string
+          logo_url: string | null
+          phone: string | null
+          trade_license: string | null
+          updated_at: string
+          website: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          address?: string | null
+          bank_account_name?: string | null
+          bank_account_number?: string | null
+          bank_branch?: string | null
+          bank_iban?: string | null
+          bank_name?: string | null
+          bank_swift?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          default_terms?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          legal_name: string
+          logo_url?: string | null
+          phone?: string | null
+          trade_license?: string | null
+          updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          address?: string | null
+          bank_account_name?: string | null
+          bank_account_number?: string | null
+          bank_branch?: string | null
+          bank_iban?: string | null
+          bank_name?: string | null
+          bank_swift?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          default_terms?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          legal_name?: string
+          logo_url?: string | null
+          phone?: string | null
+          trade_license?: string | null
+          updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      document_settings: {
+        Row: {
+          commission_prefix: string
+          created_at: string
+          default_currency: string
+          default_incoterms: string
+          default_payment_terms: string
+          default_vat_percent: number
+          delivery_note_prefix: string
+          footer_text: string | null
+          id: string
+          invoice_prefix: string
+          packing_list_prefix: string
+          proforma_prefix: string
+          purchase_order_prefix: string
+          quotation_prefix: string
+          signature_name: string | null
+          signature_title: string | null
+          updated_at: string
+        }
+        Insert: {
+          commission_prefix?: string
+          created_at?: string
+          default_currency?: string
+          default_incoterms?: string
+          default_payment_terms?: string
+          default_vat_percent?: number
+          delivery_note_prefix?: string
+          footer_text?: string | null
+          id?: string
+          invoice_prefix?: string
+          packing_list_prefix?: string
+          proforma_prefix?: string
+          purchase_order_prefix?: string
+          quotation_prefix?: string
+          signature_name?: string | null
+          signature_title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          commission_prefix?: string
+          created_at?: string
+          default_currency?: string
+          default_incoterms?: string
+          default_payment_terms?: string
+          default_vat_percent?: number
+          delivery_note_prefix?: string
+          footer_text?: string | null
+          id?: string
+          invoice_prefix?: string
+          packing_list_prefix?: string
+          proforma_prefix?: string
+          purchase_order_prefix?: string
+          quotation_prefix?: string
+          signature_name?: string | null
+          signature_title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       download_events: {
         Row: {
           category: string | null
@@ -131,6 +293,42 @@ export type Database = {
           ua?: string | null
           url?: string | null
           variant?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          is_active: boolean
+          job_title: string | null
+          last_login_at: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          is_active?: boolean
+          job_title?: string | null
+          last_login_at?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          job_title?: string | null
+          last_login_at?: string | null
+          phone?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
