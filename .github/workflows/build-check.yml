@@ -22,29 +22,67 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Bun
+        id: setup-bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
-      - name: Cache bun install
+      - name: Compute cache keys
+        id: cache-keys
+        run: |
+          BUN_VERSION="$(bun --version)"
+          echo "bun-version=${BUN_VERSION}" >> "$GITHUB_OUTPUT"
+          LOCK_HASH="${{ hashFiles('bun.lock', 'package.json') }}"
+          echo "primary=${{ runner.os }}-bun-${BUN_VERSION}-${LOCK_HASH}" >> "$GITHUB_OUTPUT"
+          echo "restore=${{ runner.os }}-bun-${BUN_VERSION}-" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Bun cache (global store + node_modules)
+        id: bun-cache
         uses: actions/cache@v4
         with:
           path: |
             ~/.bun/install/cache
             node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock', 'bun.lockb', 'package.json') }}
+          key: ${{ steps.cache-keys.outputs.primary }}
           restore-keys: |
+            ${{ steps.cache-keys.outputs.restore }}
             ${{ runner.os }}-bun-
 
+      - name: Report cache status
+        run: |
+          echo "Bun version:  ${{ steps.cache-keys.outputs.bun-version }}"
+          echo "Cache key:    ${{ steps.cache-keys.outputs.primary }}"
+          echo "Cache hit:    ${{ steps.bun-cache.outputs.cache-hit }}"
+          echo "Matched key:  ${{ steps.bun-cache.outputs.cache-matched-key }}"
+          if [ -d node_modules ]; then
+            echo "node_modules: present ($(find node_modules -maxdepth 1 -mindepth 1 -type d | wc -l) top-level packages)"
+          else
+            echo "node_modules: missing (will be populated by bun install)"
+          fi
+          {
+            echo "### Bun dependency cache"
+            echo ""
+            echo "- **Bun**: \`${{ steps.cache-keys.outputs.bun-version }}\`"
+            echo "- **Key**: \`${{ steps.cache-keys.outputs.primary }}\`"
+            echo "- **Hit**: \`${{ steps.bun-cache.outputs.cache-hit || 'false' }}\`"
+            echo "- **Matched key**: \`${{ steps.bun-cache.outputs.cache-matched-key || '(none)' }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Install dependencies
-        run: bun install --frozen-lockfile || bun install
+        run: |
+          START=$SECONDS
+          bun install --frozen-lockfile || bun install
+          echo "bun install took $((SECONDS-START))s"
+          echo "- **Install time**: \`$((SECONDS-START))s\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Run build:dev with diagnostics
         id: build
         run: |
           mkdir -p build-logs
           set -o pipefail
+          START=$SECONDS
           bun run build:dev:diagnose 2>&1 | tee build-logs/build-dev.log
+          echo "- **build:dev time**: \`$((SECONDS-START))s\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload build logs
         if: failure()
