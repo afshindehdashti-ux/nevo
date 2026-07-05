@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as CrmRouteImport } from './routes/crm'
+import { Route as BackofficeRouteImport } from './routes/backoffice'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LangRouteImport } from './routes/$lang'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -19,6 +21,7 @@ import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as KnowledgeSplatRouteImport } from './routes/knowledge.$'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as LangSustainabilityRouteImport } from './routes/$lang.sustainability'
 import { Route as LangResearchInnovationRouteImport } from './routes/$lang.research-innovation'
@@ -83,6 +86,16 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CrmRoute = CrmRouteImport.update({
+  id: '/crm',
+  path: '/crm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BackofficeRoute = BackofficeRouteImport.update({
+  id: '/backoffice',
+  path: '/backoffice',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -120,6 +133,11 @@ const KnowledgeSplatRoute = KnowledgeSplatRouteImport.update({
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -415,6 +433,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
   '/auth': typeof AuthRoute
+  '/backoffice': typeof BackofficeRoute
+  '/crm': typeof CrmRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/$lang/about': typeof LangAboutRoute
@@ -442,6 +462,7 @@ export interface FileRoutesByFullPath {
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
   '/api/chat': typeof ApiChatRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/$lang/': typeof LangIndexRoute
@@ -478,6 +499,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/backoffice': typeof BackofficeRoute
+  '/crm': typeof CrmRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/$lang/about': typeof LangAboutRoute
@@ -504,6 +527,7 @@ export interface FileRoutesByTo {
   '/$lang/quality': typeof LangQualityRoute
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
+  '/admin/login': typeof AdminLoginRoute
   '/api/chat': typeof ApiChatRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/$lang': typeof LangIndexRoute
@@ -543,6 +567,8 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/$lang': typeof LangRouteWithChildren
   '/auth': typeof AuthRoute
+  '/backoffice': typeof BackofficeRoute
+  '/crm': typeof CrmRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/$lang/about': typeof LangAboutRoute
@@ -570,6 +596,7 @@ export interface FileRoutesById {
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
   '/api/chat': typeof ApiChatRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/$lang/': typeof LangIndexRoute
@@ -609,6 +636,8 @@ export interface FileRouteTypes {
     | '/'
     | '/$lang'
     | '/auth'
+    | '/backoffice'
+    | '/crm'
     | '/sitemap.xml'
     | '/status'
     | '/$lang/about'
@@ -636,6 +665,7 @@ export interface FileRouteTypes {
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
     | '/admin'
+    | '/admin/login'
     | '/api/chat'
     | '/knowledge/$'
     | '/$lang/'
@@ -672,6 +702,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/backoffice'
+    | '/crm'
     | '/sitemap.xml'
     | '/status'
     | '/$lang/about'
@@ -698,6 +730,7 @@ export interface FileRouteTypes {
     | '/$lang/quality'
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
+    | '/admin/login'
     | '/api/chat'
     | '/knowledge/$'
     | '/$lang'
@@ -736,6 +769,8 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/$lang'
     | '/auth'
+    | '/backoffice'
+    | '/crm'
     | '/sitemap.xml'
     | '/status'
     | '/$lang/about'
@@ -763,6 +798,7 @@ export interface FileRouteTypes {
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
     | '/_authenticated/admin'
+    | '/admin/login'
     | '/api/chat'
     | '/knowledge/$'
     | '/$lang/'
@@ -802,8 +838,11 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LangRoute: typeof LangRouteWithChildren
   AuthRoute: typeof AuthRoute
+  BackofficeRoute: typeof BackofficeRoute
+  CrmRoute: typeof CrmRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   ApiChatRoute: typeof ApiChatRoute
   KnowledgeSplatRoute: typeof KnowledgeSplatRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
@@ -825,6 +864,20 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crm': {
+      id: '/crm'
+      path: '/crm'
+      fullPath: '/crm'
+      preLoaderRoute: typeof CrmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/backoffice': {
+      id: '/backoffice'
+      path: '/backoffice'
+      fullPath: '/backoffice'
+      preLoaderRoute: typeof BackofficeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -881,6 +934,13 @@ declare module '@tanstack/react-router' {
       path: '/api/chat'
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -1404,8 +1464,11 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LangRoute: LangRouteWithChildren,
   AuthRoute: AuthRoute,
+  BackofficeRoute: BackofficeRoute,
+  CrmRoute: CrmRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
+  AdminLoginRoute: AdminLoginRoute,
   ApiChatRoute: ApiChatRoute,
   KnowledgeSplatRoute: KnowledgeSplatRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,

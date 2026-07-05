@@ -4,12 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Sign in — Admin" },
+      { title: "Sign in — NEVO CRM" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -20,14 +21,14 @@ function AuthPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mode, setMode] = useState<"in" | "up">("in");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [resetMode, setResetMode] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/admin/logo-events" });
+      if (data.user) navigate({ to: "/admin" });
     });
   }, [navigate]);
 
@@ -37,18 +38,16 @@ function AuthPage() {
     setError(null);
     setInfo(null);
     try {
-      if (mode === "in") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        navigate({ to: "/admin/logo-events" });
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin + "/admin/logo-events" },
+      if (resetMode) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + "/admin/login",
         });
         if (error) throw error;
-        setInfo("Account created. If email confirmation is required, check your inbox.");
+        setInfo("If that email is registered, a reset link has been sent.");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        navigate({ to: "/admin" });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign in failed");
@@ -59,31 +58,42 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-4 border border-border rounded-lg p-6 bg-card">
+      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-4 border border-border rounded-lg p-6 bg-card shadow-sm">
+        <div className="flex items-center gap-2 text-primary">
+          <ShieldCheck className="h-5 w-5" />
+          <span className="text-xs uppercase tracking-widest font-semibold">NEVO Back Office</span>
+        </div>
         <div>
-          <h1 className="text-xl font-semibold">Admin sign in</h1>
-          <p className="text-sm text-muted-foreground">Access is restricted to admin users.</p>
+          <h1 className="text-xl font-semibold">{resetMode ? "Reset password" : "Sign in"}</h1>
+          <p className="text-sm text-muted-foreground">
+            Internal access only. Accounts are created by invitation from a Super Admin.
+          </p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">Work email</Label>
           <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "in" ? "current-password" : "new-password"} />
-        </div>
+        {!resetMode && (
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+          </div>
+        )}
         {error && <p className="text-sm text-destructive">{error}</p>}
         {info && <p className="text-sm text-muted-foreground">{info}</p>}
         <Button type="submit" disabled={loading} className="w-full">
-          {loading ? "Please wait…" : mode === "in" ? "Sign in" : "Create account"}
+          {loading ? "Please wait…" : resetMode ? "Send reset link" : "Sign in"}
         </Button>
         <button
           type="button"
-          onClick={() => setMode(mode === "in" ? "up" : "in")}
+          onClick={() => { setResetMode(!resetMode); setError(null); setInfo(null); }}
           className="text-xs text-muted-foreground hover:text-foreground underline block w-full text-center"
         >
-          {mode === "in" ? "Need an account? Sign up" : "Have an account? Sign in"}
+          {resetMode ? "Back to sign in" : "Forgot your password?"}
         </button>
+        <p className="text-[11px] text-muted-foreground text-center border-t border-border pt-3">
+          Not a NEVO team member? This portal is not open to the public.
+        </p>
       </form>
     </div>
   );
