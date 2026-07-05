@@ -63,6 +63,7 @@ export type Database = {
           legal_name: string
           logo_url: string | null
           phone: string | null
+          team_members: Json
           trade_license: string | null
           updated_at: string
           website: string | null
@@ -86,6 +87,7 @@ export type Database = {
           legal_name: string
           logo_url?: string | null
           phone?: string | null
+          team_members?: Json
           trade_license?: string | null
           updated_at?: string
           website?: string | null
@@ -109,9 +111,70 @@ export type Database = {
           legal_name?: string
           logo_url?: string | null
           phone?: string | null
+          team_members?: Json
           trade_license?: string | null
           updated_at?: string
           website?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      customers: {
+        Row: {
+          address: string | null
+          city: string | null
+          contact_person: string | null
+          country: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          payment_terms: string | null
+          phone: string | null
+          updated_at: string
+          vat_number: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          contact_person?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          payment_terms?: string | null
+          phone?: string | null
+          updated_at?: string
+          vat_number?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          contact_person?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          payment_terms?: string | null
+          phone?: string | null
+          updated_at?: string
+          vat_number?: string | null
           whatsapp?: string | null
         }
         Relationships: []
@@ -296,6 +359,68 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          default_commission_pct: number
+          description: string | null
+          hs_code: string | null
+          id: string
+          is_active: boolean
+          name: string
+          sku: string | null
+          supplier_id: string | null
+          unit: string
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          default_commission_pct?: number
+          description?: string | null
+          hs_code?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          sku?: string | null
+          supplier_id?: string | null
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          default_commission_pct?: number
+          description?: string | null
+          hs_code?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          sku?: string | null
+          supplier_id?: string | null
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -428,6 +553,69 @@ export type Database = {
           rich_verdict?: string | null
           url?: string
           verdict?: string | null
+        }
+        Relationships: []
+      }
+      suppliers: {
+        Row: {
+          address: string | null
+          city: string | null
+          contact_person: string | null
+          country: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          default_commission_pct: number
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          payment_terms: string | null
+          phone: string | null
+          updated_at: string
+          vat_number: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          contact_person?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          default_commission_pct?: number
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          payment_terms?: string | null
+          phone?: string | null
+          updated_at?: string
+          vat_number?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          contact_person?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          default_commission_pct?: number
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          payment_terms?: string | null
+          phone?: string | null
+          updated_at?: string
+          vat_number?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }
