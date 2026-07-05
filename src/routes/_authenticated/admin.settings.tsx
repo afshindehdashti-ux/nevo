@@ -38,10 +38,13 @@ function SettingsPage() {
         <TabsList>
           <TabsTrigger value="company">Company Profile</TabsTrigger>
           <TabsTrigger value="documents">Document Defaults</TabsTrigger>
+          <TabsTrigger value="team">Team</TabsTrigger>
         </TabsList>
         <TabsContent value="company"><CompanyForm canEdit={isSuperAdmin} /></TabsContent>
         <TabsContent value="documents"><DocumentForm canEdit={isSuperAdmin} /></TabsContent>
+        <TabsContent value="team"><TeamPanel /></TabsContent>
       </Tabs>
+
     </div>
   );
 }
@@ -204,3 +207,57 @@ function DocumentForm({ canEdit }: { canEdit: boolean }) {
     </form>
   );
 }
+
+type TeamMember = { full_name: string; title?: string; email?: string; phone?: string; is_default_signer?: boolean };
+
+function TeamPanel() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["company_settings", "team"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("company_settings").select("team_members").eq("is_active", true).limit(1).maybeSingle();
+      if (error) throw error;
+      return (data?.team_members as unknown as TeamMember[]) ?? [];
+    },
+  });
+
+  if (isLoading) return <p className="text-sm text-muted-foreground p-4">Loading…</p>;
+  const members = data ?? [];
+
+  return (
+    <div className="mt-4 space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Team</CardTitle>
+          <CardDescription>People whose names, titles and contacts appear on NEVO documents.</CardDescription>
+        </CardHeader>
+        <CardContent className="divide-y">
+          {members.length === 0 && <p className="text-sm text-muted-foreground py-4">No team members configured.</p>}
+          {members.map((m) => (
+            <div key={m.email ?? m.full_name} className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <div className="font-medium">
+                  {m.full_name}
+                  {m.is_default_signer && (
+                    <span className="ml-2 text-xs rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5">
+                      Default signer
+                    </span>
+                  )}
+                </div>
+                {m.title && <div className="text-sm text-muted-foreground">{m.title}</div>}
+              </div>
+              <div className="text-sm text-muted-foreground sm:text-right">
+                {m.email && <div>{m.email}</div>}
+                {m.phone && <div>{m.phone}</div>}
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+      <p className="text-xs text-muted-foreground">
+        A full Team Members module (add/edit/remove from the UI) can be turned on later — right now the roster is seeded.
+      </p>
+    </div>
+  );
+}
+
