@@ -251,15 +251,29 @@ function UsersPage() {
                         <Badge variant="secondary">Disabled</Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right space-x-1">
                       {isSuperAdmin && p.id !== me?.id && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => toggleActive.mutate({ userId: p.id, active: !p.is_active })}
-                        >
-                          {p.is_active ? "Disable" : "Enable"}
-                        </Button>
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="gap-1"
+                            onClick={() => {
+                              const email = (p as { email?: string | null }).email;
+                              if (!email) { toast.error("No email on profile"); return; }
+                              resetPw.mutate(email);
+                            }}
+                          >
+                            <KeyRound className="h-3.5 w-3.5" /> Reset
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => toggleActive.mutate({ userId: p.id, active: !p.is_active })}
+                          >
+                            {p.is_active ? "Disable" : "Enable"}
+                          </Button>
+                        </>
                       )}
                     </TableCell>
                   </TableRow>
