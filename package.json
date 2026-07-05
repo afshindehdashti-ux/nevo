@@ -10,6 +10,7 @@
     "build:dev:diagnose": "node scripts/build-diagnose.mjs --mode development",
     "build:diagnose": "node scripts/build-diagnose.mjs --mode production",
     "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
     "check:links": "node scripts/check-links.mjs --no-external",
     "check:links:full": "node scripts/check-links.mjs",
