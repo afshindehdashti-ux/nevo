@@ -1,0 +1,103 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
+
+type AppRole = Database["public"]["Enums"]["app_role"];
+
+const inviteSchema = z.object({
+  email: z.string().email(),
+  fullName: z.string().min(1).max(200),
+  jobTitle: z.string().max(200).optional().nullable(),
+  role: z.enum([
+    "super_admin",
+    "management",
+    "sales",
+    "operations",
+    "finance",
+    "read_only",
+  ]),
+});
+
+const resetSchema = z.object({ email: z.string().email() });
+
+async function assertSuperAdmin(ctx: {
+  supabase: Awaited<ReturnType<typeof import("@supabase/supabase-js").createClient>>;
+  userId: string;
+}) {
+  const { data, error } = await (ctx.supabase as any).rpc("has_role", {
+    _user_id: ctx.userId,
+    _role: "super_admin" as AppRole,
+  });
+  if (error) throw new Error("Permission check failed");
+  if (!data) throw new Error("Forbidden: super admin only");
+}
+
+export const inviteTeamMember = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => inviteSchema.parse(raw))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context as any);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const siteUrl =
+      process.env.APP_URL ||
+      process.env.SITE_URL ||
+      "https://nevoindustrial.com";
+
+    const { data: invited, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(
+      data.email,
+      {
+        redirectTo: `${siteUrl}/admin/login`,
+        data: { full_name: data.fullName, job_title: data.jobTitle ?? null },
+      },
+    );
+    if (error) throw new Error(error.message);
+    const userId = invited.user?.id;
+    if (!userId) throw new Error("Invite created but no user id returned");
+
+    // Ensure profile fields
+    await supabaseAdmin
+      .from("profiles")
+      .upsert(
+        {
+          id: userId,
+          full_name: data.fullName,
+          job_title: data.jobTitle ?? null,
+          is_active: true,
+        },
+        { onConflict: "id" },
+      );
+
+    // Replace roles with the requested one
+    await supabaseAdmin.from("user_roles").delete().eq("user_id", userId);
+    const { error: roleErr } = await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: userId, role: data.role });
+    if (roleErr) throw new Error(roleErr.message);
+
+    await supabaseAdmin.from("activity_logs").insert({
+      user_id: (context as any).userId,
+      action: "user_invited",
+      entity_type: "auth_user",
+      entity_id: userId,
+      metadata: { email: data.email, role: data.role },
+    });
+
+    return { ok: true, userId };
+  });
+
+export const sendPasswordReset = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => resetSchema.parse(raw))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context as any);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const siteUrl =
+      process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
+    const { error } = await supabaseAdmin.auth.resetPasswordForEmail(data.email, {
+      redirectTo: `${siteUrl}/admin/login`,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

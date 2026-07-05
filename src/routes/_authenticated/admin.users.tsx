@@ -1,17 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsSuperAdmin, useCurrentUser } from "@/lib/crm-hooks";
+import { inviteTeamMember, sendPasswordReset } from "@/lib/crm-admin.functions";
 import type { Database } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ShieldAlert } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ShieldAlert, UserPlus, KeyRound } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
@@ -90,18 +95,101 @@ function UsersPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
+  const inviteFn = useServerFn(inviteTeamMember);
+  const resetFn = useServerFn(sendPasswordReset);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteName, setInviteName] = useState("");
+  const [inviteTitle, setInviteTitle] = useState("");
+  const [inviteRole, setInviteRole] = useState<AppRole>("sales");
+
+  const invite = useMutation({
+    mutationFn: () =>
+      inviteFn({
+        data: {
+          email: inviteEmail.trim(),
+          fullName: inviteName.trim(),
+          jobTitle: inviteTitle.trim() || null,
+          role: inviteRole,
+        },
+      }),
+    onSuccess: () => {
+      toast.success(`Invitation sent to ${inviteEmail}`);
+      setInviteOpen(false);
+      setInviteEmail(""); setInviteName(""); setInviteTitle(""); setInviteRole("sales");
+      qc.invalidateQueries({ queryKey: ["profiles-list"] });
+      qc.invalidateQueries({ queryKey: ["user-roles-list"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to invite user"),
+  });
+
+  const resetPw = useMutation({
+    mutationFn: (email: string) => resetFn({ data: { email } }),
+    onSuccess: () => toast.success("Password reset email sent"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to send reset"),
+  });
+
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Users & Roles</h1>
-        <p className="text-sm text-muted-foreground">Manage team members and their CRM permissions.</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Users & Roles</h1>
+          <p className="text-sm text-muted-foreground">Manage team members and their CRM permissions.</p>
+        </div>
+        {isSuperAdmin && (
+          <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="gap-2"><UserPlus className="h-4 w-4" /> Invite user</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Invite team member</DialogTitle>
+                <DialogDescription>
+                  They will receive an email to set their password and sign in to the CRM.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label>Full name</Label>
+                  <Input value={inviteName} onChange={(e) => setInviteName(e.target.value)} placeholder="Jane Doe" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Work email</Label>
+                  <Input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="jane@nevoindustrial.com" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Job title</Label>
+                  <Input value={inviteTitle} onChange={(e) => setInviteTitle(e.target.value)} placeholder="Sales Manager" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Role</Label>
+                  <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as AppRole)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {ROLES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="ghost" onClick={() => setInviteOpen(false)}>Cancel</Button>
+                <Button
+                  onClick={() => invite.mutate()}
+                  disabled={invite.isPending || !inviteEmail || !inviteName}
+                >
+                  {invite.isPending ? "Sending…" : "Send invitation"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {!isSuperAdmin && (
         <Alert>
           <ShieldAlert className="h-4 w-4" />
           <AlertTitle>Restricted</AlertTitle>
-          <AlertDescription>Only Super Admins can view or change roles.</AlertDescription>
+          <AlertDescription>Only Super Admins can invite users or change roles.</AlertDescription>
         </Alert>
       )}
 
@@ -109,7 +197,7 @@ function UsersPage() {
         <CardHeader>
           <CardTitle className="text-base">Team members</CardTitle>
           <CardDescription>
-            To invite new users, ask them to sign up at the sign-in page — a profile is created automatically.
+            Access is invite-only. Public sign-ups are disabled — only Super Admins can add new users.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -163,15 +251,29 @@ function UsersPage() {
                         <Badge variant="secondary">Disabled</Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right space-x-1">
                       {isSuperAdmin && p.id !== me?.id && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => toggleActive.mutate({ userId: p.id, active: !p.is_active })}
-                        >
-                          {p.is_active ? "Disable" : "Enable"}
-                        </Button>
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="gap-1"
+                            onClick={() => {
+                              const email = (p as { email?: string | null }).email;
+                              if (!email) { toast.error("No email on profile"); return; }
+                              resetPw.mutate(email);
+                            }}
+                          >
+                            <KeyRound className="h-3.5 w-3.5" /> Reset
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => toggleActive.mutate({ userId: p.id, active: !p.is_active })}
+                          >
+                            {p.is_active ? "Disable" : "Enable"}
+                          </Button>
+                        </>
                       )}
                     </TableCell>
                   </TableRow>
