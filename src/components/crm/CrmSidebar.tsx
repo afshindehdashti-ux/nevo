@@ -9,7 +9,7 @@ import { CRM_NAV } from "@/lib/crm-nav";
 import { useIsSuperAdmin, useMyProfile, useCurrentUser } from "@/lib/crm-hooks";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/nevo-logo-full.png";
+import logo from "@/assets/nevo-logo-light.png";
 
 export function CrmSidebar() {
   const { state } = useSidebar();
