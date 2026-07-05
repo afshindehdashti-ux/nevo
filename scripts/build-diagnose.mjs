@@ -127,6 +127,113 @@ child.on("close", (code) => {
     }
   }
 
+  // ─── GitHub Actions annotations ────────────────────────────────────────
+  // Emit `::error file=<path>,line=<n>,col=<n>::<message>` so failures show
+  // up inline on the PR "Files changed" tab and in the run summary.
+  // See: https://docs.github.com/actions/reference/workflow-commands
+  const annotations = new Map(); // key -> {file,line,col,message}
+  const toRel = (p) => {
+    try {
+      const abs = p.startsWith("/") ? p : p;
+      const rel = relative(process.cwd(), abs);
+      return rel && !rel.startsWith("..") ? rel : p.replace(/^\/+/, "");
+    } catch {
+      return p;
+    }
+  };
+  const escape = (s) =>
+    String(s)
+      .replace(/%/g, "%25")
+      .replace(/\r/g, "%0D")
+      .replace(/\n/g, "%0A");
+  const push = (file, line, col, message) => {
+    if (!file) return;
+    const rel = toRel(file);
+    // Only annotate files that live inside the repo (skip node_modules/dist).
+    if (rel.startsWith("node_modules") || rel.startsWith("dist")) return;
+    const key = `${rel}:${line ?? 0}:${col ?? 0}:${message}`;
+    if (annotations.has(key)) return;
+    annotations.set(key, { file: rel, line: line ?? 1, col: col ?? 1, message });
+  };
+
+  const FILE_CHARS = String.raw`[^\s"'\`():]+?\.(?:tsx?|jsx?|mjs|cjs|css|scss|json|html)`;
+
+  // 1) "Failed to resolve import \"X\" from \"path/to/file.tsx\"."
+  const failResolveRx = new RegExp(
+    String.raw`Failed to resolve import\s+["']([^"']+)["']\s+from\s+["']([^"']+)["']`,
+    "gi",
+  );
+  // 2) "Rollup failed to resolve import \"X\" from \"path/to/file.tsx\""
+  const rollupResolveRx = new RegExp(
+    String.raw`Rollup failed to resolve import\s+["']([^"']+)["']\s+from\s+["']([^"']+)["']`,
+    "gi",
+  );
+  // 3) esbuild/vite style: "path/to/file.tsx:LINE:COL: ERROR: message"
+  const esbuildRx = new RegExp(
+    String.raw`(${FILE_CHARS}):(\d+):(\d+):\s*(?:ERROR|error)[:\s-]*(.*)`,
+    "g",
+  );
+  // 4) Generic "at path/to/file.tsx:LINE(:COL)?"
+  const atRx = new RegExp(
+    String.raw`\b(?:at|File:|Location:)\s+(${FILE_CHARS}):(\d+)(?::(\d+))?`,
+    "g",
+  );
+  // 5) SyntaxError / Transform failed followed later by a file reference.
+  const genericErrRx = /(?:SyntaxError|Transform failed|Unexpected token|is not exported by)[:\s-]+(.*)/i;
+
+  for (let i = 0; i < lines.length; i++) {
+    const ln = lines[i];
+    let m;
+
+    failResolveRx.lastIndex = 0;
+    while ((m = failResolveRx.exec(ln)) !== null) {
+      push(m[2], 1, 1, `Failed to resolve import "${m[1]}"`);
+    }
+    rollupResolveRx.lastIndex = 0;
+    while ((m = rollupResolveRx.exec(ln)) !== null) {
+      push(m[2], 1, 1, `Rollup failed to resolve import "${m[1]}"`);
+    }
+    esbuildRx.lastIndex = 0;
+    while ((m = esbuildRx.exec(ln)) !== null) {
+      const [, file, line, col, msg] = m;
+      push(file, Number(line), Number(col), (msg || "Build error").trim());
+    }
+    atRx.lastIndex = 0;
+    while ((m = atRx.exec(ln)) !== null) {
+      const [, file, line, col] = m;
+      // Pair with the nearest preceding error-ish line for context.
+      const contextLine =
+        [...Array(4).keys()]
+          .map((k) => lines[i - 1 - k])
+          .find((s) => s && errorPatterns.some((rx) => rx.test(s))) ??
+        genericErrRx.exec(ln)?.[1] ??
+        ln;
+      push(file, Number(line), col ? Number(col) : 1, contextLine.trim().slice(0, 400));
+    }
+  }
+
+  // Fall back: if we only got unresolved specifiers but no importer path,
+  // still annotate at repo root so the PR gets *some* signal.
+  if (annotations.size === 0 && importSpecs.size > 0) {
+    for (const spec of importSpecs) {
+      annotations.set(`::${spec}`, {
+        file: "package.json",
+        line: 1,
+        col: 1,
+        message: `Unresolved import "${spec}" (importer path not detected in log)`,
+      });
+    }
+  }
+
+  if (annotations.size > 0) {
+    // Print to stdout so GitHub Actions parses them out of the workflow log.
+    for (const a of annotations.values()) {
+      process.stdout.write(
+        `::error file=${a.file},line=${a.line},col=${a.col}::${escape(a.message)}\n`,
+      );
+    }
+  }
+
   console.error("\n💡 Next steps:");
   console.error("   1. Open the file above and verify the import path exists.");
   console.error("   2. For missing packages, run: bun add <package>");
