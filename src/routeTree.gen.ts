@@ -19,6 +19,7 @@ import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as KnowledgeSplatRouteImport } from './routes/knowledge.$'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as LangSustainabilityRouteImport } from './routes/$lang.sustainability'
 import { Route as LangResearchInnovationRouteImport } from './routes/$lang.research-innovation'
 import { Route as LangQualityRouteImport } from './routes/$lang.quality'
@@ -43,11 +44,28 @@ import { Route as LangCareersRouteImport } from './routes/$lang.careers'
 import { Route as LangAiProjectEstimatorRouteImport } from './routes/$lang.ai-project-estimator'
 import { Route as LangAiAssistantRouteImport } from './routes/$lang.ai-assistant'
 import { Route as LangAboutRouteImport } from './routes/$lang.about'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as LangSolutionsIndexRouteImport } from './routes/$lang.solutions.index'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicClientLogRouteImport } from './routes/api/public/client-log'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminTasksRouteImport } from './routes/_authenticated/admin.tasks'
+import { Route as AuthenticatedAdminSuppliersRouteImport } from './routes/_authenticated/admin.suppliers'
 import { Route as AuthenticatedAdminSolutionsSeoRouteImport } from './routes/_authenticated/admin.solutions-seo'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
+import { Route as AuthenticatedAdminPurchaseOrdersRouteImport } from './routes/_authenticated/admin.purchase-orders'
+import { Route as AuthenticatedAdminProformaInvoicesRouteImport } from './routes/_authenticated/admin.proforma-invoices'
+import { Route as AuthenticatedAdminProductsRouteImport } from './routes/_authenticated/admin.products'
+import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
+import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
+import { Route as AuthenticatedAdminOpportunitiesRouteImport } from './routes/_authenticated/admin.opportunities'
 import { Route as AuthenticatedAdminLogoEventsRouteImport } from './routes/_authenticated/admin.logo-events'
+import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
+import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authenticated/admin.invoices'
+import { Route as AuthenticatedAdminFilesRouteImport } from './routes/_authenticated/admin.files'
+import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
+import { Route as AuthenticatedAdminCommissionInvoicesRouteImport } from './routes/_authenticated/admin.commission-invoices'
 import { Route as LangSolutionsSandwichPanelsRouteImport } from './routes/$lang.solutions.sandwich-panels'
 import { Route as LangSolutionsRawMaterialsRouteImport } from './routes/$lang.solutions.raw-materials'
 import { Route as LangSolutionsProductionLinesRouteImport } from './routes/$lang.solutions.production-lines'
@@ -103,6 +121,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const LangSustainabilityRoute = LangSustainabilityRouteImport.update({
   id: '/sustainability',
@@ -228,6 +251,11 @@ const LangAboutRoute = LangAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => LangRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const LangSolutionsIndexRoute = LangSolutionsIndexRouteImport.update({
   id: '/solutions/',
   path: '/solutions/',
@@ -243,17 +271,109 @@ const ApiPublicClientLogRoute = ApiPublicClientLogRouteImport.update({
   path: '/api/public/client-log',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminTasksRoute = AuthenticatedAdminTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminSuppliersRoute =
+  AuthenticatedAdminSuppliersRouteImport.update({
+    id: '/suppliers',
+    path: '/suppliers',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminSolutionsSeoRoute =
   AuthenticatedAdminSolutionsSeoRouteImport.update({
-    id: '/admin/solutions-seo',
-    path: '/admin/solutions-seo',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/solutions-seo',
+    path: '/solutions-seo',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminReportsRoute =
+  AuthenticatedAdminReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminPurchaseOrdersRoute =
+  AuthenticatedAdminPurchaseOrdersRouteImport.update({
+    id: '/purchase-orders',
+    path: '/purchase-orders',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminProformaInvoicesRoute =
+  AuthenticatedAdminProformaInvoicesRouteImport.update({
+    id: '/proforma-invoices',
+    path: '/proforma-invoices',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminProductsRoute =
+  AuthenticatedAdminProductsRouteImport.update({
+    id: '/products',
+    path: '/products',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminPaymentsRoute =
+  AuthenticatedAdminPaymentsRouteImport.update({
+    id: '/payments',
+    path: '/payments',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminOrdersRoute =
+  AuthenticatedAdminOrdersRouteImport.update({
+    id: '/orders',
+    path: '/orders',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminOpportunitiesRoute =
+  AuthenticatedAdminOpportunitiesRouteImport.update({
+    id: '/opportunities',
+    path: '/opportunities',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminLogoEventsRoute =
   AuthenticatedAdminLogoEventsRouteImport.update({
-    id: '/admin/logo-events',
-    path: '/admin/logo-events',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/logo-events',
+    path: '/logo-events',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminLeadsRoute = AuthenticatedAdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminInvoicesRoute =
+  AuthenticatedAdminInvoicesRouteImport.update({
+    id: '/invoices',
+    path: '/invoices',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminFilesRoute = AuthenticatedAdminFilesRouteImport.update({
+  id: '/files',
+  path: '/files',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminCustomersRoute =
+  AuthenticatedAdminCustomersRouteImport.update({
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCommissionInvoicesRoute =
+  AuthenticatedAdminCommissionInvoicesRouteImport.update({
+    id: '/commission-invoices',
+    path: '/commission-invoices',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const LangSolutionsSandwichPanelsRoute =
   LangSolutionsSandwichPanelsRouteImport.update({
@@ -321,6 +441,7 @@ export interface FileRoutesByFullPath {
   '/$lang/quality': typeof LangQualityRoute
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/$lang/': typeof LangIndexRoute
@@ -331,11 +452,28 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
+  '/admin/customers': typeof AuthenticatedAdminCustomersRoute
+  '/admin/files': typeof AuthenticatedAdminFilesRoute
+  '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
+  '/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
+  '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
+  '/admin/orders': typeof AuthenticatedAdminOrdersRoute
+  '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
+  '/admin/products': typeof AuthenticatedAdminProductsRoute
+  '/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
+  '/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
+  '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
+  '/admin/tasks': typeof AuthenticatedAdminTasksRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -376,11 +514,28 @@ export interface FileRoutesByTo {
   '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
+  '/admin/customers': typeof AuthenticatedAdminCustomersRoute
+  '/admin/files': typeof AuthenticatedAdminFilesRoute
+  '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
+  '/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
+  '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
+  '/admin/orders': typeof AuthenticatedAdminOrdersRoute
+  '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
+  '/admin/products': typeof AuthenticatedAdminProductsRoute
+  '/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
+  '/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
+  '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
+  '/admin/tasks': typeof AuthenticatedAdminTasksRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -414,6 +569,7 @@ export interface FileRoutesById {
   '/$lang/quality': typeof LangQualityRoute
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/$lang/': typeof LangIndexRoute
@@ -424,11 +580,28 @@ export interface FileRoutesById {
   '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/_authenticated/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
+  '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
+  '/_authenticated/admin/files': typeof AuthenticatedAdminFilesRoute
+  '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
+  '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/_authenticated/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
+  '/_authenticated/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
+  '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
+  '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
+  '/_authenticated/admin/products': typeof AuthenticatedAdminProductsRoute
+  '/_authenticated/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
+  '/_authenticated/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
+  '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
+  '/_authenticated/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
+  '/_authenticated/admin/tasks': typeof AuthenticatedAdminTasksRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -462,6 +635,7 @@ export interface FileRouteTypes {
     | '/$lang/quality'
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
+    | '/admin'
     | '/api/chat'
     | '/knowledge/$'
     | '/$lang/'
@@ -472,11 +646,28 @@ export interface FileRouteTypes {
     | '/$lang/solutions/production-lines'
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
+    | '/admin/commission-invoices'
+    | '/admin/customers'
+    | '/admin/files'
+    | '/admin/invoices'
+    | '/admin/leads'
     | '/admin/logo-events'
+    | '/admin/opportunities'
+    | '/admin/orders'
+    | '/admin/payments'
+    | '/admin/products'
+    | '/admin/proforma-invoices'
+    | '/admin/purchase-orders'
+    | '/admin/reports'
+    | '/admin/settings'
     | '/admin/solutions-seo'
+    | '/admin/suppliers'
+    | '/admin/tasks'
+    | '/admin/users'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions/'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -517,11 +708,28 @@ export interface FileRouteTypes {
     | '/$lang/solutions/production-lines'
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
+    | '/admin/commission-invoices'
+    | '/admin/customers'
+    | '/admin/files'
+    | '/admin/invoices'
+    | '/admin/leads'
     | '/admin/logo-events'
+    | '/admin/opportunities'
+    | '/admin/orders'
+    | '/admin/payments'
+    | '/admin/products'
+    | '/admin/proforma-invoices'
+    | '/admin/purchase-orders'
+    | '/admin/reports'
+    | '/admin/settings'
     | '/admin/solutions-seo'
+    | '/admin/suppliers'
+    | '/admin/tasks'
+    | '/admin/users'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -554,6 +762,7 @@ export interface FileRouteTypes {
     | '/$lang/quality'
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
+    | '/_authenticated/admin'
     | '/api/chat'
     | '/knowledge/$'
     | '/$lang/'
@@ -564,11 +773,28 @@ export interface FileRouteTypes {
     | '/$lang/solutions/production-lines'
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
+    | '/_authenticated/admin/commission-invoices'
+    | '/_authenticated/admin/customers'
+    | '/_authenticated/admin/files'
+    | '/_authenticated/admin/invoices'
+    | '/_authenticated/admin/leads'
     | '/_authenticated/admin/logo-events'
+    | '/_authenticated/admin/opportunities'
+    | '/_authenticated/admin/orders'
+    | '/_authenticated/admin/payments'
+    | '/_authenticated/admin/products'
+    | '/_authenticated/admin/proforma-invoices'
+    | '/_authenticated/admin/purchase-orders'
+    | '/_authenticated/admin/reports'
+    | '/_authenticated/admin/settings'
     | '/_authenticated/admin/solutions-seo'
+    | '/_authenticated/admin/suppliers'
+    | '/_authenticated/admin/tasks'
+    | '/_authenticated/admin/users'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions/'
+    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -656,6 +882,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/$lang/sustainability': {
       id: '/$lang/sustainability'
@@ -825,6 +1058,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangAboutRouteImport
       parentRoute: typeof LangRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/$lang/solutions/': {
       id: '/$lang/solutions/'
       path: '/solutions'
@@ -846,19 +1086,131 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicClientLogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/tasks': {
+      id: '/_authenticated/admin/tasks'
+      path: '/tasks'
+      fullPath: '/admin/tasks'
+      preLoaderRoute: typeof AuthenticatedAdminTasksRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/suppliers': {
+      id: '/_authenticated/admin/suppliers'
+      path: '/suppliers'
+      fullPath: '/admin/suppliers'
+      preLoaderRoute: typeof AuthenticatedAdminSuppliersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/solutions-seo': {
       id: '/_authenticated/admin/solutions-seo'
-      path: '/admin/solutions-seo'
+      path: '/solutions-seo'
       fullPath: '/admin/solutions-seo'
       preLoaderRoute: typeof AuthenticatedAdminSolutionsSeoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/reports': {
+      id: '/_authenticated/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/purchase-orders': {
+      id: '/_authenticated/admin/purchase-orders'
+      path: '/purchase-orders'
+      fullPath: '/admin/purchase-orders'
+      preLoaderRoute: typeof AuthenticatedAdminPurchaseOrdersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/proforma-invoices': {
+      id: '/_authenticated/admin/proforma-invoices'
+      path: '/proforma-invoices'
+      fullPath: '/admin/proforma-invoices'
+      preLoaderRoute: typeof AuthenticatedAdminProformaInvoicesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/products': {
+      id: '/_authenticated/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AuthenticatedAdminProductsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/payments': {
+      id: '/_authenticated/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AuthenticatedAdminPaymentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/orders': {
+      id: '/_authenticated/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AuthenticatedAdminOrdersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/opportunities': {
+      id: '/_authenticated/admin/opportunities'
+      path: '/opportunities'
+      fullPath: '/admin/opportunities'
+      preLoaderRoute: typeof AuthenticatedAdminOpportunitiesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/logo-events': {
       id: '/_authenticated/admin/logo-events'
-      path: '/admin/logo-events'
+      path: '/logo-events'
       fullPath: '/admin/logo-events'
       preLoaderRoute: typeof AuthenticatedAdminLogoEventsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/leads': {
+      id: '/_authenticated/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AuthenticatedAdminLeadsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/invoices': {
+      id: '/_authenticated/admin/invoices'
+      path: '/invoices'
+      fullPath: '/admin/invoices'
+      preLoaderRoute: typeof AuthenticatedAdminInvoicesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/files': {
+      id: '/_authenticated/admin/files'
+      path: '/files'
+      fullPath: '/admin/files'
+      preLoaderRoute: typeof AuthenticatedAdminFilesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/customers': {
+      id: '/_authenticated/admin/customers'
+      path: '/customers'
+      fullPath: '/admin/customers'
+      preLoaderRoute: typeof AuthenticatedAdminCustomersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/commission-invoices': {
+      id: '/_authenticated/admin/commission-invoices'
+      path: '/commission-invoices'
+      fullPath: '/admin/commission-invoices'
+      preLoaderRoute: typeof AuthenticatedAdminCommissionInvoicesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/$lang/solutions/sandwich-panels': {
       id: '/$lang/solutions/sandwich-panels'
@@ -905,14 +1257,61 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminCommissionInvoicesRoute: typeof AuthenticatedAdminCommissionInvoicesRoute
+  AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
+  AuthenticatedAdminFilesRoute: typeof AuthenticatedAdminFilesRoute
+  AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRoute
+  AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
   AuthenticatedAdminLogoEventsRoute: typeof AuthenticatedAdminLogoEventsRoute
+  AuthenticatedAdminOpportunitiesRoute: typeof AuthenticatedAdminOpportunitiesRoute
+  AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
+  AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
+  AuthenticatedAdminProductsRoute: typeof AuthenticatedAdminProductsRoute
+  AuthenticatedAdminProformaInvoicesRoute: typeof AuthenticatedAdminProformaInvoicesRoute
+  AuthenticatedAdminPurchaseOrdersRoute: typeof AuthenticatedAdminPurchaseOrdersRoute
+  AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSolutionsSeoRoute: typeof AuthenticatedAdminSolutionsSeoRoute
+  AuthenticatedAdminSuppliersRoute: typeof AuthenticatedAdminSuppliersRoute
+  AuthenticatedAdminTasksRoute: typeof AuthenticatedAdminTasksRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminCommissionInvoicesRoute:
+    AuthenticatedAdminCommissionInvoicesRoute,
+  AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
+  AuthenticatedAdminFilesRoute: AuthenticatedAdminFilesRoute,
+  AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRoute,
+  AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
+  AuthenticatedAdminLogoEventsRoute: AuthenticatedAdminLogoEventsRoute,
+  AuthenticatedAdminOpportunitiesRoute: AuthenticatedAdminOpportunitiesRoute,
+  AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
+  AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
+  AuthenticatedAdminProductsRoute: AuthenticatedAdminProductsRoute,
+  AuthenticatedAdminProformaInvoicesRoute:
+    AuthenticatedAdminProformaInvoicesRoute,
+  AuthenticatedAdminPurchaseOrdersRoute: AuthenticatedAdminPurchaseOrdersRoute,
+  AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+  AuthenticatedAdminSolutionsSeoRoute: AuthenticatedAdminSolutionsSeoRoute,
+  AuthenticatedAdminSuppliersRoute: AuthenticatedAdminSuppliersRoute,
+  AuthenticatedAdminTasksRoute: AuthenticatedAdminTasksRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminLogoEventsRoute: AuthenticatedAdminLogoEventsRoute,
-  AuthenticatedAdminSolutionsSeoRoute: AuthenticatedAdminSolutionsSeoRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
