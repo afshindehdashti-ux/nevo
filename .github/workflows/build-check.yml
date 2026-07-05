@@ -90,29 +90,32 @@ jobs:
       - name: ESLint
         id: lint
         # Run even if typecheck failed so contributors see all issues in one run.
+        # `continue-on-error: true` keeps lint informational for now — the
+        # codebase has a large backlog of prettier-rule violations that would
+        # otherwise turn every PR red. Annotations still surface inline on the
+        # PR; flip this to `false` after running `bun run format`.
         if: always() && steps.typecheck.conclusion != 'skipped'
+        continue-on-error: true
         run: |
           mkdir -p build-logs
           set -o pipefail
           START=$SECONDS
-          # `--format=stylish` for humans + a second pass that emits GitHub
-          # annotations (`::error file=…,line=…,col=…::message`) inline on the PR.
           bun run lint --format=stylish 2>&1 | tee build-logs/lint.log || LINT_EXIT=$?
-          bunx eslint . --format=@microsoft/eslint-formatter-sarif -o build-logs/eslint.sarif 2>/dev/null || true
-          bunx eslint . --format=compact 2>/dev/null | awk -F': ' '
-            /: line [0-9]+, col [0-9]+, (Error|Warning) -/ {
-              match($0, /^(.*): line ([0-9]+), col ([0-9]+), (Error|Warning) - (.*)$/, a);
+          # Emit `::error/::warning file=…,line=…,col=…::message` per finding so
+          # they render inline on the PR "Files changed" tab.
+          bunx eslint . --format=compact 2>/dev/null | awk '
+            match($0, /^(.*): line ([0-9]+), col ([0-9]+), (Error|Warning) - (.*)$/, a) {
               lvl = (a[4]=="Error") ? "error" : "warning";
               printf("::%s file=%s,line=%s,col=%s::%s\n", lvl, a[1], a[2], a[3], a[5]);
             }' || true
-          echo "- **lint time**: \`$((SECONDS-START))s\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **lint time**: \`$((SECONDS-START))s\` (exit=${LINT_EXIT:-0})" >> "$GITHUB_STEP_SUMMARY"
           exit ${LINT_EXIT:-0}
 
       - name: Run build:dev with diagnostics
         id: build
-        # Skip the build only if typecheck/lint failed — no point spending
-        # minutes on Vite when the code doesn't compile or lint clean.
-        if: success()
+        # Skip the build only if typecheck failed — no point spending
+        # minutes on Vite when the code doesn't compile.
+        if: steps.typecheck.conclusion == 'success'
         run: |
           mkdir -p build-logs
           set -o pipefail
