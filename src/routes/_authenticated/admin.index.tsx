@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Users, Target, TrendingUp, Truck, Factory, Ship, PackageCheck,
   FileText, Receipt, Percent, AlertCircle, DollarSign, LineChart, CheckSquare,
+  Package, Boxes,
 } from "lucide-react";
 import { useMyProfile, useCurrentUser } from "@/lib/crm-hooks";
 
@@ -14,23 +17,6 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 
 type Metric = { label: string; value: string; hint?: string; icon: React.ComponentType<{ className?: string }>; tone?: "default" | "success" | "warn" | "danger" };
 
-const METRICS: Metric[] = [
-  { label: "Total Customers", value: "—", icon: Users },
-  { label: "Active Leads", value: "—", icon: Target },
-  { label: "Open Opportunities", value: "—", icon: TrendingUp },
-  { label: "Active Orders", value: "—", icon: Truck },
-  { label: "In Production", value: "—", icon: Factory },
-  { label: "In Shipment", value: "—", icon: Ship },
-  { label: "Delivered", value: "—", icon: PackageCheck },
-  { label: "Pending Proformas", value: "—", icon: FileText },
-  { label: "Pending Invoices", value: "—", icon: Receipt, tone: "warn" },
-  { label: "Pending Commission", value: "—", icon: Percent, tone: "warn" },
-  { label: "Unpaid Amount", value: "—", icon: AlertCircle, tone: "danger" },
-  { label: "Paid Amount", value: "—", icon: DollarSign, tone: "success" },
-  { label: "Monthly Sales", value: "—", icon: LineChart },
-  { label: "Monthly Commission", value: "—", icon: Percent },
-];
-
 function toneClass(tone?: Metric["tone"]) {
   switch (tone) {
     case "success": return "text-emerald-600 dark:text-emerald-400";
@@ -39,6 +25,26 @@ function toneClass(tone?: Metric["tone"]) {
     default: return "text-foreground";
   }
 }
+
+function useDashboardCounts() {
+  return useQuery({
+    queryKey: ["dashboard-counts"],
+    queryFn: async () => {
+      const [c, s, p] = await Promise.all([
+        supabase.from("customers").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("suppliers").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("products").select("id", { count: "exact", head: true }).eq("is_active", true),
+      ]);
+      return {
+        customers: c.count ?? 0,
+        suppliers: s.count ?? 0,
+        products: p.count ?? 0,
+      };
+    },
+    staleTime: 30_000,
+  });
+}
+
 
 function Dashboard() {
   const { data: profile } = useMyProfile();
