@@ -19,6 +19,7 @@ import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as KnowledgeSplatRouteImport } from './routes/knowledge.$'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as LangSustainabilityRouteImport } from './routes/$lang.sustainability'
 import { Route as LangResearchInnovationRouteImport } from './routes/$lang.research-innovation'
 import { Route as LangQualityRouteImport } from './routes/$lang.quality'
@@ -43,10 +44,13 @@ import { Route as LangCareersRouteImport } from './routes/$lang.careers'
 import { Route as LangAiProjectEstimatorRouteImport } from './routes/$lang.ai-project-estimator'
 import { Route as LangAiAssistantRouteImport } from './routes/$lang.ai-assistant'
 import { Route as LangAboutRouteImport } from './routes/$lang.about'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as LangSolutionsIndexRouteImport } from './routes/$lang.solutions.index'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicClientLogRouteImport } from './routes/api/public/client-log'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminSolutionsSeoRouteImport } from './routes/_authenticated/admin.solutions-seo'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminLogoEventsRouteImport } from './routes/_authenticated/admin.logo-events'
 import { Route as LangSolutionsSandwichPanelsRouteImport } from './routes/$lang.solutions.sandwich-panels'
 import { Route as LangSolutionsRawMaterialsRouteImport } from './routes/$lang.solutions.raw-materials'
@@ -103,6 +107,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const LangSustainabilityRoute = LangSustainabilityRouteImport.update({
   id: '/sustainability',
@@ -228,6 +237,11 @@ const LangAboutRoute = LangAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => LangRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const LangSolutionsIndexRoute = LangSolutionsIndexRouteImport.update({
   id: '/solutions/',
   path: '/solutions/',
@@ -243,17 +257,28 @@ const ApiPublicClientLogRoute = ApiPublicClientLogRouteImport.update({
   path: '/api/public/client-log',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminSolutionsSeoRoute =
   AuthenticatedAdminSolutionsSeoRouteImport.update({
-    id: '/admin/solutions-seo',
-    path: '/admin/solutions-seo',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/solutions-seo',
+    path: '/solutions-seo',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminLogoEventsRoute =
   AuthenticatedAdminLogoEventsRouteImport.update({
-    id: '/admin/logo-events',
-    path: '/admin/logo-events',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/logo-events',
+    path: '/logo-events',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const LangSolutionsSandwichPanelsRoute =
   LangSolutionsSandwichPanelsRouteImport.update({
@@ -321,6 +346,7 @@ export interface FileRoutesByFullPath {
   '/$lang/quality': typeof LangQualityRoute
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/$lang/': typeof LangIndexRoute
@@ -332,10 +358,13 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -377,10 +406,13 @@ export interface FileRoutesByTo {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -414,6 +446,7 @@ export interface FileRoutesById {
   '/$lang/quality': typeof LangQualityRoute
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/$lang/': typeof LangIndexRoute
@@ -425,10 +458,13 @@ export interface FileRoutesById {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/_authenticated/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -462,6 +498,7 @@ export interface FileRouteTypes {
     | '/$lang/quality'
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
+    | '/admin'
     | '/api/chat'
     | '/knowledge/$'
     | '/$lang/'
@@ -473,10 +510,13 @@ export interface FileRouteTypes {
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
     | '/admin/logo-events'
+    | '/admin/settings'
     | '/admin/solutions-seo'
+    | '/admin/users'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions/'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -518,10 +558,13 @@ export interface FileRouteTypes {
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
     | '/admin/logo-events'
+    | '/admin/settings'
     | '/admin/solutions-seo'
+    | '/admin/users'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -554,6 +597,7 @@ export interface FileRouteTypes {
     | '/$lang/quality'
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
+    | '/_authenticated/admin'
     | '/api/chat'
     | '/knowledge/$'
     | '/$lang/'
@@ -565,10 +609,13 @@ export interface FileRouteTypes {
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
     | '/_authenticated/admin/logo-events'
+    | '/_authenticated/admin/settings'
     | '/_authenticated/admin/solutions-seo'
+    | '/_authenticated/admin/users'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions/'
+    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -656,6 +703,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/$lang/sustainability': {
       id: '/$lang/sustainability'
@@ -825,6 +879,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangAboutRouteImport
       parentRoute: typeof LangRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/$lang/solutions/': {
       id: '/$lang/solutions/'
       path: '/solutions'
@@ -846,19 +907,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicClientLogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/solutions-seo': {
       id: '/_authenticated/admin/solutions-seo'
-      path: '/admin/solutions-seo'
+      path: '/solutions-seo'
       fullPath: '/admin/solutions-seo'
       preLoaderRoute: typeof AuthenticatedAdminSolutionsSeoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/logo-events': {
       id: '/_authenticated/admin/logo-events'
-      path: '/admin/logo-events'
+      path: '/logo-events'
       fullPath: '/admin/logo-events'
       preLoaderRoute: typeof AuthenticatedAdminLogoEventsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/$lang/solutions/sandwich-panels': {
       id: '/$lang/solutions/sandwich-panels'
@@ -905,14 +980,31 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
+interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminLogoEventsRoute: typeof AuthenticatedAdminLogoEventsRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSolutionsSeoRoute: typeof AuthenticatedAdminSolutionsSeoRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminLogoEventsRoute: AuthenticatedAdminLogoEventsRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+  AuthenticatedAdminSolutionsSeoRoute: AuthenticatedAdminSolutionsSeoRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminLogoEventsRoute: AuthenticatedAdminLogoEventsRoute,
-  AuthenticatedAdminSolutionsSeoRoute: AuthenticatedAdminSolutionsSeoRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =

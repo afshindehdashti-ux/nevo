@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import type { TablesUpdate } from "@/integrations/supabase/types";
 import { ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
@@ -62,9 +63,9 @@ function CompanyForm({ canEdit }: { canEdit: boolean }) {
   const save = useMutation({
     mutationFn: async () => {
       if (!data?.id) throw new Error("Settings row missing");
-      const payload: Record<string, string | null> = {};
-      const fields = ["legal_name","trade_license","address","city","country","email","phone","whatsapp","website","logo_url","bank_name","bank_account_name","bank_account_number","bank_iban","bank_swift","bank_branch","default_terms"];
-      for (const f of fields) payload[f] = (form[f] ?? "").trim() || null;
+      const payload: TablesUpdate<"company_settings"> = {};
+      const fields = ["legal_name","trade_license","address","city","country","email","phone","whatsapp","website","logo_url","bank_name","bank_account_name","bank_account_number","bank_iban","bank_swift","bank_branch","default_terms"] as const;
+      for (const f of fields) (payload as Record<string, string | null>)[f] = (form[f] ?? "").trim() || null;
       const { error } = await supabase.from("company_settings").update(payload).eq("id", data.id);
       if (error) throw error;
     },
@@ -144,10 +145,10 @@ function DocumentForm({ canEdit }: { canEdit: boolean }) {
   const save = useMutation({
     mutationFn: async () => {
       if (!data?.id) throw new Error("Settings row missing");
-      const payload: Record<string, string | number | null> = {};
-      const textFields = ["quotation_prefix","proforma_prefix","invoice_prefix","commission_prefix","purchase_order_prefix","delivery_note_prefix","packing_list_prefix","default_currency","default_incoterms","default_payment_terms","footer_text","signature_name","signature_title"];
-      for (const f of textFields) payload[f] = (form[f] ?? "").trim() || null;
-      payload.default_vat_percent = form.default_vat_percent ? Number(form.default_vat_percent) : 0;
+      const payload: TablesUpdate<"document_settings"> = {};
+      const textFields = ["quotation_prefix","proforma_prefix","invoice_prefix","commission_prefix","purchase_order_prefix","delivery_note_prefix","packing_list_prefix","default_currency","default_incoterms","default_payment_terms","footer_text","signature_name","signature_title"] as const;
+      for (const f of textFields) (payload as Record<string, string | null>)[f] = (form[f] ?? "").trim() || null;
+      (payload as Record<string, number>).default_vat_percent = form.default_vat_percent ? Number(form.default_vat_percent) : 0;
       const { error } = await supabase.from("document_settings").update(payload).eq("id", data.id);
       if (error) throw error;
     },
