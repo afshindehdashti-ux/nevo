@@ -38,10 +38,13 @@ function SettingsPage() {
         <TabsList>
           <TabsTrigger value="company">Company Profile</TabsTrigger>
           <TabsTrigger value="documents">Document Defaults</TabsTrigger>
+          <TabsTrigger value="team">Team</TabsTrigger>
         </TabsList>
         <TabsContent value="company"><CompanyForm canEdit={isSuperAdmin} /></TabsContent>
         <TabsContent value="documents"><DocumentForm canEdit={isSuperAdmin} /></TabsContent>
+        <TabsContent value="team"><TeamPanel /></TabsContent>
       </Tabs>
+
     </div>
   );
 }
