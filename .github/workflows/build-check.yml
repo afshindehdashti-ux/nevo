@@ -41,10 +41,22 @@ jobs:
 
       - name: Run build:dev with diagnostics
         id: build
-        run: bun run build:dev:diagnose
+        run: |
+          mkdir -p build-logs
+          set -o pipefail
+          bun run build:dev:diagnose 2>&1 | tee build-logs/build-dev.log
+
+      - name: Upload build logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-dev-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build-logs/
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Surface failure summary
         if: failure()
         run: |
-          echo "::error title=build:dev failed::Vite build failed. See 'Run build:dev with diagnostics' step above for the exact failing file/module and unresolved import (printed under '📍 Likely offender(s)')."
+          echo "::error title=build:dev failed::Vite build failed. See 'Run build:dev with diagnostics' step above for the exact failing file/module and unresolved import (printed under '📍 Likely offender(s)'). Full log is attached as the 'build-dev-diagnostics' artifact on this run."
           exit 1
