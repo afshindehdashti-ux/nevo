@@ -49,10 +49,31 @@ function useDashboardCounts() {
 function Dashboard() {
   const { data: profile } = useMyProfile();
   const { data: user } = useCurrentUser();
+  const { data: counts } = useDashboardCounts();
   const name = profile?.full_name || user?.email?.split("@")[0] || "Team";
 
+  const fmt = (n?: number) => (n == null ? "—" : n.toLocaleString());
+
+  const metrics: Metric[] = [
+    { label: "Active Customers", value: fmt(counts?.customers), icon: Users, tone: "success" },
+    { label: "Active Suppliers", value: fmt(counts?.suppliers), icon: Package },
+    { label: "Active Products", value: fmt(counts?.products), icon: Boxes },
+    { label: "Active Leads", value: "—", icon: Target, hint: "Ships in Sales phase" },
+    { label: "Open Opportunities", value: "—", icon: TrendingUp, hint: "Ships in Sales phase" },
+    { label: "Active Orders", value: "—", icon: Truck, hint: "Ships in Sales phase" },
+    { label: "In Production", value: "—", icon: Factory },
+    { label: "In Shipment", value: "—", icon: Ship },
+    { label: "Delivered", value: "—", icon: PackageCheck },
+    { label: "Pending Proformas", value: "—", icon: FileText },
+    { label: "Pending Invoices", value: "—", icon: Receipt, tone: "warn" },
+    { label: "Pending Commission", value: "—", icon: Percent, tone: "warn" },
+    { label: "Unpaid Amount", value: "—", icon: AlertCircle, tone: "danger" },
+    { label: "Paid Amount", value: "—", icon: DollarSign, tone: "success" },
+    { label: "Monthly Sales", value: "—", icon: LineChart },
+  ];
+
   return (
-    <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
+    <div className="p-4 md:p-6 space-y-6 max-w-[1600px] mx-auto">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
         <div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground">NEVO Industrial · Back Office</p>
@@ -62,12 +83,12 @@ function Dashboard() {
           </p>
         </div>
         <Badge variant="outline" className="border-emerald-500/30 text-emerald-700 dark:text-emerald-400">
-          Phase 1 · Foundation
+          Phase 2 · Master data
         </Badge>
       </div>
 
-      <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
-        {METRICS.map((m) => (
+      <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        {metrics.map((m) => (
           <Card key={m.label} className="border-border/60">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
@@ -82,6 +103,7 @@ function Dashboard() {
           </Card>
         ))}
       </section>
+
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="lg:col-span-2">
