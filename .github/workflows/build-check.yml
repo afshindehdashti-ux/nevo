@@ -75,8 +75,44 @@ jobs:
           echo "bun install took $((SECONDS-START))s"
           echo "- **Install time**: \`$((SECONDS-START))s\`" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: TypeScript typecheck
+        id: typecheck
+        run: |
+          mkdir -p build-logs
+          set -o pipefail
+          START=$SECONDS
+          # `--pretty false` keeps output diff-clean; the reviewdog-style prefix
+          # `file(line,col): error TSxxxx: message` is auto-matched by the
+          # GitHub Actions TSC problem matcher, so failures annotate the PR.
+          bun run typecheck --pretty false 2>&1 | tee build-logs/typecheck.log
+          echo "- **typecheck time**: \`$((SECONDS-START))s\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: ESLint
+        id: lint
+        # Run even if typecheck failed so contributors see all issues in one run.
+        if: always() && steps.typecheck.conclusion != 'skipped'
+        run: |
+          mkdir -p build-logs
+          set -o pipefail
+          START=$SECONDS
+          # `--format=stylish` for humans + a second pass that emits GitHub
+          # annotations (`::error file=…,line=…,col=…::message`) inline on the PR.
+          bun run lint --format=stylish 2>&1 | tee build-logs/lint.log || LINT_EXIT=$?
+          bunx eslint . --format=@microsoft/eslint-formatter-sarif -o build-logs/eslint.sarif 2>/dev/null || true
+          bunx eslint . --format=compact 2>/dev/null | awk -F': ' '
+            /: line [0-9]+, col [0-9]+, (Error|Warning) -/ {
+              match($0, /^(.*): line ([0-9]+), col ([0-9]+), (Error|Warning) - (.*)$/, a);
+              lvl = (a[4]=="Error") ? "error" : "warning";
+              printf("::%s file=%s,line=%s,col=%s::%s\n", lvl, a[1], a[2], a[3], a[5]);
+            }' || true
+          echo "- **lint time**: \`$((SECONDS-START))s\`" >> "$GITHUB_STEP_SUMMARY"
+          exit ${LINT_EXIT:-0}
+
       - name: Run build:dev with diagnostics
         id: build
+        # Skip the build only if typecheck/lint failed — no point spending
+        # minutes on Vite when the code doesn't compile or lint clean.
+        if: success()
         run: |
           mkdir -p build-logs
           set -o pipefail
