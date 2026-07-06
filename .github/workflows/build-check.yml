@@ -90,12 +90,8 @@ jobs:
       - name: ESLint
         id: lint
         # Run even if typecheck failed so contributors see all issues in one run.
-        # `continue-on-error: true` keeps lint informational for now — the
-        # codebase has a large backlog of prettier-rule violations that would
-        # otherwise turn every PR red. Annotations still surface inline on the
-        # PR; flip this to `false` after running `bun run format`.
+        # Lint is now blocking: any Error-level finding fails the build.
         if: always() && steps.typecheck.conclusion != 'skipped'
-        continue-on-error: true
         run: |
           mkdir -p build-logs
           set -o pipefail
@@ -113,9 +109,9 @@ jobs:
 
       - name: Run build:dev with diagnostics
         id: build
-        # Skip the build only if typecheck failed — no point spending
-        # minutes on Vite when the code doesn't compile.
-        if: steps.typecheck.conclusion == 'success'
+        # Skip the build if either typecheck or lint failed — no point spending
+        # minutes on Vite when the code already fails a blocking gate.
+        if: steps.typecheck.conclusion == 'success' && steps.lint.conclusion == 'success'
         run: |
           mkdir -p build-logs
           set -o pipefail
