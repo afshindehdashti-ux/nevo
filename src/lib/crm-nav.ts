@@ -81,6 +81,7 @@ export const CRM_NAV: CrmNavGroup[] = [
   {
     label: "Finance",
     items: [
+      { title: "Quotations", url: "/admin/quotations", icon: FileText, allowedRoles: SALES_OPS },
       {
         title: "Proforma Invoices",
         url: "/admin/proforma-invoices",

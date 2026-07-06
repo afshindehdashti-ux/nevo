@@ -44,6 +44,116 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_assistant_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          inquiry_id: string | null
+          last_message_at: string
+          lead_captured: boolean
+          message_count: number
+          metadata: Json
+          session_id: string
+          user_id: string | null
+          visitor_country: string | null
+          visitor_ip: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inquiry_id?: string | null
+          last_message_at?: string
+          lead_captured?: boolean
+          message_count?: number
+          metadata?: Json
+          session_id: string
+          user_id?: string | null
+          visitor_country?: string | null
+          visitor_ip?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inquiry_id?: string | null
+          last_message_at?: string
+          lead_captured?: boolean
+          message_count?: number
+          metadata?: Json
+          session_id?: string
+          user_id?: string | null
+          visitor_country?: string | null
+          visitor_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_assistant_conversations_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "project_inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      communications: {
+        Row: {
+          attachments: Json
+          body: string | null
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string
+          created_by: string | null
+          direction: Database["public"]["Enums"]["communication_direction"]
+          entity_id: string
+          entity_type: string
+          id: string
+          kind: Database["public"]["Enums"]["communication_kind"]
+          metadata: Json
+          occurred_at: string
+          subject: string | null
+          updated_at: string
+          updated_by: string | null
+          user_id: string | null
+        }
+        Insert: {
+          attachments?: Json
+          body?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          direction?: Database["public"]["Enums"]["communication_direction"]
+          entity_id: string
+          entity_type: string
+          id?: string
+          kind?: Database["public"]["Enums"]["communication_kind"]
+          metadata?: Json
+          occurred_at?: string
+          subject?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          attachments?: Json
+          body?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          direction?: Database["public"]["Enums"]["communication_direction"]
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["communication_kind"]
+          metadata?: Json
+          occurred_at?: string
+          subject?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       company_settings: {
         Row: {
           address: string | null
@@ -1573,6 +1683,176 @@ export type Database = {
           },
         ]
       }
+      quotation_items: {
+        Row: {
+          created_at: string
+          description: string
+          discount_pct: number
+          id: string
+          line_total: number
+          position: number
+          product_id: string | null
+          quantity: number
+          quotation_id: string
+          unit: string | null
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          discount_pct?: number
+          id?: string
+          line_total?: number
+          position?: number
+          product_id?: string | null
+          quantity?: number
+          quotation_id: string
+          unit?: string | null
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          discount_pct?: number
+          id?: string
+          line_total?: number
+          position?: number
+          product_id?: string | null
+          quantity?: number
+          quotation_id?: string
+          unit?: string | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotation_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotation_items_quotation_id_fkey"
+            columns: ["quotation_id"]
+            isOneToOne: false
+            referencedRelation: "quotations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotations: {
+        Row: {
+          accepted_at: string | null
+          approved_at: string | null
+          approved_by: string | null
+          converted_invoice_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string | null
+          id: string
+          inquiry_id: string | null
+          internal_notes: string | null
+          issue_date: string
+          notes: string | null
+          project_id: string | null
+          quotation_number: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["quotation_status"]
+          subtotal: number
+          terms: string | null
+          total: number
+          updated_at: string
+          updated_by: string | null
+          valid_until: string | null
+          vat_amount: number
+          vat_rate: number
+        }
+        Insert: {
+          accepted_at?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          converted_invoice_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          id?: string
+          inquiry_id?: string | null
+          internal_notes?: string | null
+          issue_date?: string
+          notes?: string | null
+          project_id?: string | null
+          quotation_number?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["quotation_status"]
+          subtotal?: number
+          terms?: string | null
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          valid_until?: string | null
+          vat_amount?: number
+          vat_rate?: number
+        }
+        Update: {
+          accepted_at?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          converted_invoice_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          id?: string
+          inquiry_id?: string | null
+          internal_notes?: string | null
+          issue_date?: string
+          notes?: string | null
+          project_id?: string | null
+          quotation_number?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["quotation_status"]
+          subtotal?: number
+          terms?: string | null
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          valid_until?: string | null
+          vat_amount?: number
+          vat_rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotations_converted_invoice_id_fkey"
+            columns: ["converted_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotations_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "project_inquiries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipment_items: {
         Row: {
           created_at: string
@@ -1821,6 +2101,69 @@ export type Database = {
         }
         Relationships: []
       }
+      tasks: {
+        Row: {
+          approval_required: boolean
+          approved_at: string | null
+          approved_by: string | null
+          assigned_to: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          metadata: Json
+          priority: Database["public"]["Enums"]["task_priority"]
+          status: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          approval_required?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          metadata?: Json
+          priority?: Database["public"]["Enums"]["task_priority"]
+          status?: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          approval_required?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          metadata?: Json
+          priority?: Database["public"]["Enums"]["task_priority"]
+          status?: Database["public"]["Enums"]["task_status"]
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1895,6 +2238,7 @@ export type Database = {
         Args: { _type: Database["public"]["Enums"]["invoice_type"] }
         Returns: string
       }
+      next_quotation_number: { Args: never; Returns: string }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -1915,6 +2259,14 @@ export type Database = {
         | "operations"
         | "finance"
         | "read_only"
+      communication_direction: "inbound" | "outbound" | "internal"
+      communication_kind:
+        | "note"
+        | "email"
+        | "call"
+        | "meeting"
+        | "whatsapp"
+        | "file"
       document_entity: "order" | "invoice" | "shipment" | "customer"
       document_kind:
         | "proforma_pdf"
@@ -1946,7 +2298,19 @@ export type Database = {
         | "cash"
         | "letter_of_credit"
         | "other"
+      quotation_status:
+        | "draft"
+        | "pending_approval"
+        | "approved"
+        | "sent"
+        | "accepted"
+        | "rejected"
+        | "expired"
+        | "converted"
+        | "void"
       shipment_status: "preparing" | "in_transit" | "delivered" | "cancelled"
+      task_priority: "low" | "normal" | "high" | "urgent"
+      task_status: "open" | "in_progress" | "waiting" | "done" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2085,6 +2449,15 @@ export const Constants = {
         "finance",
         "read_only",
       ],
+      communication_direction: ["inbound", "outbound", "internal"],
+      communication_kind: [
+        "note",
+        "email",
+        "call",
+        "meeting",
+        "whatsapp",
+        "file",
+      ],
       document_entity: ["order", "invoice", "shipment", "customer"],
       document_kind: [
         "proforma_pdf",
@@ -2120,7 +2493,20 @@ export const Constants = {
         "letter_of_credit",
         "other",
       ],
+      quotation_status: [
+        "draft",
+        "pending_approval",
+        "approved",
+        "sent",
+        "accepted",
+        "rejected",
+        "expired",
+        "converted",
+        "void",
+      ],
       shipment_status: ["preparing", "in_transit", "delivered", "cancelled"],
+      task_priority: ["low", "normal", "high", "urgent"],
+      task_status: ["open", "in_progress", "waiting", "done", "cancelled"],
     },
   },
 } as const
