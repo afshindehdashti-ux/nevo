@@ -126,7 +126,7 @@ function SessionStatusPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => refetchRoles()}>
+          <Button variant="outline" size="sm" onClick={() => { refetchRoles(); refetchHistory(); }}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
