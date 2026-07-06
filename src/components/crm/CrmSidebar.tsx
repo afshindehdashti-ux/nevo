@@ -13,8 +13,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { CRM_NAV } from "@/lib/crm-nav";
-import { useIsSuperAdmin, useMyProfile, useCurrentUser } from "@/lib/crm-hooks";
+import { CRM_NAV, canSeeNavItem } from "@/lib/crm-nav";
+import { useIsSuperAdmin, useMyProfile, useCurrentUser, useMyRoles } from "@/lib/crm-hooks";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/nevo-logo-light.png";
