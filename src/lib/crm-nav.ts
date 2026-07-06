@@ -18,6 +18,7 @@ import {
   UserCog,
   Image as ImageIcon,
   Search,
+  ScrollText,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -123,6 +124,7 @@ export const CRM_NAV: CrmNavGroup[] = [
     label: "Administration",
     items: [
       { title: "Users & Roles", url: "/admin/users", icon: UserCog, requiresSuperAdmin: true },
+      { title: "Activity Log", url: "/admin/activity", icon: ScrollText, requiresSuperAdmin: true },
       { title: "Settings", url: "/admin/settings", icon: Settings, requiresSuperAdmin: true },
     ],
   },
