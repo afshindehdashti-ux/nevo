@@ -180,9 +180,9 @@ export const listCommunicationsCenter = createServerFn({ method: "GET" })
       if (t === "customer") {
         const { data } = await context.supabase
           .from("customers")
-          .select("id, company_name, contact_name")
+          .select("id, name, contact_person")
           .in("id", ids);
-        for (const r of data ?? []) labels.set(key(t, r.id), r.company_name || r.contact_name || "Customer");
+        for (const r of data ?? []) labels.set(key(t, r.id), r.name || r.contact_person || "Customer");
       } else if (t === "lead") {
         const { data } = await context.supabase
           .from("project_inquiries")
@@ -192,15 +192,15 @@ export const listCommunicationsCenter = createServerFn({ method: "GET" })
       } else if (t === "project") {
         const { data } = await context.supabase
           .from("projects")
-          .select("id, name, code")
+          .select("id, project_name")
           .in("id", ids);
-        for (const r of data ?? []) labels.set(key(t, r.id), r.name || r.code || "Project");
+        for (const r of data ?? []) labels.set(key(t, r.id), r.project_name || "Project");
       } else if (t === "partner") {
         const { data } = await context.supabase
           .from("partners")
-          .select("id, name")
+          .select("id, company_name")
           .in("id", ids);
-        for (const r of data ?? []) labels.set(key(t, r.id), r.name);
+        for (const r of data ?? []) labels.set(key(t, r.id), r.company_name);
       } else if (t === "order") {
         const { data } = await context.supabase
           .from("orders")
@@ -222,9 +222,9 @@ export const listCommunicationsCenter = createServerFn({ method: "GET" })
       } else if (t === "shipment") {
         const { data } = await context.supabase
           .from("shipments")
-          .select("id, tracking_number")
+          .select("id, shipment_number, tracking_no")
           .in("id", ids);
-        for (const r of data ?? []) labels.set(key(t, r.id), r.tracking_number || "Shipment");
+        for (const r of data ?? []) labels.set(key(t, r.id), r.shipment_number || r.tracking_no || "Shipment");
       }
     }
 
