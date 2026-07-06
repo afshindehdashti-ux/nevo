@@ -716,6 +716,38 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
   );
 }
 
+type PortalMessage = {
+  id: string;
+  thread_id: string | null;
+  parent_id: string | null;
+  kind: string;
+  direction: string;
+  subject: string | null;
+  body: string | null;
+  occurred_at: string;
+  contact_name: string | null;
+  attachments?: unknown;
+};
+
+function groupThreads(messages: PortalMessage[]): PortalMessage[][] {
+  const byThread = new Map<string, PortalMessage[]>();
+  for (const m of messages) {
+    const key = m.thread_id ?? m.id;
+    const arr = byThread.get(key) ?? [];
+    arr.push(m);
+    byThread.set(key, arr);
+  }
+  const threads = Array.from(byThread.values()).map((arr) =>
+    arr.slice().sort((a, b) => (a.occurred_at < b.occurred_at ? -1 : 1)),
+  );
+  threads.sort((a, b) => {
+    const la = a[a.length - 1].occurred_at;
+    const lb = b[b.length - 1].occurred_at;
+    return la < lb ? 1 : -1;
+  });
+  return threads;
+}
+
 function KpiCard({
   icon: Icon,
   label,
