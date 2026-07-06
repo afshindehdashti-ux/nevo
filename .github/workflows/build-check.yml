@@ -75,6 +75,16 @@ jobs:
           echo "bun install took $((SECONDS-START))s"
           echo "- **Install time**: \`$((SECONDS-START))s\`" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Prettier format check
+        id: format
+        run: |
+          mkdir -p build-logs
+          set -o pipefail
+          START=$SECONDS
+          bun run format:check 2>&1 | tee build-logs/prettier.log || FORMAT_EXIT=$?
+          echo "- **format check time**: \`$((SECONDS-START))s\` (exit=${FORMAT_EXIT:-0})" >> "$GITHUB_STEP_SUMMARY"
+          exit ${FORMAT_EXIT:-0}
+
       - name: TypeScript typecheck
         id: typecheck
         run: |
