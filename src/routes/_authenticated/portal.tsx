@@ -367,7 +367,45 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
             </Card>
           </TabsContent>
 
+          <TabsContent value="messages">
+            <Card className="p-6 space-y-3">
+              {messages.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  No messages yet.
+                </p>
+              ) : (
+                messages.map((m) => (
+                  <div key={m.id} className="border border-border rounded-md p-3">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <div className="flex items-center gap-2 text-xs">
+                        {m.direction === "in" ? (
+                          <ArrowDownLeft className="h-3.5 w-3.5 text-emerald-600" />
+                        ) : (
+                          <ArrowUpRight className="h-3.5 w-3.5 text-blue-600" />
+                        )}
+                        <Badge variant="outline">{m.kind}</Badge>
+                        <span className="text-muted-foreground">
+                          {m.contact_name ?? (m.direction === "in" ? "From you" : "From NEVO")}
+                        </span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(m.occurred_at).toLocaleString()}
+                      </span>
+                    </div>
+                    {m.subject && <div className="text-sm font-medium">{m.subject}</div>}
+                    {m.body && (
+                      <div className="text-sm text-muted-foreground whitespace-pre-wrap mt-1">
+                        {m.body}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </Card>
+          </TabsContent>
+
           <TabsContent value="profile">
+
             <Card className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <User className="h-5 w-5 text-muted-foreground" />
