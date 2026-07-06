@@ -69,6 +69,7 @@ import { Route as AuthenticatedAdminLogoEventsRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
 import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authenticated/admin.invoices'
 import { Route as AuthenticatedAdminFilesRouteImport } from './routes/_authenticated/admin.files'
+import { Route as AuthenticatedAdminDocumentIntelligenceRouteImport } from './routes/_authenticated/admin.document-intelligence'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
 import { Route as AuthenticatedAdminControlPanelRouteImport } from './routes/_authenticated/admin.control-panel'
 import { Route as AuthenticatedAdminCommissionInvoicesRouteImport } from './routes/_authenticated/admin.commission-invoices'
@@ -406,6 +407,12 @@ const AuthenticatedAdminFilesRoute = AuthenticatedAdminFilesRouteImport.update({
   path: '/files',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminDocumentIntelligenceRoute =
+  AuthenticatedAdminDocumentIntelligenceRouteImport.update({
+    id: '/document-intelligence',
+    path: '/document-intelligence',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminCustomersRoute =
   AuthenticatedAdminCustomersRouteImport.update({
     id: '/customers',
@@ -567,6 +574,7 @@ export interface FileRoutesByFullPath {
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
+  '/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
@@ -645,6 +653,7 @@ export interface FileRoutesByTo {
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
+  '/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
@@ -727,6 +736,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/_authenticated/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
+  '/_authenticated/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
   '/_authenticated/admin/files': typeof AuthenticatedAdminFilesRoute
   '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
@@ -809,6 +819,7 @@ export interface FileRouteTypes {
     | '/admin/commission-invoices'
     | '/admin/control-panel'
     | '/admin/customers'
+    | '/admin/document-intelligence'
     | '/admin/files'
     | '/admin/invoices'
     | '/admin/leads'
@@ -887,6 +898,7 @@ export interface FileRouteTypes {
     | '/admin/commission-invoices'
     | '/admin/control-panel'
     | '/admin/customers'
+    | '/admin/document-intelligence'
     | '/admin/files'
     | '/admin/invoices'
     | '/admin/leads'
@@ -968,6 +980,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/commission-invoices'
     | '/_authenticated/admin/control-panel'
     | '/_authenticated/admin/customers'
+    | '/_authenticated/admin/document-intelligence'
     | '/_authenticated/admin/files'
     | '/_authenticated/admin/invoices'
     | '/_authenticated/admin/leads'
@@ -1443,6 +1456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFilesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/document-intelligence': {
+      id: '/_authenticated/admin/document-intelligence'
+      path: '/document-intelligence'
+      fullPath: '/admin/document-intelligence'
+      preLoaderRoute: typeof AuthenticatedAdminDocumentIntelligenceRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/customers': {
       id: '/_authenticated/admin/customers'
       path: '/customers'
@@ -1655,6 +1675,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCommissionInvoicesRoute: typeof AuthenticatedAdminCommissionInvoicesRoute
   AuthenticatedAdminControlPanelRoute: typeof AuthenticatedAdminControlPanelRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRouteWithChildren
+  AuthenticatedAdminDocumentIntelligenceRoute: typeof AuthenticatedAdminDocumentIntelligenceRoute
   AuthenticatedAdminFilesRoute: typeof AuthenticatedAdminFilesRoute
   AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRouteWithChildren
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
@@ -1683,6 +1704,8 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminControlPanelRoute: AuthenticatedAdminControlPanelRoute,
   AuthenticatedAdminCustomersRoute:
     AuthenticatedAdminCustomersRouteWithChildren,
+  AuthenticatedAdminDocumentIntelligenceRoute:
+    AuthenticatedAdminDocumentIntelligenceRoute,
   AuthenticatedAdminFilesRoute: AuthenticatedAdminFilesRoute,
   AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRouteWithChildren,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
@@ -1824,13 +1847,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
