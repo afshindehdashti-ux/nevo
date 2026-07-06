@@ -16,7 +16,7 @@ export type ApprovalAuditEntry = {
   new_status: string | null;
   reason: string | null;
   notes: string | null;
-  affected_fields: Record<string, unknown> | null;
+  affected_fields: Record<string, string | number | boolean | null> | null;
   entity_label?: string | null;
 };
 
@@ -71,7 +71,7 @@ export const listApprovalAudit = createServerFn({ method: "GET" })
                 : null),
         reason: meta.reason ?? null,
         notes: meta.notes ?? null,
-        affected_fields: (meta.details ?? null) as Record<string, unknown> | null,
+        affected_fields: normalizeFields(meta.details),
       };
     });
 

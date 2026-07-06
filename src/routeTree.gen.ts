@@ -100,6 +100,7 @@ import { Route as AuthenticatedAdminOrdersIdRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminLeadsIdRouteImport } from './routes/_authenticated/admin.leads.$id'
 import { Route as AuthenticatedAdminInvoicesIdRouteImport } from './routes/_authenticated/admin.invoices.$id'
 import { Route as AuthenticatedAdminCustomersIdRouteImport } from './routes/_authenticated/admin.customers.$id'
+import { Route as AuthenticatedAdminApprovalsAuditRouteImport } from './routes/_authenticated/admin.approvals.audit'
 import { Route as AuthenticatedAdminQuotationsIdPrintRouteImport } from './routes/_authenticated/admin.quotations.$id.print'
 
 const StatusRoute = StatusRouteImport.update({
@@ -600,6 +601,12 @@ const AuthenticatedAdminCustomersIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedAdminCustomersRoute,
   } as any)
+const AuthenticatedAdminApprovalsAuditRoute =
+  AuthenticatedAdminApprovalsAuditRouteImport.update({
+    id: '/audit',
+    path: '/audit',
+    getParentRoute: () => AuthenticatedAdminApprovalsRoute,
+  } as any)
 const AuthenticatedAdminQuotationsIdPrintRoute =
   AuthenticatedAdminQuotationsIdPrintRouteImport.update({
     id: '/print',
@@ -655,7 +662,7 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
-  '/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
+  '/admin/approvals': typeof AuthenticatedAdminApprovalsRouteWithChildren
   '/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/admin/communications': typeof AuthenticatedAdminCommunicationsRoute
@@ -688,6 +695,7 @@ export interface FileRoutesByFullPath {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/approvals/audit': typeof AuthenticatedAdminApprovalsAuditRoute
   '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
   '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
   '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
@@ -746,7 +754,7 @@ export interface FileRoutesByTo {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
-  '/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
+  '/admin/approvals': typeof AuthenticatedAdminApprovalsRouteWithChildren
   '/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/admin/communications': typeof AuthenticatedAdminCommunicationsRoute
@@ -779,6 +787,7 @@ export interface FileRoutesByTo {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/approvals/audit': typeof AuthenticatedAdminApprovalsAuditRoute
   '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
   '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
   '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
@@ -841,7 +850,7 @@ export interface FileRoutesById {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
-  '/_authenticated/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
+  '/_authenticated/admin/approvals': typeof AuthenticatedAdminApprovalsRouteWithChildren
   '/_authenticated/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/_authenticated/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/_authenticated/admin/communications': typeof AuthenticatedAdminCommunicationsRoute
@@ -874,6 +883,7 @@ export interface FileRoutesById {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/approvals/audit': typeof AuthenticatedAdminApprovalsAuditRoute
   '/_authenticated/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
   '/_authenticated/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
   '/_authenticated/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
@@ -969,6 +979,7 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/$lang/solutions/'
     | '/admin/'
+    | '/admin/approvals/audit'
     | '/admin/customers/$id'
     | '/admin/invoices/$id'
     | '/admin/leads/$id'
@@ -1060,6 +1071,7 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/$lang/solutions'
     | '/admin'
+    | '/admin/approvals/audit'
     | '/admin/customers/$id'
     | '/admin/invoices/$id'
     | '/admin/leads/$id'
@@ -1154,6 +1166,7 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/$lang/solutions/'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/approvals/audit'
     | '/_authenticated/admin/customers/$id'
     | '/_authenticated/admin/invoices/$id'
     | '/_authenticated/admin/leads/$id'
@@ -1828,6 +1841,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCustomersIdRouteImport
       parentRoute: typeof AuthenticatedAdminCustomersRoute
     }
+    '/_authenticated/admin/approvals/audit': {
+      id: '/_authenticated/admin/approvals/audit'
+      path: '/audit'
+      fullPath: '/admin/approvals/audit'
+      preLoaderRoute: typeof AuthenticatedAdminApprovalsAuditRouteImport
+      parentRoute: typeof AuthenticatedAdminApprovalsRoute
+    }
     '/_authenticated/admin/quotations/$id/print': {
       id: '/_authenticated/admin/quotations/$id/print'
       path: '/print'
@@ -1837,6 +1857,21 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedAdminApprovalsRouteChildren {
+  AuthenticatedAdminApprovalsAuditRoute: typeof AuthenticatedAdminApprovalsAuditRoute
+}
+
+const AuthenticatedAdminApprovalsRouteChildren: AuthenticatedAdminApprovalsRouteChildren =
+  {
+    AuthenticatedAdminApprovalsAuditRoute:
+      AuthenticatedAdminApprovalsAuditRoute,
+  }
+
+const AuthenticatedAdminApprovalsRouteWithChildren =
+  AuthenticatedAdminApprovalsRoute._addFileChildren(
+    AuthenticatedAdminApprovalsRouteChildren,
+  )
 
 interface AuthenticatedAdminCustomersRouteChildren {
   AuthenticatedAdminCustomersIdRoute: typeof AuthenticatedAdminCustomersIdRoute
@@ -1954,7 +1989,7 @@ const AuthenticatedAdminUsersRouteWithChildren =
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
-  AuthenticatedAdminApprovalsRoute: typeof AuthenticatedAdminApprovalsRoute
+  AuthenticatedAdminApprovalsRoute: typeof AuthenticatedAdminApprovalsRouteWithChildren
   AuthenticatedAdminChangePasswordRoute: typeof AuthenticatedAdminChangePasswordRoute
   AuthenticatedAdminCommissionInvoicesRoute: typeof AuthenticatedAdminCommissionInvoicesRoute
   AuthenticatedAdminCommunicationsRoute: typeof AuthenticatedAdminCommunicationsRoute
@@ -1987,7 +2022,8 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
-  AuthenticatedAdminApprovalsRoute: AuthenticatedAdminApprovalsRoute,
+  AuthenticatedAdminApprovalsRoute:
+    AuthenticatedAdminApprovalsRouteWithChildren,
   AuthenticatedAdminChangePasswordRoute: AuthenticatedAdminChangePasswordRoute,
   AuthenticatedAdminCommissionInvoicesRoute:
     AuthenticatedAdminCommissionInvoicesRoute,
