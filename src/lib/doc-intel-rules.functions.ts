@@ -187,7 +187,7 @@ export const reapplyRulesToDocument = createServerFn({ method: "POST" })
       await context.supabase
         .from("doc_intel_tags")
         .upsert(
-          outcome.added_tags.map((tag) => ({ document_id: doc.id, tag })) as never,
+          outcome.added_tags.map((tag: string) => ({ document_id: doc.id, tag })) as never,
           { onConflict: "document_id,tag" as never },
         );
     }
@@ -196,7 +196,10 @@ export const reapplyRulesToDocument = createServerFn({ method: "POST" })
       actor_id: context.userId,
       action: "rules_reapplied",
       details: {
-        matched_rules: outcome.matched.map((m) => ({ id: m.id, name: m.name })),
+        matched_rules: outcome.matched.map((m: { id: string; name: string }) => ({
+          id: m.id,
+          name: m.name,
+        })),
         require_approval: outcome.requires_approval,
       },
     });
