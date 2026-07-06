@@ -33,7 +33,7 @@ function redact(email: string): string {
 }
 
 async function resolveEntityLabel(
-  admin: ReturnType<typeof createClient>,
+  admin: any,
   entityType: string,
   entityId: string,
 ): Promise<string | null> {
@@ -85,7 +85,7 @@ async function resolveEntityLabel(
 }
 
 async function resolveEmail(
-  admin: ReturnType<typeof createClient>,
+  admin: any,
   userId: string,
 ): Promise<string | null> {
   try {
@@ -98,7 +98,7 @@ async function resolveEmail(
 }
 
 async function resolveName(
-  admin: ReturnType<typeof createClient>,
+  admin: any,
   userId: string | null | undefined,
 ): Promise<string | null> {
   if (!userId) return null
@@ -115,7 +115,7 @@ async function resolveName(
 }
 
 async function enqueueForRecipient(
-  admin: ReturnType<typeof createClient>,
+  admin: any,
   recipient: string,
   subject: string,
   html: string,

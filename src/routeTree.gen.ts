@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -57,6 +58,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicClientLogRouteImport } from './routes/api/public/client-log'
 import { Route as ApiPublicBootstrapSuperAdminRouteImport } from './routes/api/public/bootstrap-super-admin'
+import { Route as ApiPublicApprovalNotifyRouteImport } from './routes/api/public/approval-notify'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTasksRouteImport } from './routes/_authenticated/admin.tasks'
 import { Route as AuthenticatedAdminSuppliersRouteImport } from './routes/_authenticated/admin.suppliers'
@@ -107,6 +109,11 @@ import { Route as AuthenticatedAdminCustomersIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminApprovalsAuditRouteImport } from './routes/_authenticated/admin.approvals.audit'
 import { Route as AuthenticatedAdminQuotationsIdPrintRouteImport } from './routes/_authenticated/admin.quotations.$id.print'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
   path: '/status',
@@ -352,6 +359,11 @@ const ApiPublicBootstrapSuperAdminRoute =
     path: '/api/public/bootstrap-super-admin',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicApprovalNotifyRoute = ApiPublicApprovalNotifyRouteImport.update({
+  id: '/api/public/approval-notify',
+  path: '/api/public/approval-notify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -649,6 +661,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/ai-assistant': typeof LangAiAssistantRoute
   '/$lang/ai-project-estimator': typeof LangAiProjectEstimatorRoute
@@ -717,6 +730,7 @@ export interface FileRoutesByFullPath {
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
+  '/api/public/approval-notify': typeof ApiPublicApprovalNotifyRoute
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
@@ -746,6 +760,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/ai-assistant': typeof LangAiAssistantRoute
   '/$lang/ai-project-estimator': typeof LangAiProjectEstimatorRoute
@@ -813,6 +828,7 @@ export interface FileRoutesByTo {
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
+  '/api/public/approval-notify': typeof ApiPublicApprovalNotifyRoute
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
@@ -845,6 +861,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/ai-assistant': typeof LangAiAssistantRoute
   '/$lang/ai-project-estimator': typeof LangAiProjectEstimatorRoute
@@ -913,6 +930,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/_authenticated/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
+  '/api/public/approval-notify': typeof ApiPublicApprovalNotifyRoute
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
@@ -945,6 +963,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/status'
+    | '/unsubscribe'
     | '/$lang/about'
     | '/$lang/ai-assistant'
     | '/$lang/ai-project-estimator'
@@ -1013,6 +1032,7 @@ export interface FileRouteTypes {
     | '/admin/suppliers'
     | '/admin/tasks'
     | '/admin/users'
+    | '/api/public/approval-notify'
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
@@ -1042,6 +1062,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/status'
+    | '/unsubscribe'
     | '/$lang/about'
     | '/$lang/ai-assistant'
     | '/$lang/ai-project-estimator'
@@ -1109,6 +1130,7 @@ export interface FileRouteTypes {
     | '/admin/suppliers'
     | '/admin/tasks'
     | '/admin/users'
+    | '/api/public/approval-notify'
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
@@ -1140,6 +1162,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/status'
+    | '/unsubscribe'
     | '/$lang/about'
     | '/$lang/ai-assistant'
     | '/$lang/ai-project-estimator'
@@ -1208,6 +1231,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/suppliers'
     | '/_authenticated/admin/tasks'
     | '/_authenticated/admin/users'
+    | '/api/public/approval-notify'
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
@@ -1240,11 +1264,13 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   AdminLoginRoute: typeof AdminLoginRoute
   ApiChatRoute: typeof ApiChatRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   KnowledgeSplatRoute: typeof KnowledgeSplatRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
+  ApiPublicApprovalNotifyRoute: typeof ApiPublicApprovalNotifyRoute
   ApiPublicBootstrapSuperAdminRoute: typeof ApiPublicBootstrapSuperAdminRoute
   ApiPublicClientLogRoute: typeof ApiPublicClientLogRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
@@ -1258,6 +1284,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/status': {
       id: '/status'
       path: '/status'
@@ -1592,6 +1625,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/bootstrap-super-admin'
       fullPath: '/api/public/bootstrap-super-admin'
       preLoaderRoute: typeof ApiPublicBootstrapSuperAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/approval-notify': {
+      id: '/api/public/approval-notify'
+      path: '/api/public/approval-notify'
+      fullPath: '/api/public/approval-notify'
+      preLoaderRoute: typeof ApiPublicApprovalNotifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/users': {
@@ -2252,11 +2292,13 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   AdminLoginRoute: AdminLoginRoute,
   ApiChatRoute: ApiChatRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   KnowledgeSplatRoute: KnowledgeSplatRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
+  ApiPublicApprovalNotifyRoute: ApiPublicApprovalNotifyRoute,
   ApiPublicBootstrapSuperAdminRoute: ApiPublicBootstrapSuperAdminRoute,
   ApiPublicClientLogRoute: ApiPublicClientLogRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
