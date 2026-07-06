@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { useMemo, useState } from "react";
@@ -101,7 +102,7 @@ export const Route = createFileRoute("/$lang/pir-vs-rock-wool")({
 // ---------------- Data ----------------
 type Row = {
   label: string;
-  icon: any;
+  icon: LucideIcon;
   pir: string;
   rw: string;
   winner: "PIR" | "RW" | "TIE";
@@ -197,7 +198,7 @@ const APPLICATIONS: {
   img: string;
   recommend: "PIR" | "RW" | "EITHER";
   reason: string;
-  icon: any;
+  icon: LucideIcon;
 }[] = [
   {
     key: "Cold Storage",

@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { useMemo, useState } from "react";
@@ -155,7 +156,7 @@ type SectionKey =
   | "quality"
   | "analytics";
 
-const NAV: { key: SectionKey; label: string; icon: any }[] = [
+const NAV: { key: SectionKey; label: string; icon: LucideIcon }[] = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { key: "projects", label: "Projects", icon: FolderKanban },
   { key: "timeline", label: "Project Timeline", icon: GitBranch },
@@ -588,7 +589,7 @@ function Stat({
   label: string;
   value: string;
   delta?: string;
-  icon: any;
+  icon: LucideIcon;
 }) {
   return (
     <GlassCard className="p-4">
@@ -823,7 +824,7 @@ function ProjectsSection() {
         ].map((f) => (
           <button
             key={f.k}
-            onClick={() => setFilter(f.k as any)}
+            onClick={() => setFilter(f.k as "all" | "current" | "completed" | "pending")}
             className={`rounded-full border px-3 py-1.5 text-xs transition
               ${filter === f.k ? "border-emerald-400/40 bg-emerald-500/15 text-emerald-300" : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10"}`}
           >

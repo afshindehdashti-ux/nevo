@@ -596,7 +596,10 @@ function FactoryLayoutPage() {
     });
   const showAllZones = () => setHiddenZones(new Set());
 
-  const cfg = { capacity, core, automation, building };
+  const cfg = useMemo(
+    () => ({ capacity, core, automation, building }),
+    [capacity, core, automation, building],
+  );
   const tech = useMemo(
     () => computeTechData(capacity, core, automation, building, shift),
     [capacity, core, automation, building, shift],

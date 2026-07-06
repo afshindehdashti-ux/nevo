@@ -212,7 +212,7 @@ function LogoEventsAdmin() {
         </div>
         <div className="space-y-1">
           <Label>Event type</Label>
-          <Select value={eventType} onValueChange={(v) => setEventType(v as any)}>
+          <Select value={eventType} onValueChange={(v) => setEventType(v as typeof eventType)}>
             <SelectTrigger className="w-36">
               <SelectValue />
             </SelectTrigger>
@@ -264,7 +264,7 @@ function LogoEventsAdmin() {
         </div>
         <div className="space-y-1">
           <Label>Bucket</Label>
-          <Select value={bucket} onValueChange={(v) => setBucket(v as any)}>
+          <Select value={bucket} onValueChange={(v) => setBucket(v as typeof bucket)}>
             <SelectTrigger className="w-28">
               <SelectValue />
             </SelectTrigger>

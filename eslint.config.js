@@ -37,5 +37,13 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "warn",
     },
   },
+  {
+    files: ["src/components/ui/**/*.tsx", "src/i18n/LanguageProvider.tsx"],
+    rules: {
+      // UI primitives and the language provider intentionally export helper
+      // functions alongside components; fast-refresh warnings are noise here.
+      "react-refresh/only-export-components": "off",
+    },
+  },
   eslintPluginPrettier,
 );

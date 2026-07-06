@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import type { LucideIcon } from "lucide-react";
 import {
   Sparkles,
   MapPin,
@@ -259,6 +260,66 @@ function estimate(
     risk,
     workingDays,
   };
+}
+
+type EstimationResult = ReturnType<typeof estimate>;
+
+interface StepShellProps {
+  n: number;
+  label: string;
+  icon: LucideIcon;
+  children: React.ReactNode;
+  last?: boolean;
+}
+
+interface ResultsHeaderProps {
+  panel: PanelKey;
+  auto: AutomationKey;
+  capacity: Capacity;
+  country: Country;
+}
+
+interface KpiRowProps {
+  r: EstimationResult;
+}
+
+interface ProjectSummaryProps {
+  r: EstimationResult;
+}
+
+interface FinancialChartsProps {
+  r: EstimationResult;
+}
+
+interface ChartCardProps {
+  title: string;
+  pill?: string;
+  children: React.ReactNode;
+}
+
+interface BarBiChartProps {
+  inflows: number[];
+  outflows: number[];
+  labels: string[];
+}
+
+interface LineChartProps {
+  values: number[];
+  labels: string[];
+  suffix?: string;
+  showZero?: boolean;
+}
+
+interface BarChartMiniProps {
+  values: number[];
+  labels: string[];
+}
+
+interface LayoutAndRecommendProps {
+  panel: PanelKey;
+  auto: AutomationKey;
+  ftype: FactoryType;
+  r: EstimationResult;
 }
 
 const fmtUSD = (n: number) => {
@@ -615,7 +676,7 @@ function EstimatorPage() {
 }
 
 /* ─── Sub components ─── */
-function StepShell({ n, label, icon: Icon, children, last }: any) {
+function StepShell({ n, label, icon: Icon, children, last }: StepShellProps) {
   return (
     <div className={`${last ? "" : "mb-3 border-b border-white/5 pb-3"}`}>
       <div className="mb-2 flex items-center gap-2 text-[11px] uppercase tracking-wider text-white/60">
@@ -653,7 +714,7 @@ function PreEstimate({ onGenerate, busy }: { onGenerate: () => void; busy: boole
   );
 }
 
-function ResultsHeader({ panel, auto, capacity, country }: any) {
+function ResultsHeader({ panel, auto, capacity, country }: ResultsHeaderProps) {
   const id = `NEVO-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999)).padStart(4, "0")}`;
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
@@ -684,7 +745,7 @@ function ResultsHeader({ panel, auto, capacity, country }: any) {
   );
 }
 
-function KpiRow({ r }: any) {
+function KpiRow({ r }: KpiRowProps) {
   const items = [
     { l: "Total Investment", v: fmtUSD(r.capex), s: "± 8% Accuracy", i: DollarSign },
     {
@@ -737,7 +798,7 @@ function KpiRow({ r }: any) {
   );
 }
 
-function ProjectSummary({ r }: any) {
+function ProjectSummary({ r }: ProjectSummaryProps) {
   const rows = [
     { i: Building2, l: "Land Area", v: `${fmt(r.landArea)} m²` },
     { i: Factory, l: "Building Area", v: `${fmt(r.buildingArea)} m²` },
@@ -777,7 +838,7 @@ function ProjectSummary({ r }: any) {
   );
 }
 
-function FinancialCharts({ r }: any) {
+function FinancialCharts({ r }: FinancialChartsProps) {
   // Cash flow: yearly, capex negative in Y0 ramp
   const yrs = [1, 2, 3, 4, 5];
   const ramp = [0.6, 0.75, 0.88, 0.95, 1.0];
@@ -819,7 +880,7 @@ function FinancialCharts({ r }: any) {
   );
 }
 
-function ChartCard({ title, pill, children }: any) {
+function ChartCard({ title, pill, children }: ChartCardProps) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
       <div className="mb-3 flex items-center justify-between text-xs">
@@ -846,7 +907,7 @@ function ChartLegend({ items }: { items: [string, string][] }) {
     </div>
   );
 }
-function BarBiChart({ inflows, outflows, labels }: any) {
+function BarBiChart({ inflows, outflows, labels }: BarBiChartProps) {
   const max = Math.max(...inflows, ...outflows, 1);
   return (
     <div className="flex h-32 items-end gap-2">
@@ -870,7 +931,7 @@ function BarBiChart({ inflows, outflows, labels }: any) {
     </div>
   );
 }
-function LineChart({ values, labels, suffix, showZero }: any) {
+function LineChart({ values, labels, suffix, showZero }: LineChartProps) {
   const min = Math.min(...values, showZero ? 0 : values[0]);
   const max = Math.max(...values);
   const range = Math.max(0.1, max - min);
@@ -904,7 +965,7 @@ function LineChart({ values, labels, suffix, showZero }: any) {
     </div>
   );
 }
-function BarChartMini({ values, labels }: any) {
+function BarChartMini({ values, labels }: BarChartMiniProps) {
   const max = Math.max(...values, 1);
   return (
     <div>
@@ -961,7 +1022,7 @@ function EquipmentRow() {
   );
 }
 
-function LayoutAndRecommend({ panel, auto, ftype, r }: any) {
+function LayoutAndRecommend({ panel, auto, ftype, r }: LayoutAndRecommendProps) {
   const zones = [
     "Raw Material Warehouse",
     "Roll Forming Line",

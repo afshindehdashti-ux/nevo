@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { useMemo, useState } from "react";
@@ -150,7 +151,7 @@ type Key =
   | "ai"
   | "mobile";
 
-const NAV: { key: Key; label: string; icon: any }[] = [
+const NAV: { key: Key; label: string; icon: LucideIcon }[] = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { key: "leads", label: "Leads", icon: Users },
   { key: "products", label: "Product Center", icon: Package },
@@ -891,7 +892,19 @@ function SalesChart() {
 }
 
 /* ─── Leads ─── */
-function LeadsPanel({ leads, query, setQuery, stage, setStage }: any) {
+function LeadsPanel({
+  leads,
+  query,
+  setQuery,
+  stage,
+  setStage,
+}: {
+  leads: typeof LEADS;
+  query: string;
+  setQuery: (v: string) => void;
+  stage: string;
+  setStage: (v: string) => void;
+}) {
   const stages = ["All", "New", "Contacted", "Proposal", "Negotiation", "Closed Won"];
   const stageTone: Record<string, "emerald" | "muted" | "amber"> = {
     New: "muted",
@@ -936,7 +949,7 @@ function LeadsPanel({ leads, query, setQuery, stage, setStage }: any) {
           <div>Expected Close</div>
           <div className="text-right">Action</div>
         </div>
-        {leads.map((l: any, i: number) => (
+        {leads.map((l, i) => (
           <div
             key={i}
             className="grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr_.6fr] items-center gap-3 border-b border-white/5 px-5 py-4 text-sm last:border-0 hover:bg-white/[0.02]"
