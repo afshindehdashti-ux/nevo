@@ -8,7 +8,11 @@ import {
   upsertQuotationItem,
   deleteQuotationItem,
   setQuotationStatus,
+  deleteQuotation,
+  convertQuotationToProforma,
+  listInquiriesLite,
 } from "@/lib/quotations.functions";
+import { listProjectsLite } from "@/lib/doc-intel.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -32,7 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CommunicationTimeline } from "@/components/crm/CommunicationTimeline";
-import { Trash2, Plus, Send, Check, X } from "lucide-react";
+import { Trash2, Plus, Send, Check, X, FileDown, ArrowRightCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/quotations/$id")({
@@ -49,6 +53,10 @@ function QuotationEditor() {
   const upsertItemFn = useServerFn(upsertQuotationItem);
   const deleteItemFn = useServerFn(deleteQuotationItem);
   const statusFn = useServerFn(setQuotationStatus);
+  const deleteFn = useServerFn(deleteQuotation);
+  const convertFn = useServerFn(convertQuotationToProforma);
+  const inquiriesFn = useServerFn(listInquiriesLite);
+  const projectsFn = useServerFn(listProjectsLite);
 
   const { data, isLoading } = useQuery({
     queryKey: ["quotation", id],
@@ -62,8 +70,19 @@ function QuotationEditor() {
     });
   }, []);
 
+  const { data: inquiries = [] } = useQuery({
+    queryKey: ["quotations", "inquiries-lite"],
+    queryFn: () => inquiriesFn(),
+  });
+  const { data: projects = [] } = useQuery({
+    queryKey: ["quotations", "projects-lite"],
+    queryFn: () => projectsFn(),
+  });
+
   const [form, setForm] = useState({
     customer_id: "",
+    inquiry_id: "",
+    project_id: "",
     issue_date: "",
     valid_until: "",
     currency: "USD",
@@ -77,6 +96,8 @@ function QuotationEditor() {
     if (data?.quotation) {
       setForm({
         customer_id: data.quotation.customer_id ?? "",
+        inquiry_id: data.quotation.inquiry_id ?? "",
+        project_id: data.quotation.project_id ?? "",
         issue_date: data.quotation.issue_date ?? "",
         valid_until: data.quotation.valid_until ?? "",
         currency: data.quotation.currency ?? "USD",
@@ -94,6 +115,8 @@ function QuotationEditor() {
         data: {
           id,
           customer_id: form.customer_id || null,
+          inquiry_id: form.inquiry_id || null,
+          project_id: form.project_id || null,
           issue_date: form.issue_date || undefined,
           valid_until: form.valid_until || null,
           currency: form.currency,
@@ -166,6 +189,27 @@ function QuotationEditor() {
     },
   });
 
+  const del = useMutation({
+    mutationFn: () => deleteFn({ data: { id } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["quotations"] });
+      toast.success("Quotation deleted");
+      navigate({ to: "/admin/quotations" });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const convert = useMutation({
+    mutationFn: () => convertFn({ data: { id } }),
+    onSuccess: (r) => {
+      qc.invalidateQueries({ queryKey: ["quotation", id] });
+      qc.invalidateQueries({ queryKey: ["quotations"] });
+      toast.success(r.already ? "Already converted — opening proforma" : "Proforma invoice created");
+      if (r.invoice_id) navigate({ to: "/admin/invoices/$id", params: { id: r.invoice_id } });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading…</div>;
   if (!data) return <div className="p-6">Not found.</div>;
 
@@ -228,6 +272,40 @@ function QuotationEditor() {
               </Button>
             </>
           )}
+          {(q.status === "accepted" || q.status === "approved") && !q.converted_invoice_id && (
+            <Button variant="secondary" onClick={() => convert.mutate()} disabled={convert.isPending}>
+              <ArrowRightCircle className="h-4 w-4 mr-1" />
+              {convert.isPending ? "Converting…" : "Convert to proforma"}
+            </Button>
+          )}
+          {q.converted_invoice_id && (
+            <Button
+              variant="secondary"
+              onClick={() =>
+                navigate({ to: "/admin/invoices/$id", params: { id: q.converted_invoice_id! } })
+              }
+            >
+              <ArrowRightCircle className="h-4 w-4 mr-1" />
+              Open proforma
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            onClick={() => window.open(`/admin/quotations/${id}/print`, "_blank")}
+          >
+            <FileDown className="h-4 w-4 mr-1" />
+            PDF
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-destructive hover:text-destructive"
+            onClick={() => {
+              if (confirm("Delete this quotation? This cannot be undone.")) del.mutate();
+            }}
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Delete
+          </Button>
         </div>
       </div>
 
@@ -279,6 +357,42 @@ function QuotationEditor() {
                 value={form.vat_rate}
                 onChange={(e) => setForm((f) => ({ ...f, vat_rate: Number(e.target.value) }))}
               />
+            </div>
+            <div>
+              <Label>Lead / inquiry</Label>
+              <Select
+                value={form.inquiry_id || "__none"}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, inquiry_id: v === "__none" ? "" : v }))
+                }
+              >
+                <SelectTrigger><SelectValue placeholder="No lead" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none">— None —</SelectItem>
+                  {inquiries.map((i) => (
+                    <SelectItem key={i.id} value={i.id}>
+                      {i.name}{i.company ? ` · ${i.company}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Project</Label>
+              <Select
+                value={form.project_id || "__none"}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, project_id: v === "__none" ? "" : v }))
+                }
+              >
+                <SelectTrigger><SelectValue placeholder="No project" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none">— None —</SelectItem>
+                  {projects.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>{p.project_name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div>

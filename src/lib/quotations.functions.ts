@@ -161,3 +161,123 @@ export const setQuotationStatus = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export const deleteQuotation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => IdInput.parse(v))
+  .handler(async ({ context, data }) => {
+    // delete items first (in case FK isn't cascade)
+    await context.supabase.from("quotation_items").delete().eq("quotation_id", data.id);
+    const { error } = await context.supabase.from("quotations").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const listInquiriesLite = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data } = await context.supabase
+      .from("project_inquiries")
+      .select("id, name, company, project_type, status, created_at")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    return (data ?? []) as {
+      id: string;
+      name: string;
+      company: string | null;
+      project_type: string | null;
+      status: string;
+      created_at: string;
+    }[];
+  });
+
+/**
+ * Convert an approved/accepted quotation into a proforma invoice.
+ * Copies line items, sets the quotation to `converted`, and links back
+ * via quotations.converted_invoice_id.
+ */
+export const convertQuotationToProforma = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        due_date: z.string().nullable().optional(),
+      })
+      .parse(v),
+  )
+  .handler(async ({ context, data }) => {
+    const [{ data: q, error: qErr }, { data: items, error: iErr }] = await Promise.all([
+      context.supabase
+        .from("quotations")
+        .select(
+          "id, customer_id, currency, vat_rate, subtotal, vat_amount, total, terms, notes, converted_invoice_id, status",
+        )
+        .eq("id", data.id)
+        .maybeSingle(),
+      context.supabase
+        .from("quotation_items")
+        .select("description, quantity, unit, unit_price, discount_pct, position, product_id")
+        .eq("quotation_id", data.id)
+        .order("position"),
+    ]);
+    if (qErr) throw new Error(qErr.message);
+    if (iErr) throw new Error(iErr.message);
+    if (!q) throw new Error("Quotation not found");
+    if (!q.customer_id) throw new Error("Quotation has no customer");
+    if (q.converted_invoice_id) {
+      return { invoice_id: q.converted_invoice_id, already: true };
+    }
+
+    const { data: inv, error: invErr } = await context.supabase
+      .from("invoices")
+      .insert({
+        type: "proforma",
+        status: "draft",
+        customer_id: q.customer_id,
+        currency: q.currency,
+        issue_date: new Date().toISOString().slice(0, 10),
+        due_date: data.due_date ?? null,
+        subtotal: Number(q.subtotal ?? 0),
+        vat_amount: Number(q.vat_amount ?? 0),
+        total: Number(q.total ?? 0),
+        notes: q.notes ?? null,
+      })
+      .select("id")
+      .maybeSingle();
+    if (invErr) throw new Error(invErr.message);
+    if (!inv?.id) throw new Error("Could not create proforma invoice");
+
+    if ((items ?? []).length > 0) {
+      const rate = Number(q.vat_rate ?? 0);
+      const rows = (items ?? []).map((it) => {
+        const qty = Number(it.quantity ?? 0);
+        const price = Number(it.unit_price ?? 0);
+        const discount = Number(it.discount_pct ?? 0);
+        const line_total = Math.round(qty * price * (1 - discount / 100) * 100) / 100;
+        return {
+          invoice_id: inv.id,
+          description: it.description,
+          quantity: qty,
+          unit: it.unit ?? "unit",
+          unit_price: price,
+          discount_pct: discount,
+          vat_pct: rate,
+          line_total,
+          position: it.position,
+          product_id: it.product_id ?? null,
+        };
+      });
+      const { error: itemsErr } = await context.supabase.from("invoice_items").insert(rows);
+      if (itemsErr) throw new Error(itemsErr.message);
+    }
+
+    const { error: linkErr } = await context.supabase
+      .from("quotations")
+      .update({ converted_invoice_id: inv.id, status: "converted" })
+      .eq("id", data.id);
+    if (linkErr) throw new Error(linkErr.message);
+
+    return { invoice_id: inv.id, already: false };
+  });
+
