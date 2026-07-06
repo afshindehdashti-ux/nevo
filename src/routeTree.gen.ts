@@ -69,6 +69,7 @@ import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authenticated/admin.invoices'
 import { Route as AuthenticatedAdminFilesRouteImport } from './routes/_authenticated/admin.files'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
+import { Route as AuthenticatedAdminControlPanelRouteImport } from './routes/_authenticated/admin.control-panel'
 import { Route as AuthenticatedAdminCommissionInvoicesRouteImport } from './routes/_authenticated/admin.commission-invoices'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
 import { Route as LangSolutionsSandwichPanelsRouteImport } from './routes/$lang.solutions.sandwich-panels'
@@ -396,6 +397,12 @@ const AuthenticatedAdminCustomersRoute =
     path: '/customers',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminControlPanelRoute =
+  AuthenticatedAdminControlPanelRouteImport.update({
+    id: '/control-panel',
+    path: '/control-panel',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminCommissionInvoicesRoute =
   AuthenticatedAdminCommissionInvoicesRouteImport.update({
     id: '/commission-invoices',
@@ -496,6 +503,7 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
+  '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
@@ -564,6 +572,7 @@ export interface FileRoutesByTo {
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
+  '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
@@ -636,6 +645,7 @@ export interface FileRoutesById {
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/_authenticated/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
+  '/_authenticated/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/_authenticated/admin/files': typeof AuthenticatedAdminFilesRoute
   '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
@@ -708,6 +718,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/sandwich-panels'
     | '/admin/activity'
     | '/admin/commission-invoices'
+    | '/admin/control-panel'
     | '/admin/customers'
     | '/admin/files'
     | '/admin/invoices'
@@ -776,6 +787,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/sandwich-panels'
     | '/admin/activity'
     | '/admin/commission-invoices'
+    | '/admin/control-panel'
     | '/admin/customers'
     | '/admin/files'
     | '/admin/invoices'
@@ -847,6 +859,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/sandwich-panels'
     | '/_authenticated/admin/activity'
     | '/_authenticated/admin/commission-invoices'
+    | '/_authenticated/admin/control-panel'
     | '/_authenticated/admin/customers'
     | '/_authenticated/admin/files'
     | '/_authenticated/admin/invoices'
@@ -1312,6 +1325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCustomersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/control-panel': {
+      id: '/_authenticated/admin/control-panel'
+      path: '/control-panel'
+      fullPath: '/admin/control-panel'
+      preLoaderRoute: typeof AuthenticatedAdminControlPanelRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/commission-invoices': {
       id: '/_authenticated/admin/commission-invoices'
       path: '/commission-invoices'
@@ -1395,6 +1415,7 @@ const AuthenticatedAdminUsersRouteWithChildren =
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
   AuthenticatedAdminCommissionInvoicesRoute: typeof AuthenticatedAdminCommissionInvoicesRoute
+  AuthenticatedAdminControlPanelRoute: typeof AuthenticatedAdminControlPanelRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
   AuthenticatedAdminFilesRoute: typeof AuthenticatedAdminFilesRoute
   AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRoute
@@ -1419,6 +1440,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
   AuthenticatedAdminCommissionInvoicesRoute:
     AuthenticatedAdminCommissionInvoicesRoute,
+  AuthenticatedAdminControlPanelRoute: AuthenticatedAdminControlPanelRoute,
   AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
   AuthenticatedAdminFilesRoute: AuthenticatedAdminFilesRoute,
   AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRoute,

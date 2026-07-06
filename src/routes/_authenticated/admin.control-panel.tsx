@@ -35,7 +35,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 
-const ROLE_LABEL: Record<AppRole, string> = {
+const ROLE_LABEL: Partial<Record<AppRole, string>> = {
   super_admin: "Super Admin",
   management: "Management",
   sales: "Sales",
@@ -43,6 +43,14 @@ const ROLE_LABEL: Record<AppRole, string> = {
   finance: "Finance",
   read_only: "Read Only",
 };
+const ROLE_ORDER: AppRole[] = [
+  "super_admin",
+  "management",
+  "sales",
+  "operations",
+  "finance",
+  "read_only",
+];
 
 export const Route = createFileRoute("/_authenticated/admin/control-panel")({
   head: () => ({
