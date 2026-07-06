@@ -1,11 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsSuperAdmin, useCurrentUser } from "@/lib/crm-hooks";
-import { inviteTeamMember, sendPasswordReset } from "@/lib/crm-admin.functions";
+import { sendPasswordReset } from "@/lib/crm-admin.functions";
 import type { Database } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
@@ -28,15 +28,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { ShieldAlert, UserPlus, KeyRound } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -123,36 +114,7 @@ function UsersPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
-  const inviteFn = useServerFn(inviteTeamMember);
   const resetFn = useServerFn(sendPasswordReset);
-  const [inviteOpen, setInviteOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteName, setInviteName] = useState("");
-  const [inviteTitle, setInviteTitle] = useState("");
-  const [inviteRole, setInviteRole] = useState<AppRole>("sales");
-
-  const invite = useMutation({
-    mutationFn: () =>
-      inviteFn({
-        data: {
-          email: inviteEmail.trim(),
-          fullName: inviteName.trim(),
-          jobTitle: inviteTitle.trim() || null,
-          role: inviteRole,
-        },
-      }),
-    onSuccess: () => {
-      toast.success(`Invitation sent to ${inviteEmail}`);
-      setInviteOpen(false);
-      setInviteEmail("");
-      setInviteName("");
-      setInviteTitle("");
-      setInviteRole("sales");
-      qc.invalidateQueries({ queryKey: ["profiles-list"] });
-      qc.invalidateQueries({ queryKey: ["user-roles-list"] });
-    },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to invite user"),
-  });
 
   const resetPw = useMutation({
     mutationFn: (email: string) => resetFn({ data: { email } }),
@@ -170,74 +132,11 @@ function UsersPage() {
           </p>
         </div>
         {isSuperAdmin && (
-          <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-2">
-                <UserPlus className="h-4 w-4" /> Invite user
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Invite team member</DialogTitle>
-                <DialogDescription>
-                  They will receive an email to set their password and sign in to the CRM.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-3">
-                <div className="space-y-1.5">
-                  <Label>Full name</Label>
-                  <Input
-                    value={inviteName}
-                    onChange={(e) => setInviteName(e.target.value)}
-                    placeholder="Jane Doe"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Work email</Label>
-                  <Input
-                    type="email"
-                    value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
-                    placeholder="jane@nevoindustrial.com"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Job title</Label>
-                  <Input
-                    value={inviteTitle}
-                    onChange={(e) => setInviteTitle(e.target.value)}
-                    placeholder="Sales Manager"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Role</Label>
-                  <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as AppRole)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ROLES.map((r) => (
-                        <SelectItem key={r.value} value={r.value}>
-                          {r.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="ghost" onClick={() => setInviteOpen(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  onClick={() => invite.mutate()}
-                  disabled={invite.isPending || !inviteEmail || !inviteName}
-                >
-                  {invite.isPending ? "Sending…" : "Send invitation"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button asChild size="sm" className="gap-2">
+            <Link to="/admin/users/invite">
+              <UserPlus className="h-4 w-4" /> Invite user
+            </Link>
+          </Button>
         )}
       </div>
 

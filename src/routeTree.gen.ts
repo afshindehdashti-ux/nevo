@@ -75,6 +75,7 @@ import { Route as LangSolutionsProductionLinesRouteImport } from './routes/$lang
 import { Route as LangSolutionsFactoryDevelopmentRouteImport } from './routes/$lang.solutions.factory-development'
 import { Route as LangSolutionsEngineeringConsultancyRouteImport } from './routes/$lang.solutions.engineering-consultancy'
 import { Route as LangKnowledgeHubSlugRouteImport } from './routes/$lang.knowledge-hub.$slug'
+import { Route as AuthenticatedAdminUsersInviteRouteImport } from './routes/_authenticated/admin.users.invite'
 
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
@@ -428,6 +429,12 @@ const LangKnowledgeHubSlugRoute = LangKnowledgeHubSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => LangKnowledgeHubRoute,
 } as any)
+const AuthenticatedAdminUsersInviteRoute =
+  AuthenticatedAdminUsersInviteRouteImport.update({
+    id: '/invite',
+    path: '/invite',
+    getParentRoute: () => AuthenticatedAdminUsersRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -490,11 +497,12 @@ export interface FileRoutesByFullPath {
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -555,11 +563,12 @@ export interface FileRoutesByTo {
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -624,11 +633,12 @@ export interface FileRoutesById {
   '/_authenticated/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/_authenticated/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/_authenticated/admin/tasks': typeof AuthenticatedAdminTasksRoute
-  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -698,6 +708,7 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/$lang/solutions/'
     | '/admin/'
+    | '/admin/users/invite'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -763,6 +774,7 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/$lang/solutions'
     | '/admin'
+    | '/admin/users/invite'
   id:
     | '__root__'
     | '/'
@@ -831,6 +843,7 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/$lang/solutions/'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/users/invite'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1314,8 +1327,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangKnowledgeHubSlugRouteImport
       parentRoute: typeof LangKnowledgeHubRoute
     }
+    '/_authenticated/admin/users/invite': {
+      id: '/_authenticated/admin/users/invite'
+      path: '/invite'
+      fullPath: '/admin/users/invite'
+      preLoaderRoute: typeof AuthenticatedAdminUsersInviteRouteImport
+      parentRoute: typeof AuthenticatedAdminUsersRoute
+    }
   }
 }
+
+interface AuthenticatedAdminUsersRouteChildren {
+  AuthenticatedAdminUsersInviteRoute: typeof AuthenticatedAdminUsersInviteRoute
+}
+
+const AuthenticatedAdminUsersRouteChildren: AuthenticatedAdminUsersRouteChildren =
+  {
+    AuthenticatedAdminUsersInviteRoute: AuthenticatedAdminUsersInviteRoute,
+  }
+
+const AuthenticatedAdminUsersRouteWithChildren =
+  AuthenticatedAdminUsersRoute._addFileChildren(
+    AuthenticatedAdminUsersRouteChildren,
+  )
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCommissionInvoicesRoute: typeof AuthenticatedAdminCommissionInvoicesRoute
@@ -1335,7 +1369,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSolutionsSeoRoute: typeof AuthenticatedAdminSolutionsSeoRoute
   AuthenticatedAdminSuppliersRoute: typeof AuthenticatedAdminSuppliersRoute
   AuthenticatedAdminTasksRoute: typeof AuthenticatedAdminTasksRoute
-  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -1359,7 +1393,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminSolutionsSeoRoute: AuthenticatedAdminSolutionsSeoRoute,
   AuthenticatedAdminSuppliersRoute: AuthenticatedAdminSuppliersRoute,
   AuthenticatedAdminTasksRoute: AuthenticatedAdminTasksRoute,
-  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRouteWithChildren,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
