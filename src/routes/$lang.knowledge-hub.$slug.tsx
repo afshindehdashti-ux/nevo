@@ -1,4 +1,4 @@
-import { createFileRoute, notFound, useRouter } from "@tanstack/react-router";
+import { createFileRoute, notFound, useParams, useRouter } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import {
   ArrowRight,
