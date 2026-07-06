@@ -376,6 +376,8 @@ function ActionBadge({ action }: { action: string }) {
     approve: "default",
     update: "secondary",
     create: "outline",
+    sign_in: "default",
   };
   return <Badge variant={variant[action] ?? "outline"}>{action}</Badge>;
 }
+
