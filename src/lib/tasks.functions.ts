@@ -51,8 +51,10 @@ export const upsertTask = createServerFn({ method: "POST" })
   .inputValidator((v) => UpsertInput.parse(v))
   .handler(async ({ context, data }) => {
     if (data.id) {
-      const patch: Record<string, unknown> = { ...data };
-      if (data.status === "done") patch.completed_at = new Date().toISOString();
+      const patch = {
+        ...data,
+        ...(data.status === "done" ? { completed_at: new Date().toISOString() } : {}),
+      };
       const { error } = await context.supabase.from("tasks").update(patch).eq("id", data.id);
       if (error) throw new Error(error.message);
       return { id: data.id };
@@ -72,8 +74,10 @@ export const setTaskStatus = createServerFn({ method: "POST" })
     z.object({ id: z.string().uuid(), status: StatusEnum }).parse(v),
   )
   .handler(async ({ context, data }) => {
-    const patch: Record<string, unknown> = { status: data.status };
-    if (data.status === "done") patch.completed_at = new Date().toISOString();
+    const patch = {
+      status: data.status,
+      ...(data.status === "done" ? { completed_at: new Date().toISOString() } : {}),
+    };
     const { error } = await context.supabase.from("tasks").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };

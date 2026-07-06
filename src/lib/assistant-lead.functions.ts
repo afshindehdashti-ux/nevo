@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
 const LeadInput = z.object({
-  full_name: z.string().min(1).max(200),
+  name: z.string().min(1).max(200),
   email: z.string().email(),
   company: z.string().max(200).nullable().optional(),
   phone: z.string().max(60).nullable().optional(),
@@ -19,7 +19,7 @@ const LeadInput = z.object({
  * chat when a visitor shows buying intent. Creates a project_inquiries row.
  */
 export const submitAssistantLead = createServerFn({ method: "POST" })
-  .inputValidator((v) => LeadInput.parse(v))
+  .inputValidator((v: unknown) => LeadInput.parse(v))
   .handler(async ({ data }) => {
     const url = process.env.SUPABASE_URL;
     const key = process.env.SUPABASE_PUBLISHABLE_KEY;
@@ -32,16 +32,15 @@ export const submitAssistantLead = createServerFn({ method: "POST" })
     const { data: row, error } = await supabase
       .from("project_inquiries")
       .insert({
-        full_name: data.full_name,
+        name: data.name,
         email: data.email,
         company: data.company ?? null,
         phone: data.phone ?? null,
         country: data.country ?? null,
         project_type: data.project_type ?? null,
         message: data.message ?? null,
-        source: "ai_assistant",
+        source_page: "ai-assistant",
         status: "new",
-        metadata: data.session_id ? { session_id: data.session_id } : {},
       })
       .select("id")
       .maybeSingle();

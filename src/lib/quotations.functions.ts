@@ -151,9 +151,12 @@ export const setQuotationStatus = createServerFn({ method: "POST" })
       .parse(v),
   )
   .handler(async ({ context, data }) => {
-    const patch: Record<string, unknown> = { status: data.status };
-    if (data.status === "sent") patch.sent_at = new Date().toISOString();
-    if (data.status === "accepted") patch.accepted_at = new Date().toISOString();
+    const now = new Date().toISOString();
+    const patch = {
+      status: data.status,
+      ...(data.status === "sent" ? { sent_at: now } : {}),
+      ...(data.status === "accepted" ? { accepted_at: now } : {}),
+    };
     const { error } = await context.supabase.from("quotations").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
