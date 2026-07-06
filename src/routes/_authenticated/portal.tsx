@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   getMyCustomerContext,
@@ -17,6 +17,7 @@ import {
   getMyTimeline,
   sendMyMessage,
   getMyMessageAttachmentUrl,
+  markMyMessagesRead,
 } from "@/lib/customer-portal.functions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -198,6 +199,22 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
     onError: (e: any) => toast.error(e?.message ?? "Failed to send"),
   });
 
+  const markMyMessagesReadFn = useServerFn(markMyMessagesRead);
+  const markRead = useMutation({
+    mutationFn: () => markMyMessagesReadFn({ data: { customer_id: customerId } }),
+    onSuccess: (res) => {
+      if (res?.marked) {
+        qc.invalidateQueries({ queryKey: ["portal", "messages", customerId] });
+      }
+    },
+  });
+
+  const unreadCount = messages.filter(
+    (m) => m.direction === "outbound" && !(m as any).read,
+  ).length;
+
+
+
 
   const proformas = invoices.filter((i) => i.type === "proforma");
   const commercialInvoices = invoices.filter((i) => i.type !== "proforma");
@@ -241,7 +258,12 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
           <KpiCard icon={FileText} label="Documents" value={docs.length} />
         </div>
 
-        <Tabs defaultValue="timeline">
+        <Tabs
+          defaultValue="timeline"
+          onValueChange={(v) => {
+            if (v === "messages" && unreadCount > 0) markRead.mutate();
+          }}
+        >
           <TabsList className="flex-wrap h-auto">
             <TabsTrigger value="timeline"><ActivityIcon className="h-3.5 w-3.5 mr-1" />Timeline</TabsTrigger>
             <TabsTrigger value="projects"><FolderKanban className="h-3.5 w-3.5 mr-1" />Projects</TabsTrigger>
@@ -252,7 +274,15 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
             <TabsTrigger value="payments"><Wallet className="h-3.5 w-3.5 mr-1" />Payments</TabsTrigger>
             <TabsTrigger value="shipments">Shipments</TabsTrigger>
             <TabsTrigger value="docs">Documents</TabsTrigger>
-            <TabsTrigger value="messages"><MessagesSquare className="h-3.5 w-3.5 mr-1" />Messages</TabsTrigger>
+            <TabsTrigger value="messages">
+              <MessagesSquare className="h-3.5 w-3.5 mr-1" />
+              Messages
+              {unreadCount > 0 && (
+                <Badge className="ml-1.5 h-4 min-w-4 px-1 text-[10px] leading-none bg-primary text-primary-foreground">
+                  {unreadCount}
+                </Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>
           </TabsList>
 
@@ -566,12 +596,20 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                         <div
                           key={m.id}
                           className={
-                            "rounded-md p-3 " +
+                            "rounded-md p-3 relative " +
                             (m.direction === "inbound"
                               ? "bg-muted/40 border border-border"
-                              : "bg-blue-50/60 border border-blue-100")
+                              : (m as any).read
+                                ? "bg-blue-50/60 border border-blue-100"
+                                : "bg-blue-50 border border-blue-300 ring-1 ring-blue-200")
                           }
                         >
+                          {m.direction === "outbound" && !(m as any).read && (
+                            <span
+                              className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary"
+                              aria-label="Unread"
+                            />
+                          )}
                           <div className="flex items-center justify-between gap-2 mb-1">
                             <div className="flex items-center gap-2 text-xs">
                               {m.direction === "inbound" ? (
@@ -580,7 +618,10 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                                 <ArrowUpRight className="h-3.5 w-3.5 text-blue-600" />
                               )}
                               <Badge variant="outline">{m.kind}</Badge>
-                              <span className="text-muted-foreground">
+                              <span className={
+                                "text-muted-foreground " +
+                                (m.direction === "outbound" && !(m as any).read ? "font-semibold text-foreground" : "")
+                              }>
                                 {m.contact_name ?? (m.direction === "inbound" ? "From you" : "From NEVO")}
                               </span>
                             </div>
