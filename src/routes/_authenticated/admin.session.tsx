@@ -213,11 +213,12 @@ function SessionStatusPage() {
                 {mine.map((r) => (
                   <span
                     key={r}
-                    className={`inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-medium ${ROLE_TONE[r]}`}
+                    className={`inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-medium ${ROLE_TONE[r] ?? "bg-muted text-muted-foreground border-border"}`}
                   >
-                    {ROLE_LABEL[r]}
+                    {ROLE_LABEL[r] ?? r}
                   </span>
                 ))}
+
               </div>
             )}
             <div className="pt-2 text-xs text-muted-foreground space-y-1">
