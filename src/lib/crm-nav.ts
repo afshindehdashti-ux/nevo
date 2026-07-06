@@ -154,6 +154,12 @@ export const CRM_NAV: CrmNavGroup[] = [
       },
       { title: "Users & Roles", url: "/admin/users", icon: UserCog, requiresSuperAdmin: true },
       { title: "Activity Log", url: "/admin/activity", icon: ScrollText, requiresSuperAdmin: true },
+      {
+        title: "Approvals",
+        url: "/admin/approvals",
+        icon: ShieldCheck,
+        allowedRoles: ["management", "finance"],
+      },
       { title: "Settings", url: "/admin/settings", icon: Settings, requiresSuperAdmin: true },
     ],
   },
