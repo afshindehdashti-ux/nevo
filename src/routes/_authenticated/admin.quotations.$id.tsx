@@ -53,6 +53,10 @@ function QuotationEditor() {
   const upsertItemFn = useServerFn(upsertQuotationItem);
   const deleteItemFn = useServerFn(deleteQuotationItem);
   const statusFn = useServerFn(setQuotationStatus);
+  const deleteFn = useServerFn(deleteQuotation);
+  const convertFn = useServerFn(convertQuotationToProforma);
+  const inquiriesFn = useServerFn(listInquiriesLite);
+  const projectsFn = useServerFn(listProjectsLite);
 
   const { data, isLoading } = useQuery({
     queryKey: ["quotation", id],
@@ -66,8 +70,19 @@ function QuotationEditor() {
     });
   }, []);
 
+  const { data: inquiries = [] } = useQuery({
+    queryKey: ["quotations", "inquiries-lite"],
+    queryFn: () => inquiriesFn(),
+  });
+  const { data: projects = [] } = useQuery({
+    queryKey: ["quotations", "projects-lite"],
+    queryFn: () => projectsFn(),
+  });
+
   const [form, setForm] = useState({
     customer_id: "",
+    inquiry_id: "",
+    project_id: "",
     issue_date: "",
     valid_until: "",
     currency: "USD",
