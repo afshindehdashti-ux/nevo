@@ -200,9 +200,29 @@ export const analyzeDocument = createServerFn({ method: "POST" })
     // Sanitize AI recommendations against server-enforced policy
     const isSensitive = SENSITIVE_CATEGORIES.has(analysis.category);
     const lowConfidence = (analysis.confidence_score ?? 0) < 0.85;
-    const requiresApproval = isSensitive || lowConfidence || analysis.requires_human_approval;
+    let requiresApproval = isSensitive || lowConfidence || analysis.requires_human_approval;
     let visibility = analysis.portal_visibility;
+    let confidentiality = analysis.confidentiality_level;
+    let destination = analysis.recommended_destination;
+    let folderPath = analysis.recommended_folder_path;
     if (isSensitive && visibility === "public") visibility = "none";
+
+    // Apply admin-defined routing rules
+    const { fetchEnabledRules, applyRulesToAnalysis, snapshotFromAnalysis } = await import(
+      "./doc-intel-rules.server"
+    );
+    const rules = await fetchEnabledRules(context.supabase as never);
+    const snap = snapshotFromAnalysis(analysis, doc.original_filename);
+    const ruleOutcome = applyRulesToAnalysis(
+      { ...snap, confidentiality_level: confidentiality, portal_visibility: visibility },
+      rules,
+    );
+    confidentiality = ruleOutcome.confidentiality;
+    visibility = ruleOutcome.visibility;
+    destination = ruleOutcome.destination;
+    folderPath = ruleOutcome.folder_path;
+    if (ruleOutcome.requires_approval) requiresApproval = true;
+    const extraTags = ruleOutcome.added_tags;
 
     // Persist extraction + AI fields
     await context.supabase.from("doc_intel_extractions").insert({
