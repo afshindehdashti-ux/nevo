@@ -420,7 +420,99 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
             </Card>
           </TabsContent>
 
-          <TabsContent value="messages">
+          <TabsContent value="messages" className="space-y-4">
+            <Card className="p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold">New message to NEVO</h3>
+                <select
+                  value={composeKind}
+                  onChange={(e) => setComposeKind(e.target.value as any)}
+                  className="text-xs border border-border rounded-md px-2 py-1 bg-background"
+                >
+                  <option value="email">Email</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="note">Note</option>
+                </select>
+              </div>
+              <input
+                type="text"
+                value={composeSubject}
+                onChange={(e) => setComposeSubject(e.target.value)}
+                placeholder="Subject (optional)"
+                className="w-full text-sm border border-border rounded-md px-3 py-2 bg-background"
+              />
+              <textarea
+                value={composeBody}
+                onChange={(e) => setComposeBody(e.target.value)}
+                placeholder="Write your message…"
+                rows={5}
+                className="w-full text-sm border border-border rounded-md px-3 py-2 bg-background resize-y"
+              />
+              {composeFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {composeFiles.map((f, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1 text-xs bg-muted rounded-md px-2 py-1"
+                    >
+                      <Paperclip className="h-3 w-3" />
+                      <span className="max-w-[160px] truncate">{f.name}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setComposeFiles((prev) => prev.filter((_, idx) => idx !== i))
+                        }
+                        className="text-muted-foreground hover:text-foreground"
+                        aria-label={`Remove ${f.name}`}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files ?? []);
+                      setComposeFiles((prev) => [...prev, ...files].slice(0, 10));
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Paperclip className="h-3.5 w-3.5 mr-1" />
+                    Attach files
+                  </Button>
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    Up to 10 files, 15 MB each
+                  </span>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={!composeBody.trim() || sendMessage.isPending}
+                  onClick={() => sendMessage.mutate()}
+                >
+                  {sendMessage.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                  ) : (
+                    <Send className="h-3.5 w-3.5 mr-1" />
+                  )}
+                  Send
+                </Button>
+              </div>
+            </Card>
+
+
             <Card className="p-6 space-y-3">
               {messages.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
