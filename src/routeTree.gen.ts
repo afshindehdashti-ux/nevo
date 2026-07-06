@@ -78,6 +78,7 @@ import { Route as LangSolutionsProductionLinesRouteImport } from './routes/$lang
 import { Route as LangSolutionsFactoryDevelopmentRouteImport } from './routes/$lang.solutions.factory-development'
 import { Route as LangSolutionsEngineeringConsultancyRouteImport } from './routes/$lang.solutions.engineering-consultancy'
 import { Route as LangKnowledgeHubSlugRouteImport } from './routes/$lang.knowledge-hub.$slug'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as AuthenticatedAdminUsersInviteRouteImport } from './routes/_authenticated/admin.users.invite'
 
 const StatusRoute = StatusRouteImport.update({
@@ -450,6 +451,12 @@ const LangKnowledgeHubSlugRoute = LangKnowledgeHubSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => LangKnowledgeHubRoute,
 } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminUsersInviteRoute =
   AuthenticatedAdminUsersInviteRouteImport.update({
     id: '/invite',
@@ -527,6 +534,7 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -596,6 +604,7 @@ export interface FileRoutesByTo {
   '/$lang/solutions': typeof LangSolutionsIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -669,6 +678,7 @@ export interface FileRoutesById {
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -742,6 +752,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/'
     | '/admin/'
     | '/admin/users/invite'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -811,6 +822,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions'
     | '/admin'
     | '/admin/users/invite'
+    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -883,6 +895,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/users/invite'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -901,6 +914,7 @@ export interface RootRouteChildren {
   ApiPublicBootstrapSuperAdminRoute: typeof ApiPublicBootstrapSuperAdminRoute
   ApiPublicClientLogRoute: typeof ApiPublicClientLogRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1388,6 +1402,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangKnowledgeHubSlugRouteImport
       parentRoute: typeof LangKnowledgeHubRoute
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/users/invite': {
       id: '/_authenticated/admin/users/invite'
       path: '/invite'
@@ -1574,6 +1595,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicBootstrapSuperAdminRoute: ApiPublicBootstrapSuperAdminRoute,
   ApiPublicClientLogRoute: ApiPublicClientLogRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
