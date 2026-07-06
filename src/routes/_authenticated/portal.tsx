@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 import {
   getMyCustomerContext,
   getMyOrders,
@@ -13,6 +15,8 @@ import {
   getMyPayments,
   getMyMessages,
   getMyTimeline,
+  sendMyMessage,
+  getMyMessageAttachmentUrl,
 } from "@/lib/customer-portal.functions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +45,10 @@ import {
   Activity as ActivityIcon,
   ArrowDownLeft,
   ArrowUpRight,
+  Paperclip,
+  Send,
+  X,
+  Loader2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/portal")({
@@ -140,6 +148,53 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
     queryKey: ["portal", "timeline", customerId],
     queryFn: () => timelineFn({ data: { customer_id: customerId } }),
   });
+
+  const qc = useQueryClient();
+  const sendMessageFn = useServerFn(sendMyMessage);
+  const attachmentUrlFn = useServerFn(getMyMessageAttachmentUrl);
+  const [composeKind, setComposeKind] = useState<"email" | "note" | "whatsapp">("email");
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeBody, setComposeBody] = useState("");
+  const [composeFiles, setComposeFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const sendMessage = useMutation({
+    mutationFn: async () => {
+      const attachments = await Promise.all(
+        composeFiles.map(async (f) => {
+          if (f.size > 15 * 1024 * 1024) throw new Error(`${f.name} exceeds 15 MB`);
+          const buf = await f.arrayBuffer();
+          let bin = "";
+          const bytes = new Uint8Array(buf);
+          const chunk = 0x8000;
+          for (let i = 0; i < bytes.length; i += chunk) {
+            bin += String.fromCharCode(...bytes.subarray(i, i + chunk));
+          }
+          return { name: f.name, mime: f.type || undefined, base64: btoa(bin) };
+        }),
+      );
+      return sendMessageFn({
+        data: {
+          customer_id: customerId,
+          kind: composeKind,
+          subject: composeSubject.trim() || null,
+          body: composeBody,
+          attachments,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Message sent");
+      setComposeSubject("");
+      setComposeBody("");
+      setComposeFiles([]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      qc.invalidateQueries({ queryKey: ["portal", "messages", customerId] });
+      qc.invalidateQueries({ queryKey: ["portal", "timeline", customerId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to send"),
+  });
+
 
   const proformas = invoices.filter((i) => i.type === "proforma");
   const commercialInvoices = invoices.filter((i) => i.type !== "proforma");
@@ -367,7 +422,99 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
             </Card>
           </TabsContent>
 
-          <TabsContent value="messages">
+          <TabsContent value="messages" className="space-y-4">
+            <Card className="p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold">New message to NEVO</h3>
+                <select
+                  value={composeKind}
+                  onChange={(e) => setComposeKind(e.target.value as any)}
+                  className="text-xs border border-border rounded-md px-2 py-1 bg-background"
+                >
+                  <option value="email">Email</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="note">Note</option>
+                </select>
+              </div>
+              <input
+                type="text"
+                value={composeSubject}
+                onChange={(e) => setComposeSubject(e.target.value)}
+                placeholder="Subject (optional)"
+                className="w-full text-sm border border-border rounded-md px-3 py-2 bg-background"
+              />
+              <textarea
+                value={composeBody}
+                onChange={(e) => setComposeBody(e.target.value)}
+                placeholder="Write your message…"
+                rows={5}
+                className="w-full text-sm border border-border rounded-md px-3 py-2 bg-background resize-y"
+              />
+              {composeFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {composeFiles.map((f, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1 text-xs bg-muted rounded-md px-2 py-1"
+                    >
+                      <Paperclip className="h-3 w-3" />
+                      <span className="max-w-[160px] truncate">{f.name}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setComposeFiles((prev) => prev.filter((_, idx) => idx !== i))
+                        }
+                        className="text-muted-foreground hover:text-foreground"
+                        aria-label={`Remove ${f.name}`}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files ?? []);
+                      setComposeFiles((prev) => [...prev, ...files].slice(0, 10));
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Paperclip className="h-3.5 w-3.5 mr-1" />
+                    Attach files
+                  </Button>
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    Up to 10 files, 15 MB each
+                  </span>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={!composeBody.trim() || sendMessage.isPending}
+                  onClick={() => sendMessage.mutate()}
+                >
+                  {sendMessage.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                  ) : (
+                    <Send className="h-3.5 w-3.5 mr-1" />
+                  )}
+                  Send
+                </Button>
+              </div>
+            </Card>
+
+
             <Card className="p-6 space-y-3">
               {messages.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
@@ -398,7 +545,32 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                         {m.body}
                       </div>
                     )}
+                    {Array.isArray((m as any).attachments) && (m as any).attachments.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {((m as any).attachments as Array<{ name: string; path: string }>).map((a, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const res = await attachmentUrlFn({
+                                  data: { customer_id: customerId, path: a.path },
+                                });
+                                if (res.url) window.open(res.url, "_blank", "noopener");
+                              } catch (e: any) {
+                                toast.error(e?.message ?? "Cannot open attachment");
+                              }
+                            }}
+                            className="inline-flex items-center gap-1 text-xs bg-muted hover:bg-muted/70 rounded-md px-2 py-1"
+                          >
+                            <Paperclip className="h-3 w-3" />
+                            <span className="max-w-[200px] truncate">{a.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
+
                 ))
               )}
             </Card>

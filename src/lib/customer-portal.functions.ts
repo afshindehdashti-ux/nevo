@@ -211,7 +211,7 @@ export const getMyMessages = createServerFn({ method: "GET" })
 
     const { data: rows, error } = await admin
       .from("communications")
-      .select("id, entity_type, entity_id, kind, direction, subject, body, occurred_at, contact_name")
+      .select("id, entity_type, entity_id, kind, direction, subject, body, occurred_at, contact_name, attachments")
       .or(filters.join(","))
       .order("occurred_at", { ascending: false })
       .limit(200);
@@ -284,5 +284,98 @@ export const getMyTimeline = createServerFn({ method: "GET" })
 
     events.sort((a, b) => (a.at < b.at ? 1 : -1));
     return events.slice(0, 100);
+  });
+
+const MessageAttachmentInput = z.object({
+  customer_id: z.string().uuid(),
+  path: z.string().min(1),
+});
+
+export const getMyMessageAttachmentUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => MessageAttachmentInput.parse(v))
+  .handler(async ({ context, data }) => {
+    const admin = await verifyCustomerAccess(context.userId, data.customer_id);
+    // Scope: only allow paths under this customer's folder OR attachments referenced by
+    // messages already visible to this customer.
+    const ownedPrefix = `customer/${data.customer_id}/`;
+    if (!data.path.startsWith(ownedPrefix)) {
+      const { data: rows } = await admin
+        .from("communications")
+        .select("attachments")
+        .eq("entity_type", "customer")
+        .eq("entity_id", data.customer_id);
+      const known = new Set<string>();
+      for (const r of rows ?? []) {
+        for (const a of (r.attachments as any[]) ?? []) if (a?.path) known.add(a.path);
+      }
+      if (!known.has(data.path)) throw new Error("Not authorized for this attachment");
+    }
+    const { data: signed, error } = await admin.storage
+      .from("crm-docs")
+      .createSignedUrl(data.path, 300);
+    if (error) throw new Error(error.message);
+    return { url: signed?.signedUrl ?? null };
+  });
+
+const AttachmentInput = z.object({
+  name: z.string().min(1).max(200),
+  mime: z.string().optional(),
+  base64: z.string().min(1),
+});
+
+const SendMessageInput = z.object({
+  customer_id: z.string().uuid(),
+  kind: z.enum(["note", "email", "whatsapp", "call", "meeting"]).default("email"),
+  subject: z.string().max(300).nullable().optional(),
+  body: z.string().min(1).max(20000),
+  attachments: z.array(AttachmentInput).max(10).optional(),
+});
+
+export const sendMyMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => SendMessageInput.parse(v))
+  .handler(async ({ context, data }) => {
+    const admin = await verifyCustomerAccess(context.userId, data.customer_id);
+
+    const uploaded: Array<{ name: string; path: string; size: number; mime?: string }> = [];
+    for (const a of data.attachments ?? []) {
+      const bytes = Buffer.from(a.base64, "base64");
+      if (bytes.byteLength > 15 * 1024 * 1024) {
+        throw new Error(`Attachment ${a.name} exceeds 15 MB limit`);
+      }
+      const safe = a.name.replace(/[^\w.\-]+/g, "_");
+      const path = `customer/${data.customer_id}/messages/${crypto.randomUUID()}-${safe}`;
+      const { error: upErr } = await admin.storage
+        .from("crm-docs")
+        .upload(path, bytes, { contentType: a.mime ?? "application/octet-stream", upsert: false });
+      if (upErr) throw new Error(upErr.message);
+      uploaded.push({ name: a.name, path, size: bytes.byteLength, mime: a.mime });
+    }
+
+    const { data: prof } = await admin
+      .from("profiles")
+      .select("full_name")
+      .eq("id", context.userId)
+      .maybeSingle();
+
+    const { data: row, error } = await admin
+      .from("communications")
+      .insert({
+        entity_type: "customer",
+        entity_id: data.customer_id,
+        kind: data.kind,
+        direction: "inbound",
+        subject: data.subject ?? null,
+        body: data.body,
+        attachments: uploaded,
+        contact_name: prof?.full_name ?? null,
+        user_id: context.userId,
+        occurred_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { ok: true, id: row!.id };
   });
 
