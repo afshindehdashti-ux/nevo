@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +19,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { formatMoney, formatDate } from "@/lib/crm-money";
 import {
   invoiceStatusVariant,
@@ -29,6 +31,7 @@ import {
   shipmentStatusLabel,
 } from "@/lib/crm-status";
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
+import { generateEntitySummary } from "@/lib/ai-summary.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/customers/$id")({
   head: () => ({
