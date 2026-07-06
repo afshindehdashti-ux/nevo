@@ -211,10 +211,10 @@ export const getMyMessages = createServerFn({ method: "GET" })
 
     const { data: rows, error } = await admin
       .from("communications")
-      .select("id, entity_type, entity_id, kind, direction, subject, body, occurred_at, contact_name, attachments")
+      .select("id, entity_type, entity_id, kind, direction, subject, body, occurred_at, contact_name, attachments, thread_id, parent_id")
       .or(filters.join(","))
-      .order("occurred_at", { ascending: false })
-      .limit(200);
+      .order("occurred_at", { ascending: true })
+      .limit(500);
     if (error) throw new Error(error.message);
     return rows ?? [];
   });
