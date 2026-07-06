@@ -136,6 +136,7 @@ export type Database = {
           payment_terms: string | null
           phone: string | null
           updated_at: string
+          updated_by: string | null
           vat_number: string | null
           whatsapp: string | null
         }
@@ -155,6 +156,7 @@ export type Database = {
           payment_terms?: string | null
           phone?: string | null
           updated_at?: string
+          updated_by?: string | null
           vat_number?: string | null
           whatsapp?: string | null
         }
@@ -174,6 +176,7 @@ export type Database = {
           payment_terms?: string | null
           phone?: string | null
           updated_at?: string
+          updated_by?: string | null
           vat_number?: string | null
           whatsapp?: string | null
         }
@@ -376,6 +379,7 @@ export type Database = {
           unit: string
           unit_price: number
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           category?: string | null
@@ -393,6 +397,7 @@ export type Database = {
           unit?: string
           unit_price?: number
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           category?: string | null
@@ -410,6 +415,7 @@ export type Database = {
           unit?: string
           unit_price?: number
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -580,6 +586,7 @@ export type Database = {
           payment_terms: string | null
           phone: string | null
           updated_at: string
+          updated_by: string | null
           vat_number: string | null
           whatsapp: string | null
         }
@@ -600,6 +607,7 @@ export type Database = {
           payment_terms?: string | null
           phone?: string | null
           updated_at?: string
+          updated_by?: string | null
           vat_number?: string | null
           whatsapp?: string | null
         }
@@ -620,6 +628,7 @@ export type Database = {
           payment_terms?: string | null
           phone?: string | null
           updated_at?: string
+          updated_by?: string | null
           vat_number?: string | null
           whatsapp?: string | null
         }
