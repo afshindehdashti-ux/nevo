@@ -286,6 +286,38 @@ export const getMyTimeline = createServerFn({ method: "GET" })
     return events.slice(0, 100);
   });
 
+const MessageAttachmentInput = z.object({
+  customer_id: z.string().uuid(),
+  path: z.string().min(1),
+});
+
+export const getMyMessageAttachmentUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => MessageAttachmentInput.parse(v))
+  .handler(async ({ context, data }) => {
+    const admin = await verifyCustomerAccess(context.userId, data.customer_id);
+    // Scope: only allow paths under this customer's folder OR attachments referenced by
+    // messages already visible to this customer.
+    const ownedPrefix = `customer/${data.customer_id}/`;
+    if (!data.path.startsWith(ownedPrefix)) {
+      const { data: rows } = await admin
+        .from("communications")
+        .select("attachments")
+        .eq("entity_type", "customer")
+        .eq("entity_id", data.customer_id);
+      const known = new Set<string>();
+      for (const r of rows ?? []) {
+        for (const a of (r.attachments as any[]) ?? []) if (a?.path) known.add(a.path);
+      }
+      if (!known.has(data.path)) throw new Error("Not authorized for this attachment");
+    }
+    const { data: signed, error } = await admin.storage
+      .from("crm-docs")
+      .createSignedUrl(data.path, 300);
+    if (error) throw new Error(error.message);
+    return { url: signed?.signedUrl ?? null };
+  });
+
 const AttachmentInput = z.object({
   name: z.string().min(1).max(200),
   mime: z.string().optional(),
