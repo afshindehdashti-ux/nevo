@@ -73,7 +73,7 @@ export const getMyPartnerDocuments = createServerFn({ method: "GET" })
     await assertLinked(context, data.partner_id);
     const { data: rows, error } = await context.supabase
       .from("doc_intel_documents")
-      .select("id, title, category, storage_path, mime_type, size_bytes, created_at, status")
+      .select("id, title, category, storage_bucket, storage_path, mime_type, file_size, created_at, status")
       .eq("partner_id", data.partner_id)
       .eq("status", "approved")
       .order("created_at", { ascending: false })
@@ -88,21 +88,17 @@ export const getMyPartnerDocumentUrl = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { data: doc, error } = await context.supabase
       .from("doc_intel_documents")
-      .select("storage_path, partner_id, status")
+      .select("storage_bucket, storage_path, partner_id, status")
       .eq("id", data.document_id)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!doc?.partner_id) throw new Error("Document not available");
     await assertLinked(context, doc.partner_id);
     if (doc.status !== "approved") throw new Error("Document not approved");
-    const path = doc.storage_path as string;
-    if (!path) throw new Error("Missing storage path");
-    // storage_path is stored as "<bucket>/<key>"
-    const [bucket, ...rest] = path.split("/");
-    const key = rest.join("/");
+    if (!doc.storage_bucket || !doc.storage_path) throw new Error("Missing storage path");
     const { data: signed, error: sErr } = await context.supabase.storage
-      .from(bucket)
-      .createSignedUrl(key, 60 * 10);
+      .from(doc.storage_bucket)
+      .createSignedUrl(doc.storage_path, 60 * 10);
     if (sErr) throw new Error(sErr.message);
     return { url: signed?.signedUrl ?? null };
   });

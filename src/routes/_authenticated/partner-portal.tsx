@@ -277,7 +277,7 @@ function PartnerContent({ partnerId, partnerName }: { partnerId: string; partner
                 rows={docs.map((d) => [
                   <span className="font-medium">{d.title}</span>,
                   d.category ?? "—",
-                  d.size_bytes ? `${Math.round(Number(d.size_bytes) / 1024)} KB` : "—",
+                  d.file_size ? `${Math.round(Number(d.file_size) / 1024)} KB` : "—",
                   new Date(d.created_at).toLocaleDateString(),
                   <Button size="sm" variant="outline" onClick={() => download(d.id)}>
                     <Download className="h-3.5 w-3.5 mr-1" /> Open
