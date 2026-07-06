@@ -542,6 +542,7 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                       <div className="text-sm text-muted-foreground whitespace-pre-wrap mt-1">
                         {m.body}
                       </div>
+                    )}
                     {Array.isArray((m as any).attachments) && (m as any).attachments.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
                         {((m as any).attachments as Array<{ name: string; path: string }>).map((a, i) => (
