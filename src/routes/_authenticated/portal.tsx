@@ -151,6 +151,7 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
 
   const qc = useQueryClient();
   const sendMessageFn = useServerFn(sendMyMessage);
+  const attachmentUrlFn = useServerFn(getMyMessageAttachmentUrl);
   const [composeKind, setComposeKind] = useState<"email" | "note" | "whatsapp">("email");
   const [composeSubject, setComposeSubject] = useState("");
   const [composeBody, setComposeBody] = useState("");
