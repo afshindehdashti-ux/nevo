@@ -211,7 +211,7 @@ export const getMyMessages = createServerFn({ method: "GET" })
 
     const { data: rows, error } = await admin
       .from("communications")
-      .select("id, entity_type, entity_id, kind, direction, subject, body, occurred_at, contact_name")
+      .select("id, entity_type, entity_id, kind, direction, subject, body, occurred_at, contact_name, attachments")
       .or(filters.join(","))
       .order("occurred_at", { ascending: false })
       .limit(200);
