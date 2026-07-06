@@ -27,7 +27,7 @@ const logoStyleDark = {
 } as const
 
 export const BrandHeader = () => (
-  <Section style={styles.header}>
+  <Section style={styles.header} className="header">
     <Img
       src={NEVO_LOGO_URL}
       alt={brand.name}
