@@ -119,6 +119,38 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_users: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_users_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           address: string | null
@@ -1083,6 +1115,38 @@ export type Database = {
           },
         ]
       }
+      partner_users: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          partner_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          partner_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          partner_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_users_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partners: {
         Row: {
           company_name: string
@@ -1663,6 +1727,14 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_customer_user: {
+        Args: { _customer_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_partner_user: {
+        Args: { _partner_id: string; _user_id: string }
         Returns: boolean
       }
       log_approval: {
