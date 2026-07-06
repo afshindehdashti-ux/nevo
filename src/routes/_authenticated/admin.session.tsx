@@ -266,9 +266,81 @@ function SessionStatusPage() {
             />
             <Row label="Account created" value={fmt(sessionInfo?.created_at)} />
             <Row label="Session expires" value={fmt(sessionInfo?.expires_at)} />
+            <Row
+              label="Last login (audited)"
+              value={fmt(profile?.last_login_at ?? currentEvent?.at ?? null)}
+            />
+            <Row
+              label="IP address"
+              value={
+                <span className="inline-flex items-center gap-1">
+                  <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+                  <code className="text-xs">{currentEvent?.ip ?? "—"}</code>
+                  {currentEvent?.country && (
+                    <Badge variant="secondary" className="ml-1">{currentEvent.country}</Badge>
+                  )}
+                </span>
+              }
+            />
+            <Row
+              label="User agent"
+              value={
+                <span className="inline-flex items-start gap-1 text-xs text-muted-foreground break-all">
+                  <Monitor className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                  <span>{currentEvent?.user_agent ?? "—"}</span>
+                </span>
+              }
+            />
+          </CardContent>
+        </Card>
+
+        {/* Recent sign-in history */}
+        <Card className="md:col-span-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Recent sign-ins</CardTitle>
+            <CardDescription>Last 10 audited sign-in events for this account</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {historyLoading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-2/3" />
+              </div>
+            ) : !history || history.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No sign-in events recorded yet.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="text-xs uppercase tracking-wide text-muted-foreground">
+                    <tr className="border-b border-border">
+                      <th className="text-left font-medium py-2 pr-4">When</th>
+                      <th className="text-left font-medium py-2 pr-4">IP</th>
+                      <th className="text-left font-medium py-2 pr-4">Country</th>
+                      <th className="text-left font-medium py-2">User agent</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {history.map((e) => (
+                      <tr key={e.id} className="border-b border-border/60 last:border-0 align-top">
+                        <td className="py-2 pr-4 whitespace-nowrap">{fmt(e.at)}</td>
+                        <td className="py-2 pr-4"><code className="text-xs">{e.ip ?? "—"}</code></td>
+                        <td className="py-2 pr-4">{e.country ?? "—"}</td>
+                        <td className="py-2 text-xs text-muted-foreground break-all max-w-[24rem]">
+                          {e.user_agent ?? "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
+
 
       <div className="flex justify-end gap-2 pt-2">
         <Button asChild variant="outline">
