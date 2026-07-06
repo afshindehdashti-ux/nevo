@@ -20,6 +20,7 @@ import {
   Search,
   ScrollText,
   ShieldCheck,
+  Brain,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -107,6 +108,12 @@ export const CRM_NAV: CrmNavGroup[] = [
     items: [
       { title: "Tasks", url: "/admin/tasks", icon: CheckSquare, allowedRoles: ALL_STAFF },
       { title: "Files", url: "/admin/files", icon: FolderOpen, allowedRoles: ALL_STAFF },
+      {
+        title: "Document Intelligence",
+        url: "/admin/document-intelligence",
+        icon: Brain,
+        allowedRoles: ALL_STAFF,
+      },
       { title: "Reports", url: "/admin/reports", icon: BarChart3, allowedRoles: ALL_STAFF },
     ],
   },

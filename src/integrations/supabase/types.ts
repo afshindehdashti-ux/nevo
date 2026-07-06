@@ -182,6 +182,291 @@ export type Database = {
         }
         Relationships: []
       }
+      doc_intel_audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json | null
+          document_id: string
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          document_id: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          document_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_intel_audit_logs_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "doc_intel_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doc_intel_documents: {
+        Row: {
+          ai_confidence: number | null
+          ai_reasoning: string | null
+          approved_at: string | null
+          approved_by: string | null
+          category: string | null
+          confidentiality_level: string | null
+          created_at: string
+          customer_id: string | null
+          destination: string | null
+          detected_company: string | null
+          detected_country: string | null
+          detected_products: Json | null
+          detected_standards: Json | null
+          document_type: string | null
+          file_size: number | null
+          file_url: string | null
+          folder_path: string | null
+          id: string
+          intended_destination: string | null
+          language: string | null
+          mime_type: string | null
+          original_filename: string
+          partner_id: string | null
+          portal_visibility: string | null
+          project_id: string | null
+          routed_bucket: string | null
+          routed_path: string | null
+          status: string
+          storage_bucket: string
+          storage_path: string
+          stored_filename: string | null
+          summary: string | null
+          title: string | null
+          updated_at: string
+          uploaded_by: string | null
+          user_note: string | null
+        }
+        Insert: {
+          ai_confidence?: number | null
+          ai_reasoning?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          category?: string | null
+          confidentiality_level?: string | null
+          created_at?: string
+          customer_id?: string | null
+          destination?: string | null
+          detected_company?: string | null
+          detected_country?: string | null
+          detected_products?: Json | null
+          detected_standards?: Json | null
+          document_type?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          folder_path?: string | null
+          id?: string
+          intended_destination?: string | null
+          language?: string | null
+          mime_type?: string | null
+          original_filename: string
+          partner_id?: string | null
+          portal_visibility?: string | null
+          project_id?: string | null
+          routed_bucket?: string | null
+          routed_path?: string | null
+          status?: string
+          storage_bucket?: string
+          storage_path: string
+          stored_filename?: string | null
+          summary?: string | null
+          title?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+          user_note?: string | null
+        }
+        Update: {
+          ai_confidence?: number | null
+          ai_reasoning?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          category?: string | null
+          confidentiality_level?: string | null
+          created_at?: string
+          customer_id?: string | null
+          destination?: string | null
+          detected_company?: string | null
+          detected_country?: string | null
+          detected_products?: Json | null
+          detected_standards?: Json | null
+          document_type?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          folder_path?: string | null
+          id?: string
+          intended_destination?: string | null
+          language?: string | null
+          mime_type?: string | null
+          original_filename?: string
+          partner_id?: string | null
+          portal_visibility?: string | null
+          project_id?: string | null
+          routed_bucket?: string | null
+          routed_path?: string | null
+          status?: string
+          storage_bucket?: string
+          storage_path?: string
+          stored_filename?: string | null
+          summary?: string | null
+          title?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+          user_note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_intel_documents_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doc_intel_documents_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doc_intel_documents_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doc_intel_extractions: {
+        Row: {
+          created_at: string
+          document_id: string
+          extracted_json: Json | null
+          id: string
+          model_name: string | null
+          raw_text: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          extracted_json?: Json | null
+          id?: string
+          model_name?: string | null
+          raw_text?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          extracted_json?: Json | null
+          id?: string
+          model_name?: string | null
+          raw_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_intel_extractions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "doc_intel_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doc_intel_tags: {
+        Row: {
+          created_at: string
+          document_id: string
+          id: string
+          tag: string
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          id?: string
+          tag: string
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          id?: string
+          tag?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_intel_tags_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "doc_intel_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doc_intel_versions: {
+        Row: {
+          change_note: string | null
+          created_at: string
+          created_by: string | null
+          document_id: string
+          file_url: string | null
+          filename: string | null
+          id: string
+          storage_bucket: string | null
+          storage_path: string | null
+          version_number: number
+        }
+        Insert: {
+          change_note?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_id: string
+          file_url?: string | null
+          filename?: string | null
+          id?: string
+          storage_bucket?: string | null
+          storage_path?: string | null
+          version_number: number
+        }
+        Update: {
+          change_note?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_id?: string
+          file_url?: string | null
+          filename?: string | null
+          id?: string
+          storage_bucket?: string | null
+          storage_path?: string | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_intel_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "doc_intel_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_settings: {
         Row: {
           commission_prefix: string
@@ -798,6 +1083,36 @@ export type Database = {
           },
         ]
       }
+      partners: {
+        Row: {
+          company_name: string
+          contact_email: string | null
+          country: string | null
+          created_at: string
+          id: string
+          partner_type: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_name: string
+          contact_email?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          partner_type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          partner_type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -1011,6 +1326,47 @@ export type Database = {
           user_agent?: string | null
         }
         Relationships: []
+      }
+      projects: {
+        Row: {
+          country: string | null
+          created_at: string
+          customer_id: string | null
+          id: string
+          project_name: string
+          project_type: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          project_name: string
+          project_type?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          project_name?: string
+          project_type?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shipment_items: {
         Row: {

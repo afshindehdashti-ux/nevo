@@ -39,3 +39,16 @@ export function useCanUploadDocuments() {
     "finance",
   ]);
 }
+export function useCanApproveDocIntel() {
+  return useHasAnyRole(["super_admin", "management"]);
+}
+export function useCanUseDocIntel() {
+  return useHasAnyRole([
+    "super_admin",
+    "management",
+    "sales",
+    "operations",
+    "finance",
+    "read_only",
+  ]);
+}
