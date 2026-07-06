@@ -148,6 +148,52 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
     queryFn: () => timelineFn({ data: { customer_id: customerId } }),
   });
 
+  const qc = useQueryClient();
+  const sendMessageFn = useServerFn(sendMyMessage);
+  const [composeKind, setComposeKind] = useState<"email" | "note" | "whatsapp">("email");
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeBody, setComposeBody] = useState("");
+  const [composeFiles, setComposeFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const sendMessage = useMutation({
+    mutationFn: async () => {
+      const attachments = await Promise.all(
+        composeFiles.map(async (f) => {
+          if (f.size > 15 * 1024 * 1024) throw new Error(`${f.name} exceeds 15 MB`);
+          const buf = await f.arrayBuffer();
+          let bin = "";
+          const bytes = new Uint8Array(buf);
+          const chunk = 0x8000;
+          for (let i = 0; i < bytes.length; i += chunk) {
+            bin += String.fromCharCode(...bytes.subarray(i, i + chunk));
+          }
+          return { name: f.name, mime: f.type || undefined, base64: btoa(bin) };
+        }),
+      );
+      return sendMessageFn({
+        data: {
+          customer_id: customerId,
+          kind: composeKind,
+          subject: composeSubject.trim() || null,
+          body: composeBody,
+          attachments,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Message sent");
+      setComposeSubject("");
+      setComposeBody("");
+      setComposeFiles([]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      qc.invalidateQueries({ queryKey: ["portal", "messages", customerId] });
+      qc.invalidateQueries({ queryKey: ["portal", "timeline", customerId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to send"),
+  });
+
+
   const proformas = invoices.filter((i) => i.type === "proforma");
   const commercialInvoices = invoices.filter((i) => i.type !== "proforma");
   const approvedProjects = projects.filter((p) =>
