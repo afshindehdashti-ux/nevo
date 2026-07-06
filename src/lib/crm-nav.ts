@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   Brain,
   MessagesSquare,
+  Mail,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
