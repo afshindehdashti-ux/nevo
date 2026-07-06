@@ -94,6 +94,54 @@ export type Database = {
           },
         ]
       }
+      approval_requests: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_notes: string | null
+          details: Json
+          entity_id: string
+          entity_type: string
+          id: string
+          reason: string | null
+          requested_at: string
+          requested_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_notes?: string | null
+          details?: Json
+          entity_id: string
+          entity_type: string
+          id?: string
+          reason?: string | null
+          requested_at?: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_notes?: string | null
+          details?: Json
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          reason?: string | null
+          requested_at?: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       communications: {
         Row: {
           attachments: Json
@@ -163,6 +211,9 @@ export type Database = {
       company_settings: {
         Row: {
           address: string | null
+          approval_commission_threshold: number
+          approval_discount_pct_threshold: number
+          approval_invoice_threshold: number
           bank_account_name: string | null
           bank_account_number: string | null
           bank_branch: string | null
@@ -187,6 +238,9 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          approval_commission_threshold?: number
+          approval_discount_pct_threshold?: number
+          approval_invoice_threshold?: number
           bank_account_name?: string | null
           bank_account_number?: string | null
           bank_branch?: string | null
@@ -211,6 +265,9 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          approval_commission_threshold?: number
+          approval_discount_pct_threshold?: number
+          approval_invoice_threshold?: number
           bank_account_name?: string | null
           bank_account_number?: string | null
           bank_branch?: string | null
@@ -2300,6 +2357,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      decide_approval_request: {
+        Args: { _decision: string; _id: string; _notes?: string }
+        Returns: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_notes: string | null
+          details: Json
+          entity_id: string
+          entity_type: string
+          id: string
+          reason: string | null
+          requested_at: string
+          requested_by: string | null
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "approval_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
