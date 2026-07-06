@@ -50,6 +50,9 @@ import {
   Send,
   X,
   Loader2,
+  FileText as FileIcon,
+  Image as ImageIcon,
+  ExternalLink,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/portal")({
@@ -635,26 +638,13 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                             </div>
                           )}
                           {Array.isArray((m as any).attachments) && (m as any).attachments.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              {((m as any).attachments as Array<{ name: string; path: string }>).map((a, i) => (
-                                <button
+                            <div className="flex flex-col gap-2 mt-2">
+                              {((m as any).attachments as Array<{ name: string; path: string; mime?: string }>).map((a, i) => (
+                                <AttachmentPreview
                                   key={i}
-                                  type="button"
-                                  onClick={async () => {
-                                    try {
-                                      const res = await attachmentUrlFn({
-                                        data: { customer_id: customerId, path: a.path },
-                                      });
-                                      if (res.url) window.open(res.url, "_blank", "noopener");
-                                    } catch (e: any) {
-                                      toast.error(e?.message ?? "Cannot open attachment");
-                                    }
-                                  }}
-                                  className="inline-flex items-center gap-1 text-xs bg-background hover:bg-muted rounded-md px-2 py-1 border border-border"
-                                >
-                                  <Paperclip className="h-3 w-3" />
-                                  <span className="max-w-[200px] truncate">{a.name}</span>
-                                </button>
+                                  attachment={a}
+                                  customerId={customerId}
+                                />
                               ))}
                             </div>
                           )}
@@ -844,5 +834,135 @@ function PortalTable({
         ))}
       </TableBody>
     </Table>
+  );
+}
+
+function guessKind(a: { name: string; mime?: string }): "image" | "pdf" | "other" {
+  const mime = (a.mime ?? "").toLowerCase();
+  const ext = a.name.toLowerCase().split(".").pop() ?? "";
+  if (mime.startsWith("image/") || ["png", "jpg", "jpeg", "gif", "webp", "avif", "svg", "bmp"].includes(ext)) return "image";
+  if (mime === "application/pdf" || ext === "pdf") return "pdf";
+  return "other";
+}
+
+function AttachmentPreview({
+  attachment,
+  customerId,
+}: {
+  attachment: { name: string; path: string; mime?: string };
+  customerId: string;
+}) {
+  const urlFn = useServerFn(getMyMessageAttachmentUrl);
+  const [url, setUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const kind = guessKind(attachment);
+
+  useEffect(() => {
+    if (kind === "other") return;
+    let cancelled = false;
+    setLoading(true);
+    urlFn({ data: { customer_id: customerId, path: attachment.path } })
+      .then((res) => {
+        if (cancelled) return;
+        setUrl(res.url ?? null);
+      })
+      .catch((e: any) => {
+        if (cancelled) return;
+        setError(e?.message ?? "Preview unavailable");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [attachment.path, customerId, kind, urlFn]);
+
+  async function openInTab() {
+    try {
+      const res = url ? { url } : await urlFn({ data: { customer_id: customerId, path: attachment.path } });
+      if (res.url) window.open(res.url, "_blank", "noopener");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Cannot open attachment");
+    }
+  }
+
+  const header = (
+    <div className="flex items-center justify-between gap-2 px-2 py-1 border-b border-border bg-muted/40">
+      <div className="flex items-center gap-1.5 text-xs min-w-0">
+        {kind === "image" ? (
+          <ImageIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        ) : kind === "pdf" ? (
+          <FileIcon className="h-3.5 w-3.5 text-red-600 shrink-0" />
+        ) : (
+          <Paperclip className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        )}
+        <span className="truncate">{attachment.name}</span>
+      </div>
+      <button
+        type="button"
+        onClick={openInTab}
+        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground shrink-0"
+        aria-label="Open in new tab"
+      >
+        <ExternalLink className="h-3 w-3" />
+        Open
+      </button>
+    </div>
+  );
+
+  if (kind === "image") {
+    return (
+      <div className="rounded-md border border-border overflow-hidden bg-background max-w-md">
+        {header}
+        <div className="p-2">
+          {loading && <div className="text-xs text-muted-foreground py-8 text-center">Loading preview…</div>}
+          {error && <div className="text-xs text-destructive py-4 text-center">{error}</div>}
+          {url && (
+            <button type="button" onClick={openInTab} className="block w-full">
+              <img
+                src={url}
+                alt={attachment.name}
+                className="max-h-72 w-auto mx-auto rounded"
+                loading="lazy"
+              />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (kind === "pdf") {
+    return (
+      <div className="rounded-md border border-border overflow-hidden bg-background max-w-2xl w-full">
+        {header}
+        {loading && <div className="text-xs text-muted-foreground py-8 text-center">Loading preview…</div>}
+        {error && <div className="text-xs text-destructive py-4 text-center">{error}</div>}
+        {url && (
+          <object data={`${url}#toolbar=0&navpanes=0`} type="application/pdf" className="w-full h-96 bg-muted">
+            <div className="p-4 text-xs text-muted-foreground text-center">
+              PDF preview isn't supported in this browser.{" "}
+              <button type="button" onClick={openInTab} className="underline">
+                Open the file
+              </button>
+            </div>
+          </object>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={openInTab}
+      className="inline-flex items-center gap-1.5 text-xs bg-background hover:bg-muted rounded-md px-2 py-1 border border-border self-start"
+    >
+      <Paperclip className="h-3 w-3" />
+      <span className="max-w-[240px] truncate">{attachment.name}</span>
+      <ExternalLink className="h-3 w-3 text-muted-foreground" />
+    </button>
   );
 }
