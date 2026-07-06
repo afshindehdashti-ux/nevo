@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as CrmRouteImport } from './routes/crm'
 import { Route as BackofficeRouteImport } from './routes/backoffice'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -100,6 +101,11 @@ const StatusRoute = StatusRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CrmRoute = CrmRouteImport.update({
@@ -545,6 +551,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/backoffice': typeof BackofficeRoute
   '/crm': typeof CrmRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/$lang/about': typeof LangAboutRoute
@@ -627,6 +634,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/backoffice': typeof BackofficeRoute
   '/crm': typeof CrmRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/$lang/about': typeof LangAboutRoute
@@ -711,6 +719,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/backoffice': typeof BackofficeRoute
   '/crm': typeof CrmRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/$lang/about': typeof LangAboutRoute
@@ -796,6 +805,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/backoffice'
     | '/crm'
+    | '/reset-password'
     | '/sitemap.xml'
     | '/status'
     | '/$lang/about'
@@ -878,6 +888,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/backoffice'
     | '/crm'
+    | '/reset-password'
     | '/sitemap.xml'
     | '/status'
     | '/$lang/about'
@@ -961,6 +972,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/backoffice'
     | '/crm'
+    | '/reset-password'
     | '/sitemap.xml'
     | '/status'
     | '/$lang/about'
@@ -1046,6 +1058,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BackofficeRoute: typeof BackofficeRoute
   CrmRoute: typeof CrmRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
   AdminLoginRoute: typeof AdminLoginRoute
@@ -1074,6 +1087,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/crm': {
@@ -1875,6 +1895,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BackofficeRoute: BackofficeRoute,
   CrmRoute: CrmRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
   AdminLoginRoute: AdminLoginRoute,
