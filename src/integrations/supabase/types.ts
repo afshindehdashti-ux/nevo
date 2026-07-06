@@ -523,6 +523,7 @@ export type Database = {
           is_active: boolean
           job_title: string | null
           last_login_at: string | null
+          must_change_password: boolean
           phone: string | null
           updated_at: string
         }
@@ -534,6 +535,7 @@ export type Database = {
           is_active?: boolean
           job_title?: string | null
           last_login_at?: string | null
+          must_change_password?: boolean
           phone?: string | null
           updated_at?: string
         }
@@ -545,6 +547,7 @@ export type Database = {
           is_active?: boolean
           job_title?: string | null
           last_login_at?: string | null
+          must_change_password?: boolean
           phone?: string | null
           updated_at?: string
         }
