@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   Brain,
   MessagesSquare,
+  Mail,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -139,6 +140,12 @@ export const CRM_NAV: CrmNavGroup[] = [
         title: "Solutions SEO",
         url: "/admin/solutions-seo",
         icon: Search,
+        requiresSuperAdmin: true,
+      },
+      {
+        title: "Email Templates",
+        url: "/admin/email-preview",
+        icon: Mail,
         requiresSuperAdmin: true,
       },
     ],
