@@ -55,7 +55,7 @@ export function CrmSidebar() {
 
       <SidebarContent>
         {CRM_NAV.map((group) => {
-          const items = group.items.filter((i) => !i.requiresSuperAdmin || isSuperAdmin);
+          const items = group.items.filter((i) => canSeeNavItem(i, effectiveRoles));
           if (items.length === 0) return null;
           return (
             <SidebarGroup key={group.label}>
