@@ -211,6 +211,7 @@ function CustomerDetailPage() {
             </CardContent>
           </Card>
 
+          <Card>
             <CardHeader>
               <CardTitle className="text-base">Contact & billing</CardTitle>
             </CardHeader>
