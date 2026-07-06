@@ -31,8 +31,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ShieldAlert, ScrollText, Search } from "lucide-react";
+import { ShieldAlert, ScrollText, Search, Download } from "lucide-react";
 import { format } from "date-fns";
+import type { Database } from "@/integrations/supabase/types";
+
+type AppRole = Database["public"]["Enums"]["app_role"];
+
+const ROLE_OPTIONS: { value: string; label: string }[] = [
+  { value: "all", label: "All roles" },
+  { value: "super_admin", label: "Super Admin" },
+  { value: "management", label: "Management" },
+  { value: "sales", label: "Sales" },
+  { value: "operations", label: "Operations" },
+  { value: "finance", label: "Finance" },
+  { value: "read_only", label: "Read Only" },
+  { value: "none", label: "No role / system" },
+];
 
 type LogRow = {
   id: string;
