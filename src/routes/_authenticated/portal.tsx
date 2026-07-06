@@ -542,8 +542,32 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                       <div className="text-sm text-muted-foreground whitespace-pre-wrap mt-1">
                         {m.body}
                       </div>
+                    {Array.isArray((m as any).attachments) && (m as any).attachments.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {((m as any).attachments as Array<{ name: string; path: string }>).map((a, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const res = await attachmentUrlFn({
+                                  data: { customer_id: customerId, path: a.path },
+                                });
+                                if (res.url) window.open(res.url, "_blank", "noopener");
+                              } catch (e: any) {
+                                toast.error(e?.message ?? "Cannot open attachment");
+                              }
+                            }}
+                            className="inline-flex items-center gap-1 text-xs bg-muted hover:bg-muted/70 rounded-md px-2 py-1"
+                          >
+                            <Paperclip className="h-3 w-3" />
+                            <span className="max-w-[200px] truncate">{a.name}</span>
+                          </button>
+                        ))}
+                      </div>
                     )}
                   </div>
+
                 ))
               )}
             </Card>
