@@ -50,6 +50,10 @@ import {
   Send,
   X,
   Loader2,
+  Download,
+  FileText as FileIcon,
+  Image as ImageIcon,
+  ExternalLink,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/portal")({
