@@ -211,7 +211,13 @@ function CustomersPage() {
               {filtered.map((c) => (
                 <TableRow key={c.id}>
                   <TableCell>
-                    <div className="font-medium">{c.name}</div>
+                    <Link
+                      to="/admin/customers/$id"
+                      params={{ id: c.id }}
+                      className="font-medium text-primary hover:underline"
+                    >
+                      {c.name}
+                    </Link>
                     {c.email && <div className="text-xs text-muted-foreground">{c.email}</div>}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
