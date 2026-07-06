@@ -93,8 +93,30 @@ function ActivityPage() {
   const [actor, setActor] = useState<string>("all");
   const [action, setAction] = useState<string>("all");
   const [entity, setEntity] = useState<string>("all");
+  const [role, setRole] = useState<string>("all");
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<LogRow | null>(null);
+
+  const logsQ = useQuery({
+    enabled: isSuperAdmin,
+    queryKey: ["activity-logs", { actor, action, entity, dateFrom, dateTo }],
+    queryFn: async () => {
+      let q = supabase
+        .from("activity_logs")
+        .select("id,user_id,action,entity_type,entity_id,metadata,created_at")
+        .order("created_at", { ascending: false })
+        .limit(500);
+      if (actor !== "all") q = actor === "system" ? q.is("user_id", null) : q.eq("user_id", actor);
+      if (action !== "all") q = q.eq("action", action);
+      if (entity !== "all") q = q.eq("entity_type", entity);
+      if (dateFrom) q = q.gte("created_at", new Date(dateFrom).toISOString());
+      if (dateTo) {
+        const end = new Date(dateTo);
+        end.setHours(23, 59, 59, 999);
+        q = q.lte("created_at", end.toISOString());
+      }
 
   const logsQ = useQuery({
     enabled: isSuperAdmin,
