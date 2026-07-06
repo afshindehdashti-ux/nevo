@@ -1,3 +1,5 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
@@ -11,7 +13,7 @@ export type LogoEventFilters = {
   bucket?: "minute" | "hour" | "day";
 };
 
-async function ensureAdmin(supabase: any, userId: string) {
+async function ensureAdmin(supabase: SupabaseClient<Database>, userId: string) {
   const { data, error } = await supabase
     .from("user_roles")
     .select("role")
@@ -68,7 +70,7 @@ export const getLogoEvents = createServerFn({ method: "POST" })
 
     // Distinct variants for filter dropdown (within the same window)
     const variants = Array.from(
-      new Set((rows ?? []).map((r: any) => r.variant).filter(Boolean)),
+      new Set((rows ?? []).map((r) => r.variant).filter(Boolean)),
     ) as string[];
 
     return {

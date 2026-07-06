@@ -1,3 +1,4 @@
+import type { Database } from "@/integrations/supabase/types";
 import { createFileRoute } from "@tanstack/react-router";
 
 /**
@@ -93,7 +94,7 @@ export const Route = createFileRoute("/api/public/client-log")({
             "-";
           const ref = request.headers.get("referer") || "-";
 
-          const logoRows: Array<any> = [];
+          const logoRows: Database["public"]["Tables"]["header_logo_events"]["Insert"][] = [];
           const sentryEvents: Array<{
             correlationId?: string;
             stage?: string;

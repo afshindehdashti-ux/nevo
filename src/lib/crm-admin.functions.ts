@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -14,10 +15,8 @@ const inviteSchema = z.object({
 
 const resetSchema = z.object({ email: z.string().email() });
 
-async function assertSuperAdmin(ctx: {
-  supabase: Awaited<ReturnType<typeof import("@supabase/supabase-js").createClient>>;
-  userId: string;
-}) {
+async function assertSuperAdmin(ctx: { supabase: SupabaseClient<Database>; userId: string }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (ctx.supabase as any).rpc("has_role", {
     _user_id: ctx.userId,
     _role: "super_admin" as AppRole,
@@ -30,7 +29,7 @@ export const inviteTeamMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => inviteSchema.parse(raw))
   .handler(async ({ data, context }) => {
-    await assertSuperAdmin(context as any);
+    await assertSuperAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const siteUrl = process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
@@ -62,7 +61,7 @@ export const inviteTeamMember = createServerFn({ method: "POST" })
     if (roleErr) throw new Error(roleErr.message);
 
     await supabaseAdmin.from("activity_logs").insert({
-      user_id: (context as any).userId,
+      user_id: context.userId,
       action: "user_invited",
       entity_type: "auth_user",
       entity_id: userId,
@@ -76,7 +75,7 @@ export const sendPasswordReset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => resetSchema.parse(raw))
   .handler(async ({ data, context }) => {
-    await assertSuperAdmin(context as any);
+    await assertSuperAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const siteUrl = process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
     const { error } = await supabaseAdmin.auth.resetPasswordForEmail(data.email, {

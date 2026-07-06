@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { Database } from "@/integrations/supabase/types";
 
 const LOCALES = ["en", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"];
 const PATHS = [
@@ -35,7 +37,30 @@ export type SolutionsInspectionList = {
   expected: Array<{ locale: string; path: string }>;
 };
 
-async function ensureAdmin(supabase: any, userId: string) {
+type GscInspectionResult = {
+  indexStatusResult?: {
+    verdict?: string | null;
+    coverageState?: string | null;
+    indexingState?: string | null;
+    googleCanonical?: string | null;
+  };
+  mobileUsabilityResult?: {
+    verdict?: string | null;
+  };
+  richResultsResult?: {
+    verdict?: string | null;
+    detectedItems?: Array<{
+      richResultType?: string | null;
+      items?: Array<{
+        issues?: Array<{
+          severity?: string | null;
+        }>;
+      }>;
+    }>;
+  };
+};
+
+async function ensureAdmin(supabase: SupabaseClient<Database>, userId: string) {
   const { data, error } = await supabase
     .from("user_roles")
     .select("role")
@@ -49,8 +74,9 @@ async function ensureAdmin(supabase: any, userId: string) {
 export const listSolutionsInspection = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SolutionsInspectionList> => {
-    await ensureAdmin(context.supabase, context.userId);
-    const { data, error } = await (context.supabase as any)
+    const supabase = context.supabase as SupabaseClient<Database>;
+    await ensureAdmin(supabase, context.userId as string);
+    const { data, error } = await supabase
       .from("solutions_inspection")
       .select(
         "id, locale, path, url, verdict, coverage_state, indexing_state, mobile_verdict, rich_verdict, google_canonical, rich_detail, last_error, inspected_at",
@@ -59,17 +85,17 @@ export const listSolutionsInspection = createServerFn({ method: "GET" })
       .order("path", { ascending: true });
     if (error) throw new Error(error.message);
     return {
-      rows: (data ?? []) as SolutionsInspectionRow[],
+      rows: (data ?? []) as unknown as SolutionsInspectionRow[],
       expected: LOCALES.flatMap((l) => PATHS.map((p) => ({ locale: l, path: p }))),
     };
   });
 
-function summarize(inspection: any) {
+function summarize(inspection: GscInspectionResult) {
   const ir = inspection?.indexStatusResult ?? {};
   const mob = inspection?.mobileUsabilityResult ?? {};
   const rich = inspection?.richResultsResult ?? {};
-  const detected = (rich.detectedItems ?? []) as Array<any>;
-  const by_type: Record<string, { count: number; errors: number; warnings: number }> = {};
+  const detected = rich.detectedItems ?? [];
+  const by_type: Record<string, RichTypeSummary> = {};
   for (const g of detected) {
     const rtype = g?.richResultType ?? "Unknown";
     const items = g?.items ?? [];
@@ -98,7 +124,8 @@ function summarize(inspection: any) {
 export const runSolutionsInspection = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await ensureAdmin(context.supabase, context.userId);
+    const supabase = context.supabase as SupabaseClient<Database>;
+    await ensureAdmin(supabase, context.userId as string);
     const lovableKey = process.env.LOVABLE_API_KEY;
     const gscKey = process.env.GOOGLE_SEARCH_CONSOLE_API_KEY;
     if (!lovableKey) throw new Error("LOVABLE_API_KEY not configured");
@@ -112,7 +139,7 @@ export const runSolutionsInspection = createServerFn({ method: "POST" })
     for (const locale of LOCALES) {
       for (const path of PATHS) {
         const url = `${SITE_URL.replace(/\/$/, "")}/${locale}${path}`;
-        const record: Record<string, any> = {
+        const record: Database["public"]["Tables"]["solutions_inspection"]["Insert"] = {
           locale,
           path,
           url,
@@ -128,7 +155,9 @@ export const runSolutionsInspection = createServerFn({ method: "POST" })
             },
             body: JSON.stringify({ inspectionUrl: url, siteUrl: SITE_URL }),
           });
-          const body = await res.json().catch(() => ({}));
+          const body = (await res.json().catch(() => ({}))) as {
+            inspectionResult?: GscInspectionResult;
+          };
           if (!res.ok) {
             record.last_error = `HTTP ${res.status}: ${JSON.stringify(body).slice(0, 200)}`;
             failed++;
@@ -137,11 +166,11 @@ export const runSolutionsInspection = createServerFn({ method: "POST" })
             record.last_error = null;
             ok++;
           }
-        } catch (e: any) {
-          record.last_error = String(e?.message ?? e).slice(0, 200);
+        } catch (e) {
+          record.last_error = String(e instanceof Error ? e.message : e).slice(0, 200);
           failed++;
         }
-        const { error: upErr } = await (context.supabase as any)
+        const { error: upErr } = await supabase
           .from("solutions_inspection")
           .upsert(record, { onConflict: "locale,path" });
         if (upErr) throw new Error(upErr.message);
