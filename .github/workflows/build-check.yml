@@ -99,9 +99,9 @@ jobs:
 
       - name: ESLint
         id: lint
-        # Run even if typecheck failed so contributors see all issues in one run.
+        # Run even if an earlier gate failed so contributors see all issues in one run.
         # Lint is now blocking: any Error-level finding fails the build.
-        if: always() && steps.typecheck.conclusion != 'skipped'
+        if: always()
         run: |
           mkdir -p build-logs
           set -o pipefail
