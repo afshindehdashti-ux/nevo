@@ -19,6 +19,7 @@ import {
   Image as ImageIcon,
   Search,
   ScrollText,
+  ShieldCheck,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
