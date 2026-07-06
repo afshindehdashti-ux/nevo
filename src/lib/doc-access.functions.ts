@@ -4,12 +4,13 @@ import { z } from "zod";
 
 const KindEnum = z.enum(["customer", "partner"]);
 
-async function assertStaff(context: { supabase: any; userId: string }) {
-  const { data, error } = await context.supabase.rpc("has_any_role", {
+async function assertStaff(context: { supabase: unknown; userId: string }) {
+  const client = context.supabase as { rpc: (fn: string, args: unknown) => Promise<{ data: unknown; error: unknown }> };
+  const { data, error } = await client.rpc("has_any_role", {
     _user_id: context.userId,
     _roles: ["super_admin", "management", "sales", "operations"],
   });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error((error as { message: string }).message);
   if (!data) throw new Error("Forbidden");
 }
 
@@ -19,30 +20,35 @@ export const listDocAccess = createServerFn({ method: "POST" })
     z.object({ kind: KindEnum, entityId: z.string().uuid() }).parse(raw),
   )
   .handler(async ({ data, context }) => {
-    await assertStaff(context);
+    await assertStaff(context as never);
     const table = data.kind === "customer" ? "customer_users" : "partner_users";
     const fk = data.kind === "customer" ? "customer_id" : "partner_id";
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error } = await supabaseAdmin
-      .from(table)
-      .select("id, user_id, created_at")
-      .eq(fk, data.entityId)
-      .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
+    const admin = supabaseAdmin as unknown as {
+      from: (t: string) => {
+        select: (s: string) => {
+          eq: (c: string, v: string) => {
+            order: (c: string, o: { ascending: boolean }) => Promise<{
+              data: { id: string; user_id: string; created_at: string }[] | null;
+              error: { message: string } | null;
+            }>;
+          };
+        };
+      };
+    };
+    const res = await admin.from(table).select("id, user_id, created_at").eq(fk, data.entityId).order("created_at", { ascending: false });
+    if (res.error) throw new Error(res.error.message);
+    const rows = res.data ?? [];
     const enriched = await Promise.all(
-      (rows ?? []).map(async (r: { id: string; user_id: string; created_at: string }) => {
-        const { data: u } = await supabaseAdmin.auth.admin.getUserById(r.user_id);
-        const { data: prof } = await supabaseAdmin
-          .from("profiles")
-          .select("full_name")
-          .eq("id", r.user_id)
-          .maybeSingle();
+      rows.map(async (r) => {
+        const u = await supabaseAdmin.auth.admin.getUserById(r.user_id);
+        const prof = await supabaseAdmin.from("profiles").select("full_name").eq("id", r.user_id).maybeSingle();
         return {
           id: r.id,
           user_id: r.user_id,
           created_at: r.created_at,
-          email: u?.user?.email ?? null,
-          full_name: (prof as { full_name?: string } | null)?.full_name ?? null,
+          email: u.data?.user?.email ?? null,
+          full_name: (prof.data as { full_name?: string } | null)?.full_name ?? null,
         };
       }),
     );
@@ -59,30 +65,27 @@ export const grantDocAccess = createServerFn({ method: "POST" })
     }).parse(raw),
   )
   .handler(async ({ data, context }) => {
-    await assertStaff(context);
+    await assertStaff(context as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    // Find user by email via admin listUsers (paginate a few pages if needed)
     const target = data.email.trim().toLowerCase();
-    let found: { id: string } | null = null;
-    for (let page = 1; page <= 20 && !found; page++) {
-      const { data: list, error } = await supabaseAdmin.auth.admin.listUsers({
-        page,
-        perPage: 200,
-      });
+    let foundId: string | null = null;
+    for (let page = 1; page <= 20 && !foundId; page++) {
+      const { data: list, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 200 });
       if (error) throw new Error(error.message);
       const hit = list.users.find((u) => (u.email ?? "").toLowerCase() === target);
-      if (hit) found = { id: hit.id };
+      if (hit) foundId = hit.id;
       if (list.users.length < 200) break;
     }
-    if (!found) throw new Error("No user found with that email. They must sign in first.");
+    if (!foundId) throw new Error("No user found with that email. They must sign in first.");
 
     const table = data.kind === "customer" ? "customer_users" : "partner_users";
     const fk = data.kind === "customer" ? "customer_id" : "partner_id";
-    const { error: insErr } = await supabaseAdmin
-      .from(table)
-      .insert({ [fk]: data.entityId, user_id: found.id, created_by: context.userId });
-    if (insErr && !insErr.message.includes("duplicate")) {
-      throw new Error(insErr.message);
+    const admin = supabaseAdmin as unknown as {
+      from: (t: string) => { insert: (row: Record<string, string>) => Promise<{ error: { message: string } | null }> };
+    };
+    const res = await admin.from(table).insert({ [fk]: data.entityId, user_id: foundId, created_by: context.userId });
+    if (res.error && !res.error.message.includes("duplicate")) {
+      throw new Error(res.error.message);
     }
     return { ok: true };
   });
@@ -93,10 +96,13 @@ export const revokeDocAccess = createServerFn({ method: "POST" })
     z.object({ kind: KindEnum, mappingId: z.string().uuid() }).parse(raw),
   )
   .handler(async ({ data, context }) => {
-    await assertStaff(context);
+    await assertStaff(context as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const table = data.kind === "customer" ? "customer_users" : "partner_users";
-    const { error } = await supabaseAdmin.from(table).delete().eq("id", data.mappingId);
-    if (error) throw new Error(error.message);
+    const admin = supabaseAdmin as unknown as {
+      from: (t: string) => { delete: () => { eq: (c: string, v: string) => Promise<{ error: { message: string } | null }> } };
+    };
+    const res = await admin.from(table).delete().eq("id", data.mappingId);
+    if (res.error) throw new Error(res.error.message);
     return { ok: true };
   });
