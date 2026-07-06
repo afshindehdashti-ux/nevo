@@ -426,157 +426,276 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
           </TabsContent>
 
           <TabsContent value="messages" className="space-y-4">
-            <Card className="p-6 space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">New message to NEVO</h3>
-                <select
-                  value={composeKind}
-                  onChange={(e) => setComposeKind(e.target.value as any)}
-                  className="text-xs border border-border rounded-md px-2 py-1 bg-background"
-                >
-                  <option value="email">Email</option>
-                  <option value="whatsapp">WhatsApp</option>
-                  <option value="note">Note</option>
-                </select>
-              </div>
-              <input
-                type="text"
-                value={composeSubject}
-                onChange={(e) => setComposeSubject(e.target.value)}
-                placeholder="Subject (optional)"
-                className="w-full text-sm border border-border rounded-md px-3 py-2 bg-background"
-              />
-              <textarea
-                value={composeBody}
-                onChange={(e) => setComposeBody(e.target.value)}
-                placeholder="Write your message…"
-                rows={5}
-                className="w-full text-sm border border-border rounded-md px-3 py-2 bg-background resize-y"
-              />
-              {composeFiles.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {composeFiles.map((f, i) => (
-                    <span
-                      key={i}
-                      className="inline-flex items-center gap-1 text-xs bg-muted rounded-md px-2 py-1"
-                    >
-                      <Paperclip className="h-3 w-3" />
-                      <span className="max-w-[160px] truncate">{f.name}</span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setComposeFiles((prev) => prev.filter((_, idx) => idx !== i))
-                        }
-                        className="text-muted-foreground hover:text-foreground"
-                        aria-label={`Remove ${f.name}`}
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </span>
-                  ))}
+            {replyParentId === null && (
+              <Card className="p-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold">Start a new conversation</h3>
+                  <select
+                    value={composeKind}
+                    onChange={(e) => setComposeKind(e.target.value as any)}
+                    className="text-xs border border-border rounded-md px-2 py-1 bg-background"
+                  >
+                    <option value="email">Email</option>
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="note">Note</option>
+                  </select>
                 </div>
-              )}
-              <div className="flex items-center justify-between gap-2">
-                <div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files ?? []);
-                      setComposeFiles((prev) => [...prev, ...files].slice(0, 10));
-                    }}
-                  />
+                <input
+                  type="text"
+                  value={composeSubject}
+                  onChange={(e) => setComposeSubject(e.target.value)}
+                  placeholder="Subject (optional)"
+                  className="w-full text-sm border border-border rounded-md px-3 py-2 bg-background"
+                />
+                <textarea
+                  value={composeBody}
+                  onChange={(e) => setComposeBody(e.target.value)}
+                  placeholder="Write your message…"
+                  rows={5}
+                  className="w-full text-sm border border-border rounded-md px-3 py-2 bg-background resize-y"
+                />
+                {composeFiles.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {composeFiles.map((f, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1 text-xs bg-muted rounded-md px-2 py-1"
+                      >
+                        <Paperclip className="h-3 w-3" />
+                        <span className="max-w-[160px] truncate">{f.name}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setComposeFiles((prev) => prev.filter((_, idx) => idx !== i))
+                          }
+                          className="text-muted-foreground hover:text-foreground"
+                          aria-label={`Remove ${f.name}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files ?? []);
+                        setComposeFiles((prev) => [...prev, ...files].slice(0, 10));
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Paperclip className="h-3.5 w-3.5 mr-1" />
+                      Attach files
+                    </Button>
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      Up to 10 files, 15 MB each
+                    </span>
+                  </div>
                   <Button
                     type="button"
-                    variant="outline"
                     size="sm"
-                    onClick={() => fileInputRef.current?.click()}
+                    disabled={!composeBody.trim() || sendMessage.isPending}
+                    onClick={() => sendMessage.mutate({ parentId: null })}
                   >
-                    <Paperclip className="h-3.5 w-3.5 mr-1" />
-                    Attach files
+                    {sendMessage.isPending ? (
+                      <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                    ) : (
+                      <Send className="h-3.5 w-3.5 mr-1" />
+                    )}
+                    Send
                   </Button>
-                  <span className="ml-2 text-xs text-muted-foreground">
-                    Up to 10 files, 15 MB each
-                  </span>
                 </div>
-                <Button
-                  type="button"
-                  size="sm"
-                  disabled={!composeBody.trim() || sendMessage.isPending}
-                  onClick={() => sendMessage.mutate()}
-                >
-                  {sendMessage.isPending ? (
-                    <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
-                  ) : (
-                    <Send className="h-3.5 w-3.5 mr-1" />
-                  )}
-                  Send
-                </Button>
-              </div>
-            </Card>
+              </Card>
+            )}
 
-
-            <Card className="p-6 space-y-3">
-              {messages.length === 0 ? (
+            {messages.length === 0 ? (
+              <Card className="p-6">
                 <p className="text-sm text-muted-foreground text-center py-8">
                   No messages yet.
                 </p>
-              ) : (
-                messages.map((m) => (
-                  <div key={m.id} className="border border-border rounded-md p-3">
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <div className="flex items-center gap-2 text-xs">
-                        {m.direction === "inbound" ? (
-                          <ArrowDownLeft className="h-3.5 w-3.5 text-emerald-600" />
-                        ) : (
-                          <ArrowUpRight className="h-3.5 w-3.5 text-blue-600" />
-                        )}
-                        <Badge variant="outline">{m.kind}</Badge>
-                        <span className="text-muted-foreground">
-                          {m.contact_name ?? (m.direction === "inbound" ? "From you" : "From NEVO")}
-                        </span>
+              </Card>
+            ) : (
+              groupThreads(messages).map((thread) => {
+                const head = thread[0];
+                const last = thread[thread.length - 1];
+                const subject = head.subject ?? `${head.kind} conversation`;
+                const isReplying = replyParentId === last.id;
+                return (
+                  <Card key={head.thread_id ?? head.id} className="p-4 space-y-3">
+                    <div className="flex items-center justify-between border-b border-border pb-2">
+                      <div>
+                        <div className="text-sm font-semibold">{subject}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {thread.length} message{thread.length === 1 ? "" : "s"} · last activity{" "}
+                          {new Date(last.occurred_at).toLocaleString()}
+                        </div>
                       </div>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(m.occurred_at).toLocaleString()}
-                      </span>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={isReplying ? "secondary" : "outline"}
+                        onClick={() => {
+                          if (isReplying) {
+                            setReplyParentId(null);
+                          } else {
+                            setReplyParentId(last.id);
+                            setComposeSubject("");
+                            setComposeBody("");
+                            setComposeFiles([]);
+                            setComposeKind((head.kind as any) === "whatsapp" ? "whatsapp" : (head.kind as any) === "note" ? "note" : "email");
+                          }
+                        }}
+                      >
+                        {isReplying ? "Cancel" : "Reply"}
+                      </Button>
                     </div>
-                    {m.subject && <div className="text-sm font-medium">{m.subject}</div>}
-                    {m.body && (
-                      <div className="text-sm text-muted-foreground whitespace-pre-wrap mt-1">
-                        {m.body}
-                      </div>
-                    )}
-                    {Array.isArray((m as any).attachments) && (m as any).attachments.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {((m as any).attachments as Array<{ name: string; path: string }>).map((a, i) => (
-                          <button
-                            key={i}
-                            type="button"
-                            onClick={async () => {
-                              try {
-                                const res = await attachmentUrlFn({
-                                  data: { customer_id: customerId, path: a.path },
-                                });
-                                if (res.url) window.open(res.url, "_blank", "noopener");
-                              } catch (e: any) {
-                                toast.error(e?.message ?? "Cannot open attachment");
-                              }
-                            }}
-                            className="inline-flex items-center gap-1 text-xs bg-muted hover:bg-muted/70 rounded-md px-2 py-1"
-                          >
-                            <Paperclip className="h-3 w-3" />
-                            <span className="max-w-[200px] truncate">{a.name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
 
-                ))
-              )}
-            </Card>
+                    <div className="space-y-2">
+                      {thread.map((m) => (
+                        <div
+                          key={m.id}
+                          className={
+                            "rounded-md p-3 " +
+                            (m.direction === "inbound"
+                              ? "bg-muted/40 border border-border"
+                              : "bg-blue-50/60 border border-blue-100")
+                          }
+                        >
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <div className="flex items-center gap-2 text-xs">
+                              {m.direction === "inbound" ? (
+                                <ArrowDownLeft className="h-3.5 w-3.5 text-emerald-600" />
+                              ) : (
+                                <ArrowUpRight className="h-3.5 w-3.5 text-blue-600" />
+                              )}
+                              <Badge variant="outline">{m.kind}</Badge>
+                              <span className="text-muted-foreground">
+                                {m.contact_name ?? (m.direction === "inbound" ? "From you" : "From NEVO")}
+                              </span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(m.occurred_at).toLocaleString()}
+                            </span>
+                          </div>
+                          {m.body && (
+                            <div className="text-sm text-foreground/90 whitespace-pre-wrap mt-1">
+                              {m.body}
+                            </div>
+                          )}
+                          {Array.isArray((m as any).attachments) && (m as any).attachments.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {((m as any).attachments as Array<{ name: string; path: string }>).map((a, i) => (
+                                <button
+                                  key={i}
+                                  type="button"
+                                  onClick={async () => {
+                                    try {
+                                      const res = await attachmentUrlFn({
+                                        data: { customer_id: customerId, path: a.path },
+                                      });
+                                      if (res.url) window.open(res.url, "_blank", "noopener");
+                                    } catch (e: any) {
+                                      toast.error(e?.message ?? "Cannot open attachment");
+                                    }
+                                  }}
+                                  className="inline-flex items-center gap-1 text-xs bg-background hover:bg-muted rounded-md px-2 py-1 border border-border"
+                                >
+                                  <Paperclip className="h-3 w-3" />
+                                  <span className="max-w-[200px] truncate">{a.name}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {isReplying && (
+                      <div className="border-t border-border pt-3 space-y-2">
+                        <textarea
+                          value={composeBody}
+                          onChange={(e) => setComposeBody(e.target.value)}
+                          placeholder={`Reply to ${subject}…`}
+                          rows={4}
+                          className="w-full text-sm border border-border rounded-md px-3 py-2 bg-background resize-y"
+                          autoFocus
+                        />
+                        {composeFiles.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {composeFiles.map((f, i) => (
+                              <span
+                                key={i}
+                                className="inline-flex items-center gap-1 text-xs bg-muted rounded-md px-2 py-1"
+                              >
+                                <Paperclip className="h-3 w-3" />
+                                <span className="max-w-[160px] truncate">{f.name}</span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setComposeFiles((prev) => prev.filter((_, idx) => idx !== i))
+                                  }
+                                  className="text-muted-foreground hover:text-foreground"
+                                  aria-label={`Remove ${f.name}`}
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between gap-2">
+                          <div>
+                            <input
+                              ref={fileInputRef}
+                              type="file"
+                              multiple
+                              className="hidden"
+                              onChange={(e) => {
+                                const files = Array.from(e.target.files ?? []);
+                                setComposeFiles((prev) => [...prev, ...files].slice(0, 10));
+                              }}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => fileInputRef.current?.click()}
+                            >
+                              <Paperclip className="h-3.5 w-3.5 mr-1" />
+                              Attach
+                            </Button>
+                          </div>
+                          <Button
+                            type="button"
+                            size="sm"
+                            disabled={!composeBody.trim() || sendMessage.isPending}
+                            onClick={() => sendMessage.mutate({ parentId: last.id })}
+                          >
+                            {sendMessage.isPending ? (
+                              <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                            ) : (
+                              <Send className="h-3.5 w-3.5 mr-1" />
+                            )}
+                            Send reply
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </Card>
+                );
+              })
+            )}
           </TabsContent>
 
           <TabsContent value="profile">
