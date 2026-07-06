@@ -2390,6 +2390,27 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      ensure_approval_request: {
+        Args: {
+          _details: Json
+          _entity_id: string
+          _entity_type: string
+          _reason: string
+        }
+        Returns: string
+      }
+      evaluate_quotation_discount_approval: {
+        Args: { _quotation_id: string }
+        Returns: undefined
+      }
+      get_approval_thresholds: {
+        Args: never
+        Returns: {
+          commission: number
+          discount_pct: number
+          invoice: number
+        }[]
+      }
       has_any_role: {
         Args: {
           _roles: Database["public"]["Enums"]["app_role"][]
