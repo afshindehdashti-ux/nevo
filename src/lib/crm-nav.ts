@@ -71,7 +71,8 @@ export const CRM_NAV: CrmNavGroup[] = [
   {
     label: "Operations",
     items: [
-      { title: "Orders", url: "/admin/orders", icon: Truck, allowedRoles: OPS_ONLY },
+      { title: "Orders", url: "/admin/orders", icon: Truck, allowedRoles: SALES_OPS },
+      { title: "Shipments", url: "/admin/shipments", icon: Package, allowedRoles: OPS_ONLY },
       { title: "Suppliers", url: "/admin/suppliers", icon: Package, allowedRoles: OPS_ONLY },
       { title: "Products", url: "/admin/products", icon: Boxes, allowedRoles: OPS_ONLY },
     ],
