@@ -21,6 +21,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as KnowledgeSplatRouteImport } from './routes/knowledge.$'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
@@ -52,6 +53,7 @@ import { Route as LangAiAssistantRouteImport } from './routes/$lang.ai-assistant
 import { Route as LangAboutRouteImport } from './routes/$lang.about'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as LangSolutionsIndexRouteImport } from './routes/$lang.solutions.index'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicClientLogRouteImport } from './routes/api/public/client-log'
 import { Route as ApiPublicBootstrapSuperAdminRouteImport } from './routes/api/public/bootstrap-super-admin'
@@ -90,6 +92,8 @@ import { Route as LangSolutionsProductionLinesRouteImport } from './routes/$lang
 import { Route as LangSolutionsFactoryDevelopmentRouteImport } from './routes/$lang.solutions.factory-development'
 import { Route as LangSolutionsEngineeringConsultancyRouteImport } from './routes/$lang.solutions.engineering-consultancy'
 import { Route as LangKnowledgeHubSlugRouteImport } from './routes/$lang.knowledge-hub.$slug'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -160,6 +164,11 @@ const LangIndexRoute = LangIndexRouteImport.update({
 const KnowledgeSplatRoute = KnowledgeSplatRouteImport.update({
   id: '/knowledge/$',
   path: '/knowledge/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -321,6 +330,11 @@ const LangSolutionsIndexRoute = LangSolutionsIndexRouteImport.update({
   id: '/solutions/',
   path: '/solutions/',
   getParentRoute: () => LangRoute,
+} as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
@@ -543,6 +557,18 @@ const LangKnowledgeHubSlugRoute = LangKnowledgeHubSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => LangKnowledgeHubRoute,
 } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -652,6 +678,7 @@ export interface FileRoutesByFullPath {
   '/portal': typeof AuthenticatedPortalRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/chat': typeof ApiChatRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/$lang/': typeof LangIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
@@ -693,6 +720,7 @@ export interface FileRoutesByFullPath {
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/approvals/audit': typeof AuthenticatedAdminApprovalsAuditRoute
@@ -706,6 +734,8 @@ export interface FileRoutesByFullPath {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
 }
 export interface FileRoutesByTo {
@@ -744,6 +774,7 @@ export interface FileRoutesByTo {
   '/portal': typeof AuthenticatedPortalRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/chat': typeof ApiChatRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/$lang': typeof LangIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
@@ -785,6 +816,7 @@ export interface FileRoutesByTo {
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/approvals/audit': typeof AuthenticatedAdminApprovalsAuditRoute
@@ -798,6 +830,8 @@ export interface FileRoutesByTo {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
 }
 export interface FileRoutesById {
@@ -840,6 +874,7 @@ export interface FileRoutesById {
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/chat': typeof ApiChatRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
   '/$lang/': typeof LangIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
@@ -881,6 +916,7 @@ export interface FileRoutesById {
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/approvals/audit': typeof AuthenticatedAdminApprovalsAuditRoute
@@ -894,6 +930,8 @@ export interface FileRoutesById {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/_authenticated/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
 }
 export interface FileRouteTypes {
@@ -936,6 +974,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/admin/login'
     | '/api/chat'
+    | '/email/unsubscribe'
     | '/knowledge/$'
     | '/$lang/'
     | '/knowledge/'
@@ -977,6 +1016,7 @@ export interface FileRouteTypes {
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
+    | '/lovable/email/suppression'
     | '/$lang/solutions/'
     | '/admin/'
     | '/admin/approvals/audit'
@@ -990,6 +1030,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
     | '/admin/quotations/$id/print'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -1028,6 +1070,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/admin/login'
     | '/api/chat'
+    | '/email/unsubscribe'
     | '/knowledge/$'
     | '/$lang'
     | '/knowledge'
@@ -1069,6 +1112,7 @@ export interface FileRouteTypes {
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
+    | '/lovable/email/suppression'
     | '/$lang/solutions'
     | '/admin'
     | '/admin/approvals/audit'
@@ -1082,6 +1126,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
     | '/admin/quotations/$id/print'
   id:
     | '__root__'
@@ -1123,6 +1169,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal'
     | '/admin/login'
     | '/api/chat'
+    | '/email/unsubscribe'
     | '/knowledge/$'
     | '/$lang/'
     | '/knowledge/'
@@ -1164,6 +1211,7 @@ export interface FileRouteTypes {
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
+    | '/lovable/email/suppression'
     | '/$lang/solutions/'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/approvals/audit'
@@ -1177,6 +1225,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
     | '/_authenticated/admin/quotations/$id/print'
   fileRoutesById: FileRoutesById
 }
@@ -1192,14 +1242,18 @@ export interface RootRouteChildren {
   StatusRoute: typeof StatusRoute
   AdminLoginRoute: typeof AdminLoginRoute
   ApiChatRoute: typeof ApiChatRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   KnowledgeSplatRoute: typeof KnowledgeSplatRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
   ApiPublicBootstrapSuperAdminRoute: typeof ApiPublicBootstrapSuperAdminRoute
   ApiPublicClientLogRoute: typeof ApiPublicClientLogRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1286,6 +1340,13 @@ declare module '@tanstack/react-router' {
       path: '/knowledge/$'
       fullPath: '/knowledge/$'
       preLoaderRoute: typeof KnowledgeSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -1504,6 +1565,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$lang/solutions/'
       preLoaderRoute: typeof LangSolutionsIndexRouteImport
       parentRoute: typeof LangRoute
+    }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/health': {
       id: '/api/public/health'
@@ -1770,6 +1838,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/$lang/knowledge-hub/$slug'
       preLoaderRoute: typeof LangKnowledgeHubSlugRouteImport
       parentRoute: typeof LangKnowledgeHubRoute
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
@@ -2172,25 +2254,19 @@ const rootRouteChildren: RootRouteChildren = {
   StatusRoute: StatusRoute,
   AdminLoginRoute: AdminLoginRoute,
   ApiChatRoute: ApiChatRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   KnowledgeSplatRoute: KnowledgeSplatRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
   ApiPublicBootstrapSuperAdminRoute: ApiPublicBootstrapSuperAdminRoute,
   ApiPublicClientLogRoute: ApiPublicClientLogRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
