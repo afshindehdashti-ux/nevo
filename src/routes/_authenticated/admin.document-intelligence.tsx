@@ -1141,7 +1141,7 @@ function AiSuggestionsPanel({
           <div key={k} className="border rounded-md p-2 bg-background/60">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{k}</span>
-              <Info className="h-3 w-3 text-muted-foreground" aria-label={hint} title={hint} />
+              <Info className="h-3 w-3 text-muted-foreground" aria-label={hint} />
             </div>
             <p className="font-medium truncate">
               {typeof v === "string" && v ? v : <span className="text-muted-foreground">—</span>}
