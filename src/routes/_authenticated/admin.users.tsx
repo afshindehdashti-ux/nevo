@@ -132,74 +132,11 @@ function UsersPage() {
           </p>
         </div>
         {isSuperAdmin && (
-          <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-2">
-                <UserPlus className="h-4 w-4" /> Invite user
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Invite team member</DialogTitle>
-                <DialogDescription>
-                  They will receive an email to set their password and sign in to the CRM.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-3">
-                <div className="space-y-1.5">
-                  <Label>Full name</Label>
-                  <Input
-                    value={inviteName}
-                    onChange={(e) => setInviteName(e.target.value)}
-                    placeholder="Jane Doe"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Work email</Label>
-                  <Input
-                    type="email"
-                    value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
-                    placeholder="jane@nevoindustrial.com"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Job title</Label>
-                  <Input
-                    value={inviteTitle}
-                    onChange={(e) => setInviteTitle(e.target.value)}
-                    placeholder="Sales Manager"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Role</Label>
-                  <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as AppRole)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ROLES.map((r) => (
-                        <SelectItem key={r.value} value={r.value}>
-                          {r.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="ghost" onClick={() => setInviteOpen(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  onClick={() => invite.mutate()}
-                  disabled={invite.isPending || !inviteEmail || !inviteName}
-                >
-                  {invite.isPending ? "Sending…" : "Send invitation"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button asChild size="sm" className="gap-2">
+            <Link to="/admin/users/invite">
+              <UserPlus className="h-4 w-4" /> Invite user
+            </Link>
+          </Button>
         )}
       </div>
 
