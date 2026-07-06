@@ -510,6 +510,32 @@ async function fetchReport(
       if (error) throw error;
       return (data ?? []) as Record<string, unknown>[];
     }
+    case "leads_pipeline": {
+      let q = supabase
+        .from("project_inquiries")
+        .select(
+          "id,created_at,name,email,company,country,application,status,priority,assigned_to,internal_score,next_action_date,budget_range",
+        )
+        .gte("created_at", f.from)
+        .lte("created_at", f.to + "T23:59:59")
+        .order("created_at", { ascending: false });
+      if (f.status !== "all") q = q.eq("status", f.status);
+      const { data, error } = await q;
+      if (error) throw error;
+      const ids = Array.from(new Set((data ?? []).map((r) => r.assigned_to).filter(Boolean))) as string[];
+      const map = new Map<string, string>();
+      if (ids.length) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("id,full_name")
+          .in("id", ids);
+        for (const p of profs ?? []) map.set(p.id, p.full_name ?? "");
+      }
+      return (data ?? []).map((r) => ({
+        ...r,
+        assignee_name: r.assigned_to ? (map.get(r.assigned_to) ?? "—") : "—",
+      })) as Record<string, unknown>[];
+    }
     case "sales_orders": {
       let q = supabase
         .from("orders")
