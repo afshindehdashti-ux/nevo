@@ -123,6 +123,12 @@ export const CRM_NAV: CrmNavGroup[] = [
   {
     label: "Administration",
     items: [
+      {
+        title: "Control Panel",
+        url: "/admin/control-panel",
+        icon: ShieldCheck,
+        requiresSuperAdmin: true,
+      },
       { title: "Users & Roles", url: "/admin/users", icon: UserCog, requiresSuperAdmin: true },
       { title: "Activity Log", url: "/admin/activity", icon: ScrollText, requiresSuperAdmin: true },
       { title: "Settings", url: "/admin/settings", icon: Settings, requiresSuperAdmin: true },
