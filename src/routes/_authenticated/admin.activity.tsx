@@ -44,9 +44,17 @@ type LogRow = {
   created_at: string;
 };
 
-const ACTION_OPTIONS = ["all", "delete", "update", "approve", "create"] as const;
+const ACTION_OPTIONS = [
+  "all",
+  "sign_in",
+  "delete",
+  "update",
+  "approve",
+  "create",
+] as const;
 const ENTITY_OPTIONS = [
   "all",
+  "auth",
   "customers",
   "suppliers",
   "products",
@@ -55,6 +63,7 @@ const ENTITY_OPTIONS = [
   "user_roles",
   "profiles",
 ] as const;
+
 
 export const Route = createFileRoute("/_authenticated/admin/activity")({
   head: () => ({
@@ -244,7 +253,7 @@ function ActivityPage() {
                   <TableHead>Actor</TableHead>
                   <TableHead>Action</TableHead>
                   <TableHead>Record type</TableHead>
-                  <TableHead>Record ID</TableHead>
+                  <TableHead>Record / IP</TableHead>
                   <TableHead className="w-[100px] text-right">Details</TableHead>
                 </TableRow>
               </TableHeader>
@@ -256,33 +265,57 @@ function ActivityPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredRows.map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell className="font-mono text-xs">
-                        {format(new Date(row.created_at), "yyyy-MM-dd HH:mm:ss")}
-                      </TableCell>
-                      <TableCell>
-                        {row.user_id
-                          ? profilesQ.data?.get(row.user_id) ?? (
-                              <span className="font-mono text-xs">{row.user_id.slice(0, 8)}…</span>
-                            )
-                          : <span className="text-muted-foreground italic">system</span>}
-                      </TableCell>
-                      <TableCell>
-                        <ActionBadge action={row.action} />
-                      </TableCell>
-                      <TableCell className="text-sm">{row.entity_type ?? "—"}</TableCell>
-                      <TableCell className="font-mono text-xs">
-                        {row.entity_id ? `${row.entity_id.slice(0, 8)}…` : "—"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => setSelected(row)}>
-                          View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  filteredRows.map((row) => {
+                    const ip =
+                      row.action === "sign_in"
+                        ? (row.metadata as { ip?: string | null })?.ip ?? null
+                        : null;
+                    const country =
+                      row.action === "sign_in"
+                        ? (row.metadata as { country?: string | null })?.country ?? null
+                        : null;
+                    return (
+                      <TableRow key={row.id}>
+                        <TableCell className="font-mono text-xs">
+                          {format(new Date(row.created_at), "yyyy-MM-dd HH:mm:ss")}
+                        </TableCell>
+                        <TableCell>
+                          {row.user_id
+                            ? profilesQ.data?.get(row.user_id) ?? (
+                                <span className="font-mono text-xs">
+                                  {row.user_id.slice(0, 8)}…
+                                </span>
+                              )
+                            : <span className="text-muted-foreground italic">system</span>}
+                        </TableCell>
+                        <TableCell>
+                          <ActionBadge action={row.action} />
+                        </TableCell>
+                        <TableCell className="text-sm">{row.entity_type ?? "—"}</TableCell>
+                        <TableCell className="font-mono text-xs">
+                          {ip ? (
+                            <span>
+                              {ip}
+                              {country ? (
+                                <span className="ml-1 text-muted-foreground">({country})</span>
+                              ) : null}
+                            </span>
+                          ) : row.entity_id ? (
+                            `${row.entity_id.slice(0, 8)}…`
+                          ) : (
+                            "—"
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="sm" onClick={() => setSelected(row)}>
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 )}
+
               </TableBody>
             </Table>
           )}
@@ -343,6 +376,8 @@ function ActionBadge({ action }: { action: string }) {
     approve: "default",
     update: "secondary",
     create: "outline",
+    sign_in: "default",
   };
   return <Badge variant={variant[action] ?? "outline"}>{action}</Badge>;
 }
+

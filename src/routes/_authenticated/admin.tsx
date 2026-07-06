@@ -43,21 +43,15 @@ function AdminLayout() {
     const key = `crm:last-login:${user.id}`;
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
-    supabase
-      .from("profiles")
-      .update({ last_login_at: new Date().toISOString() })
-      .eq("id", user.id)
-      .then(() => {});
-    supabase
-      .from("activity_logs")
-      .insert({
-        user_id: user.id,
-        action: "sign_in",
-        entity_type: "auth",
-        entity_id: user.id,
-      })
-      .then(() => {});
+    // Server fn captures IP + user agent from request headers.
+    import("@/lib/auth-audit.functions").then(({ logAdminSignIn }) => {
+      logAdminSignIn().catch(() => {
+        // Non-blocking: audit failure must not break the admin session.
+        sessionStorage.removeItem(key);
+      });
+    });
   }, [user?.id]);
+
 
   return (
     <SidebarProvider>
