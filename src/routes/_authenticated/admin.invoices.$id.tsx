@@ -44,6 +44,7 @@ import {
 } from "@/lib/crm-status";
 import { useCanEditInvoices, useCanEditPayments } from "@/lib/crm-permissions";
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
+import { ApprovalPanel } from "@/components/crm/ApprovalPanel";
 
 export const Route = createFileRoute("/_authenticated/admin/invoices/$id")({
   head: () => ({ meta: [{ title: "Invoice — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
