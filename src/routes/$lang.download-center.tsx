@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { RoutedDocumentsList } from "@/components/site/RoutedDocumentsList";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { submitInquiry } from "@/lib/inquiries.functions";
 import { z } from "zod";
