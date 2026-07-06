@@ -96,6 +96,8 @@ function QuotationEditor() {
     if (data?.quotation) {
       setForm({
         customer_id: data.quotation.customer_id ?? "",
+        inquiry_id: data.quotation.inquiry_id ?? "",
+        project_id: data.quotation.project_id ?? "",
         issue_date: data.quotation.issue_date ?? "",
         valid_until: data.quotation.valid_until ?? "",
         currency: data.quotation.currency ?? "USD",
@@ -113,6 +115,8 @@ function QuotationEditor() {
         data: {
           id,
           customer_id: form.customer_id || null,
+          inquiry_id: form.inquiry_id || null,
+          project_id: form.project_id || null,
           issue_date: form.issue_date || undefined,
           valid_until: form.valid_until || null,
           currency: form.currency,
