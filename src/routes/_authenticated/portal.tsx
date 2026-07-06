@@ -199,6 +199,22 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
     onError: (e: any) => toast.error(e?.message ?? "Failed to send"),
   });
 
+  const markMyMessagesReadFn = useServerFn(markMyMessagesRead);
+  const markRead = useMutation({
+    mutationFn: () => markMyMessagesReadFn({ data: { customer_id: customerId } }),
+    onSuccess: (res) => {
+      if (res?.marked) {
+        qc.invalidateQueries({ queryKey: ["portal", "messages", customerId] });
+      }
+    },
+  });
+
+  const unreadCount = messages.filter(
+    (m) => m.direction === "outbound" && !(m as any).read,
+  ).length;
+
+
+
 
   const proformas = invoices.filter((i) => i.type === "proforma");
   const commercialInvoices = invoices.filter((i) => i.type !== "proforma");
