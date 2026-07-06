@@ -460,6 +460,8 @@ export type Database = {
       project_inquiries: {
         Row: {
           application: string | null
+          approved_at: string | null
+          approved_by: string | null
           calculator_state: Json | null
           company: string | null
           country: string | null
@@ -476,6 +478,8 @@ export type Database = {
         }
         Insert: {
           application?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           calculator_state?: Json | null
           company?: string | null
           country?: string | null
@@ -492,6 +496,8 @@ export type Database = {
         }
         Update: {
           application?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           calculator_state?: Json | null
           company?: string | null
           country?: string | null
@@ -651,6 +657,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      log_approval: {
+        Args: { _entity_id: string; _entity_type: string; _metadata?: Json }
+        Returns: string
       }
     }
     Enums: {
