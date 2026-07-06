@@ -272,6 +272,40 @@ function QuotationEditor() {
               </Button>
             </>
           )}
+          {(q.status === "accepted" || q.status === "approved") && !q.converted_invoice_id && (
+            <Button variant="secondary" onClick={() => convert.mutate()} disabled={convert.isPending}>
+              <ArrowRightCircle className="h-4 w-4 mr-1" />
+              {convert.isPending ? "Converting…" : "Convert to proforma"}
+            </Button>
+          )}
+          {q.converted_invoice_id && (
+            <Button
+              variant="secondary"
+              onClick={() =>
+                navigate({ to: "/admin/invoices/$id", params: { id: q.converted_invoice_id! } })
+              }
+            >
+              <ArrowRightCircle className="h-4 w-4 mr-1" />
+              Open proforma
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            onClick={() => window.open(`/admin/quotations/${id}/print`, "_blank")}
+          >
+            <FileDown className="h-4 w-4 mr-1" />
+            PDF
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-destructive hover:text-destructive"
+            onClick={() => {
+              if (confirm("Delete this quotation? This cannot be undone.")) del.mutate();
+            }}
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Delete
+          </Button>
         </div>
       </div>
 
