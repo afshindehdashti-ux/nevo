@@ -559,14 +559,113 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
               </Card>
             )}
 
-            {messages.length === 0 ? (
-              <Card className="p-6">
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  No messages yet.
-                </p>
-              </Card>
-            ) : (
-              groupThreads(messages).map((thread) => {
+            <Card className="p-3 flex flex-wrap items-center gap-2">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                <input
+                  type="search"
+                  value={messageSearch}
+                  onChange={(e) => setMessageSearch(e.target.value)}
+                  placeholder="Search subject, body, or contact…"
+                  className="w-full text-sm border border-border rounded-md pl-7 pr-2 py-1.5 bg-background"
+                />
+              </div>
+              <select
+                value={messageKindFilter}
+                onChange={(e) => setMessageKindFilter(e.target.value as any)}
+                className="text-xs border border-border rounded-md px-2 py-1.5 bg-background"
+                aria-label="Filter by type"
+              >
+                <option value="all">All types</option>
+                <option value="email">Email</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="note">Note</option>
+              </select>
+              <select
+                value={messageReadFilter}
+                onChange={(e) => setMessageReadFilter(e.target.value as any)}
+                className="text-xs border border-border rounded-md px-2 py-1.5 bg-background"
+                aria-label="Filter by read status"
+              >
+                <option value="all">All threads</option>
+                <option value="unread">Unread only</option>
+                <option value="read">Read only</option>
+              </select>
+              <select
+                value={messageSort}
+                onChange={(e) => setMessageSort(e.target.value as any)}
+                className="text-xs border border-border rounded-md px-2 py-1.5 bg-background"
+                aria-label="Sort"
+              >
+                <option value="newest">Newest activity</option>
+                <option value="oldest">Oldest activity</option>
+              </select>
+              {(messageSearch || messageKindFilter !== "all" || messageReadFilter !== "all") && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setMessageSearch("");
+                    setMessageKindFilter("all");
+                    setMessageReadFilter("all");
+                  }}
+                >
+                  <X className="h-3.5 w-3.5 mr-1" />
+                  Clear
+                </Button>
+              )}
+            </Card>
+
+            {(() => {
+              const q = messageSearch.trim().toLowerCase();
+              const allThreads = groupThreads(messages);
+              const filtered = allThreads.filter((thread) => {
+                if (messageKindFilter !== "all" && !thread.some((m) => m.kind === messageKindFilter)) {
+                  return false;
+                }
+                if (messageReadFilter !== "all") {
+                  const hasUnread = thread.some(
+                    (m) => m.direction === "outbound" && !(m as any).read,
+                  );
+                  if (messageReadFilter === "unread" && !hasUnread) return false;
+                  if (messageReadFilter === "read" && hasUnread) return false;
+                }
+                if (q) {
+                  const hit = thread.some((m) =>
+                    [m.subject, m.body, m.contact_name]
+                      .filter(Boolean)
+                      .some((v) => String(v).toLowerCase().includes(q)),
+                  );
+                  if (!hit) return false;
+                }
+                return true;
+              });
+              if (messageSort === "oldest") {
+                filtered.sort((a, b) =>
+                  a[a.length - 1].occurred_at < b[b.length - 1].occurred_at ? -1 : 1,
+                );
+              }
+              if (messages.length === 0) {
+                return (
+                  <Card className="p-6">
+                    <p className="text-sm text-muted-foreground text-center py-8">
+                      No messages yet.
+                    </p>
+                  </Card>
+                );
+              }
+              if (filtered.length === 0) {
+                return (
+                  <Card className="p-6">
+                    <p className="text-sm text-muted-foreground text-center py-8">
+                      No messages match your filters.
+                    </p>
+                  </Card>
+                );
+              }
+              return filtered.map((thread) => {
+
                 const head = thread[0];
                 const last = thread[thread.length - 1];
                 const subject = head.subject ?? `${head.kind} conversation`;
