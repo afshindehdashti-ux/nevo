@@ -88,7 +88,7 @@ export function RoutedDocumentsList({
                 <p className="text-xs text-muted-foreground line-clamp-2">{d.summary}</p>
               )}
               <p className="text-[10px] text-muted-foreground mt-1">
-                {d.category ?? "—"} · {d.portal_visibility.replace(/_/g, " ")}
+                {d.category ?? "—"} · {(d.portal_visibility ?? "none").replace(/_/g, " ")}
               </p>
             </div>
             {d.portal_visibility === "on_request" ? (
