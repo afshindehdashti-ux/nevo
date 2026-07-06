@@ -32,10 +32,7 @@ export const EmailChangeEmail = ({
     <Preview>Confirm your new NEVO Industrial email address</Preview>
     <Body style={styles.main}>
       <Container style={styles.container}>
-        <Section style={styles.header}>
-          <Text style={styles.brandMark}>{brand.name}</Text>
-          <Text style={styles.brandTagline}>{brand.tagline}</Text>
-        </Section>
+        <BrandHeader />
 
         <Section style={styles.card}>
           <Heading style={styles.h1}>Confirm your email change</Heading>

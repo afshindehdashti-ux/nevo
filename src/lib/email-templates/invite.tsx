@@ -26,10 +26,7 @@ export const InviteEmail = ({ confirmationUrl }: InviteEmailProps) => (
     <Preview>You've been invited to the NEVO Industrial back office</Preview>
     <Body style={styles.main}>
       <Container style={styles.container}>
-        <Section style={styles.header}>
-          <Text style={styles.brandMark}>{brand.name}</Text>
-          <Text style={styles.brandTagline}>{brand.tagline}</Text>
-        </Section>
+        <BrandHeader />
 
         <Section style={styles.card}>
           <Heading style={styles.h1}>You're invited to the team</Heading>

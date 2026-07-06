@@ -25,10 +25,7 @@ export const MagicLinkEmail = ({ confirmationUrl }: MagicLinkEmailProps) => (
     <Preview>Your NEVO Industrial sign-in link</Preview>
     <Body style={styles.main}>
       <Container style={styles.container}>
-        <Section style={styles.header}>
-          <Text style={styles.brandMark}>{brand.name}</Text>
-          <Text style={styles.brandTagline}>{brand.tagline}</Text>
-        </Section>
+        <BrandHeader />
 
         <Section style={styles.card}>
           <Heading style={styles.h1}>Your sign-in link</Heading>
