@@ -53,6 +53,8 @@ import {
   FileText as FileIcon,
   Image as ImageIcon,
   ExternalLink,
+  Search,
+
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/portal")({
