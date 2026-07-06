@@ -559,6 +559,9 @@ function DownloadCenterPage() {
         </div>
       </section>
 
+      <section className="container mx-auto px-4 py-10">
+        <RoutedDocumentsList visibility={["public", "on_request"]} title="Documents Library" />
+      </section>
       <SiteFooter />
 
       <AnimatePresence>
