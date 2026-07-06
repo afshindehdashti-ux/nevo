@@ -1,121 +1,99 @@
-# NEVO Professionalization Roadmap
+# Back-office ERP MVP — Orders, Customer 360, Invoicing, Shipping
 
-Scope: English site only. No new pages, no new languages. Turn the current site into a production-ready industrial platform.
+از **Invoicing + Payments** شروع می‌کنم (اولویت شما)، ولی چون همه‌ی چهار حوزه به هم وابسته‌اند، **یک migration واحد** برای کل شِما می‌سازم و بعد ماژول‌ها را به ترتیب پیاده می‌کنم. اجرای هر ماژول کاملاً end-to-end است.
 
-Current baseline: 406 image files (~73 MB), 32 routes, 3 tools (Panel Configurator, Factory Layout Generator, Panel Thickness Calculator). Only the Thickness Calculator is fully dynamic today. Inquiry form exists but is not wired to a backend.
+## چه چیزی ساخته می‌شود
 
----
+### ۱. شِمای دیتابیس (یک migration)
+جدول‌های جدید در `public` با RLS، GRANT، تریگر `updated_at`، و پالیسی‌های نقش‌محور (`super_admin`/`management`/`sales`/`operations`/`finance`).
 
-## Phase 1 — Backend + Data Model (Foundation)
+```text
+orders                — سفارش مشتری (سربرگ)
+  status: draft | confirmed | in_production | ready_to_ship | shipped | delivered | cancelled
+  customer_id, currency, incoterm, order_date, requested_delivery, total_net/vat/gross, notes
+order_items           — خطوط سفارش (product_id, qty, unit_price, discount, line_total)
+order_status_history  — تاریخچه تغییر وضعیت با کاربر + timestamp
 
-**Goal:** everything downstream (inquiry form, calculator hand-off) writes to real storage.
+invoices              — proforma & commercial (نوع: proforma | commercial)
+  status: draft | issued | partially_paid | paid | overdue | void
+  order_id, customer_id, invoice_number (auto), issue_date, due_date,
+  currency, subtotal, vat_amount, total, amount_paid, balance
+invoice_items         — خطوط فاکتور
+invoice_number_seq    — sequence برای شماره‌گذاری خودکار (INV-2026-000123)
 
-1. Migration: `public.project_inquiries` table
-   - Columns: `id`, `created_at`, `name`, `email`, `phone`, `company`, `country`, `application`, `message`, `source_page`, `calculator_state jsonb`, `status`, `ip`, `user_agent`.
-   - RLS on. Policies: `anon + authenticated` may INSERT; only `admin` role may SELECT. GRANT block per project conventions.
-2. Migration: `public.download_events` (small event log for download-button clicks so "downloads" become real, trackable actions).
-3. Server function `submitInquiry` (createServerFn, no auth middleware — public form). Zod validation, rate-limit by IP, writes to `project_inquiries`.
-4. Server function `logDownload` for the download center.
+payments              — پرداخت‌های دریافتی
+  invoice_id, amount, currency, method (bank/card/cash/lc/other),
+  received_at, reference, notes
 
-## Phase 2 — Image Overhaul (visual replacement pass)
+shipments             — ارسال‌ها
+  order_id, status (preparing|in_transit|delivered), carrier, tracking_no,
+  incoterm, container_no, bl_number, shipped_at, delivered_at, notes
+shipment_items        — نگاشت آیتم‌های ارسال‌شده به order_items
 
-**Goal:** kill every poster crop, screenshot, blur, and placeholder. Replace with clean, high-res AI-generated industrial photography.
+documents             — انبار اسناد پیوست‌شونده
+  entity_type (order|invoice|shipment|customer), entity_id,
+  kind (proforma_pdf|commercial_pdf|packing_list|bl|coa|other),
+  file_path (Supabase Storage), file_name, mime_type, size, uploaded_by
+```
+یک bucket خصوصی به نام `crm-docs` برای PDF/فایل‌ها ساخته می‌شود.
 
-1. Audit script: enumerate every `import ... from "@/assets/..."` and every raw asset reference across all routes. Group by section (hero, industries, machinery, engineering, knowledge-hub, raw-materials, corporate, tools).
-2. Delete every screenshot-style tool preview (calculator/configurator/factory-layout hero crops) — they'll be replaced by the live components themselves in Phase 3.
-3. Generate a curated set of ~35–45 fresh **1536×1024 hero/section images** with `openai/gpt-image-2` premium via the agent image tool. Categories:
-   - Sandwich panel manufacturing lines (continuous laminator, cutting, stacking)
-   - Cold storage / freezer interiors with panels installed
-   - Cleanroom pharma/food facility interiors
-   - PIR/PUR/mineral wool raw materials, PPGI coils
-   - Engineering / R&D / QA lab environments
-   - Corporate: careers, contact, sustainability, investors
-   - Industries: food, pharma, logistics, retail cold chain
-4. Externalize every retained image via `lovable-assets` CLI so the repo stays lean and CDN delivery is fast. Delete original binaries from `src/assets`.
-5. Add descriptive `alt` text to every `<img>` in the same edit pass — this doubles as the SEO fix.
+### ۲. Customer 360 — ماژول اول UI
+- صفحه `/admin/customers/$id`: هدر مشتری + KPI (تعداد سفارش، مانده باز، LTV) + تب‌های:
+  - **Overview** (اطلاعات + یادداشت‌ها)
+  - **Orders** (لیست سفارش‌های همان مشتری با وضعیت)
+  - **Invoices** (فاکتورها + وضعیت پرداخت)
+  - **Shipments**
+  - **Documents**
+- لینک از ردیف‌های جدول موجود `admin/customers` به این صفحه.
 
-## Phase 3 — Rebuild the two remaining tools as dynamic components
+### ۳. Orders — CRUD + وضعیت
+- جایگزینی placeholder فعلی `admin.orders.tsx` با لیست کامل + فیلتر وضعیت/مشتری/تاریخ.
+- صفحه‌ی `/admin/orders/$id` با ویرایش خطوط، محاسبه‌ی خودکار جمع/مالیات، دکمه‌ی «تغییر وضعیت» با ثبت در `order_status_history`.
+- اکشن‌های سریع: **Generate Proforma**, **Generate Invoice**, **Create Shipment**.
 
-**Panel Configurator** (`$lang.product-configurator.tsx`)
+### ۴. Invoicing + Payments (اولویت اول شما)
+- جایگزینی `admin.proforma-invoices.tsx` و `admin.invoices.tsx` با لیست‌های واقعی + فیلتر وضعیت/تاریخ/مشتری.
+- صفحه‌ی جزئیات فاکتور با خطوط، وضعیت پرداخت، Timeline پرداخت‌ها.
+- **تولید PDF** (سرور فانکشن با `pdfkit` یا React-PDF مشابه cv-confirmation-pdf.ts موجود) و آپلود در bucket `crm-docs`، ثبت در `documents`.
+- ثبت پرداخت با فرم: مبلغ، تاریخ، روش، مرجع → به‌روزرسانی `amount_paid` و `status` (partial/paid).
+- شماره‌گذاری خودکار: `PRO-2026-XXXX` و `INV-2026-XXXX` از sequence.
 
-- Real React state: application, core, thickness, skin gauges, colour (RAL), length, joint type.
-- Live SVG cross-section (same style as Panel Thickness Calculator).
-- Live spec sheet: U-value, weight/m², fire class, recommended use.
-- Validation and impossible-combo guardrails (mirror Thickness Calculator patterns).
-- "Send to inquiry" button that navigates to Project Inquiry with encoded state.
+### ۵. Shipping + Documents
+- صفحه‌ی `/admin/shipments` و جزئیات با آپلود Packing List / BOL / COA.
+- در صفحه‌ی سفارش، تب Documents برای مشاهده/آپلود دستی.
+- Signed URL برای دانلود، دسترسی محدود به کاربران احراز شده.
 
-**Factory Layout Generator** (`$lang.factory-layout-generator.tsx`)
+## نقش‌ها و دسترسی
+- `super_admin`, `management`: همه چیز
+- `sales`: مشاهده و ویرایش orders/customers، فقط مشاهده invoice/payment/shipment
+- `operations`: orders/shipments/documents، فقط مشاهده invoice
+- `finance`: invoices/payments، فقط مشاهده orders/shipments
+- `read_only`: فقط مشاهده
 
-- Inputs: plant capacity (m³/day or panels/day), line width, panel length range, product mix (cold-room / façade / roof), site dimensions.
-- Deterministic layout algorithm places: decoiler, mixing station, laminator, cooling tunnel, cutting, stacking, packaging, raw material storage, finished-goods warehouse, offices, forklift lanes.
-- Renders a live scalable SVG floor plan with legend, dimensions, and area breakdown.
-- Outputs: total footprint (m²), theoretical throughput, staffing estimate, energy load estimate.
-- "Send layout to inquiry" CTA.
+هم در RLS و هم در `crm-permissions.ts` اعمال می‌شود.
 
-**Panel Thickness Calculator** — already dynamic; polish only: mobile layout, focus states, animation timing.
+## چیزی که در این پلن **نیست** (می‌تونیم بعداً اضافه کنیم)
+- درگاه پرداخت واقعی (Stripe/Paddle) — الان فقط ثبت دستی پرداخت
+- Purchase Orders / Suppliers side (خرید از تأمین‌کننده) — الان placeholder می‌ماند
+- ماژول انبار/موجودی (stock levels, lot tracking)
+- ایمیل خودکار فاکتور به مشتری (زیرساخت ایمیل branded آماده‌ست، در فاز بعد وصل می‌کنم)
+- گزارش‌های مالی پیشرفته (aging, cashflow) — یک KPI ساده در dashboard اضافه می‌شود
 
-## Phase 4 — Wire tools → Project Inquiry
+## ترتیب اجرا
+۱. Migration کامل schema + RLS + storage bucket → منتظر تایید شما
+۲. Customer 360 (چون همه‌ی ماژول‌ها به آن لینک می‌دهند)
+۳. Orders (CRUD + status flow)
+۴. Invoices + Payments + PDF
+۵. Shipments + Documents
 
-- Project Inquiry page reads `?config=...` (base64 JSON) query param and pre-fills a read-only "Attached configuration" card.
-- All three tools' primary CTA becomes "Request engineering recommendation" and links with the encoded state.
-- Inquiry form submits via `submitInquiry` server fn; success/error toast; disabled state during submit; honeypot field for spam.
+بعد از هر مرحله preview قابل تست است.
 
-## Phase 5 — Every CTA becomes real
+## جزئیات فنی
+- همه‌ی جدول‌ها: `id uuid pk`, `created_at`, `updated_at`, `created_by`, `updated_by`, تریگر `set_updated_at` و `stamp_updated_by` (موجود).
+- تریگر `log_row_delete` روی جدول‌های حساس (invoices, payments, orders).
+- Sequence با تابع SECURITY DEFINER برای شماره‌گذاری thread-safe.
+- Storage bucket `crm-docs` private + پالیسی خواندن/نوشتن برای نقش‌های مجاز از طریق server function با signed URL.
+- تمام queryها از طریق کلاینت مرورگر با RLS انجام می‌شوند (بدون service role).
+- PDFها با همان الگوی `src/lib/cv-confirmation-pdf.ts` (React-PDF) در server function.
 
-- Sweep every `<Link>`, `<a>`, `<Button>` across all 32 routes. Any target that resolves to `#`, `javascript:void`, or a missing route gets a real destination (existing route or scroll anchor to a real section).
-- "Read More / Learn More" on cards must go to the correct sub-route or knowledge-hub article.
-- Download-center buttons: generate real PDF spec sheets on the fly with `jsPDF` (same pattern already used in Thickness Calculator report), OR link to a real PDF asset. Every click logs to `download_events`.
-
-## Phase 6 — SEO, structured data, internal linking
-
-- Per-route `head()`: unique title (<60), description (<160), og:title, og:description, og:type, canonical, og:url. og:image only on leaf routes with a real hero.
-- JSON-LD: `Organization` sitewide (root), `Product` on panel/config routes, `Article` on knowledge-hub, `FAQPage` where FAQs exist, `BreadcrumbList` on deep routes.
-- `sitemap.xml` regenerated from actual route list.
-- Internal linking: every solution page links to relevant industries + tools; every knowledge-hub article links to related tools; footer gets a full sitemap block.
-- Alt text: done in Phase 2.
-
-## Phase 7 — Performance & Core Web Vitals
-
-- All hero images externalized to CDN (Phase 2) — massive LCP win.
-- Preload the LCP image per route via `head().links`.
-- `loading="lazy"` + `decoding="async"` on all below-the-fold images.
-- Explicit `width`/`height` on every `<img>` to eliminate CLS.
-- Font strategy: keep the existing `<link>` in `__root.tsx`; add `font-display: swap`.
-- Code-split the three heavy tool routes (they already use dynamic imports for jsPDF; extend to any charting libs).
-
-## Phase 8 — Responsive & polish QA
-
-Run Playwright at 375, 768, 1024, 1280, 1536 across the 12 highest-traffic routes. Capture screenshots. Fix each finding:
-
-- Overflow rows: apply the grid + min-w-0 + shrink-0 pattern from responsive-layout-patterns.
-- Clipped cards: normalize `aspect-ratio` and `object-fit`.
-- Broken sticky elements, off-screen buttons, wrapped nav.
-- Focus rings, tap targets ≥44px.
-
-## Phase 9 — Final sweep
-
-- Build passes (`bun run build`).
-- Typecheck clean.
-- Security scan (Cloud tables + edge fn if any).
-- Trigger SEO scan, resolve findings.
-
----
-
-## Technical notes
-
-- **Storage:** Lovable Cloud (Supabase). No email notifications this pass; admin views inquiries in backend panel.
-- **Images:** all AI-generated via agent `imagegen--generate_image` premium tier, then externalized to CDN via `lovable-assets`. Repo `src/assets` shrinks from 73 MB to <5 MB (only true source SVGs, .asset.json pointers).
-- **No new pages, no new languages.** English content only. Existing `$lang` routes stay; only English content polished.
-- **Reversibility:** each phase is a discrete commit; user can revert individually.
-
-## Deliverable per phase
-
-Each phase ends with: files changed listed, build green, one-line summary. I'll pause after **Phase 2** and **Phase 5** for you to sanity-check the visual direction and CTA behaviour before continuing.
-
-## Time estimate
-
-Long. Realistically 8–12 agent turns given image generation volume and the two tool rebuilds. I will not stop mid-phase.
-
----
-
-Approve to start with **Phase 1 (backend)**, or reorder phases if you want a different starting point.
+آماده‌ام شروع کنم. تأیید می‌کنی migration رو بسازم؟

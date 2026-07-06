@@ -18,3 +18,24 @@ export function useCanEditProducts() {
 export function useCanDeleteMasters() {
   return useHasAnyRole(["super_admin", "management"]);
 }
+export function useCanEditOrders() {
+  return useHasAnyRole(["super_admin", "management", "sales", "operations"]);
+}
+export function useCanEditInvoices() {
+  return useHasAnyRole(["super_admin", "management", "finance"]);
+}
+export function useCanEditPayments() {
+  return useHasAnyRole(["super_admin", "management", "finance"]);
+}
+export function useCanEditShipments() {
+  return useHasAnyRole(["super_admin", "management", "operations"]);
+}
+export function useCanUploadDocuments() {
+  return useHasAnyRole([
+    "super_admin",
+    "management",
+    "sales",
+    "operations",
+    "finance",
+  ]);
+}

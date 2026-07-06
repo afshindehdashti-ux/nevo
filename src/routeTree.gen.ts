@@ -56,6 +56,7 @@ import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminTasksRouteImport } from './routes/_authenticated/admin.tasks'
 import { Route as AuthenticatedAdminSuppliersRouteImport } from './routes/_authenticated/admin.suppliers'
 import { Route as AuthenticatedAdminSolutionsSeoRouteImport } from './routes/_authenticated/admin.solutions-seo'
+import { Route as AuthenticatedAdminShipmentsRouteImport } from './routes/_authenticated/admin.shipments'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminPurchaseOrdersRouteImport } from './routes/_authenticated/admin.purchase-orders'
@@ -83,6 +84,10 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as AuthenticatedAdminUsersInviteRouteImport } from './routes/_authenticated/admin.users.invite'
+import { Route as AuthenticatedAdminShipmentsIdRouteImport } from './routes/_authenticated/admin.shipments.$id'
+import { Route as AuthenticatedAdminOrdersIdRouteImport } from './routes/_authenticated/admin.orders.$id'
+import { Route as AuthenticatedAdminInvoicesIdRouteImport } from './routes/_authenticated/admin.invoices.$id'
+import { Route as AuthenticatedAdminCustomersIdRouteImport } from './routes/_authenticated/admin.customers.$id'
 
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
@@ -325,6 +330,12 @@ const AuthenticatedAdminSolutionsSeoRoute =
     path: '/solutions-seo',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminShipmentsRoute =
+  AuthenticatedAdminShipmentsRouteImport.update({
+    id: '/shipments',
+    path: '/shipments',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminSettingsRoute =
   AuthenticatedAdminSettingsRouteImport.update({
     id: '/settings',
@@ -482,6 +493,30 @@ const AuthenticatedAdminUsersInviteRoute =
     path: '/invite',
     getParentRoute: () => AuthenticatedAdminUsersRoute,
   } as any)
+const AuthenticatedAdminShipmentsIdRoute =
+  AuthenticatedAdminShipmentsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminShipmentsRoute,
+  } as any)
+const AuthenticatedAdminOrdersIdRoute =
+  AuthenticatedAdminOrdersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminOrdersRoute,
+  } as any)
+const AuthenticatedAdminInvoicesIdRoute =
+  AuthenticatedAdminInvoicesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminInvoicesRoute,
+  } as any)
+const AuthenticatedAdminCustomersIdRoute =
+  AuthenticatedAdminCustomersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminCustomersRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -531,19 +566,20 @@ export interface FileRoutesByFullPath {
   '/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
-  '/admin/customers': typeof AuthenticatedAdminCustomersRoute
+  '/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
   '/admin/files': typeof AuthenticatedAdminFilesRoute
-  '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
+  '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
   '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
-  '/admin/orders': typeof AuthenticatedAdminOrdersRoute
+  '/admin/orders': typeof AuthenticatedAdminOrdersRouteWithChildren
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/products': typeof AuthenticatedAdminProductsRoute
   '/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
   '/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
@@ -553,6 +589,10 @@ export interface FileRoutesByFullPath {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
+  '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
+  '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
+  '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -604,19 +644,20 @@ export interface FileRoutesByTo {
   '/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
-  '/admin/customers': typeof AuthenticatedAdminCustomersRoute
+  '/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
   '/admin/files': typeof AuthenticatedAdminFilesRoute
-  '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
+  '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
   '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
-  '/admin/orders': typeof AuthenticatedAdminOrdersRoute
+  '/admin/orders': typeof AuthenticatedAdminOrdersRouteWithChildren
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/products': typeof AuthenticatedAdminProductsRoute
   '/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
   '/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
@@ -626,6 +667,10 @@ export interface FileRoutesByTo {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
+  '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
+  '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
+  '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -681,19 +726,20 @@ export interface FileRoutesById {
   '/_authenticated/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/_authenticated/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/_authenticated/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
-  '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
+  '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
   '/_authenticated/admin/files': typeof AuthenticatedAdminFilesRoute
-  '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
+  '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/_authenticated/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
   '/_authenticated/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
-  '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
+  '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRouteWithChildren
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin/products': typeof AuthenticatedAdminProductsRoute
   '/_authenticated/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
   '/_authenticated/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/_authenticated/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
   '/_authenticated/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/_authenticated/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/_authenticated/admin/tasks': typeof AuthenticatedAdminTasksRoute
@@ -703,6 +749,10 @@ export interface FileRoutesById {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
+  '/_authenticated/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
+  '/_authenticated/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
+  '/_authenticated/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/_authenticated/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -771,6 +821,7 @@ export interface FileRouteTypes {
     | '/admin/purchase-orders'
     | '/admin/reports'
     | '/admin/settings'
+    | '/admin/shipments'
     | '/admin/solutions-seo'
     | '/admin/suppliers'
     | '/admin/tasks'
@@ -780,6 +831,10 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/$lang/solutions/'
     | '/admin/'
+    | '/admin/customers/$id'
+    | '/admin/invoices/$id'
+    | '/admin/orders/$id'
+    | '/admin/shipments/$id'
     | '/admin/users/invite'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -844,6 +899,7 @@ export interface FileRouteTypes {
     | '/admin/purchase-orders'
     | '/admin/reports'
     | '/admin/settings'
+    | '/admin/shipments'
     | '/admin/solutions-seo'
     | '/admin/suppliers'
     | '/admin/tasks'
@@ -853,6 +909,10 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/$lang/solutions'
     | '/admin'
+    | '/admin/customers/$id'
+    | '/admin/invoices/$id'
+    | '/admin/orders/$id'
+    | '/admin/shipments/$id'
     | '/admin/users/invite'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -920,6 +980,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/purchase-orders'
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/settings'
+    | '/_authenticated/admin/shipments'
     | '/_authenticated/admin/solutions-seo'
     | '/_authenticated/admin/suppliers'
     | '/_authenticated/admin/tasks'
@@ -929,6 +990,10 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/$lang/solutions/'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/customers/$id'
+    | '/_authenticated/admin/invoices/$id'
+    | '/_authenticated/admin/orders/$id'
+    | '/_authenticated/admin/shipments/$id'
     | '/_authenticated/admin/users/invite'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1287,6 +1352,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSolutionsSeoRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/shipments': {
+      id: '/_authenticated/admin/shipments'
+      path: '/shipments'
+      fullPath: '/admin/shipments'
+      preLoaderRoute: typeof AuthenticatedAdminShipmentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/settings': {
       id: '/_authenticated/admin/settings'
       path: '/settings'
@@ -1476,8 +1548,92 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersInviteRouteImport
       parentRoute: typeof AuthenticatedAdminUsersRoute
     }
+    '/_authenticated/admin/shipments/$id': {
+      id: '/_authenticated/admin/shipments/$id'
+      path: '/$id'
+      fullPath: '/admin/shipments/$id'
+      preLoaderRoute: typeof AuthenticatedAdminShipmentsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminShipmentsRoute
+    }
+    '/_authenticated/admin/orders/$id': {
+      id: '/_authenticated/admin/orders/$id'
+      path: '/$id'
+      fullPath: '/admin/orders/$id'
+      preLoaderRoute: typeof AuthenticatedAdminOrdersIdRouteImport
+      parentRoute: typeof AuthenticatedAdminOrdersRoute
+    }
+    '/_authenticated/admin/invoices/$id': {
+      id: '/_authenticated/admin/invoices/$id'
+      path: '/$id'
+      fullPath: '/admin/invoices/$id'
+      preLoaderRoute: typeof AuthenticatedAdminInvoicesIdRouteImport
+      parentRoute: typeof AuthenticatedAdminInvoicesRoute
+    }
+    '/_authenticated/admin/customers/$id': {
+      id: '/_authenticated/admin/customers/$id'
+      path: '/$id'
+      fullPath: '/admin/customers/$id'
+      preLoaderRoute: typeof AuthenticatedAdminCustomersIdRouteImport
+      parentRoute: typeof AuthenticatedAdminCustomersRoute
+    }
   }
 }
+
+interface AuthenticatedAdminCustomersRouteChildren {
+  AuthenticatedAdminCustomersIdRoute: typeof AuthenticatedAdminCustomersIdRoute
+}
+
+const AuthenticatedAdminCustomersRouteChildren: AuthenticatedAdminCustomersRouteChildren =
+  {
+    AuthenticatedAdminCustomersIdRoute: AuthenticatedAdminCustomersIdRoute,
+  }
+
+const AuthenticatedAdminCustomersRouteWithChildren =
+  AuthenticatedAdminCustomersRoute._addFileChildren(
+    AuthenticatedAdminCustomersRouteChildren,
+  )
+
+interface AuthenticatedAdminInvoicesRouteChildren {
+  AuthenticatedAdminInvoicesIdRoute: typeof AuthenticatedAdminInvoicesIdRoute
+}
+
+const AuthenticatedAdminInvoicesRouteChildren: AuthenticatedAdminInvoicesRouteChildren =
+  {
+    AuthenticatedAdminInvoicesIdRoute: AuthenticatedAdminInvoicesIdRoute,
+  }
+
+const AuthenticatedAdminInvoicesRouteWithChildren =
+  AuthenticatedAdminInvoicesRoute._addFileChildren(
+    AuthenticatedAdminInvoicesRouteChildren,
+  )
+
+interface AuthenticatedAdminOrdersRouteChildren {
+  AuthenticatedAdminOrdersIdRoute: typeof AuthenticatedAdminOrdersIdRoute
+}
+
+const AuthenticatedAdminOrdersRouteChildren: AuthenticatedAdminOrdersRouteChildren =
+  {
+    AuthenticatedAdminOrdersIdRoute: AuthenticatedAdminOrdersIdRoute,
+  }
+
+const AuthenticatedAdminOrdersRouteWithChildren =
+  AuthenticatedAdminOrdersRoute._addFileChildren(
+    AuthenticatedAdminOrdersRouteChildren,
+  )
+
+interface AuthenticatedAdminShipmentsRouteChildren {
+  AuthenticatedAdminShipmentsIdRoute: typeof AuthenticatedAdminShipmentsIdRoute
+}
+
+const AuthenticatedAdminShipmentsRouteChildren: AuthenticatedAdminShipmentsRouteChildren =
+  {
+    AuthenticatedAdminShipmentsIdRoute: AuthenticatedAdminShipmentsIdRoute,
+  }
+
+const AuthenticatedAdminShipmentsRouteWithChildren =
+  AuthenticatedAdminShipmentsRoute._addFileChildren(
+    AuthenticatedAdminShipmentsRouteChildren,
+  )
 
 interface AuthenticatedAdminUsersRouteChildren {
   AuthenticatedAdminUsersInviteRoute: typeof AuthenticatedAdminUsersInviteRoute
@@ -1498,19 +1654,20 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminChangePasswordRoute: typeof AuthenticatedAdminChangePasswordRoute
   AuthenticatedAdminCommissionInvoicesRoute: typeof AuthenticatedAdminCommissionInvoicesRoute
   AuthenticatedAdminControlPanelRoute: typeof AuthenticatedAdminControlPanelRoute
-  AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
+  AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRouteWithChildren
   AuthenticatedAdminFilesRoute: typeof AuthenticatedAdminFilesRoute
-  AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRoute
+  AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRouteWithChildren
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
   AuthenticatedAdminLogoEventsRoute: typeof AuthenticatedAdminLogoEventsRoute
   AuthenticatedAdminOpportunitiesRoute: typeof AuthenticatedAdminOpportunitiesRoute
-  AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
+  AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRouteWithChildren
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminProductsRoute: typeof AuthenticatedAdminProductsRoute
   AuthenticatedAdminProformaInvoicesRoute: typeof AuthenticatedAdminProformaInvoicesRoute
   AuthenticatedAdminPurchaseOrdersRoute: typeof AuthenticatedAdminPurchaseOrdersRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
+  AuthenticatedAdminShipmentsRoute: typeof AuthenticatedAdminShipmentsRouteWithChildren
   AuthenticatedAdminSolutionsSeoRoute: typeof AuthenticatedAdminSolutionsSeoRoute
   AuthenticatedAdminSuppliersRoute: typeof AuthenticatedAdminSuppliersRoute
   AuthenticatedAdminTasksRoute: typeof AuthenticatedAdminTasksRoute
@@ -1524,13 +1681,14 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCommissionInvoicesRoute:
     AuthenticatedAdminCommissionInvoicesRoute,
   AuthenticatedAdminControlPanelRoute: AuthenticatedAdminControlPanelRoute,
-  AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
+  AuthenticatedAdminCustomersRoute:
+    AuthenticatedAdminCustomersRouteWithChildren,
   AuthenticatedAdminFilesRoute: AuthenticatedAdminFilesRoute,
-  AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRoute,
+  AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRouteWithChildren,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
   AuthenticatedAdminLogoEventsRoute: AuthenticatedAdminLogoEventsRoute,
   AuthenticatedAdminOpportunitiesRoute: AuthenticatedAdminOpportunitiesRoute,
-  AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
+  AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRouteWithChildren,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedAdminProductsRoute: AuthenticatedAdminProductsRoute,
   AuthenticatedAdminProformaInvoicesRoute:
@@ -1538,6 +1696,8 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminPurchaseOrdersRoute: AuthenticatedAdminPurchaseOrdersRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+  AuthenticatedAdminShipmentsRoute:
+    AuthenticatedAdminShipmentsRouteWithChildren,
   AuthenticatedAdminSolutionsSeoRoute: AuthenticatedAdminSolutionsSeoRoute,
   AuthenticatedAdminSuppliersRoute: AuthenticatedAdminSuppliersRoute,
   AuthenticatedAdminTasksRoute: AuthenticatedAdminTasksRoute,
