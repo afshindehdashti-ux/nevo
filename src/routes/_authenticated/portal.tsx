@@ -378,14 +378,14 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                   <div key={m.id} className="border border-border rounded-md p-3">
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <div className="flex items-center gap-2 text-xs">
-                        {m.direction === "in" ? (
+                        {m.direction === "inbound" ? (
                           <ArrowDownLeft className="h-3.5 w-3.5 text-emerald-600" />
                         ) : (
                           <ArrowUpRight className="h-3.5 w-3.5 text-blue-600" />
                         )}
                         <Badge variant="outline">{m.kind}</Badge>
                         <span className="text-muted-foreground">
-                          {m.contact_name ?? (m.direction === "in" ? "From you" : "From NEVO")}
+                          {m.contact_name ?? (m.direction === "inbound" ? "From you" : "From NEVO")}
                         </span>
                       </div>
                       <span className="text-xs text-muted-foreground">
