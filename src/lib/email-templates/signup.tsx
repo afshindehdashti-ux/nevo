@@ -3,7 +3,6 @@ import {
   Body,
   Button,
   Container,
-  Head,
   Heading,
   Html,
   Link,
