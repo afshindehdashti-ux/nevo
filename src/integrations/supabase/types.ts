@@ -159,7 +159,9 @@ export type Database = {
           kind: Database["public"]["Enums"]["communication_kind"]
           metadata: Json
           occurred_at: string
+          parent_id: string | null
           subject: string | null
+          thread_id: string | null
           updated_at: string
           updated_by: string | null
           user_id: string | null
@@ -180,7 +182,9 @@ export type Database = {
           kind?: Database["public"]["Enums"]["communication_kind"]
           metadata?: Json
           occurred_at?: string
+          parent_id?: string | null
           subject?: string | null
+          thread_id?: string | null
           updated_at?: string
           updated_by?: string | null
           user_id?: string | null
@@ -201,12 +205,22 @@ export type Database = {
           kind?: Database["public"]["Enums"]["communication_kind"]
           metadata?: Json
           occurred_at?: string
+          parent_id?: string | null
           subject?: string | null
+          thread_id?: string | null
           updated_at?: string
           updated_by?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "communications_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "communications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       company_settings: {
         Row: {
