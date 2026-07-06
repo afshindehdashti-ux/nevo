@@ -548,10 +548,27 @@ export const signDocumentUrl = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: doc, error } = await context.supabase
       .from("doc_intel_documents")
-      .select("storage_bucket,storage_path,routed_bucket,routed_path,stored_filename,original_filename")
+      .select(
+        "storage_bucket,storage_path,routed_bucket,routed_path,stored_filename,original_filename,confidentiality_level,status,uploaded_by,customer_id,partner_id",
+      )
       .eq("id", data.id)
       .single();
     if (error || !doc) throw new Error(error?.message ?? "Not found");
+
+    const sensitive = ["confidential", "restricted", "secret"].includes(
+      (doc.confidentiality_level ?? "").toLowerCase(),
+    );
+    if (sensitive && doc.status !== "approved") {
+      const isUploader = doc.uploaded_by === context.userId;
+      const { data: canApprove } = await context.supabase.rpc("has_any_role", {
+        _user_id: context.userId,
+        _roles: ["super_admin", "management", "finance"],
+      });
+      if (!isUploader && !canApprove) {
+        throw new Error("Document is pending approval — access locked");
+      }
+    }
+
     const bucket =
       data.which === "routed" && doc.routed_bucket ? doc.routed_bucket : doc.storage_bucket;
     const path = data.which === "routed" && doc.routed_path ? doc.routed_path : doc.storage_path;
