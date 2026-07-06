@@ -79,6 +79,7 @@ import { Route as AuthenticatedAdminDocumentAccessRouteImport } from './routes/_
 import { Route as AuthenticatedAdminDocIntelRulesRouteImport } from './routes/_authenticated/admin.doc-intel-rules'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
 import { Route as AuthenticatedAdminControlPanelRouteImport } from './routes/_authenticated/admin.control-panel'
+import { Route as AuthenticatedAdminCommunicationsRouteImport } from './routes/_authenticated/admin.communications'
 import { Route as AuthenticatedAdminCommissionInvoicesRouteImport } from './routes/_authenticated/admin.commission-invoices'
 import { Route as AuthenticatedAdminChangePasswordRouteImport } from './routes/_authenticated/admin.change-password'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
@@ -475,6 +476,12 @@ const AuthenticatedAdminControlPanelRoute =
     path: '/control-panel',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminCommunicationsRoute =
+  AuthenticatedAdminCommunicationsRouteImport.update({
+    id: '/communications',
+    path: '/communications',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminCommissionInvoicesRoute =
   AuthenticatedAdminCommissionInvoicesRouteImport.update({
     id: '/commission-invoices',
@@ -643,6 +650,7 @@ export interface FileRoutesByFullPath {
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
+  '/admin/communications': typeof AuthenticatedAdminCommunicationsRoute
   '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
   '/admin/doc-intel-rules': typeof AuthenticatedAdminDocIntelRulesRoute
@@ -732,6 +740,7 @@ export interface FileRoutesByTo {
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
+  '/admin/communications': typeof AuthenticatedAdminCommunicationsRoute
   '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
   '/admin/doc-intel-rules': typeof AuthenticatedAdminDocIntelRulesRoute
@@ -825,6 +834,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/_authenticated/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/_authenticated/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
+  '/_authenticated/admin/communications': typeof AuthenticatedAdminCommunicationsRoute
   '/_authenticated/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
   '/_authenticated/admin/doc-intel-rules': typeof AuthenticatedAdminDocIntelRulesRoute
@@ -918,6 +928,7 @@ export interface FileRouteTypes {
     | '/admin/activity'
     | '/admin/change-password'
     | '/admin/commission-invoices'
+    | '/admin/communications'
     | '/admin/control-panel'
     | '/admin/customers'
     | '/admin/doc-intel-rules'
@@ -1007,6 +1018,7 @@ export interface FileRouteTypes {
     | '/admin/activity'
     | '/admin/change-password'
     | '/admin/commission-invoices'
+    | '/admin/communications'
     | '/admin/control-panel'
     | '/admin/customers'
     | '/admin/doc-intel-rules'
@@ -1099,6 +1111,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/activity'
     | '/_authenticated/admin/change-password'
     | '/_authenticated/admin/commission-invoices'
+    | '/_authenticated/admin/communications'
     | '/_authenticated/admin/control-panel'
     | '/_authenticated/admin/customers'
     | '/_authenticated/admin/doc-intel-rules'
@@ -1655,6 +1668,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminControlPanelRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/communications': {
+      id: '/_authenticated/admin/communications'
+      path: '/communications'
+      fullPath: '/admin/communications'
+      preLoaderRoute: typeof AuthenticatedAdminCommunicationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/commission-invoices': {
       id: '/_authenticated/admin/commission-invoices'
       path: '/commission-invoices'
@@ -1916,6 +1936,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
   AuthenticatedAdminChangePasswordRoute: typeof AuthenticatedAdminChangePasswordRoute
   AuthenticatedAdminCommissionInvoicesRoute: typeof AuthenticatedAdminCommissionInvoicesRoute
+  AuthenticatedAdminCommunicationsRoute: typeof AuthenticatedAdminCommunicationsRoute
   AuthenticatedAdminControlPanelRoute: typeof AuthenticatedAdminControlPanelRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRouteWithChildren
   AuthenticatedAdminDocIntelRulesRoute: typeof AuthenticatedAdminDocIntelRulesRoute
@@ -1948,6 +1969,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminChangePasswordRoute: AuthenticatedAdminChangePasswordRoute,
   AuthenticatedAdminCommissionInvoicesRoute:
     AuthenticatedAdminCommissionInvoicesRoute,
+  AuthenticatedAdminCommunicationsRoute: AuthenticatedAdminCommunicationsRoute,
   AuthenticatedAdminControlPanelRoute: AuthenticatedAdminControlPanelRoute,
   AuthenticatedAdminCustomersRoute:
     AuthenticatedAdminCustomersRouteWithChildren,
