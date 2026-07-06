@@ -1,14 +1,163 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { AdminPlaceholder } from "@/components/crm/AdminPlaceholder";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { MasterListShell } from "@/components/crm/MasterListShell";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { formatDate, formatMoney } from "@/lib/crm-money";
+import {
+  INVOICE_STATUSES,
+  invoiceStatusLabel,
+  invoiceStatusVariant,
+  type InvoiceStatus,
+} from "@/lib/crm-status";
 
 export const Route = createFileRoute("/_authenticated/admin/invoices")({
-  head: () => ({
-    meta: [{ title: "Invoices — NEVO CRM" }, { name: "robots", content: "noindex" }],
-  }),
-  component: () => (
-    <AdminPlaceholder
-      title="Invoices"
-      description="Manage Invoices in the NEVO Industrial back office."
-    />
-  ),
+  head: () => ({ meta: [{ title: "Invoices — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  component: () => <InvoicesList type="commercial" title="Invoices" />,
 });
+
+export function InvoicesList({
+  type,
+  title,
+}: {
+  type: "commercial" | "proforma";
+  title: string;
+}) {
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<InvoiceStatus | "all">("all");
+
+  const { data: invoices = [], isLoading } = useQuery({
+    queryKey: ["invoices", type],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("invoices")
+        .select("*, customers(name)")
+        .eq("type", type)
+        .order("issue_date", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return invoices.filter((i) => {
+      if (statusFilter !== "all" && i.status !== statusFilter) return false;
+      if (!q) return true;
+      const cName = (i.customers as { name?: string } | null)?.name || "";
+      return (
+        (i.invoice_number || "").toLowerCase().includes(q) ||
+        cName.toLowerCase().includes(q)
+      );
+    });
+  }, [invoices, search, statusFilter]);
+
+  return (
+    <MasterListShell
+      title={title}
+      description={
+        type === "proforma"
+          ? "Proforma invoices sent before shipment."
+          : "Commercial invoices with payment tracking."
+      }
+      count={invoices.length}
+      search={search}
+      onSearchChange={setSearch}
+      canCreate={false}
+      onCreate={() => {}}
+    >
+      <div className="p-3 border-b flex gap-2 items-center">
+        <Label className="text-xs text-muted-foreground">Status</Label>
+        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as InvoiceStatus | "all")}>
+          <SelectTrigger className="w-52 h-8">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            {INVOICE_STATUSES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {invoiceStatusLabel(s)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground ml-auto">
+          Create from an <Link to="/admin/orders" className="text-primary hover:underline">order</Link>.
+        </p>
+      </div>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Invoice #</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Due</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Total</TableHead>
+              <TableHead className="text-right">Balance</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading && (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  Loading…
+                </TableCell>
+              </TableRow>
+            )}
+            {!isLoading && filtered.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
+                  {invoices.length === 0
+                    ? `No ${type === "proforma" ? "proforma " : ""}invoices yet.`
+                    : "No matches."}
+                </TableCell>
+              </TableRow>
+            )}
+            {filtered.map((i) => (
+              <TableRow key={i.id}>
+                <TableCell>
+                  <Link
+                    to="/admin/invoices/$id"
+                    params={{ id: i.id }}
+                    className="text-primary hover:underline font-medium"
+                  >
+                    {i.invoice_number}
+                  </Link>
+                </TableCell>
+                <TableCell>{(i.customers as { name?: string } | null)?.name || "—"}</TableCell>
+                <TableCell>{formatDate(i.issue_date)}</TableCell>
+                <TableCell>{formatDate(i.due_date)}</TableCell>
+                <TableCell>
+                  <Badge variant={invoiceStatusVariant(i.status)}>
+                    {invoiceStatusLabel(i.status)}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">{formatMoney(i.total, i.currency)}</TableCell>
+                <TableCell className="text-right">{formatMoney(i.balance, i.currency)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </MasterListShell>
+  );
+}
