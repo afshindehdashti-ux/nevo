@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { CrmSidebar } from "@/components/crm/CrmSidebar";
@@ -14,6 +14,28 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 function AdminLayout() {
   const { data: user } = useCurrentUser();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Force password change on first sign-in with a temporary password
+  useEffect(() => {
+    if (!user?.id) return;
+    if (location.pathname === "/admin/change-password") return;
+    let cancelled = false;
+    supabase
+      .from("profiles")
+      .select("must_change_password")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled && data?.must_change_password) {
+          navigate({ to: "/admin/change-password", replace: true });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, location.pathname, navigate]);
 
   // Track last login (fire-and-forget, once per session mount)
   useEffect(() => {
