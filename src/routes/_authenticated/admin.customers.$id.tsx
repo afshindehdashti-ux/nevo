@@ -42,6 +42,8 @@ export const Route = createFileRoute("/_authenticated/admin/customers/$id")({
 
 function CustomerDetailPage() {
   const { id } = useParams({ from: "/_authenticated/admin/customers/$id" });
+  const qc = useQueryClient();
+  const generateSummary = useServerFn(generateEntitySummary);
 
   const { data: customer, isLoading } = useQuery({
     queryKey: ["customer", id],
@@ -54,6 +56,16 @@ function CustomerDetailPage() {
       if (error) throw error;
       return data;
     },
+  });
+
+  const summaryMutation = useMutation({
+    mutationFn: async () =>
+      await generateSummary({ data: { entity: "customer" as const, id } }),
+    onSuccess: () => {
+      toast.success("AI summary updated");
+      qc.invalidateQueries({ queryKey: ["customer", id] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "AI failed"),
   });
 
   const { data: orders = [] } = useQuery({
