@@ -45,3 +45,39 @@ export const logAdminSignIn = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true, ip, country };
   });
+
+export type SignInEvent = {
+  id: string;
+  at: string;
+  ip: string | null;
+  user_agent: string | null;
+  country: string | null;
+};
+
+/**
+ * Returns the current user's recent admin sign-in events (from activity_logs).
+ * Ordered most-recent first. Limited to 10 rows.
+ */
+export const getMySignInHistory = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<SignInEvent[]> => {
+    const { data, error } = await context.supabase
+      .from("activity_logs")
+      .select("id, created_at, metadata")
+      .eq("user_id", context.userId)
+      .eq("action", "sign_in")
+      .eq("entity_type", "auth")
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((r) => {
+      const md = (r.metadata ?? {}) as Record<string, unknown>;
+      return {
+        id: r.id as string,
+        at: (md.at as string) || (r.created_at as string),
+        ip: (md.ip as string | null) ?? null,
+        user_agent: (md.user_agent as string | null) ?? null,
+        country: (md.country as string | null) ?? null,
+      };
+    });
+  });
