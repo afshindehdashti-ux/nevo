@@ -82,6 +82,7 @@ import { Route as AuthenticatedAdminControlPanelRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminCommunicationsRouteImport } from './routes/_authenticated/admin.communications'
 import { Route as AuthenticatedAdminCommissionInvoicesRouteImport } from './routes/_authenticated/admin.commission-invoices'
 import { Route as AuthenticatedAdminChangePasswordRouteImport } from './routes/_authenticated/admin.change-password'
+import { Route as AuthenticatedAdminApprovalsRouteImport } from './routes/_authenticated/admin.approvals'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
 import { Route as LangSolutionsSandwichPanelsRouteImport } from './routes/$lang.solutions.sandwich-panels'
 import { Route as LangSolutionsRawMaterialsRouteImport } from './routes/$lang.solutions.raw-materials'
@@ -494,6 +495,12 @@ const AuthenticatedAdminChangePasswordRoute =
     path: '/change-password',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminApprovalsRoute =
+  AuthenticatedAdminApprovalsRouteImport.update({
+    id: '/approvals',
+    path: '/approvals',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminActivityRoute =
   AuthenticatedAdminActivityRouteImport.update({
     id: '/activity',
@@ -648,6 +655,7 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
   '/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/admin/communications': typeof AuthenticatedAdminCommunicationsRoute
@@ -738,6 +746,7 @@ export interface FileRoutesByTo {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
   '/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/admin/communications': typeof AuthenticatedAdminCommunicationsRoute
@@ -832,6 +841,7 @@ export interface FileRoutesById {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/_authenticated/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
   '/_authenticated/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/_authenticated/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/_authenticated/admin/communications': typeof AuthenticatedAdminCommunicationsRoute
@@ -926,6 +936,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
     | '/admin/activity'
+    | '/admin/approvals'
     | '/admin/change-password'
     | '/admin/commission-invoices'
     | '/admin/communications'
@@ -1016,6 +1027,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
     | '/admin/activity'
+    | '/admin/approvals'
     | '/admin/change-password'
     | '/admin/commission-invoices'
     | '/admin/communications'
@@ -1109,6 +1121,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
     | '/_authenticated/admin/activity'
+    | '/_authenticated/admin/approvals'
     | '/_authenticated/admin/change-password'
     | '/_authenticated/admin/commission-invoices'
     | '/_authenticated/admin/communications'
@@ -1689,6 +1702,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminChangePasswordRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/approvals': {
+      id: '/_authenticated/admin/approvals'
+      path: '/approvals'
+      fullPath: '/admin/approvals'
+      preLoaderRoute: typeof AuthenticatedAdminApprovalsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/activity': {
       id: '/_authenticated/admin/activity'
       path: '/activity'
@@ -1934,6 +1954,7 @@ const AuthenticatedAdminUsersRouteWithChildren =
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
+  AuthenticatedAdminApprovalsRoute: typeof AuthenticatedAdminApprovalsRoute
   AuthenticatedAdminChangePasswordRoute: typeof AuthenticatedAdminChangePasswordRoute
   AuthenticatedAdminCommissionInvoicesRoute: typeof AuthenticatedAdminCommissionInvoicesRoute
   AuthenticatedAdminCommunicationsRoute: typeof AuthenticatedAdminCommunicationsRoute
@@ -1966,6 +1987,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
+  AuthenticatedAdminApprovalsRoute: AuthenticatedAdminApprovalsRoute,
   AuthenticatedAdminChangePasswordRoute: AuthenticatedAdminChangePasswordRoute,
   AuthenticatedAdminCommissionInvoicesRoute:
     AuthenticatedAdminCommissionInvoicesRoute,
