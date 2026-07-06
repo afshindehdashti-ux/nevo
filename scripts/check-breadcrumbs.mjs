@@ -81,7 +81,10 @@ function validateBreadcrumb(bc) {
   let expectedPos = 1;
   items.forEach((li, i) => {
     const label = `itemListElement[${i}]`;
-    if (!li || typeof li !== "object") { errors.push(`${label} not an object`); return; }
+    if (!li || typeof li !== "object") {
+      errors.push(`${label} not an object`);
+      return;
+    }
     if (li["@type"] !== "ListItem") errors.push(`${label}.@type must be ListItem`);
     if (typeof li.position !== "number" || !Number.isFinite(li.position)) {
       errors.push(`${label}.position must be a number`);
@@ -99,7 +102,9 @@ function validateBreadcrumb(bc) {
     } else {
       const url = typeof li.item === "string" ? li.item : li.item?.["@id"];
       if (!isAbsoluteHttp(url)) {
-        errors.push(`${label}.item must be an absolute http(s) URL (got ${JSON.stringify(li.item)})`);
+        errors.push(
+          `${label}.item must be an absolute http(s) URL (got ${JSON.stringify(li.item)})`,
+        );
       }
     }
   });
@@ -114,13 +119,13 @@ function auditPage(html, locale, path) {
   const failures = [];
   if (parseErrors.length) failures.push(`JSON parse errors: ${parseErrors.join("; ")}`);
   if (breadcrumbs.length === 0) failures.push("no BreadcrumbList JSON-LD found");
-  if (breadcrumbs.length > 1) failures.push(`expected exactly 1 BreadcrumbList, found ${breadcrumbs.length}`);
+  if (breadcrumbs.length > 1)
+    failures.push(`expected exactly 1 BreadcrumbList, found ${breadcrumbs.length}`);
 
   breadcrumbs.forEach((bc, i) => {
     const errs = validateBreadcrumb(bc);
     for (const e of errs) failures.push(`BreadcrumbList[${i}]: ${e}`);
   });
-
 
   return {
     url: `/${locale}${path}`,
@@ -136,7 +141,10 @@ function auditPage(html, locale, path) {
 function isPortOpen(port, host = "127.0.0.1") {
   return new Promise((resolve) => {
     const s = net.createConnection({ port, host });
-    s.once("connect", () => { s.destroy(); resolve(true); });
+    s.once("connect", () => {
+      s.destroy();
+      resolve(true);
+    });
     s.once("error", () => resolve(false));
   });
 }
@@ -164,7 +172,10 @@ async function startDevServer() {
   proc.stderr.on("data", () => {});
   const baseUrl = `http://127.0.0.1:${PORT}`;
   const ok = await waitForServer(baseUrl);
-  if (!ok) { proc.kill("SIGTERM"); throw new Error(`Dev server on ${baseUrl} did not become ready`); }
+  if (!ok) {
+    proc.kill("SIGTERM");
+    throw new Error(`Dev server on ${baseUrl} did not become ready`);
+  }
   return { baseUrl, proc };
 }
 
@@ -233,17 +244,27 @@ async function run() {
   const failed = results.filter((r) => r.failures.length > 0);
 
   if (JSON_OUT) {
-    process.stdout.write(JSON.stringify({
-      base: baseUrl,
-      total: results.length,
-      failed: failed.length,
-      results,
-    }, null, 2) + "\n");
+    process.stdout.write(
+      JSON.stringify(
+        {
+          base: baseUrl,
+          total: results.length,
+          failed: failed.length,
+          results,
+        },
+        null,
+        2,
+      ) + "\n",
+    );
   } else {
-    console.log(`\nBreadcrumbList JSON-LD check — ${results.length} pages ` +
-      `(${LOCALES.length} locales × ${SOLUTIONS_ROUTES.length} Solutions routes) @ ${baseUrl}\n`);
+    console.log(
+      `\nBreadcrumbList JSON-LD check — ${results.length} pages ` +
+        `(${LOCALES.length} locales × ${SOLUTIONS_ROUTES.length} Solutions routes) @ ${baseUrl}\n`,
+    );
     if (failed.length === 0) {
-      console.log(`✓ All ${results.length} pages have a valid BreadcrumbList with absolute URLs.\n`);
+      console.log(
+        `✓ All ${results.length} pages have a valid BreadcrumbList with absolute URLs.\n`,
+      );
     } else {
       console.log(`✗ ${failed.length} page(s) failed:\n`);
       for (const f of failed) {

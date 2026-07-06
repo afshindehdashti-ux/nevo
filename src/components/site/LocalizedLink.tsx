@@ -24,38 +24,40 @@ function startsWithLocale(path: string) {
   return (SUPPORTED_LOCALES as readonly string[]).includes(first);
 }
 
-export const LocalizedLink = forwardRef<HTMLAnchorElement, AnyLinkProps>(
-  function LocalizedLink({ to, params, ...rest }, ref) {
-    const routeParams = useParams({ strict: false }) as { lang?: Locale };
-    const lang = (routeParams?.lang ?? DEFAULT_LOCALE) as Locale;
+export const LocalizedLink = forwardRef<HTMLAnchorElement, AnyLinkProps>(function LocalizedLink(
+  { to, params, ...rest },
+  ref,
+) {
+  const routeParams = useParams({ strict: false }) as { lang?: Locale };
+  const lang = (routeParams?.lang ?? DEFAULT_LOCALE) as Locale;
 
-    if (typeof to !== "string" || !to.startsWith("/")) {
-      // eslint-disable-next-line jsx-a11y/anchor-has-content
-      return <a ref={ref} href={to as string | undefined} {...(rest as ComponentPropsWithoutRef<"a">)} />;
-    }
+  if (typeof to !== "string" || !to.startsWith("/")) {
+    return (
+      <a ref={ref} href={to as string | undefined} {...(rest as ComponentPropsWithoutRef<"a">)} />
+    );
+  }
 
-    if (to.startsWith("/$lang") || startsWithLocale(to)) {
-      return (
-        <TSLink
-          ref={ref}
-          {...(rest as object)}
-          to={to as never}
-          params={{ ...(params ?? {}), lang } as never}
-        />
-      );
-    }
-
-    const suffix = to === "/" ? "/" : to;
-    const nextTo = `/$lang${suffix}`;
+  if (to.startsWith("/$lang") || startsWithLocale(to)) {
     return (
       <TSLink
         ref={ref}
         {...(rest as object)}
-        to={nextTo as never}
+        to={to as never}
         params={{ ...(params ?? {}), lang } as never}
       />
     );
   }
-);
+
+  const suffix = to === "/" ? "/" : to;
+  const nextTo = `/$lang${suffix}`;
+  return (
+    <TSLink
+      ref={ref}
+      {...(rest as object)}
+      to={nextTo as never}
+      params={{ ...(params ?? {}), lang } as never}
+    />
+  );
+});
 
 export { LocalizedLink as Link };

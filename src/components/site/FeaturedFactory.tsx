@@ -33,9 +33,7 @@ export function FeaturedFactory() {
 
         <div className="flex flex-col justify-center lg:col-span-5">
           <Eyebrow>{t("home.featured.eyebrow")}</Eyebrow>
-          <h2 className="text-h1 mt-6 text-balance text-foreground">
-            {t("home.featured.title")}
-          </h2>
+          <h2 className="text-h1 mt-6 text-balance text-foreground">{t("home.featured.title")}</h2>
           <p className="text-body-lg mt-6">{t("home.featured.body1")}</p>
           <p className="text-body mt-4">{t("home.featured.body2")}</p>
 

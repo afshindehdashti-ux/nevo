@@ -8,13 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { useEffect, type ReactNode } from "react";
-import {
-  BookOpen,
-  Calculator,
-  ClipboardList,
-  ArrowRight,
-  Home,
-} from "lucide-react";
+import { BookOpen, Calculator, ClipboardList, ArrowRight, Home } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import nevoLogoDark from "@/assets/nevo-logo-dark.png";
@@ -58,12 +52,16 @@ function NotFoundComponent() {
             to="/"
             className="flex items-center gap-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <img loading="lazy" decoding="async"
+            <img
+              loading="lazy"
+              decoding="async"
               src={nevoLogoDark}
               alt="NEVO Industrial"
               className="h-7 w-auto dark:hidden"
             />
-            <img loading="lazy" decoding="async"
+            <img
+              loading="lazy"
+              decoding="async"
               src={nevoLogoLight}
               alt="NEVO Industrial"
               className="hidden h-7 w-auto dark:block"
@@ -78,9 +76,7 @@ function NotFoundComponent() {
           <div className="mx-auto max-w-4xl text-center">
             <div className="eyebrow mb-4 text-accent">{t("errors.notFoundEyebrow")}</div>
             <h1 className="text-display mb-5">{t("errors.notFoundTitle")}</h1>
-            <p className="text-body-lg mx-auto max-w-2xl">
-              {t("errors.notFoundBody")}
-            </p>
+            <p className="text-body-lg mx-auto max-w-2xl">{t("errors.notFoundBody")}</p>
 
             {/* Direct link cards */}
             <div className="mt-14 grid gap-4 sm:grid-cols-3">
@@ -92,9 +88,7 @@ function NotFoundComponent() {
                   <BookOpen className="h-5 w-5" />
                 </div>
                 <h3 className="text-h3 mb-1">{t("knowledge.articles")}</h3>
-                <p className="text-small">
-                  Technical guides, FAQs, and academy courses.
-                </p>
+                <p className="text-small">Technical guides, FAQs, and academy courses.</p>
                 <span className="mt-4 inline-flex items-center text-sm font-medium text-accent">
                   Explore
                   <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -109,9 +103,7 @@ function NotFoundComponent() {
                   <Calculator className="h-5 w-5" />
                 </div>
                 <h3 className="text-h3 mb-1">{t("knowledge.tools")}</h3>
-                <p className="text-small">
-                  20+ calculators for panels, loads, and energy.
-                </p>
+                <p className="text-small">20+ calculators for panels, loads, and energy.</p>
                 <span className="mt-4 inline-flex items-center text-sm font-medium text-accent">
                   Calculate
                   <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -126,9 +118,7 @@ function NotFoundComponent() {
                   <ClipboardList className="h-5 w-5" />
                 </div>
                 <h3 className="text-h3 mb-1">{t("cta.requestQuotation")}</h3>
-                <p className="text-small">
-                  Get a tailored project estimate in 24 hours.
-                </p>
+                <p className="text-small">Get a tailored project estimate in 24 hours.</p>
                 <span className="mt-4 inline-flex items-center text-sm font-medium text-accent">
                   Start inquiry
                   <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -168,9 +158,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {t("errors.systemTitle")}
         </h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          {t("errors.systemBody")}
-        </p>
+        <p className="mt-3 text-sm text-muted-foreground">{t("errors.systemBody")}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
@@ -230,10 +218,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       ...hreflangLinks("/"),
     ],
-    scripts: [
-      ldScript(orgJsonLd()),
-      ldScript(websiteJsonLd()),
-    ],
+    scripts: [ldScript(orgJsonLd()), ldScript(websiteJsonLd())],
   }),
   shellComponent: RootShell,
   component: RootComponent,

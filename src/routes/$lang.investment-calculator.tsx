@@ -154,8 +154,7 @@ function computeModel(i: Inputs) {
     i.automation === "Standard" ? 0.9 : i.automation === "Advanced" ? 1 : 1.18;
 
   const capacityScale = Math.pow(i.capacity / 10000, 0.92); // mild economies of scale
-  const baseCapex =
-    i.capacity * panelCapexFactor[i.panel] * lineFactor * automationFactor;
+  const baseCapex = i.capacity * panelCapexFactor[i.panel] * lineFactor * automationFactor;
   const totalCapex = baseCapex * capacityScale;
 
   // Breakdown (weights approximate industry norms)
@@ -181,7 +180,10 @@ function computeModel(i: Inputs) {
   const steam = i.panel === "Rock Wool" ? Math.round(i.capacity * 0.15) : 0;
   const operators = Math.max(
     18,
-    Math.round((i.capacity / 1000) * (i.automation === "Fully Automated" ? 3.2 : i.automation === "Advanced" ? 4.5 : 6.2)),
+    Math.round(
+      (i.capacity / 1000) *
+        (i.automation === "Fully Automated" ? 3.2 : i.automation === "Advanced" ? 4.5 : 6.2),
+    ),
   );
 
   // Production & revenue
@@ -216,8 +218,7 @@ function computeModel(i: Inputs) {
   const costPerM2Day = totalInvestment / Math.max(i.capacity, 1);
 
   const cashflow = Array.from({ length: 6 }, (_, y) => {
-    const outflow =
-      y === 0 ? totalCapex + workingCapital : opex * (1 + y * 0.03);
+    const outflow = y === 0 ? totalCapex + workingCapital : opex * (1 + y * 0.03);
     const inflow = y === 0 ? 0 : revenue * (0.8 + y * 0.05);
     return {
       year: `Year ${y}`,
@@ -298,13 +299,7 @@ function fmtCompact(v: number, cur: Inputs["currency"]) {
 }
 
 // ---------------- UI atoms (scoped dark theme) ----------------
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
       <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.14em] text-emerald-400/80">
@@ -406,8 +401,7 @@ function InvestmentCalculatorPage() {
     "investment" | "roi" | "cashflow" | "specification" | "summary" | null
   >(null);
   const m = useMemo(() => computeModel(i), [i]);
-  const set = <K extends keyof Inputs>(k: K, v: Inputs[K]) =>
-    setI((s) => ({ ...s, [k]: v }));
+  const set = <K extends keyof Inputs>(k: K, v: Inputs[K]) => setI((s) => ({ ...s, [k]: v }));
 
   async function handleDownloadReport(
     kind: "investment" | "roi" | "cashflow" | "specification" | "summary",
@@ -540,14 +534,12 @@ function InvestmentCalculatorPage() {
                   transition={{ duration: 0.4 }}
                   className="font-display text-4xl md:text-6xl font-semibold leading-[1.02] tracking-tight"
                 >
-                  Factory <span className="text-emerald-400">Investment</span>{" "}
-                  Calculator
+                  Factory <span className="text-emerald-400">Investment</span> Calculator
                 </motion.h1>
                 <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/60">
-                  Estimate total investment, model operating cost and forecast
-                  profitability of a sandwich panel manufacturing plant — in
-                  minutes. Built by NEVO's engineers for investors, developers
-                  and industrial groups.
+                  Estimate total investment, model operating cost and forecast profitability of a
+                  sandwich panel manufacturing plant — in minutes. Built by NEVO's engineers for
+                  investors, developers and industrial groups.
                 </p>
               </div>
 
@@ -590,9 +582,7 @@ function InvestmentCalculatorPage() {
                   >
                     <span
                       className={`grid h-5 w-5 place-items-center rounded-full text-[10px] font-semibold ${
-                        idx === step
-                          ? "bg-emerald-400 text-black"
-                          : "bg-white/10 text-white/70"
+                        idx === step ? "bg-emerald-400 text-black" : "bg-white/10 text-white/70"
                       }`}
                     >
                       {idx + 1}
@@ -646,11 +636,7 @@ function InvestmentCalculatorPage() {
                 <Field label="Production Line">
                   <div className="grid grid-cols-2 gap-1.5">
                     {(["Continuous", "Discontinuous"] as LineType[]).map((l) => (
-                      <Chip
-                        key={l}
-                        active={i.line === l}
-                        onClick={() => set("line", l)}
-                      >
+                      <Chip key={l} active={i.line === l} onClick={() => set("line", l)}>
                         {l}
                       </Chip>
                     ))}
@@ -670,9 +656,7 @@ function InvestmentCalculatorPage() {
                     <select
                       className={inputCx}
                       value={i.currency}
-                      onChange={(e) =>
-                        set("currency", e.target.value as Inputs["currency"])
-                      }
+                      onChange={(e) => set("currency", e.target.value as Inputs["currency"])}
                     >
                       <option value="USD">USD — US Dollar</option>
                       <option value="EUR">EUR — Euro</option>
@@ -689,9 +673,7 @@ function InvestmentCalculatorPage() {
                       step="0.01"
                       className={inputCx}
                       value={i.electricity}
-                      onChange={(e) =>
-                        set("electricity", parseFloat(e.target.value) || 0)
-                      }
+                      onChange={(e) => set("electricity", parseFloat(e.target.value) || 0)}
                     />
                   </Field>
                   <Field label="Labor ($/mo·op)">
@@ -707,11 +689,7 @@ function InvestmentCalculatorPage() {
                 <Field label="Land Ownership">
                   <div className="grid grid-cols-2 gap-1.5">
                     {(["Owned", "To be Purchased"] as Ownership[]).map((o) => (
-                      <Chip
-                        key={o}
-                        active={i.ownership === o}
-                        onClick={() => set("ownership", o)}
-                      >
+                      <Chip key={o} active={i.ownership === o} onClick={() => set("ownership", o)}>
                         {o}
                       </Chip>
                     ))}
@@ -724,26 +702,22 @@ function InvestmentCalculatorPage() {
                       type="number"
                       className={inputCx}
                       value={i.landPrice}
-                      onChange={(e) =>
-                        set("landPrice", parseFloat(e.target.value) || 0)
-                      }
+                      onChange={(e) => set("landPrice", parseFloat(e.target.value) || 0)}
                     />
                   </Field>
                 ) : null}
 
                 <Field label="Automation Level">
                   <div className="grid grid-cols-3 gap-1.5">
-                    {(["Standard", "Advanced", "Fully Automated"] as Automation[]).map(
-                      (a) => (
-                        <Chip
-                          key={a}
-                          active={i.automation === a}
-                          onClick={() => set("automation", a)}
-                        >
-                          {a}
-                        </Chip>
-                      ),
-                    )}
+                    {(["Standard", "Advanced", "Fully Automated"] as Automation[]).map((a) => (
+                      <Chip
+                        key={a}
+                        active={i.automation === a}
+                        onClick={() => set("automation", a)}
+                      >
+                        {a}
+                      </Chip>
+                    ))}
                   </div>
                 </Field>
 
@@ -753,18 +727,14 @@ function InvestmentCalculatorPage() {
                       type="number"
                       className={inputCx}
                       value={i.workingDays}
-                      onChange={(e) =>
-                        set("workingDays", parseInt(e.target.value) || 0)
-                      }
+                      onChange={(e) => set("workingDays", parseInt(e.target.value) || 0)}
                     />
                   </Field>
                   <Field label="Shifts">
                     <select
                       className={inputCx}
                       value={i.shifts}
-                      onChange={(e) =>
-                        set("shifts", parseInt(e.target.value) as 1 | 2 | 3)
-                      }
+                      onChange={(e) => set("shifts", parseInt(e.target.value) as 1 | 2 | 3)}
                     >
                       <option value={1}>1 shift</option>
                       <option value={2}>2 shifts</option>
@@ -779,9 +749,7 @@ function InvestmentCalculatorPage() {
                     step="0.1"
                     className={inputCx}
                     value={i.sellingPrice}
-                    onChange={(e) =>
-                      set("sellingPrice", parseFloat(e.target.value) || 0)
-                    }
+                    onChange={(e) => set("sellingPrice", parseFloat(e.target.value) || 0)}
                   />
                 </Field>
 
@@ -868,10 +836,7 @@ function InvestmentCalculatorPage() {
                       {[
                         ["Total Fixed Cost", fmtMoney(m.totalCapex, i.currency)],
                         ["Land Cost", fmtMoney(m.landCost, i.currency)],
-                        [
-                          "Total Working Capital",
-                          fmtMoney(m.workingCapital, i.currency),
-                        ],
+                        ["Total Working Capital", fmtMoney(m.workingCapital, i.currency)],
                       ].map(([k, v]) => (
                         <div
                           key={k}
@@ -913,9 +878,7 @@ function InvestmentCalculatorPage() {
                         className="flex justify-between border-b border-white/5 py-1.5"
                       >
                         <span className="text-white/60">{b.name}</span>
-                        <span className="tabular-nums">
-                          {fmtCompact(b.value, i.currency)}
-                        </span>
+                        <span className="tabular-nums">{fmtCompact(b.value, i.currency)}</span>
                       </li>
                     ))}
                     <li className="mt-1.5 flex justify-between pt-1.5">
@@ -935,9 +898,7 @@ function InvestmentCalculatorPage() {
                         className="flex justify-between border-b border-white/5 py-1.5"
                       >
                         <span className="text-white/60">{o.name}</span>
-                        <span className="tabular-nums">
-                          {fmtCompact(o.value, i.currency)}
-                        </span>
+                        <span className="tabular-nums">{fmtCompact(o.value, i.currency)}</span>
                       </li>
                     ))}
                     <li className="mt-1.5 flex justify-between pt-1.5">
@@ -1050,7 +1011,11 @@ function InvestmentCalculatorPage() {
                   <ul className="grid gap-2 text-[12px]">
                     {[
                       { icon: MapPin, k: "Land Area", v: `${m.landArea.toLocaleString()} m²` },
-                      { icon: Building2, k: "Building Area", v: `${m.buildingArea.toLocaleString()} m²` },
+                      {
+                        icon: Building2,
+                        k: "Building Area",
+                        v: `${m.buildingArea.toLocaleString()} m²`,
+                      },
                       { icon: Zap, k: "Power", v: `${m.powerKw.toLocaleString()} kW` },
                       { icon: Droplets, k: "Water", v: `${m.waterM3} m³/day` },
                       { icon: Wind, k: "Compressed Air", v: `${m.compressedAir} Nm³/h` },
@@ -1113,13 +1078,15 @@ function InvestmentCalculatorPage() {
 
                 <Card title="Download PDF Report" icon={FileText}>
                   <ul className="grid gap-2 text-[12px]">
-                    {([
-                      ["investment", "Investment Report (PDF)"],
-                      ["roi", "ROI Report (PDF)"],
-                      ["cashflow", "Cash Flow Report (PDF)"],
-                      ["specification", "Factory Specification (PDF)"],
-                      ["summary", "Project Summary (PDF)"],
-                    ] as const).map(([kind, label]) => {
+                    {(
+                      [
+                        ["investment", "Investment Report (PDF)"],
+                        ["roi", "ROI Report (PDF)"],
+                        ["cashflow", "Cash Flow Report (PDF)"],
+                        ["specification", "Factory Specification (PDF)"],
+                        ["summary", "Project Summary (PDF)"],
+                      ] as const
+                    ).map(([kind, label]) => {
                       const isPending = pendingKind === kind;
                       const anyPending = pendingKind !== null;
                       return (
@@ -1133,7 +1100,10 @@ function InvestmentCalculatorPage() {
                             className="flex w-full items-center justify-between rounded-md border border-white/10 bg-white/[0.02] px-3 py-2 text-left text-white/70 transition hover:border-emerald-400/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-white/10 disabled:hover:text-white/70"
                           >
                             <span className="flex items-center gap-2">
-                              <FileText className="h-3.5 w-3.5 text-emerald-400/80" aria-hidden="true" />
+                              <FileText
+                                className="h-3.5 w-3.5 text-emerald-400/80"
+                                aria-hidden="true"
+                              />
                               {isPending ? `Generating ${label}…` : label}
                             </span>
                             {isPending ? (
@@ -1159,9 +1129,7 @@ function InvestmentCalculatorPage() {
                     <div className="text-[11px] uppercase tracking-[0.16em] text-emerald-300/80">
                       Primary
                     </div>
-                    <div className="font-semibold text-white">
-                      Request Detailed Quotation
-                    </div>
+                    <div className="font-semibold text-white">Request Detailed Quotation</div>
                     <div className="text-[11px] text-white/60">
                       Get a customized offer for your project
                     </div>
@@ -1191,9 +1159,7 @@ function InvestmentCalculatorPage() {
                     <div className="text-[11px] uppercase tracking-[0.16em] text-white/50">
                       Third
                     </div>
-                    <div className="font-semibold text-white">
-                      AI Engineering Assistant
-                    </div>
+                    <div className="font-semibold text-white">AI Engineering Assistant</div>
                     <div className="text-[11px] text-white/60">
                       Book an online consultation instantly
                     </div>
@@ -1237,9 +1203,7 @@ function InvestmentCalculatorPage() {
                 </div>
                 <Button
                   className="bg-emerald-500 text-black hover:bg-emerald-400"
-                  onClick={() =>
-                    setStep(Math.min(steps.length - 1, step + 1))
-                  }
+                  onClick={() => setStep(Math.min(steps.length - 1, step + 1))}
                   disabled={step === steps.length - 1}
                 >
                   Next <ChevronRight className="ml-1 h-4 w-4" />

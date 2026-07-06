@@ -15,10 +15,7 @@ import { formatDistanceToNow, format } from "date-fns";
 
 export const Route = createFileRoute("/_authenticated/admin/solutions-seo")({
   head: () => ({
-    meta: [
-      { title: "Solutions SEO — Admin" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Solutions SEO — Admin" }, { name: "robots", content: "noindex" }],
   }),
   component: SolutionsSeoAdmin,
 });
@@ -101,7 +98,11 @@ function SolutionsSeoAdmin() {
   }, [merged]);
 
   if (adminQ.isLoading) {
-    return <Shell><p className="text-sm text-muted-foreground">Checking access…</p></Shell>;
+    return (
+      <Shell>
+        <p className="text-sm text-muted-foreground">Checking access…</p>
+      </Shell>
+    );
   }
   if (!adminQ.data?.admin) {
     return (
@@ -109,9 +110,12 @@ function SolutionsSeoAdmin() {
         <div className="border border-border rounded-lg p-6 bg-card space-y-3 max-w-lg">
           <h2 className="text-lg font-semibold">Not authorized</h2>
           <p className="text-sm text-muted-foreground">
-            Your account isn't an admin. Ask a project owner to grant you the <code>admin</code> role.
+            Your account isn't an admin. Ask a project owner to grant you the <code>admin</code>{" "}
+            role.
           </p>
-          <Button variant="outline" onClick={() => signOut.mutate()}>Sign out</Button>
+          <Button variant="outline" onClick={() => signOut.mutate()}>
+            Sign out
+          </Button>
         </div>
       </Shell>
     );
@@ -123,7 +127,9 @@ function SolutionsSeoAdmin() {
         <div className="text-sm text-muted-foreground">
           Last inspection:{" "}
           <strong className="text-foreground">
-            {lastRun ? `${format(lastRun, "PPpp")} (${formatDistanceToNow(lastRun, { addSuffix: true })})` : "never"}
+            {lastRun
+              ? `${format(lastRun, "PPpp")} (${formatDistanceToNow(lastRun, { addSuffix: true })})`
+              : "never"}
           </strong>
         </div>
         <div className="ml-auto flex gap-2">
@@ -133,15 +139,13 @@ function SolutionsSeoAdmin() {
           <Button onClick={() => runM.mutate()} disabled={runM.isPending}>
             {runM.isPending ? "Running inspection (60 URLs)…" : "Run inspection"}
           </Button>
-          <Button variant="ghost" onClick={() => signOut.mutate()}>Sign out</Button>
+          <Button variant="ghost" onClick={() => signOut.mutate()}>
+            Sign out
+          </Button>
         </div>
       </div>
 
-      {runM.isError && (
-        <p className="text-sm text-destructive">
-          {(runM.error as Error).message}
-        </p>
-      )}
+      {runM.isError && <p className="text-sm text-destructive">{(runM.error as Error).message}</p>}
       {runM.isSuccess && !runM.isPending && (
         <p className="text-sm text-muted-foreground">
           Last run: {runM.data.ok}/{runM.data.total} succeeded · {runM.data.failed} failed.
@@ -189,7 +193,10 @@ function SolutionsSeoAdmin() {
                   <td className="p-2">{r.indexing_state ?? "—"}</td>
                   <td className="p-2">{r.mobile_verdict ?? "—"}</td>
                   <td className="p-2">{r.rich_verdict ?? "—"}</td>
-                  <td className="p-2 truncate max-w-[260px]" title={r.google_canonical ?? undefined}>
+                  <td
+                    className="p-2 truncate max-w-[260px]"
+                    title={r.google_canonical ?? undefined}
+                  >
                     {r.google_canonical ?? "—"}
                   </td>
                   <td className="p-2 text-right whitespace-nowrap">
@@ -213,7 +220,8 @@ function Shell({ children }: { children: React.ReactNode }) {
       <header>
         <h1 className="text-2xl font-semibold">Solutions SEO — Search Console</h1>
         <p className="text-sm text-muted-foreground">
-          Index/coverage status and last inspection time for every Solutions page across all locales.
+          Index/coverage status and last inspection time for every Solutions page across all
+          locales.
         </p>
       </header>
       {children}
@@ -221,7 +229,15 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Stat({ label, value, accent }: { label: string; value: number | string; accent?: string }) {
+function Stat({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: number | string;
+  accent?: string;
+}) {
   return (
     <div className="border border-border rounded-lg p-4 bg-card">
       <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>

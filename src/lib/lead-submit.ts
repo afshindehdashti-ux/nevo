@@ -4,7 +4,6 @@ import { isValidPhone, getPhoneExample } from "./phone-validation";
 const STORAGE_KEY = "nevo:leads";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-
 export type LeadPayload = Record<string, FormDataEntryValue | string>;
 
 export interface ValidateRule {
@@ -64,7 +63,6 @@ const DEFAULT_MESSAGES: Required<LeadMessages> = {
   retry: "Retry",
 };
 
-
 function fmt(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
 }
@@ -99,7 +97,6 @@ export function validateLead(
   return null;
 }
 
-
 function persist(source: string, payload: LeadPayload) {
   if (typeof window === "undefined") return;
   try {
@@ -116,10 +113,7 @@ function persist(source: string, payload: LeadPayload) {
  * validates required fields, persists locally as fallback, shows toast.
  * Returns true on success so the caller can reset the form.
  */
-export async function submitLeadForm(
-  form: HTMLFormElement,
-  opts: LeadOptions,
-): Promise<boolean> {
+export async function submitLeadForm(form: HTMLFormElement, opts: LeadOptions): Promise<boolean> {
   const m = { ...DEFAULT_MESSAGES, ...(opts.messages ?? {}) };
   const payload = collectFormData(form);
   const error = validateLead(payload, opts.rules, m, opts.phoneLocale);
@@ -150,7 +144,9 @@ export async function submitLeadForm(
       if (res && typeof (res as Response).status === "number") {
         status = (res as Response).status;
       } else if (res && typeof (res as { ok: boolean }).ok === "boolean") {
-        status = (res as { ok: boolean; status?: number }).status ?? ((res as { ok: boolean }).ok ? 200 : 500);
+        status =
+          (res as { ok: boolean; status?: number }).status ??
+          ((res as { ok: boolean }).ok ? 200 : 500);
       }
     } else {
       // Simulate async delivery so the UX matches a real backend call.
@@ -177,9 +173,7 @@ export async function submitLeadForm(
 
   toast.success(opts.successTitle ?? "Request received", {
     description:
-      opts.successDescription ??
-      "A senior NEVO engineer will reach out within one business day.",
+      opts.successDescription ?? "A senior NEVO engineer will reach out within one business day.",
   });
   return true;
 }
-

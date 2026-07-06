@@ -1,4 +1,3 @@
-
 import { Link } from "@/components/site/LocalizedLink";
 import { useTranslation } from "react-i18next";
 import { Mail, MessageCircle, Linkedin, MapPin, ArrowUpRight, Phone } from "lucide-react";
@@ -76,7 +75,6 @@ const COLUMNS = [
   },
 ];
 
-
 export function SiteFooter() {
   const { t } = useTranslation();
   const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
@@ -113,21 +111,17 @@ export function SiteFooter() {
                 href="mailto:solutions@nevoindustrial.com"
                 className="flex items-center gap-3 text-primary-foreground/85 hover:text-primary-foreground"
               >
-                <Mail
-                  className="size-4 text-primary-foreground/50"
-                  strokeWidth={1.75}
-                />
+                <Mail className="size-4 text-primary-foreground/50" strokeWidth={1.75} />
                 solutions@nevoindustrial.com
               </a>
               <a
                 href={whatsappHref}
                 className="flex items-center gap-3 text-primary-foreground/85 hover:text-primary-foreground"
               >
-                <MessageCircle
-                  className="size-4 text-primary-foreground/50"
-                  strokeWidth={1.75}
-                />
-                {SITE.contact.whatsapp ? `WhatsApp · ${SITE.contact.whatsappDisplay}` : "Project Inquiry Center"}
+                <MessageCircle className="size-4 text-primary-foreground/50" strokeWidth={1.75} />
+                {SITE.contact.whatsapp
+                  ? `WhatsApp · ${SITE.contact.whatsappDisplay}`
+                  : "Project Inquiry Center"}
               </a>
               <a
                 href={SITE.contact.phoneHref}
@@ -140,17 +134,11 @@ export function SiteFooter() {
                 href="https://www.linkedin.com/company/nevo-industrial"
                 className="flex items-center gap-3 text-primary-foreground/85 hover:text-primary-foreground"
               >
-                <Linkedin
-                  className="size-4 text-primary-foreground/50"
-                  strokeWidth={1.75}
-                />
+                <Linkedin className="size-4 text-primary-foreground/50" strokeWidth={1.75} />
                 LinkedIn
               </a>
               <div className="flex items-center gap-3 text-primary-foreground/85">
-                <MapPin
-                  className="size-4 text-primary-foreground/50"
-                  strokeWidth={1.75}
-                />
+                <MapPin className="size-4 text-primary-foreground/50" strokeWidth={1.75} />
                 Dubai, United Arab Emirates
               </div>
             </div>
@@ -172,7 +160,7 @@ export function SiteFooter() {
                   {t(columnKeys[col.title] ?? "", col.title)}
                 </div>
                 <ul className="space-y-2.5">
-                {col.links.map((l) => (
+                  {col.links.map((l) => (
                     <li key={l.label}>
                       <a
                         href={l.href}
@@ -193,9 +181,7 @@ export function SiteFooter() {
             © {new Date().getFullYear()} NEVO Industrial. {t("footer.rights")}
           </div>
           <LanguageSwitcher variant="footer" />
-          <div className="shrink-0 font-mono tracking-widest">
-            NEVOINDUSTRIAL.COM · DUBAI · UAE
-          </div>
+          <div className="shrink-0 font-mono tracking-widest">NEVOINDUSTRIAL.COM · DUBAI · UAE</div>
         </div>
       </div>
     </footer>

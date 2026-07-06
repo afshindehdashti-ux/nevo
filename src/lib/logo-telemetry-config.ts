@@ -24,12 +24,7 @@ type Env = Record<string, string | undefined>;
 
 const rawEnv = (import.meta.env ?? {}) as unknown as Env;
 
-function clampNumber(
-  raw: string | undefined,
-  fallback: number,
-  min: number,
-  max: number,
-): number {
+function clampNumber(raw: string | undefined, fallback: number, min: number, max: number): number {
   if (raw === undefined || raw === "") return fallback;
   const n = Number(raw);
   if (!Number.isFinite(n)) return fallback;
@@ -38,12 +33,7 @@ function clampNumber(
   return n;
 }
 
-function clampInt(
-  raw: string | undefined,
-  fallback: number,
-  min: number,
-  max: number,
-): number {
+function clampInt(raw: string | undefined, fallback: number, min: number, max: number): number {
   return Math.floor(clampNumber(raw, fallback, min, max));
 }
 
@@ -110,18 +100,8 @@ export const LOGO_TELEMETRY_CONFIG = {
     0,
     1,
   ),
-  errorMaxPerSession: clampInt(
-    rawEnv.VITE_LOGO_ERROR_MAX_PER_SESSION,
-    4,
-    0,
-    1000,
-  ),
-  errorMinIntervalMs: clampInt(
-    rawEnv.VITE_LOGO_ERROR_MIN_INTERVAL_MS,
-    1000,
-    0,
-    60_000,
-  ),
+  errorMaxPerSession: clampInt(rawEnv.VITE_LOGO_ERROR_MAX_PER_SESSION, 4, 0, 1000),
+  errorMinIntervalMs: clampInt(rawEnv.VITE_LOGO_ERROR_MIN_INTERVAL_MS, 1000, 0, 60_000),
   debug: readDebugFlag(),
   /**
    * When false, the single-line grep-friendly `[nevo:logo-telemetry] ...`

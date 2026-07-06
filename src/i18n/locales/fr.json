@@ -128,122 +128,73 @@
         {
           "t": "Entrepôts frigorifiques",
           "d": "Airtight low-temperature envelopes for logistics hubs, distribution centers and –40 °C freezer stores.",
-          "apps": [
-            "Frozen distribution",
-            "Chilled logistics",
-            "Blast freezers"
-          ],
+          "apps": ["Frozen distribution", "Chilled logistics", "Blast freezers"],
           "panel": "PIR — 100–200 mm, cam-lock joints"
         },
         {
           "t": "Salles blanches et pharmaceutique",
           "d": "ISO-classified environments with hygienic flush-finish panels and controlled airtightness.",
-          "apps": [
-            "Pharmaceutical suites",
-            "Semiconductor fabs",
-            "Hospital OR"
-          ],
+          "apps": ["Pharmaceutical suites", "Semiconductor fabs", "Hospital OR"],
           "panel": "Clean Room Panel — flush face, PIR/Rock Wool core"
         },
         {
           "t": "Usines agroalimentaires",
           "d": "HACCP-compliant hygienic envelopes with food-grade coatings and sealed sanitary joints.",
-          "apps": [
-            "Meat & poultry",
-            "Dairy",
-            "Bakery",
-            "Beverage"
-          ],
+          "apps": ["Meat & poultry", "Dairy", "Bakery", "Beverage"],
           "panel": "PIR / Rock Wool — HDP food-grade facing"
         },
         {
           "t": "Bâtiments industriels",
           "d": "Manufacturing halls, workshops and heavy-industry envelopes with engineered fire and structural performance.",
-          "apps": [
-            "Manufacturing",
-            "Heavy industry",
-            "Assembly plants"
-          ],
+          "apps": ["Manufacturing", "Heavy industry", "Assembly plants"],
           "panel": "PIR / Rock Wool — 80–150 mm structural"
         },
         {
           "t": "Entrepôts et centres logistiques",
           "d": "Large-span envelopes for distribution, e-commerce and freight hubs — fast assembly, low lifecycle cost.",
-          "apps": [
-            "Distribution",
-            "E-commerce fulfilment",
-            "Freight terminals"
-          ],
+          "apps": ["Distribution", "E-commerce fulfilment", "Freight terminals"],
           "panel": "PIR wall + PIR/Rock Wool roof"
         },
         {
           "t": "Bâtiments commerciaux",
           "d": "Showrooms, retail and office facades combining architectural design and engineered performance.",
-          "apps": [
-            "Showrooms",
-            "Bureaux",
-            "Retail"
-          ],
+          "apps": ["Showrooms", "Bureaux", "Retail"],
           "panel": "Hidden-fix PIR facade + insulated glass"
         },
         {
           "t": "Bâtiments agricoles",
           "d": "Livestock, storage and agro-industrial envelopes engineered for humidity, ammonia and long spans.",
-          "apps": [
-            "Livestock",
-            "Grain storage",
-            "Agro-processing"
-          ],
+          "apps": ["Livestock", "Grain storage", "Agro-processing"],
           "panel": "PIR — corrosion-resistant PVDF facing"
         },
         {
           "t": "Bâtiments modulaires",
           "d": "Prefabricated modular systems for offices, camps and site accommodation — factory built, site assembled.",
-          "apps": [
-            "Site offices",
-            "Worker accommodation",
-            "Prefab clinics"
-          ],
+          "apps": ["Site offices", "Worker accommodation", "Prefab clinics"],
           "panel": "PIR — 50–80 mm lightweight"
         },
         {
           "t": "Centres de données",
           "d": "Non-combustible envelopes with EMI-shielded finishes and stringent fire compartmentation.",
-          "apps": [
-            "Hyperscale halls",
-            "Edge data centers",
-            "Modular pods"
-          ],
+          "apps": ["Hyperscale halls", "Edge data centers", "Modular pods"],
           "panel": "Rock Wool — 120–150 mm A2 fire class"
         },
         {
           "t": "Commerce et supermarchés",
           "d": "Retail envelopes combining thermal comfort, fast build and integrated cold-storage back-of-house.",
-          "apps": [
-            "Supermarkets",
-            "Big-box retail",
-            "DIY stores"
-          ],
+          "apps": ["Supermarkets", "Big-box retail", "DIY stores"],
           "panel": "PIR facade + integrated cold rooms"
         },
         {
           "t": "Installations sportives et de loisirs",
           "d": "Long-span sports halls, arenas and ice rinks with engineered acoustic and thermal envelopes.",
-          "apps": [
-            "Sports halls",
-            "Ice rinks",
-            "Indoor arenas"
-          ],
+          "apps": ["Sports halls", "Ice rinks", "Indoor arenas"],
           "panel": "Rock Wool — acoustic Rw 32+ dB"
         },
         {
           "t": "Installations aéroportuaires et de transport",
           "d": "Terminals, hangars and MRO facilities engineered for fire, security and long-span roof structures.",
-          "apps": [
-            "Terminals",
-            "Hangars",
-            "MRO facilities"
-          ],
+          "apps": ["Terminals", "Hangars", "MRO facilities"],
           "panel": "Rock Wool + PIR — certified fire/thermal"
         }
       ]

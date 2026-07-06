@@ -9,10 +9,7 @@ import { ShieldCheck } from "lucide-react";
 export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
-    meta: [
-      { title: "Sign in — NEVO CRM" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Sign in — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   component: AuthPage,
 });
@@ -58,7 +55,10 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-4 border border-border rounded-lg p-6 bg-card shadow-sm">
+      <form
+        onSubmit={onSubmit}
+        className="w-full max-w-sm space-y-4 border border-border rounded-lg p-6 bg-card shadow-sm"
+      >
         <div className="flex items-center gap-2 text-primary">
           <ShieldCheck className="h-5 w-5" />
           <span className="text-xs uppercase tracking-widest font-semibold">NEVO Back Office</span>
@@ -71,12 +71,27 @@ function AuthPage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="email">Work email</Label>
-          <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
+          <Input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+          />
         </div>
         {!resetMode && (
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+            <Input
+              id="password"
+              type="password"
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+            />
           </div>
         )}
         {error && <p className="text-sm text-destructive">{error}</p>}
@@ -86,7 +101,11 @@ function AuthPage() {
         </Button>
         <button
           type="button"
-          onClick={() => { setResetMode(!resetMode); setError(null); setInfo(null); }}
+          onClick={() => {
+            setResetMode(!resetMode);
+            setError(null);
+            setInfo(null);
+          }}
           className="text-xs text-muted-foreground hover:text-foreground underline block w-full text-center"
         >
           {resetMode ? "Back to sign in" : "Forgot your password?"}

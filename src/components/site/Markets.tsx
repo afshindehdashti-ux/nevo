@@ -4,12 +4,12 @@ import { Section, SectionHeader } from "@/components/site/primitives";
 const MARKETS = [
   { key: "sa", x: 58.5, y: 44 },
   { key: "ae", x: 61.5, y: 46 },
-  { key: "om", x: 63,   y: 47 },
+  { key: "om", x: 63, y: 47 },
   { key: "tr", x: 55.5, y: 34 },
-  { key: "iq", x: 58,   y: 39 },
-  { key: "ru", x: 62,   y: 22 },
-  { key: "ke", x: 58,   y: 60 },
-  { key: "cm", x: 51,   y: 56 },
+  { key: "iq", x: 58, y: 39 },
+  { key: "ru", x: 62, y: 22 },
+  { key: "ke", x: 58, y: 60 },
+  { key: "cm", x: 51, y: 56 },
 ] as const;
 
 export function Markets() {
@@ -104,7 +104,12 @@ function DotWorldMap({ className }: { className?: string }) {
     }
   }
   return (
-    <svg viewBox={`0 0 ${cols} ${rowsN}`} className={className} preserveAspectRatio="none" aria-hidden="true">
+    <svg
+      viewBox={`0 0 ${cols} ${rowsN}`}
+      className={className}
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
       {dots.map((d, i) => (
         <circle key={i} cx={d.x + 0.5} cy={d.y + 0.5} r={0.28} fill="currentColor" />
       ))}

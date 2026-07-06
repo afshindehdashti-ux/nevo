@@ -5,6 +5,7 @@ import {
   type LogoDecisionRecord,
 } from "../logo-telemetry";
 
+// eslint-disable-next-line no-control-regex
 const CONTROL_CHAR_RE = /[\x00-\x1F\x7F]/;
 
 function makeRecord(over: Partial<LogoDecisionRecord> = {}): LogoDecisionRecord {

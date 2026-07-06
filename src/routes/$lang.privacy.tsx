@@ -23,9 +23,7 @@ function PrivacyPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-24 text-foreground">
       <h1 className="mb-2 text-4xl font-semibold tracking-tight">{t("privacy.title")}</h1>
-      <p className="mb-10 text-sm text-muted-foreground">
-        {t("privacy.lastUpdated", { year })}
-      </p>
+      <p className="mb-10 text-sm text-muted-foreground">{t("privacy.lastUpdated", { year })}</p>
 
       <div className="space-y-8 text-[15px] leading-relaxed text-muted-foreground">
         <section>
@@ -36,8 +34,7 @@ function PrivacyPage() {
         <section>
           <h2 className="mb-2 text-xl font-semibold text-foreground">{t("privacy.s2.h")}</h2>
           <ul className="list-disc space-y-1 pl-6">
-            {Array.isArray(bullets) &&
-              bullets.map((item, i) => <li key={i}>{item}</li>)}
+            {Array.isArray(bullets) && bullets.map((item, i) => <li key={i}>{item}</li>)}
           </ul>
         </section>
 

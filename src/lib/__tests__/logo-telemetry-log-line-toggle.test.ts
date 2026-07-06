@@ -17,7 +17,13 @@ describe("logo debug logLine runtime toggle", () => {
   it("prints the grep-friendly console line when logLine is true", () => {
     const spy = vi.spyOn(console, "debug").mockImplementation(() => {});
     shouldLogRender({
-      state: { renderLogged: false, renderSampled: null, errorCount: 0, lastErrorAt: 0, lastErrorStage: "" },
+      state: {
+        renderLogged: false,
+        renderSampled: null,
+        errorCount: 0,
+        lastErrorAt: 0,
+        lastErrorStage: "",
+      },
       config: cfg({ logLine: true }),
       random: () => 0,
     });
@@ -29,7 +35,13 @@ describe("logo debug logLine runtime toggle", () => {
 
   it("suppresses the console line when logLine is false but keeps sampling behavior", () => {
     const spy = vi.spyOn(console, "debug").mockImplementation(() => {});
-    const state = { renderLogged: false, renderSampled: null, errorCount: 0, lastErrorAt: 0, lastErrorStage: "" };
+    const state = {
+      renderLogged: false,
+      renderSampled: null,
+      errorCount: 0,
+      lastErrorAt: 0,
+      lastErrorStage: "",
+    };
     const result = shouldLogRender({
       state,
       config: cfg({ logLine: false }),

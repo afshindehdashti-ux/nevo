@@ -9,11 +9,7 @@
  *   - decision reflects sampled-in vs sampled-out for every reason
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  createLogoRateState,
-  shouldLogError,
-  shouldLogRender,
-} from "../logo-telemetry";
+import { createLogoRateState, shouldLogError, shouldLogRender } from "../logo-telemetry";
 import type { LogoTelemetryConfig } from "../logo-telemetry-config";
 
 const cfg = (over: Partial<LogoTelemetryConfig> = {}): LogoTelemetryConfig => ({

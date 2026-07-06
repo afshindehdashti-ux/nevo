@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  createLogoRateState,
-  shouldLogError,
-  shouldLogRender,
-} from "../logo-telemetry";
+import { createLogoRateState, shouldLogError, shouldLogRender } from "../logo-telemetry";
 import type { LogoTelemetryConfig } from "../logo-telemetry-config";
 
 // A permissive default config so tests only vary the knob under test.
@@ -89,7 +85,9 @@ describe("shouldLogError — session cap", () => {
     const state = createLogoRateState();
     const config = cfg({ errorMaxPerSession: 0 });
     expect(shouldLogError("primary-light-png", false, { state, config, now: () => 0 })).toBe(false);
-    expect(shouldLogError("fallback-inline-svg", true, { state, config, now: () => 0 })).toBe(false);
+    expect(shouldLogError("fallback-inline-svg", true, { state, config, now: () => 0 })).toBe(
+      false,
+    );
     expect(state.errorCount).toBe(0);
   });
 });
@@ -161,6 +159,5 @@ describe("shouldLogError — full fallback-chain scenario", () => {
     expect(shouldLogError("fallback-inline-svg", false, { state, config, now: c.now })).toBe(true);
     expect(shouldLogError("fallback-inline-svg", true, { state, config, now: c.now })).toBe(false);
     expect(state.errorCount).toBe(4);
-
   });
 });

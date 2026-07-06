@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AdminPlaceholder } from "@/components/crm/AdminPlaceholder";
 
 export const Route = createFileRoute("/_authenticated/admin/purchase-orders")({
-  head: () => ({ meta: [{ title: "Purchase Orders — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Purchase Orders — NEVO CRM" }, { name: "robots", content: "noindex" }],
+  }),
   component: () => (
     <AdminPlaceholder
       title="Purchase Orders"

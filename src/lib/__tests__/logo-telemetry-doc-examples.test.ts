@@ -13,15 +13,9 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import {
-  formatLogoDecisionRecord,
-  type LogoDecisionRecord,
-} from "../logo-telemetry";
+import { formatLogoDecisionRecord, type LogoDecisionRecord } from "../logo-telemetry";
 
-const SOURCE = readFileSync(
-  join(__dirname, "..", "logo-telemetry-debug.ts"),
-  "utf8",
-);
+const SOURCE = readFileSync(join(__dirname, "..", "logo-telemetry-debug.ts"), "utf8");
 
 const PREFIX = "[nevo:logo-telemetry] ";
 
@@ -76,11 +70,7 @@ function parseExamples(): string[] {
 
 /** Parse the "Useful grep queries" block into pattern strings. */
 function parseGrepQueries(): string[] {
-  const block = sliceBetween(
-    SOURCE,
-    "Useful grep queries for QA:",
-    "Toggling noise at runtime",
-  );
+  const block = sliceBetween(SOURCE, "Useful grep queries for QA:", "Toggling noise at runtime");
   const queries: string[] = [];
   for (const raw of block.split("\n")) {
     const line = stripJsdocPrefix(raw).trim();

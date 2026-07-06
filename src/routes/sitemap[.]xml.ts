@@ -52,8 +52,16 @@ const ROUTES: SitemapEntry[] = [
 
 const ACTIVE_LOCALES = ["en", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"] as const;
 const HREFLANG: Record<(typeof ACTIVE_LOCALES)[number], string> = {
-  en: "en", ar: "ar", tr: "tr", ru: "ru", pt: "pt",
-  de: "de", es: "es", fr: "fr", it: "it", zh: "zh-Hans",
+  en: "en",
+  ar: "ar",
+  tr: "tr",
+  ru: "ru",
+  pt: "pt",
+  de: "de",
+  es: "es",
+  fr: "fr",
+  it: "it",
+  zh: "zh-Hans",
 };
 
 export const Route = createFileRoute("/sitemap.xml")({
@@ -64,7 +72,8 @@ export const Route = createFileRoute("/sitemap.xml")({
         for (const e of ROUTES) {
           const pathSuffix = e.path === "/" ? "" : e.path;
           const alternates = ACTIVE_LOCALES.map(
-            (l) => `    <xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${BASE_URL}/${l}${pathSuffix}"/>`,
+            (l) =>
+              `    <xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${BASE_URL}/${l}${pathSuffix}"/>`,
           ).join("\n");
           const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE_URL}/en${pathSuffix}"/>`;
           for (const l of ACTIVE_LOCALES) {

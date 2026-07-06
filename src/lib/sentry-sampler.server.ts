@@ -37,12 +37,7 @@ type SamplerInput = {
 export type SamplingDecision = {
   forward: boolean;
   /** Why the decision was made — surfaced as a Sentry tag for observability. */
-  reason:
-    | "terminal"
-    | "first-n"
-    | "sampled-in"
-    | "sampled-out"
-    | "no-bucket";
+  reason: "terminal" | "first-n" | "sampled-in" | "sampled-out" | "no-bucket";
   /** Ordinal of this event within its bucket window (1 = first). */
   windowIndex: number;
   /** Bucket key used (for debugging). */

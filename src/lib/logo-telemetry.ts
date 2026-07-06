@@ -193,8 +193,7 @@ function debugLog(
       errorCount: state.errorCount,
       lastErrorStage: state.lastErrorStage,
       msSinceLastError:
-        ctx.msSinceLastError ??
-        (state.lastErrorAt ? ctx.now - state.lastErrorAt : null),
+        ctx.msSinceLastError ?? (state.lastErrorAt ? ctx.now - state.lastErrorAt : null),
     },
     limits: {
       renderSampleRate: config.renderSampleRate,
@@ -242,11 +241,7 @@ export function shouldLogRender(deps: Deps = {}): boolean {
  * Terminal errors bypass the per-stage throttle (but still respect the
  * session cap).
  */
-export function shouldLogError(
-  stage: string,
-  terminal: boolean,
-  deps: Deps = {},
-): boolean {
+export function shouldLogError(stage: string, terminal: boolean, deps: Deps = {}): boolean {
   const state = deps.state ?? getLogoRateState();
   const config = deps.config ?? LOGO_TELEMETRY_CONFIG;
   const nowFn = deps.now ?? Date.now;
@@ -273,4 +268,3 @@ export function shouldLogError(
   debugLog("error", "sampled-in", terminal ? "terminal" : "accepted", state, config, base);
   return true;
 }
-

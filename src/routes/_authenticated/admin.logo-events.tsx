@@ -2,7 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getLogoEvents, isCurrentUserAdmin, type LogoEventFilters } from "@/lib/logo-events.functions";
+import {
+  getLogoEvents,
+  isCurrentUserAdmin,
+  type LogoEventFilters,
+} from "@/lib/logo-events.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,10 +34,7 @@ import { format } from "date-fns";
 
 export const Route = createFileRoute("/_authenticated/admin/logo-events")({
   head: () => ({
-    meta: [
-      { title: "Logo Telemetry — Admin" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Logo Telemetry — Admin" }, { name: "robots", content: "noindex" }],
   }),
   component: LogoEventsAdmin,
 });
@@ -79,7 +80,9 @@ function LogoEventsAdmin() {
   const adminQ = useQuery({ queryKey: ["is-admin"], queryFn: () => checkAdmin() });
 
   const now = Date.now();
-  const [from, setFrom] = useState<string>(toLocalInput(new Date(now - 24 * 3600 * 1000).toISOString()));
+  const [from, setFrom] = useState<string>(
+    toLocalInput(new Date(now - 24 * 3600 * 1000).toISOString()),
+  );
   const [to, setTo] = useState<string>(toLocalInput(new Date(now).toISOString()));
   const [eventType, setEventType] = useState<"all" | "render" | "error">("all");
   const [variant, setVariant] = useState<string>("");
@@ -114,7 +117,11 @@ function LogoEventsAdmin() {
   });
 
   if (adminQ.isLoading) {
-    return <Shell><p className="text-sm text-muted-foreground">Checking access…</p></Shell>;
+    return (
+      <Shell>
+        <p className="text-sm text-muted-foreground">Checking access…</p>
+      </Shell>
+    );
   }
   if (!adminQ.data?.admin) {
     return (
@@ -122,10 +129,13 @@ function LogoEventsAdmin() {
         <div className="border border-border rounded-lg p-6 bg-card space-y-3 max-w-lg">
           <h2 className="text-lg font-semibold">Not authorized</h2>
           <p className="text-sm text-muted-foreground">
-            Your account isn't an admin. Ask a project owner to grant you the <code>admin</code> role in Lovable Cloud
-            (insert a row in <code>user_roles</code> with your user id and role <code>admin</code>).
+            Your account isn't an admin. Ask a project owner to grant you the <code>admin</code>{" "}
+            role in Lovable Cloud (insert a row in <code>user_roles</code> with your user id and
+            role <code>admin</code>).
           </p>
-          <Button variant="outline" onClick={() => signOut.mutate()}>Sign out</Button>
+          <Button variant="outline" onClick={() => signOut.mutate()}>
+            Sign out
+          </Button>
         </div>
       </Shell>
     );
@@ -144,10 +154,12 @@ function LogoEventsAdmin() {
     cur[r.event_type] += 1;
     seriesMap.set(t, cur);
   }
-  const series = Array.from(seriesMap.values()).sort((a, b) => a.t - b.t).map((p) => ({
-    ...p,
-    label: format(p.t, bucket === "day" ? "MMM d" : bucket === "hour" ? "MMM d HH:00" : "HH:mm"),
-  }));
+  const series = Array.from(seriesMap.values())
+    .sort((a, b) => a.t - b.t)
+    .map((p) => ({
+      ...p,
+      label: format(p.t, bucket === "day" ? "MMM d" : bucket === "hour" ? "MMM d HH:00" : "HH:mm"),
+    }));
 
   // Variant breakdown
   const variantMap = new Map<string, { variant: string; render: number; error: number }>();
@@ -157,7 +169,9 @@ function LogoEventsAdmin() {
     cur[r.event_type] += 1;
     variantMap.set(v, cur);
   }
-  const byVariant = Array.from(variantMap.values()).sort((a, b) => (b.render + b.error) - (a.render + a.error));
+  const byVariant = Array.from(variantMap.values()).sort(
+    (a, b) => b.render + b.error - (a.render + a.error),
+  );
 
   // Device width buckets
   const widthCounts = WIDTH_BUCKETS.map((b) => ({ label: b.label, render: 0, error: 0 }));
@@ -175,16 +189,22 @@ function LogoEventsAdmin() {
     },
     { render: 0, error: 0 },
   );
-  const errorRate = totals.render + totals.error > 0
-    ? ((totals.error / (totals.render + totals.error)) * 100).toFixed(1)
-    : "0.0";
+  const errorRate =
+    totals.render + totals.error > 0
+      ? ((totals.error / (totals.render + totals.error)) * 100).toFixed(1)
+      : "0.0";
 
   return (
     <Shell>
       <div className="flex flex-wrap items-end gap-3 p-4 border border-border rounded-lg bg-card">
         <div className="space-y-1">
           <Label htmlFor="from">From</Label>
-          <Input id="from" type="datetime-local" value={from} onChange={(e) => setFrom(e.target.value)} />
+          <Input
+            id="from"
+            type="datetime-local"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+          />
         </div>
         <div className="space-y-1">
           <Label htmlFor="to">To</Label>
@@ -193,7 +213,9 @@ function LogoEventsAdmin() {
         <div className="space-y-1">
           <Label>Event type</Label>
           <Select value={eventType} onValueChange={(v) => setEventType(v as any)}>
-            <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-36">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="render">Render</SelectItem>
@@ -203,26 +225,49 @@ function LogoEventsAdmin() {
         </div>
         <div className="space-y-1">
           <Label>Variant</Label>
-          <Select value={variant || "__all"} onValueChange={(v) => setVariant(v === "__all" ? "" : v)}>
-            <SelectTrigger className="w-56"><SelectValue placeholder="All" /></SelectTrigger>
+          <Select
+            value={variant || "__all"}
+            onValueChange={(v) => setVariant(v === "__all" ? "" : v)}
+          >
+            <SelectTrigger className="w-56">
+              <SelectValue placeholder="All" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="__all">All variants</SelectItem>
-              {(variants as string[]).map((v: string) => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+              {(variants as string[]).map((v: string) => (
+                <SelectItem key={v} value={v}>
+                  {v}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-1">
           <Label htmlFor="minw">Min width</Label>
-          <Input id="minw" type="number" className="w-24" value={minWidth} onChange={(e) => setMinWidth(e.target.value)} />
+          <Input
+            id="minw"
+            type="number"
+            className="w-24"
+            value={minWidth}
+            onChange={(e) => setMinWidth(e.target.value)}
+          />
         </div>
         <div className="space-y-1">
           <Label htmlFor="maxw">Max width</Label>
-          <Input id="maxw" type="number" className="w-24" value={maxWidth} onChange={(e) => setMaxWidth(e.target.value)} />
+          <Input
+            id="maxw"
+            type="number"
+            className="w-24"
+            value={maxWidth}
+            onChange={(e) => setMaxWidth(e.target.value)}
+          />
         </div>
         <div className="space-y-1">
           <Label>Bucket</Label>
           <Select value={bucket} onValueChange={(v) => setBucket(v as any)}>
-            <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-28">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="minute">Minute</SelectItem>
               <SelectItem value="hour">Hour</SelectItem>
@@ -234,18 +279,27 @@ function LogoEventsAdmin() {
           <Button variant="outline" onClick={() => eventsQ.refetch()} disabled={eventsQ.isFetching}>
             {eventsQ.isFetching ? "Refreshing…" : "Refresh"}
           </Button>
-          <Button variant="ghost" onClick={() => signOut.mutate()}>Sign out</Button>
+          <Button variant="ghost" onClick={() => signOut.mutate()}>
+            Sign out
+          </Button>
         </div>
       </div>
 
       {eventsQ.isError && (
-        <p className="text-sm text-destructive">Failed to load: {(eventsQ.error as Error).message}</p>
+        <p className="text-sm text-destructive">
+          Failed to load: {(eventsQ.error as Error).message}
+        </p>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <Stat label="Total events" value={rows.length} />
         <Stat label="Renders" value={totals.render} accent="text-emerald-600" />
-        <Stat label="Errors" value={totals.error} accent="text-red-600" sub={`${errorRate}% error rate`} />
+        <Stat
+          label="Errors"
+          value={totals.error}
+          accent="text-red-600"
+          sub={`${errorRate}% error rate`}
+        />
       </div>
 
       <Panel title="Events over time">
@@ -270,7 +324,14 @@ function LogoEventsAdmin() {
             <ResponsiveContainer>
               <BarChart data={byVariant}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                <XAxis dataKey="variant" fontSize={11} interval={0} angle={-15} textAnchor="end" height={60} />
+                <XAxis
+                  dataKey="variant"
+                  fontSize={11}
+                  interval={0}
+                  angle={-15}
+                  textAnchor="end"
+                  height={60}
+                />
                 <YAxis fontSize={11} allowDecimals={false} />
                 <Tooltip />
                 <Legend />
@@ -315,17 +376,34 @@ function LogoEventsAdmin() {
             <tbody>
               {rows.slice(0, 100).map((r) => (
                 <tr key={r.id} className="border-t border-border">
-                  <td className="p-2 whitespace-nowrap">{format(new Date(r.created_at), "MMM d HH:mm:ss")}</td>
-                  <td className={`p-2 ${r.event_type === "error" ? "text-red-600" : "text-emerald-600"}`}>{r.event_type}</td>
+                  <td className="p-2 whitespace-nowrap">
+                    {format(new Date(r.created_at), "MMM d HH:mm:ss")}
+                  </td>
+                  <td
+                    className={`p-2 ${r.event_type === "error" ? "text-red-600" : "text-emerald-600"}`}
+                  >
+                    {r.event_type}
+                  </td>
                   <td className="p-2">{r.variant ?? "—"}</td>
                   <td className="p-2">{r.stage ?? "—"}</td>
                   <td className="p-2 text-right">{r.device_width ?? "—"}</td>
-                  <td className="p-2 font-mono text-[10px] truncate max-w-[140px]" title={r.correlation_id ?? undefined}>{r.correlation_id ?? "—"}</td>
-                  <td className="p-2 truncate max-w-[280px]" title={r.src ?? undefined}>{r.src ?? "—"}</td>
+                  <td
+                    className="p-2 font-mono text-[10px] truncate max-w-[140px]"
+                    title={r.correlation_id ?? undefined}
+                  >
+                    {r.correlation_id ?? "—"}
+                  </td>
+                  <td className="p-2 truncate max-w-[280px]" title={r.src ?? undefined}>
+                    {r.src ?? "—"}
+                  </td>
                 </tr>
               ))}
               {rows.length === 0 && !eventsQ.isFetching && (
-                <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">No events in this window.</td></tr>
+                <tr>
+                  <td colSpan={7} className="p-6 text-center text-muted-foreground">
+                    No events in this window.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -341,7 +419,9 @@ function Shell({ children }: { children: React.ReactNode }) {
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Header logo telemetry</h1>
-          <p className="text-sm text-muted-foreground">Renders vs errors, by variant, device width, and time.</p>
+          <p className="text-sm text-muted-foreground">
+            Renders vs errors, by variant, device width, and time.
+          </p>
         </div>
       </header>
       {children}
@@ -349,7 +429,17 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Stat({ label, value, accent, sub }: { label: string; value: number | string; accent?: string; sub?: string }) {
+function Stat({
+  label,
+  value,
+  accent,
+  sub,
+}: {
+  label: string;
+  value: number | string;
+  accent?: string;
+  sub?: string;
+}) {
   return (
     <div className="border border-border rounded-lg p-4 bg-card">
       <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>

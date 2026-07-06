@@ -15,8 +15,9 @@ const LanguageContext = createContext<LanguageContextValue>({
 
 function readInitialLocale(): Locale {
   if (typeof window === "undefined") return DEFAULT_LOCALE;
-  const stored = document.cookie.match(/(?:^|;\s*)NEVO_LANG=([a-zA-Z-]+)/)?.[1]
-    ?? window.localStorage.getItem("NEVO_LANG");
+  const stored =
+    document.cookie.match(/(?:^|;\s*)NEVO_LANG=([a-zA-Z-]+)/)?.[1] ??
+    window.localStorage.getItem("NEVO_LANG");
   if (stored && (SUPPORTED_LOCALES as string[]).includes(stored)) return stored as Locale;
   const nav = window.navigator.language?.slice(0, 2).toLowerCase();
   if (nav && (SUPPORTED_LOCALES as string[]).includes(nav)) return nav as Locale;
@@ -53,9 +54,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ lang, dir, setLang }}>
-      {children}
-    </LanguageContext.Provider>
+    <LanguageContext.Provider value={{ lang, dir, setLang }}>{children}</LanguageContext.Provider>
   );
 }
 

@@ -48,10 +48,7 @@ export function Analytics() {
     if (consent !== "accepted") return;
 
     if (IDS.ga4) {
-      injectSrc(
-        "ga4-src",
-        `https://www.googletagmanager.com/gtag/js?id=${IDS.ga4}`,
-      );
+      injectSrc("ga4-src", `https://www.googletagmanager.com/gtag/js?id=${IDS.ga4}`);
       inject(
         "ga4-init",
         `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${IDS.ga4}',{anonymize_ip:true});`,

@@ -84,7 +84,7 @@ const LAMBDA: Record<Core, number> = {
   PUR: 0.026,
   "Rock Wool": 0.038,
   EPS: 0.036,
-  "Glass Wool": 0.040,
+  "Glass Wool": 0.04,
 };
 
 // Density kg/m³ (per spec)
@@ -130,7 +130,11 @@ function fireRequirementMinutes(f: Fire): number {
 // Core visual palette for SVG cross-section
 const CORE_STYLE: Record<
   Core,
-  { base: string; accent: string; pattern: "foam-yellow" | "foam-warm" | "wool" | "beads" | "fiber" }
+  {
+    base: string;
+    accent: string;
+    pattern: "foam-yellow" | "foam-warm" | "wool" | "beads" | "fiber";
+  }
 > = {
   PIR: { base: "#F5E6A0", accent: "#D9BC55", pattern: "foam-yellow" },
   PUR: { base: "#F1CE6E", accent: "#B98A2E", pattern: "foam-warm" },
@@ -146,10 +150,14 @@ function calcUValue(core: Core, thickness_mm: number): number {
   return +(1 / R_total).toFixed(2);
 }
 
-function calcWeight(core: Core, thickness_mm: number, extSteel_mm: number, intSteel_mm: number): number {
+function calcWeight(
+  core: Core,
+  thickness_mm: number,
+  extSteel_mm: number,
+  intSteel_mm: number,
+): number {
   const coreKg = DENSITY[core] * (thickness_mm / 1000);
-  const steelKg =
-    (extSteel_mm / 1000) * STEEL_DENSITY + (intSteel_mm / 1000) * STEEL_DENSITY;
+  const steelKg = (extSteel_mm / 1000) * STEEL_DENSITY + (intSteel_mm / 1000) * STEEL_DENSITY;
   return +(coreKg + steelKg).toFixed(1);
 }
 
@@ -185,13 +193,18 @@ function recommendRange(
     // still return a functional range but the warning surfaces separately
   }
 
-  if (app === "Freezer Room" || t <= -30) return { min: 180, max: 200, note: "Deep-freeze envelope — minimise thermal bridging." };
+  if (app === "Freezer Room" || t <= -30)
+    return { min: 180, max: 200, note: "Deep-freeze envelope — minimise thermal bridging." };
   if (t <= -15) return { min: 120, max: 150, note: "Freezer / low-temperature envelope." };
-  if (app === "Cold Storage" || t <= 5) return { min: 80, max: 100, note: "Cold storage envelope." };
+  if (app === "Cold Storage" || t <= 5)
+    return { min: 80, max: 100, note: "Cold storage envelope." };
   if (app === "Clean Room") return { min: 60, max: 100, note: "Clean room hygienic envelope." };
-  if (app === "Data Center") return { min: 80, max: 120, note: "Controlled-environment data hall." };
-  if (app === "Food Processing") return { min: 80, max: 120, note: "Hygienic food processing envelope." };
-  if (app === "Industrial Building") return { min: 50, max: 100, note: "Industrial building envelope." };
+  if (app === "Data Center")
+    return { min: 80, max: 120, note: "Controlled-environment data hall." };
+  if (app === "Food Processing")
+    return { min: 80, max: 120, note: "Hygienic food processing envelope." };
+  if (app === "Industrial Building")
+    return { min: 50, max: 100, note: "Industrial building envelope." };
   if (app === "Warehouse") return { min: 40, max: 80, note: "Warehouse envelope." };
   if (app === "Agriculture") return { min: 40, max: 60, note: "Agricultural building." };
   return { min: 50, max: 80, note: "Commercial envelope." };
@@ -262,11 +275,11 @@ function Section({
         className={`mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] ${tone}`}
       >
         <span>{label}</span>
+        {issue && <span aria-hidden="true">•</span>}
         {issue && (
-          <span aria-hidden="true">•</span>
-        )}
-        {issue && (
-          <span className="normal-case tracking-normal">{issue.severity === "error" ? "Invalid" : "Check"}</span>
+          <span className="normal-case tracking-normal">
+            {issue.severity === "error" ? "Invalid" : "Check"}
+          </span>
         )}
       </div>
       <div
@@ -292,8 +305,6 @@ function Section({
     </div>
   );
 }
-
-
 
 // ---------------- Dynamic SVG Cross-section ----------------
 function CrossSection({
@@ -350,10 +361,17 @@ function CrossSection({
         aria-labelledby={titleId}
         aria-describedby={descId}
       >
-        <title id={titleId}>Sandwich panel cross-section — {core}, {thickness} mm</title>
+        <title id={titleId}>
+          Sandwich panel cross-section — {core}, {thickness} mm
+        </title>
         <desc id={descId}>{description}</desc>
         <defs>
-          <CorePattern id={patternId} kind={style.pattern} base={style.base} accent={style.accent} />
+          <CorePattern
+            id={patternId}
+            kind={style.pattern}
+            base={style.base}
+            accent={style.accent}
+          />
 
           <linearGradient id="skin-shade" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" stopColor="rgba(255,255,255,0.5)" />
@@ -380,7 +398,6 @@ function CrossSection({
           opacity={0.9}
           pointerEvents="none"
         />
-
 
         {/* Exterior skin */}
         <rect
@@ -420,13 +437,16 @@ function CrossSection({
           opacity={0.4}
         />
 
-
-
         {/* Thickness dimension */}
         <g stroke="rgba(255,255,255,0.7)" strokeWidth={0.8} fill="rgba(255,255,255,0.85)">
           <line x1={padX + panelW + 28} y1={startY} x2={padX + panelW + 28} y2={intTop + skinInt} />
           <line x1={padX + panelW + 22} y1={startY} x2={padX + panelW + 34} y2={startY} />
-          <line x1={padX + panelW + 22} y1={intTop + skinInt} x2={padX + panelW + 34} y2={intTop + skinInt} />
+          <line
+            x1={padX + panelW + 22}
+            y1={intTop + skinInt}
+            x2={padX + panelW + 34}
+            y2={intTop + skinInt}
+          />
           <text
             x={padX + panelW + 40}
             y={startY + totalH / 2 + 4}
@@ -446,7 +466,14 @@ function CrossSection({
           <text x={padX} y={intTop + skinInt + 18}>
             INT STEEL · {intSteel.toFixed(2)} mm
           </text>
-          <text x={padX + panelW - 4} y={coreTop + coreH / 2 + 4} textAnchor="end" fill="rgba(0,0,0,0.7)" fontSize={12} fontWeight={600}>
+          <text
+            x={padX + panelW - 4}
+            y={coreTop + coreH / 2 + 4}
+            textAnchor="end"
+            fill="rgba(0,0,0,0.7)"
+            fontSize={12}
+            fontWeight={600}
+          >
             CORE · {core}
           </text>
         </g>
@@ -455,7 +482,6 @@ function CrossSection({
     </figure>
   );
 }
-
 
 function CorePattern({
   id,
@@ -483,8 +509,20 @@ function CorePattern({
     return (
       <pattern id={id} width="26" height="12" patternUnits="userSpaceOnUse">
         <rect width="26" height="12" fill={base} />
-        <path d="M0 4 Q6 1 13 4 T26 4" stroke={accent} strokeWidth="0.7" fill="none" opacity="0.8" />
-        <path d="M0 8 Q7 5 14 9 T26 8" stroke={accent} strokeWidth="0.6" fill="none" opacity="0.6" />
+        <path
+          d="M0 4 Q6 1 13 4 T26 4"
+          stroke={accent}
+          strokeWidth="0.7"
+          fill="none"
+          opacity="0.8"
+        />
+        <path
+          d="M0 8 Q7 5 14 9 T26 8"
+          stroke={accent}
+          strokeWidth="0.6"
+          fill="none"
+          opacity="0.6"
+        />
       </pattern>
     );
   }
@@ -535,7 +573,13 @@ function UValueChart({ core, selected }: { core: Core; selected: number }) {
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
         <line x1={padL} y1={padT} x2={padL} y2={padT + ch} stroke="rgba(255,255,255,0.2)" />
-        <line x1={padL} y1={padT + ch} x2={padL + cw} y2={padT + ch} stroke="rgba(255,255,255,0.2)" />
+        <line
+          x1={padL}
+          y1={padT + ch}
+          x2={padL + cw}
+          y2={padT + ch}
+          stroke="rgba(255,255,255,0.2)"
+        />
         <polyline points={points} fill="none" stroke="rgb(52,211,153)" strokeWidth={1.8} />
         {data.map((d, i) => {
           const x = padL + (i / (data.length - 1)) * cw;
@@ -543,19 +587,44 @@ function UValueChart({ core, selected }: { core: Core; selected: number }) {
           const active = d.t === selected;
           return (
             <g key={d.t}>
-              <circle cx={x} cy={y} r={active ? 5 : 2.5} fill={active ? "rgb(52,211,153)" : "rgba(255,255,255,0.5)"} />
+              <circle
+                cx={x}
+                cy={y}
+                r={active ? 5 : 2.5}
+                fill={active ? "rgb(52,211,153)" : "rgba(255,255,255,0.5)"}
+              />
               {active && (
-                <text x={x} y={y - 10} fontSize={10} fill="rgb(52,211,153)" textAnchor="middle" fontFamily="ui-monospace,Menlo,monospace">
+                <text
+                  x={x}
+                  y={y - 10}
+                  fontSize={10}
+                  fill="rgb(52,211,153)"
+                  textAnchor="middle"
+                  fontFamily="ui-monospace,Menlo,monospace"
+                >
                   U={d.u}
                 </text>
               )}
-              <text x={x} y={padT + ch + 14} fontSize={9} fill="rgba(255,255,255,0.5)" textAnchor="middle" fontFamily="ui-monospace,Menlo,monospace">
+              <text
+                x={x}
+                y={padT + ch + 14}
+                fontSize={9}
+                fill="rgba(255,255,255,0.5)"
+                textAnchor="middle"
+                fontFamily="ui-monospace,Menlo,monospace"
+              >
                 {d.t}
               </text>
             </g>
           );
         })}
-        <text x={4} y={padT + 6} fontSize={9} fill="rgba(255,255,255,0.5)" fontFamily="ui-monospace,Menlo,monospace">
+        <text
+          x={4}
+          y={padT + 6}
+          fontSize={9}
+          fill="rgba(255,255,255,0.5)"
+          fontFamily="ui-monospace,Menlo,monospace"
+        >
           W/m²K
         </text>
       </svg>
@@ -577,7 +646,9 @@ function BarChart({
   const max = Math.max(...data.map((d) => d.value), 1);
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-      <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">{title}</div>
+      <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
+        {title}
+      </div>
       <div className="space-y-2">
         {data.map((d, i) => (
           <div key={d.label} className="flex items-center gap-2">
@@ -592,7 +663,9 @@ function BarChart({
                 }`}
               />
             </div>
-            <div className={`w-16 shrink-0 text-right font-mono text-[10px] ${i === selectedIndex ? "text-emerald-300" : "text-white/60"}`}>
+            <div
+              className={`w-16 shrink-0 text-right font-mono text-[10px] ${i === selectedIndex ? "text-emerald-300" : "text-white/60"}`}
+            >
               {d.value} {unit}
             </div>
           </div>
@@ -701,7 +774,8 @@ function validateInputs(input: {
     issues.push({
       field: "extSteel",
       severity: "warning",
-      message: "Interior skin is thicker than exterior. Exterior faces weather; typically ext ≥ int.",
+      message:
+        "Interior skin is thicker than exterior. Exterior faces weather; typically ext ≥ int.",
     });
   }
 
@@ -807,8 +881,12 @@ function readSharedFromUrl(): SharedState {
 
   const extNum = Number(p.get("ext"));
   const intNum = Number(p.get("int"));
-  const extSteel = (STEEL_GAUGES as readonly number[]).includes(extNum) ? extNum : DEFAULT_SHARED.extSteel;
-  const intSteel = (STEEL_GAUGES as readonly number[]).includes(intNum) ? intNum : DEFAULT_SHARED.intSteel;
+  const extSteel = (STEEL_GAUGES as readonly number[]).includes(extNum)
+    ? extNum
+    : DEFAULT_SHARED.extSteel;
+  const intSteel = (STEEL_GAUGES as readonly number[]).includes(intNum)
+    ? intNum
+    : DEFAULT_SHARED.intSteel;
 
   const cmp = (p.get("cmp") ?? "")
     .split(",")
@@ -855,14 +933,15 @@ function PanelThicknessPage() {
   const [extSteel, setExtSteel] = useState<number>(initial.extSteel);
   const [intSteel, setIntSteel] = useState<number>(initial.intSteel);
   const [compare, setCompare] = useState<number[]>(initial.compare);
-  const [tab, setTab] = useState<"Inputs" | "Recommendation" | "Cross Section" | "Charts" | "Compare" | "Report">(
-    "Inputs",
-  );
+  const [tab, setTab] = useState<
+    "Inputs" | "Recommendation" | "Cross Section" | "Charts" | "Compare" | "Report"
+  >("Inputs");
   const [copied, setCopied] = useState(false);
   const [pdfPending, setPdfPending] = useState(false);
 
   const shareQuery = useMemo(
-    () => buildSharedQuery({ app, core, climate, temp, fire, thickness, extSteel, intSteel, compare }),
+    () =>
+      buildSharedQuery({ app, core, climate, temp, fire, thickness, extSteel, intSteel, compare }),
     [app, core, climate, temp, fire, thickness, extSteel, intSteel, compare],
   );
 
@@ -899,12 +978,19 @@ function PanelThicknessPage() {
     window.setTimeout(() => setCopied(false), 2000);
   }
 
-
   // Live results
   const u = useMemo(() => calcUValue(core, thickness), [core, thickness]);
   const rTotal = useMemo(() => +(1 / u).toFixed(2), [u]);
-  const w = useMemo(() => calcWeight(core, thickness, extSteel, intSteel), [core, thickness, extSteel, intSteel]);
-  const deltaT = useMemo(() => Math.abs(20 - tempToNumber(temp)) + { "Very Cold": 15, Cold: 8, Moderate: 0, Hot: -3, "Very Hot": -6 }[climate], [temp, climate]);
+  const w = useMemo(
+    () => calcWeight(core, thickness, extSteel, intSteel),
+    [core, thickness, extSteel, intSteel],
+  );
+  const deltaT = useMemo(
+    () =>
+      Math.abs(20 - tempToNumber(temp)) +
+      { "Very Cold": 15, Cold: 8, Moderate: 0, Hot: -3, "Very Hot": -6 }[climate],
+    [temp, climate],
+  );
   const hLoss = useMemo(() => calcHeatLoss(u, Math.max(1, deltaT)), [u, deltaT]);
   const perf = useMemo(() => thermalPerformance(u), [u]);
   const fireAchieved = useMemo(() => fireMinutesOf(core, thickness), [core, thickness]);
@@ -916,18 +1002,30 @@ function PanelThicknessPage() {
   const meetsRec = thickness >= rec.min && thickness <= rec.max;
   const belowRec = thickness < rec.min;
 
-  const performanceScores = useMemo((): Record<"thermal" | "fire" | "weight" | "cost" | "appFit", ScoreValue> => {
+  const performanceScores = useMemo((): Record<
+    "thermal" | "fire" | "weight" | "cost" | "appFit",
+    ScoreValue
+  > => {
     const thermal: ScoreValue =
       u <= 0.18 ? "Excellent" : u <= 0.28 ? "Very Good" : u <= 0.45 ? "Good" : "Limited";
-    const fireS: ScoreValue = requiredFireMin === 0
-      ? "Excellent"
-      : fireAchieved >= requiredFireMin
+    const fireS: ScoreValue =
+      requiredFireMin === 0
         ? "Excellent"
-        : fireAchieved >= requiredFireMin - 30
-          ? "Limited"
-          : "Not Recommended";
-    const weightS: ScoreValue = w < 15 ? "Excellent" : w < 25 ? "Very Good" : w < 40 ? "Good" : "Limited";
-    const costS: ScoreValue = thickness <= 80 ? "Excellent" : thickness <= 120 ? "Very Good" : thickness <= 180 ? "Good" : "Limited";
+        : fireAchieved >= requiredFireMin
+          ? "Excellent"
+          : fireAchieved >= requiredFireMin - 30
+            ? "Limited"
+            : "Not Recommended";
+    const weightS: ScoreValue =
+      w < 15 ? "Excellent" : w < 25 ? "Very Good" : w < 40 ? "Good" : "Limited";
+    const costS: ScoreValue =
+      thickness <= 80
+        ? "Excellent"
+        : thickness <= 120
+          ? "Very Good"
+          : thickness <= 180
+            ? "Good"
+            : "Limited";
     const appFit: ScoreValue = meetsRec ? "Excellent" : belowRec ? "Not Recommended" : "Very Good";
     return { thermal, fire: fireS, weight: weightS, cost: costS, appFit };
   }, [u, w, thickness, meetsRec, belowRec, fireAchieved, requiredFireMin]);
@@ -951,7 +1049,6 @@ function PanelThicknessPage() {
     intSteel: firstBy(issues, "intSteel"),
   };
 
-
   function toggleCompare(t: number) {
     setCompare((prev) => {
       if (prev.includes(t)) return prev.filter((x) => x !== t);
@@ -959,7 +1056,6 @@ function PanelThicknessPage() {
       return [...prev, t];
     });
   }
-
 
   async function downloadPdfReport() {
     if (hasErrors || pdfPending) return;
@@ -978,105 +1074,120 @@ function PanelThicknessPage() {
     try {
       const { default: jsPDF } = await import("jspdf");
       const doc = new jsPDF({ unit: "pt", format: "a4" });
-    const pageW = doc.internal.pageSize.getWidth();
-    const marginX = 48;
-    let y = 56;
+      const pageW = doc.internal.pageSize.getWidth();
+      const marginX = 48;
+      let y = 56;
 
-    const line = (text: string, opts?: { size?: number; bold?: boolean; color?: [number, number, number] }) => {
-      const size = opts?.size ?? 10;
-      doc.setFont("helvetica", opts?.bold ? "bold" : "normal");
-      doc.setFontSize(size);
-      const [r, g, b] = opts?.color ?? [30, 30, 30];
-      doc.setTextColor(r, g, b);
-      const wrapped = doc.splitTextToSize(text, pageW - marginX * 2);
-      doc.text(wrapped, marginX, y);
-      y += wrapped.length * (size + 3);
-    };
-    const spacer = (h = 8) => { y += h; };
-    const rule = () => {
-      doc.setDrawColor(200);
-      doc.line(marginX, y, pageW - marginX, y);
-      y += 10;
-    };
-    const kv = (k: string, v: string) => {
+      const line = (
+        text: string,
+        opts?: { size?: number; bold?: boolean; color?: [number, number, number] },
+      ) => {
+        const size = opts?.size ?? 10;
+        doc.setFont("helvetica", opts?.bold ? "bold" : "normal");
+        doc.setFontSize(size);
+        const [r, g, b] = opts?.color ?? [30, 30, 30];
+        doc.setTextColor(r, g, b);
+        const wrapped = doc.splitTextToSize(text, pageW - marginX * 2);
+        doc.text(wrapped, marginX, y);
+        y += wrapped.length * (size + 3);
+      };
+      const spacer = (h = 8) => {
+        y += h;
+      };
+      const rule = () => {
+        doc.setDrawColor(200);
+        doc.line(marginX, y, pageW - marginX, y);
+        y += 10;
+      };
+      const kv = (k: string, v: string) => {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(90);
+        doc.text(k, marginX, y);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(20);
+        doc.text(v, marginX + 190, y);
+        y += 15;
+      };
+
+      // Header
+      doc.setFillColor(15, 23, 42);
+      doc.rect(0, 0, pageW, 40, "F");
+      doc.setTextColor(255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("NEVO Engineering", marginX, 26);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
-      doc.setTextColor(90);
-      doc.text(k, marginX, y);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(20);
-      doc.text(v, marginX + 190, y);
-      y += 15;
-    };
+      doc.text("Panel Thickness Calculation Report", pageW - marginX, 26, { align: "right" });
 
-    // Header
-    doc.setFillColor(15, 23, 42);
-    doc.rect(0, 0, pageW, 40, "F");
-    doc.setTextColor(255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text("NEVO Engineering", marginX, 26);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.text("Panel Thickness Calculation Report", pageW - marginX, 26, { align: "right" });
+      y = 72;
+      line("Panel Thickness Calculation Report", { size: 18, bold: true });
+      line(`Generated ${new Date().toLocaleString()}`, { size: 9, color: [110, 110, 110] });
+      spacer(6);
+      rule();
 
-    y = 72;
-    line("Panel Thickness Calculation Report", { size: 18, bold: true });
-    line(`Generated ${new Date().toLocaleString()}`, { size: 9, color: [110, 110, 110] });
-    spacer(6);
-    rule();
-
-    line("Inputs", { size: 12, bold: true });
-    spacer(2);
-    kv("Application", app);
-    kv("Core Material", core);
-    kv("Climate Zone", climate);
-    kv("Required Internal Temp", temp);
-    kv("Fire Requirement", fire);
-    kv("Selected Thickness", `${thickness} mm`);
-    kv("Exterior Steel Skin", `${extSteel.toFixed(2)} mm`);
-    kv("Interior Steel Skin", `${intSteel.toFixed(2)} mm`);
-    spacer(4);
-    rule();
-
-    line("Computed Results", { size: 12, bold: true });
-    spacer(2);
-    kv("U-Value", `${u} W/m²K`);
-    kv("Thermal Resistance (R)", `${rTotal} m²K/W`);
-    kv("Panel Weight", `${w} kg/m²`);
-    kv("Estimated Heat Loss", `${hLoss} W/m² (ΔT ${deltaT} K)`);
-    kv("Fire Rating Achieved", `${fireLabel(fireAchieved)} (required: ${fire})`);
-    kv("Thermal Performance", perf);
-    spacer(4);
-    rule();
-
-    line("Recommendation", { size: 12, bold: true });
-    spacer(2);
-    kv("Recommended Range", `${rec.min}–${rec.max} mm`);
-    kv("Selection Status", meetsRec ? "Within recommended range" : belowRec ? "Below recommended range" : "Above recommended range");
-    line(`Note: ${rec.note}`, { size: 10 });
-    if (fireWarn) {
+      line("Inputs", { size: 12, bold: true });
+      spacer(2);
+      kv("Application", app);
+      kv("Core Material", core);
+      kv("Climate Zone", climate);
+      kv("Required Internal Temp", temp);
+      kv("Fire Requirement", fire);
+      kv("Selected Thickness", `${thickness} mm`);
+      kv("Exterior Steel Skin", `${extSteel.toFixed(2)} mm`);
+      kv("Interior Steel Skin", `${intSteel.toFixed(2)} mm`);
       spacer(4);
-      line("WARNING: For high fire resistance requirements (>=120 min), Rock Wool or Glass Wool cores are strongly recommended.", { size: 10, bold: true, color: [180, 60, 30] });
-    }
-    spacer(6);
-    rule();
+      rule();
 
-    line("Disclaimer", { size: 12, bold: true });
-    spacer(2);
-    line(
-      "This calculator provides conceptual guidance only. Final sandwich panel thickness must be verified by project-specific engineering, local building regulations, fire safety requirements and detailed thermal performance calculations. Contact NEVO Engineering for a validated project specification.",
-      { size: 9, color: [90, 90, 90] },
-    );
+      line("Computed Results", { size: 12, bold: true });
+      spacer(2);
+      kv("U-Value", `${u} W/m²K`);
+      kv("Thermal Resistance (R)", `${rTotal} m²K/W`);
+      kv("Panel Weight", `${w} kg/m²`);
+      kv("Estimated Heat Loss", `${hLoss} W/m² (ΔT ${deltaT} K)`);
+      kv("Fire Rating Achieved", `${fireLabel(fireAchieved)} (required: ${fire})`);
+      kv("Thermal Performance", perf);
+      spacer(4);
+      rule();
 
-    // Footer
-    const pageH = doc.internal.pageSize.getHeight();
-    doc.setDrawColor(220);
-    doc.line(marginX, pageH - 40, pageW - marginX, pageH - 40);
-    doc.setFontSize(8);
-    doc.setTextColor(120);
-    doc.text("NEVO Engineering · Panel Thickness Calculator", marginX, pageH - 24);
-    doc.text("nevo.engineering", pageW - marginX, pageH - 24, { align: "right" });
+      line("Recommendation", { size: 12, bold: true });
+      spacer(2);
+      kv("Recommended Range", `${rec.min}–${rec.max} mm`);
+      kv(
+        "Selection Status",
+        meetsRec
+          ? "Within recommended range"
+          : belowRec
+            ? "Below recommended range"
+            : "Above recommended range",
+      );
+      line(`Note: ${rec.note}`, { size: 10 });
+      if (fireWarn) {
+        spacer(4);
+        line(
+          "WARNING: For high fire resistance requirements (>=120 min), Rock Wool or Glass Wool cores are strongly recommended.",
+          { size: 10, bold: true, color: [180, 60, 30] },
+        );
+      }
+      spacer(6);
+      rule();
+
+      line("Disclaimer", { size: 12, bold: true });
+      spacer(2);
+      line(
+        "This calculator provides conceptual guidance only. Final sandwich panel thickness must be verified by project-specific engineering, local building regulations, fire safety requirements and detailed thermal performance calculations. Contact NEVO Engineering for a validated project specification.",
+        { size: 9, color: [90, 90, 90] },
+      );
+
+      // Footer
+      const pageH = doc.internal.pageSize.getHeight();
+      doc.setDrawColor(220);
+      doc.line(marginX, pageH - 40, pageW - marginX, pageH - 40);
+      doc.setFontSize(8);
+      doc.setTextColor(120);
+      doc.text("NEVO Engineering · Panel Thickness Calculator", marginX, pageH - 24);
+      doc.text("nevo.engineering", pageW - marginX, pageH - 24, { align: "right" });
 
       const filename = `nevo-panel-thickness-${app.replace(/\s+/g, "-")}-${core.replace(/\s+/g, "-")}-${thickness}mm.pdf`;
       doc.save(filename);
@@ -1141,7 +1252,14 @@ function PanelThicknessPage() {
   const TEMPS: Temp[] = ["+20°C", "+5°C", "0°C", "-18°C", "-25°C", "-40°C"];
   const FIRES: Fire[] = ["None", "30 min", "60 min", "90 min", "120 min", "180 min"];
 
-  const TABS = ["Inputs", "Recommendation", "Cross Section", "Charts", "Compare", "Report"] as const;
+  const TABS = [
+    "Inputs",
+    "Recommendation",
+    "Cross Section",
+    "Charts",
+    "Compare",
+    "Report",
+  ] as const;
 
   const InputsPanel = (
     <div className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
@@ -1242,7 +1360,6 @@ function PanelThicknessPage() {
         </Section>
         <Section label="Interior Steel (mm)" issue={fieldIssues.intSteel}>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-
             {STEEL_GAUGES.map((s) => (
               <Chip key={s} active={intSteel === s} onClick={() => setIntSteel(s)}>
                 {s.toFixed(2)}
@@ -1265,11 +1382,41 @@ function PanelThicknessPage() {
         <MetricCard icon={Thermometer} label="U-Value" value={`${u}`} unit="W/m²K" tone="emerald" />
         <MetricCard icon={Zap} label="Thermal Perf." value={perf} unit="" tone="emerald" />
         <MetricCard icon={Weight} label="Weight" value={`${w}`} unit="kg/m²" tone="white" />
-        <MetricCard icon={Flame} label="Fire Achieved" value={fireLabel(fireAchieved)} unit="" tone={fireOk ? "emerald" : "amber"} />
-        <MetricCard icon={Thermometer} label="R-Value" value={`${rTotal}`} unit="m²K/W" tone="white" />
-        <MetricCard icon={Zap} label="Heat Loss" value={`${hLoss}`} unit={`W/m² · ΔT ${deltaT}K`} tone="white" />
-        <MetricCard icon={Weight} label="Recommended" value={`${rec.min}–${rec.max}`} unit="mm" tone="emerald" />
-        <MetricCard icon={CheckCircle2} label="Selected" value={`${thickness}`} unit="mm" tone={meetsRec ? "emerald" : belowRec ? "rose" : "amber"} />
+        <MetricCard
+          icon={Flame}
+          label="Fire Achieved"
+          value={fireLabel(fireAchieved)}
+          unit=""
+          tone={fireOk ? "emerald" : "amber"}
+        />
+        <MetricCard
+          icon={Thermometer}
+          label="R-Value"
+          value={`${rTotal}`}
+          unit="m²K/W"
+          tone="white"
+        />
+        <MetricCard
+          icon={Zap}
+          label="Heat Loss"
+          value={`${hLoss}`}
+          unit={`W/m² · ΔT ${deltaT}K`}
+          tone="white"
+        />
+        <MetricCard
+          icon={Weight}
+          label="Recommended"
+          value={`${rec.min}–${rec.max}`}
+          unit="mm"
+          tone="emerald"
+        />
+        <MetricCard
+          icon={CheckCircle2}
+          label="Selected"
+          value={`${thickness}`}
+          unit="mm"
+          tone={meetsRec ? "emerald" : belowRec ? "rose" : "amber"}
+        />
       </div>
       {hasErrors && (
         <div className="absolute inset-0 flex items-center justify-center">
@@ -1279,7 +1426,8 @@ function PanelThicknessPage() {
               Results unavailable
             </div>
             <p className="text-xs text-rose-100/80">
-              Resolve the {errors.length} configuration {errors.length === 1 ? "issue" : "issues"} above to see valid engineering results.
+              Resolve the {errors.length} configuration {errors.length === 1 ? "issue" : "issues"}{" "}
+              above to see valid engineering results.
             </p>
           </div>
         </div>
@@ -1287,26 +1435,30 @@ function PanelThicknessPage() {
     </div>
   );
 
-
   const RecommendationPanel = (
     <div className="space-y-4">
       {ResultCards}
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-        <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">Engineering Note</div>
+        <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
+          Engineering Note
+        </div>
         <p className="text-sm text-white/80">
           For <span className="text-emerald-300">{app}</span> at{" "}
           <span className="text-emerald-300">{temp}</span> in a{" "}
           <span className="text-emerald-300">{climate}</span> climate, NEVO Engineering recommends a{" "}
-          <span className="text-emerald-300">{rec.min}–{rec.max} mm {core}</span> panel. {rec.note}{" "}
-          Your selected {thickness} mm gives a U-value of <span className="text-emerald-300">{u} W/m²K</span>{" "}
-          ({perf.toLowerCase()}).
+          <span className="text-emerald-300">
+            {rec.min}–{rec.max} mm {core}
+          </span>{" "}
+          panel. {rec.note} Your selected {thickness} mm gives a U-value of{" "}
+          <span className="text-emerald-300">{u} W/m²K</span> ({perf.toLowerCase()}).
         </p>
         {fireWarn && (
           <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-400/30 bg-amber-400/5 p-4">
             <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-400" />
             <p className="text-sm text-amber-200">
-              For high fire resistance requirements ({fire}), Rock Wool is usually recommended. Final selection must be verified according to local fire regulations.
+              For high fire resistance requirements ({fire}), Rock Wool is usually recommended.
+              Final selection must be verified according to local fire regulations.
             </p>
           </div>
         )}
@@ -1314,7 +1466,8 @@ function PanelThicknessPage() {
           <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-400/30 bg-amber-400/5 p-4">
             <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-400" />
             <p className="text-sm text-amber-200">
-              The selected {core} at {thickness} mm reaches ~{fireLabel(fireAchieved)}. Increase thickness or switch to Rock Wool to meet the {fire} requirement.
+              The selected {core} at {thickness} mm reaches ~{fireLabel(fireAchieved)}. Increase
+              thickness or switch to Rock Wool to meet the {fire} requirement.
             </p>
           </div>
         )}
@@ -1335,24 +1488,35 @@ function PanelThicknessPage() {
       <UValueChart core={core} selected={thickness} />
       <BarChart
         title={`Weight vs Thickness · ${core}`}
-        data={THICKNESSES.map((t) => ({ label: `${t}mm`, value: calcWeight(core, t, extSteel, intSteel) }))}
+        data={THICKNESSES.map((t) => ({
+          label: `${t}mm`,
+          value: calcWeight(core, t, extSteel, intSteel),
+        }))}
         selectedIndex={THICKNESSES.indexOf(thickness)}
         unit="kg/m²"
       />
       <BarChart
         title="Heat Loss (relative)"
-        data={THICKNESSES.map((t) => ({ label: `${t}mm`, value: calcHeatLoss(calcUValue(core, t), Math.max(1, deltaT)) }))}
+        data={THICKNESSES.map((t) => ({
+          label: `${t}mm`,
+          value: calcHeatLoss(calcUValue(core, t), Math.max(1, deltaT)),
+        }))}
         selectedIndex={THICKNESSES.indexOf(thickness)}
         unit="W/m²"
       />
       <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-        <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">Fire Suitability</div>
+        <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
+          Fire Suitability
+        </div>
         <div className="space-y-2">
           {(["30 min", "60 min", "90 min", "120 min", "180 min"] as Fire[]).map((f) => {
             const req = fireRequirementMinutes(f);
             const ok = fireAchieved >= req;
             return (
-              <div key={f} className="flex items-center justify-between rounded-md border border-white/5 bg-white/[0.02] px-3 py-2">
+              <div
+                key={f}
+                className="flex items-center justify-between rounded-md border border-white/5 bg-white/[0.02] px-3 py-2"
+              >
                 <span className="font-mono text-xs text-white/70">{f}</span>
                 <span
                   className={`rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${
@@ -1435,7 +1599,9 @@ function PanelThicknessPage() {
   const ReportPanel = (
     <div className="space-y-4">
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-        <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">Calculation Report</div>
+        <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
+          Calculation Report
+        </div>
         <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
           <ReportRow k="Application" v={app} />
           <ReportRow k="Core Material" v={core} />
@@ -1453,14 +1619,17 @@ function PanelThicknessPage() {
           <ReportRow k="Recommended" v={`${rec.min}–${rec.max} mm`} />
         </dl>
         <p className="mt-4 text-xs text-white/50">
-          This calculator provides conceptual guidance only. Final sandwich panel thickness must be verified by project-specific engineering, local regulations, fire requirements and thermal performance calculations.
+          This calculator provides conceptual guidance only. Final sandwich panel thickness must be
+          verified by project-specific engineering, local regulations, fire requirements and thermal
+          performance calculations.
         </p>
       </div>
 
       {hasErrors && (
         <p role="alert" className="flex items-start gap-2 text-xs text-rose-300">
           <AlertTriangle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-          Resolve the {errors.length} configuration {errors.length === 1 ? "issue" : "issues"} in the Inputs tab before exporting a report or requesting an engineering recommendation.
+          Resolve the {errors.length} configuration {errors.length === 1 ? "issue" : "issues"} in
+          the Inputs tab before exporting a report or requesting an engineering recommendation.
         </p>
       )}
       <div className="flex flex-wrap gap-3">
@@ -1533,7 +1702,6 @@ function PanelThicknessPage() {
     </div>
   );
 
-
   const tabContent = {
     Inputs: InputsPanel,
     Recommendation: RecommendationPanel,
@@ -1557,7 +1725,9 @@ function PanelThicknessPage() {
             Panel Thickness Calculator
           </h1>
           <p className="mt-2 max-w-3xl text-sm text-white/60">
-            Dynamic sandwich panel sizing. Live U-value, weight, heat loss and fire suitability update as you change inputs. All values are computed in real time — no static tables, no images.
+            Dynamic sandwich panel sizing. Live U-value, weight, heat loss and fire suitability
+            update as you change inputs. All values are computed in real time — no static tables, no
+            images.
           </p>
         </div>
 
@@ -1581,19 +1751,28 @@ function PanelThicknessPage() {
 
         {/* Desktop: side-by-side inputs + selected tab; Mobile: single column */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-5">{tab === "Inputs" ? InputsPanel : (
-            <div className="hidden lg:block">{InputsPanel}</div>
-          )}
-          {tab === "Inputs" && (
-            <div className="mt-6 lg:hidden">
-              <CrossSection core={core} thickness={thickness} extSteel={extSteel} intSteel={intSteel} />
-            </div>
-          )}
+          <div className="lg:col-span-5">
+            {tab === "Inputs" ? InputsPanel : <div className="hidden lg:block">{InputsPanel}</div>}
+            {tab === "Inputs" && (
+              <div className="mt-6 lg:hidden">
+                <CrossSection
+                  core={core}
+                  thickness={thickness}
+                  extSteel={extSteel}
+                  intSteel={intSteel}
+                />
+              </div>
+            )}
           </div>
           <div className="lg:col-span-7">
             {tab === "Inputs" ? (
               <div className="space-y-4">
-                <CrossSection core={core} thickness={thickness} extSteel={extSteel} intSteel={intSteel} />
+                <CrossSection
+                  core={core}
+                  thickness={thickness}
+                  extSteel={extSteel}
+                  intSteel={intSteel}
+                />
                 {ResultCards}
               </div>
             ) : (
@@ -1609,7 +1788,8 @@ function PanelThicknessPage() {
               Ready to lock in {thickness} mm {core}?
             </div>
             <div className="text-xs text-white/60">
-              NEVO Engineering will validate the design against project-specific loads, fire and thermal requirements.
+              NEVO Engineering will validate the design against project-specific loads, fire and
+              thermal requirements.
             </div>
           </div>
           {hasErrors ? (
@@ -1653,7 +1833,9 @@ function PanelThicknessPage() {
         </div>
 
         <p className="mt-6 text-xs text-white/40">
-          This calculator provides conceptual guidance only. Final sandwich panel thickness must be verified by project-specific engineering, local regulations, fire requirements and thermal performance calculations.
+          This calculator provides conceptual guidance only. Final sandwich panel thickness must be
+          verified by project-specific engineering, local regulations, fire requirements and thermal
+          performance calculations.
         </p>
       </main>
 
@@ -1738,7 +1920,6 @@ function ScoreBadge({
   );
 }
 
-
 function ReportRow({ k, v }: { k: string; v: string }) {
   return (
     <div className="flex items-center justify-between rounded-md border border-white/5 bg-white/[0.02] px-3 py-2">
@@ -1807,7 +1988,10 @@ function Stepper<T extends string | number>({
       onKeyDown={onKeyDown}
       className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2"
     >
-      <div id={groupLabelId} className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50">
+      <div
+        id={groupLabelId}
+        className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50"
+      >
         {label}
       </div>
       <div className="flex items-center gap-2">
@@ -1869,9 +2053,7 @@ function CrossSectionControls({
         <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
           Adjust cross-section
         </h3>
-        <p className="text-[10px] text-white/40">
-          Use ← → or Home/End to step
-        </p>
+        <p className="text-[10px] text-white/40">Use ← → or Home/End to step</p>
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <Stepper<Thickness>
@@ -1901,4 +2083,3 @@ function CrossSectionControls({
     </section>
   );
 }
-

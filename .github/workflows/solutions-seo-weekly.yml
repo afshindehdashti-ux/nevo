@@ -158,7 +158,6 @@ jobs:
           retention-days: 90
           if-no-files-found: error
 
-
       # Notify Slack when the live snapshot finds regressions.
       # Runs after upload so the "View run & artifacts" link resolves.
       - name: Notify Slack on failure

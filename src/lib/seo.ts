@@ -5,7 +5,6 @@
 import { OG_IMAGES, OG_DEFAULT } from "./og-images";
 import { SEO_META } from "./seo-meta";
 
-
 export const SITE = {
   name: "NEVO Industrial",
   legalName: "NEVO Industrial LLC",
@@ -40,16 +39,16 @@ export const WHATSAPP_URL = `https://wa.me/971502426167?text=${encodeURIComponen
 )}`;
 
 export const LOCALES = [
-  { code: "en", label: "English",    hreflang: "en", status: "active" },
-  { code: "ar", label: "العربية",    hreflang: "ar", status: "active" },
-  { code: "tr", label: "Türkçe",     hreflang: "tr", status: "active" },
-  { code: "ru", label: "Русский",    hreflang: "ru", status: "active" },
-  { code: "pt", label: "Português",  hreflang: "pt", status: "active" },
-  { code: "de", label: "Deutsch",    hreflang: "de", status: "active" },
-  { code: "es", label: "Español",    hreflang: "es", status: "active" },
-  { code: "fr", label: "Français",   hreflang: "fr", status: "active" },
-  { code: "it", label: "Italiano",   hreflang: "it", status: "active" },
-  { code: "zh", label: "简体中文",     hreflang: "zh-Hans", status: "active" },
+  { code: "en", label: "English", hreflang: "en", status: "active" },
+  { code: "ar", label: "العربية", hreflang: "ar", status: "active" },
+  { code: "tr", label: "Türkçe", hreflang: "tr", status: "active" },
+  { code: "ru", label: "Русский", hreflang: "ru", status: "active" },
+  { code: "pt", label: "Português", hreflang: "pt", status: "active" },
+  { code: "de", label: "Deutsch", hreflang: "de", status: "active" },
+  { code: "es", label: "Español", hreflang: "es", status: "active" },
+  { code: "fr", label: "Français", hreflang: "fr", status: "active" },
+  { code: "it", label: "Italiano", hreflang: "it", status: "active" },
+  { code: "zh", label: "简体中文", hreflang: "zh-Hans", status: "active" },
 ] as const;
 
 export type LocaleCode = (typeof LOCALES)[number]["code"];
@@ -69,9 +68,7 @@ export interface SeoInput {
 export function buildSeo(input: SeoInput) {
   const cleanPath = input.path === "/" ? "" : input.path;
   const localizedPath = `/${input.lang}${cleanPath}`;
-  const absolutePath = input.path.startsWith("http")
-    ? input.path
-    : `${SITE.url}${localizedPath}`;
+  const absolutePath = input.path.startsWith("http") ? input.path : `${SITE.url}${localizedPath}`;
 
   // Auto-localize: if SEO_META has an entry for this path+locale, override the
   // caller's title/description. Callers pass an English fallback, and the
@@ -93,7 +90,15 @@ export function buildSeo(input: SeoInput) {
     { property: "og:type", content: input.type ?? "website" },
     { property: "og:url", content: absolutePath },
     { property: "og:site_name", content: SITE.name },
-    { property: "og:locale", content: (String(input.lang) === "ar" ? "ar_AE" : String(input.lang) === "zh" ? "zh_CN" : `${String(input.lang)}_${String(input.lang).toUpperCase()}`) },
+    {
+      property: "og:locale",
+      content:
+        String(input.lang) === "ar"
+          ? "ar_AE"
+          : String(input.lang) === "zh"
+            ? "zh_CN"
+            : `${String(input.lang)}_${String(input.lang).toUpperCase()}`,
+    },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: fullTitle },
     { name: "twitter:description", content: effectiveDescription },
@@ -122,14 +127,11 @@ export function buildSeo(input: SeoInput) {
   } else {
     meta.push({
       name: "robots",
-      content:
-        "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     });
   }
 
-  const links: Array<Record<string, string>> = [
-    { rel: "canonical", href: absolutePath },
-  ];
+  const links: Array<Record<string, string>> = [{ rel: "canonical", href: absolutePath }];
 
   // hreflang — every active locale uses a /{code} prefix; x-default → /en
   for (const l of LOCALES.filter((l) => l.status === "active")) {
@@ -147,7 +149,6 @@ export function buildSeo(input: SeoInput) {
 
   return { meta, links };
 }
-
 
 /* -------------------- JSON-LD builders -------------------- */
 
@@ -167,17 +168,33 @@ export const orgJsonLd = () => ({
       ...(SITE.contact.phone ? { telephone: SITE.contact.phone } : {}),
       areaServed: ["AE", "GCC", "MENA", "EU", "CIS", "LATAM", "APAC", "Africa"],
       availableLanguage: [
-        "English", "Arabic", "Turkish", "Russian", "Portuguese",
-        "German", "Spanish", "French", "Italian", "Chinese",
+        "English",
+        "Arabic",
+        "Turkish",
+        "Russian",
+        "Portuguese",
+        "German",
+        "Spanish",
+        "French",
+        "Italian",
+        "Chinese",
       ],
     },
   ],
   knowsAbout: [
-    "Sandwich panels", "PIR panels", "PUR panels", "Rock wool panels",
-    "Continuous laminators", "Discontinuous production lines",
-    "Roll forming", "Cold storage engineering", "Clean room construction",
-    "Industrial building envelopes", "Factory feasibility studies",
-    "PPGI", "Galvanized steel coils",
+    "Sandwich panels",
+    "PIR panels",
+    "PUR panels",
+    "Rock wool panels",
+    "Continuous laminators",
+    "Discontinuous production lines",
+    "Roll forming",
+    "Cold storage engineering",
+    "Clean room construction",
+    "Industrial building envelopes",
+    "Factory feasibility studies",
+    "PPGI",
+    "Galvanized steel coils",
   ],
   address: {
     "@type": "PostalAddress",
@@ -202,11 +219,13 @@ export const websiteJsonLd = () => ({
 export const hreflangLinks = (path: string) => {
   const clean = path.startsWith("/") ? path : `/${path}`;
   const suffix = clean === "/" ? "" : clean;
-  const links: Array<Record<string, string>> = LOCALES.filter((l) => l.status === "active").map((l) => ({
-    rel: "alternate",
-    hrefLang: l.hreflang,
-    href: `${SITE.url}/${l.code}${suffix}`,
-  }));
+  const links: Array<Record<string, string>> = LOCALES.filter((l) => l.status === "active").map(
+    (l) => ({
+      rel: "alternate",
+      hrefLang: l.hreflang,
+      href: `${SITE.url}/${l.code}${suffix}`,
+    }),
+  );
   links.push({ rel: "alternate", hrefLang: "x-default", href: `${SITE.url}/en${suffix}` });
   return links;
 };
@@ -331,4 +350,3 @@ export const ldScript = (data: unknown) => ({
   type: "application/ld+json",
   children: JSON.stringify(data),
 });
-

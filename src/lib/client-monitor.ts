@@ -44,9 +44,16 @@ let flushTimer: ReturnType<typeof setInterval> | undefined;
 
 function trim(v: unknown, cap = MAX_STRING): string {
   if (v == null) return "";
-  const str = typeof v === "string" ? v : (() => {
-    try { return JSON.stringify(v); } catch { return String(v); }
-  })();
+  const str =
+    typeof v === "string"
+      ? v
+      : (() => {
+          try {
+            return JSON.stringify(v);
+          } catch {
+            return String(v);
+          }
+        })();
   return str.length > cap ? str.slice(0, cap) + "…" : str;
 }
 
@@ -99,11 +106,7 @@ async function flush(useBeacon = false) {
 }
 
 /** Public: log a manual event from anywhere in the app. */
-export function logClientEvent(
-  message: string,
-  extra?: unknown,
-  level: Level = "info",
-): void {
+export function logClientEvent(message: string, extra?: unknown, level: Level = "info"): void {
   enqueue({ level, kind: "manual", message, extra });
 }
 
@@ -135,7 +138,8 @@ export function installClientMonitor(): void {
     enqueue({
       level: "error",
       kind: "unhandledrejection",
-      message: err?.message || (typeof reason === "string" ? reason : "Unhandled promise rejection"),
+      message:
+        err?.message || (typeof reason === "string" ? reason : "Unhandled promise rejection"),
       stack: err?.stack,
       extra: err ? undefined : reason,
     });
@@ -146,8 +150,17 @@ export function installClientMonitor(): void {
   const origFetch = window.fetch.bind(window);
   window.fetch = async (...args: Parameters<typeof fetch>) => {
     const [input, init] = args;
-    const url = typeof input === "string" ? input : input instanceof URL ? input.href : (input as Request).url;
-    const method = (init?.method || (input instanceof Request ? input.method : "GET") || "GET").toUpperCase();
+    const url =
+      typeof input === "string"
+        ? input
+        : input instanceof URL
+          ? input.href
+          : (input as Request).url;
+    const method = (
+      init?.method ||
+      (input instanceof Request ? input.method : "GET") ||
+      "GET"
+    ).toUpperCase();
     const started = performance.now();
     const isSelf = url.includes(ENDPOINT);
     try {
@@ -191,7 +204,9 @@ export function installClientMonitor(): void {
         stack: err?.stack,
         extra: args.length > 1 ? trim(args, 800) : undefined,
       });
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     origError(...args);
   };
 

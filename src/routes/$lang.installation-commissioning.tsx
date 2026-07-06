@@ -23,8 +23,7 @@ import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
 import { ogImageMeta } from "@/lib/og-images";
 
-const TITLE =
-  "Installation, Commissioning & After-Sales Support | NEVO Industrial";
+const TITLE = "Installation, Commissioning & After-Sales Support | NEVO Industrial";
 const DESCRIPTION =
   "NEVO field engineers install, commission and support your sandwich panel factory — from mechanical alignment and PLC/SCADA commissioning to FAT, SAT, operator training and lifetime after-sales service.";
 const URL_PATH = "/installation-commissioning";
@@ -116,7 +115,9 @@ function InstallationCommissioningPage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-graphite text-white">
         <div className="absolute inset-0 opacity-40">
-          <img loading="lazy" decoding="async"
+          <img
+            loading="lazy"
+            decoding="async"
             src={inst01}
             alt=""
             className="h-full w-full object-cover"
@@ -139,19 +140,13 @@ function InstallationCommissioningPage() {
               We don't just deliver machines. We commission factories.
             </h1>
             <p className="mt-6 text-lg text-white/70 max-w-2xl">
-              NEVO field engineers install, align, wire, commission and support
-              every production line we build — from the first anchor bolt to
-              lifetime after-sales service.
+              NEVO field engineers install, align, wire, commission and support every production
+              line we build — from the first anchor bolt to lifetime after-sales service.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button
-                asChild
-                size="lg"
-                className="bg-emerald text-graphite hover:bg-emerald/90"
-              >
+              <Button asChild size="lg" className="bg-emerald text-graphite hover:bg-emerald/90">
                 <Link to="/project-inquiry">
-                  Request Service Visit{" "}
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  Request Service Visit <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button
@@ -198,12 +193,8 @@ function InstallationCommissioningPage() {
                   </span>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-semibold tracking-tight">
-                    {tile.title}
-                  </h3>
-                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                    {tile.body}
-                  </p>
+                  <h3 className="text-lg font-semibold tracking-tight">{tile.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{tile.body}</p>
                 </div>
               </SurfaceCard>
             </motion.div>
@@ -249,17 +240,12 @@ function InstallationCommissioningPage() {
               Book a field engineer, spare part or upgrade.
             </h2>
             <p className="mt-3 text-white/70 max-w-2xl">
-              Whether it's commissioning a new line, resolving a production
-              issue or scheduling preventive maintenance — NEVO's field
-              engineering team is one request away.
+              Whether it's commissioning a new line, resolving a production issue or scheduling
+              preventive maintenance — NEVO's field engineering team is one request away.
             </p>
           </div>
           <div className="flex gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="bg-emerald text-graphite hover:bg-emerald/90"
-            >
+            <Button asChild size="lg" className="bg-emerald text-graphite hover:bg-emerald/90">
               <Link to="/project-inquiry">
                 Request Service <Wrench className="ml-2 h-4 w-4" />
               </Link>

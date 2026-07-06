@@ -81,30 +81,95 @@ const DOWNLOADS_LD_ITEMS = [
   "General Layout & Utility Requirements",
 ];
 
-
 const FAQS = [
-  { q: "How much production capacity do I need?", a: "Capacity is defined by your target market, panel spectrum and shift model. A typical entry continuous line runs 6–10 m/min, mid-range 12–18 m/min, and high-output above 20 m/min. Our engineers size the line against your 5-year demand forecast, not against a catalogue." },
-  { q: "What is the maximum line speed?", a: "Continuous PIR/PUR lines are engineered up to 25 m/min for standard thicknesses. Real productive speed depends on panel thickness, core reactivity, curing zone length and cutting cycle — not the nameplate figure." },
-  { q: "Can PIR and PUR be produced on the same line?", a: "Yes. A dual-recipe foaming system with automatic switching between PIR and PUR chemistries is standard on modern continuous lines. Recipe management, temperature setpoints and belt speed are handled by the PLC." },
-  { q: "How much factory space is required?", a: "A continuous line typically needs a hall 120–180 m long by 24–36 m wide, plus raw material, finished-goods and utilities zones. We deliver a general arrangement drawing during the feasibility phase." },
-  { q: "How many operators are needed per shift?", a: "A modern automated continuous line runs with 6–10 operators per shift: line supervisor, foaming station, laminator, cutting/stacking, packaging, quality and forklift. Automation level directly changes this number." },
-  { q: "Can the line be upgraded later?", a: "Every NEVO line is engineered with defined upgrade paths — additional decoilers, extended curing, higher-speed cutting, automatic packaging, MES integration. We document upgrade envelopes in the mechanical general arrangement." },
-  { q: "What is the difference between continuous and discontinuous lines?", a: "Continuous lines produce panels in an uninterrupted flow between two belts, ideal for high volume and consistent quality. Discontinuous lines press panels one at a time in a batch press — lower investment, wider thickness range, lower output." },
-  { q: "Which panel thicknesses can be produced?", a: "Continuous lines typically produce 30–200 mm PIR/PUR panels and 50–200 mm rock wool. Discontinuous presses handle 20–300 mm. Facing choices include PPGI, GI, Aluzinc, aluminium and stainless steel." },
-  { q: "What raw materials does the line consume?", a: "Steel coils (PPGI/GI/Aluzinc), polyol and isocyanate chemical systems for PIR/PUR, rock wool lamellas for mineral wool, plus release films, adhesives, edge tapes and packaging consumables." },
-  { q: "What utilities are required?", a: "Typical continuous line: 800–1500 kW installed electrical power, 6–10 bar compressed air, chilled water for cooling zone, hot oil or steam for curing zone, and exhaust with VOC treatment. We deliver a full utilities schedule." },
-  { q: "How long does installation take?", a: "From equipment arrival on site: 10–14 weeks for a standard continuous line — mechanical erection, electrical, piping, commissioning, hot trials and production ramp-up." },
-  { q: "What is the total project lead time?", a: "From contract signature to first sellable panel: 10–14 months for a continuous PIR/PUR line, depending on equipment origin, civil works and permitting in your country." },
-  { q: "Do you provide training?", a: "Yes. Operator training, maintenance training and quality control training are delivered on site during commissioning, with printed procedures and video documentation for future hires." },
-  { q: "What certifications are supported?", a: "Lines are engineered to produce panels compliant with EN 14509, ASTM, GOST, SASO and local regional standards. Foaming and control systems are CE-marked; safety follows ISO 13849 / EN ISO 12100." },
-  { q: "Can the line handle multiple panel profiles?", a: "Roll formers are equipped with quick-change tooling for wall, roof and cold-storage profiles. Profile changeover typically takes 30–60 minutes." },
-  { q: "What automation level should I choose?", a: "Three tiers: manual (operator-driven, lowest investment), semi-automatic (PLC + assisted stacking) and fully automatic (SCADA, auto-stacking, auto-packaging, MES). We recommend based on labour cost and target OEE." },
-  { q: "Do you provide after-sales support and spare parts?", a: "Yes. NEVO holds spare-parts inventory for critical items, offers remote diagnostics via VPN, and dispatches field engineers for scheduled audits and troubleshooting." },
-  { q: "Can the line be relocated later?", a: "Yes. All NEVO lines are engineered with modular foundations and documented disassembly procedures. Relocations are typically completed in 8–12 weeks including re-commissioning." },
-  { q: "What is the typical energy consumption?", a: "Modern continuous PIR line: 45–70 kWh per ton of panel, depending on thickness mix, curing recipe and heat-recovery equipment. Rock wool lines are lower on chemistry, higher on mechanical handling." },
-  { q: "How is quality controlled inline?", a: "Continuous thickness measurement, adhesion sampling, density checks, dimensional laser scanning and automatic reject marking. Data is logged to the SCADA and available in production reports." },
-  { q: "What warranty is provided?", a: "Standard 12-month warranty on mechanical equipment, 24 months on control systems, with extended options. Warranty starts at successful performance test acceptance." },
-  { q: "Do you handle CE marking and export documentation?", a: "Yes. Machinery Directive documentation, technical file, risk assessment and Declaration of Conformity are prepared as part of the delivery scope." },
+  {
+    q: "How much production capacity do I need?",
+    a: "Capacity is defined by your target market, panel spectrum and shift model. A typical entry continuous line runs 6–10 m/min, mid-range 12–18 m/min, and high-output above 20 m/min. Our engineers size the line against your 5-year demand forecast, not against a catalogue.",
+  },
+  {
+    q: "What is the maximum line speed?",
+    a: "Continuous PIR/PUR lines are engineered up to 25 m/min for standard thicknesses. Real productive speed depends on panel thickness, core reactivity, curing zone length and cutting cycle — not the nameplate figure.",
+  },
+  {
+    q: "Can PIR and PUR be produced on the same line?",
+    a: "Yes. A dual-recipe foaming system with automatic switching between PIR and PUR chemistries is standard on modern continuous lines. Recipe management, temperature setpoints and belt speed are handled by the PLC.",
+  },
+  {
+    q: "How much factory space is required?",
+    a: "A continuous line typically needs a hall 120–180 m long by 24–36 m wide, plus raw material, finished-goods and utilities zones. We deliver a general arrangement drawing during the feasibility phase.",
+  },
+  {
+    q: "How many operators are needed per shift?",
+    a: "A modern automated continuous line runs with 6–10 operators per shift: line supervisor, foaming station, laminator, cutting/stacking, packaging, quality and forklift. Automation level directly changes this number.",
+  },
+  {
+    q: "Can the line be upgraded later?",
+    a: "Every NEVO line is engineered with defined upgrade paths — additional decoilers, extended curing, higher-speed cutting, automatic packaging, MES integration. We document upgrade envelopes in the mechanical general arrangement.",
+  },
+  {
+    q: "What is the difference between continuous and discontinuous lines?",
+    a: "Continuous lines produce panels in an uninterrupted flow between two belts, ideal for high volume and consistent quality. Discontinuous lines press panels one at a time in a batch press — lower investment, wider thickness range, lower output.",
+  },
+  {
+    q: "Which panel thicknesses can be produced?",
+    a: "Continuous lines typically produce 30–200 mm PIR/PUR panels and 50–200 mm rock wool. Discontinuous presses handle 20–300 mm. Facing choices include PPGI, GI, Aluzinc, aluminium and stainless steel.",
+  },
+  {
+    q: "What raw materials does the line consume?",
+    a: "Steel coils (PPGI/GI/Aluzinc), polyol and isocyanate chemical systems for PIR/PUR, rock wool lamellas for mineral wool, plus release films, adhesives, edge tapes and packaging consumables.",
+  },
+  {
+    q: "What utilities are required?",
+    a: "Typical continuous line: 800–1500 kW installed electrical power, 6–10 bar compressed air, chilled water for cooling zone, hot oil or steam for curing zone, and exhaust with VOC treatment. We deliver a full utilities schedule.",
+  },
+  {
+    q: "How long does installation take?",
+    a: "From equipment arrival on site: 10–14 weeks for a standard continuous line — mechanical erection, electrical, piping, commissioning, hot trials and production ramp-up.",
+  },
+  {
+    q: "What is the total project lead time?",
+    a: "From contract signature to first sellable panel: 10–14 months for a continuous PIR/PUR line, depending on equipment origin, civil works and permitting in your country.",
+  },
+  {
+    q: "Do you provide training?",
+    a: "Yes. Operator training, maintenance training and quality control training are delivered on site during commissioning, with printed procedures and video documentation for future hires.",
+  },
+  {
+    q: "What certifications are supported?",
+    a: "Lines are engineered to produce panels compliant with EN 14509, ASTM, GOST, SASO and local regional standards. Foaming and control systems are CE-marked; safety follows ISO 13849 / EN ISO 12100.",
+  },
+  {
+    q: "Can the line handle multiple panel profiles?",
+    a: "Roll formers are equipped with quick-change tooling for wall, roof and cold-storage profiles. Profile changeover typically takes 30–60 minutes.",
+  },
+  {
+    q: "What automation level should I choose?",
+    a: "Three tiers: manual (operator-driven, lowest investment), semi-automatic (PLC + assisted stacking) and fully automatic (SCADA, auto-stacking, auto-packaging, MES). We recommend based on labour cost and target OEE.",
+  },
+  {
+    q: "Do you provide after-sales support and spare parts?",
+    a: "Yes. NEVO holds spare-parts inventory for critical items, offers remote diagnostics via VPN, and dispatches field engineers for scheduled audits and troubleshooting.",
+  },
+  {
+    q: "Can the line be relocated later?",
+    a: "Yes. All NEVO lines are engineered with modular foundations and documented disassembly procedures. Relocations are typically completed in 8–12 weeks including re-commissioning.",
+  },
+  {
+    q: "What is the typical energy consumption?",
+    a: "Modern continuous PIR line: 45–70 kWh per ton of panel, depending on thickness mix, curing recipe and heat-recovery equipment. Rock wool lines are lower on chemistry, higher on mechanical handling.",
+  },
+  {
+    q: "How is quality controlled inline?",
+    a: "Continuous thickness measurement, adhesion sampling, density checks, dimensional laser scanning and automatic reject marking. Data is logged to the SCADA and available in production reports.",
+  },
+  {
+    q: "What warranty is provided?",
+    a: "Standard 12-month warranty on mechanical equipment, 24 months on control systems, with extended options. Warranty starts at successful performance test acceptance.",
+  },
+  {
+    q: "Do you handle CE marking and export documentation?",
+    a: "Yes. Machinery Directive documentation, technical file, risk assessment and Declaration of Conformity are prepared as part of the delivery scope.",
+  },
 ];
 
 export const Route = createFileRoute("/$lang/solutions/production-lines")({
@@ -152,7 +217,13 @@ export const Route = createFileRoute("/$lang/solutions/production-lines")({
             areaServed: ["AE", "SA", "TR", "IQ", "KE", "CM", "RU", "EU", "LATAM"],
             url: canonical,
             description: DESCRIPTION,
-            category: ["Continuous PIR/PUR lines", "Discontinuous lines", "Rock wool lamella lines", "EPS lines", "Roll forming"],
+            category: [
+              "Continuous PIR/PUR lines",
+              "Discontinuous lines",
+              "Rock wool lamella lines",
+              "EPS lines",
+              "Roll forming",
+            ],
           }),
         },
         {
@@ -161,8 +232,18 @@ export const Route = createFileRoute("/$lang/solutions/production-lines")({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/${params.lang}` },
-              { "@type": "ListItem", position: 2, name: "Solutions", item: `${SITE.url}/${params.lang}/solutions` },
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: `${SITE.url}/${params.lang}`,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Solutions",
+                item: `${SITE.url}/${params.lang}/solutions`,
+              },
               { "@type": "ListItem", position: 3, name: "Production Lines", item: canonical },
             ],
           }),
@@ -178,7 +259,6 @@ export const Route = createFileRoute("/$lang/solutions/production-lines")({
           }),
         ),
       ],
-
     };
   },
   component: ProductionLinesPage,
@@ -247,7 +327,10 @@ function PageHero() {
             }}
           />
           <div aria-hidden className="absolute inset-y-0 right-0 w-[30%] bg-black/35" />
-          <div aria-hidden className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 to-transparent" />
+          <div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 to-transparent"
+          />
         </div>
 
         <div className="container-wide relative flex min-h-[78vh] flex-col justify-between px-6 pt-36 pb-12 lg:min-h-[86vh] lg:px-8 lg:pt-44 lg:pb-16">
@@ -268,8 +351,7 @@ function PageHero() {
               transition={{ duration: 1, ease: [0.25, 1, 0.5, 1], delay: 0.08 }}
               className="text-display text-balance text-white"
             >
-              Complete Sandwich Panel{" "}
-              <span className="text-white/55">Production Lines.</span>
+              Complete Sandwich Panel <span className="text-white/55">Production Lines.</span>
             </motion.p>
             <motion.p
               initial={{ opacity: 0, y: 12 }}
@@ -277,8 +359,8 @@ function PageHero() {
               transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1], delay: 0.2 }}
               className="text-body-lg mt-8 max-w-2xl text-white/75"
             >
-              Engineering, equipment selection, automation, installation and
-              commissioning for modern sandwich panel manufacturing facilities.
+              Engineering, equipment selection, automation, installation and commissioning for
+              modern sandwich panel manufacturing facilities.
             </motion.p>
 
             <motion.div
@@ -396,8 +478,15 @@ function SolutionsGrid() {
       />
       <GridBoard className="sm:grid-cols-2 lg:grid-cols-3">
         {SOLUTIONS.map((s) => (
-          <BoardCell key={s.title} interactive className="card-accent-line gap-5 min-h-[220px] justify-between">
-            <s.icon className="size-6 text-muted-foreground transition-colors group-hover:text-accent" strokeWidth={1.5} />
+          <BoardCell
+            key={s.title}
+            interactive
+            className="card-accent-line gap-5 min-h-[220px] justify-between"
+          >
+            <s.icon
+              className="size-6 text-muted-foreground transition-colors group-hover:text-accent"
+              strokeWidth={1.5}
+            />
             <div>
               <h3 className="text-h3 text-foreground">{s.title}</h3>
               <p className="text-body mt-2">{s.desc}</p>
@@ -414,13 +503,41 @@ function SolutionsGrid() {
 /* ------------------------------------------------------------------ */
 
 const PHILOSOPHY_TOPICS = [
-  { n: "01", t: "Required Capacity", d: "Sized to your 5-year demand forecast, not to a catalogue nameplate." },
-  { n: "02", t: "Automation Level", d: "Matched to your labour market, OEE targets and operator skill base." },
-  { n: "03", t: "Factory Layout", d: "General arrangement engineered around your plot, flow and utilities." },
-  { n: "04", t: "Future Expansion", d: "Documented upgrade envelopes for speed, thickness and packaging." },
-  { n: "05", t: "Energy Efficiency", d: "Heat recovery, VFDs and optimized curing to minimize kWh per ton." },
-  { n: "06", t: "Maintenance Access", d: "Every critical zone reachable without dismantling adjacent modules." },
-  { n: "07", t: "Operator Safety", d: "ISO 13849 / EN ISO 12100 compliant guarding, interlocks and EPO logic." },
+  {
+    n: "01",
+    t: "Required Capacity",
+    d: "Sized to your 5-year demand forecast, not to a catalogue nameplate.",
+  },
+  {
+    n: "02",
+    t: "Automation Level",
+    d: "Matched to your labour market, OEE targets and operator skill base.",
+  },
+  {
+    n: "03",
+    t: "Factory Layout",
+    d: "General arrangement engineered around your plot, flow and utilities.",
+  },
+  {
+    n: "04",
+    t: "Future Expansion",
+    d: "Documented upgrade envelopes for speed, thickness and packaging.",
+  },
+  {
+    n: "05",
+    t: "Energy Efficiency",
+    d: "Heat recovery, VFDs and optimized curing to minimize kWh per ton.",
+  },
+  {
+    n: "06",
+    t: "Maintenance Access",
+    d: "Every critical zone reachable without dismantling adjacent modules.",
+  },
+  {
+    n: "07",
+    t: "Operator Safety",
+    d: "ISO 13849 / EN ISO 12100 compliant guarding, interlocks and EPO logic.",
+  },
 ];
 
 function Philosophy() {
@@ -452,16 +569,17 @@ function Philosophy() {
             We design production systems around your requirements — not the other way around.
           </h2>
           <p className="text-body-lg mt-6">
-            A sandwich panel line is a system of interdependent decisions. NEVO
-            engineers begin with the seven questions below before a single
-            component is specified.
+            A sandwich panel line is a system of interdependent decisions. NEVO engineers begin with
+            the seven questions below before a single component is specified.
           </p>
           <ol className="mt-10 divide-y divide-border border-y border-border">
             {PHILOSOPHY_TOPICS.map((p) => (
               <li key={p.n} className="grid grid-cols-[auto_1fr] gap-6 py-4">
                 <span className="font-mono text-[11px] tracking-widest text-accent">{p.n}</span>
                 <div>
-                  <div className="text-base font-semibold tracking-tight text-foreground">{p.t}</div>
+                  <div className="text-base font-semibold tracking-tight text-foreground">
+                    {p.t}
+                  </div>
                   <div className="mt-1 text-sm text-muted-foreground">{p.d}</div>
                 </div>
               </li>
@@ -532,16 +650,76 @@ function ProcessTimeline() {
 /* ------------------------------------------------------------------ */
 
 const EQUIPMENT = [
-  { n: "01", img: eq01, icon: Layers, t: "Decoiler", d: "Hydraulic decoiler for PPGI / PPGL steel coils. Stable, precise and high capacity." },
-  { n: "02", img: eq02, icon: Ruler, t: "Roll Forming Machine", d: "High precision roll forming system for perfect panel profile and dimensional accuracy." },
-  { n: "03", img: eq03, icon: Flame, t: "Foam Injection System", d: "High-pressure mixing head for precise PIR foam injection with uniform density and distribution." },
-  { n: "04", img: eq04, icon: Factory, t: "Double Belt Laminator", d: "Heavy-duty double belt laminator ensures strong adhesion, flatness and excellent panel quality." },
-  { n: "05", img: eq05, icon: Scissors, t: "Flying Saw Cutting System", d: "High-speed flying saw for accurate cutting to length with smooth, clean edges." },
-  { n: "06", img: eq06, icon: Snowflake, t: "Cooling Section", d: "Powerful cooling system for stable panel temperature and continuous high-speed production." },
-  { n: "07", img: eq07, icon: Package, t: "Automatic Stacking System", d: "Fully automatic stacking for safe handling, high efficiency and reduced labour cost." },
-  { n: "08", img: eq08, icon: Package, t: "Auto Packaging Line", d: "Automatic packing with stretch film and edge protection for safe ocean transportation." },
-  { n: "09", img: eq09, icon: Cpu, t: "Electrical & Control System", d: "Siemens / Schneider based control system with HMI and intelligent automation." },
-  { n: "10", img: eq10, icon: Zap, t: "Air Compressor System", d: "High-efficiency air compressor ensuring stable air supply for the whole production line." },
+  {
+    n: "01",
+    img: eq01,
+    icon: Layers,
+    t: "Decoiler",
+    d: "Hydraulic decoiler for PPGI / PPGL steel coils. Stable, precise and high capacity.",
+  },
+  {
+    n: "02",
+    img: eq02,
+    icon: Ruler,
+    t: "Roll Forming Machine",
+    d: "High precision roll forming system for perfect panel profile and dimensional accuracy.",
+  },
+  {
+    n: "03",
+    img: eq03,
+    icon: Flame,
+    t: "Foam Injection System",
+    d: "High-pressure mixing head for precise PIR foam injection with uniform density and distribution.",
+  },
+  {
+    n: "04",
+    img: eq04,
+    icon: Factory,
+    t: "Double Belt Laminator",
+    d: "Heavy-duty double belt laminator ensures strong adhesion, flatness and excellent panel quality.",
+  },
+  {
+    n: "05",
+    img: eq05,
+    icon: Scissors,
+    t: "Flying Saw Cutting System",
+    d: "High-speed flying saw for accurate cutting to length with smooth, clean edges.",
+  },
+  {
+    n: "06",
+    img: eq06,
+    icon: Snowflake,
+    t: "Cooling Section",
+    d: "Powerful cooling system for stable panel temperature and continuous high-speed production.",
+  },
+  {
+    n: "07",
+    img: eq07,
+    icon: Package,
+    t: "Automatic Stacking System",
+    d: "Fully automatic stacking for safe handling, high efficiency and reduced labour cost.",
+  },
+  {
+    n: "08",
+    img: eq08,
+    icon: Package,
+    t: "Auto Packaging Line",
+    d: "Automatic packing with stretch film and edge protection for safe ocean transportation.",
+  },
+  {
+    n: "09",
+    img: eq09,
+    icon: Cpu,
+    t: "Electrical & Control System",
+    d: "Siemens / Schneider based control system with HMI and intelligent automation.",
+  },
+  {
+    n: "10",
+    img: eq10,
+    icon: Zap,
+    t: "Air Compressor System",
+    d: "High-efficiency air compressor ensuring stable air supply for the whole production line.",
+  },
 ];
 
 function MainEquipment() {
@@ -569,7 +747,10 @@ function MainEquipment() {
             </div>
             <div className="flex flex-1 flex-col gap-2 p-5">
               <div className="flex items-center gap-2">
-                <e.icon className="size-4 text-muted-foreground transition-colors group-hover:text-accent" strokeWidth={1.5} />
+                <e.icon
+                  className="size-4 text-muted-foreground transition-colors group-hover:text-accent"
+                  strokeWidth={1.5}
+                />
                 <h3 className="text-base font-semibold tracking-tight text-foreground">{e.t}</h3>
               </div>
               <p className="text-sm text-muted-foreground">{e.d}</p>
@@ -645,11 +826,7 @@ function ComparisonTable() {
 
   const toggle = (k: LineKey) => {
     setActive((cur) =>
-      cur.includes(k)
-        ? cur.length > 1
-          ? cur.filter((x) => x !== k)
-          : cur
-        : [...cur, k],
+      cur.includes(k) ? (cur.length > 1 ? cur.filter((x) => x !== k) : cur) : [...cur, k],
     );
   };
 
@@ -725,11 +902,27 @@ function ComparisonTable() {
 const AUTOMATION = [
   { icon: Cpu, t: "PLC", d: "Deterministic control of every actuator, valve and drive." },
   { icon: Gauge, t: "SCADA", d: "Unified operator interface with alarms, trends and audit trail." },
-  { icon: Radio, t: "Remote Monitoring", d: "Secure VPN diagnostics and firmware updates from NEVO." },
-  { icon: Settings2, t: "Recipe Management", d: "One-click switching between PIR, PUR and thickness recipes." },
+  {
+    icon: Radio,
+    t: "Remote Monitoring",
+    d: "Secure VPN diagnostics and firmware updates from NEVO.",
+  },
+  {
+    icon: Settings2,
+    t: "Recipe Management",
+    d: "One-click switching between PIR, PUR and thickness recipes.",
+  },
   { icon: Shield, t: "Quality Control", d: "Inline thickness, density and adhesion monitoring." },
-  { icon: FileText, t: "Production Reports", d: "Shift, batch and OEE reports exported automatically." },
-  { icon: Sparkles, t: "Industry 4.0 Integration", d: "MES / ERP connectivity via OPC-UA and REST." },
+  {
+    icon: FileText,
+    t: "Production Reports",
+    d: "Shift, batch and OEE reports exported automatically.",
+  },
+  {
+    icon: Sparkles,
+    t: "Industry 4.0 Integration",
+    d: "MES / ERP connectivity via OPC-UA and REST.",
+  },
 ];
 
 function Automation() {
@@ -744,7 +937,10 @@ function Automation() {
       <div className="grid gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
         {AUTOMATION.map((a) => (
           <div key={a.t} className="group bg-primary p-6 sm:p-8 transition-colors hover:bg-white/5">
-            <a.icon className="size-5 text-white/70 transition-colors group-hover:text-accent" strokeWidth={1.5} />
+            <a.icon
+              className="size-5 text-white/70 transition-colors group-hover:text-accent"
+              strokeWidth={1.5}
+            />
             <h3 className="mt-5 text-base font-semibold tracking-tight text-white">{a.t}</h3>
             <p className="mt-1 text-sm text-white/60">{a.d}</p>
           </div>
@@ -813,7 +1009,11 @@ function Downloads() {
       />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {DOWNLOADS.map((d) => (
-          <SurfaceCard key={d.t} interactive className="flex-row items-center justify-between gap-4">
+          <SurfaceCard
+            key={d.t}
+            interactive
+            className="flex-row items-center justify-between gap-4"
+          >
             <div className="flex items-center gap-4">
               <div className="flex size-10 items-center justify-center rounded-md border border-border bg-surface">
                 <FileText className="size-4 text-muted-foreground" strokeWidth={1.5} />
@@ -825,7 +1025,10 @@ function Downloads() {
                 </div>
               </div>
             </div>
-            <Download className="size-4 text-muted-foreground transition-colors group-hover:text-accent" strokeWidth={1.5} />
+            <Download
+              className="size-4 text-muted-foreground transition-colors group-hover:text-accent"
+              strokeWidth={1.5}
+            />
           </SurfaceCard>
         ))}
       </div>
@@ -849,7 +1052,11 @@ function FAQSection() {
           />
         </div>
         <div className="lg:col-span-8">
-          <Accordion type="single" collapsible className="w-full divide-y divide-border border-y border-border">
+          <Accordion
+            type="single"
+            collapsible
+            className="w-full divide-y divide-border border-y border-border"
+          >
             {FAQS.map((f, i) => (
               <AccordionItem key={f.q} value={`item-${i}`} className="border-b-0">
                 <AccordionTrigger className="py-5 text-left text-base font-medium tracking-tight text-foreground hover:no-underline">
@@ -911,7 +1118,12 @@ function ProjectInquiry() {
             lede="Share your project envelope and a senior engineer will respond within one business day with a scoped technical proposal."
           />
           <ul className="mt-4 space-y-4 border-t border-border pt-8 text-sm text-foreground">
-            {["Confidential handling of technical details", "Engineering-led scoping — not sales-led", "Feasibility, layout and utilities included", "Available in English, Arabic, Russian, Turkish"].map((i) => (
+            {[
+              "Confidential handling of technical details",
+              "Engineering-led scoping — not sales-led",
+              "Feasibility, layout and utilities included",
+              "Available in English, Arabic, Russian, Turkish",
+            ].map((i) => (
               <li key={i} className="flex items-start gap-3">
                 <Wrench className="mt-0.5 size-4 text-accent" strokeWidth={1.5} />
                 {i}
@@ -928,19 +1140,45 @@ function ProjectInquiry() {
         >
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <label htmlFor="pl-company" className={LABEL}>Company *</label>
-              <input id="pl-company" name="company" required className={FIELD} placeholder="Company name" />
+              <label htmlFor="pl-company" className={LABEL}>
+                Company *
+              </label>
+              <input
+                id="pl-company"
+                name="company"
+                required
+                className={FIELD}
+                placeholder="Company name"
+              />
             </div>
             <div>
-              <label htmlFor="pl-email" className={LABEL}>Email *</label>
-              <input id="pl-email" name="email" type="email" required className={FIELD} placeholder="you@company.com" />
+              <label htmlFor="pl-email" className={LABEL}>
+                Email *
+              </label>
+              <input
+                id="pl-email"
+                name="email"
+                type="email"
+                required
+                className={FIELD}
+                placeholder="you@company.com"
+              />
             </div>
             <div>
-              <label htmlFor="pl-country" className={LABEL}>Country</label>
-              <input id="pl-country" name="country" className={FIELD} placeholder="e.g. Saudi Arabia" />
+              <label htmlFor="pl-country" className={LABEL}>
+                Country
+              </label>
+              <input
+                id="pl-country"
+                name="country"
+                className={FIELD}
+                placeholder="e.g. Saudi Arabia"
+              />
             </div>
             <div>
-              <label htmlFor="pl-capacity" className={LABEL}>Production Capacity</label>
+              <label htmlFor="pl-capacity" className={LABEL}>
+                Production Capacity
+              </label>
               <select id="pl-capacity" name="capacity" defaultValue="" className={FIELD}>
                 <option value="">Select target capacity…</option>
                 <option>Up to 300,000 m²/yr</option>
@@ -950,11 +1188,20 @@ function ProjectInquiry() {
               </select>
             </div>
             <div>
-              <label htmlFor="pl-thickness" className={LABEL}>Panel Thickness</label>
-              <input id="pl-thickness" name="thickness" className={FIELD} placeholder="e.g. 40–200 mm" />
+              <label htmlFor="pl-thickness" className={LABEL}>
+                Panel Thickness
+              </label>
+              <input
+                id="pl-thickness"
+                name="thickness"
+                className={FIELD}
+                placeholder="e.g. 40–200 mm"
+              />
             </div>
             <div>
-              <label htmlFor="pl-core" className={LABEL}>Core Type</label>
+              <label htmlFor="pl-core" className={LABEL}>
+                Core Type
+              </label>
               <select id="pl-core" name="core" defaultValue="" className={FIELD}>
                 <option value="">Select core…</option>
                 <option>PIR</option>
@@ -964,11 +1211,20 @@ function ProjectInquiry() {
               </select>
             </div>
             <div>
-              <label htmlFor="pl-factory" className={LABEL}>Factory Size</label>
-              <input id="pl-factory" name="factorySize" className={FIELD} placeholder="e.g. 150 × 30 m" />
+              <label htmlFor="pl-factory" className={LABEL}>
+                Factory Size
+              </label>
+              <input
+                id="pl-factory"
+                name="factorySize"
+                className={FIELD}
+                placeholder="e.g. 150 × 30 m"
+              />
             </div>
             <div>
-              <label htmlFor="pl-auto" className={LABEL}>Automation Preference</label>
+              <label htmlFor="pl-auto" className={LABEL}>
+                Automation Preference
+              </label>
               <select id="pl-auto" name="automation" defaultValue="" className={FIELD}>
                 <option value="">Select automation…</option>
                 <option>Manual</option>
@@ -977,11 +1233,20 @@ function ProjectInquiry() {
               </select>
             </div>
             <div>
-              <label htmlFor="pl-market" className={LABEL}>Target Market</label>
-              <input id="pl-market" name="market" className={FIELD} placeholder="e.g. GCC, Africa, CIS" />
+              <label htmlFor="pl-market" className={LABEL}>
+                Target Market
+              </label>
+              <input
+                id="pl-market"
+                name="market"
+                className={FIELD}
+                placeholder="e.g. GCC, Africa, CIS"
+              />
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="pl-timeline" className={LABEL}>Project Timeline</label>
+              <label htmlFor="pl-timeline" className={LABEL}>
+                Project Timeline
+              </label>
               <select id="pl-timeline" name="timeline" defaultValue="" className={FIELD}>
                 <option value="">Select timeline…</option>
                 <option>Immediate</option>
@@ -991,8 +1256,16 @@ function ProjectInquiry() {
               </select>
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="pl-message" className={LABEL}>Message</label>
-              <textarea id="pl-message" name="message" rows={5} className={FIELD} placeholder="Briefly describe your project, existing site conditions and any technical constraints." />
+              <label htmlFor="pl-message" className={LABEL}>
+                Message
+              </label>
+              <textarea
+                id="pl-message"
+                name="message"
+                rows={5}
+                className={FIELD}
+                placeholder="Briefly describe your project, existing site conditions and any technical constraints."
+              />
             </div>
           </div>
 
@@ -1001,7 +1274,15 @@ function ProjectInquiry() {
               Confidential. Used only to prepare your technical proposal.
             </p>
             <Button type="submit" variant="primary" size="lg" disabled={busy}>
-              {busy ? (<><Loader2 className="mr-2 !size-4 animate-spin" /> Sending…</>) : (<>Submit Project Inquiry <ArrowRight className="!size-4" /></>)}
+              {busy ? (
+                <>
+                  <Loader2 className="mr-2 !size-4 animate-spin" /> Sending…
+                </>
+              ) : (
+                <>
+                  Submit Project Inquiry <ArrowRight className="!size-4" />
+                </>
+              )}
             </Button>
           </div>
         </form>

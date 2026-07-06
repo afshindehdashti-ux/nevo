@@ -15,7 +15,9 @@ import type { TablesUpdate } from "@/integrations/supabase/types";
 import { ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
-  head: () => ({ meta: [{ title: "Settings — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Settings — NEVO CRM" }, { name: "robots", content: "noindex" }],
+  }),
   component: SettingsPage,
 });
 
@@ -25,13 +27,17 @@ function SettingsPage() {
     <div className="p-6 max-w-5xl mx-auto space-y-4">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-sm text-muted-foreground">Company profile, document defaults and system preferences.</p>
+        <p className="text-sm text-muted-foreground">
+          Company profile, document defaults and system preferences.
+        </p>
       </div>
       {!isSuperAdmin && (
         <Alert>
           <ShieldAlert className="h-4 w-4" />
           <AlertTitle>Read-only</AlertTitle>
-          <AlertDescription>Only Super Admins can edit these settings. You can view current values.</AlertDescription>
+          <AlertDescription>
+            Only Super Admins can edit these settings. You can view current values.
+          </AlertDescription>
         </Alert>
       )}
       <Tabs defaultValue="company">
@@ -40,11 +46,16 @@ function SettingsPage() {
           <TabsTrigger value="documents">Document Defaults</TabsTrigger>
           <TabsTrigger value="team">Team</TabsTrigger>
         </TabsList>
-        <TabsContent value="company"><CompanyForm canEdit={isSuperAdmin} /></TabsContent>
-        <TabsContent value="documents"><DocumentForm canEdit={isSuperAdmin} /></TabsContent>
-        <TabsContent value="team"><TeamPanel /></TabsContent>
+        <TabsContent value="company">
+          <CompanyForm canEdit={isSuperAdmin} />
+        </TabsContent>
+        <TabsContent value="documents">
+          <DocumentForm canEdit={isSuperAdmin} />
+        </TabsContent>
+        <TabsContent value="team">
+          <TeamPanel />
+        </TabsContent>
       </Tabs>
-
     </div>
   );
 }
@@ -55,24 +66,55 @@ function CompanyForm({ canEdit }: { canEdit: boolean }) {
     queryKey: ["company_settings"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("company_settings").select("*").order("created_at", { ascending: true }).limit(1).maybeSingle();
+        .from("company_settings")
+        .select("*")
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
   });
   const [form, setForm] = useState<Record<string, string>>({});
-  useEffect(() => { if (data) setForm(Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v == null ? "" : String(v)]))); }, [data]);
+  useEffect(() => {
+    if (data)
+      setForm(
+        Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v == null ? "" : String(v)])),
+      );
+  }, [data]);
 
   const save = useMutation({
     mutationFn: async () => {
       if (!data?.id) throw new Error("Settings row missing");
       const payload: TablesUpdate<"company_settings"> = {};
-      const fields = ["legal_name","trade_license","address","city","country","email","phone","whatsapp","website","logo_url","bank_name","bank_account_name","bank_account_number","bank_iban","bank_swift","bank_branch","default_terms"] as const;
-      for (const f of fields) (payload as Record<string, string | null>)[f] = (form[f] ?? "").trim() || null;
+      const fields = [
+        "legal_name",
+        "trade_license",
+        "address",
+        "city",
+        "country",
+        "email",
+        "phone",
+        "whatsapp",
+        "website",
+        "logo_url",
+        "bank_name",
+        "bank_account_name",
+        "bank_account_number",
+        "bank_iban",
+        "bank_swift",
+        "bank_branch",
+        "default_terms",
+      ] as const;
+      for (const f of fields)
+        (payload as Record<string, string | null>)[f] = (form[f] ?? "").trim() || null;
       const { error } = await supabase.from("company_settings").update(payload).eq("id", data.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Company settings saved"); qc.invalidateQueries({ queryKey: ["company_settings"] }); },
+    onSuccess: () => {
+      toast.success("Company settings saved");
+      qc.invalidateQueries({ queryKey: ["company_settings"] });
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to save"),
   });
 
@@ -82,17 +124,38 @@ function CompanyForm({ canEdit }: { canEdit: boolean }) {
     <div className="space-y-1.5">
       <Label htmlFor={name}>{label}</Label>
       {opts.textarea ? (
-        <Textarea id={name} value={form[name] ?? ""} onChange={(e) => setForm({ ...form, [name]: e.target.value })} disabled={!canEdit} rows={3} />
+        <Textarea
+          id={name}
+          value={form[name] ?? ""}
+          onChange={(e) => setForm({ ...form, [name]: e.target.value })}
+          disabled={!canEdit}
+          rows={3}
+        />
       ) : (
-        <Input id={name} type={opts.type ?? "text"} value={form[name] ?? ""} onChange={(e) => setForm({ ...form, [name]: e.target.value })} disabled={!canEdit} />
+        <Input
+          id={name}
+          type={opts.type ?? "text"}
+          value={form[name] ?? ""}
+          onChange={(e) => setForm({ ...form, [name]: e.target.value })}
+          disabled={!canEdit}
+        />
       )}
     </div>
   );
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); save.mutate(); }} className="space-y-6 mt-4">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        save.mutate();
+      }}
+      className="space-y-6 mt-4"
+    >
       <Card>
-        <CardHeader><CardTitle className="text-base">Company identity</CardTitle><CardDescription>Used on all invoices and documents.</CardDescription></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-base">Company identity</CardTitle>
+          <CardDescription>Used on all invoices and documents.</CardDescription>
+        </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {F("legal_name", "Legal name")}
           {F("trade_license", "Trade license no.")}
@@ -107,7 +170,10 @@ function CompanyForm({ canEdit }: { canEdit: boolean }) {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Bank details</CardTitle><CardDescription>Appears on proforma and commercial invoices.</CardDescription></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-base">Bank details</CardTitle>
+          <CardDescription>Appears on proforma and commercial invoices.</CardDescription>
+        </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {F("bank_name", "Bank name")}
           {F("bank_branch", "Branch")}
@@ -119,13 +185,19 @@ function CompanyForm({ canEdit }: { canEdit: boolean }) {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Default terms</CardTitle></CardHeader>
-        <CardContent>{F("default_terms", "Default terms & conditions", { textarea: true })}</CardContent>
+        <CardHeader>
+          <CardTitle className="text-base">Default terms</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {F("default_terms", "Default terms & conditions", { textarea: true })}
+        </CardContent>
       </Card>
 
       {canEdit && (
         <div className="flex justify-end">
-          <Button type="submit" disabled={save.isPending}>{save.isPending ? "Saving…" : "Save changes"}</Button>
+          <Button type="submit" disabled={save.isPending}>
+            {save.isPending ? "Saving…" : "Save changes"}
+          </Button>
         </div>
       )}
     </form>
@@ -137,25 +209,55 @@ function DocumentForm({ canEdit }: { canEdit: boolean }) {
   const { data, isLoading } = useQuery({
     queryKey: ["document_settings"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("document_settings").select("*").order("created_at", { ascending: true }).limit(1).maybeSingle();
+      const { data, error } = await supabase
+        .from("document_settings")
+        .select("*")
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
   });
   const [form, setForm] = useState<Record<string, string>>({});
-  useEffect(() => { if (data) setForm(Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v == null ? "" : String(v)]))); }, [data]);
+  useEffect(() => {
+    if (data)
+      setForm(
+        Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v == null ? "" : String(v)])),
+      );
+  }, [data]);
 
   const save = useMutation({
     mutationFn: async () => {
       if (!data?.id) throw new Error("Settings row missing");
       const payload: TablesUpdate<"document_settings"> = {};
-      const textFields = ["quotation_prefix","proforma_prefix","invoice_prefix","commission_prefix","purchase_order_prefix","delivery_note_prefix","packing_list_prefix","default_currency","default_incoterms","default_payment_terms","footer_text","signature_name","signature_title"] as const;
-      for (const f of textFields) (payload as Record<string, string | null>)[f] = (form[f] ?? "").trim() || null;
-      (payload as Record<string, number>).default_vat_percent = form.default_vat_percent ? Number(form.default_vat_percent) : 0;
+      const textFields = [
+        "quotation_prefix",
+        "proforma_prefix",
+        "invoice_prefix",
+        "commission_prefix",
+        "purchase_order_prefix",
+        "delivery_note_prefix",
+        "packing_list_prefix",
+        "default_currency",
+        "default_incoterms",
+        "default_payment_terms",
+        "footer_text",
+        "signature_name",
+        "signature_title",
+      ] as const;
+      for (const f of textFields)
+        (payload as Record<string, string | null>)[f] = (form[f] ?? "").trim() || null;
+      (payload as Record<string, number>).default_vat_percent = form.default_vat_percent
+        ? Number(form.default_vat_percent)
+        : 0;
       const { error } = await supabase.from("document_settings").update(payload).eq("id", data.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Document settings saved"); qc.invalidateQueries({ queryKey: ["document_settings"] }); },
+    onSuccess: () => {
+      toast.success("Document settings saved");
+      qc.invalidateQueries({ queryKey: ["document_settings"] });
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to save"),
   });
 
@@ -164,14 +266,28 @@ function DocumentForm({ canEdit }: { canEdit: boolean }) {
   const F = (name: string, label: string, opts: { type?: string } = {}) => (
     <div className="space-y-1.5">
       <Label htmlFor={name}>{label}</Label>
-      <Input id={name} type={opts.type ?? "text"} value={form[name] ?? ""} onChange={(e) => setForm({ ...form, [name]: e.target.value })} disabled={!canEdit} />
+      <Input
+        id={name}
+        type={opts.type ?? "text"}
+        value={form[name] ?? ""}
+        onChange={(e) => setForm({ ...form, [name]: e.target.value })}
+        disabled={!canEdit}
+      />
     </div>
   );
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); save.mutate(); }} className="space-y-6 mt-4">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        save.mutate();
+      }}
+      className="space-y-6 mt-4"
+    >
       <Card>
-        <CardHeader><CardTitle className="text-base">Numbering prefixes</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-base">Numbering prefixes</CardTitle>
+        </CardHeader>
         <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {F("quotation_prefix", "Quotation")}
           {F("proforma_prefix", "Proforma")}
@@ -183,16 +299,22 @@ function DocumentForm({ canEdit }: { canEdit: boolean }) {
         </CardContent>
       </Card>
       <Card>
-        <CardHeader><CardTitle className="text-base">Defaults</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-base">Defaults</CardTitle>
+        </CardHeader>
         <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {F("default_vat_percent", "Default VAT %", { type: "number" })}
           {F("default_currency", "Currency")}
           {F("default_incoterms", "Incoterms")}
-          <div className="col-span-2 md:col-span-4">{F("default_payment_terms", "Payment terms")}</div>
+          <div className="col-span-2 md:col-span-4">
+            {F("default_payment_terms", "Payment terms")}
+          </div>
         </CardContent>
       </Card>
       <Card>
-        <CardHeader><CardTitle className="text-base">Footer & signature</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-base">Footer & signature</CardTitle>
+        </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">{F("footer_text", "Footer text")}</div>
           {F("signature_name", "Signature name")}
@@ -201,21 +323,33 @@ function DocumentForm({ canEdit }: { canEdit: boolean }) {
       </Card>
       {canEdit && (
         <div className="flex justify-end">
-          <Button type="submit" disabled={save.isPending}>{save.isPending ? "Saving…" : "Save changes"}</Button>
+          <Button type="submit" disabled={save.isPending}>
+            {save.isPending ? "Saving…" : "Save changes"}
+          </Button>
         </div>
       )}
     </form>
   );
 }
 
-type TeamMember = { full_name: string; title?: string; email?: string; phone?: string; is_default_signer?: boolean };
+type TeamMember = {
+  full_name: string;
+  title?: string;
+  email?: string;
+  phone?: string;
+  is_default_signer?: boolean;
+};
 
 function TeamPanel() {
   const { data, isLoading } = useQuery({
     queryKey: ["company_settings", "team"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("company_settings").select("team_members").eq("is_active", true).limit(1).maybeSingle();
+        .from("company_settings")
+        .select("team_members")
+        .eq("is_active", true)
+        .limit(1)
+        .maybeSingle();
       if (error) throw error;
       return (data?.team_members as unknown as TeamMember[]) ?? [];
     },
@@ -229,12 +363,19 @@ function TeamPanel() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Team</CardTitle>
-          <CardDescription>People whose names, titles and contacts appear on NEVO documents.</CardDescription>
+          <CardDescription>
+            People whose names, titles and contacts appear on NEVO documents.
+          </CardDescription>
         </CardHeader>
         <CardContent className="divide-y">
-          {members.length === 0 && <p className="text-sm text-muted-foreground py-4">No team members configured.</p>}
+          {members.length === 0 && (
+            <p className="text-sm text-muted-foreground py-4">No team members configured.</p>
+          )}
           {members.map((m) => (
-            <div key={m.email ?? m.full_name} className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div
+              key={m.email ?? m.full_name}
+              className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
+            >
               <div>
                 <div className="font-medium">
                   {m.full_name}
@@ -255,9 +396,9 @@ function TeamPanel() {
         </CardContent>
       </Card>
       <p className="text-xs text-muted-foreground">
-        A full Team Members module (add/edit/remove from the UI) can be turned on later — right now the roster is seeded.
+        A full Team Members module (add/edit/remove from the UI) can be turned on later — right now
+        the roster is seeded.
       </p>
     </div>
   );
 }
-

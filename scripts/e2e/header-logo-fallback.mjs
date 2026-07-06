@@ -99,9 +99,6 @@ try {
     img.src = src;
   });
 
-
-
-
   // Poll until the SVG fallback is present; on each miss dump the current
   // state so a debug run shows why the chain stalled.
   const deadline = Date.now() + 15_000;
@@ -119,20 +116,19 @@ try {
       };
     });
     if (
-      lastState
-      && lastState.variant === "fallback-svg"
-      && lastState.currentSrc.startsWith("data:image/svg+xml")
-      && lastState.complete
-      && lastState.naturalWidth > 0
-    ) break;
+      lastState &&
+      lastState.variant === "fallback-svg" &&
+      lastState.currentSrc.startsWith("data:image/svg+xml") &&
+      lastState.complete &&
+      lastState.naturalWidth > 0
+    )
+      break;
     await page.waitForTimeout(250);
   }
   if (!lastState || lastState.variant !== "fallback-svg") {
     console.error("Logo never reached SVG fallback. Last observed:", lastState);
     throw new Error("logo fallback chain did not complete");
   }
-
-
 
   const state = await logo.evaluate((el) => {
     const img = /** @type {HTMLImageElement} */ (el);
@@ -146,17 +142,25 @@ try {
     };
   });
 
-  assert(state.variant === "fallback-svg", `logo variant should be fallback-svg, got ${state.variant}`);
+  assert(
+    state.variant === "fallback-svg",
+    `logo variant should be fallback-svg, got ${state.variant}`,
+  );
   assert(state.fallbackStep === "2", `fallback step should be 2, got ${state.fallbackStep}`);
-  assert(state.currentSrc.startsWith("data:image/svg+xml"), "logo src should be inline SVG data URI");
-  assert(state.naturalWidth > 0 && state.naturalHeight > 0, "inline SVG must decode with non-zero dimensions");
+  assert(
+    state.currentSrc.startsWith("data:image/svg+xml"),
+    "logo src should be inline SVG data URI",
+  );
+  assert(
+    state.naturalWidth > 0 && state.naturalHeight > 0,
+    "inline SVG must decode with non-zero dimensions",
+  );
   assert(state.visible, "logo must remain visibly laid out after fallback");
 
   // Client-monitor batches entries and flushes on a 5s timer or on beacon
   // triggers (pagehide / visibilitychange=hidden). Wait past the timer so
   // buffered header.logo.* events land in the sink.
   await page.waitForTimeout(6500);
-
 
   const logoEvents = loggedEntries.filter(
     (e) => e?.message === "header.logo.error" || e?.message === "header.logo.render",
@@ -178,7 +182,10 @@ try {
   if (errPrimary && errCdn && renderSvg) {
     const cid = renderSvg.extra?.correlationId;
     assert(typeof cid === "string" && cid.length > 0, "render event must include correlationId");
-    assert(errPrimary.extra?.correlationId === cid, "primary error correlationId must match render");
+    assert(
+      errPrimary.extra?.correlationId === cid,
+      "primary error correlationId must match render",
+    );
     assert(errCdn.extra?.correlationId === cid, "cdn error correlationId must match render");
   }
 
@@ -195,8 +202,12 @@ try {
   }
 
   console.log("✅ header-logo-fallback e2e passed");
-  console.log(`   variant=${state.variant} step=${state.fallbackStep} natural=${state.naturalWidth}x${state.naturalHeight}`);
-  console.log(`   events: primary-fail=✓ cdn-fail=✓ svg-render=✓ (cid=${renderSvg.extra?.correlationId})`);
+  console.log(
+    `   variant=${state.variant} step=${state.fallbackStep} natural=${state.naturalWidth}x${state.naturalHeight}`,
+  );
+  console.log(
+    `   events: primary-fail=✓ cdn-fail=✓ svg-render=✓ (cid=${renderSvg.extra?.correlationId})`,
+  );
 } catch (err) {
   console.error("Harness error:", err);
   if (browser) await browser.close().catch(() => {});

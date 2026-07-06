@@ -10,11 +10,7 @@ import {
   redactLogoTelemetryDump,
   type LogoTelemetryDump,
 } from "../logo-telemetry-debug";
-import {
-  clearLogoDecisions,
-  recordLogoDecision,
-  type LogoDecisionRecord,
-} from "../logo-telemetry";
+import { clearLogoDecisions, recordLogoDecision, type LogoDecisionRecord } from "../logo-telemetry";
 
 const record = (over: Partial<LogoDecisionRecord> = {}): LogoDecisionRecord => ({
   kind: "render",
@@ -46,8 +42,7 @@ describe("logo telemetry redaction", () => {
   it("redacts sensitive URL query and hash params", () => {
     vi.stubGlobal("window", {
       location: {
-        href:
-          "http://app.test/oauth/callback?code=abc123&state=xyz&safe=1#access_token=eyJhbGciOi.payload.sig&refresh_token=r_secret",
+        href: "http://app.test/oauth/callback?code=abc123&state=xyz&safe=1#access_token=eyJhbGciOi.payload.sig&refresh_token=r_secret",
       },
     });
     const dump = buildLogoTelemetryDump("console");
@@ -86,8 +81,7 @@ describe("logo telemetry redaction", () => {
     );
     recordLogoDecision(
       record({
-        correlationId:
-          "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.abcdefghijklmnop",
+        correlationId: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.abcdefghijklmnop",
       }),
     );
 
@@ -97,25 +91,15 @@ describe("logo telemetry redaction", () => {
     expect(d1.stage).toContain("[redacted]");
     expect(d1.counters.lastErrorStage).toBe("[redacted]");
     expect(d2.correlationId).toBe("[redacted]");
-    expect(dump.redactions).toEqual(
-      expect.arrayContaining(["string:bearer", "string:email"]),
-    );
+    expect(dump.redactions).toEqual(expect.arrayContaining(["string:bearer", "string:email"]));
     // Sensitive-looking correlationId → either the JWT string scrub OR
     // the length/pattern-based redaction fires; both produce [redacted].
-    expect(
-      dump.redactions.some(
-        (r) => r === "correlationId" || r === "string:jwt",
-      ),
-    ).toBe(true);
+    expect(dump.redactions.some((r) => r === "correlationId" || r === "string:jwt")).toBe(true);
   });
 
   it("redacts correlationIds that embed user identifiers", () => {
-    recordLogoDecision(
-      record({ correlationId: "user:42:session-abc" }),
-    );
-    recordLogoDecision(
-      record({ correlationId: "qa@nevo.example" }),
-    );
+    recordLogoDecision(record({ correlationId: "user:42:session-abc" }));
+    recordLogoDecision(record({ correlationId: "qa@nevo.example" }));
     const dump = buildLogoTelemetryDump("console");
     expect(dump.decisions[0].correlationId).toBe("[redacted]");
     expect(dump.decisions[1].correlationId).toBe("[redacted]");
@@ -126,9 +110,7 @@ describe("logo telemetry redaction", () => {
     vi.stubGlobal("window", {
       location: { href: "http://app.test/panels?variant=roof" },
     });
-    recordLogoDecision(
-      record({ correlationId: "cid-123", stage: "primary-light-png" }),
-    );
+    recordLogoDecision(record({ correlationId: "cid-123", stage: "primary-light-png" }));
     const dump = buildLogoTelemetryDump("console");
     expect(dump.url).toBe("http://app.test/panels?variant=roof");
     expect(dump.decisions[0].correlationId).toBe("cid-123");

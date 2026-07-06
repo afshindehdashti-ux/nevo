@@ -1,8 +1,16 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 import {
-  Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
-  SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { CRM_NAV } from "@/lib/crm-nav";
@@ -35,7 +43,9 @@ export function CrmSidebar() {
           {!collapsed && (
             <div className="flex flex-col leading-tight">
               <span className="text-sm font-semibold tracking-tight">NEVO CRM</span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Back Office</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                Back Office
+              </span>
             </div>
           )}
         </Link>

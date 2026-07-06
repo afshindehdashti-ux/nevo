@@ -1,4 +1,3 @@
-
 # NEVO Professionalization Roadmap
 
 Scope: English site only. No new pages, no new languages. Turn the current site into a production-ready industrial platform.
@@ -38,6 +37,7 @@ Current baseline: 406 image files (~73 MB), 32 routes, 3 tools (Panel Configurat
 ## Phase 3 — Rebuild the two remaining tools as dynamic components
 
 **Panel Configurator** (`$lang.product-configurator.tsx`)
+
 - Real React state: application, core, thickness, skin gauges, colour (RAL), length, joint type.
 - Live SVG cross-section (same style as Panel Thickness Calculator).
 - Live spec sheet: U-value, weight/m², fire class, recommended use.
@@ -45,6 +45,7 @@ Current baseline: 406 image files (~73 MB), 32 routes, 3 tools (Panel Configurat
 - "Send to inquiry" button that navigates to Project Inquiry with encoded state.
 
 **Factory Layout Generator** (`$lang.factory-layout-generator.tsx`)
+
 - Inputs: plant capacity (m³/day or panels/day), line width, panel length range, product mix (cold-room / façade / roof), site dimensions.
 - Deterministic layout algorithm places: decoiler, mixing station, laminator, cooling tunnel, cutting, stacking, packaging, raw material storage, finished-goods warehouse, offices, forklift lanes.
 - Renders a live scalable SVG floor plan with legend, dimensions, and area breakdown.
@@ -85,6 +86,7 @@ Current baseline: 406 image files (~73 MB), 32 routes, 3 tools (Panel Configurat
 ## Phase 8 — Responsive & polish QA
 
 Run Playwright at 375, 768, 1024, 1280, 1536 across the 12 highest-traffic routes. Capture screenshots. Fix each finding:
+
 - Overflow rows: apply the grid + min-w-0 + shrink-0 pattern from responsive-layout-patterns.
 - Clipped cards: normalize `aspect-ratio` and `object-fit`.
 - Broken sticky elements, off-screen buttons, wrapped nav.

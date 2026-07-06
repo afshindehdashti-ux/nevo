@@ -149,11 +149,12 @@ export function generateCvConfirmationPdf(input: CvConfirmationInput): CvConfirm
   doc.text("NEVO Industrial · Dubai · Germany · Türkiye · nevoindustrial.com", margin, footerY);
   doc.text(reference, pageWidth - margin, footerY, { align: "right" });
 
-  const safeName = (input.name || "candidate")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 40) || "candidate";
+  const safeName =
+    (input.name || "candidate")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 40) || "candidate";
   const filename = `nevo-application-${safeName}-${reference}.pdf`;
   const blob = doc.output("blob") as Blob;
   return { blob, filename, reference };

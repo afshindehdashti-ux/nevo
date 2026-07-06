@@ -14,12 +14,12 @@ import { GridBoard, BoardCell } from "@/components/site/cards";
 
 const INDUSTRIES = [
   { key: "coldStorage", icon: Snowflake },
-  { key: "food",        icon: UtensilsCrossed },
-  { key: "industrial",  icon: Factory },
-  { key: "cleanRooms",  icon: FlaskConical },
+  { key: "food", icon: UtensilsCrossed },
+  { key: "industrial", icon: Factory },
+  { key: "cleanRooms", icon: FlaskConical },
   { key: "warehousing", icon: Warehouse },
-  { key: "modular",     icon: Boxes },
-  { key: "commercial",  icon: Building },
+  { key: "modular", icon: Boxes },
+  { key: "commercial", icon: Building },
   { key: "agriculture", icon: Sprout },
 ] as const;
 

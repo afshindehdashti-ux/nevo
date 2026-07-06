@@ -12,10 +12,7 @@ import { spawn } from "node:child_process";
 import { relative } from "node:path";
 
 const args = process.argv.slice(2);
-const mode =
-  args.includes("--mode")
-    ? args[args.indexOf("--mode") + 1]
-    : "development";
+const mode = args.includes("--mode") ? args[args.indexOf("--mode") + 1] : "development";
 const passthrough = args.filter((a, i, arr) => {
   if (a === "--mode") return false;
   if (arr[i - 1] === "--mode") return false;
@@ -86,14 +83,21 @@ child.on("close", (code) => {
 
   if (hits.size > 0) {
     console.error("\n🔎 Error context (filtered from build output):\n");
-    [...hits].sort((a, b) => a - b).forEach((i) => {
-      console.error(`  ${String(i + 1).padStart(5)} │ ${lines[i]}`);
-    });
+    [...hits]
+      .sort((a, b) => a - b)
+      .forEach((i) => {
+        console.error(`  ${String(i + 1).padStart(5)} │ ${lines[i]}`);
+      });
   } else {
     console.error(
       "\n(No obvious error pattern matched — showing last 40 lines of build output.)\n",
     );
-    console.error(lines.slice(-40).map((l) => `  │ ${l}`).join("\n"));
+    console.error(
+      lines
+        .slice(-40)
+        .map((l) => `  │ ${l}`)
+        .join("\n"),
+    );
   }
 
   // Best-effort offender extraction.
@@ -141,11 +145,7 @@ child.on("close", (code) => {
       return p;
     }
   };
-  const escape = (s) =>
-    String(s)
-      .replace(/%/g, "%25")
-      .replace(/\r/g, "%0D")
-      .replace(/\n/g, "%0A");
+  const escape = (s) => String(s).replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
   const push = (file, line, col, message) => {
     if (!file) return;
     const rel = toRel(file);
@@ -179,7 +179,8 @@ child.on("close", (code) => {
     "g",
   );
   // 5) SyntaxError / Transform failed followed later by a file reference.
-  const genericErrRx = /(?:SyntaxError|Transform failed|Unexpected token|is not exported by)[:\s-]+(.*)/i;
+  const genericErrRx =
+    /(?:SyntaxError|Transform failed|Unexpected token|is not exported by)[:\s-]+(.*)/i;
 
   for (let i = 0; i < lines.length; i++) {
     const ln = lines[i];

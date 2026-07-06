@@ -16,15 +16,15 @@ one user's fallback chain across Sentry, `header_logo_events`, and
 
 Where it appears in a Sentry event (all values MUST be identical):
 
-| Location                         | Field                              | When missing |
-| -------------------------------- | ---------------------------------- | ------------ |
-| Tag                              | `tags.correlation_id`              | `null`       |
-| Context                          | `contexts.logo.correlationId`     | `null`       |
-| Extra                            | `extra.correlationId`              | `undefined`  |
-| User                             | `user.id`                          | `user` omitted |
-| Fingerprint (last segment)       | `fingerprint[3]`                   | `"no-cid"`   |
-| Message                          | `message.formatted` → `cid=<id>`  | `cid=-`      |
-| Every breadcrumb                 | `data.correlationId` + message prefix | `null` + `[cid:-]` |
+| Location                   | Field                                 | When missing       |
+| -------------------------- | ------------------------------------- | ------------------ |
+| Tag                        | `tags.correlation_id`                 | `null`             |
+| Context                    | `contexts.logo.correlationId`         | `null`             |
+| Extra                      | `extra.correlationId`                 | `undefined`        |
+| User                       | `user.id`                             | `user` omitted     |
+| Fingerprint (last segment) | `fingerprint[3]`                      | `"no-cid"`         |
+| Message                    | `message.formatted` → `cid=<id>`      | `cid=-`            |
+| Every breadcrumb           | `data.correlationId` + message prefix | `null` + `[cid:-]` |
 
 Unit test: `src/lib/__tests__/sentry-forwarder-correlation.test.ts`.
 
@@ -49,7 +49,7 @@ Every breadcrumb message uses this exact shape — no exceptions:
   (do NOT invent one).
 - `<kind>` — one of:
   - `render` — a `header.logo.render` event (successful paint of a variant)
-  - `fail`   — a `header.logo.error` event (a stage failed to load)
+  - `fail` — a `header.logo.error` event (a stage failed to load)
 - `<stage>` — the pipeline stage identifier. Stable set:
   - `primary-light-png` — bundled PNG (initial paint)
   - `fallback-cdn-full` — CDN-hosted full logo
@@ -97,7 +97,7 @@ Examples (real cid `4f2c9`):
   tail (same `category` + `message` + timestamp within 1ms), it is NOT
   duplicated — the forwarder detects the duplicate and skips it.
 - The tail crumb's `level` reflects the terminal flag:
-  - `terminal === true`  → `level: "error"`
+  - `terminal === true` → `level: "error"`
   - `terminal === false` → `level: "warning"`
 
 Implementation: `buildBreadcrumbs()` in `sentry-forwarder.server.ts`
@@ -126,12 +126,12 @@ the current failure. Same string, two locations.
 
 ### 3.2 Canonical examples
 
-| Scenario                                            | fallback_chain                                                                    |
-| --------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Only primary failed                                 | `fail:primary-light-png`                                                          |
-| Primary → CDN both failed                           | `fail:primary-light-png → fail:fallback-cdn-full`                                 |
-| Full cascade to terminal SVG failure                | `fail:primary-light-png → fail:fallback-cdn-full → fail:fallback-inline-svg`      |
-| Render succeeded on SVG fallback after two failures | `fail:primary-light-png → fail:fallback-cdn-full → render:fallback-inline-svg`    |
+| Scenario                                            | fallback_chain                                                                 |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Only primary failed                                 | `fail:primary-light-png`                                                       |
+| Primary → CDN both failed                           | `fail:primary-light-png → fail:fallback-cdn-full`                              |
+| Full cascade to terminal SVG failure                | `fail:primary-light-png → fail:fallback-cdn-full → fail:fallback-inline-svg`   |
+| Render succeeded on SVG fallback after two failures | `fail:primary-light-png → fail:fallback-cdn-full → render:fallback-inline-svg` |
 
 ### 3.3 Where it's used
 
@@ -187,7 +187,7 @@ Implementation: `buildFallbackChain()` in `sentry-forwarder.server.ts`
    (see `docs/content/README.md` §17 and
    `src/lib/logo-telemetry-debug.ts`):
    ```js
-   __nevoLogoDebug.enable()   // in devtools
+   __nevoLogoDebug.enable(); // in devtools
    // reload; [nevo:logo-telemetry] lines show the sampling decision for
    // every stage — same `stage` values as the Sentry breadcrumbs above.
    ```

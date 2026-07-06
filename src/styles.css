@@ -62,8 +62,7 @@
 
   /* ── Elevation ──────────────────────────────────────── */
   --shadow-panel: 0 1px 2px 0 rgb(0 0 0 / 0.03), 0 8px 24px -12px rgb(0 0 0 / 0.08);
-  --shadow-panel-lg:
-    0 2px 4px 0 rgb(0 0 0 / 0.04), 0 20px 40px -20px rgb(0 0 0 / 0.12);
+  --shadow-panel-lg: 0 2px 4px 0 rgb(0 0 0 / 0.04), 0 20px 40px -20px rgb(0 0 0 / 0.12);
 
   /* ── Motion ─────────────────────────────────────────── */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
@@ -88,10 +87,10 @@
   --radius: 0.5rem;
 
   /* Base surfaces — obsidian → charcoal → graphite */
-  --background: oklch(0.13 0.004 260);        /* near-black */
-  --foreground: oklch(0.985 0 0);             /* near-white */
-  --surface: oklch(0.17 0.004 260);           /* charcoal */
-  --surface-muted: oklch(0.21 0.004 260);     /* graphite */
+  --background: oklch(0.13 0.004 260); /* near-black */
+  --foreground: oklch(0.985 0 0); /* near-white */
+  --surface: oklch(0.17 0.004 260); /* charcoal */
+  --surface-muted: oklch(0.21 0.004 260); /* graphite */
 
   --card: oklch(0.17 0.004 260);
   --card-foreground: oklch(0.985 0 0);
@@ -107,7 +106,7 @@
   --secondary-foreground: oklch(0.985 0 0);
 
   --muted: oklch(0.22 0.004 260);
-  --muted-foreground: oklch(0.72 0.008 260);  /* dark grey body copy */
+  --muted-foreground: oklch(0.72 0.008 260); /* dark grey body copy */
 
   /* NEVO green — accent only. Foreground kept WHITE for CTA legibility. */
   --accent: oklch(0.72 0.155 158);
@@ -116,10 +115,10 @@
   --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
 
-  --border: oklch(1 0 0 / 8%);           /* hairline white */
+  --border: oklch(1 0 0 / 8%); /* hairline white */
   --border-strong: oklch(1 0 0 / 20%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.72 0.155 158);          /* green focus ring */
+  --ring: oklch(0.72 0.155 158); /* green focus ring */
 }
 
 /* Explicit .dark class kept as an alias for components that gate on it
@@ -148,7 +147,6 @@
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.72 0.155 158);
 }
-
 
 @layer base {
   * {
@@ -181,7 +179,10 @@
     color: var(--color-accent);
   }
   /* Locked heading defaults — components can override sizes but keep tracking */
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     letter-spacing: -0.02em;
     color: var(--color-foreground);
   }
@@ -299,8 +300,14 @@
  * Motion primitives — subtle only
  * ─────────────────────────────────────────────────── */
 @keyframes nevo-fade-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @utility animate-fade-up {
   animation: nevo-fade-up var(--duration-slow) var(--ease-out-quart) both;
@@ -313,16 +320,21 @@
 .card-accent-line::after {
   content: "";
   position: absolute;
-  left: 0; bottom: 0;
-  height: 1px; width: 0;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 0;
   background: var(--color-accent);
   transition: width var(--duration-base) var(--ease-out-quart);
 }
-.card-accent-line:hover::after { width: 100%; }
+.card-accent-line:hover::after {
+  width: 100%;
+}
 
 /* ── Internationalization: RTL + non-Latin typography ─────────── */
 html[lang="ar"] {
-  font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family:
+    "IBM Plex Sans Arabic", "Noto Sans Arabic", Inter, ui-sans-serif, system-ui, sans-serif;
 }
 html[lang="ar"] .font-mono {
   font-family: "IBM Plex Sans Arabic", ui-monospace, monospace;

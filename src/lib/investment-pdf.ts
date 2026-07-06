@@ -15,15 +15,9 @@ const FX: Record<Currency, number> = {
   SAR: 3.75,
 };
 
-const money = (v: number, c: Currency) =>
-  `${SYMBOL[c]}${Math.round(v * FX[c]).toLocaleString()}`;
+const money = (v: number, c: Currency) => `${SYMBOL[c]}${Math.round(v * FX[c]).toLocaleString()}`;
 
-export type ReportKind =
-  | "investment"
-  | "roi"
-  | "cashflow"
-  | "specification"
-  | "summary";
+export type ReportKind = "investment" | "roi" | "cashflow" | "specification" | "summary";
 
 interface Inputs {
   capacity: number;
@@ -99,11 +93,7 @@ const REPORT_META: Record<ReportKind, { title: string; subtitle: string; file: s
   },
 };
 
-export function downloadInvestmentReport(
-  kind: ReportKind,
-  inputs: Inputs,
-  model: Model,
-) {
+export function downloadInvestmentReport(kind: ReportKind, inputs: Inputs, model: Model) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();

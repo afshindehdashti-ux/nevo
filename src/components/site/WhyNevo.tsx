@@ -1,20 +1,13 @@
 import { useTranslation } from "react-i18next";
-import {
-  Compass,
-  MapPin,
-  Globe2,
-  BookOpenCheck,
-  Layers3,
-  HandshakeIcon,
-} from "lucide-react";
+import { Compass, MapPin, Globe2, BookOpenCheck, Layers3, HandshakeIcon } from "lucide-react";
 import { Section, SectionHeader } from "@/components/site/primitives";
 
 const PROOFS = [
-  { icon: Compass,       key: "engineering" },
-  { icon: MapPin,        key: "dubai" },
-  { icon: Globe2,        key: "network" },
+  { icon: Compass, key: "engineering" },
+  { icon: MapPin, key: "dubai" },
+  { icon: Globe2, key: "network" },
   { icon: BookOpenCheck, key: "consultancy" },
-  { icon: Layers3,       key: "integrated" },
+  { icon: Layers3, key: "integrated" },
   { icon: HandshakeIcon, key: "partnership" },
 ] as const;
 

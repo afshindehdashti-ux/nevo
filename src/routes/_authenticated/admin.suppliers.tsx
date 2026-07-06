@@ -7,14 +7,30 @@ import { supabase } from "@/integrations/supabase/client";
 import { MasterListShell } from "@/components/crm/MasterListShell";
 import { useCanEditSuppliers, useCanDeleteMasters } from "@/lib/crm-permissions";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,7 +42,9 @@ import { Pencil, Trash2 } from "lucide-react";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/admin/suppliers")({
-  head: () => ({ meta: [{ title: "Suppliers — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Suppliers — NEVO CRM" }, { name: "robots", content: "noindex" }],
+  }),
   component: SuppliersPage,
 });
 
@@ -51,9 +69,20 @@ const SupplierSchema = z.object({
 });
 
 const empty = {
-  name: "", contact_person: "", email: "", phone: "", whatsapp: "",
-  address: "", city: "", country: "", vat_number: "", currency: "USD",
-  default_commission_pct: 5, payment_terms: "", notes: "", is_active: true,
+  name: "",
+  contact_person: "",
+  email: "",
+  phone: "",
+  whatsapp: "",
+  address: "",
+  city: "",
+  country: "",
+  vat_number: "",
+  currency: "USD",
+  default_commission_pct: 5,
+  payment_terms: "",
+  notes: "",
+  is_active: true,
 };
 
 function SuppliersPage() {
@@ -69,7 +98,9 @@ function SuppliersPage() {
     queryKey: ["suppliers"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("suppliers").select("*").order("created_at", { ascending: false });
+        .from("suppliers")
+        .select("*")
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data as Supplier[];
     },
@@ -80,7 +111,8 @@ function SuppliersPage() {
     if (!q) return rows;
     return rows.filter((r) =>
       [r.name, r.email, r.contact_person, r.country, r.city, r.vat_number]
-        .filter(Boolean).some((v) => v!.toLowerCase().includes(q))
+        .filter(Boolean)
+        .some((v) => v!.toLowerCase().includes(q)),
     );
   }, [rows, search]);
 
@@ -114,7 +146,8 @@ function SuppliersPage() {
       toast.success(editing ? "Supplier updated" : "Supplier created");
       qc.invalidateQueries({ queryKey: ["suppliers"] });
       qc.invalidateQueries({ queryKey: ["dashboard-counts"] });
-      setDialogOpen(false); setEditing(null);
+      setDialogOpen(false);
+      setEditing(null);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
   });
@@ -142,7 +175,10 @@ function SuppliersPage() {
         search={search}
         onSearchChange={setSearch}
         canCreate={canEdit}
-        onCreate={() => { setEditing(null); setDialogOpen(true); }}
+        onCreate={() => {
+          setEditing(null);
+          setDialogOpen(true);
+        }}
         createLabel="New supplier"
       >
         <div className="overflow-x-auto">
@@ -159,12 +195,20 @@ function SuppliersPage() {
             </TableHeader>
             <TableBody>
               {isLoading && (
-                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading…</TableCell></TableRow>
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    Loading…
+                  </TableCell>
+                </TableRow>
               )}
               {!isLoading && filtered.length === 0 && (
-                <TableRow><TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
-                  {rows.length === 0 ? "No suppliers yet. Click \"New supplier\" to add one." : "No matches."}
-                </TableCell></TableRow>
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
+                    {rows.length === 0
+                      ? 'No suppliers yet. Click "New supplier" to add one.'
+                      : "No matches."}
+                  </TableCell>
+                </TableRow>
               )}
               {filtered.map((c) => (
                 <TableRow key={c.id}>
@@ -181,12 +225,21 @@ function SuppliersPage() {
                     {Number(c.default_commission_pct).toFixed(2)}%
                   </TableCell>
                   <TableCell>
-                    <Badge variant={c.is_active ? "default" : "secondary"}>{c.is_active ? "Active" : "Inactive"}</Badge>
+                    <Badge variant={c.is_active ? "default" : "secondary"}>
+                      {c.is_active ? "Active" : "Inactive"}
+                    </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="inline-flex gap-1">
                       {canEdit && (
-                        <Button size="icon" variant="ghost" onClick={() => { setEditing(c); setDialogOpen(true); }}>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => {
+                            setEditing(c);
+                            setDialogOpen(true);
+                          }}
+                        >
                           <Pencil className="h-4 w-4" />
                         </Button>
                       )}
@@ -206,7 +259,10 @@ function SuppliersPage() {
 
       <SupplierDialog
         open={dialogOpen}
-        onOpenChange={(o) => { setDialogOpen(o); if (!o) setEditing(null); }}
+        onOpenChange={(o) => {
+          setDialogOpen(o);
+          if (!o) setEditing(null);
+        }}
         initial={editing}
         onSubmit={(f) => save.mutate(f)}
         saving={save.isPending}
@@ -217,12 +273,16 @@ function SuppliersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete supplier?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently remove <strong>{deleteTarget?.name}</strong>. Products linked to this supplier will lose the link.
+              This will permanently remove <strong>{deleteTarget?.name}</strong>. Products linked to
+              this supplier will lose the link.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteTarget && del.mutate(deleteTarget.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={() => deleteTarget && del.mutate(deleteTarget.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -233,7 +293,11 @@ function SuppliersPage() {
 }
 
 function SupplierDialog({
-  open, onOpenChange, initial, onSubmit, saving,
+  open,
+  onOpenChange,
+  initial,
+  onSubmit,
+  saving,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -270,7 +334,8 @@ function SupplierDialog({
     }
   }, [open, initial]);
 
-  const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((s) => ({ ...s, [k]: v }));
+  const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
+    setForm((s) => ({ ...s, [k]: v }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -289,7 +354,9 @@ function SupplierDialog({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{initial ? "Edit supplier" : "New supplier"}</DialogTitle>
-          <DialogDescription>Supplier master record used for products, purchase orders and commission invoices.</DialogDescription>
+          <DialogDescription>
+            Supplier master record used for products, purchase orders and commission invoices.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -297,61 +364,104 @@ function SupplierDialog({
               <Input value={form.name} onChange={(e) => set("name", e.target.value)} autoFocus />
             </Field>
             <Field label="Contact person">
-              <Input value={form.contact_person ?? ""} onChange={(e) => set("contact_person", e.target.value)} />
+              <Input
+                value={form.contact_person ?? ""}
+                onChange={(e) => set("contact_person", e.target.value)}
+              />
             </Field>
             <Field label="Email" error={errors.email}>
-              <Input type="email" value={form.email ?? ""} onChange={(e) => set("email", e.target.value)} />
+              <Input
+                type="email"
+                value={form.email ?? ""}
+                onChange={(e) => set("email", e.target.value)}
+              />
             </Field>
             <Field label="Phone">
               <Input value={form.phone ?? ""} onChange={(e) => set("phone", e.target.value)} />
             </Field>
             <Field label="WhatsApp">
-              <Input value={form.whatsapp ?? ""} onChange={(e) => set("whatsapp", e.target.value)} />
+              <Input
+                value={form.whatsapp ?? ""}
+                onChange={(e) => set("whatsapp", e.target.value)}
+              />
             </Field>
             <Field label="VAT / Tax number">
-              <Input value={form.vat_number ?? ""} onChange={(e) => set("vat_number", e.target.value)} />
+              <Input
+                value={form.vat_number ?? ""}
+                onChange={(e) => set("vat_number", e.target.value)}
+              />
             </Field>
             <div className="sm:col-span-2">
               <Field label="Address">
-                <Textarea rows={2} value={form.address ?? ""} onChange={(e) => set("address", e.target.value)} />
+                <Textarea
+                  rows={2}
+                  value={form.address ?? ""}
+                  onChange={(e) => set("address", e.target.value)}
+                />
               </Field>
             </div>
-            <Field label="City"><Input value={form.city ?? ""} onChange={(e) => set("city", e.target.value)} /></Field>
-            <Field label="Country"><Input value={form.country ?? ""} onChange={(e) => set("country", e.target.value)} /></Field>
+            <Field label="City">
+              <Input value={form.city ?? ""} onChange={(e) => set("city", e.target.value)} />
+            </Field>
+            <Field label="Country">
+              <Input value={form.country ?? ""} onChange={(e) => set("country", e.target.value)} />
+            </Field>
             <Field label="Currency">
               <select
                 className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
                 value={form.currency}
                 onChange={(e) => set("currency", e.target.value)}
               >
-                {CurrencyList.map((c) => <option key={c} value={c}>{c}</option>)}
+                {CurrencyList.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
               </select>
             </Field>
             <Field label="Default commission %" error={errors.default_commission_pct}>
               <Input
-                type="number" step="0.01" min="0" max="100"
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
                 value={form.default_commission_pct}
                 onChange={(e) => set("default_commission_pct", Number(e.target.value) || 0)}
               />
             </Field>
             <div className="sm:col-span-2">
               <Field label="Payment terms">
-                <Input value={form.payment_terms ?? ""} onChange={(e) => set("payment_terms", e.target.value)} />
+                <Input
+                  value={form.payment_terms ?? ""}
+                  onChange={(e) => set("payment_terms", e.target.value)}
+                />
               </Field>
             </div>
             <div className="sm:col-span-2">
               <Field label="Notes">
-                <Textarea rows={2} value={form.notes ?? ""} onChange={(e) => set("notes", e.target.value)} />
+                <Textarea
+                  rows={2}
+                  value={form.notes ?? ""}
+                  onChange={(e) => set("notes", e.target.value)}
+                />
               </Field>
             </div>
             <div className="sm:col-span-2 flex items-center gap-2">
-              <Switch checked={form.is_active} onCheckedChange={(v) => set("is_active", v)} id="s_active" />
+              <Switch
+                checked={form.is_active}
+                onCheckedChange={(v) => set("is_active", v)}
+                id="s_active"
+              />
               <Label htmlFor="s_active">Active</Label>
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={saving}>{saving ? "Saving…" : initial ? "Save changes" : "Create"}</Button>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Saving…" : initial ? "Save changes" : "Create"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -359,7 +469,15 @@ function SupplierDialog({
   );
 }
 
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1">
       <Label className="text-xs font-medium">{label}</Label>

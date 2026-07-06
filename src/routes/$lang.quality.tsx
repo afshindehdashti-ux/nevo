@@ -23,8 +23,7 @@ import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
 import { ogImageMeta } from "@/lib/og-images";
 
-const TITLE =
-  "Quality Assurance & Certifications — Sandwich Panel Testing | NEVO Industrial";
+const TITLE = "Quality Assurance & Certifications — Sandwich Panel Testing | NEVO Industrial";
 const DESCRIPTION =
   "Independent quality control: fire, thermal, adhesion and dimensional testing of sandwich panels. ISO 9001, 14001, 45001 certified. NEVO Industrial, Dubai.";
 const URL_PATH = "/quality";
@@ -116,7 +115,9 @@ function QualityPage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-graphite text-white">
         <div className="absolute inset-0 opacity-40">
-          <img loading="lazy" decoding="async"
+          <img
+            loading="lazy"
+            decoding="async"
             src={qa01}
             alt=""
             className="h-full w-full object-cover"
@@ -137,15 +138,22 @@ function QualityPage() {
               Engineering-grade quality, verified at every step.
             </h1>
             <p className="mt-6 text-lg text-white/70 max-w-2xl">
-              From incoming raw materials to the final panel leaving our warehouse,
-              NEVO applies certified test protocols and third-party audits to
-              guarantee performance, safety and durability.
+              From incoming raw materials to the final panel leaving our warehouse, NEVO applies
+              certified test protocols and third-party audits to guarantee performance, safety and
+              durability.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="bg-emerald text-graphite hover:bg-emerald/90">
-                <Link to="/download-center">Download Test Reports <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Link to="/download-center">
+                  Download Test Reports <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10">
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-white/20 text-white hover:bg-white/10"
+              >
                 <Link to="/project-inquiry">Request an Audit</Link>
               </Button>
             </div>
@@ -185,9 +193,7 @@ function QualityPage() {
                 </div>
                 <div className="p-6">
                   <h3 className="text-lg font-semibold tracking-tight">{tile.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                    {tile.body}
-                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{tile.body}</p>
                 </div>
               </SurfaceCard>
             </motion.div>
@@ -231,13 +237,15 @@ function QualityPage() {
               Request project-specific test reports.
             </h2>
             <p className="mt-3 text-white/70 max-w-2xl">
-              Fire, thermal, mechanical and dimensional test data for the exact panel
-              specification of your project — delivered by our engineering team.
+              Fire, thermal, mechanical and dimensional test data for the exact panel specification
+              of your project — delivered by our engineering team.
             </p>
           </div>
           <div className="flex gap-3">
             <Button asChild size="lg" className="bg-emerald text-graphite hover:bg-emerald/90">
-              <Link to="/project-inquiry">Contact Engineering <FlaskConical className="ml-2 h-4 w-4" /></Link>
+              <Link to="/project-inquiry">
+                Contact Engineering <FlaskConical className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </div>
         </div>

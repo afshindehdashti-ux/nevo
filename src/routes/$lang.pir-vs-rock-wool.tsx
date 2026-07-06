@@ -109,21 +109,47 @@ type Row = {
 };
 
 const ROWS: Row[] = [
-  { label: "Thermal Conductivity (W/m·K)", icon: ThermometerSun, pir: "0.022 – 0.024", rw: "0.036 – 0.040", winner: "PIR", note: "Lower λ = better insulation" },
-  { label: "Fire Resistance", icon: Flame, pir: "B-s2,d0", rw: "A1 (Non-combustible)", winner: "RW", note: "Rock Wool is non-combustible" },
+  {
+    label: "Thermal Conductivity (W/m·K)",
+    icon: ThermometerSun,
+    pir: "0.022 – 0.024",
+    rw: "0.036 – 0.040",
+    winner: "PIR",
+    note: "Lower λ = better insulation",
+  },
+  {
+    label: "Fire Resistance",
+    icon: Flame,
+    pir: "B-s2,d0",
+    rw: "A1 (Non-combustible)",
+    winner: "RW",
+    note: "Rock Wool is non-combustible",
+  },
   { label: "Density (kg/m³)", icon: Layers, pir: "32 – 42", rw: "100 – 150", winner: "PIR" },
   { label: "Weight @ 100mm (kg/m²)", icon: Weight, pir: "10.2", rw: "16.8", winner: "PIR" },
-  { label: "Water Absorption (by volume)", icon: Droplets, pir: "< 2 %", rw: "1 – 3 %", winner: "PIR" },
+  {
+    label: "Water Absorption (by volume)",
+    icon: Droplets,
+    pir: "< 2 %",
+    rw: "1 – 3 %",
+    winner: "PIR",
+  },
   { label: "Installation Speed", icon: Zap, pir: "Very Fast", rw: "Fast", winner: "PIR" },
   { label: "Initial Cost", icon: DollarSign, pir: "Lower", rw: "Higher", winner: "PIR" },
   { label: "Lifespan", icon: Clock, pir: "25 – 30 yrs", rw: "30 – 40 yrs", winner: "RW" },
   { label: "Energy Saving", icon: Leaf, pir: "Excellent", rw: "Very Good", winner: "PIR" },
   { label: "Maintenance", icon: Wrench, pir: "Very Low", rw: "Low", winner: "PIR" },
-  { label: "Environmental Impact", icon: Leaf, pir: "Low (CFC/HCFC free)", rw: "Recyclable", winner: "RW" },
+  {
+    label: "Environmental Impact",
+    icon: Leaf,
+    pir: "Low (CFC/HCFC free)",
+    rw: "Recyclable",
+    winner: "RW",
+  },
 ];
 
 const U_VALUES: Record<number, { pir: number; rw: number }> = {
-  40: { pir: 0.55, rw: 0.80 },
+  40: { pir: 0.55, rw: 0.8 },
   60: { pir: 0.37, rw: 0.56 },
   80: { pir: 0.28, rw: 0.42 },
   100: { pir: 0.22, rw: 0.34 },
@@ -157,38 +183,117 @@ const SOUND: Record<number, { pir: number; rw: number }> = {
   150: { pir: 29, rw: 38 },
 };
 
-type AppKey = "Cold Storage" | "Food Factory" | "Warehouse" | "Industrial Building" | "Clean Room" | "Office" | "Commercial Building";
+type AppKey =
+  | "Cold Storage"
+  | "Food Factory"
+  | "Warehouse"
+  | "Industrial Building"
+  | "Clean Room"
+  | "Office"
+  | "Commercial Building";
 
 const APPLICATIONS: {
-  key: AppKey; img: string; recommend: "PIR" | "RW" | "EITHER"; reason: string; icon: any;
+  key: AppKey;
+  img: string;
+  recommend: "PIR" | "RW" | "EITHER";
+  reason: string;
+  icon: any;
 }[] = [
-  { key: "Cold Storage", img: appColdStorage, recommend: "PIR", reason: "Lowest λ, minimum heat loss, moisture resistant.", icon: Snowflake },
-  { key: "Food Factory", img: appIndustrial, recommend: "PIR", reason: "Hygienic, low water absorption, HACCP compatible.", icon: Factory },
-  { key: "Warehouse", img: appWarehouse, recommend: "PIR", reason: "Best cost-to-performance for large envelopes.", icon: Warehouse },
-  { key: "Industrial Building", img: appIndustrial, recommend: "EITHER", reason: "PIR for thermal priority, Rock Wool for fire zones.", icon: Building2 },
-  { key: "Clean Room", img: appCleanRoom, recommend: "PIR", reason: "Dimensionally stable, smooth surface, low VOC.", icon: Shield },
-  { key: "Office", img: appCommercial, recommend: "RW", reason: "Superior acoustic and fire compartmentation.", icon: Volume2 },
-  { key: "Commercial Building", img: appCommercial, recommend: "RW", reason: "Code-driven A1 fire class for façades > 18m.", icon: Building2 },
+  {
+    key: "Cold Storage",
+    img: appColdStorage,
+    recommend: "PIR",
+    reason: "Lowest λ, minimum heat loss, moisture resistant.",
+    icon: Snowflake,
+  },
+  {
+    key: "Food Factory",
+    img: appIndustrial,
+    recommend: "PIR",
+    reason: "Hygienic, low water absorption, HACCP compatible.",
+    icon: Factory,
+  },
+  {
+    key: "Warehouse",
+    img: appWarehouse,
+    recommend: "PIR",
+    reason: "Best cost-to-performance for large envelopes.",
+    icon: Warehouse,
+  },
+  {
+    key: "Industrial Building",
+    img: appIndustrial,
+    recommend: "EITHER",
+    reason: "PIR for thermal priority, Rock Wool for fire zones.",
+    icon: Building2,
+  },
+  {
+    key: "Clean Room",
+    img: appCleanRoom,
+    recommend: "PIR",
+    reason: "Dimensionally stable, smooth surface, low VOC.",
+    icon: Shield,
+  },
+  {
+    key: "Office",
+    img: appCommercial,
+    recommend: "RW",
+    reason: "Superior acoustic and fire compartmentation.",
+    icon: Volume2,
+  },
+  {
+    key: "Commercial Building",
+    img: appCommercial,
+    recommend: "RW",
+    reason: "Code-driven A1 fire class for façades > 18m.",
+    icon: Building2,
+  },
 ];
 
 const FAQS = [
-  { q: "Which is better, PIR or Rock Wool?", a: "Neither is universally better. PIR delivers superior thermal performance, lower weight and lower cost — ideal for cold storage, food and warehousing. Rock Wool is non-combustible (A1) and provides better acoustics — required for high-rise façades, offices and fire-critical compartments." },
-  { q: "What is the U-value difference at 100 mm?", a: "PIR at 100 mm delivers ~0.22 W/m²K, Rock Wool ~0.34 W/m²K. PIR is roughly 35% more thermally efficient at the same thickness." },
-  { q: "Is Rock Wool fireproof?", a: "Rock Wool is classified A1 non-combustible per EN 13501-1 — it does not burn, does not release smoke and withstands >1000°C. PIR is B-s2,d0 and self-extinguishing but combustible under sustained flame." },
-  { q: "How much heavier is Rock Wool?", a: "A 100 mm Rock Wool panel weighs ~16.8 kg/m² vs ~10.2 kg/m² for PIR — Rock Wool is ~65% heavier, affecting structure, transport and installation." },
-  { q: "Which panel installs faster?", a: "PIR installs 20–30% faster due to lower weight and lighter handling. Rock Wool requires more crew and rigging for the same area." },
-  { q: "What is the lifecycle cost difference?", a: "PIR has ~15% lower CAPEX and 20–30% lower energy cost over 20 years. Rock Wool has a longer service life (30–40 yrs vs 25–30 yrs) and better residual value in fire-rated buildings." },
+  {
+    q: "Which is better, PIR or Rock Wool?",
+    a: "Neither is universally better. PIR delivers superior thermal performance, lower weight and lower cost — ideal for cold storage, food and warehousing. Rock Wool is non-combustible (A1) and provides better acoustics — required for high-rise façades, offices and fire-critical compartments.",
+  },
+  {
+    q: "What is the U-value difference at 100 mm?",
+    a: "PIR at 100 mm delivers ~0.22 W/m²K, Rock Wool ~0.34 W/m²K. PIR is roughly 35% more thermally efficient at the same thickness.",
+  },
+  {
+    q: "Is Rock Wool fireproof?",
+    a: "Rock Wool is classified A1 non-combustible per EN 13501-1 — it does not burn, does not release smoke and withstands >1000°C. PIR is B-s2,d0 and self-extinguishing but combustible under sustained flame.",
+  },
+  {
+    q: "How much heavier is Rock Wool?",
+    a: "A 100 mm Rock Wool panel weighs ~16.8 kg/m² vs ~10.2 kg/m² for PIR — Rock Wool is ~65% heavier, affecting structure, transport and installation.",
+  },
+  {
+    q: "Which panel installs faster?",
+    a: "PIR installs 20–30% faster due to lower weight and lighter handling. Rock Wool requires more crew and rigging for the same area.",
+  },
+  {
+    q: "What is the lifecycle cost difference?",
+    a: "PIR has ~15% lower CAPEX and 20–30% lower energy cost over 20 years. Rock Wool has a longer service life (30–40 yrs vs 25–30 yrs) and better residual value in fire-rated buildings.",
+  },
 ];
 
 // ---------------- Small UI ----------------
-function Chip({ children, tone = "emerald" }: { children: React.ReactNode; tone?: "emerald" | "graphite" | "amber" }) {
+function Chip({
+  children,
+  tone = "emerald",
+}: {
+  children: React.ReactNode;
+  tone?: "emerald" | "graphite" | "amber";
+}) {
   const tones = {
     emerald: "border-emerald-400/30 bg-emerald-400/10 text-emerald-200",
     graphite: "border-white/10 bg-white/5 text-white/70",
     amber: "border-amber-400/30 bg-amber-400/10 text-amber-200",
   };
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-mono uppercase tracking-widest ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-mono uppercase tracking-widest ${tones[tone]}`}
+    >
       {children}
     </span>
   );
@@ -246,9 +351,13 @@ function PirVsRockWoolPage() {
       {/* Breadcrumb */}
       <nav aria-label="Breadcrumb" className="border-b border-white/5 bg-black/40">
         <div className="mx-auto flex max-w-[1440px] items-center gap-2 px-6 py-3 text-xs text-white/50">
-          <Link to="/" className="hover:text-white">Home</Link>
+          <Link to="/" className="hover:text-white">
+            Home
+          </Link>
           <ChevronRight className="h-3 w-3" />
-          <Link to="/knowledge-hub" className="hover:text-white">Knowledge</Link>
+          <Link to="/knowledge-hub" className="hover:text-white">
+            Knowledge
+          </Link>
           <ChevronRight className="h-3 w-3" />
           <span className="text-white">PIR vs Rock Wool</span>
         </div>
@@ -265,7 +374,9 @@ function PirVsRockWoolPage() {
         />
         <div className="relative mx-auto max-w-[1440px] px-6 py-20 md:py-28">
           <div className="mb-6 flex flex-wrap items-center gap-2">
-            <Chip><Sparkles className="h-3 w-3" /> Engineering Guide</Chip>
+            <Chip>
+              <Sparkles className="h-3 w-3" /> Engineering Guide
+            </Chip>
             <Chip tone="graphite">Updated 2026</Chip>
             <Chip tone="graphite">14 min read</Chip>
           </div>
@@ -274,9 +385,8 @@ function PirVsRockWoolPage() {
             <span className="text-emerald-400">Rock Wool</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-white/60">
-            Different materials. Different performance. One right choice — the
-            complete side-by-side comparison for engineers, consultants and
-            factory owners.
+            Different materials. Different performance. One right choice — the complete side-by-side
+            comparison for engineers, consultants and factory owners.
           </p>
 
           <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -321,12 +431,44 @@ function PirVsRockWoolPage() {
           />
           <div className="grid gap-6 md:grid-cols-2">
             {[
-              { title: "PIR Panel", img: crossPir, badge: "Closed-cell foam", color: "emerald" as const, layers: ["PPGI Steel Sheet", "Adhesive", "PIR Core", "Adhesive", "PPGI Steel Sheet"] },
-              { title: "Rock Wool Panel", img: crossRw, badge: "Mineral fibre", color: "graphite" as const, layers: ["PPGI Steel Sheet", "Adhesive", "Rock Wool Core", "Adhesive", "PPGI Steel Sheet"] },
+              {
+                title: "PIR Panel",
+                img: crossPir,
+                badge: "Closed-cell foam",
+                color: "emerald" as const,
+                layers: [
+                  "PPGI Steel Sheet",
+                  "Adhesive",
+                  "PIR Core",
+                  "Adhesive",
+                  "PPGI Steel Sheet",
+                ],
+              },
+              {
+                title: "Rock Wool Panel",
+                img: crossRw,
+                badge: "Mineral fibre",
+                color: "graphite" as const,
+                layers: [
+                  "PPGI Steel Sheet",
+                  "Adhesive",
+                  "Rock Wool Core",
+                  "Adhesive",
+                  "PPGI Steel Sheet",
+                ],
+              },
             ].map((c) => (
-              <div key={c.title} className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]">
+              <div
+                key={c.title}
+                className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]"
+              >
                 <div className="relative aspect-[16/10] overflow-hidden bg-black">
-                  <img src={c.img} alt={`${c.title} cross section`} className="h-full w-full object-cover transition group-hover:scale-[1.02]" loading="lazy" />
+                  <img
+                    src={c.img}
+                    alt={`${c.title} cross section`}
+                    className="h-full w-full object-cover transition group-hover:scale-[1.02]"
+                    loading="lazy"
+                  />
                 </div>
                 <div className="p-6">
                   <div className="mb-3 flex items-center justify-between">
@@ -379,8 +521,16 @@ function PirVsRockWoolPage() {
                     {r.note && <div className="text-[11px] text-white/40">{r.note}</div>}
                   </div>
                 </div>
-                <div className={`col-span-3 font-mono ${r.winner === "PIR" ? "text-emerald-300" : "text-white/70"}`}>{r.pir}</div>
-                <div className={`col-span-3 font-mono ${r.winner === "RW" ? "text-emerald-300" : "text-white/70"}`}>{r.rw}</div>
+                <div
+                  className={`col-span-3 font-mono ${r.winner === "PIR" ? "text-emerald-300" : "text-white/70"}`}
+                >
+                  {r.pir}
+                </div>
+                <div
+                  className={`col-span-3 font-mono ${r.winner === "RW" ? "text-emerald-300" : "text-white/70"}`}
+                >
+                  {r.rw}
+                </div>
                 <div className="col-span-1 text-right">
                   {r.winner === "TIE" ? (
                     <span className="font-mono text-[11px] text-white/40">TIE</span>
@@ -420,7 +570,9 @@ function PirVsRockWoolPage() {
                       key={m.id}
                       onClick={() => setViewMode(m.id)}
                       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium transition ${
-                        viewMode === m.id ? "bg-emerald-500 text-black" : "text-white/60 hover:text-white"
+                        viewMode === m.id
+                          ? "bg-emerald-500 text-black"
+                          : "text-white/60 hover:text-white"
                       }`}
                     >
                       <m.icon className="h-3 w-3" /> {m.label}
@@ -442,7 +594,12 @@ function PirVsRockWoolPage() {
                   },
                 ].map((p) => (
                   <div key={p.title} className="relative aspect-square overflow-hidden bg-black">
-                    <img src={p.imgs[viewMode]} alt={`${p.title} ${viewMode}`} className="h-full w-full object-cover" loading="lazy" />
+                    <img
+                      src={p.imgs[viewMode]}
+                      alt={`${p.title} ${viewMode}`}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
                     <div className="absolute left-3 top-3 rounded-full border border-white/10 bg-black/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-white/80 backdrop-blur">
                       {p.title}
                     </div>
@@ -453,10 +610,18 @@ function PirVsRockWoolPage() {
                 ))}
               </div>
               <div className="flex flex-wrap items-center gap-3 border-t border-white/10 bg-black/40 px-4 py-3 font-mono text-[10px] uppercase tracking-widest text-white/40">
-                <span className="inline-flex items-center gap-1"><RotateCw className="h-3 w-3" /> Rotate</span>
-                <span className="inline-flex items-center gap-1"><ZoomIn className="h-3 w-3" /> Zoom</span>
-                <span className="inline-flex items-center gap-1"><Layers className="h-3 w-3" /> Explode</span>
-                <span className="inline-flex items-center gap-1"><Ruler className="h-3 w-3" /> Measure</span>
+                <span className="inline-flex items-center gap-1">
+                  <RotateCw className="h-3 w-3" /> Rotate
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <ZoomIn className="h-3 w-3" /> Zoom
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Layers className="h-3 w-3" /> Explode
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Ruler className="h-3 w-3" /> Measure
+                </span>
               </div>
             </div>
 
@@ -464,8 +629,13 @@ function PirVsRockWoolPage() {
             <div className="lg:col-span-2 space-y-6">
               <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">Thickness</div>
-                  <div className="font-mono text-2xl font-semibold text-white">{selectedThickness}<span className="text-sm text-white/40"> mm</span></div>
+                  <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">
+                    Thickness
+                  </div>
+                  <div className="font-mono text-2xl font-semibold text-white">
+                    {selectedThickness}
+                    <span className="text-sm text-white/40"> mm</span>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {thicknessKeys.map((t) => (
@@ -506,7 +676,8 @@ function PirVsRockWoolPage() {
               <div className="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.04] p-6">
                 <ThermometerSun className="mb-3 h-4 w-4 text-emerald-300" />
                 <div className="text-sm text-white/80">
-                  At <span className="font-mono text-emerald-300">{selectedThickness} mm</span>, PIR delivers{" "}
+                  At <span className="font-mono text-emerald-300">{selectedThickness} mm</span>, PIR
+                  delivers{" "}
                   <span className="font-mono text-emerald-300">
                     {Math.round(((currentU.rw - currentU.pir) / currentU.rw) * 100)}%
                   </span>{" "}
@@ -528,12 +699,30 @@ function PirVsRockWoolPage() {
           />
           <div className="grid gap-6 lg:grid-cols-2">
             {[
-              { title: "PIR Panel", img: firePir, tag: "Self-extinguishing", desc: "No flame propagation. B-s2,d0 EN 13501-1." },
-              { title: "Rock Wool Panel", img: fireRw, tag: "Non-combustible", desc: "Excellent fire resistance. A1 EN 13501-1." },
+              {
+                title: "PIR Panel",
+                img: firePir,
+                tag: "Self-extinguishing",
+                desc: "No flame propagation. B-s2,d0 EN 13501-1.",
+              },
+              {
+                title: "Rock Wool Panel",
+                img: fireRw,
+                tag: "Non-combustible",
+                desc: "Excellent fire resistance. A1 EN 13501-1.",
+              },
             ].map((c) => (
-              <div key={c.title} className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]">
+              <div
+                key={c.title}
+                className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]"
+              >
                 <div className="relative aspect-[16/10] bg-black">
-                  <img src={c.img} alt={`${c.title} fire test`} className="h-full w-full object-cover" loading="lazy" />
+                  <img
+                    src={c.img}
+                    alt={`${c.title} fire test`}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
                   <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-white backdrop-blur">
                     {c.title}
                   </div>
@@ -548,10 +737,16 @@ function PirVsRockWoolPage() {
 
           <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.02] p-6">
             <div className="mb-6 flex items-center justify-between">
-              <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">Fire Resistance Duration</div>
+              <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">
+                Fire Resistance Duration
+              </div>
               <div className="flex items-center gap-3 text-[11px] text-white/60">
-                <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-400" /> PIR (intumescent)</span>
-                <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-white/40" /> Rock Wool</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400" /> PIR (intumescent)
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-white/40" /> Rock Wool
+                </span>
               </div>
             </div>
             <div className="space-y-4">
@@ -560,11 +755,17 @@ function PirVsRockWoolPage() {
                   <div className="col-span-2 font-mono text-xs text-white/60">{label}</div>
                   <div className="col-span-10 space-y-1.5">
                     <div className="flex items-center gap-3">
-                      <div className="flex-1"><Bar value={v.pir} max={180} tone="emerald" /></div>
-                      <div className="w-12 text-right font-mono text-xs text-emerald-300">{v.pir}m</div>
+                      <div className="flex-1">
+                        <Bar value={v.pir} max={180} tone="emerald" />
+                      </div>
+                      <div className="w-12 text-right font-mono text-xs text-emerald-300">
+                        {v.pir}m
+                      </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="flex-1"><Bar value={v.rw} max={180} tone="graphite" /></div>
+                      <div className="flex-1">
+                        <Bar value={v.rw} max={180} tone="graphite" />
+                      </div>
                       <div className="w-12 text-right font-mono text-xs text-white/60">{v.rw}m</div>
                     </div>
                   </div>
@@ -588,21 +789,31 @@ function PirVsRockWoolPage() {
               <div className="grid grid-cols-6 gap-4">
                 {Object.entries(WEIGHTS).map(([thk, v]) => (
                   <div key={thk} className="text-center">
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-white/40">{thk}mm</div>
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+                      {thk}mm
+                    </div>
                     <div className="mt-3 flex h-40 items-end justify-center gap-2">
                       <div className="flex flex-col items-center gap-1">
                         <div className="font-mono text-[10px] text-emerald-300">{v.pir}</div>
-                        <div className="w-6 rounded-t bg-emerald-400" style={{ height: `${(v.pir / 34) * 100}%` }} />
+                        <div
+                          className="w-6 rounded-t bg-emerald-400"
+                          style={{ height: `${(v.pir / 34) * 100}%` }}
+                        />
                       </div>
                       <div className="flex flex-col items-center gap-1">
                         <div className="font-mono text-[10px] text-white/60">{v.rw}</div>
-                        <div className="w-6 rounded-t bg-white/40" style={{ height: `${(v.rw / 34) * 100}%` }} />
+                        <div
+                          className="w-6 rounded-t bg-white/40"
+                          style={{ height: `${(v.rw / 34) * 100}%` }}
+                        />
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 text-center font-mono text-[10px] uppercase tracking-widest text-white/40">kg/m² · PIR (green) vs Rock Wool (grey)</div>
+              <div className="mt-4 text-center font-mono text-[10px] uppercase tracking-widest text-white/40">
+                kg/m² · PIR (green) vs Rock Wool (grey)
+              </div>
             </div>
           </div>
 
@@ -618,17 +829,27 @@ function PirVsRockWoolPage() {
                   <div className="col-span-2 font-mono text-xs text-white/60">{thk}mm</div>
                   <div className="col-span-10 space-y-1.5">
                     <div className="flex items-center gap-3">
-                      <div className="flex-1"><Bar value={v.pir} max={40} tone="emerald" /></div>
-                      <div className="w-12 text-right font-mono text-xs text-emerald-300">{v.pir} dB</div>
+                      <div className="flex-1">
+                        <Bar value={v.pir} max={40} tone="emerald" />
+                      </div>
+                      <div className="w-12 text-right font-mono text-xs text-emerald-300">
+                        {v.pir} dB
+                      </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="flex-1"><Bar value={v.rw} max={40} tone="graphite" /></div>
-                      <div className="w-12 text-right font-mono text-xs text-white/60">{v.rw} dB</div>
+                      <div className="flex-1">
+                        <Bar value={v.rw} max={40} tone="graphite" />
+                      </div>
+                      <div className="w-12 text-right font-mono text-xs text-white/60">
+                        {v.rw} dB
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
-              <p className="pt-2 font-mono text-[10px] uppercase tracking-widest text-white/40">Higher dB = Better sound insulation</p>
+              <p className="pt-2 font-mono text-[10px] uppercase tracking-widest text-white/40">
+                Higher dB = Better sound insulation
+              </p>
             </div>
           </div>
         </div>
@@ -644,24 +865,44 @@ function PirVsRockWoolPage() {
           <div className="grid gap-6 md:grid-cols-3">
             {[
               {
-                title: "Moisture Resistance", icon: Droplets, img: corePir,
-                pir: "< 2% water absorption", rw: "1 – 3% water absorption",
-                winner: "PIR", desc: "Closed-cell PIR does not wick moisture — essential for cold storage vapour barriers.",
+                title: "Moisture Resistance",
+                icon: Droplets,
+                img: corePir,
+                pir: "< 2% water absorption",
+                rw: "1 – 3% water absorption",
+                winner: "PIR",
+                desc: "Closed-cell PIR does not wick moisture — essential for cold storage vapour barriers.",
               },
               {
-                title: "Installation Speed", icon: Wrench, img: ppgiCoil,
-                pir: "Very fast · 2-man crew", rw: "Fast · 3-man crew",
-                winner: "PIR", desc: "Lighter panels install 20–30% faster with lower crane/rigging requirements.",
+                title: "Installation Speed",
+                icon: Wrench,
+                img: ppgiCoil,
+                pir: "Very fast · 2-man crew",
+                rw: "Fast · 3-man crew",
+                winner: "PIR",
+                desc: "Lighter panels install 20–30% faster with lower crane/rigging requirements.",
               },
               {
-                title: "Mechanical Strength", icon: Shield, img: mechanical,
-                pir: "High rigidity", rw: "High rigidity + fibre integrity",
-                winner: "TIE", desc: "Both cores meet EN 14509 span requirements when steel skins are correctly gauged.",
+                title: "Mechanical Strength",
+                icon: Shield,
+                img: mechanical,
+                pir: "High rigidity",
+                rw: "High rigidity + fibre integrity",
+                winner: "TIE",
+                desc: "Both cores meet EN 14509 span requirements when steel skins are correctly gauged.",
               },
             ].map((c) => (
-              <div key={c.title} className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]">
+              <div
+                key={c.title}
+                className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]"
+              >
                 <div className="relative aspect-[16/10] bg-black">
-                  <img src={c.img} alt={c.title} className="h-full w-full object-cover" loading="lazy" />
+                  <img
+                    src={c.img}
+                    alt={c.title}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
                 </div>
                 <div className="p-6">
                   <div className="mb-3 flex items-center justify-between">
@@ -715,28 +956,49 @@ function PirVsRockWoolPage() {
           <div className="grid gap-6 lg:grid-cols-5">
             <div className="lg:col-span-3 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]">
               <div className="relative aspect-[16/9] bg-black">
-                <img src={selectedAppData.img} alt={selectedAppData.key} className="h-full w-full object-cover" loading="lazy" />
+                <img
+                  src={selectedAppData.img}
+                  alt={selectedAppData.key}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
                 <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-white backdrop-blur">
                   {selectedAppData.key}
                 </div>
               </div>
             </div>
             <div className="lg:col-span-2 rounded-3xl border border-white/10 bg-white/[0.02] p-8">
-              <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">Recommendation</div>
+              <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">
+                Recommendation
+              </div>
               <div className="mt-3 flex items-center gap-3">
                 <Trophy className="h-6 w-6 text-emerald-400" />
                 <div className="text-3xl font-semibold text-white">
-                  {selectedAppData.recommend === "EITHER" ? "PIR or Rock Wool" : selectedAppData.recommend === "PIR" ? "PIR" : "Rock Wool"}
+                  {selectedAppData.recommend === "EITHER"
+                    ? "PIR or Rock Wool"
+                    : selectedAppData.recommend === "PIR"
+                      ? "PIR"
+                      : "Rock Wool"}
                 </div>
               </div>
               <p className="mt-4 text-sm text-white/70">{selectedAppData.reason}</p>
               <div className="mt-6 flex flex-col gap-2">
-                <Link to="/product-configurator" className="inline-flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white transition hover:bg-white/10">
-                  <span className="inline-flex items-center gap-2"><Layers className="h-4 w-4 text-emerald-300" /> Configure this panel</span>
+                <Link
+                  to="/product-configurator"
+                  className="inline-flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white transition hover:bg-white/10"
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <Layers className="h-4 w-4 text-emerald-300" /> Configure this panel
+                  </span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link to="/contact" className="inline-flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white transition hover:bg-white/10">
-                  <span className="inline-flex items-center gap-2"><MessageSquare className="h-4 w-4 text-emerald-300" /> Talk to an engineer</span>
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white transition hover:bg-white/10"
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4 text-emerald-300" /> Talk to an engineer
+                  </span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -754,10 +1016,38 @@ function PirVsRockWoolPage() {
           />
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { icon: DollarSign, title: "Initial Cost", pir: "Lower", rw: "Higher", pct: [40, 70], desc: "PIR CAPEX is ~15% below Rock Wool at equal U-value." },
-              { icon: Clock, title: "Lifecycle (20 yr)", pir: "Best value", rw: "Higher TCO", pct: [55, 85], desc: "Energy savings compound over 20 years — PIR leads TCO." },
-              { icon: Leaf, title: "Energy Saving", pir: "20 – 30%", rw: "10 – 15%", pct: [90, 55], desc: "Vs uninsulated envelope, over 20 years." },
-              { icon: Wrench, title: "Maintenance", pir: "Very Low", rw: "Low", pct: [92, 78], desc: "Sealed skins on both; PIR edge integrity is superior." },
+              {
+                icon: DollarSign,
+                title: "Initial Cost",
+                pir: "Lower",
+                rw: "Higher",
+                pct: [40, 70],
+                desc: "PIR CAPEX is ~15% below Rock Wool at equal U-value.",
+              },
+              {
+                icon: Clock,
+                title: "Lifecycle (20 yr)",
+                pir: "Best value",
+                rw: "Higher TCO",
+                pct: [55, 85],
+                desc: "Energy savings compound over 20 years — PIR leads TCO.",
+              },
+              {
+                icon: Leaf,
+                title: "Energy Saving",
+                pir: "20 – 30%",
+                rw: "10 – 15%",
+                pct: [90, 55],
+                desc: "Vs uninsulated envelope, over 20 years.",
+              },
+              {
+                icon: Wrench,
+                title: "Maintenance",
+                pir: "Very Low",
+                rw: "Low",
+                pct: [92, 78],
+                desc: "Sealed skins on both; PIR edge integrity is superior.",
+              },
             ].map((c) => (
               <div key={c.title} className="rounded-3xl border border-white/10 bg-white/[0.02] p-6">
                 <c.icon className="h-4 w-4 text-emerald-300/80" />
@@ -809,7 +1099,9 @@ function PirVsRockWoolPage() {
                     <d.icon className="h-4 w-4 text-emerald-300/80" />
                     <span className="text-sm font-medium text-white">{d.title}</span>
                   </div>
-                  <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-white/40">{d.size}</div>
+                  <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-white/40">
+                    {d.size}
+                  </div>
                 </div>
                 <Download className="h-4 w-4 text-white/40 transition group-hover:text-emerald-300" />
               </button>
@@ -821,13 +1113,13 @@ function PirVsRockWoolPage() {
       {/* FAQ */}
       <section className="border-b border-white/5 bg-black/30">
         <div className="mx-auto max-w-[1440px] px-6 py-20">
-          <SectionTitle
-            eyebrow="11 — FAQ"
-            title="Engineering questions, answered"
-          />
+          <SectionTitle eyebrow="11 — FAQ" title="Engineering questions, answered" />
           <div className="grid gap-3">
             {FAQS.map((f) => (
-              <details key={f.q} className="group rounded-2xl border border-white/10 bg-white/[0.02] p-6 open:border-emerald-400/30">
+              <details
+                key={f.q}
+                className="group rounded-2xl border border-white/10 bg-white/[0.02] p-6 open:border-emerald-400/30"
+              >
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-6">
                   <span className="text-base font-medium text-white">{f.q}</span>
                   <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-white/40 transition group-open:rotate-90" />
@@ -849,18 +1141,28 @@ function PirVsRockWoolPage() {
           }}
         />
         <div className="relative mx-auto max-w-[1440px] px-6 py-24 text-center">
-          <Chip><Info className="h-3 w-3" /> Still deciding?</Chip>
+          <Chip>
+            <Info className="h-3 w-3" /> Still deciding?
+          </Chip>
           <h2 className="mx-auto mt-6 max-w-3xl text-4xl font-semibold tracking-tight text-white md:text-6xl">
-            Let a NEVO engineer <span className="text-emerald-400">specify the right panel</span> for your project.
+            Let a NEVO engineer <span className="text-emerald-400">specify the right panel</span>{" "}
+            for your project.
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-white/60">
-            Free 30-minute engineering consultation. Send us your project brief and receive a specification pack within 24 hours.
+            Free 30-minute engineering consultation. Send us your project brief and receive a
+            specification pack within 24 hours.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Link to="/contact" className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-black transition hover:bg-emerald-400">
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-black transition hover:bg-emerald-400"
+            >
               <PhoneCall className="h-4 w-4" /> Talk to an Engineer
             </Link>
-            <Link to="/product-configurator" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/10">
+            <Link
+              to="/product-configurator"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/10"
+            >
               Request Quotation <ArrowRight className="h-4 w-4" />
             </Link>
             <button className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/10">

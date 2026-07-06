@@ -48,10 +48,7 @@ export function InquiryCTA({
         </div>
         <div className="lg:col-span-4 lg:justify-self-end">
           <Button asChild size="lg">
-            <LocalizedLink
-              to="/project-inquiry"
-              search={source ? { source } : undefined}
-            >
+            <LocalizedLink to="/project-inquiry" search={source ? { source } : undefined}>
               {ctaLabel} <ArrowRight className="ml-2 !size-4" />
             </LocalizedLink>
           </Button>
@@ -60,4 +57,3 @@ export function InquiryCTA({
     </Section>
   );
 }
-

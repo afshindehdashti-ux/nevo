@@ -14,11 +14,7 @@ import {
   dumpLogoTelemetryAsJSON,
   downloadLogoTelemetryDump,
 } from "../logo-telemetry-debug";
-import {
-  clearLogoDecisions,
-  recordLogoDecision,
-  type LogoDecisionRecord,
-} from "../logo-telemetry";
+import { clearLogoDecisions, recordLogoDecision, type LogoDecisionRecord } from "../logo-telemetry";
 
 const g = globalThis as {
   __NEVO_FORCE_DISABLE_LOGO_DEBUG__?: boolean;

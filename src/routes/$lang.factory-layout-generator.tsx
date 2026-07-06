@@ -69,7 +69,11 @@ type ViewMode =
   | "expansion"
   | "equipment";
 
-const VIEW_MODES: { id: ViewMode; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+const VIEW_MODES: {
+  id: ViewMode;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}[] = [
   { id: "top", label: "Top View", icon: Scan },
   { id: "iso", label: "3D / Iso", icon: Boxes },
   { id: "material", label: "Material Flow", icon: ArrowRight },
@@ -218,7 +222,14 @@ function LayoutSVG({
     return new Set<string>();
   }, [view]);
 
-  const dimHighlight = view === "equipment" ? (z: Zone) => z.category !== "production" && z.category !== "cutting" && z.category !== "stacking" && z.category !== "packaging" : () => false;
+  const dimHighlight =
+    view === "equipment"
+      ? (z: Zone) =>
+          z.category !== "production" &&
+          z.category !== "cutting" &&
+          z.category !== "stacking" &&
+          z.category !== "packaging"
+      : () => false;
 
   const expansionEmphasis = view === "expansion";
 
@@ -257,7 +268,12 @@ function LayoutSVG({
           <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
         </pattern>
         <pattern id="gridMinor" width="10" height="10" patternUnits="userSpaceOnUse">
-          <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="0.5" />
+          <path
+            d="M 10 0 L 0 0 0 10"
+            fill="none"
+            stroke="rgba(255,255,255,0.02)"
+            strokeWidth="0.5"
+          />
         </pattern>
       </defs>
 
@@ -514,8 +530,19 @@ function ZoneDrawer({ zone, onClose }: { zone: Zone | null; onClose: () => void 
 // ─── Legend ────────────────────────────────────────────────────────────
 function FlowLegend({ view }: { view: ViewMode }) {
   const rows: Array<{ k: keyof typeof FLOW_STYLES; visible: boolean }> = [
-    { k: "material", visible: view === "material" || view === "top" || view === "iso" || view === "equipment" || view === "expansion" },
-    { k: "truck", visible: view === "truck" || view === "top" || view === "iso" || view === "expansion" },
+    {
+      k: "material",
+      visible:
+        view === "material" ||
+        view === "top" ||
+        view === "iso" ||
+        view === "equipment" ||
+        view === "expansion",
+    },
+    {
+      k: "truck",
+      visible: view === "truck" || view === "top" || view === "iso" || view === "expansion",
+    },
     { k: "operator", visible: view === "operator" },
     { k: "utility", visible: view === "utility" },
   ];
@@ -528,7 +555,10 @@ function FlowLegend({ view }: { view: ViewMode }) {
         </span>
       ))}
       <span className="ml-auto inline-flex items-center gap-1.5 opacity-70">
-        <span className="h-3 w-3 rounded border border-emerald-400" style={{ background: "rgba(16,185,129,0.15)", borderStyle: "dashed" }} />
+        <span
+          className="h-3 w-3 rounded border border-emerald-400"
+          style={{ background: "rgba(16,185,129,0.15)", borderStyle: "dashed" }}
+        />
         Expansion
       </span>
     </div>
@@ -567,15 +597,15 @@ function FactoryLayoutPage() {
   const showAllZones = () => setHiddenZones(new Set());
 
   const cfg = { capacity, core, automation, building };
-  const tech = useMemo(() => computeTechData(capacity, core, automation, building, shift), [
-    capacity,
-    core,
-    automation,
-    building,
-    shift,
-  ]);
+  const tech = useMemo(
+    () => computeTechData(capacity, core, automation, building, shift),
+    [capacity, core, automation, building, shift],
+  );
   const layoutPreview = useMemo(() => computeFactoryLayout(cfg), [cfg]);
-  const equipment = useMemo(() => computeEquipment(capacity, core, automation), [capacity, core, automation]);
+  const equipment = useMemo(
+    () => computeEquipment(capacity, core, automation),
+    [capacity, core, automation],
+  );
   const expansionCopy = expansionRecommendation({ capacity, building });
   const bldRecommendation = recommendedBuildingCopy({ capacity, core });
 
@@ -622,7 +652,8 @@ function FactoryLayoutPage() {
         </div>
       </div>
       <div className="mt-6 rounded-xl border border-amber-400/20 bg-amber-400/5 p-3 text-[11px] leading-relaxed text-amber-100/80">
-        <Info className="mb-1 inline h-3 w-3" /> Conceptual layout only. Final dimensions and utilities require detailed engineering review.
+        <Info className="mb-1 inline h-3 w-3" /> Conceptual layout only. Final dimensions and
+        utilities require detailed engineering review.
       </div>
     </div>
   );
@@ -718,7 +749,9 @@ function FactoryLayoutPage() {
       </div>
 
       <div className={`relative ${fullscreen ? "fixed inset-0 z-50 bg-[#07090b]" : ""}`}>
-        <div className={`${fullscreen ? "h-screen" : "aspect-[16/10]"} w-full overflow-hidden bg-[#07090b]`}>
+        <div
+          className={`${fullscreen ? "h-screen" : "aspect-[16/10]"} w-full overflow-hidden bg-[#07090b]`}
+        >
           <LayoutSVG
             cfg={cfg}
             view={view}
@@ -792,8 +825,8 @@ function FactoryLayoutPage() {
         })}
       </div>
       <div className="border-t border-white/5 px-4 py-2 font-mono text-[10px] text-white/40">
-        Each toggle is React state → filters <code>layout.zones</code> → SVG re-renders
-        with a spring animation.
+        Each toggle is React state → filters <code>layout.zones</code> → SVG re-renders with a
+        spring animation.
       </div>
     </div>
   );
@@ -810,14 +843,15 @@ function FactoryLayoutPage() {
       </div>
       <div className="grid gap-0 divide-y divide-white/5 md:grid-cols-2 md:divide-y-0">
         {equipment.map((e) => (
-          <div key={e.name} className="flex items-start justify-between gap-3 p-4 md:border-b md:border-white/5">
+          <div
+            key={e.name}
+            className="flex items-start justify-between gap-3 p-4 md:border-b md:border-white/5"
+          >
             <div className="flex items-start gap-3">
               <CategoryIcon cat={e.category} />
               <div>
                 <div className="text-sm font-medium text-white">{e.name}</div>
-                {e.reason && (
-                  <div className="mt-0.5 text-[11px] text-white/50">{e.reason}</div>
-                )}
+                {e.reason && <div className="mt-0.5 text-[11px] text-white/50">{e.reason}</div>}
               </div>
             </div>
             <span className="whitespace-nowrap rounded-md border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[11px] text-white/70">
@@ -834,9 +868,12 @@ function FactoryLayoutPage() {
       <Chip>
         <ClipboardList className="h-3 w-3" /> Ready for next step
       </Chip>
-      <h3 className="mt-4 text-2xl font-semibold text-white">Turn this concept into a real factory.</h3>
+      <h3 className="mt-4 text-2xl font-semibold text-white">
+        Turn this concept into a real factory.
+      </h3>
       <p className="mt-2 text-sm text-white/60">
-        Send this configuration to NEVO engineering — you receive a complete masterplan, utilities layout, equipment list, CAPEX and delivery schedule.
+        Send this configuration to NEVO engineering — you receive a complete masterplan, utilities
+        layout, equipment list, CAPEX and delivery schedule.
       </p>
       <div className="mt-5 flex flex-wrap gap-3">
         <Link
@@ -876,9 +913,13 @@ function FactoryLayoutPage() {
 
       <nav aria-label="Breadcrumb" className="border-b border-white/5 bg-black/40">
         <div className="mx-auto flex max-w-[1440px] items-center gap-2 px-6 py-3 text-xs text-white/50">
-          <Link to="/" className="hover:text-white">Home</Link>
+          <Link to="/" className="hover:text-white">
+            Home
+          </Link>
           <ChevronRight className="h-3 w-3" />
-          <Link to="/solutions/factory-development" className="hover:text-white">Factory Development</Link>
+          <Link to="/solutions/factory-development" className="hover:text-white">
+            Factory Development
+          </Link>
           <ChevronRight className="h-3 w-3" />
           <span className="text-white">Factory Layout Generator</span>
         </div>
@@ -903,7 +944,8 @@ function FactoryLayoutPage() {
             Factory Layout <span className="text-emerald-400">Generator</span>
           </h1>
           <p className="mt-5 max-w-2xl text-base text-white/60 md:text-lg">
-            Choose capacity, core technology, automation and building configuration. The layout, flow diagrams, equipment list and utility requirements update instantly.
+            Choose capacity, core technology, automation and building configuration. The layout,
+            flow diagrams, equipment list and utility requirements update instantly.
           </p>
         </div>
       </section>
@@ -962,7 +1004,8 @@ function FactoryLayoutPage() {
                   <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-emerald-300/80">
                     Flow guide
                   </div>
-                  Switch view modes above to see Material, Truck, Operator or Utility flows overlaid on the layout.
+                  Switch view modes above to see Material, Truck, Operator or Utility flows overlaid
+                  on the layout.
                 </div>
               </>
             )}
@@ -995,7 +1038,8 @@ function FactoryLayoutPage() {
             One configuration away from a <span className="text-emerald-400">real factory</span>.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-white/60">
-            NEVO Industrial delivers the masterplan, utilities, equipment, CAPEX and delivery schedule.
+            NEVO Industrial delivers the masterplan, utilities, equipment, CAPEX and delivery
+            schedule.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
@@ -1032,7 +1076,11 @@ function Cog2({ className }: { className?: string }) {
   return <Layers className={className} />;
 }
 
-function CategoryIcon({ cat }: { cat: "production" | "handling" | "utility" | "safety" | "control" }) {
+function CategoryIcon({
+  cat,
+}: {
+  cat: "production" | "handling" | "utility" | "safety" | "control";
+}) {
   const I =
     cat === "production"
       ? Factory

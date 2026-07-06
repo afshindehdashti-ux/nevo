@@ -57,7 +57,11 @@ export const Route = createFileRoute("/api/chat")({
         }
         for (const m of messages) {
           for (const p of m.parts ?? []) {
-            if (p.type === "text" && typeof p.text === "string" && p.text.length > MAX_SINGLE_MESSAGE_CHARS) {
+            if (
+              p.type === "text" &&
+              typeof p.text === "string" &&
+              p.text.length > MAX_SINGLE_MESSAGE_CHARS
+            ) {
               return new Response("Message too long", { status: 413 });
             }
           }

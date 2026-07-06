@@ -8,7 +8,6 @@
  * Vite fingerprints these asset imports, so URLs are cache-busted per build.
  */
 
-
 // Home / brand
 import heroNevoLine from "@/assets/hero-nevo-line.jpg";
 import heroProductionLine from "@/assets/hero-production-line.jpg";
@@ -61,50 +60,50 @@ export const OG_DEFAULT: string = heroNevoLine;
  * Keys are locale-agnostic paths (without the /{lang} prefix).
  */
 export const OG_IMAGES: Record<string, string> = {
-  "/":                                    heroNevoLine,
-  "/about":                               engineeringPhilosophy,
+  "/": heroNevoLine,
+  "/about": engineeringPhilosophy,
 
   // Solutions
-  "/solutions":                           heroProductionLine,
-  "/solutions/factory-development":       ecoFactoryDev,
-  "/solutions/production-lines":          ecoProductionLines,
-  "/solutions/raw-materials":             ecoRawMaterials,
-  "/solutions/engineering-consultancy":   ecoConsultancy,
-  "/solutions/sandwich-panels":           ecoFinishedPanels,
+  "/solutions": heroProductionLine,
+  "/solutions/factory-development": ecoFactoryDev,
+  "/solutions/production-lines": ecoProductionLines,
+  "/solutions/raw-materials": ecoRawMaterials,
+  "/solutions/engineering-consultancy": ecoConsultancy,
+  "/solutions/sandwich-panels": ecoFinishedPanels,
 
   // Content hubs
-  "/industries":                          industriesTile,
-  "/panels":                              panelsTile,
-  "/factory-layouts":                     factoryLayoutMaster,
-  "/factory-layout-generator":            factoryLayoutMaster,
-  "/pir-vs-rock-wool":                    knowledgePirVsPur,
-  "/quality":                             knowledgeFireRating,
+  "/industries": industriesTile,
+  "/panels": panelsTile,
+  "/factory-layouts": factoryLayoutMaster,
+  "/factory-layout-generator": factoryLayoutMaster,
+  "/pir-vs-rock-wool": knowledgePirVsPur,
+  "/quality": knowledgeFireRating,
 
   // Corporate
-  "/careers":                             careersHero,
-  "/contact":                             contactHero,
-  "/investors":                           investorHero,
-  "/sustainability":                      sustainabilityHero,
-  "/privacy":                             engineeringPhilosophy,
+  "/careers": careersHero,
+  "/contact": contactHero,
+  "/investors": investorHero,
+  "/sustainability": sustainabilityHero,
+  "/privacy": engineeringPhilosophy,
 
   // Tools & configurators
-  "/product-configurator":                configuratorHero,
-  "/project-inquiry":                     projectBlueprint,
-  "/panel-thickness-calculator":          knowledgeCrossSection,
-  "/investment-calculator":               knowledgeInvestment,
-  "/ai-project-estimator":                aiTechnicalProposal,
-  "/engineering-tools":                   engineeringHero,
-  "/installation-commissioning":          installationHero,
-  "/download-center":                     knowledgeDatasheet,
+  "/product-configurator": configuratorHero,
+  "/project-inquiry": projectBlueprint,
+  "/panel-thickness-calculator": knowledgeCrossSection,
+  "/investment-calculator": knowledgeInvestment,
+  "/ai-project-estimator": aiTechnicalProposal,
+  "/engineering-tools": engineeringHero,
+  "/installation-commissioning": installationHero,
+  "/download-center": knowledgeDatasheet,
 
   // Knowledge / AI
-  "/knowledge-hub":                       knowledgeHubHero,
-  "/ai-assistant":                        aiHeroEngineer,
-  "/research-innovation":                 aiDigitalTwin,
+  "/knowledge-hub": knowledgeHubHero,
+  "/ai-assistant": aiHeroEngineer,
+  "/research-innovation": aiDigitalTwin,
 
   // Portals
-  "/customer-portal":                     factoryHero,
-  "/partner-portal":                      aiCollab,
+  "/customer-portal": factoryHero,
+  "/partner-portal": aiCollab,
 };
 
 /** Resolve the OG image URL for a locale-agnostic path, falling back to the brand default. */

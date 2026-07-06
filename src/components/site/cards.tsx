@@ -42,13 +42,7 @@ export function SurfaceCard({
  * <GridBoard> — hairline grid of cells (used for solutions/industries).
  * Uses 1px gap on a border background to render pixel-perfect internal rules.
  */
-export function GridBoard({
-  className,
-  children,
-}: {
-  className?: string;
-  children: ReactNode;
-}) {
+export function GridBoard({ className, children }: { className?: string; children: ReactNode }) {
   return (
     <div
       className={cn(
