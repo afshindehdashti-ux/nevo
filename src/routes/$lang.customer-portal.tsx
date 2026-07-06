@@ -282,6 +282,9 @@ function CustomerPortalPage() {
       ) : (
         <PortalShell onLogout={() => setAuthed(false)} />
       )}
+      <div className="container mx-auto px-4 py-10">
+        <RoutedDocumentsList visibility="customer" title="Project Documents" />
+      </div>
       <SiteFooter />
     </div>
   );
