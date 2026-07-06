@@ -156,10 +156,11 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
   const [composeSubject, setComposeSubject] = useState("");
   const [composeBody, setComposeBody] = useState("");
   const [composeFiles, setComposeFiles] = useState<File[]>([]);
+  const [replyParentId, setReplyParentId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const sendMessage = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (opts: { parentId?: string | null }) => {
       const attachments = await Promise.all(
         composeFiles.map(async (f) => {
           if (f.size > 15 * 1024 * 1024) throw new Error(`${f.name} exceeds 15 MB`);
@@ -180,6 +181,7 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
           subject: composeSubject.trim() || null,
           body: composeBody,
           attachments,
+          parent_id: opts.parentId ?? null,
         },
       });
     },
@@ -188,6 +190,7 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
       setComposeSubject("");
       setComposeBody("");
       setComposeFiles([]);
+      setReplyParentId(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
       qc.invalidateQueries({ queryKey: ["portal", "messages", customerId] });
       qc.invalidateQueries({ queryKey: ["portal", "timeline", customerId] });
