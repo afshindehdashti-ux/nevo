@@ -189,6 +189,27 @@ function QuotationEditor() {
     },
   });
 
+  const del = useMutation({
+    mutationFn: () => deleteFn({ data: { id } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["quotations"] });
+      toast.success("Quotation deleted");
+      navigate({ to: "/admin/quotations" });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const convert = useMutation({
+    mutationFn: () => convertFn({ data: { id } }),
+    onSuccess: (r) => {
+      qc.invalidateQueries({ queryKey: ["quotation", id] });
+      qc.invalidateQueries({ queryKey: ["quotations"] });
+      toast.success(r.already ? "Already converted — opening proforma" : "Proforma invoice created");
+      if (r.invoice_id) navigate({ to: "/admin/invoices/$id", params: { id: r.invoice_id } });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading…</div>;
   if (!data) return <div className="p-6">Not found.</div>;
 
