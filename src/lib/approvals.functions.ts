@@ -155,12 +155,12 @@ export const listApprovalRequests = createServerFn({ method: "GET" })
     if (docIds.length) {
       const { data } = await context.supabase
         .from("doc_intel_documents")
-        .select("id, filename, confidentiality_level")
+        .select("id, original_filename, title, confidentiality_level")
         .in("id", docIds);
       for (const r of data ?? []) {
         labels.set(
           key("document", r.id),
-          `${r.filename ?? "Document"}${r.confidentiality_level ? ` · ${r.confidentiality_level}` : ""}`,
+          `${r.title || r.original_filename || "Document"}${r.confidentiality_level ? ` · ${r.confidentiality_level}` : ""}`,
         );
       }
     }
