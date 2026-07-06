@@ -251,14 +251,20 @@ function ActivityPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <ScrollText className="h-6 w-6 text-primary" />
-        <div>
-          <h1 className="text-2xl font-semibold">Activity Log</h1>
-          <p className="text-sm text-muted-foreground">
-            Every important action across the CRM — creates, edits, approvals, deletes.
-          </p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <ScrollText className="h-6 w-6 text-primary" />
+          <div>
+            <h1 className="text-2xl font-semibold">Activity Log</h1>
+            <p className="text-sm text-muted-foreground">
+              Every important action across the CRM — creates, edits, approvals, deletes.
+            </p>
+          </div>
         </div>
+        <Button variant="outline" size="sm" onClick={exportCsv} disabled={!filteredRows.length}>
+          <Download className="h-4 w-4 mr-2" />
+          Export CSV
+        </Button>
       </div>
 
       <Card>
