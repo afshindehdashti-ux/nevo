@@ -117,22 +117,11 @@ function ActivityPage() {
         end.setHours(23, 59, 59, 999);
         q = q.lte("created_at", end.toISOString());
       }
-
-  const logsQ = useQuery({
-    enabled: isSuperAdmin,
-    queryKey: ["activity-logs", { actor, action, entity }],
-    queryFn: async () => {
-      let q = supabase
-        .from("activity_logs")
-        .select("id,user_id,action,entity_type,entity_id,metadata,created_at")
-        .order("created_at", { ascending: false })
-        .limit(500);
-      if (actor !== "all") q = actor === "system" ? q.is("user_id", null) : q.eq("user_id", actor);
-      if (action !== "all") q = q.eq("action", action);
-      if (entity !== "all") q = q.eq("entity_type", entity);
       const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as LogRow[];
+    },
+  });
     },
   });
 
