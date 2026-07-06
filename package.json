@@ -38,7 +38,8 @@
     "test:visual:update": "node scripts/visual/header-logo.mjs --update",
     "test:e2e:logo-fallback": "node scripts/e2e/header-logo-fallback.mjs",
     "test:e2e:logo-sequencing": "node scripts/e2e/header-logo-sequencing.mjs",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "1",
