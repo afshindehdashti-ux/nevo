@@ -216,7 +216,62 @@ export const getMyMessages = createServerFn({ method: "GET" })
       .order("occurred_at", { ascending: true })
       .limit(500);
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    const list = rows ?? [];
+    const ids = list.map((r) => r.id);
+    let readSet = new Set<string>();
+    if (ids.length) {
+      const { data: reads } = await admin
+        .from("communication_reads")
+        .select("message_id")
+        .eq("user_id", context.userId)
+        .in("message_id", ids);
+      readSet = new Set((reads ?? []).map((r) => r.message_id as string));
+    }
+    return list.map((m) => ({
+      ...m,
+      read: m.direction === "inbound" ? true : readSet.has(m.id),
+    }));
+  });
+
+export const markMyMessagesRead = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CustomerScoped.parse(v))
+  .handler(async ({ context, data }) => {
+    const admin = await verifyCustomerAccess(context.userId, data.customer_id);
+    const [projs, orders] = await Promise.all([
+      admin.from("projects").select("id").eq("customer_id", data.customer_id),
+      admin.from("orders").select("id").eq("customer_id", data.customer_id),
+    ]);
+    const projIds = (projs.data ?? []).map((r) => r.id);
+    const orderIds = (orders.data ?? []).map((r) => r.id);
+    const filters: string[] = [`and(entity_type.eq.customer,entity_id.eq.${data.customer_id})`];
+    if (projIds.length)
+      filters.push(`and(entity_type.eq.project,entity_id.in.(${projIds.join(",")}))`);
+    if (orderIds.length)
+      filters.push(`and(entity_type.eq.order,entity_id.in.(${orderIds.join(",")}))`);
+
+    const { data: outbound } = await admin
+      .from("communications")
+      .select("id")
+      .eq("direction", "outbound")
+      .or(filters.join(","))
+      .limit(1000);
+    const ids = (outbound ?? []).map((r) => r.id);
+    if (!ids.length) return { marked: 0 };
+
+    const { data: existing } = await admin
+      .from("communication_reads")
+      .select("message_id")
+      .eq("user_id", context.userId)
+      .in("message_id", ids);
+    const already = new Set((existing ?? []).map((r) => r.message_id as string));
+    const toInsert = ids
+      .filter((id) => !already.has(id))
+      .map((id) => ({ message_id: id, user_id: context.userId }));
+    if (!toInsert.length) return { marked: 0 };
+    const { error } = await admin.from("communication_reads").insert(toInsert);
+    if (error) throw new Error(error.message);
+    return { marked: toInsert.length };
   });
 
 export type TimelineEvent = {
