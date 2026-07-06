@@ -142,6 +142,12 @@ export const CRM_NAV: CrmNavGroup[] = [
         icon: Search,
         requiresSuperAdmin: true,
       },
+      {
+        title: "Email Templates",
+        url: "/admin/email-preview",
+        icon: Mail,
+        requiresSuperAdmin: true,
+      },
     ],
   },
   {
