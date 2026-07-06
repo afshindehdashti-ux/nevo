@@ -16,6 +16,7 @@ import {
   getMyMessages,
   getMyTimeline,
   sendMyMessage,
+  getMyMessageAttachmentUrl,
 } from "@/lib/customer-portal.functions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
