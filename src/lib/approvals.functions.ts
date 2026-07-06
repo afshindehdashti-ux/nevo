@@ -82,7 +82,7 @@ export const decideApprovalRequest = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase.rpc("decide_approval_request", {
       _id: data.id,
       _decision: data.decision,
-      _notes: data.notes ?? null,
+      _notes: data.notes ?? undefined,
     });
     if (error) throw new Error(error.message);
     return row as ApprovalRequest;
