@@ -78,6 +78,7 @@ import { Route as AuthenticatedAdminLogoEventsRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
 import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authenticated/admin.invoices'
 import { Route as AuthenticatedAdminFilesRouteImport } from './routes/_authenticated/admin.files'
+import { Route as AuthenticatedAdminEmailPreviewRouteImport } from './routes/_authenticated/admin.email-preview'
 import { Route as AuthenticatedAdminDocumentIntelligenceRouteImport } from './routes/_authenticated/admin.document-intelligence'
 import { Route as AuthenticatedAdminDocumentAccessRouteImport } from './routes/_authenticated/admin.document-access'
 import { Route as AuthenticatedAdminDocIntelRulesRouteImport } from './routes/_authenticated/admin.doc-intel-rules'
@@ -474,6 +475,12 @@ const AuthenticatedAdminFilesRoute = AuthenticatedAdminFilesRouteImport.update({
   path: '/files',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminEmailPreviewRoute =
+  AuthenticatedAdminEmailPreviewRouteImport.update({
+    id: '/email-preview',
+    path: '/email-preview',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminDocumentIntelligenceRoute =
   AuthenticatedAdminDocumentIntelligenceRouteImport.update({
     id: '/document-intelligence',
@@ -711,6 +718,7 @@ export interface FileRoutesByFullPath {
   '/admin/doc-intel-rules': typeof AuthenticatedAdminDocIntelRulesRoute
   '/admin/document-access': typeof AuthenticatedAdminDocumentAccessRoute
   '/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
+  '/admin/email-preview': typeof AuthenticatedAdminEmailPreviewRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -809,6 +817,7 @@ export interface FileRoutesByTo {
   '/admin/doc-intel-rules': typeof AuthenticatedAdminDocIntelRulesRoute
   '/admin/document-access': typeof AuthenticatedAdminDocumentAccessRoute
   '/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
+  '/admin/email-preview': typeof AuthenticatedAdminEmailPreviewRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -911,6 +920,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/doc-intel-rules': typeof AuthenticatedAdminDocIntelRulesRoute
   '/_authenticated/admin/document-access': typeof AuthenticatedAdminDocumentAccessRoute
   '/_authenticated/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
+  '/_authenticated/admin/email-preview': typeof AuthenticatedAdminEmailPreviewRoute
   '/_authenticated/admin/files': typeof AuthenticatedAdminFilesRoute
   '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -1013,6 +1023,7 @@ export interface FileRouteTypes {
     | '/admin/doc-intel-rules'
     | '/admin/document-access'
     | '/admin/document-intelligence'
+    | '/admin/email-preview'
     | '/admin/files'
     | '/admin/invoices'
     | '/admin/leads'
@@ -1111,6 +1122,7 @@ export interface FileRouteTypes {
     | '/admin/doc-intel-rules'
     | '/admin/document-access'
     | '/admin/document-intelligence'
+    | '/admin/email-preview'
     | '/admin/files'
     | '/admin/invoices'
     | '/admin/leads'
@@ -1212,6 +1224,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/doc-intel-rules'
     | '/_authenticated/admin/document-access'
     | '/_authenticated/admin/document-intelligence'
+    | '/_authenticated/admin/email-preview'
     | '/_authenticated/admin/files'
     | '/_authenticated/admin/invoices'
     | '/_authenticated/admin/leads'
@@ -1767,6 +1780,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFilesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/email-preview': {
+      id: '/_authenticated/admin/email-preview'
+      path: '/email-preview'
+      fullPath: '/admin/email-preview'
+      preLoaderRoute: typeof AuthenticatedAdminEmailPreviewRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/document-intelligence': {
       id: '/_authenticated/admin/document-intelligence'
       path: '/document-intelligence'
@@ -2120,6 +2140,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminDocIntelRulesRoute: typeof AuthenticatedAdminDocIntelRulesRoute
   AuthenticatedAdminDocumentAccessRoute: typeof AuthenticatedAdminDocumentAccessRoute
   AuthenticatedAdminDocumentIntelligenceRoute: typeof AuthenticatedAdminDocumentIntelligenceRoute
+  AuthenticatedAdminEmailPreviewRoute: typeof AuthenticatedAdminEmailPreviewRoute
   AuthenticatedAdminFilesRoute: typeof AuthenticatedAdminFilesRoute
   AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRouteWithChildren
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -2157,6 +2178,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminDocumentAccessRoute: AuthenticatedAdminDocumentAccessRoute,
   AuthenticatedAdminDocumentIntelligenceRoute:
     AuthenticatedAdminDocumentIntelligenceRoute,
+  AuthenticatedAdminEmailPreviewRoute: AuthenticatedAdminEmailPreviewRoute,
   AuthenticatedAdminFilesRoute: AuthenticatedAdminFilesRoute,
   AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRouteWithChildren,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRouteWithChildren,
