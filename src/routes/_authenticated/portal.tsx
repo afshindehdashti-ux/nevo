@@ -831,8 +831,9 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                     )}
                   </Card>
                 );
-              })
-            )}
+              });
+            })()}
+
           </TabsContent>
 
           <TabsContent value="profile">
