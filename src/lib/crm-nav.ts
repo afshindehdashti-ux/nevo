@@ -160,6 +160,12 @@ export const CRM_NAV: CrmNavGroup[] = [
         icon: ShieldCheck,
         allowedRoles: ["management", "finance"],
       },
+      {
+        title: "Approvals audit",
+        url: "/admin/approvals/audit",
+        icon: ScrollText,
+        allowedRoles: ["management", "finance"],
+      },
       { title: "Settings", url: "/admin/settings", icon: Settings, requiresSuperAdmin: true },
     ],
   },
