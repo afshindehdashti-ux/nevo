@@ -51,6 +51,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as LangSolutionsIndexRouteImport } from './routes/$lang.solutions.index'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicClientLogRouteImport } from './routes/api/public/client-log'
+import { Route as ApiPublicBootstrapSuperAdminRouteImport } from './routes/api/public/bootstrap-super-admin'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTasksRouteImport } from './routes/_authenticated/admin.tasks'
 import { Route as AuthenticatedAdminSuppliersRouteImport } from './routes/_authenticated/admin.suppliers'
@@ -291,6 +292,12 @@ const ApiPublicClientLogRoute = ApiPublicClientLogRouteImport.update({
   path: '/api/public/client-log',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicBootstrapSuperAdminRoute =
+  ApiPublicBootstrapSuperAdminRouteImport.update({
+    id: '/api/public/bootstrap-super-admin',
+    path: '/api/public/bootstrap-super-admin',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -506,6 +513,7 @@ export interface FileRoutesByFullPath {
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
+  '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
@@ -573,6 +581,7 @@ export interface FileRoutesByTo {
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
+  '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
@@ -644,6 +653,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/_authenticated/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
+  '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
@@ -715,6 +725,7 @@ export interface FileRouteTypes {
     | '/admin/suppliers'
     | '/admin/tasks'
     | '/admin/users'
+    | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions/'
@@ -782,6 +793,7 @@ export interface FileRouteTypes {
     | '/admin/suppliers'
     | '/admin/tasks'
     | '/admin/users'
+    | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions'
@@ -852,6 +864,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/suppliers'
     | '/_authenticated/admin/tasks'
     | '/_authenticated/admin/users'
+    | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions/'
@@ -872,6 +885,7 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   KnowledgeSplatRoute: typeof KnowledgeSplatRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
+  ApiPublicBootstrapSuperAdminRoute: typeof ApiPublicBootstrapSuperAdminRoute
   ApiPublicClientLogRoute: typeof ApiPublicClientLogRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
 }
@@ -1170,6 +1184,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/client-log'
       fullPath: '/api/public/client-log'
       preLoaderRoute: typeof ApiPublicClientLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/bootstrap-super-admin': {
+      id: '/api/public/bootstrap-super-admin'
+      path: '/api/public/bootstrap-super-admin'
+      fullPath: '/api/public/bootstrap-super-admin'
+      preLoaderRoute: typeof ApiPublicBootstrapSuperAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/users': {
@@ -1528,6 +1549,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   KnowledgeSplatRoute: KnowledgeSplatRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
+  ApiPublicBootstrapSuperAdminRoute: ApiPublicBootstrapSuperAdminRoute,
   ApiPublicClientLogRoute: ApiPublicClientLogRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
 }
