@@ -105,6 +105,8 @@ export type Database = {
           direction: Database["public"]["Enums"]["communication_direction"]
           entity_id: string
           entity_type: string
+          follow_up_at: string | null
+          follow_up_done: boolean
           id: string
           kind: Database["public"]["Enums"]["communication_kind"]
           metadata: Json
@@ -124,6 +126,8 @@ export type Database = {
           direction?: Database["public"]["Enums"]["communication_direction"]
           entity_id: string
           entity_type: string
+          follow_up_at?: string | null
+          follow_up_done?: boolean
           id?: string
           kind?: Database["public"]["Enums"]["communication_kind"]
           metadata?: Json
@@ -143,6 +147,8 @@ export type Database = {
           direction?: Database["public"]["Enums"]["communication_direction"]
           entity_id?: string
           entity_type?: string
+          follow_up_at?: string | null
+          follow_up_done?: boolean
           id?: string
           kind?: Database["public"]["Enums"]["communication_kind"]
           metadata?: Json
