@@ -242,7 +242,12 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
           <KpiCard icon={FileText} label="Documents" value={docs.length} />
         </div>
 
-        <Tabs defaultValue="timeline">
+        <Tabs
+          defaultValue="timeline"
+          onValueChange={(v) => {
+            if (v === "messages" && unreadCount > 0) markRead.mutate();
+          }}
+        >
           <TabsList className="flex-wrap h-auto">
             <TabsTrigger value="timeline"><ActivityIcon className="h-3.5 w-3.5 mr-1" />Timeline</TabsTrigger>
             <TabsTrigger value="projects"><FolderKanban className="h-3.5 w-3.5 mr-1" />Projects</TabsTrigger>
@@ -253,7 +258,15 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
             <TabsTrigger value="payments"><Wallet className="h-3.5 w-3.5 mr-1" />Payments</TabsTrigger>
             <TabsTrigger value="shipments">Shipments</TabsTrigger>
             <TabsTrigger value="docs">Documents</TabsTrigger>
-            <TabsTrigger value="messages"><MessagesSquare className="h-3.5 w-3.5 mr-1" />Messages</TabsTrigger>
+            <TabsTrigger value="messages">
+              <MessagesSquare className="h-3.5 w-3.5 mr-1" />
+              Messages
+              {unreadCount > 0 && (
+                <Badge className="ml-1.5 h-4 min-w-4 px-1 text-[10px] leading-none bg-primary text-primary-foreground">
+                  {unreadCount}
+                </Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>
           </TabsList>
 
