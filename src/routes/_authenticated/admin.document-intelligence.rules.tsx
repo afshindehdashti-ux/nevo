@@ -32,7 +32,7 @@ import {
   VISIBILITY,
 } from "@/lib/doc-intel.schema";
 
-export const Route = createFileRoute("/_authenticated/admin/document-intelligence.rules")({
+export const Route = createFileRoute("/_authenticated/admin/document-intelligence/rules")({
   head: () => ({
     meta: [
       { title: "Routing Rules — NEVO Document Intelligence" },
