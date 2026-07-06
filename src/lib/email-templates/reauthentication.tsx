@@ -10,6 +10,7 @@ import {
   Text,
 } from '@react-email/components'
 import { brand, styles } from './_shared'
+import { BrandHeader } from './BrandHeader'
 
 interface ReauthenticationEmailProps {
   token: string

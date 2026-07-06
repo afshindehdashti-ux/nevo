@@ -12,6 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 import { brand, styles } from './_shared'
+import { BrandHeader } from './BrandHeader'
 import type { TemplateEntry } from './registry'
 
 export type ApprovalEmailKind = 'submitted' | 'approved' | 'rejected' | 'cancelled'
