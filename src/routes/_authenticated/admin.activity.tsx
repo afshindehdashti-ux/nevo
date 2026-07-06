@@ -122,8 +122,7 @@ function ActivityPage() {
       return (data ?? []) as LogRow[];
     },
   });
-    },
-  });
+
 
   const actorIds = useMemo(() => {
     const ids = new Set<string>();
