@@ -32,7 +32,6 @@ export const LocalizedLink = forwardRef<HTMLAnchorElement, AnyLinkProps>(functio
   const lang = (routeParams?.lang ?? DEFAULT_LOCALE) as Locale;
 
   if (typeof to !== "string" || !to.startsWith("/")) {
-    // eslint-disable-next-line jsx-a11y/anchor-has-content
     return (
       <a ref={ref} href={to as string | undefined} {...(rest as ComponentPropsWithoutRef<"a">)} />
     );
