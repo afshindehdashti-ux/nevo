@@ -358,6 +358,42 @@ function QuotationEditor() {
                 onChange={(e) => setForm((f) => ({ ...f, vat_rate: Number(e.target.value) }))}
               />
             </div>
+            <div>
+              <Label>Lead / inquiry</Label>
+              <Select
+                value={form.inquiry_id || "__none"}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, inquiry_id: v === "__none" ? "" : v }))
+                }
+              >
+                <SelectTrigger><SelectValue placeholder="No lead" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none">— None —</SelectItem>
+                  {inquiries.map((i) => (
+                    <SelectItem key={i.id} value={i.id}>
+                      {i.name}{i.company ? ` · ${i.company}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Project</Label>
+              <Select
+                value={form.project_id || "__none"}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, project_id: v === "__none" ? "" : v }))
+                }
+              >
+                <SelectTrigger><SelectValue placeholder="No project" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none">— None —</SelectItem>
+                  {projects.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>{p.project_name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div>
             <Label>Terms &amp; conditions</Label>
