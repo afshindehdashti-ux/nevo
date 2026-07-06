@@ -8,7 +8,11 @@ import {
   upsertQuotationItem,
   deleteQuotationItem,
   setQuotationStatus,
+  deleteQuotation,
+  convertQuotationToProforma,
+  listInquiriesLite,
 } from "@/lib/quotations.functions";
+import { listProjectsLite } from "@/lib/doc-intel.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -32,7 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CommunicationTimeline } from "@/components/crm/CommunicationTimeline";
-import { Trash2, Plus, Send, Check, X } from "lucide-react";
+import { Trash2, Plus, Send, Check, X, FileDown, ArrowRightCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/quotations/$id")({
