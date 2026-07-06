@@ -128,13 +128,40 @@ jobs:
           bun run build:dev:diagnose 2>&1 | tee build-logs/build-dev.log
           echo "- **build:dev time**: \`$((SECONDS-START))s\`" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload build logs
+      - name: Upload Prettier log
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: build-dev-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
-          path: build-logs/
-          if-no-files-found: warn
+          name: prettier-log-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build-logs/prettier.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload typecheck log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: typecheck-log-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build-logs/typecheck.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload lint log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-log-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build-logs/lint.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload build:dev log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-dev-log-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build-logs/build-dev.log
+          if-no-files-found: ignore
           retention-days: 14
 
       - name: Surface failure summary
