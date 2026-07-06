@@ -41,6 +41,7 @@ export const Route = createFileRoute("/_authenticated/admin/reports")({
 
 type ReportKey =
   | "customers"
+  | "leads_pipeline"
   | "sales_orders"
   | "invoices_ar"
   | "payments"
@@ -50,6 +51,10 @@ const REPORTS: Record<ReportKey, { label: string; description: string }> = {
   customers: {
     label: "Customer Directory",
     description: "All customers with contact, currency, and status.",
+  },
+  leads_pipeline: {
+    label: "Leads Pipeline",
+    description: "Project inquiries by status, priority, and assignee.",
   },
   sales_orders: {
     label: "Sales Orders",
