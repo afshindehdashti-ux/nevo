@@ -44,9 +44,17 @@ type LogRow = {
   created_at: string;
 };
 
-const ACTION_OPTIONS = ["all", "delete", "update", "approve", "create"] as const;
+const ACTION_OPTIONS = [
+  "all",
+  "sign_in",
+  "delete",
+  "update",
+  "approve",
+  "create",
+] as const;
 const ENTITY_OPTIONS = [
   "all",
+  "auth",
   "customers",
   "suppliers",
   "products",
@@ -55,6 +63,7 @@ const ENTITY_OPTIONS = [
   "user_roles",
   "profiles",
 ] as const;
+
 
 export const Route = createFileRoute("/_authenticated/admin/activity")({
   head: () => ({
