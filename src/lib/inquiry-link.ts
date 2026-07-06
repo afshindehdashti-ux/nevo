@@ -4,9 +4,10 @@
 export function encodeInquiryConfig(value: unknown): string {
   const json = JSON.stringify(value);
   // btoa handles latin1; unescape/encodeURIComponent trick supports full unicode.
-  const b64 = typeof window !== "undefined"
-    ? btoa(unescape(encodeURIComponent(json)))
-    : Buffer.from(json, "utf8").toString("base64");
+  const b64 =
+    typeof window !== "undefined"
+      ? btoa(unescape(encodeURIComponent(json)))
+      : Buffer.from(json, "utf8").toString("base64");
   return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 

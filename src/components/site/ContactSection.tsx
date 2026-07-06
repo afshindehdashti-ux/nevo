@@ -8,8 +8,7 @@ import { SITE, WHATSAPP_URL } from "@/lib/seo";
 
 const FIELD =
   "block w-full rounded-md border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/40";
-const LABEL =
-  "mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground";
+const LABEL = "mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground";
 
 const SOLUTION_KEYS = ["s1", "s2", "s3", "s4", "s5", "s6"] as const;
 const TIMELINE_KEYS = ["t1", "t2", "t3", "t4", "t5"] as const;
@@ -54,7 +53,12 @@ export function ContactSection() {
             <div>
               <dt className={LABEL}>{t("home.contactSection.whatsapp")}</dt>
               <dd className="mt-1 text-sm text-foreground">
-                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
                   {SITE.contact.whatsappDisplay}
                 </a>
               </dd>
@@ -62,12 +66,16 @@ export function ContactSection() {
             <div>
               <dt className={LABEL}>{t("home.contactSection.phone")}</dt>
               <dd className="mt-1 text-sm text-foreground">
-                <a href={SITE.contact.phoneHref} className="hover:underline">{SITE.contact.phone}</a>
+                <a href={SITE.contact.phoneHref} className="hover:underline">
+                  {SITE.contact.phone}
+                </a>
               </dd>
             </div>
             <div>
               <dt className={LABEL}>{t("home.contactSection.office")}</dt>
-              <dd className="mt-1 text-sm text-foreground">{t("home.contactSection.officeCity")}</dd>
+              <dd className="mt-1 text-sm text-foreground">
+                {t("home.contactSection.officeCity")}
+              </dd>
             </div>
           </dl>
         </div>
@@ -80,27 +88,66 @@ export function ContactSection() {
         >
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <label htmlFor="name" className={LABEL}>{t("home.contactSection.fullName")}</label>
-              <input id="name" name="name" required className={FIELD} placeholder={t("home.contactSection.fullNamePlaceholder")} />
+              <label htmlFor="name" className={LABEL}>
+                {t("home.contactSection.fullName")}
+              </label>
+              <input
+                id="name"
+                name="name"
+                required
+                className={FIELD}
+                placeholder={t("home.contactSection.fullNamePlaceholder")}
+              />
             </div>
             <div>
-              <label htmlFor="company" className={LABEL}>{t("home.contactSection.company")}</label>
-              <input id="company" name="company" className={FIELD} placeholder={t("home.contactSection.companyPlaceholder")} />
+              <label htmlFor="company" className={LABEL}>
+                {t("home.contactSection.company")}
+              </label>
+              <input
+                id="company"
+                name="company"
+                className={FIELD}
+                placeholder={t("home.contactSection.companyPlaceholder")}
+              />
             </div>
             <div>
-              <label htmlFor="email" className={LABEL}>{t("home.contactSection.email")}</label>
-              <input id="email" type="email" required className={FIELD} placeholder={t("home.contactSection.emailPlaceholder")} />
+              <label htmlFor="email" className={LABEL}>
+                {t("home.contactSection.email")}
+              </label>
+              <input
+                id="email"
+                type="email"
+                required
+                className={FIELD}
+                placeholder={t("home.contactSection.emailPlaceholder")}
+              />
             </div>
             <div>
-              <label htmlFor="phone" className={LABEL}>{t("home.contactSection.phoneField")}</label>
-              <input id="phone" name="phone" className={FIELD} placeholder={t("home.contactSection.phonePlaceholder")} />
+              <label htmlFor="phone" className={LABEL}>
+                {t("home.contactSection.phoneField")}
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                className={FIELD}
+                placeholder={t("home.contactSection.phonePlaceholder")}
+              />
             </div>
             <div>
-              <label htmlFor="country" className={LABEL}>{t("home.contactSection.country")}</label>
-              <input id="country" name="country" className={FIELD} placeholder={t("home.contactSection.countryPlaceholder")} />
+              <label htmlFor="country" className={LABEL}>
+                {t("home.contactSection.country")}
+              </label>
+              <input
+                id="country"
+                name="country"
+                className={FIELD}
+                placeholder={t("home.contactSection.countryPlaceholder")}
+              />
             </div>
             <div>
-              <label htmlFor="solution" className={LABEL}>{t("home.contactSection.solution")}</label>
+              <label htmlFor="solution" className={LABEL}>
+                {t("home.contactSection.solution")}
+              </label>
               <select id="solution" name="solution" className={FIELD} defaultValue="">
                 <option value="">{t("home.contactSection.solutionPlaceholder")}</option>
                 {SOLUTION_KEYS.map((k) => (
@@ -109,7 +156,9 @@ export function ContactSection() {
               </select>
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="timeline" className={LABEL}>{t("home.contactSection.timeline")}</label>
+              <label htmlFor="timeline" className={LABEL}>
+                {t("home.contactSection.timeline")}
+              </label>
               <select id="timeline" name="timeline" className={FIELD} defaultValue="">
                 <option value="">{t("home.contactSection.timelinePlaceholder")}</option>
                 {TIMELINE_KEYS.map((k) => (
@@ -118,7 +167,9 @@ export function ContactSection() {
               </select>
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="message" className={LABEL}>{t("home.contactSection.message")}</label>
+              <label htmlFor="message" className={LABEL}>
+                {t("home.contactSection.message")}
+              </label>
               <textarea
                 id="message"
                 name="message"
@@ -135,9 +186,13 @@ export function ContactSection() {
             </p>
             <Button type="submit" variant="primary" size="lg" disabled={busy}>
               {busy ? (
-                <><Loader2 className="!size-4 animate-spin" /> {t("home.contactSection.sending")}</>
+                <>
+                  <Loader2 className="!size-4 animate-spin" /> {t("home.contactSection.sending")}
+                </>
               ) : (
-                <>{t("home.contactSection.submit")} <ArrowRight className="!size-4" /></>
+                <>
+                  {t("home.contactSection.submit")} <ArrowRight className="!size-4" />
+                </>
               )}
             </Button>
           </div>

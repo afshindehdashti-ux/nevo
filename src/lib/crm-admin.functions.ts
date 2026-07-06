@@ -9,14 +9,7 @@ const inviteSchema = z.object({
   email: z.string().email(),
   fullName: z.string().min(1).max(200),
   jobTitle: z.string().max(200).optional().nullable(),
-  role: z.enum([
-    "super_admin",
-    "management",
-    "sales",
-    "operations",
-    "finance",
-    "read_only",
-  ]),
+  role: z.enum(["super_admin", "management", "sales", "operations", "finance", "read_only"]),
 });
 
 const resetSchema = z.object({ email: z.string().email() });
@@ -40,34 +33,26 @@ export const inviteTeamMember = createServerFn({ method: "POST" })
     await assertSuperAdmin(context as any);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const siteUrl =
-      process.env.APP_URL ||
-      process.env.SITE_URL ||
-      "https://nevoindustrial.com";
+    const siteUrl = process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
 
-    const { data: invited, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(
-      data.email,
-      {
-        redirectTo: `${siteUrl}/admin/login`,
-        data: { full_name: data.fullName, job_title: data.jobTitle ?? null },
-      },
-    );
+    const { data: invited, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, {
+      redirectTo: `${siteUrl}/admin/login`,
+      data: { full_name: data.fullName, job_title: data.jobTitle ?? null },
+    });
     if (error) throw new Error(error.message);
     const userId = invited.user?.id;
     if (!userId) throw new Error("Invite created but no user id returned");
 
     // Ensure profile fields
-    await supabaseAdmin
-      .from("profiles")
-      .upsert(
-        {
-          id: userId,
-          full_name: data.fullName,
-          job_title: data.jobTitle ?? null,
-          is_active: true,
-        },
-        { onConflict: "id" },
-      );
+    await supabaseAdmin.from("profiles").upsert(
+      {
+        id: userId,
+        full_name: data.fullName,
+        job_title: data.jobTitle ?? null,
+        is_active: true,
+      },
+      { onConflict: "id" },
+    );
 
     // Replace roles with the requested one
     await supabaseAdmin.from("user_roles").delete().eq("user_id", userId);
@@ -93,8 +78,7 @@ export const sendPasswordReset = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context as any);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const siteUrl =
-      process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
+    const siteUrl = process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
     const { error } = await supabaseAdmin.auth.resetPasswordForEmail(data.email, {
       redirectTo: `${siteUrl}/admin/login`,
     });

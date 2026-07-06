@@ -1,6 +1,6 @@
 # NEVO Industrial — Content & SEO Master Architecture
 
-Companion to `docs/ia/`. The IA defines *where* content lives; this document defines *what* is written, *how* it is structured, and *how* it earns organic authority. Scope: 1,000+ articles, 500+ technical documents, 300+ FAQs, 100+ case studies, 100+ market pages — with zero structural change required to scale.
+Companion to `docs/ia/`. The IA defines _where_ content lives; this document defines _what_ is written, _how_ it is structured, and _how_ it earns organic authority. Scope: 1,000+ articles, 500+ technical documents, 300+ FAQs, 100+ case studies, 100+ market pages — with zero structural change required to scale.
 
 ---
 
@@ -9,6 +9,7 @@ Companion to `docs/ia/`. The IA defines *where* content lives; this document def
 **Mission.** Become the first trusted destination for anyone researching sandwich panels, factory development, raw materials, production lines, and industrial engineering.
 
 **Non-negotiables.**
+
 - Education before selling. Every page solves a real customer problem.
 - Technical accuracy over marketing polish. Engineers are the primary reader; buyers and investors are secondary.
 - No SEO-only content. If it does not teach, it does not ship.
@@ -23,12 +24,12 @@ Companion to `docs/ia/`. The IA defines *where* content lives; this document def
 
 Four tiers. Every URL in `docs/ia/url-map.md` belongs to exactly one tier.
 
-| Tier | Purpose | Examples | Target length | Cadence |
-|---|---|---|---|---|
-| **L1 — Pillar** | Definitive guide to a broad topic. Anchors a cluster. | Complete Guide to Sandwich Panels · Factory Development · Production Lines · Raw Materials · Industrial Engineering · Cold Storage · Fire-Rated Panels | 3,500–6,000 words | ~15 total, refreshed quarterly |
-| **L2 — Cluster** | Deep sub-topic that links up to a pillar and down to supporting articles. | PIR · PUR · Rock Wool · PPGI · Roof Panels · Wall Panels · Cold Room Panels · Continuous Line · Roll Forming · Automation | 1,500–3,000 words | ~60 total |
-| **L3 — Supporting** | Focused answer to a specific engineering question. | What is PIR · PIR vs PUR · Rock Wool Density Guide · PPGI Coating Types · How Sandwich Panels Are Manufactured · Factory Layout Guide · Panel Installation Guide · Energy Efficiency Guide | 800–1,800 words | 500–1,000 total |
-| **L4 — Knowledge Library** | Atomic reference: FAQ entry, glossary term, datasheet, checklist, calculator input, download landing. | PIR density FAQ · Glossary: Lambda value · Datasheet: NEVO PIR 100mm · Engineering Checklist v3 | 150–800 words + asset | Unlimited |
+| Tier                       | Purpose                                                                                               | Examples                                                                                                                                                                                   | Target length         | Cadence                        |
+| -------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- | ------------------------------ |
+| **L1 — Pillar**            | Definitive guide to a broad topic. Anchors a cluster.                                                 | Complete Guide to Sandwich Panels · Factory Development · Production Lines · Raw Materials · Industrial Engineering · Cold Storage · Fire-Rated Panels                                     | 3,500–6,000 words     | ~15 total, refreshed quarterly |
+| **L2 — Cluster**           | Deep sub-topic that links up to a pillar and down to supporting articles.                             | PIR · PUR · Rock Wool · PPGI · Roof Panels · Wall Panels · Cold Room Panels · Continuous Line · Roll Forming · Automation                                                                  | 1,500–3,000 words     | ~60 total                      |
+| **L3 — Supporting**        | Focused answer to a specific engineering question.                                                    | What is PIR · PIR vs PUR · Rock Wool Density Guide · PPGI Coating Types · How Sandwich Panels Are Manufactured · Factory Layout Guide · Panel Installation Guide · Energy Efficiency Guide | 800–1,800 words       | 500–1,000 total                |
+| **L4 — Knowledge Library** | Atomic reference: FAQ entry, glossary term, datasheet, checklist, calculator input, download landing. | PIR density FAQ · Glossary: Lambda value · Datasheet: NEVO PIR 100mm · Engineering Checklist v3                                                                                            | 150–800 words + asset | Unlimited                      |
 
 **Rule.** Each L3 must link up to one L2 and one L1. Each L2 must link up to one L1. Pillars link down to every direct cluster child.
 
@@ -60,19 +61,19 @@ Optional blocks per page type: Case Studies (industry, market, project pages), S
 
 Each template is a JSON-serializable content model. Editors fill fields; the renderer maps them to the 9+3 spine.
 
-| Template | Route pattern | Required blocks | Optional blocks |
-|---|---|---|---|
-| `pillar` | `/knowledge/{slug}`, `/solutions/{slug}` | 1–7, 9, 11–13 | Downloads, Case Studies |
-| `cluster` | `/knowledge/{topic}/{slug}`, `/raw-materials/{slug}` | 1–9, 11–13 | Standards, Cost |
-| `article` | `/knowledge/{topic}/{slug}` | 1–5, 9, 11 | 6–8, 12–13 |
-| `product-family` | `/raw-materials/{slug}`, `/production-lines/{slug}`, `/panels/{slug}` | 1–9, 12, 13 | Standards, Case Studies |
-| `industry` | `/industries/{slug}` | 1, 2, 6, 7, 9, 11, 12 | Standards, Case Studies |
-| `market` | `/markets/{slug}` | see §12 | — |
-| `case-study` | `/case-studies/{slug}` | see §13 | — |
-| `service` | `/solutions/{slug}` | 1–5, 9, 10, 11 | Process, Timeline |
-| `download-landing` | `/downloads/{slug}` | Hero, Description, Preview, Form-gated CTA, Related | — |
-| `faq-entry` | `/knowledge/faq/{slug}` | Question, Answer, Related, Source | — |
-| `glossary` | `/knowledge/glossary/{slug}` | Term, Definition, See Also | — |
+| Template           | Route pattern                                                         | Required blocks                                     | Optional blocks         |
+| ------------------ | --------------------------------------------------------------------- | --------------------------------------------------- | ----------------------- |
+| `pillar`           | `/knowledge/{slug}`, `/solutions/{slug}`                              | 1–7, 9, 11–13                                       | Downloads, Case Studies |
+| `cluster`          | `/knowledge/{topic}/{slug}`, `/raw-materials/{slug}`                  | 1–9, 11–13                                          | Standards, Cost         |
+| `article`          | `/knowledge/{topic}/{slug}`                                           | 1–5, 9, 11                                          | 6–8, 12–13              |
+| `product-family`   | `/raw-materials/{slug}`, `/production-lines/{slug}`, `/panels/{slug}` | 1–9, 12, 13                                         | Standards, Case Studies |
+| `industry`         | `/industries/{slug}`                                                  | 1, 2, 6, 7, 9, 11, 12                               | Standards, Case Studies |
+| `market`           | `/markets/{slug}`                                                     | see §12                                             | —                       |
+| `case-study`       | `/case-studies/{slug}`                                                | see §13                                             | —                       |
+| `service`          | `/solutions/{slug}`                                                   | 1–5, 9, 10, 11                                      | Process, Timeline       |
+| `download-landing` | `/downloads/{slug}`                                                   | Hero, Description, Preview, Form-gated CTA, Related | —                       |
+| `faq-entry`        | `/knowledge/faq/{slug}`                                               | Question, Answer, Related, Source                   | —                       |
+| `glossary`         | `/knowledge/glossary/{slug}`                                          | Term, Definition, See Also                          | —                       |
 
 ---
 
@@ -104,6 +105,7 @@ Enforces `docs/ia/url-map.md`. Additional editorial rules:
 The related-content engine reads the taxonomy graph. No manual "related links" arrays.
 
 **Automatic surfaces on every page:**
+
 - **Related Articles** — up to 6, same `topic` + shared `industry` or `product-family`, ranked by recency × depth-tier match.
 - **Related Products** — same `product-family` tag.
 - **Related Services** — same `solution` tag.
@@ -113,6 +115,7 @@ The related-content engine reads the taxonomy graph. No manual "related links" a
 - **Related FAQs** — FAQ entries with matching `topic`.
 
 **Manual editorial links (inside body copy):**
+
 - Each L3 body MUST contain 3–8 inline links: 1 up to L2, 1 up to L1, 1+ lateral to sibling L3s, remainder to product / industry / download.
 - Each L2 body MUST contain 5–15 inline links, at least 5 pointing to its L3 children.
 - Each L1 body MUST link to every direct L2 child at least once.
@@ -159,6 +162,7 @@ external_authoritative_refs: 1-3   # standards bodies, peer-reviewed, gov
 **Heading hierarchy.** Exactly one H1 per page. H2s ordered by search intent. H3s only under H2s. Never skip levels.
 
 **Title/description patterns.**
+
 - Pillar: `{Topic}: Complete Guide | NEVO Industrial`
 - Cluster: `{Topic}: {Angle} | NEVO`
 - Article: `{Primary Keyword} — {Benefit or Angle}`
@@ -175,6 +179,7 @@ Engineering-first. Marketing questions ("Why choose NEVO?") do not belong in FAQ
 **Question archetypes.** Density · Lambda / U-value · Fire class · Cost per m² · Manufacturing tolerance · Compatible substrates · Installation sequence · Standards compliance · Capacity sizing · Payback period.
 
 **Examples (from the brief).**
+
 - What density should PIR have?
 - How is Rock Wool manufactured?
 - What production capacity should I choose?
@@ -182,6 +187,7 @@ Engineering-first. Marketing questions ("Why choose NEVO?") do not belong in FAQ
 - How much does a sandwich panel factory cost?
 
 **Rules.**
+
 - 5–12 FAQs per L1/L2, 3–6 per L3.
 - Question in real user phrasing (mirror People-Also-Ask when accurate).
 - Answer: first sentence answers directly, following 2–4 sentences add technical nuance and link out.
@@ -192,19 +198,20 @@ Engineering-first. Marketing questions ("Why choose NEVO?") do not belong in FAQ
 
 ## 10. Download Strategy
 
-Downloads are lead magnets *and* SEO assets — each has a landing page indexed as `download-landing`.
+Downloads are lead magnets _and_ SEO assets — each has a landing page indexed as `download-landing`.
 
-| Download type | Format | Gating |
-|---|---|---|
-| Factory Investment Guide | PDF | Form-gated (name, company, email, country) |
-| Engineering Checklist | PDF | Ungated |
-| Technical Datasheet | PDF | Ungated |
-| White Paper | PDF | Form-gated |
-| Comparison Table | PDF / HTML | Ungated |
-| Factory Planning Pack | PDF + DWG | Form-gated |
-| Panel Selection Guide | PDF | Ungated |
+| Download type            | Format     | Gating                                     |
+| ------------------------ | ---------- | ------------------------------------------ |
+| Factory Investment Guide | PDF        | Form-gated (name, company, email, country) |
+| Engineering Checklist    | PDF        | Ungated                                    |
+| Technical Datasheet      | PDF        | Ungated                                    |
+| White Paper              | PDF        | Form-gated                                 |
+| Comparison Table         | PDF / HTML | Ungated                                    |
+| Factory Planning Pack    | PDF + DWG  | Form-gated                                 |
+| Panel Selection Guide    | PDF        | Ungated                                    |
 
 **Rules.**
+
 - File naming: `{slug}-v{n}.pdf`. Version bumps never break URLs.
 - Every download tagged with `topic`, `product-family`, `industry`, `audience`.
 - Landing page carries a preview (first 2 pages as images) + full table of contents.
@@ -216,16 +223,16 @@ Downloads are lead magnets *and* SEO assets — each has a landing page indexed 
 
 Every educational page carries **one contextual CTA**, chosen by page type. Never interrupt the reading flow.
 
-| Page type | Primary CTA | Secondary CTA |
-|---|---|---|
-| Raw material pillar/cluster | Request Material Quotation | Download Datasheet |
-| Production line pillar/cluster | Request Factory Proposal | Talk to an Engineer |
-| Factory development / consultancy | Request Consultation | Download Investment Guide |
-| Industry page | Talk to an Engineer | Download Selection Guide |
-| Market page | Contact Regional Team | Download Country Brief |
-| Knowledge L3 article | Talk to an Engineer | Related Download |
-| Case study | Request Similar Project | — |
-| FAQ / Glossary | Talk to an Engineer | — |
+| Page type                         | Primary CTA                | Secondary CTA             |
+| --------------------------------- | -------------------------- | ------------------------- |
+| Raw material pillar/cluster       | Request Material Quotation | Download Datasheet        |
+| Production line pillar/cluster    | Request Factory Proposal   | Talk to an Engineer       |
+| Factory development / consultancy | Request Consultation       | Download Investment Guide |
+| Industry page                     | Talk to an Engineer        | Download Selection Guide  |
+| Market page                       | Contact Regional Team      | Download Country Brief    |
+| Knowledge L3 article              | Talk to an Engineer        | Related Download          |
+| Case study                        | Request Similar Project    | —                         |
+| FAQ / Glossary                    | Talk to an Engineer        | —                         |
 
 CTA copy is verb-first. All CTAs share one form contract (see `docs/ia/page-contract.md` §CTA).
 
@@ -290,6 +297,7 @@ The system supports the target volumes without structural change because:
 - **Locked vocabularies** — new categories, industries, markets require IA review; the system rejects free-tagging.
 
 When any single tier crosses these thresholds, revisit this doc:
+
 - Pillars > 20 → introduce a second-level hub grouping.
 - Cluster pages > 150 within one pillar → split the pillar.
 - Downloads > 500 → introduce a searchable resource centre index.
@@ -303,18 +311,18 @@ When any single tier crosses these thresholds, revisit this doc:
 - `docs/ia/url-map.md` — canonical URL registry
 - `docs/ia/taxonomies.md` — closed vocabularies
 - `docs/ia/page-contract.md` — 9-block spine
-- `docs/content/templates/` — per-template field specs *(to be authored with first page of each type)*
-- `docs/content/checklist.md` — pre-publish quality gate *(to be authored before first launch)*
-- `docs/content/calendar.md` — editorial calendar *(to be authored when scheduling begins)*
+- `docs/content/templates/` — per-template field specs _(to be authored with first page of each type)_
+- `docs/content/checklist.md` — pre-publish quality gate _(to be authored before first launch)_
+- `docs/content/calendar.md` — editorial calendar _(to be authored when scheduling begins)_
 
 ## 17. Logo Telemetry Configuration
 
 Header logo events (`header.logo.render` and `header.logo.error`) are controlled by three build-time environment variables. All are read by Vite at build time and clamped to safe ranges; malformed or missing values fall back to defaults.
 
-| Variable | Type | Range | Default | Behavior |
-|---|---|---|---|---|
-| `VITE_LOGO_RENDER_SAMPLE_RATE` | number | `0..1` | `1` in dev, `0.05` in production | Probability that a single render event is logged per tab session. Set to `0` to disable render logging entirely. |
-| `VITE_LOGO_ERROR_MAX_PER_SESSION` | integer | `0..1000` | `4` | Maximum `header.logo.error` events sent per tab session. Set to `0` to disable error logging entirely. |
-| `VITE_LOGO_ERROR_MIN_INTERVAL_MS` | integer | `0..60000` | `1000` | Minimum milliseconds between two non-terminal errors of the same stage. Used to suppress duplicate bursts while preserving real-time alerting. |
+| Variable                          | Type    | Range      | Default                          | Behavior                                                                                                                                       |
+| --------------------------------- | ------- | ---------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_LOGO_RENDER_SAMPLE_RATE`    | number  | `0..1`     | `1` in dev, `0.05` in production | Probability that a single render event is logged per tab session. Set to `0` to disable render logging entirely.                               |
+| `VITE_LOGO_ERROR_MAX_PER_SESSION` | integer | `0..1000`  | `4`                              | Maximum `header.logo.error` events sent per tab session. Set to `0` to disable error logging entirely.                                         |
+| `VITE_LOGO_ERROR_MIN_INTERVAL_MS` | integer | `0..60000` | `1000`                           | Minimum milliseconds between two non-terminal errors of the same stage. Used to suppress duplicate bursts while preserving real-time alerting. |
 
 These values are consumed in `src/lib/logo-telemetry-config.ts` and emitted by the client logger to `/api/public/client-log`. Events are stored in `public.header_logo_events` and forwarded to Sentry for operational alerts.

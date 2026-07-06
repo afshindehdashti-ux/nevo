@@ -39,7 +39,9 @@ const loggedEntries = [];
 /** @type {Array<{ status: number; count: number; at: number }>} */
 const postResponses = [];
 const failures = [];
-const assert = (cond, msg) => { if (!cond) failures.push(msg); };
+const assert = (cond, msg) => {
+  if (!cond) failures.push(msg);
+};
 
 let browser;
 try {
@@ -77,7 +79,9 @@ try {
       if (!Array.isArray(parsed?.entries)) return;
       const receivedAt = Date.now();
       for (const entry of parsed.entries) loggedEntries.push({ entry, receivedAt });
-    } catch { /* ignore malformed batches */ }
+    } catch {
+      /* ignore malformed batches */
+    }
   });
 
   // Confirm the server accepts each batch (HTTP 2xx).
@@ -91,7 +95,9 @@ try {
         const parsed = JSON.parse(body);
         if (Array.isArray(parsed?.entries)) count = parsed.entries.length;
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     postResponses.push({ status: res.status(), count, at: Date.now() });
   });
 
@@ -128,12 +134,13 @@ try {
       };
     });
     if (
-      lastState
-      && lastState.variant === "fallback-svg"
-      && lastState.currentSrc.startsWith("data:image/svg+xml")
-      && lastState.complete
-      && lastState.naturalWidth > 0
-    ) break;
+      lastState &&
+      lastState.variant === "fallback-svg" &&
+      lastState.currentSrc.startsWith("data:image/svg+xml") &&
+      lastState.complete &&
+      lastState.naturalWidth > 0
+    )
+      break;
     await page.waitForTimeout(250);
   }
   if (!lastState || lastState.variant !== "fallback-svg") {
@@ -153,8 +160,10 @@ try {
 
   // ---- Assertions -------------------------------------------------------
 
-  const logoEvents = loggedEntries
-    .filter(({ entry }) => entry?.message === "header.logo.error" || entry?.message === "header.logo.render");
+  const logoEvents = loggedEntries.filter(
+    ({ entry }) =>
+      entry?.message === "header.logo.error" || entry?.message === "header.logo.render",
+  );
 
   // 1) Every POST that carried a batch was accepted by the server.
   const badPost = postResponses.find((r) => r.status < 200 || r.status >= 300);
@@ -163,13 +172,16 @@ try {
 
   // 2) The three expected events exist.
   const idxPrimary = logoEvents.findIndex(
-    ({ entry }) => entry.message === "header.logo.error" && entry.extra?.stage === "primary-light-png",
+    ({ entry }) =>
+      entry.message === "header.logo.error" && entry.extra?.stage === "primary-light-png",
   );
   const idxCdn = logoEvents.findIndex(
-    ({ entry }) => entry.message === "header.logo.error" && entry.extra?.stage === "fallback-cdn-full",
+    ({ entry }) =>
+      entry.message === "header.logo.error" && entry.extra?.stage === "fallback-cdn-full",
   );
   const idxRender = logoEvents.findIndex(
-    ({ entry }) => entry.message === "header.logo.render" && entry.extra?.variant === "fallback-inline-svg",
+    ({ entry }) =>
+      entry.message === "header.logo.render" && entry.extra?.variant === "fallback-inline-svg",
   );
   assert(idxPrimary !== -1, "expected header.logo.error stage=primary-light-png");
   assert(idxCdn !== -1, "expected header.logo.error stage=fallback-cdn-full");
@@ -188,9 +200,9 @@ try {
 
     // 4) No terminal render was emitted BEFORE the errors — guards against
     //    a race where the SVG fallback logs before the failed stages.
-    const earlyRender = logoEvents.slice(0, idxPrimary).some(
-      ({ entry }) => entry.message === "header.logo.render",
-    );
+    const earlyRender = logoEvents
+      .slice(0, idxPrimary)
+      .some(({ entry }) => entry.message === "header.logo.render");
     assert(!earlyRender, "no render event may fire before the first error stage");
 
     // 5) Monotonic client timestamps. Client-log entries carry `ts` (ISO)
@@ -227,7 +239,10 @@ try {
       ["render", logoEvents[idxRender]],
     ]) {
       const ex = rec.entry.extra ?? {};
-      assert(typeof ex.stage === "string" || label === "render", `${label} entry must have extra.stage`);
+      assert(
+        typeof ex.stage === "string" || label === "render",
+        `${label} entry must have extra.stage`,
+      );
       assert(typeof ex.correlationId === "string", `${label} entry must have extra.correlationId`);
     }
   }
@@ -238,14 +253,22 @@ try {
     console.error("❌ header-logo-sequencing e2e failed:");
     for (const f of failures) console.error("  - " + f);
     console.error("\nCollected logo events (in arrival order):");
-    console.error(JSON.stringify(logoEvents.map((r) => r.entry), null, 2));
+    console.error(
+      JSON.stringify(
+        logoEvents.map((r) => r.entry),
+        null,
+        2,
+      ),
+    );
     console.error("\nPOST responses:");
     console.error(JSON.stringify(postResponses, null, 2));
     process.exit(1);
   }
 
   console.log("✅ header-logo-sequencing e2e passed");
-  console.log(`   batches=${postResponses.length} entries=${loggedEntries.length} logo-events=${logoEvents.length}`);
+  console.log(
+    `   batches=${postResponses.length} entries=${loggedEntries.length} logo-events=${logoEvents.length}`,
+  );
   console.log(`   order: primary-light-png → fallback-cdn-full → fallback-inline-svg`);
 } catch (err) {
   console.error("Harness error:", err);

@@ -71,10 +71,7 @@ const history: LogoHistoryEntry[] = [
 ];
 
 /** Every place a correlationId is expected to appear inside one Sentry event. */
-function assertCorrelationIdEverywhere(
-  ev: ReturnType<typeof buildSentryEvent>,
-  cid: string,
-) {
+function assertCorrelationIdEverywhere(ev: ReturnType<typeof buildSentryEvent>, cid: string) {
   // tags
   expect(ev.tags.correlation_id).toBe(cid);
   // context

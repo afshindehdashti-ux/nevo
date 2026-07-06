@@ -69,8 +69,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const TITLE =
-  "Engineering Consultancy — Sandwich Panel Factory Engineering | NEVO Industrial";
+const TITLE = "Engineering Consultancy — Sandwich Panel Factory Engineering | NEVO Industrial";
 const DESCRIPTION =
   "Engineering beyond equipment. Feasibility, master planning, factory layout, process and utility engineering, automation, commissioning and long-term technical support for sandwich panel factories worldwide.";
 const URL_PATH = "/solutions/engineering-consultancy";
@@ -86,39 +85,131 @@ const DOWNLOADS_LD_ITEMS = [
   "Project Preparation Guide",
 ];
 
-
 const FAQS: { q: string; a: string }[] = [
-  { q: "What does NEVO's Engineering Consultancy actually cover?", a: "Everything upstream and around the machinery: feasibility, master planning, factory layout, process engineering, utility engineering, automation architecture, supplier selection, construction supervision, commissioning, operator training and long-term performance optimization." },
-  { q: "Do I need to buy a production line from NEVO to hire your engineers?", a: "No. Our engineering practice is independent. We frequently engineer factories that source equipment from third parties, and we audit or upgrade existing lines we did not originally supply." },
-  { q: "How is engineering different from just buying a production line?", a: "A line is a machine. A factory is a system — building, utilities, logistics, storage, people, chemistry, controls, safety. Engineering makes those pieces converge on a stated capacity, quality and cost per m²." },
-  { q: "How long does a typical engineering study take?", a: "A feasibility study runs 3–5 weeks. Concept engineering 6–10 weeks. Detailed engineering for a full factory 3–5 months. Timelines depend on site data availability and decision speed on the investor side." },
-  { q: "What information do I need before you can start?", a: "Target capacity (m²/year), panel spectrum, land or building option, utilities available (power, gas, water), local labour rate and target market. If any are missing we help you define them in the discovery phase." },
-  { q: "Can you engineer a factory on a greenfield site?", a: "Yes. We handle site selection support, master plan, general arrangement, structural loads, utility sizing, road and truck flow, expansion reserves and phasing from bare land through operation." },
-  { q: "Can you engineer an expansion of my existing factory?", a: "Yes. We audit the current line, identify bottlenecks (OEE, changeover, curing, cutting, packing) and engineer targeted upgrades or a parallel line with shared utilities." },
-  { q: "What panel technologies do you engineer for?", a: "Continuous and discontinuous PIR, PUR, mineral rock wool, EPS and hybrid cores; wall, roof, cold-storage and clean-room panels; metal facings in PPGI, GI, Aluzinc, prepainted aluminium and stainless." },
-  { q: "How do you determine the right capacity?", a: "From your market study, target payback, land envelope and utility ceiling — not from a catalogue. Capacity is engineered downward from demand and upward from feasible line speed, not guessed." },
-  { q: "What deliverables do I receive from the engineering phase?", a: "Feasibility report, master plan, general arrangement, P&ID, material flow diagram, process flow diagram, utility load schedule, electrical single-line, structural loads, equipment selection report, ROI model and project timeline." },
-  { q: "Do you provide 3D factory models?", a: "Yes. We build 3D layouts and clash-checked models so investors, contractors and operators can walk the plant before a single beam is erected." },
-  { q: "Which automation platforms do you engineer around?", a: "Siemens (S7-1500, TIA Portal, WinCC), Rockwell (ControlLogix, FactoryTalk) and Beckhoff TwinCAT. SCADA over OPC UA, historian and MES integration for Industry 4.0 factories." },
-  { q: "Can you integrate remote monitoring?", a: "Yes. Every NEVO-engineered line ships with an edge gateway, secure VPN and dashboards for OEE, uptime, alarm history and quality KPIs, accessible from any authorised device." },
-  { q: "Do you handle utility engineering?", a: "Yes. Electrical HV/LV, compressed air, chilled water, hot oil / thermal fluid, steam, natural gas, nitrogen, dust and fume extraction — sized, routed and specified in coordination with the process." },
-  { q: "Do you handle civil and structural engineering?", a: "We engineer the industrial building envelope: foundation loads for the laminator and press, crane rails, mezzanine loads, floor flatness, roof and cladding spec. Local licensed civil partners execute stamped drawings for permits." },
-  { q: "Do you provide fire, safety and environmental design?", a: "Yes. Fire compartmentation, sprinkler zoning, foam suppression around chemical stores, MDI vapour containment, VOC extraction and process safety reviews are part of the standard engineering package." },
-  { q: "What kind of ROI can I expect from a NEVO-engineered factory?", a: "Depending on market, capacity and product mix, payback typically lands in 3–5 years for continuous PIR/PUR lines with balanced utilisation. We model this transparently before contract, not after." },
-  { q: "How do you select suppliers for equipment?", a: "By engineering fit, not by rebate. We shortlist against a written technical specification, request comparable bids, evaluate on lifecycle cost and reference visits, and recommend with a documented decision matrix." },
-  { q: "Do you supervise construction and installation?", a: "Yes. Site engineers manage civil–mechanical–electrical interfaces, inspect deliveries, sign off milestones and enforce the design intent from foundation pour to first panel." },
-  { q: "What is included in commissioning?", a: "Cold commissioning of utilities, hot commissioning of the line, chemistry setup and reactivity tuning, PLC/SCADA validation, quality qualification runs and performance acceptance against contractual OEE targets." },
-  { q: "Do you train our team?", a: "Yes. Operators, line leaders, quality inspectors, maintenance and management each receive dedicated modules — classroom, on-line and structured shadowing — with skill matrices signed off before handover." },
-  { q: "What ongoing support do you provide after handover?", a: "Remote monitoring, quarterly performance reviews, spare-parts planning, chemistry re-optimisation, upgrade roadmaps and on-call troubleshooting under an annual technical partnership agreement." },
-  { q: "Can you audit a factory built by someone else?", a: "Yes. Independent technical audits cover OEE, quality yield, energy per m², safety, chemistry, maintenance and organisation, with a prioritised action plan and quantified savings." },
-  { q: "How do you protect our project's confidentiality?", a: "All engagements begin under mutual NDA. Data is stored in access-controlled workspaces. Deliverables carry document control and are shared only with named recipients." },
-  { q: "What markets have you engineered factories in?", a: "GCC, wider MENA, East Africa, Central Asia, the CIS and selected European and South-East Asian markets. Local codes, climate loads and grid conditions are integrated per project." },
-  { q: "How is your engineering priced?", a: "Fixed-fee for feasibility and concept; milestone-based for detailed engineering; day-rate or retainer for supervision, commissioning and long-term optimisation. All scopes are contracted before mobilisation." },
-  { q: "Do you work with investors who have no factory experience?", a: "A large share of our clients are first-time industrial investors. We translate market ambition into an engineered, financeable, buildable factory — and stay through operation." },
-  { q: "Can you help arrange financing or bank documentation?", a: "We prepare the technical and ROI documentation banks and export-credit agencies require. Financing itself is arranged by the investor with their preferred institutions." },
-  { q: "Do you engineer for cold-storage and clean-room applications?", a: "Yes. Both are core competencies: high-density PIR/PUR/rock-wool cold-storage panels and ISO-classified clean-room envelopes with matching factory quality controls." },
-  { q: "How do I start an engineering engagement?", a: "Send us the brief — capacity target, market, site status, timeline. We respond with a scoped engineering proposal and a schedule for the first workshop, usually within one week." },
-  { q: "What makes NEVO different from a machinery vendor's 'free' layout?", a: "Vendor layouts sell equipment. Our engineering serves the investor: independent, documented, benchmarked and accountable for the factory's operating performance — not for a purchase order." },
+  {
+    q: "What does NEVO's Engineering Consultancy actually cover?",
+    a: "Everything upstream and around the machinery: feasibility, master planning, factory layout, process engineering, utility engineering, automation architecture, supplier selection, construction supervision, commissioning, operator training and long-term performance optimization.",
+  },
+  {
+    q: "Do I need to buy a production line from NEVO to hire your engineers?",
+    a: "No. Our engineering practice is independent. We frequently engineer factories that source equipment from third parties, and we audit or upgrade existing lines we did not originally supply.",
+  },
+  {
+    q: "How is engineering different from just buying a production line?",
+    a: "A line is a machine. A factory is a system — building, utilities, logistics, storage, people, chemistry, controls, safety. Engineering makes those pieces converge on a stated capacity, quality and cost per m².",
+  },
+  {
+    q: "How long does a typical engineering study take?",
+    a: "A feasibility study runs 3–5 weeks. Concept engineering 6–10 weeks. Detailed engineering for a full factory 3–5 months. Timelines depend on site data availability and decision speed on the investor side.",
+  },
+  {
+    q: "What information do I need before you can start?",
+    a: "Target capacity (m²/year), panel spectrum, land or building option, utilities available (power, gas, water), local labour rate and target market. If any are missing we help you define them in the discovery phase.",
+  },
+  {
+    q: "Can you engineer a factory on a greenfield site?",
+    a: "Yes. We handle site selection support, master plan, general arrangement, structural loads, utility sizing, road and truck flow, expansion reserves and phasing from bare land through operation.",
+  },
+  {
+    q: "Can you engineer an expansion of my existing factory?",
+    a: "Yes. We audit the current line, identify bottlenecks (OEE, changeover, curing, cutting, packing) and engineer targeted upgrades or a parallel line with shared utilities.",
+  },
+  {
+    q: "What panel technologies do you engineer for?",
+    a: "Continuous and discontinuous PIR, PUR, mineral rock wool, EPS and hybrid cores; wall, roof, cold-storage and clean-room panels; metal facings in PPGI, GI, Aluzinc, prepainted aluminium and stainless.",
+  },
+  {
+    q: "How do you determine the right capacity?",
+    a: "From your market study, target payback, land envelope and utility ceiling — not from a catalogue. Capacity is engineered downward from demand and upward from feasible line speed, not guessed.",
+  },
+  {
+    q: "What deliverables do I receive from the engineering phase?",
+    a: "Feasibility report, master plan, general arrangement, P&ID, material flow diagram, process flow diagram, utility load schedule, electrical single-line, structural loads, equipment selection report, ROI model and project timeline.",
+  },
+  {
+    q: "Do you provide 3D factory models?",
+    a: "Yes. We build 3D layouts and clash-checked models so investors, contractors and operators can walk the plant before a single beam is erected.",
+  },
+  {
+    q: "Which automation platforms do you engineer around?",
+    a: "Siemens (S7-1500, TIA Portal, WinCC), Rockwell (ControlLogix, FactoryTalk) and Beckhoff TwinCAT. SCADA over OPC UA, historian and MES integration for Industry 4.0 factories.",
+  },
+  {
+    q: "Can you integrate remote monitoring?",
+    a: "Yes. Every NEVO-engineered line ships with an edge gateway, secure VPN and dashboards for OEE, uptime, alarm history and quality KPIs, accessible from any authorised device.",
+  },
+  {
+    q: "Do you handle utility engineering?",
+    a: "Yes. Electrical HV/LV, compressed air, chilled water, hot oil / thermal fluid, steam, natural gas, nitrogen, dust and fume extraction — sized, routed and specified in coordination with the process.",
+  },
+  {
+    q: "Do you handle civil and structural engineering?",
+    a: "We engineer the industrial building envelope: foundation loads for the laminator and press, crane rails, mezzanine loads, floor flatness, roof and cladding spec. Local licensed civil partners execute stamped drawings for permits.",
+  },
+  {
+    q: "Do you provide fire, safety and environmental design?",
+    a: "Yes. Fire compartmentation, sprinkler zoning, foam suppression around chemical stores, MDI vapour containment, VOC extraction and process safety reviews are part of the standard engineering package.",
+  },
+  {
+    q: "What kind of ROI can I expect from a NEVO-engineered factory?",
+    a: "Depending on market, capacity and product mix, payback typically lands in 3–5 years for continuous PIR/PUR lines with balanced utilisation. We model this transparently before contract, not after.",
+  },
+  {
+    q: "How do you select suppliers for equipment?",
+    a: "By engineering fit, not by rebate. We shortlist against a written technical specification, request comparable bids, evaluate on lifecycle cost and reference visits, and recommend with a documented decision matrix.",
+  },
+  {
+    q: "Do you supervise construction and installation?",
+    a: "Yes. Site engineers manage civil–mechanical–electrical interfaces, inspect deliveries, sign off milestones and enforce the design intent from foundation pour to first panel.",
+  },
+  {
+    q: "What is included in commissioning?",
+    a: "Cold commissioning of utilities, hot commissioning of the line, chemistry setup and reactivity tuning, PLC/SCADA validation, quality qualification runs and performance acceptance against contractual OEE targets.",
+  },
+  {
+    q: "Do you train our team?",
+    a: "Yes. Operators, line leaders, quality inspectors, maintenance and management each receive dedicated modules — classroom, on-line and structured shadowing — with skill matrices signed off before handover.",
+  },
+  {
+    q: "What ongoing support do you provide after handover?",
+    a: "Remote monitoring, quarterly performance reviews, spare-parts planning, chemistry re-optimisation, upgrade roadmaps and on-call troubleshooting under an annual technical partnership agreement.",
+  },
+  {
+    q: "Can you audit a factory built by someone else?",
+    a: "Yes. Independent technical audits cover OEE, quality yield, energy per m², safety, chemistry, maintenance and organisation, with a prioritised action plan and quantified savings.",
+  },
+  {
+    q: "How do you protect our project's confidentiality?",
+    a: "All engagements begin under mutual NDA. Data is stored in access-controlled workspaces. Deliverables carry document control and are shared only with named recipients.",
+  },
+  {
+    q: "What markets have you engineered factories in?",
+    a: "GCC, wider MENA, East Africa, Central Asia, the CIS and selected European and South-East Asian markets. Local codes, climate loads and grid conditions are integrated per project.",
+  },
+  {
+    q: "How is your engineering priced?",
+    a: "Fixed-fee for feasibility and concept; milestone-based for detailed engineering; day-rate or retainer for supervision, commissioning and long-term optimisation. All scopes are contracted before mobilisation.",
+  },
+  {
+    q: "Do you work with investors who have no factory experience?",
+    a: "A large share of our clients are first-time industrial investors. We translate market ambition into an engineered, financeable, buildable factory — and stay through operation.",
+  },
+  {
+    q: "Can you help arrange financing or bank documentation?",
+    a: "We prepare the technical and ROI documentation banks and export-credit agencies require. Financing itself is arranged by the investor with their preferred institutions.",
+  },
+  {
+    q: "Do you engineer for cold-storage and clean-room applications?",
+    a: "Yes. Both are core competencies: high-density PIR/PUR/rock-wool cold-storage panels and ISO-classified clean-room envelopes with matching factory quality controls.",
+  },
+  {
+    q: "How do I start an engineering engagement?",
+    a: "Send us the brief — capacity target, market, site status, timeline. We respond with a scoped engineering proposal and a schedule for the first workshop, usually within one week.",
+  },
+  {
+    q: "What makes NEVO different from a machinery vendor's 'free' layout?",
+    a: "Vendor layouts sell equipment. Our engineering serves the investor: independent, documented, benchmarked and accountable for the factory's operating performance — not for a purchase order.",
+  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -142,7 +233,12 @@ export const Route = createFileRoute("/$lang/solutions/engineering-consultancy")
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/${params.lang}` },
-        { "@type": "ListItem", position: 2, name: "Solutions", item: `${SITE.url}/${params.lang}/solutions` },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Solutions",
+          item: `${SITE.url}/${params.lang}/solutions`,
+        },
         { "@type": "ListItem", position: 3, name: "Engineering Consultancy", item: canonical },
       ],
     };
@@ -155,7 +251,13 @@ export const Route = createFileRoute("/$lang/solutions/engineering-consultancy")
       areaServed: ["AE", "SA", "OM", "QA", "KW", "TR", "IQ", "KE", "CM", "RU", "EU"],
       url: canonical,
       description: DESCRIPTION,
-      category: ["Feasibility study", "Factory layout", "Process engineering", "Automation architecture", "Commissioning support"],
+      category: [
+        "Feasibility study",
+        "Factory layout",
+        "Process engineering",
+        "Automation architecture",
+        "Commissioning support",
+      ],
     };
     const seo = buildSeo({
       title: TITLE,
@@ -189,7 +291,6 @@ export const Route = createFileRoute("/$lang/solutions/engineering-consultancy")
           }),
         ),
       ],
-
     };
   },
   component: EngineeringConsultancyPage,
@@ -272,23 +373,31 @@ function Hero() {
             Engineering Consultancy
           </div>
           <h1 className="text-display text-balance text-white">
-            Engineering{" "}
-            <span className="italic text-accent">Beyond</span> Equipment.
+            Engineering <span className="italic text-accent">Beyond</span> Equipment.
           </h1>
           <p className="text-body-lg mt-6 max-w-2xl text-white/75">
-            Complete engineering solutions for sandwich panel factories — from
-            concept and feasibility studies to commissioning, optimisation and
-            long-term technical support.
+            Complete engineering solutions for sandwich panel factories — from concept and
+            feasibility studies to commissioning, optimisation and long-term technical support.
           </p>
 
           <div className="mt-10 flex flex-wrap gap-3">
-            <Button asChild variant="primary" size="lg" className="bg-white text-primary hover:bg-white/90">
+            <Button
+              asChild
+              variant="primary"
+              size="lg"
+              className="bg-white text-primary hover:bg-white/90"
+            >
               <a href="/project-inquiry">
                 Book Engineering Consultation
                 <ArrowRight className="!size-4" />
               </a>
             </Button>
-            <Button asChild variant="secondary" size="lg" className="border-white/30 bg-transparent text-white hover:bg-white/10">
+            <Button
+              asChild
+              variant="secondary"
+              size="lg"
+              className="border-white/30 bg-transparent text-white hover:bg-white/10"
+            >
               <a href="#downloads">
                 Request Technical Proposal
                 <ArrowUpRight className="!size-4" />
@@ -347,15 +456,14 @@ function Philosophy() {
             Engineering begins long before the first machine arrives.
           </h2>
           <p className="text-body-lg mt-6">
-            A sandwich panel factory is a system of decisions — market, site,
-            capacity, chemistry, utilities, people. Engineering is the
-            discipline of resolving those decisions on paper, so the plant
-            performs on the floor.
+            A sandwich panel factory is a system of decisions — market, site, capacity, chemistry,
+            utilities, people. Engineering is the discipline of resolving those decisions on paper,
+            so the plant performs on the floor.
           </p>
           <p className="text-body mt-4">
-            Factory performance begins with planning. Every kilowatt, every
-            square metre, every second of cycle time is engineered before it is
-            built — because a factory can only run as well as it was designed.
+            Factory performance begins with planning. Every kilowatt, every square metre, every
+            second of cycle time is engineered before it is built — because a factory can only run
+            as well as it was designed.
           </p>
 
           <ul className="mt-8 space-y-3">
@@ -389,23 +497,39 @@ function EngineeringTeam() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <figure className="group relative overflow-hidden rounded-xl border border-border bg-background">
-          <img src={img03} alt="NEVO engineering team reviewing factory plans" className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy" />
+          <img
+            src={img03}
+            alt="NEVO engineering team reviewing factory plans"
+            className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            loading="lazy"
+          />
           <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-black/85 via-black/30 to-transparent p-6 text-white">
             <div>
               <div className="font-mono text-[10px] tracking-widest text-accent">FIG. 02</div>
               <div className="mt-1 text-lg font-medium">Engineering studio</div>
-              <p className="mt-1 text-sm text-white/70">Cross-discipline review — process, mechanical, controls, chemistry — around one factory model.</p>
+              <p className="mt-1 text-sm text-white/70">
+                Cross-discipline review — process, mechanical, controls, chemistry — around one
+                factory model.
+              </p>
             </div>
           </figcaption>
         </figure>
 
         <figure className="group relative overflow-hidden rounded-xl border border-border bg-background">
-          <img src={img04} alt="NEVO engineer working on a 3D factory model" className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy" />
+          <img
+            src={img04}
+            alt="NEVO engineer working on a 3D factory model"
+            className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            loading="lazy"
+          />
           <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-black/85 via-black/30 to-transparent p-6 text-white">
             <div>
               <div className="font-mono text-[10px] tracking-widest text-accent">FIG. 03</div>
               <div className="mt-1 text-lg font-medium">3D factory modelling</div>
-              <p className="mt-1 text-sm text-white/70">Every plant is walked through in 3D before it is built — clash-checked, load-verified, operator-reviewed.</p>
+              <p className="mt-1 text-sm text-white/70">
+                Every plant is walked through in 3D before it is built — clash-checked,
+                load-verified, operator-reviewed.
+              </p>
             </div>
           </figcaption>
         </figure>
@@ -413,10 +537,26 @@ function EngineeringTeam() {
 
       <div className="mt-10 grid gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-4">
         {[
-          { icon: Users, k: "Multi-disciplinary", d: "Process, mechanical, electrical, civil, chemistry, controls." },
-          { icon: Ruler, k: "Model-first", d: "3D layout and P&ID before any drawing is issued for construction." },
-          { icon: ClipboardCheck, k: "Peer-reviewed", d: "Every deliverable signed off by a senior discipline lead." },
-          { icon: ShieldCheck, k: "Accountable", d: "KPIs contracted at the start, measured at commissioning." },
+          {
+            icon: Users,
+            k: "Multi-disciplinary",
+            d: "Process, mechanical, electrical, civil, chemistry, controls.",
+          },
+          {
+            icon: Ruler,
+            k: "Model-first",
+            d: "3D layout and P&ID before any drawing is issued for construction.",
+          },
+          {
+            icon: ClipboardCheck,
+            k: "Peer-reviewed",
+            d: "Every deliverable signed off by a senior discipline lead.",
+          },
+          {
+            icon: ShieldCheck,
+            k: "Accountable",
+            d: "KPIs contracted at the start, measured at commissioning.",
+          },
         ].map(({ icon: Icon, k, d }) => (
           <div key={k} className="bg-background p-6">
             <Icon className="size-5 text-accent" />
@@ -432,11 +572,31 @@ function EngineeringTeam() {
 /* ---------- DELIVERABLES ---------- */
 
 const DELIVERABLES = [
-  { img: img05, title: "Factory Layout", desc: "3D general arrangement optimised for material flow, safety, expansion and future automation." },
-  { img: img06, title: "Material Flow Diagram", desc: "End-to-end path of coils, chemistry and panels — from receiving to dispatch, sized to target capacity." },
-  { img: img07, title: "Process Engineering", desc: "PFD, mass and heat balance, reaction chemistry and cure kinetics engineered around the panel recipe." },
-  { img: img08, title: "Equipment Selection Report", desc: "Technical specifications and comparative evaluation of every major module, with a documented decision matrix." },
-  { img: img09, title: "Utility Engineering", desc: "Electrical, compressed air, chilled water, hot oil, gas and extraction sized and routed alongside the process." },
+  {
+    img: img05,
+    title: "Factory Layout",
+    desc: "3D general arrangement optimised for material flow, safety, expansion and future automation.",
+  },
+  {
+    img: img06,
+    title: "Material Flow Diagram",
+    desc: "End-to-end path of coils, chemistry and panels — from receiving to dispatch, sized to target capacity.",
+  },
+  {
+    img: img07,
+    title: "Process Engineering",
+    desc: "PFD, mass and heat balance, reaction chemistry and cure kinetics engineered around the panel recipe.",
+  },
+  {
+    img: img08,
+    title: "Equipment Selection Report",
+    desc: "Technical specifications and comparative evaluation of every major module, with a documented decision matrix.",
+  },
+  {
+    img: img09,
+    title: "Utility Engineering",
+    desc: "Electrical, compressed air, chilled water, hot oil, gas and extraction sized and routed alongside the process.",
+  },
 ];
 
 function Deliverables() {
@@ -459,10 +619,17 @@ function Deliverables() {
             className="group overflow-hidden rounded-xl border border-border bg-background"
           >
             <div className="relative aspect-[4/3] overflow-hidden bg-surface">
-              <img src={d.img} alt={d.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" loading="lazy" />
+              <img
+                src={d.img}
+                alt={d.title}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                loading="lazy"
+              />
             </div>
             <div className="p-6">
-              <div className="font-mono text-[10px] tracking-widest text-accent">DELIVERABLE / {String(i + 1).padStart(2, "0")}</div>
+              <div className="font-mono text-[10px] tracking-widest text-accent">
+                DELIVERABLE / {String(i + 1).padStart(2, "0")}
+              </div>
               <h3 className="text-h3 mt-2 text-foreground">{d.title}</h3>
               <p className="text-body mt-2">{d.desc}</p>
             </div>
@@ -485,10 +652,9 @@ function Automation() {
             PLC, SCADA and Industry 4.0 — engineered as one control layer.
           </h2>
           <p className="text-body-lg mt-6 text-primary-foreground/75">
-            Every NEVO factory ships with a coherent controls architecture:
-            deterministic PLC control on the line, plant-wide SCADA on top,
-            secure edge gateways for remote monitoring and an MES-ready
-            historian for Industry 4.0 analytics.
+            Every NEVO factory ships with a coherent controls architecture: deterministic PLC
+            control on the line, plant-wide SCADA on top, secure edge gateways for remote monitoring
+            and an MES-ready historian for Industry 4.0 analytics.
           </p>
 
           <div className="mt-10 grid gap-px overflow-hidden rounded-lg bg-white/10 sm:grid-cols-2">
@@ -509,7 +675,12 @@ function Automation() {
 
         <figure className="relative lg:col-span-7">
           <div className="relative overflow-hidden rounded-xl border border-white/10">
-            <img src={img10} alt="NEVO electrical control cabinet and HMI" className="aspect-[4/3] w-full object-cover" loading="lazy" />
+            <img
+              src={img10}
+              alt="NEVO electrical control cabinet and HMI"
+              className="aspect-[4/3] w-full object-cover"
+              loading="lazy"
+            />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
             <div className="absolute bottom-4 left-5 font-mono text-[10px] tracking-widest text-white/70">
               FIG. 04 · ELECTRICAL & AUTOMATION CABINET
@@ -524,10 +695,26 @@ function Automation() {
 /* ---------- EXECUTION ---------- */
 
 const EXECUTION = [
-  { img: img11, title: "Factory Construction", desc: "Structural erection supervised against engineered loads and tolerances." },
-  { img: img12, title: "Installation", desc: "Mechanical and electrical installation aligned to the engineered general arrangement." },
-  { img: img13, title: "Commissioning", desc: "Cold and hot commissioning, chemistry setup and performance qualification." },
-  { img: img14, title: "Training", desc: "Operators, maintenance, quality and leadership trained to signed-off skill matrices." },
+  {
+    img: img11,
+    title: "Factory Construction",
+    desc: "Structural erection supervised against engineered loads and tolerances.",
+  },
+  {
+    img: img12,
+    title: "Installation",
+    desc: "Mechanical and electrical installation aligned to the engineered general arrangement.",
+  },
+  {
+    img: img13,
+    title: "Commissioning",
+    desc: "Cold and hot commissioning, chemistry setup and performance qualification.",
+  },
+  {
+    img: img14,
+    title: "Training",
+    desc: "Operators, maintenance, quality and leadership trained to signed-off skill matrices.",
+  },
 ];
 
 function Execution() {
@@ -541,9 +728,17 @@ function Execution() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {EXECUTION.map((e, i) => (
-          <article key={e.title} className="group overflow-hidden rounded-xl border border-border bg-background">
+          <article
+            key={e.title}
+            className="group overflow-hidden rounded-xl border border-border bg-background"
+          >
             <div className="relative aspect-[4/3] overflow-hidden">
-              <img src={e.img} alt={e.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" loading="lazy" />
+              <img
+                src={e.img}
+                alt={e.title}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                loading="lazy"
+              />
               <div className="absolute left-4 top-4 rounded bg-black/60 px-2 py-1 font-mono text-[10px] tracking-widest text-white">
                 STEP · {String(i + 1).padStart(2, "0")}
               </div>
@@ -572,20 +767,36 @@ function ContinuousImprovement() {
 
       <div className="grid gap-8 lg:grid-cols-2">
         <figure className="group relative overflow-hidden rounded-xl border border-border bg-surface">
-          <img src={img15} alt="OEE and production optimization dashboard" className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy" />
+          <img
+            src={img15}
+            alt="OEE and production optimization dashboard"
+            className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            loading="lazy"
+          />
           <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-6 text-white">
             <div className="font-mono text-[10px] tracking-widest text-accent">FIG. 05</div>
             <div className="mt-1 text-lg font-medium">Production optimisation</div>
-            <p className="mt-1 max-w-md text-sm text-white/75">OEE, availability, performance and quality tracked continuously — the north star of every optimisation project.</p>
+            <p className="mt-1 max-w-md text-sm text-white/75">
+              OEE, availability, performance and quality tracked continuously — the north star of
+              every optimisation project.
+            </p>
           </figcaption>
         </figure>
 
         <figure className="group relative overflow-hidden rounded-xl border border-border bg-surface">
-          <img src={img16} alt="NEVO quality control lab technician" className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy" />
+          <img
+            src={img16}
+            alt="NEVO quality control lab technician"
+            className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            loading="lazy"
+          />
           <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-6 text-white">
             <div className="font-mono text-[10px] tracking-widest text-accent">FIG. 06</div>
             <div className="mt-1 text-lg font-medium">Quality control lab</div>
-            <p className="mt-1 max-w-md text-sm text-white/75">Density, peel, compression, dimensional and thermal testing — engineered laboratories, engineered discipline.</p>
+            <p className="mt-1 max-w-md text-sm text-white/75">
+              Density, peel, compression, dimensional and thermal testing — engineered laboratories,
+              engineered discipline.
+            </p>
           </figcaption>
         </figure>
       </div>
@@ -621,19 +832,35 @@ function IntegratedSolutions() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <figure className="group relative overflow-hidden rounded-xl border border-border bg-background">
-          <img src={img17} alt="NEVO finished sandwich panels stacked and packaged" className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy" />
+          <img
+            src={img17}
+            alt="NEVO finished sandwich panels stacked and packaged"
+            className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            loading="lazy"
+          />
           <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-6 text-white">
             <div className="font-mono text-[10px] tracking-widest text-accent">FIG. 07</div>
             <div className="mt-1 text-lg font-medium">Finished sandwich panels</div>
-            <p className="mt-1 max-w-md text-sm text-white/75">Bridge demand during factory build-up with panels engineered to the same standard as your future line.</p>
+            <p className="mt-1 max-w-md text-sm text-white/75">
+              Bridge demand during factory build-up with panels engineered to the same standard as
+              your future line.
+            </p>
           </figcaption>
         </figure>
         <figure className="group relative overflow-hidden rounded-xl border border-border bg-background">
-          <img src={img18} alt="NEVO raw materials — steel coils and chemical IBCs" className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy" />
+          <img
+            src={img18}
+            alt="NEVO raw materials — steel coils and chemical IBCs"
+            className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            loading="lazy"
+          />
           <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-6 text-white">
             <div className="font-mono text-[10px] tracking-widest text-accent">FIG. 08</div>
             <div className="mt-1 text-lg font-medium">Raw materials</div>
-            <p className="mt-1 max-w-md text-sm text-white/75">Steel, chemistry, insulation cores and adhesives, matched to the recipe and line speed engineered for your plant.</p>
+            <p className="mt-1 max-w-md text-sm text-white/75">
+              Steel, chemistry, insulation cores and adhesives, matched to the recipe and line speed
+              engineered for your plant.
+            </p>
           </figcaption>
         </figure>
       </div>
@@ -644,12 +871,36 @@ function IntegratedSolutions() {
 /* ---------- DOCUMENTATION ---------- */
 
 const DOCS = [
-  { img: img19, title: "P&ID Diagram", desc: "Piping and instrumentation — every valve, sensor and control loop on one page." },
-  { img: img20, title: "General Arrangement", desc: "Dimensioned plant layout with clearances, access and safety envelopes." },
-  { img: img21, title: "Structural Design", desc: "Loads, footings, mezzanines and crane rails engineered for the equipment above them." },
-  { img: img22, title: "Capacity Analysis", desc: "Throughput vs line speed, mix and OEE — modelled scenario by scenario." },
-  { img: img23, title: "ROI Analysis", desc: "Financial model tying capex, chemistry and utilisation to payback and IRR." },
-  { img: img24, title: "Project Timeline", desc: "Gantt-level schedule from engineering release to hot commissioning." },
+  {
+    img: img19,
+    title: "P&ID Diagram",
+    desc: "Piping and instrumentation — every valve, sensor and control loop on one page.",
+  },
+  {
+    img: img20,
+    title: "General Arrangement",
+    desc: "Dimensioned plant layout with clearances, access and safety envelopes.",
+  },
+  {
+    img: img21,
+    title: "Structural Design",
+    desc: "Loads, footings, mezzanines and crane rails engineered for the equipment above them.",
+  },
+  {
+    img: img22,
+    title: "Capacity Analysis",
+    desc: "Throughput vs line speed, mix and OEE — modelled scenario by scenario.",
+  },
+  {
+    img: img23,
+    title: "ROI Analysis",
+    desc: "Financial model tying capex, chemistry and utilisation to payback and IRR.",
+  },
+  {
+    img: img24,
+    title: "Project Timeline",
+    desc: "Gantt-level schedule from engineering release to hot commissioning.",
+  },
 ];
 
 function Documentation() {
@@ -665,7 +916,12 @@ function Documentation() {
         {DOCS.map((d, i) => (
           <SurfaceCard key={d.title} interactive padded={false} className="overflow-hidden">
             <div className="relative aspect-[16/10] overflow-hidden bg-surface">
-              <img src={d.img} alt={d.title} className="h-full w-full object-cover" loading="lazy" />
+              <img
+                src={d.img}
+                alt={d.title}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
               <div className="absolute left-3 top-3 rounded bg-black/70 px-2 py-1 font-mono text-[10px] tracking-widest text-white">
                 DOC · {String(i + 1).padStart(2, "0")}
               </div>
@@ -673,7 +929,10 @@ function Documentation() {
             <div className="flex flex-col p-5">
               <h3 className="text-h3 text-foreground">{d.title}</h3>
               <p className="text-body mt-2 text-sm">{d.desc}</p>
-              <a href="/project-inquiry" className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent hover:underline">
+              <a
+                href="/project-inquiry"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent hover:underline"
+              >
                 <Download className="size-4" /> Request sample
               </a>
             </div>
@@ -696,21 +955,38 @@ function EngineeringMaterials() {
             The engineered material ecosystem behind every NEVO factory.
           </h2>
           <p className="text-body-lg mt-6 text-white/70">
-            PPGI, GI, Aluzinc and prepainted coils; polyol and MDI in IBC and
-            drum; PIR and rock wool cores; adhesives and sealants — engineered
-            together, delivered together, performing together.
+            PPGI, GI, Aluzinc and prepainted coils; polyol and MDI in IBC and drum; PIR and rock
+            wool cores; adhesives and sealants — engineered together, delivered together, performing
+            together.
           </p>
         </div>
 
         <figure className="overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 md:p-8">
-          <img src={img25} alt="NEVO raw materials and chemical systems lineup" className="w-full object-contain" loading="lazy" />
+          <img
+            src={img25}
+            alt="NEVO raw materials and chemical systems lineup"
+            className="w-full object-contain"
+            loading="lazy"
+          />
         </figure>
 
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {[
-            { icon: Layers, k: "Engineered together", d: "Recipe, facings and chemistry designed as one system." },
-            { icon: Boxes, k: "Delivered together", d: "Consolidated supply, one accountable partner." },
-            { icon: Sparkles, k: "Performing together", d: "Line behaviour and panel quality validated at commissioning." },
+            {
+              icon: Layers,
+              k: "Engineered together",
+              d: "Recipe, facings and chemistry designed as one system.",
+            },
+            {
+              icon: Boxes,
+              k: "Delivered together",
+              d: "Consolidated supply, one accountable partner.",
+            },
+            {
+              icon: Sparkles,
+              k: "Performing together",
+              d: "Line behaviour and panel quality validated at commissioning.",
+            },
           ].map(({ icon: Icon, k, d }) => (
             <div key={k} className="rounded-lg border border-white/10 bg-white/[0.03] p-6">
               <Icon className="size-5 text-accent" />
@@ -843,7 +1119,9 @@ function Downloads() {
               </span>
               <div>
                 <div className="text-sm font-medium text-foreground">{t}</div>
-                <div className="mt-0.5 font-mono text-[10px] tracking-widest text-muted-foreground">PDF · ENGINEERING</div>
+                <div className="mt-0.5 font-mono text-[10px] tracking-widest text-muted-foreground">
+                  PDF · ENGINEERING
+                </div>
               </div>
             </div>
             <ArrowUpRight className="size-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
@@ -869,7 +1147,9 @@ function FAQ() {
           {FAQS.map((f, i) => (
             <AccordionItem key={f.q} value={`q-${i}`} className="border-border">
               <AccordionTrigger className="text-left text-base font-medium text-foreground hover:no-underline">
-                <span className="mr-4 font-mono text-xs tracking-widest text-accent">Q{String(i + 1).padStart(2, "0")}</span>
+                <span className="mr-4 font-mono text-xs tracking-widest text-accent">
+                  Q{String(i + 1).padStart(2, "0")}
+                </span>
                 <span className="flex-1">{f.q}</span>
               </AccordionTrigger>
               <AccordionContent className="text-body pl-10 pr-4">{f.a}</AccordionContent>
@@ -893,8 +1173,8 @@ function InquiryForm() {
             Start with a conversation with a senior engineer.
           </h2>
           <p className="text-body-lg mt-6">
-            Share your factory ambition. We respond within one business day
-            with a scoped engineering proposal and the first workshop agenda.
+            Share your factory ambition. We respond within one business day with a scoped
+            engineering proposal and the first workshop agenda.
           </p>
           <ul className="mt-8 space-y-3 text-sm text-foreground">
             {[
@@ -920,17 +1200,52 @@ function InquiryForm() {
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Company" name="company" required />
             <Field label="Country" name="country" required />
-            <Select label="Existing factory" name="existing" options={["Greenfield / new investment", "Existing factory — expansion", "Existing factory — audit / optimisation", "Undecided"]} />
-            <Select label="Target capacity" name="capacity" options={["< 500,000 m²/yr", "500,000 – 1,500,000 m²/yr", "1,500,000 – 3,000,000 m²/yr", "> 3,000,000 m²/yr", "To be defined"]} />
-            <Field label="Project timeline" name="timeline" placeholder="e.g. commissioning Q4 2027" />
+            <Select
+              label="Existing factory"
+              name="existing"
+              options={[
+                "Greenfield / new investment",
+                "Existing factory — expansion",
+                "Existing factory — audit / optimisation",
+                "Undecided",
+              ]}
+            />
+            <Select
+              label="Target capacity"
+              name="capacity"
+              options={[
+                "< 500,000 m²/yr",
+                "500,000 – 1,500,000 m²/yr",
+                "1,500,000 – 3,000,000 m²/yr",
+                "> 3,000,000 m²/yr",
+                "To be defined",
+              ]}
+            />
+            <Field
+              label="Project timeline"
+              name="timeline"
+              placeholder="e.g. commissioning Q4 2027"
+            />
             <Field label="Email" name="email" type="email" required />
           </div>
           <div className="mt-5 grid gap-5">
-            <Textarea label="Current challenges" name="challenges" rows={3} placeholder="Bottlenecks, quality issues, capacity gaps..." />
-            <Textarea label="Message" name="message" rows={4} placeholder="Anything else our engineers should know before the first call." />
+            <Textarea
+              label="Current challenges"
+              name="challenges"
+              rows={3}
+              placeholder="Bottlenecks, quality issues, capacity gaps..."
+            />
+            <Textarea
+              label="Message"
+              name="message"
+              rows={4}
+              placeholder="Anything else our engineers should know before the first call."
+            />
           </div>
           <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-xs text-muted-foreground">By submitting, you agree to be contacted by a NEVO engineer regarding your project.</p>
+            <p className="text-xs text-muted-foreground">
+              By submitting, you agree to be contacted by a NEVO engineer regarding your project.
+            </p>
             <Button type="submit" variant="primary" size="lg">
               Send inquiry
               <ArrowRight className="!size-4" />
@@ -957,7 +1272,10 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">{label}{required && " *"}</span>
+      <span className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+        {label}
+        {required && " *"}
+      </span>
       <input
         name={name}
         type={type}
@@ -972,25 +1290,43 @@ function Field({
 function Select({ label, name, options }: { label: string; name: string; options: string[] }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">{label}</span>
+      <span className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+        {label}
+      </span>
       <select
         name={name}
         defaultValue=""
         className="w-full rounded-md border border-border bg-background px-3.5 py-3 text-sm text-foreground outline-none transition-colors focus:border-accent focus:ring-2 focus:ring-accent/20"
       >
-        <option value="" disabled>Select…</option>
+        <option value="" disabled>
+          Select…
+        </option>
         {options.map((o) => (
-          <option key={o} value={o}>{o}</option>
+          <option key={o} value={o}>
+            {o}
+          </option>
         ))}
       </select>
     </label>
   );
 }
 
-function Textarea({ label, name, rows = 4, placeholder }: { label: string; name: string; rows?: number; placeholder?: string }) {
+function Textarea({
+  label,
+  name,
+  rows = 4,
+  placeholder,
+}: {
+  label: string;
+  name: string;
+  rows?: number;
+  placeholder?: string;
+}) {
   return (
     <label className="block">
-      <span className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">{label}</span>
+      <span className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+        {label}
+      </span>
       <textarea
         name={name}
         rows={rows}
@@ -1006,8 +1342,14 @@ function Textarea({ label, name, rows = 4, placeholder }: { label: string; name:
 function FinalCTA() {
   return (
     <section className="relative isolate overflow-hidden bg-primary text-primary-foreground">
-      <div aria-hidden className="pointer-events-none absolute -left-24 top-1/2 size-[420px] -translate-y-1/2 rounded-full bg-accent/20 blur-3xl" />
-      <div aria-hidden className="pointer-events-none absolute -right-24 bottom-0 size-[420px] rounded-full bg-accent/10 blur-3xl" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-24 top-1/2 size-[420px] -translate-y-1/2 rounded-full bg-accent/20 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-24 bottom-0 size-[420px] rounded-full bg-accent/10 blur-3xl"
+      />
       <div className="container-wide relative section-y">
         <div className="mx-auto max-w-3xl text-center">
           <Eyebrow className="justify-center text-accent">Ready when you are</Eyebrow>
@@ -1015,17 +1357,27 @@ function FinalCTA() {
             Every great factory starts with great engineering.
           </h2>
           <p className="text-body-lg mt-6 text-primary-foreground/70">
-            Engineering transforms investment into long-term industrial
-            performance. Let's engineer yours.
+            Engineering transforms investment into long-term industrial performance. Let's engineer
+            yours.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Button asChild variant="primary" size="lg" className="bg-white text-primary hover:bg-white/90">
+            <Button
+              asChild
+              variant="primary"
+              size="lg"
+              className="bg-white text-primary hover:bg-white/90"
+            >
               <a href="/project-inquiry">
                 Book Engineering Consultation
                 <ArrowRight className="!size-4" />
               </a>
             </Button>
-            <Button asChild variant="secondary" size="lg" className="border-white/30 bg-transparent text-white hover:bg-white/10">
+            <Button
+              asChild
+              variant="secondary"
+              size="lg"
+              className="border-white/30 bg-transparent text-white hover:bg-white/10"
+            >
               <a href="/project-inquiry">
                 Talk to a Senior Engineer
                 <ArrowUpRight className="!size-4" />

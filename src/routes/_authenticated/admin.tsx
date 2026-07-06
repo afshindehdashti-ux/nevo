@@ -7,10 +7,7 @@ import { useCurrentUser } from "@/lib/crm-hooks";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
-    meta: [
-      { title: "NEVO CRM — Back Office" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "NEVO CRM — Back Office" }, { name: "robots", content: "noindex" }],
   }),
   component: AdminLayout,
 });
@@ -29,12 +26,15 @@ function AdminLayout() {
       .update({ last_login_at: new Date().toISOString() })
       .eq("id", user.id)
       .then(() => {});
-    supabase.from("activity_logs").insert({
-      user_id: user.id,
-      action: "sign_in",
-      entity_type: "auth",
-      entity_id: user.id,
-    }).then(() => {});
+    supabase
+      .from("activity_logs")
+      .insert({
+        user_id: user.id,
+        action: "sign_in",
+        entity_type: "auth",
+        entity_id: user.id,
+      })
+      .then(() => {});
   }, [user?.id]);
 
   return (

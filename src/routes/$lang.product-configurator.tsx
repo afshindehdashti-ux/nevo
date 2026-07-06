@@ -106,8 +106,6 @@ const CONTEXT_IMAGES: Record<PanelType, string> = {
   fire: ctxFire,
 };
 
-
-
 /* --------------------------- Reusable studio frame --------------------------- */
 /*  White studio card that renders the dynamic SVG panel. Colour, thickness,    */
 /*  profile, core material and panel type all update in place — no photo swap.  */
@@ -147,7 +145,6 @@ function PanelStudio({
   );
 }
 
-
 /* --------------------------- Component --------------------------- */
 
 function ProductConfiguratorPage() {
@@ -157,8 +154,7 @@ function ProductConfiguratorPage() {
   const [comparisons, setComparisons] = useState<Config[]>([]);
   const results = useMemo(() => computeResults(cfg), [cfg]);
 
-  const update = <K extends keyof Config>(k: K, v: Config[K]) =>
-    setCfg((c) => ({ ...c, [k]: v }));
+  const update = <K extends keyof Config>(k: K, v: Config[K]) => setCfg((c) => ({ ...c, [k]: v }));
 
   const toggleAccessory = (a: string) =>
     setCfg((c) => ({
@@ -172,24 +168,24 @@ function ProductConfiguratorPage() {
     if (comparisons.length < 3) setComparisons([...comparisons, cfg]);
   };
 
-  const steps = [
-    "Panel Type",
-    "Core",
-    "Dimensions",
-    "Steel & Coating",
-    "Accessories",
-    "Results",
-  ];
+  const steps = ["Panel Type", "Core", "Dimensions", "Steel & Coating", "Accessories", "Results"];
 
   return (
     <main className="bg-background">
       {/* ============================ HERO ============================ */}
       <section className="relative overflow-hidden border-b border-border bg-[hsl(220_18%_9%)] text-white">
         <div className="container-wide relative py-20 md:py-28">
-          <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-xs uppercase tracking-widest text-white/60">
-            <Link to="/" className="hover:text-white">Home</Link>
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-8 flex items-center gap-2 text-xs uppercase tracking-widest text-white/60"
+          >
+            <Link to="/" className="hover:text-white">
+              Home
+            </Link>
             <ChevronRight className="size-3" />
-            <Link to="/solutions/sandwich-panels" className="hover:text-white">Sandwich Panels</Link>
+            <Link to="/solutions/sandwich-panels" className="hover:text-white">
+              Sandwich Panels
+            </Link>
             <ChevronRight className="size-3" />
             <span className="text-accent">Product Configurator</span>
           </nav>
@@ -204,15 +200,22 @@ function ProductConfiguratorPage() {
                 Product <span className="text-accent">Configurator</span>
               </h1>
               <p className="mt-6 max-w-2xl text-lg text-white/70">
-                Design your sandwich panel to the millimetre. Get instant thermal,
-                fire, acoustic and structural results — then request a certified
-                quotation from the NEVO engineering team.
+                Design your sandwich panel to the millimetre. Get instant thermal, fire, acoustic
+                and structural results — then request a certified quotation from the NEVO
+                engineering team.
               </p>
               <div className="mt-10 flex flex-wrap gap-4">
                 <Button asChild size="lg" className="bg-accent text-black hover:bg-accent/90">
-                  <a href="#configurator">Start Configuring <ArrowRight className="ml-1 size-4" /></a>
+                  <a href="#configurator">
+                    Start Configuring <ArrowRight className="ml-1 size-4" />
+                  </a>
                 </Button>
-                <Button asChild variant="secondary" size="lg" className="border-white/30 bg-white/5 text-white hover:bg-white/10">
+                <Button
+                  asChild
+                  variant="secondary"
+                  size="lg"
+                  className="border-white/30 bg-white/5 text-white hover:bg-white/10"
+                >
                   <Link to="/project-inquiry">Talk to an Engineer</Link>
                 </Button>
               </div>
@@ -225,7 +228,9 @@ function ProductConfiguratorPage() {
                 ].map((s) => (
                   <div key={s.v}>
                     <div className="text-2xl font-semibold text-accent md:text-3xl">{s.k}</div>
-                    <div className="mt-1 text-xs uppercase tracking-widest text-white/50">{s.v}</div>
+                    <div className="mt-1 text-xs uppercase tracking-widest text-white/50">
+                      {s.v}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -237,7 +242,9 @@ function ProductConfiguratorPage() {
               transition={{ duration: 0.9, delay: 0.15 }}
               className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-white p-8 shadow-[0_40px_120px_-40px_rgba(16,185,129,0.35)] md:p-12"
             >
-              <img loading="lazy" decoding="async"
+              <img
+                loading="lazy"
+                decoding="async"
                 src={heroImg}
                 alt="NEVO sandwich panel — engineering render"
                 className="relative z-10 max-h-full max-w-full object-contain"
@@ -261,7 +268,11 @@ function ProductConfiguratorPage() {
           <SectionHeader
             eyebrow="Configure. Calculate. Confirm."
             title={<span className="text-white">Design your perfect sandwich panel</span>}
-            lede={<span className="text-white/60">Every choice updates the technical results in real time.</span>}
+            lede={
+              <span className="text-white/60">
+                Every choice updates the technical results in real time.
+              </span>
+            }
             onTone="primary"
           />
 
@@ -286,7 +297,11 @@ function ProductConfiguratorPage() {
                   <span
                     className={cn(
                       "flex size-5 items-center justify-center rounded-full text-[10px] font-semibold",
-                      active ? "bg-black text-accent" : done ? "bg-accent text-black" : "bg-white/10",
+                      active
+                        ? "bg-black text-accent"
+                        : done
+                          ? "bg-accent text-black"
+                          : "bg-white/10",
                     )}
                   >
                     {done ? <Check className="size-3" /> : i + 1}
@@ -300,23 +315,11 @@ function ProductConfiguratorPage() {
           <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
             {/* Main configuration area */}
             <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-              {step === 0 && (
-                <StepPanelType
-                  cfg={cfg}
-                  onSelect={(v) => update("panelType", v)}
-                />
-              )}
-              {step === 1 && (
-                <StepCore cfg={cfg} onSelect={(v) => update("core", v)} />
-              )}
+              {step === 0 && <StepPanelType cfg={cfg} onSelect={(v) => update("panelType", v)} />}
+              {step === 1 && <StepCore cfg={cfg} onSelect={(v) => update("core", v)} />}
               {step === 2 && <StepDimensions cfg={cfg} update={update} />}
               {step === 3 && <StepSteel cfg={cfg} update={update} />}
-              {step === 4 && (
-                <StepAccessories
-                  cfg={cfg}
-                  onToggle={toggleAccessory}
-                />
-              )}
+              {step === 4 && <StepAccessories cfg={cfg} onToggle={toggleAccessory} />}
 
               {step === 5 && <StepResults results={results} cfg={cfg} />}
 
@@ -356,7 +359,10 @@ function ProductConfiguratorPage() {
                   </span>
                 </div>
                 <dl className="space-y-3 text-sm">
-                  <Row label="Panel Type" value={PANEL_TYPES.find((p) => p.id === cfg.panelType)!.label} />
+                  <Row
+                    label="Panel Type"
+                    value={PANEL_TYPES.find((p) => p.id === cfg.panelType)!.label}
+                  />
                   <Row label="Core Material" value={cfg.core} />
                   <Row label="Thickness" value={`${cfg.thickness} mm`} />
                   <Row label="Width" value={`${cfg.width} mm`} />
@@ -365,8 +371,14 @@ function ProductConfiguratorPage() {
                   <Row label="Steel Int." value={`${cfg.intSteel} mm`} />
                   <Row label="Profile" value={cfg.profile} />
                   <Row label="Coating" value={cfg.coating} />
-                  <Row label="Exterior Colour" value={`${cfg.extColor} · ${findColor(cfg.extColor).name}`} />
-                  <Row label="Interior Colour" value={`${cfg.intColor} · ${findColor(cfg.intColor).name}`} />
+                  <Row
+                    label="Exterior Colour"
+                    value={`${cfg.extColor} · ${findColor(cfg.extColor).name}`}
+                  />
+                  <Row
+                    label="Interior Colour"
+                    value={`${cfg.intColor} · ${findColor(cfg.intColor).name}`}
+                  />
 
                   <div className="my-3 border-t border-white/10" />
                   <Row label="U-Value" value={`${results.uValue} W/m²K`} accent />
@@ -375,7 +387,11 @@ function ProductConfiguratorPage() {
                   <Row label="Sound (Rw)" value={`${results.sound} dB`} accent />
                   <Row label="Warranty" value={`${results.warranty} years`} accent />
                   <Row label="Price / m²" value={`$${results.pricePerM2}`} accent />
-                  <Row label="Panel Total" value={`$${results.totalPrice.toLocaleString()}`} accent />
+                  <Row
+                    label="Panel Total"
+                    value={`$${results.totalPrice.toLocaleString()}`}
+                    accent
+                  />
                   <Row label="Lead Time" value={`${results.leadTime} weeks`} accent />
                 </dl>
               </div>
@@ -406,7 +422,11 @@ function ProductConfiguratorPage() {
           <SectionHeader
             eyebrow="Live Panel Preview"
             title={<span className="text-white">Inspect the exact panel you built</span>}
-            lede={<span className="text-white/60">Studio-lit engineering renders. Update your spec — the preview updates instantly.</span>}
+            lede={
+              <span className="text-white/60">
+                Studio-lit engineering renders. Update your spec — the preview updates instantly.
+              </span>
+            }
             onTone="primary"
           />
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
@@ -420,7 +440,9 @@ function ProductConfiguratorPage() {
               )}
               caption={
                 <>
-                  <span>{cfg.core} · {cfg.thickness} mm · Ext {cfg.extColor} · Int {cfg.intColor}</span>
+                  <span>
+                    {cfg.core} · {cfg.thickness} mm · Ext {cfg.extColor} · Int {cfg.intColor}
+                  </span>
                   <span>NEVO INDUSTRIAL · DUBAI</span>
                 </>
               }
@@ -534,7 +556,12 @@ function ProductConfiguratorPage() {
             value={`${results.uValue} W/m²K`}
             hint={`U-Value · ${results.thermalScore}`}
           />
-          <ResultCard icon={Flame} title="Fire" value={results.fireRating} hint={`EN 13501-1 class`} />
+          <ResultCard
+            icon={Flame}
+            title="Fire"
+            value={results.fireRating}
+            hint={`EN 13501-1 class`}
+          />
           <ResultCard
             icon={Volume2}
             title="Acoustic"
@@ -590,7 +617,10 @@ function ProductConfiguratorPage() {
             {comparisons.map((c, i) => {
               const r = computeResults(c);
               return (
-                <div key={i} className="relative overflow-hidden rounded-3xl border border-border bg-surface">
+                <div
+                  key={i}
+                  className="relative overflow-hidden rounded-3xl border border-border bg-surface"
+                >
                   <div className="relative aspect-[4/3] w-full bg-white p-4">
                     <DynamicPanelPreview cfg={c} ratio="absolute inset-0" showLabels={false} />
                     <button
@@ -598,7 +628,6 @@ function ProductConfiguratorPage() {
                       className="absolute right-3 top-3 z-30 flex size-7 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 hover:text-black"
                       aria-label="Remove"
                     >
-
                       <X className="size-3.5" />
                     </button>
                   </div>
@@ -656,7 +685,9 @@ function ProductConfiguratorPage() {
           {/* Engineering-style datasheet card — clean, white, monospaced */}
           <div className="overflow-hidden rounded-3xl border border-border bg-white shadow-[0_30px_80px_-40px_rgba(0,0,0,0.35)]">
             <div className="flex items-center justify-between border-b border-black/5 px-5 py-3 font-mono text-[10px] uppercase tracking-[0.25em] text-black/50">
-              <span>Datasheet · NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness}</span>
+              <span>
+                Datasheet · NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness}
+              </span>
               <span>REV 01</span>
             </div>
             <div className="relative aspect-[4/3] w-full bg-white p-4">
@@ -664,10 +695,22 @@ function ProductConfiguratorPage() {
             </div>
 
             <dl className="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-black/5 px-5 py-4 font-mono text-[11px]">
-              <div className="flex justify-between text-black/60"><span>U-VALUE</span><span className="text-black">{results.uValue}</span></div>
-              <div className="flex justify-between text-black/60"><span>FIRE</span><span className="text-black">{results.fireRating}</span></div>
-              <div className="flex justify-between text-black/60"><span>WEIGHT</span><span className="text-black">{results.weight}</span></div>
-              <div className="flex justify-between text-black/60"><span>Rw</span><span className="text-black">{results.sound} dB</span></div>
+              <div className="flex justify-between text-black/60">
+                <span>U-VALUE</span>
+                <span className="text-black">{results.uValue}</span>
+              </div>
+              <div className="flex justify-between text-black/60">
+                <span>FIRE</span>
+                <span className="text-black">{results.fireRating}</span>
+              </div>
+              <div className="flex justify-between text-black/60">
+                <span>WEIGHT</span>
+                <span className="text-black">{results.weight}</span>
+              </div>
+              <div className="flex justify-between text-black/60">
+                <span>Rw</span>
+                <span className="text-black">{results.sound} dB</span>
+              </div>
             </dl>
           </div>
         </div>
@@ -680,11 +723,12 @@ function ProductConfiguratorPage() {
             <div>
               <Eyebrow className="text-accent">Request a Quotation</Eyebrow>
               <h2 className="mt-6 text-3xl font-semibold md:text-5xl">
-                Send your configuration to the <span className="text-accent">NEVO engineering team</span>
+                Send your configuration to the{" "}
+                <span className="text-accent">NEVO engineering team</span>
               </h2>
               <p className="mt-6 max-w-lg text-white/70">
-                We reply within one business day with pricing, lead time, technical
-                validation and shipping options for your delivery country.
+                We reply within one business day with pricing, lead time, technical validation and
+                shipping options for your delivery country.
               </p>
               <div className="mt-8 space-y-4">
                 {[
@@ -699,10 +743,22 @@ function ProductConfiguratorPage() {
                 ))}
               </div>
               <div className="mt-10 flex flex-wrap gap-3">
-                <Button asChild variant="secondary" size="lg" className="border-white/30 bg-white/5 text-white hover:bg-white/10">
-                  <Link to="/project-inquiry"><MessageCircle className="mr-2 size-4" /> Talk to an Engineer</Link>
+                <Button
+                  asChild
+                  variant="secondary"
+                  size="lg"
+                  className="border-white/30 bg-white/5 text-white hover:bg-white/10"
+                >
+                  <Link to="/project-inquiry">
+                    <MessageCircle className="mr-2 size-4" /> Talk to an Engineer
+                  </Link>
                 </Button>
-                <Button asChild variant="ghost" size="lg" className="text-white/70 hover:bg-white/5 hover:text-white">
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="lg"
+                  className="text-white/70 hover:bg-white/5 hover:text-white"
+                >
                   <Link to="/knowledge-hub">Read Engineering Notes</Link>
                 </Button>
               </div>
@@ -721,7 +777,11 @@ function ProductConfiguratorPage() {
                 <Field label="Country" name="country" required />
                 <Field label="Email" name="email" type="email" required />
                 <Field label="Phone / WhatsApp" name="phone" />
-                <Field label="Project Type" name="projectType" placeholder="Warehouse, cold room, factory…" />
+                <Field
+                  label="Project Type"
+                  name="projectType"
+                  placeholder="Warehouse, cold room, factory…"
+                />
                 <Field label="Quantity (m²)" name="quantity" type="number" />
                 <Field label="Delivery Country" name="delivery" />
               </div>
@@ -732,7 +792,8 @@ function ProductConfiguratorPage() {
                 <div className="mt-2 rounded-xl border border-white/10 bg-black/40 p-4 text-sm text-white/80">
                   <div>
                     <span className="text-white/50">Panel:</span>{" "}
-                    {PANEL_TYPES.find((p) => p.id === cfg.panelType)!.label} · {cfg.core} · {cfg.thickness}mm
+                    {PANEL_TYPES.find((p) => p.id === cfg.panelType)!.label} · {cfg.core} ·{" "}
+                    {cfg.thickness}mm
                   </div>
                   <div className="mt-1">
                     <span className="text-white/50">Size:</span> {cfg.width}mm × {cfg.length}m ·{" "}
@@ -760,7 +821,9 @@ function ProductConfiguratorPage() {
                 />
               </div>
               <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-                <p className="text-xs text-white/50">By submitting you agree to our privacy policy.</p>
+                <p className="text-xs text-white/50">
+                  By submitting you agree to our privacy policy.
+                </p>
                 <Button type="submit" size="lg" className="bg-accent text-black hover:bg-accent/90">
                   Send Quotation Request <ArrowRight className="ml-1 size-4" />
                 </Button>
@@ -776,8 +839,8 @@ function ProductConfiguratorPage() {
           <div>
             <Eyebrow>One configurator. Endless possibilities.</Eyebrow>
             <h2 className="mt-4 text-3xl font-semibold md:text-4xl">
-              From standard to highly specialised panels — configure exactly what
-              your project needs.
+              From standard to highly specialised panels — configure exactly what your project
+              needs.
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-4 text-sm">
@@ -787,7 +850,10 @@ function ProductConfiguratorPage() {
               { icon: Shield, label: "Building Owners" },
               { icon: Globe, label: "Distributors" },
             ].map((a) => (
-              <div key={a.label} className="flex items-center gap-3 rounded-xl border border-border bg-background p-4">
+              <div
+                key={a.label}
+                className="flex items-center gap-3 rounded-xl border border-border bg-background p-4"
+              >
                 <a.icon className="size-4 text-accent" />
                 <span className="font-medium">{a.label}</span>
               </div>
@@ -814,7 +880,12 @@ function Row({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <dt className={cn("text-xs uppercase tracking-widest", light ? "text-muted-foreground" : "text-white/50")}>
+      <dt
+        className={cn(
+          "text-xs uppercase tracking-widest",
+          light ? "text-muted-foreground" : "text-white/50",
+        )}
+      >
         {label}
       </dt>
       <dd
@@ -894,16 +965,14 @@ function ResultCard({
 
 /* --------------------------- Steps --------------------------- */
 
-function StepPanelType({
-  cfg,
-  onSelect,
-}: {
-  cfg: Config;
-  onSelect: (v: PanelType) => void;
-}) {
+function StepPanelType({ cfg, onSelect }: { cfg: Config; onSelect: (v: PanelType) => void }) {
   return (
     <div>
-      <StepHeader n={1} title="Panel Type" desc="Choose the type of panel that fits your application — the preview shape updates instantly." />
+      <StepHeader
+        n={1}
+        title="Panel Type"
+        desc="Choose the type of panel that fits your application — the preview shape updates instantly."
+      />
       <div className="grid gap-6 md:grid-cols-[1fr_1.2fr]">
         <PanelStudio cfg={cfg} ratio="aspect-[4/3]" showLabels={false} />
         <div className="space-y-2">
@@ -942,16 +1011,14 @@ function StepPanelType({
   );
 }
 
-function StepCore({
-  cfg,
-  onSelect,
-}: {
-  cfg: Config;
-  onSelect: (v: CoreMaterial) => void;
-}) {
+function StepCore({ cfg, onSelect }: { cfg: Config; onSelect: (v: CoreMaterial) => void }) {
   return (
     <div>
-      <StepHeader n={2} title="Core Material" desc="Select the insulation core — only the core texture changes in the preview." />
+      <StepHeader
+        n={2}
+        title="Core Material"
+        desc="Select the insulation core — only the core texture changes in the preview."
+      />
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {CORES.map((c) => {
           const active = c.id === cfg.core;
@@ -1002,7 +1069,11 @@ function StepDimensions({
 }) {
   return (
     <div>
-      <StepHeader n={3} title="Dimensions & Profile" desc="Define exact dimensions, profile geometry and joint type." />
+      <StepHeader
+        n={3}
+        title="Dimensions & Profile"
+        desc="Define exact dimensions, profile geometry and joint type."
+      />
       <div className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="md:col-span-2">
@@ -1083,7 +1154,9 @@ function StepDimensions({
           ratio="aspect-[4/3]"
           caption={
             <>
-              <span>{cfg.thickness} × {cfg.width} mm · {cfg.length} m</span>
+              <span>
+                {cfg.thickness} × {cfg.width} mm · {cfg.length} m
+              </span>
               <span>{cfg.joint}</span>
             </>
           }
@@ -1102,7 +1175,11 @@ function StepSteel({
 }) {
   return (
     <div>
-      <StepHeader n={4} title="Steel, Coating & Colour" desc="Colour changes are applied only to the steel skins — the core is never affected." />
+      <StepHeader
+        n={4}
+        title="Steel, Coating & Colour"
+        desc="Colour changes are applied only to the steel skins — the core is never affected."
+      />
       <div className="grid gap-6 md:grid-cols-[1.2fr_1fr]">
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
@@ -1199,8 +1276,12 @@ function StepSteel({
           ratio="aspect-[4/5]"
           caption={
             <>
-              <span>{cfg.coating} · {cfg.profile}</span>
-              <span>Ext {cfg.extColor} · Int {cfg.intColor}</span>
+              <span>
+                {cfg.coating} · {cfg.profile}
+              </span>
+              <span>
+                Ext {cfg.extColor} · Int {cfg.intColor}
+              </span>
             </>
           }
         />
@@ -1275,17 +1356,15 @@ function isLight(hex: string): boolean {
   return yiq >= 160;
 }
 
-function StepAccessories({
-  cfg,
-  onToggle,
-}: {
-  cfg: Config;
-  onToggle: (a: string) => void;
-}) {
+function StepAccessories({ cfg, onToggle }: { cfg: Config; onToggle: (a: string) => void }) {
   const items = ["Flashings", "Sealants", "Fasteners", "Ventilation", "Skylights", "Others"];
   return (
     <div>
-      <StepHeader n={5} title="Accessories" desc="Add finishing accessories and system components." />
+      <StepHeader
+        n={5}
+        title="Accessories"
+        desc="Add finishing accessories and system components."
+      />
       <div className="grid gap-6 md:grid-cols-[1fr_1fr]">
         <div className="grid grid-cols-2 gap-3">
           {items.map((a) => {
@@ -1317,7 +1396,6 @@ function StepAccessories({
   );
 }
 
-
 function StepResults({
   results,
   cfg,
@@ -1328,7 +1406,11 @@ function StepResults({
   const panelLabel = PANEL_TYPES.find((p) => p.id === cfg.panelType)!.label;
   return (
     <div>
-      <StepHeader n={6} title="Results" desc="Review full technical results and confirm your specification." />
+      <StepHeader
+        n={6}
+        title="Results"
+        desc="Review full technical results and confirm your specification."
+      />
       <div className="grid gap-4 md:grid-cols-3">
         <MiniResult label="U-Value" value={`${results.uValue} W/m²K`} />
         <MiniResult label="Fire Rating" value={results.fireRating} />
@@ -1337,15 +1419,22 @@ function StepResults({
         <MiniResult label="Core Density" value={`${results.coreDensity} kg/m³`} />
         <MiniResult label="Thermal Score" value={results.thermalScore} />
         <MiniResult label="Indicative Price" value={`$${results.pricePerM2}/m²`} />
-        <MiniResult label="Panel Total" value={`$${results.totalPrice.toLocaleString()} · ${results.totalArea} m²`} />
-        <MiniResult label="Coating Warranty" value={`${results.warranty} yrs · ${results.coatingDurability}`} />
+        <MiniResult
+          label="Panel Total"
+          value={`$${results.totalPrice.toLocaleString()} · ${results.totalArea} m²`}
+        />
+        <MiniResult
+          label="Coating Warranty"
+          value={`${results.warranty} yrs · ${results.coatingDurability}`}
+        />
         <MiniResult label="Lead Time" value={`${results.leadTime} weeks`} />
       </div>
       <div className="mt-6 rounded-2xl border border-accent/30 bg-accent/5 p-6">
         <div className="text-xs uppercase tracking-widest text-accent">Recommended Application</div>
         <div className="mt-2 text-lg font-medium text-white">{results.application}</div>
         <div className="mt-1 text-sm text-white/60">
-          Based on {cfg.core} core at {cfg.thickness}mm with {cfg.coating} finish for a {panelLabel.toLowerCase()} system.
+          Based on {cfg.core} core at {cfg.thickness}mm with {cfg.coating} finish for a{" "}
+          {panelLabel.toLowerCase()} system.
         </div>
       </div>
       <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -1354,8 +1443,13 @@ function StepResults({
           ratio="aspect-[4/3]"
           caption={
             <>
-              <span>NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness} · Ext {cfg.extColor}</span>
-              <span>U {results.uValue} · Fire {results.fireRating}</span>
+              <span>
+                NEVO-{cfg.core.replace(/\s/g, "").toUpperCase()}-{cfg.thickness} · Ext{" "}
+                {cfg.extColor}
+              </span>
+              <span>
+                U {results.uValue} · Fire {results.fireRating}
+              </span>
             </>
           }
         />
@@ -1371,7 +1465,9 @@ function StepResults({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-5">
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent">In-situ reference</div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent">
+              In-situ reference
+            </div>
             <div className="mt-1 text-lg font-semibold text-white">{panelLabel}</div>
             <div className="text-sm text-white/70">{results.application}</div>
           </div>

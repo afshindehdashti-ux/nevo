@@ -18,19 +18,19 @@ import { Loader2, CheckCircle2, AlertTriangle, RefreshCw } from "lucide-react";
  */
 
 type Phase =
-  | "checking"        // initial probe
-  | "genuine_404"     // health ok AND current path 404 → nothing to do
-  | "deploying"      // health missing/5xx/307 → show maintenance UI
-  | "recovering"     // health returned but current path still 404 → keep polling
-  | "recovered";     // ready to reload
+  | "checking" // initial probe
+  | "genuine_404" // health ok AND current path 404 → nothing to do
+  | "deploying" // health missing/5xx/307 → show maintenance UI
+  | "recovering" // health returned but current path still 404 → keep polling
+  | "recovered"; // ready to reload
 
 const HEALTH_PATH = "/api/public/health";
 const POLL_MS = 10_000;
 const MAX_POLLS = 60; // ~10 minutes
 
-async function probeStatus(currentPath: string): Promise<
-  { healthOk: boolean; pathOk: boolean; healthStatus: number; pathStatus: number }
-> {
+async function probeStatus(
+  currentPath: string,
+): Promise<{ healthOk: boolean; pathOk: boolean; healthStatus: number; pathStatus: number }> {
   const [h, p] = await Promise.allSettled([
     fetch(HEALTH_PATH, { cache: "no-store", redirect: "manual" }),
     fetch(currentPath, { method: "HEAD", cache: "no-store", redirect: "manual" }),
@@ -88,7 +88,9 @@ export function MaintenanceBanner() {
     // Health good but path still 404 → could be recovering or genuine miss.
     // First check after we already showed the maintenance UI stays as
     // "recovering" so we keep polling briefly before falling back.
-    setPhase((prev) => (prev === "deploying" || prev === "recovering" ? "recovering" : "genuine_404"));
+    setPhase((prev) =>
+      prev === "deploying" || prev === "recovering" ? "recovering" : "genuine_404",
+    );
   }, []);
 
   useEffect(() => {
@@ -109,17 +111,19 @@ export function MaintenanceBanner() {
   if (phase === "checking" || phase === "genuine_404") return null;
 
   const isRecovering = phase === "recovering" || phase === "recovered";
-  const title = phase === "recovered"
-    ? "Back online — reloading"
-    : isRecovering
-      ? "Almost ready"
-      : "Site update in progress";
+  const title =
+    phase === "recovered"
+      ? "Back online — reloading"
+      : isRecovering
+        ? "Almost ready"
+        : "Site update in progress";
 
-  const body = phase === "recovered"
-    ? "The new build is live. Reloading this page now…"
-    : isRecovering
-      ? "The new build is deploying. This page will appear as soon as it's ready."
-      : "We're publishing a new build. Some pages may return 404 for a minute or two while it propagates.";
+  const body =
+    phase === "recovered"
+      ? "The new build is live. Reloading this page now…"
+      : isRecovering
+        ? "The new build is deploying. This page will appear as soon as it's ready."
+        : "We're publishing a new build. Some pages may return 404 for a minute or two while it propagates.";
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm px-6">
@@ -134,15 +138,11 @@ export function MaintenanceBanner() {
           )}
           <div className="eyebrow text-accent">Deployment status</div>
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          {title}
-        </h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
         <p className="mt-3 text-sm text-muted-foreground">{body}</p>
 
         <div className="mt-6 flex items-center justify-between text-xs text-muted-foreground">
-          <span>
-            {lastCheck ? `Last check: ${lastCheck.toLocaleTimeString()}` : "Checking…"}
-          </span>
+          <span>{lastCheck ? `Last check: ${lastCheck.toLocaleTimeString()}` : "Checking…"}</span>
           <span>
             Retry {polls}/{MAX_POLLS}
           </span>

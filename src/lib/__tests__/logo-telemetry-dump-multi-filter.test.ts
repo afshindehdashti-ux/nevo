@@ -132,9 +132,7 @@ describe("multi-field dump filter", () => {
       limits: { renderSampleRate: 0.01, errorMaxPerSession: 5, errorMinIntervalMs: 1000 },
       ts: 0,
     };
-    expect(matchesLogoDumpFilter(record, { kind: "error", stage: "primary-light-png" })).toBe(
-      true,
-    );
+    expect(matchesLogoDumpFilter(record, { kind: "error", stage: "primary-light-png" })).toBe(true);
     expect(matchesLogoDumpFilter(record, { terminal: true })).toBe(false);
     expect(matchesLogoDumpFilter(record, { reason: ["accepted", "throttle"] })).toBe(true);
   });

@@ -21,8 +21,8 @@ export function AdminPlaceholder({ title, description }: { title: string; descri
             dashboard, roles, and company settings) is now live.
           </p>
           <p>
-            This module will be delivered in the next phase, together with the related database tables,
-            list views, detail pages, and PDF exports.
+            This module will be delivered in the next phase, together with the related database
+            tables, list views, detail pages, and PDF exports.
           </p>
         </CardContent>
       </Card>

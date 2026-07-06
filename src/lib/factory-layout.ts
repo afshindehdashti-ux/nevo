@@ -20,16 +20,8 @@ export type Shift = "1 Shift" | "2 Shifts" | "3 Shifts";
 
 export const CAPACITIES: Capacity[] = [3000, 5000, 8000, 12000, 20000];
 export const CORES: Core[] = ["PIR", "PUR", "Rock Wool", "EPS", "Hybrid"];
-export const AUTOMATIONS: Automation[] = [
-  "Semi Automatic",
-  "Automatic",
-  "Fully Automatic",
-];
-export const BUILDINGS: Building[] = [
-  "Single Hall",
-  "Dual Hall",
-  "Expansion Ready",
-];
+export const AUTOMATIONS: Automation[] = ["Semi Automatic", "Automatic", "Fully Automatic"];
+export const BUILDINGS: Building[] = ["Single Hall", "Dual Hall", "Expansion Ready"];
 export const SHIFTS: Shift[] = ["1 Shift", "2 Shifts", "3 Shifts"];
 
 // ─── Conceptual engineering spec (verbatim from brief) ─────────────────
@@ -45,11 +37,51 @@ export type CapacitySpec = {
 };
 
 export const CAPACITY_SPEC: Record<Capacity, CapacitySpec> = {
-  3000:  { lines: [1, 1], landM2: [6000, 8000],   buildingM2: [3000, 4500],   powerKW: [500, 800],   operators: [15, 25], forklifts: [1, 2], loadingBays: [1, 2] },
-  5000:  { lines: [1, 1], landM2: [10000, 13000], buildingM2: [5000, 7000],   powerKW: [900, 1200],  operators: [25, 35], forklifts: [2, 2], loadingBays: [2, 2] },
-  8000:  { lines: [1, 2], landM2: [15000, 20000], buildingM2: [7000, 9000],   powerKW: [1200, 1800], operators: [30, 45], forklifts: [2, 3], loadingBays: [2, 3] },
-  12000: { lines: [2, 2], landM2: [20000, 28000], buildingM2: [10000, 14000], powerKW: [1800, 2600], operators: [45, 60], forklifts: [3, 4], loadingBays: [3, 4] },
-  20000: { lines: [2, 3], landM2: [35000, 50000], buildingM2: [18000, 25000], powerKW: [3000, 4500], operators: [70, 100], forklifts: [5, 7], loadingBays: [5, 8] },
+  3000: {
+    lines: [1, 1],
+    landM2: [6000, 8000],
+    buildingM2: [3000, 4500],
+    powerKW: [500, 800],
+    operators: [15, 25],
+    forklifts: [1, 2],
+    loadingBays: [1, 2],
+  },
+  5000: {
+    lines: [1, 1],
+    landM2: [10000, 13000],
+    buildingM2: [5000, 7000],
+    powerKW: [900, 1200],
+    operators: [25, 35],
+    forklifts: [2, 2],
+    loadingBays: [2, 2],
+  },
+  8000: {
+    lines: [1, 2],
+    landM2: [15000, 20000],
+    buildingM2: [7000, 9000],
+    powerKW: [1200, 1800],
+    operators: [30, 45],
+    forklifts: [2, 3],
+    loadingBays: [2, 3],
+  },
+  12000: {
+    lines: [2, 2],
+    landM2: [20000, 28000],
+    buildingM2: [10000, 14000],
+    powerKW: [1800, 2600],
+    operators: [45, 60],
+    forklifts: [3, 4],
+    loadingBays: [3, 4],
+  },
+  20000: {
+    lines: [2, 3],
+    landM2: [35000, 50000],
+    buildingM2: [18000, 25000],
+    powerKW: [3000, 4500],
+    operators: [70, 100],
+    forklifts: [5, 7],
+    loadingBays: [5, 8],
+  },
 };
 
 const fmtRange = (r: Range, unit = "") =>
@@ -89,8 +121,7 @@ export function computeTechData(
   const coreBldMult =
     core === "Rock Wool" ? 1.15 : core === "Hybrid" ? 1.12 : core === "EPS" ? 1.05 : 1;
   // Building type adjustments.
-  const bldMult =
-    building === "Dual Hall" ? 1.18 : building === "Expansion Ready" ? 1.25 : 1;
+  const bldMult = building === "Dual Hall" ? 1.18 : building === "Expansion Ready" ? 1.25 : 1;
   const totalBld = Math.round(bMid * coreBldMult * bldMult);
 
   // Room breakdown (share of total building area).
@@ -100,16 +131,14 @@ export function computeTechData(
   const officeM2 = Math.round(totalBld * 0.06);
 
   // Automation shifts operator count within the spec range.
-  const opsMult =
-    automation === "Fully Automatic" ? 0.7 : automation === "Automatic" ? 0.9 : 1.1;
+  const opsMult = automation === "Fully Automatic" ? 0.7 : automation === "Automatic" ? 0.9 : 1.1;
   const opsBase = (spec.operators[0] + spec.operators[1]) / 2;
   const shiftMult = shift === "3 Shifts" ? 1.8 : shift === "2 Shifts" ? 1.4 : 1;
   const opsFinal = Math.round(opsBase * opsMult * shiftMult);
 
   // Power adjustments for Rock Wool (curing ovens) + Fully Automatic (robots).
   const powerMult =
-    (core === "Rock Wool" ? 1.15 : 1) *
-    (automation === "Fully Automatic" ? 1.1 : 1);
+    (core === "Rock Wool" ? 1.15 : 1) * (automation === "Fully Automatic" ? 1.1 : 1);
   const powerMid = Math.round(((spec.powerKW[0] + spec.powerKW[1]) / 2) * powerMult);
 
   // Utility ratios keyed to capacity (per-day / per-min / per-hour).
@@ -166,11 +195,26 @@ export function computeEquipment(
       reason: `Required for ${core} continuous foaming`,
     });
     items.push({ name: "Polyol / MDI Day Tanks", qty: "×2 sets", category: "safety" });
-    items.push({ name: "Pentane Blowing Agent Skid", qty: "×1", category: "safety", reason: "Explosion-proof pentane handling" });
+    items.push({
+      name: "Pentane Blowing Agent Skid",
+      qty: "×1",
+      category: "safety",
+      reason: "Explosion-proof pentane handling",
+    });
   }
   if (core === "Rock Wool" || core === "Hybrid") {
-    items.push({ name: "Rock Wool Lamella Cutting & Turning Unit", qty: "×1", category: "production", reason: "Fibre orientation for structural performance" });
-    items.push({ name: "Dust Extraction & Filtration Plant", qty: "×1", category: "utility", reason: "Mandatory for mineral fibre operations" });
+    items.push({
+      name: "Rock Wool Lamella Cutting & Turning Unit",
+      qty: "×1",
+      category: "production",
+      reason: "Fibre orientation for structural performance",
+    });
+    items.push({
+      name: "Dust Extraction & Filtration Plant",
+      qty: "×1",
+      category: "utility",
+      reason: "Mandatory for mineral fibre operations",
+    });
     items.push({ name: "PU Adhesive Roller Coater", qty: `×${lines[1]}`, category: "production" });
   }
   if (core === "EPS") {
@@ -180,14 +224,28 @@ export function computeEquipment(
   }
 
   items.push({ name: "Double Belt Laminator", qty: `×${lines[1]}`, category: "production" });
-  items.push({ name: "Curing Oven / Cooling Section", qty: `×${lines[1]}`, category: "production" });
+  items.push({
+    name: "Curing Oven / Cooling Section",
+    qty: `×${lines[1]}`,
+    category: "production",
+  });
   items.push({ name: "Flying Saw / Cut-to-Length", qty: `×${lines[1]}`, category: "production" });
 
   // Stacking / packaging vary with automation.
   if (automation === "Fully Automatic") {
-    items.push({ name: "Robotic Stacking Cell (6-axis)", qty: `×${lines[1]}`, category: "production", reason: "Replaces manual stacking" });
+    items.push({
+      name: "Robotic Stacking Cell (6-axis)",
+      qty: `×${lines[1]}`,
+      category: "production",
+      reason: "Replaces manual stacking",
+    });
     items.push({ name: "Automatic Strapping & Wrapping Line", qty: "×1", category: "production" });
-    items.push({ name: "Central SCADA Control Room", qty: "×1", category: "control", reason: "Line-wide MES / OEE monitoring" });
+    items.push({
+      name: "Central SCADA Control Room",
+      qty: "×1",
+      category: "control",
+      reason: "Line-wide MES / OEE monitoring",
+    });
   } else if (automation === "Automatic") {
     items.push({ name: "Automatic Vacuum Stacker", qty: `×${lines[1]}`, category: "production" });
     items.push({ name: "Semi-Automatic Strapping Station", qty: "×1", category: "production" });
@@ -201,14 +259,22 @@ export function computeEquipment(
   // Utilities scale with capacity.
   const compQty = capacity >= 12000 ? "×3" : capacity >= 5000 ? "×2" : "×1";
   items.push({ name: "Screw Air Compressor (oil-free)", qty: compQty, category: "utility" });
-  items.push({ name: "Process Chiller Unit", qty: capacity >= 12000 ? "×2" : "×1", category: "utility" });
+  items.push({
+    name: "Process Chiller Unit",
+    qty: capacity >= 12000 ? "×2" : "×1",
+    category: "utility",
+  });
   if (core !== "Rock Wool") {
     items.push({ name: "Thermal Oil / Steam Boiler", qty: "×1", category: "utility" });
   }
   items.push({ name: "MV Transformer & LV Distribution", qty: "×1 set", category: "utility" });
   items.push({ name: "Fire Detection & Foam Suppression", qty: "×1 system", category: "safety" });
 
-  items.push({ name: `Diesel Forklift (3–5 t)`, qty: fmtRange(CAPACITY_SPEC[capacity].forklifts), category: "handling" });
+  items.push({
+    name: `Diesel Forklift (3–5 t)`,
+    qty: fmtRange(CAPACITY_SPEC[capacity].forklifts),
+    category: "handling",
+  });
 
   return items;
 }
@@ -288,7 +354,7 @@ export const zoneFill = (c: ZoneCategory) => CAT_COLORS[c];
 // Building envelope grows with capacity — very simple linear ramp within
 // a fixed viewBox so proportions read correctly against the site outline.
 const capacityScale = (c: Capacity) =>
-  ({ 3000: 0.62, 5000: 0.75, 8000: 0.86, 12000: 0.95, 20000: 1.0 }[c]);
+  ({ 3000: 0.62, 5000: 0.75, 8000: 0.86, 12000: 0.95, 20000: 1.0 })[c];
 
 export function computeFactoryLayout(cfg: {
   capacity: Capacity;
@@ -454,17 +520,67 @@ export function computeFactoryLayout(cfg: {
     const y = bldY + 10 + i * stationH * (lines === 1 ? 0.5 : 1);
     const h = lines === 1 ? bldH - 20 : stationH - 10;
     const stepW = prodW / 5;
-    const stations: Array<{ id: string; name: string; short: string; cat: ZoneCategory; eq: string[]; fn: string }> = [
-      { id: "rf", name: "Roll Forming", short: "Roll Form", cat: "production", eq: ["Roll former", "Decoiler"], fn: "Profile forming of upper/lower skins." },
-      { id: "lam", name: "Double Belt Laminator", short: "Laminator", cat: "production", eq: ["Double belt press"], fn: "Continuous bonding under pressure & heat." },
-      { id: "cool", name: "Cooling Section", short: "Cooling", cat: "cooling", eq: ["Cooling tunnel"], fn: "Controlled curing / cooling of the panel." },
-      { id: "cut", name: "Flying Saw", short: "Flying Saw", cat: "cutting", eq: ["Flying cut-to-length saw"], fn: "Cut-to-length on the move." },
-      { id: automation === "Fully Automatic" ? "rstack" : "stack",
-        name: automation === "Fully Automatic" ? "Robotic Stacking" : automation === "Automatic" ? "Automatic Stacking" : "Manual Stacking",
+    const stations: Array<{
+      id: string;
+      name: string;
+      short: string;
+      cat: ZoneCategory;
+      eq: string[];
+      fn: string;
+    }> = [
+      {
+        id: "rf",
+        name: "Roll Forming",
+        short: "Roll Form",
+        cat: "production",
+        eq: ["Roll former", "Decoiler"],
+        fn: "Profile forming of upper/lower skins.",
+      },
+      {
+        id: "lam",
+        name: "Double Belt Laminator",
+        short: "Laminator",
+        cat: "production",
+        eq: ["Double belt press"],
+        fn: "Continuous bonding under pressure & heat.",
+      },
+      {
+        id: "cool",
+        name: "Cooling Section",
+        short: "Cooling",
+        cat: "cooling",
+        eq: ["Cooling tunnel"],
+        fn: "Controlled curing / cooling of the panel.",
+      },
+      {
+        id: "cut",
+        name: "Flying Saw",
+        short: "Flying Saw",
+        cat: "cutting",
+        eq: ["Flying cut-to-length saw"],
+        fn: "Cut-to-length on the move.",
+      },
+      {
+        id: automation === "Fully Automatic" ? "rstack" : "stack",
+        name:
+          automation === "Fully Automatic"
+            ? "Robotic Stacking"
+            : automation === "Automatic"
+              ? "Automatic Stacking"
+              : "Manual Stacking",
         short: "Stacking",
         cat: "stacking",
-        eq: automation === "Fully Automatic" ? ["6-axis robot", "Vacuum EOAT"] : automation === "Automatic" ? ["Vacuum stacker"] : ["Manual table"],
-        fn: automation === "Fully Automatic" ? "Robotic bundle building." : "Bundle formation for packaging." },
+        eq:
+          automation === "Fully Automatic"
+            ? ["6-axis robot", "Vacuum EOAT"]
+            : automation === "Automatic"
+              ? ["Vacuum stacker"]
+              : ["Manual table"],
+        fn:
+          automation === "Fully Automatic"
+            ? "Robotic bundle building."
+            : "Bundle formation for packaging.",
+      },
     ];
     stations.forEach((st, k) => {
       zones.push({
@@ -510,7 +626,10 @@ export function computeFactoryLayout(cfg: {
     category: "packaging",
     fn: "Strapping, wrapping, labeling.",
     approxAreaM2: Math.round(rightW * bldH * 0.22 * 0.4),
-    equipment: automation === "Fully Automatic" ? ["Auto strapper", "Stretch wrapper", "Label robot"] : ["Strapping tool", "Manual wrapper"],
+    equipment:
+      automation === "Fully Automatic"
+        ? ["Auto strapper", "Stretch wrapper", "Label robot"]
+        : ["Strapping tool", "Manual wrapper"],
   });
   zones.push({
     id: "fin",
@@ -542,13 +661,62 @@ export function computeFactoryLayout(cfg: {
   // ── Bottom row: Utilities + QC + Office + Workshop ─────────────────────
   const bottomY = bldY + bldH + 12;
   const bottomH = 90;
-  const bottomZones: Array<{ id: string; name: string; short: string; cat: ZoneCategory; fn: string; eq: string[] }> = [
-    { id: "util", name: "Utility Room", short: "Utility", cat: "utility", fn: "Chillers, boilers, water treatment.", eq: ["Chiller", "Boiler", "Softener"] },
-    { id: "elec", name: "Electrical Room", short: "Electrical", cat: "utility", fn: "MV transformer, LV distribution.", eq: ["Transformer", "LV switchgear"] },
-    { id: "air", name: "Air Compressor Room", short: "Compressors", cat: "utility", fn: "Oil-free screw compressors + receivers.", eq: ["Screw compressor", "Air dryer", "Receiver"] },
-    { id: "lab", name: "Quality Control Lab", short: "QC Lab", cat: "lab", fn: "Density, adhesion, fire, thermal testing.", eq: ["Density scale", "Peel tester", "Cone calorimeter"] },
-    { id: "maint", name: "Maintenance Workshop", short: "Workshop", cat: "workshop", fn: "Preventive maintenance & spares.", eq: ["Lathe", "Welder", "Spare parts racks"] },
-    { id: "office", name: "Administration / Office", short: "Office", cat: "office", fn: "Production office, planning, control room.", eq: ["SCADA HMI", "Meeting rooms"] },
+  const bottomZones: Array<{
+    id: string;
+    name: string;
+    short: string;
+    cat: ZoneCategory;
+    fn: string;
+    eq: string[];
+  }> = [
+    {
+      id: "util",
+      name: "Utility Room",
+      short: "Utility",
+      cat: "utility",
+      fn: "Chillers, boilers, water treatment.",
+      eq: ["Chiller", "Boiler", "Softener"],
+    },
+    {
+      id: "elec",
+      name: "Electrical Room",
+      short: "Electrical",
+      cat: "utility",
+      fn: "MV transformer, LV distribution.",
+      eq: ["Transformer", "LV switchgear"],
+    },
+    {
+      id: "air",
+      name: "Air Compressor Room",
+      short: "Compressors",
+      cat: "utility",
+      fn: "Oil-free screw compressors + receivers.",
+      eq: ["Screw compressor", "Air dryer", "Receiver"],
+    },
+    {
+      id: "lab",
+      name: "Quality Control Lab",
+      short: "QC Lab",
+      cat: "lab",
+      fn: "Density, adhesion, fire, thermal testing.",
+      eq: ["Density scale", "Peel tester", "Cone calorimeter"],
+    },
+    {
+      id: "maint",
+      name: "Maintenance Workshop",
+      short: "Workshop",
+      cat: "workshop",
+      fn: "Preventive maintenance & spares.",
+      eq: ["Lathe", "Welder", "Spare parts racks"],
+    },
+    {
+      id: "office",
+      name: "Administration / Office",
+      short: "Office",
+      cat: "office",
+      fn: "Production office, planning, control room.",
+      eq: ["SCADA HMI", "Meeting rooms"],
+    },
   ];
   const stepBW = bldW / bottomZones.length;
   bottomZones.forEach((bz, i) => {
@@ -661,10 +829,7 @@ export function computeFactoryLayout(cfg: {
 }
 
 // ─── Expansion recommendation copy ──────────────────────────────────────
-export function expansionRecommendation(cfg: {
-  capacity: Capacity;
-  building: Building;
-}): string {
+export function expansionRecommendation(cfg: { capacity: Capacity; building: Building }): string {
   if (cfg.building === "Expansion Ready") {
     return `Reserve ${Math.round(CAPACITY_SPEC[cfg.capacity].landM2[1] * 0.5).toLocaleString()} m² adjacent land; pre-size utilities for +50% throughput.`;
   }
@@ -674,10 +839,7 @@ export function expansionRecommendation(cfg: {
   return "Single hall is compact; if scaling beyond 50%, switch to Dual Hall or Expansion Ready.";
 }
 
-export function recommendedBuildingCopy(cfg: {
-  capacity: Capacity;
-  core: Core;
-}): string {
+export function recommendedBuildingCopy(cfg: { capacity: Capacity; core: Core }): string {
   if (cfg.capacity >= 12000) return "Dual Hall or Expansion Ready recommended for 12,000+ m²/day.";
   if (cfg.core === "Rock Wool") return "Extra warehouse depth recommended for lamella storage.";
   return "Single hall is efficient for this configuration.";

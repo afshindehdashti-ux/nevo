@@ -33,9 +33,16 @@ const MAX_BODY_BYTES = 64 * 1024;
 
 const s = (v: unknown, cap = MAX_STRING): string => {
   if (v == null) return "";
-  const str = typeof v === "string" ? v : (() => {
-    try { return JSON.stringify(v); } catch { return String(v); }
-  })();
+  const str =
+    typeof v === "string"
+      ? v
+      : (() => {
+          try {
+            return JSON.stringify(v);
+          } catch {
+            return String(v);
+          }
+        })();
   return str.length > cap ? str.slice(0, cap) + "…[truncated]" : str;
 };
 
@@ -56,18 +63,34 @@ export const Route = createFileRoute("/api/public/client-log")({
         try {
           const cl = Number(request.headers.get("content-length") || "0");
           if (cl > MAX_BODY_BYTES) {
-            return Response.json({ ok: false, error: "payload_too_large" }, { status: 413, headers: corsHeaders() });
+            return Response.json(
+              { ok: false, error: "payload_too_large" },
+              { status: 413, headers: corsHeaders() },
+            );
           }
           const raw = await request.text();
           if (raw.length > MAX_BODY_BYTES) {
-            return Response.json({ ok: false, error: "payload_too_large" }, { status: 413, headers: corsHeaders() });
+            return Response.json(
+              { ok: false, error: "payload_too_large" },
+              { status: 413, headers: corsHeaders() },
+            );
           }
           let payload: { entries?: ClientLogEntry[] } = {};
-          try { payload = JSON.parse(raw); } catch {
-            return Response.json({ ok: false, error: "invalid_json" }, { status: 400, headers: corsHeaders() });
+          try {
+            payload = JSON.parse(raw);
+          } catch {
+            return Response.json(
+              { ok: false, error: "invalid_json" },
+              { status: 400, headers: corsHeaders() },
+            );
           }
-          const entries = Array.isArray(payload.entries) ? payload.entries.slice(0, MAX_ENTRIES) : [];
-          const ip = request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || "-";
+          const entries = Array.isArray(payload.entries)
+            ? payload.entries.slice(0, MAX_ENTRIES)
+            : [];
+          const ip =
+            request.headers.get("cf-connecting-ip") ||
+            request.headers.get("x-forwarded-for") ||
+            "-";
           const ref = request.headers.get("referer") || "-";
 
           const logoRows: Array<any> = [];
@@ -105,7 +128,9 @@ export const Route = createFileRoute("/api/public/client-log")({
               `ip=${s(ip, 64)}`,
               `ref=${s(ref, 240)}`,
               e.extra ? `extra=${s(e.extra, 1000)}` : "",
-            ].filter(Boolean).join(" | ");
+            ]
+              .filter(Boolean)
+              .join(" | ");
 
             const level = e.level === "warn" ? "warn" : e.level === "info" ? "info" : "error";
             if (level === "error") console.error(line);
@@ -115,10 +140,10 @@ export const Route = createFileRoute("/api/public/client-log")({
             // Persist header.logo.* events for the admin dashboard.
             const msg = typeof e.message === "string" ? e.message : "";
             if (msg === "header.logo.render" || msg === "header.logo.error") {
-              const extra = (e.extra && typeof e.extra === "object" ? e.extra as Record<string, unknown> : {});
+              const extra =
+                e.extra && typeof e.extra === "object" ? (e.extra as Record<string, unknown>) : {};
               const vp = extra.viewport as { width?: unknown } | undefined;
-              const num = (v: unknown) =>
-                typeof v === "number" && Number.isFinite(v) ? v : null;
+              const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : null);
               const str = (v: unknown, cap = 400) =>
                 typeof v === "string" ? (v.length > cap ? v.slice(0, cap) : v) : null;
               const rawTs = e.ts;
@@ -191,21 +216,22 @@ export const Route = createFileRoute("/api/public/client-log")({
               // end-to-end breadcrumbs for sticky logo breaks.
               const uniqueIds = Array.from(
                 new Set(
-                  sentryEvents
-                    .map((ev) => ev.correlationId)
-                    .filter((id): id is string => !!id),
+                  sentryEvents.map((ev) => ev.correlationId).filter((id): id is string => !!id),
                 ),
               );
 
-              const historyByCid = new Map<string, Array<{
-                eventType: "render" | "error";
-                stage: string | null;
-                variant: string | null;
-                src: string | null;
-                nextSrc: string | null;
-                online: boolean | null;
-                clientTs: string | null;
-              }>>();
+              const historyByCid = new Map<
+                string,
+                Array<{
+                  eventType: "render" | "error";
+                  stage: string | null;
+                  variant: string | null;
+                  src: string | null;
+                  nextSrc: string | null;
+                  online: boolean | null;
+                  clientTs: string | null;
+                }>
+              >();
 
               if (uniqueIds.length > 0) {
                 const { data: hist, error: histErr } = await supabaseAdmin
@@ -237,7 +263,7 @@ export const Route = createFileRoute("/api/public/client-log")({
 
               const hydrated = sentryEvents.map((ev) => ({
                 ...ev,
-                history: ev.correlationId ? historyByCid.get(ev.correlationId) ?? [] : [],
+                history: ev.correlationId ? (historyByCid.get(ev.correlationId) ?? []) : [],
               }));
               void forwardLogoErrorsToSentry(hydrated);
             } catch (err) {
@@ -245,12 +271,13 @@ export const Route = createFileRoute("/api/public/client-log")({
             }
           }
 
-
-
           return Response.json({ ok: true, received: entries.length }, { headers: corsHeaders() });
         } catch (err) {
           console.error("[client-log] sink failed:", err);
-          return Response.json({ ok: false, error: "sink_failed" }, { status: 500, headers: corsHeaders() });
+          return Response.json(
+            { ok: false, error: "sink_failed" },
+            { status: 500, headers: corsHeaders() },
+          );
         }
       },
     },

@@ -3,7 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type LogoEventFilters = {
   from?: string; // ISO
-  to?: string;   // ISO
+  to?: string; // ISO
   eventType?: "all" | "render" | "error";
   variant?: string | null;
   minWidth?: number | null;
@@ -21,7 +21,6 @@ async function ensureAdmin(supabase: any, userId: string) {
   if (error) throw new Error("Role check failed");
   if (!data) throw new Error("Forbidden: admin role required");
 }
-
 
 function normalize(input: unknown): Required<LogoEventFilters> {
   const i = (input && typeof input === "object" ? input : {}) as LogoEventFilters;

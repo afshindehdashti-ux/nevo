@@ -3,6 +3,7 @@
 > Master IA blueprint. Single source of truth for routes, navigation, taxonomies, page contracts, search, related-content, conversions, SEO, and scalability. No visual design decisions live here.
 
 Companion documents:
+
 - [`url-map.md`](./url-map.md) — flat URL registry (drives router + sitemap)
 - [`taxonomies.md`](./taxonomies.md) — closed vocabularies for tagging
 - [`page-contract.md`](./page-contract.md) — 9-block spine + per-template extensions
@@ -14,6 +15,7 @@ Companion documents:
 Positioning: the definitive global engineering platform for the sandwich panel industry — factories, machinery, materials, panels, and knowledge, unified under one authority.
 
 Business objectives → primary conversion events:
+
 - Factory Project inquiry
 - Engineering Consultancy inquiry
 - Raw Material RFQ
@@ -29,18 +31,18 @@ Authority KPIs: organic sessions, backlinks, avg. pages/session in `/knowledge/`
 
 ## 2. Audience → Goal → Entry point matrix
 
-| Audience | Primary goal | First-touch entry | Primary CTA |
-|---|---|---|---|
-| Investor | Build a factory | `/solutions/factory-development/`, `/knowledge/factory-cost/` | Request Feasibility Study |
-| Factory Owner | Modernize / expand | `/solutions/production-optimization/`, `/production-lines/modernization/` | Request Audit |
-| Factory Manager | Fix production issue | `/solutions/factory-audits/`, `/knowledge/production-technology/` | Book Technical Call |
-| Production Manager | Improve OEE / quality | `/solutions/automation/`, `/production-lines/automation/` | Request Line Assessment |
-| Engineering Consultant | Reference / partnership | `/knowledge/engineering-library/`, `/company/partners/` | Become a Partner |
-| Construction Co. / Contractor | Buy panels | `/finished-panels/*`, `/industries/*` | Request Panel Quote |
-| Architect | Specify panels | `/finished-panels/architectural/`, `/downloads/category/cad-drawings/` | Download CAD + Datasheet |
-| Distributor | Represent NEVO | `/company/partners/`, `/markets/{country}/` | Apply as Distributor |
-| Raw Material Buyer | Source PIR/PPGI/etc. | `/raw-materials/*` | Request Material RFQ |
-| Developer / Gov. Projects | Turnkey capability | `/solutions/factory-development/`, `/case-studies/category/factory-projects/` | Request Proposal |
+| Audience                      | Primary goal            | First-touch entry                                                             | Primary CTA               |
+| ----------------------------- | ----------------------- | ----------------------------------------------------------------------------- | ------------------------- |
+| Investor                      | Build a factory         | `/solutions/factory-development/`, `/knowledge/factory-cost/`                 | Request Feasibility Study |
+| Factory Owner                 | Modernize / expand      | `/solutions/production-optimization/`, `/production-lines/modernization/`     | Request Audit             |
+| Factory Manager               | Fix production issue    | `/solutions/factory-audits/`, `/knowledge/production-technology/`             | Book Technical Call       |
+| Production Manager            | Improve OEE / quality   | `/solutions/automation/`, `/production-lines/automation/`                     | Request Line Assessment   |
+| Engineering Consultant        | Reference / partnership | `/knowledge/engineering-library/`, `/company/partners/`                       | Become a Partner          |
+| Construction Co. / Contractor | Buy panels              | `/finished-panels/*`, `/industries/*`                                         | Request Panel Quote       |
+| Architect                     | Specify panels          | `/finished-panels/architectural/`, `/downloads/category/cad-drawings/`        | Download CAD + Datasheet  |
+| Distributor                   | Represent NEVO          | `/company/partners/`, `/markets/{country}/`                                   | Apply as Distributor      |
+| Raw Material Buyer            | Source PIR/PPGI/etc.    | `/raw-materials/*`                                                            | Request Material RFQ      |
+| Developer / Gov. Projects     | Turnkey capability      | `/solutions/factory-development/`, `/case-studies/category/factory-projects/` | Request Proposal          |
 
 Every persona has a pathway ribbon on the homepage ("I want to…") that lands them on the correct hub.
 
@@ -77,6 +79,7 @@ Mobile: same taxonomy as a two-level accordion. Persistent bottom bar with Call 
 ## 4. Canonical URL structure
 
 Rules:
+
 - Lowercase, hyphenated, trailing slash on directories.
 - Two-level max for hubs, three-level max for detail pages.
 - Country slugs use readable form (`saudi-arabia`, `uae`).
@@ -115,6 +118,7 @@ Every hub and detail page implements the same 9-block spine so editors, designer
 9. **CTA** — page-specific primary conversion.
 
 Cross-cutting elements on every internal page:
+
 - Breadcrumb (BreadcrumbList JSON-LD).
 - "Related Markets" strip where relevant.
 - "Related Case Studies" strip where relevant.
@@ -149,6 +153,7 @@ Single search index with faceted fields:
 `objectID`, `url`, `title`, `summary`, `body`, `image`, `content_type`, `taxonomies.{topic,industry,product,solution,market,audience,stage}[]`, `language`, `updated_at`, `weight`.
 
 Search UI:
+
 - Instant results grouped by tab (All · Products · Knowledge · Downloads · Case Studies · FAQ · Markets).
 - Faceted refinement by industry, topic, market, content type.
 - Empty state → trending queries + top pillar guides.
@@ -202,9 +207,9 @@ All forms feed one CRM pipeline with `source_url`, `persona`, `stage`, `market`,
 - One H1 per page; H2/H3 hierarchy mirrors the 9-block spine.
 - Schema.org JSON-LD by page type: Organization (root), WebSite + SearchAction (root), BreadcrumbList (all internal), Article/TechArticle (knowledge), Product (product detail), HowTo (installation guides), FAQPage (any FAQ block), CreativeWork (case studies), LocalBusiness (country pages), JobPosting (careers).
 - Internal linking driven by taxonomy plus three pillar-cluster hubs:
-  1. *How to build a sandwich panel factory* under `/knowledge/factory-design/`.
-  2. *PIR vs PUR vs Rock Wool* under `/knowledge/pir-guide/` (+ siblings).
-  3. *Production line selection* under `/knowledge/production-technology/`.
+  1. _How to build a sandwich panel factory_ under `/knowledge/factory-design/`.
+  2. _PIR vs PUR vs Rock Wool_ under `/knowledge/pir-guide/` (+ siblings).
+  3. _Production line selection_ under `/knowledge/production-technology/`.
 - Sitemap: dynamic server route generating one entry per public URL, including taxonomy landings; split into sitemap index if it exceeds 50k URLs (10-year horizon).
 - Hreflang: reserved for `en` / `ar` / `ru` / `tr` / `fr`. First release ships `en` only; URL scheme is `/` (English default) and `/{lang}/…` for future locales.
 - Robots: allow all; disallow `/search/`, `/contact/*/thank-you/`, `/legal/preview/*`.
@@ -214,6 +219,7 @@ All forms feed one CRM pipeline with `source_url`, `persona`, `stage`, `market`,
 ## 12. User journey blueprints
 
 Investor — building a factory:
+
 ```text
 Home → pathway "Build a Factory" → /solutions/factory-development/ →
   /knowledge/factory-cost/ → /case-studies/category/factory-projects/ →
@@ -221,6 +227,7 @@ Home → pathway "Build a Factory" → /solutions/factory-development/ →
 ```
 
 Factory Manager — fix production quality:
+
 ```text
 Home → Solutions mega-menu → /solutions/factory-audits/ →
   /knowledge/production-technology/ → /production-lines/automation/ →
@@ -228,6 +235,7 @@ Home → Solutions mega-menu → /solutions/factory-audits/ →
 ```
 
 Architect — specify panels:
+
 ```text
 Search "fire rated wall panel" → /finished-panels/fire-rated/ →
   /downloads/{datasheet} → /downloads/{cad-pack} →
@@ -235,11 +243,13 @@ Search "fire rated wall panel" → /finished-panels/fire-rated/ →
 ```
 
 Distributor — represent NEVO in Kenya:
+
 ```text
 /markets/kenya/ → /company/partners/ → Distributor Application
 ```
 
 Raw material buyer — PPGI in Iraq:
+
 ```text
 Search "PPGI supplier" → /raw-materials/ppgi/ → /markets/iraq/ →
   Material RFQ

@@ -51,13 +51,33 @@ export const Route = createFileRoute("/$lang/ai-assistant")({
 
 const CAPABILITIES = [
   { icon: Factory, title: "Factory Planning", desc: "Layout, land, utilities & workflow sizing." },
-  { icon: Calculator, title: "Capacity Calculator", desc: "m/min, m²/year, shift & OEE modelling." },
+  {
+    icon: Calculator,
+    title: "Capacity Calculator",
+    desc: "m/min, m²/year, shift & OEE modelling.",
+  },
   { icon: Layers, title: "Panel Recommendation", desc: "PIR vs Rock Wool, thickness, U-value." },
-  { icon: PackageSearch, title: "Material Selection", desc: "Steel coils, chemicals, mineral wool." },
-  { icon: Cog, title: "Production Line Selection", desc: "Continuous / discontinuous line matching." },
+  {
+    icon: PackageSearch,
+    title: "Material Selection",
+    desc: "Steel coils, chemicals, mineral wool.",
+  },
+  {
+    icon: Cog,
+    title: "Production Line Selection",
+    desc: "Continuous / discontinuous line matching.",
+  },
   { icon: Zap, title: "Automation Advisory", desc: "Level of automation vs ROI & OPEX." },
-  { icon: BarChart3, title: "Investment Estimation", desc: "CAPEX ranges & sensitivity assumptions." },
-  { icon: BookOpen, title: "Knowledge Hub Search", desc: "Instant answers from technical library." },
+  {
+    icon: BarChart3,
+    title: "Investment Estimation",
+    desc: "CAPEX ranges & sensitivity assumptions.",
+  },
+  {
+    icon: BookOpen,
+    title: "Knowledge Hub Search",
+    desc: "Instant answers from technical library.",
+  },
 ];
 
 const TOOLS = [
@@ -107,7 +127,9 @@ function AIAssistantPage() {
         <div className="absolute inset-0 bg-[radial-gradient(1200px_600px_at_10%_-10%,color-mix(in_oklab,var(--color-accent)_18%,transparent),transparent_60%)]" />
         <div className="container-wide relative grid gap-12 pt-32 pb-16 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-40 lg:pb-24">
           <div className="flex flex-col justify-center">
-            <Eyebrow className="text-[color:var(--color-accent)]">Meet your AI Engineering Assistant</Eyebrow>
+            <Eyebrow className="text-[color:var(--color-accent)]">
+              Meet your AI Engineering Assistant
+            </Eyebrow>
             <h1 className="mt-5 text-balance text-5xl font-semibold tracking-tightest sm:text-6xl lg:text-7xl">
               NEVO <span className="text-[color:var(--color-accent)]">AI Engineer</span>
             </h1>
@@ -137,7 +159,10 @@ function AIAssistantPage() {
                 { k: "Smart", v: "Calculations" },
                 { k: "Project", v: "Support" },
               ].map((s) => (
-                <div key={s.k} className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                <div
+                  key={s.k}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3"
+                >
                   <div className="text-[10px] uppercase tracking-[0.16em] text-white/50">{s.k}</div>
                   <div className="text-sm font-medium text-white">{s.v}</div>
                 </div>
@@ -147,7 +172,13 @@ function AIAssistantPage() {
           <div className="relative">
             <div className="absolute -inset-6 rounded-3xl bg-[color:var(--color-accent)]/10 blur-2xl" />
             <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/40">
-              <img loading="lazy" decoding="async" src={heroEngineer} alt="NEVO AI Engineer — engineer reviewing holographic factory model" className="h-full w-full object-cover" />
+              <img
+                loading="lazy"
+                decoding="async"
+                src={heroEngineer}
+                alt="NEVO AI Engineer — engineer reviewing holographic factory model"
+                className="h-full w-full object-cover"
+              />
             </div>
           </div>
         </div>
@@ -162,9 +193,9 @@ function AIAssistantPage() {
               Ask a Senior Process Engineer. In real time.
             </h2>
             <p className="max-w-2xl text-white/60">
-              NEVO AI Engineer is trained on sandwich panel engineering — not generic chat.
-              Ask about capacity, panels, materials, automation or investment. Evidence-based,
-              never oversold.
+              NEVO AI Engineer is trained on sandwich panel engineering — not generic chat. Ask
+              about capacity, panels, materials, automation or investment. Evidence-based, never
+              oversold.
             </p>
           </div>
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#0B0F14] shadow-[0_40px_120px_-40px_rgba(0,0,0,0.7)]">
@@ -184,7 +215,10 @@ function AIAssistantPage() {
         />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {CAPABILITIES.map((c) => (
-            <div key={c.title} className="group rounded-2xl border border-border bg-surface p-5 transition hover:border-accent/50 hover:shadow-sm">
+            <div
+              key={c.title}
+              className="group rounded-2xl border border-border bg-surface p-5 transition hover:border-accent/50 hover:shadow-sm"
+            >
               <c.icon className="h-6 w-6 text-accent" strokeWidth={1.6} />
               <div className="mt-4 text-sm font-semibold text-foreground">{c.title}</div>
               <div className="mt-1 text-sm text-muted-foreground">{c.desc}</div>
@@ -202,7 +236,10 @@ function AIAssistantPage() {
         />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {TOOLS.map((t) => (
-            <div key={t.title} className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-4">
+            <div
+              key={t.title}
+              className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-4"
+            >
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10 text-accent">
                 <t.icon className="h-4 w-4" />
               </div>
@@ -220,9 +257,17 @@ function AIAssistantPage() {
         />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {VISUAL_SUPPORT.map((v) => (
-            <div key={v.title} className="group overflow-hidden rounded-2xl border border-border bg-surface">
+            <div
+              key={v.title}
+              className="group overflow-hidden rounded-2xl border border-border bg-surface"
+            >
               <div className="aspect-[4/3] overflow-hidden">
-                <img src={v.img} alt={v.title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                <img
+                  src={v.img}
+                  alt={v.title}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                />
               </div>
               <div className="p-4 text-sm font-medium text-foreground">{v.title}</div>
             </div>
@@ -235,7 +280,9 @@ function AIAssistantPage() {
         <div className="grid gap-10 lg:grid-cols-3">
           <div className="lg:col-span-1">
             <Eyebrow>Quick actions</Eyebrow>
-            <h3 className="mt-4 text-h3 text-foreground">Jump straight into an engineering task.</h3>
+            <h3 className="mt-4 text-h3 text-foreground">
+              Jump straight into an engineering task.
+            </h3>
             <div className="mt-6 flex flex-col gap-2">
               {QUICK_ACTIONS.map((a) => (
                 <a
@@ -252,20 +299,26 @@ function AIAssistantPage() {
 
           <div className="lg:col-span-2">
             <Eyebrow>How it works</Eyebrow>
-            <h3 className="mt-4 text-h3 text-foreground">Five steps from question to engineering answer.</h3>
+            <h3 className="mt-4 text-h3 text-foreground">
+              Five steps from question to engineering answer.
+            </h3>
             <ol className="mt-6 grid gap-4 sm:grid-cols-5">
               {["Ask", "Analyze", "Calculate", "Recommend", "Connect"].map((step, i) => (
                 <li key={step} className="rounded-xl border border-border bg-background p-4">
-                  <div className="text-[10px] uppercase tracking-[0.16em] text-accent">Step {i + 1}</div>
+                  <div className="text-[10px] uppercase tracking-[0.16em] text-accent">
+                    Step {i + 1}
+                  </div>
                   <div className="mt-2 text-sm font-semibold text-foreground">{step}</div>
                   <div className="mt-1 text-xs text-muted-foreground">
-                    {[
-                      "Ask your engineering question.",
-                      "AI analyzes with domain knowledge.",
-                      "Smart calculations & evaluation.",
-                      "The best engineering solution.",
-                      "Route to a NEVO engineer.",
-                    ][i]}
+                    {
+                      [
+                        "Ask your engineering question.",
+                        "AI analyzes with domain knowledge.",
+                        "Smart calculations & evaluation.",
+                        "The best engineering solution.",
+                        "Route to a NEVO engineer.",
+                      ][i]
+                    }
                   </div>
                 </li>
               ))}
@@ -288,7 +341,12 @@ function AIAssistantPage() {
               className="group overflow-hidden rounded-2xl border border-border bg-surface transition hover:border-accent/50"
             >
               <div className="aspect-square overflow-hidden">
-                <img src={e.img} alt={e.title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                <img
+                  src={e.img}
+                  alt={e.title}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                />
               </div>
               <div className="p-3 text-xs font-medium text-foreground">{e.title}</div>
             </Link>
@@ -300,7 +358,13 @@ function AIAssistantPage() {
       <section className="bg-[#0B0F14] text-white">
         <div className="container-wide grid gap-10 py-20 lg:grid-cols-2 lg:items-center">
           <div className="overflow-hidden rounded-3xl border border-white/10">
-            <img loading="lazy" decoding="async" src={collab} alt="NEVO engineering team reviewing a project" className="h-full w-full object-cover" />
+            <img
+              loading="lazy"
+              decoding="async"
+              src={collab}
+              alt="NEVO engineering team reviewing a project"
+              className="h-full w-full object-cover"
+            />
           </div>
           <div>
             <Eyebrow className="text-[color:var(--color-accent)]">When AI isn't enough</Eyebrow>
@@ -314,7 +378,11 @@ function AIAssistantPage() {
             </p>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {[
-                { icon: MessageCircle, label: "Book Engineering Consultation", href: "/project-inquiry" },
+                {
+                  icon: MessageCircle,
+                  label: "Book Engineering Consultation",
+                  href: "/project-inquiry",
+                },
                 { icon: Upload, label: "Upload Drawings", href: "/project-inquiry" },
                 { icon: Phone, label: "Talk to an Engineer", href: "/project-inquiry" },
                 { icon: FileText, label: "Request Technical Proposal", href: "/project-inquiry" },

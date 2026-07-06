@@ -12,7 +12,10 @@ export const Route = createFileRoute("/status")({
   head: () => ({
     meta: [
       { title: "System Status — NEVO Industrial" },
-      { name: "description", content: "Live deployment and API status for the NEVO Industrial website." },
+      {
+        name: "description",
+        content: "Live deployment and API status for the NEVO Industrial website.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -36,7 +39,11 @@ async function checkEndpoint(path: string, expectJson: boolean): Promise<CheckSt
       try {
         const body = await res.json();
         if (body?.ok === true) {
-          return { state: "ok", status: 200, detail: `service=${body.service ?? "unknown"} ts=${body.ts ?? "-"}` };
+          return {
+            state: "ok",
+            status: 200,
+            detail: `service=${body.service ?? "unknown"} ts=${body.ts ?? "-"}`,
+          };
         }
         return { state: "fail", status: 200, detail: "ok:false in body" };
       } catch {
@@ -44,9 +51,17 @@ async function checkEndpoint(path: string, expectJson: boolean): Promise<CheckSt
       }
     }
     if (!expectJson && res.status >= 200 && res.status < 400) {
-      return { state: "ok", status: res.status, detail: `${res.status} ${res.statusText || ""}`.trim() };
+      return {
+        state: "ok",
+        status: res.status,
+        detail: `${res.status} ${res.statusText || ""}`.trim(),
+      };
     }
-    return { state: "fail", status: res.status, detail: `${res.status} ${res.statusText || ""}`.trim() };
+    return {
+      state: "fail",
+      status: res.status,
+      detail: `${res.status} ${res.statusText || ""}`.trim(),
+    };
   } catch (err) {
     return { state: "fail", status: 0, detail: err instanceof Error ? err.message : String(err) };
   }
@@ -109,8 +124,8 @@ function StatusPage() {
         </div>
 
         <p className="mt-8 text-xs text-muted-foreground">
-          Auto-refreshes every 30 seconds. If a check keeps failing after a recent deploy,
-          the build may still be propagating.
+          Auto-refreshes every 30 seconds. If a check keeps failing after a recent deploy, the build
+          may still be propagating.
         </p>
       </div>
     </div>

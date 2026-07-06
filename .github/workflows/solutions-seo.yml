@@ -116,7 +116,6 @@ jobs:
           print(f"Heatmap validation OK ({data['total_combos']} combo(s)).")
           PY
 
-
       - name: Evaluate preflight outcome
         id: preflight_gate
         env:
@@ -180,7 +179,6 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           RUN_LABEL: ${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.pull_request.number) || format('{0}@{1}', github.ref_name, github.sha) }}
         run: python3 scripts/notify_solutions_seo.py
-
 
       - name: Upload SEO snapshot report
         if: always() && steps.preflight_gate.outputs.skip != 'true'

@@ -240,8 +240,10 @@ if (asJson) {
   }
 
   const preview = (arr, n = 10) =>
-    arr.slice(0, n).map((k) => `    - ${k}`).join("\n") +
-    (arr.length > n ? `\n    ${dim(`… +${arr.length - n} more`)}` : "");
+    arr
+      .slice(0, n)
+      .map((k) => `    - ${k}`)
+      .join("\n") + (arr.length > n ? `\n    ${dim(`… +${arr.length - n} more`)}` : "");
 
   for (const [code, info] of Object.entries(report.locales)) {
     const flags = [];

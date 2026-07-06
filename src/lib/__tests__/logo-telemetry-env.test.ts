@@ -24,9 +24,11 @@ type Emission =
  * records everything that makes it past the gate — i.e. what would be
  * POSTed to /api/public/client-log and stored in header_logo_events.
  */
-async function loadHarness(opts: {
-  random?: () => number;
-} = {}) {
+async function loadHarness(
+  opts: {
+    random?: () => number;
+  } = {},
+) {
   vi.resetModules();
   const config = await import("../logo-telemetry-config");
   const tele = await import("../logo-telemetry");

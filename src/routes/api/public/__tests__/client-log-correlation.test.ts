@@ -105,8 +105,14 @@ describe("/api/public/client-log — correlationId end-to-end", () => {
   it("persists correlation_id on every logo row (render + error)", async () => {
     const res = await postBatch([
       entry({ message: "header.logo.render", extra: { correlationId: CID, variant: "light" } }),
-      entry({ message: "header.logo.error", extra: { correlationId: CID, stage: "primary-light-png" } }),
-      entry({ message: "header.logo.error", extra: { correlationId: CID, stage: "fallback-cdn-full" } }),
+      entry({
+        message: "header.logo.error",
+        extra: { correlationId: CID, stage: "primary-light-png" },
+      }),
+      entry({
+        message: "header.logo.error",
+        extra: { correlationId: CID, stage: "fallback-cdn-full" },
+      }),
     ]);
     expect(res.status).toBe(200);
     expect(insertSpy).toHaveBeenCalledTimes(1);
@@ -198,12 +204,30 @@ describe("/api/public/client-log — correlationId end-to-end", () => {
     const CID_A = "cid-A";
     const CID_B = "cid-B";
     historyRows = [
-      { correlation_id: CID_A, event_type: "error", stage: "primary-light-png", variant: null, src: null, next_src: null, online: null, client_ts: "2026-07-03T12:00:00.000Z" },
-      { correlation_id: CID_B, event_type: "error", stage: "fallback-cdn-full",  variant: null, src: null, next_src: null, online: null, client_ts: "2026-07-03T12:00:01.000Z" },
+      {
+        correlation_id: CID_A,
+        event_type: "error",
+        stage: "primary-light-png",
+        variant: null,
+        src: null,
+        next_src: null,
+        online: null,
+        client_ts: "2026-07-03T12:00:00.000Z",
+      },
+      {
+        correlation_id: CID_B,
+        event_type: "error",
+        stage: "fallback-cdn-full",
+        variant: null,
+        src: null,
+        next_src: null,
+        online: null,
+        client_ts: "2026-07-03T12:00:01.000Z",
+      },
     ];
 
     await postBatch([
-      entry({ extra: { correlationId: CID_A, stage: "fallback-cdn-full",   terminal: false } }),
+      entry({ extra: { correlationId: CID_A, stage: "fallback-cdn-full", terminal: false } }),
       entry({ extra: { correlationId: CID_A, stage: "fallback-inline-svg", terminal: true } }),
       entry({ extra: { correlationId: CID_B, stage: "fallback-inline-svg", terminal: true } }),
     ]);
@@ -240,16 +264,17 @@ describe("/api/public/client-log — correlationId end-to-end", () => {
   });
 
   it("does not attempt a history lookup or Sentry forward when every error is missing correlationId", async () => {
-    await postBatch([
-      entry({ extra: { stage: "primary-light-png", terminal: false } }),
-    ]);
+    await postBatch([entry({ extra: { stage: "primary-light-png", terminal: false } })]);
     // insert still happened (renders/errors persist regardless of cid)
     expect(insertSpy).toHaveBeenCalledTimes(1);
     // no correlationIds → the .in([]) branch is skipped
     expect(inCidsCapture).toEqual([]);
     // the forwarder is still invoked (event without history), but with no cid
     expect(forwardSpy).toHaveBeenCalledTimes(1);
-    const forwarded = forwardSpy.mock.calls[0][0] as Array<{ correlationId?: string; history?: unknown[] }>;
+    const forwarded = forwardSpy.mock.calls[0][0] as Array<{
+      correlationId?: string;
+      history?: unknown[];
+    }>;
     expect(forwarded[0].correlationId).toBeUndefined();
     expect(forwarded[0].history).toEqual([]);
   });

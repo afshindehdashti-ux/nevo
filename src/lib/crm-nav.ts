@@ -1,7 +1,23 @@
 import {
-  LayoutDashboard, Users, Target, TrendingUp, Package, Truck, Boxes,
-  FileText, Receipt, Percent, ClipboardList, Wallet, CheckSquare,
-  FolderOpen, BarChart3, Settings, UserCog, Image as ImageIcon, Search,
+  LayoutDashboard,
+  Users,
+  Target,
+  TrendingUp,
+  Package,
+  Truck,
+  Boxes,
+  FileText,
+  Receipt,
+  Percent,
+  ClipboardList,
+  Wallet,
+  CheckSquare,
+  FolderOpen,
+  BarChart3,
+  Settings,
+  UserCog,
+  Image as ImageIcon,
+  Search,
 } from "lucide-react";
 
 export type CrmNavItem = {

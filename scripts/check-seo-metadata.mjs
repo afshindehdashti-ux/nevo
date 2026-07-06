@@ -79,7 +79,8 @@ function extractMeta(html, key, value) {
 }
 
 function extractCanonical(html) {
-  const re = /<link\b[^>]*?(?:rel\s*=\s*["']canonical["'][^>]*?href\s*=\s*["']([^"']*)["']|href\s*=\s*["']([^"']*)["'][^>]*?rel\s*=\s*["']canonical["'])[^>]*>/i;
+  const re =
+    /<link\b[^>]*?(?:rel\s*=\s*["']canonical["'][^>]*?href\s*=\s*["']([^"']*)["']|href\s*=\s*["']([^"']*)["'][^>]*?rel\s*=\s*["']canonical["'])[^>]*>/i;
   const m = html.match(re);
   return m ? (m[1] ?? m[2] ?? "").trim() : "";
 }
@@ -124,7 +125,10 @@ function auditHtml(html, locale, path) {
 function isPortOpen(port, host = "127.0.0.1") {
   return new Promise((resolve) => {
     const socket = net.createConnection({ port, host });
-    socket.once("connect", () => { socket.destroy(); resolve(true); });
+    socket.once("connect", () => {
+      socket.destroy();
+      resolve(true);
+    });
     socket.once("error", () => resolve(false));
   });
 }
@@ -222,14 +226,22 @@ async function run() {
   const warned = results.filter((r) => r.warnings.length > 0);
 
   if (JSON_OUT) {
-    process.stdout.write(JSON.stringify({
-      total: results.length,
-      failed: failures.length,
-      warned: warned.length,
-      results,
-    }, null, 2) + "\n");
+    process.stdout.write(
+      JSON.stringify(
+        {
+          total: results.length,
+          failed: failures.length,
+          warned: warned.length,
+          results,
+        },
+        null,
+        2,
+      ) + "\n",
+    );
   } else {
-    console.log(`\nSEO metadata check — ${results.length} pages (${LOCALES.length} locales × ${ROUTES.length} routes)\n`);
+    console.log(
+      `\nSEO metadata check — ${results.length} pages (${LOCALES.length} locales × ${ROUTES.length} routes)\n`,
+    );
     if (failures.length === 0 && warned.length === 0) {
       console.log("✓ All pages have title, description, canonical, og:image, twitter:image.\n");
     } else {

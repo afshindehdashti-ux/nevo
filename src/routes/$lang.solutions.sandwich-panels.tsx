@@ -88,35 +88,115 @@ const DOWNLOADS_LD_ITEMS = [
   "Installation & Fixing Handbook",
 ];
 
-
 const FAQS: { q: string; a: string }[] = [
-  { q: "What panel types does NEVO supply?", a: "PIR (polyisocyanurate) wall panels, PIR roof panels, and rock wool wall/roof panels for industrial, commercial, food processing, cold storage and clean-room applications." },
-  { q: "What is the difference between PIR and rock wool panels?", a: "PIR panels offer excellent thermal insulation (λ 0.022–0.024 W/m·K) with a lightweight closed-cell core. Rock wool panels deliver non-combustible A2-s1,d0 fire performance, superior acoustic insulation and higher operating temperatures — at a slightly higher weight and thermal conductivity (0.036–0.040 W/m·K)." },
-  { q: "What panel thicknesses are available?", a: "Standard thicknesses: 40, 50, 60, 80, 100 and 150 mm. Custom thicknesses up to 200 mm are available for cold storage and specialised applications on request." },
-  { q: "What is the effective panel width?", a: "1000 mm and 1150 mm effective coverage width, with 1200 mm total width including the tongue. Custom widths available for OEM projects." },
-  { q: "What is the maximum panel length?", a: "Up to 16 m per panel in standard production, longer on project basis. Transport and site handling normally dictate practical lengths of 12–14 m." },
-  { q: "What fire rating do the panels achieve?", a: "PIR panels reach B-s2,d0 or B-s1,d0 to EN 13501-1. Rock wool panels reach A2-s1,d0 or A1 and provide up to 120 minutes fire resistance (EI 120) depending on thickness and fixing." },
-  { q: "What steel facings do you use?", a: "PPGI (pre-painted galvanised steel) 0.35–0.80 mm, coated with PE, SMP, HDP or PVDF paint systems in a wide range of RAL colours and food-grade finishes." },
-  { q: "What surface profiles are available?", a: "Five standard exterior profiles — Micro Rib, Mini Rib, Flat (Smooth), Linear and Wave — plus flat, stucco embossed or mini-box interior facings." },
-  { q: "Which colours are standard?", a: "RAL 9002, 9006, 9010, 5010, 6005, 7016, 8017, 3009 and metallic silver are stocked. Any RAL or NCS colour can be produced on order with a minimum coil quantity." },
-  { q: "What joint systems do you offer?", a: "Tongue-and-groove for standard wall panels, EZ Lock for hidden-fix wall systems, and hidden-screw joint for architectural facades. Roof panels use standing seam or trapezoidal overlap with EPDM sealing." },
-  { q: "What is the U-value of a 100 mm PIR panel?", a: "Approximately 0.22 W/m²·K for a 100 mm PIR panel with 0.023 W/m·K core, without thermal bridging at joints thanks to the tongue-and-groove profile." },
-  { q: "What is the compressive strength of the core?", a: "PIR core: ≥ 150 kPa at 10% deformation. Rock wool lamella core: ≥ 80 kPa at 10% deformation with fibre orientation perpendicular to facings for maximum panel stiffness." },
-  { q: "Are the panels suitable for cold storage?", a: "Yes. Cold-storage panels use PIR core with high-density facings, food-grade coatings, cam-lock joints for airtightness and thicknesses from 80 to 200 mm for temperatures down to –40 °C." },
-  { q: "What acoustic performance do rock wool panels provide?", a: "Rock wool panels achieve Rw 30–36 dB depending on thickness and facing, suitable for industrial noise-control envelopes, technical rooms and commercial buildings." },
-  { q: "Are the panels water-tight?", a: "Yes. Panel joints are tested to EN 12865 for driving rain and equipped with pre-applied EPDM or butyl sealant. Roof panels achieve full watertightness at pitches ≥ 3°." },
-  { q: "What accessories are supplied with the panels?", a: "Corner and base flashings, ridge and eaves trims, window and door frames, fastening systems (visible and hidden), sealants, EPDM tapes and touch-up paint — supplied per project bill of materials." },
-  { q: "Do you supply certified windows and doors?", a: "Yes. Factory-made insulated windows and personnel/service doors matched to panel thickness, with the same thermal, fire and hygiene classification as the wall system." },
-  { q: "What fastening options are available?", a: "Visible self-drilling stainless steel screws with EPDM washers for standard applications, hidden clip systems for architectural facades, and concealed brackets for cold-storage assemblies." },
-  { q: "Are the panels certified for food processing?", a: "Yes. Panels with HDP or food-grade PVDF coating, hygienic sealed joints and stainless fasteners are certified for HACCP and EU food-contact regulations." },
-  { q: "What is the panel warranty?", a: "10 years on structural performance and thermal integrity, 15–25 years on paint system depending on coating and environment, subject to correct installation and maintenance." },
-  { q: "Can you supply project-specific engineering?", a: "Yes. Structural calculations, wind and snow load verification, thermal bridging analysis, installation drawings and site supervision are available per project." },
-  { q: "What is the standard delivery time?", a: "4–8 weeks ex-works Dubai for standard specifications; 8–12 weeks for custom colours or non-stocked thicknesses. Consolidated multi-panel projects are planned on Gantt schedule." },
-  { q: "Which incoterms do you offer?", a: "EXW Jebel Ali, FOB, CFR, CIF and DAP into GCC, Levant, East and West Africa, CIS and South Asia. DDP with local stock available in select markets." },
-  { q: "How are panels packed for shipping?", a: "Vertically stacked on wooden pallets, wrapped in polyethylene film, protected with polystyrene edge and corner protectors, and steel-strapped for safe container and truck transport." },
-  { q: "Do you provide installation support?", a: "Yes. Method statements, on-site supervision by NEVO technical engineers, and installer training for the client's contractor are available as an integrated service." },
-  { q: "Are the panels sustainable?", a: "PIR cores use HFC-free blowing agents. Rock wool is 100% recyclable. Steel facings contain up to 30% recycled content. EPDs and GWP declarations are available on request." },
-  { q: "Do you offer OEM / private-label supply?", a: "Yes. Panels can be produced under distributor branding, with private-label documentation, packaging and technical datasheets for regional resellers." },
+  {
+    q: "What panel types does NEVO supply?",
+    a: "PIR (polyisocyanurate) wall panels, PIR roof panels, and rock wool wall/roof panels for industrial, commercial, food processing, cold storage and clean-room applications.",
+  },
+  {
+    q: "What is the difference between PIR and rock wool panels?",
+    a: "PIR panels offer excellent thermal insulation (λ 0.022–0.024 W/m·K) with a lightweight closed-cell core. Rock wool panels deliver non-combustible A2-s1,d0 fire performance, superior acoustic insulation and higher operating temperatures — at a slightly higher weight and thermal conductivity (0.036–0.040 W/m·K).",
+  },
+  {
+    q: "What panel thicknesses are available?",
+    a: "Standard thicknesses: 40, 50, 60, 80, 100 and 150 mm. Custom thicknesses up to 200 mm are available for cold storage and specialised applications on request.",
+  },
+  {
+    q: "What is the effective panel width?",
+    a: "1000 mm and 1150 mm effective coverage width, with 1200 mm total width including the tongue. Custom widths available for OEM projects.",
+  },
+  {
+    q: "What is the maximum panel length?",
+    a: "Up to 16 m per panel in standard production, longer on project basis. Transport and site handling normally dictate practical lengths of 12–14 m.",
+  },
+  {
+    q: "What fire rating do the panels achieve?",
+    a: "PIR panels reach B-s2,d0 or B-s1,d0 to EN 13501-1. Rock wool panels reach A2-s1,d0 or A1 and provide up to 120 minutes fire resistance (EI 120) depending on thickness and fixing.",
+  },
+  {
+    q: "What steel facings do you use?",
+    a: "PPGI (pre-painted galvanised steel) 0.35–0.80 mm, coated with PE, SMP, HDP or PVDF paint systems in a wide range of RAL colours and food-grade finishes.",
+  },
+  {
+    q: "What surface profiles are available?",
+    a: "Five standard exterior profiles — Micro Rib, Mini Rib, Flat (Smooth), Linear and Wave — plus flat, stucco embossed or mini-box interior facings.",
+  },
+  {
+    q: "Which colours are standard?",
+    a: "RAL 9002, 9006, 9010, 5010, 6005, 7016, 8017, 3009 and metallic silver are stocked. Any RAL or NCS colour can be produced on order with a minimum coil quantity.",
+  },
+  {
+    q: "What joint systems do you offer?",
+    a: "Tongue-and-groove for standard wall panels, EZ Lock for hidden-fix wall systems, and hidden-screw joint for architectural facades. Roof panels use standing seam or trapezoidal overlap with EPDM sealing.",
+  },
+  {
+    q: "What is the U-value of a 100 mm PIR panel?",
+    a: "Approximately 0.22 W/m²·K for a 100 mm PIR panel with 0.023 W/m·K core, without thermal bridging at joints thanks to the tongue-and-groove profile.",
+  },
+  {
+    q: "What is the compressive strength of the core?",
+    a: "PIR core: ≥ 150 kPa at 10% deformation. Rock wool lamella core: ≥ 80 kPa at 10% deformation with fibre orientation perpendicular to facings for maximum panel stiffness.",
+  },
+  {
+    q: "Are the panels suitable for cold storage?",
+    a: "Yes. Cold-storage panels use PIR core with high-density facings, food-grade coatings, cam-lock joints for airtightness and thicknesses from 80 to 200 mm for temperatures down to –40 °C.",
+  },
+  {
+    q: "What acoustic performance do rock wool panels provide?",
+    a: "Rock wool panels achieve Rw 30–36 dB depending on thickness and facing, suitable for industrial noise-control envelopes, technical rooms and commercial buildings.",
+  },
+  {
+    q: "Are the panels water-tight?",
+    a: "Yes. Panel joints are tested to EN 12865 for driving rain and equipped with pre-applied EPDM or butyl sealant. Roof panels achieve full watertightness at pitches ≥ 3°.",
+  },
+  {
+    q: "What accessories are supplied with the panels?",
+    a: "Corner and base flashings, ridge and eaves trims, window and door frames, fastening systems (visible and hidden), sealants, EPDM tapes and touch-up paint — supplied per project bill of materials.",
+  },
+  {
+    q: "Do you supply certified windows and doors?",
+    a: "Yes. Factory-made insulated windows and personnel/service doors matched to panel thickness, with the same thermal, fire and hygiene classification as the wall system.",
+  },
+  {
+    q: "What fastening options are available?",
+    a: "Visible self-drilling stainless steel screws with EPDM washers for standard applications, hidden clip systems for architectural facades, and concealed brackets for cold-storage assemblies.",
+  },
+  {
+    q: "Are the panels certified for food processing?",
+    a: "Yes. Panels with HDP or food-grade PVDF coating, hygienic sealed joints and stainless fasteners are certified for HACCP and EU food-contact regulations.",
+  },
+  {
+    q: "What is the panel warranty?",
+    a: "10 years on structural performance and thermal integrity, 15–25 years on paint system depending on coating and environment, subject to correct installation and maintenance.",
+  },
+  {
+    q: "Can you supply project-specific engineering?",
+    a: "Yes. Structural calculations, wind and snow load verification, thermal bridging analysis, installation drawings and site supervision are available per project.",
+  },
+  {
+    q: "What is the standard delivery time?",
+    a: "4–8 weeks ex-works Dubai for standard specifications; 8–12 weeks for custom colours or non-stocked thicknesses. Consolidated multi-panel projects are planned on Gantt schedule.",
+  },
+  {
+    q: "Which incoterms do you offer?",
+    a: "EXW Jebel Ali, FOB, CFR, CIF and DAP into GCC, Levant, East and West Africa, CIS and South Asia. DDP with local stock available in select markets.",
+  },
+  {
+    q: "How are panels packed for shipping?",
+    a: "Vertically stacked on wooden pallets, wrapped in polyethylene film, protected with polystyrene edge and corner protectors, and steel-strapped for safe container and truck transport.",
+  },
+  {
+    q: "Do you provide installation support?",
+    a: "Yes. Method statements, on-site supervision by NEVO technical engineers, and installer training for the client's contractor are available as an integrated service.",
+  },
+  {
+    q: "Are the panels sustainable?",
+    a: "PIR cores use HFC-free blowing agents. Rock wool is 100% recyclable. Steel facings contain up to 30% recycled content. EPDs and GWP declarations are available on request.",
+  },
+  {
+    q: "Do you offer OEM / private-label supply?",
+    a: "Yes. Panels can be produced under distributor branding, with private-label documentation, packaging and technical datasheets for regional resellers.",
+  },
 ];
 
 export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
@@ -136,7 +216,12 @@ export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/${params.lang}` },
-        { "@type": "ListItem", position: 2, name: "Solutions", item: `${SITE.url}/${params.lang}/solutions` },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Solutions",
+          item: `${SITE.url}/${params.lang}/solutions`,
+        },
         { "@type": "ListItem", position: 3, name: "Finished Sandwich Panels", item: canonical },
       ],
     };
@@ -151,7 +236,11 @@ export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
       additionalProperty: [
         { "@type": "PropertyValue", name: "Cores", value: "PIR, PUR, Rock wool, EPS" },
         { "@type": "PropertyValue", name: "Standards", value: "EN 14509, EN 13501-1" },
-        { "@type": "PropertyValue", name: "Applications", value: "Roof, wall, cold room, clean room, industrial buildings" },
+        {
+          "@type": "PropertyValue",
+          name: "Applications",
+          value: "Roof, wall, cold room, clean room, industrial buildings",
+        },
       ],
     };
     const seo = buildSeo({
@@ -188,7 +277,6 @@ export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
           }),
         ),
       ],
-
     };
   },
   component: SandwichPanelsPage,
@@ -275,9 +363,9 @@ function Hero() {
             Premium Panels. <span className="text-accent">Engineered Performance.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-white/80 md:text-xl">
-            PIR and Rock Wool sandwich panels engineered for the world's most demanding
-            industrial, commercial and cold-storage envelopes — certified fire, thermal,
-            acoustic and structural performance in every panel we ship.
+            PIR and Rock Wool sandwich panels engineered for the world's most demanding industrial,
+            commercial and cold-storage envelopes — certified fire, thermal, acoustic and structural
+            performance in every panel we ship.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Button size="lg" variant="primary" asChild>
@@ -303,9 +391,7 @@ function Hero() {
             { k: "Reliability", v: "Global supply chain" },
           ].map((s) => (
             <div key={s.k}>
-              <div className="text-xs font-mono uppercase tracking-widest text-accent">
-                {s.k}
-              </div>
+              <div className="text-xs font-mono uppercase tracking-widest text-accent">{s.k}</div>
               <div className="mt-2 text-sm text-white/80">{s.v}</div>
             </div>
           ))}
@@ -419,10 +505,7 @@ const APPS = [
 function Applications() {
   return (
     <Section id="applications" className="bg-secondary/40">
-      <SectionHeader
-        eyebrow="Applications"
-        title="Engineered for every industrial envelope."
-      />
+      <SectionHeader eyebrow="Applications" title="Engineered for every industrial envelope." />
       <div className="grid gap-6 md:grid-cols-3">
         {APPS.map((a, i) => (
           <motion.article
@@ -492,7 +575,12 @@ function CoreEngineering() {
         {items.map((it) => (
           <SurfaceCard key={it.tag} className="overflow-hidden p-0">
             <div className="relative aspect-[4/3] bg-black">
-              <img src={it.img} alt={it.title} className="h-full w-full object-cover" loading="lazy" />
+              <img
+                src={it.img}
+                alt={it.title}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
               <span className="absolute top-4 left-4 rounded bg-accent px-2 py-1 font-mono text-xs text-accent-foreground">
                 {it.tag}
               </span>
@@ -569,10 +657,34 @@ function SurfaceOptions() {
 
 function Performance() {
   const items = [
-    { tag: "13", img: t13, icon: Flame, title: "Fire Resistance", desc: "Rock wool core delivers non-combustible A2-s1,d0 fire performance." },
-    { tag: "14", img: t14, icon: Thermometer, title: "Thermal Insulation", desc: "PIR core provides ultra-low thermal conductivity — verified −20 °C to +20 °C." },
-    { tag: "15", img: t15, icon: Volume2, title: "Acoustic Performance", desc: "Rock wool core delivers high sound insulation for industrial and commercial buildings." },
-    { tag: "16", img: t16, icon: Droplets, title: "Water Tightness", desc: "Panel joints tested for driving-rain penetration — excellent sealing performance." },
+    {
+      tag: "13",
+      img: t13,
+      icon: Flame,
+      title: "Fire Resistance",
+      desc: "Rock wool core delivers non-combustible A2-s1,d0 fire performance.",
+    },
+    {
+      tag: "14",
+      img: t14,
+      icon: Thermometer,
+      title: "Thermal Insulation",
+      desc: "PIR core provides ultra-low thermal conductivity — verified −20 °C to +20 °C.",
+    },
+    {
+      tag: "15",
+      img: t15,
+      icon: Volume2,
+      title: "Acoustic Performance",
+      desc: "Rock wool core delivers high sound insulation for industrial and commercial buildings.",
+    },
+    {
+      tag: "16",
+      img: t16,
+      icon: Droplets,
+      title: "Water Tightness",
+      desc: "Panel joints tested for driving-rain penetration — excellent sealing performance.",
+    },
   ];
   return (
     <Section id="performance" className="bg-black text-white">
@@ -592,7 +704,12 @@ function Performance() {
             className="group overflow-hidden rounded-lg border border-white/10 bg-white/[0.03]"
           >
             <div className="relative aspect-[4/3] overflow-hidden bg-black">
-              <img src={img} alt={title} className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-105" loading="lazy" />
+              <img
+                src={img}
+                alt={title}
+                className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-105"
+                loading="lazy"
+              />
               <span className="absolute top-3 left-3 rounded bg-accent px-2 py-1 font-mono text-xs text-accent-foreground">
                 {tag}
               </span>
@@ -615,10 +732,34 @@ function Performance() {
 
 function BuildingTypes() {
   const items = [
-    { tag: "17", img: t17, icon: Factory, title: "Industrial Buildings", desc: "Manufacturing, logistics and warehousing envelopes with certified fire and thermal performance." },
-    { tag: "18", img: t18, icon: Building2, title: "Commercial Buildings", desc: "Showrooms, retail and office facades combining architectural design and engineered performance." },
-    { tag: "19", img: t19, icon: Warehouse, title: "Food Processing Facilities", desc: "Hygienic HACCP-compliant panels with food-grade coatings and sealed sanitary joints." },
-    { tag: "20", img: t20, icon: Snowflake, title: "Cold Rooms & Clean Rooms", desc: "Airtight cam-lock panels for low-temperature and controlled-environment applications." },
+    {
+      tag: "17",
+      img: t17,
+      icon: Factory,
+      title: "Industrial Buildings",
+      desc: "Manufacturing, logistics and warehousing envelopes with certified fire and thermal performance.",
+    },
+    {
+      tag: "18",
+      img: t18,
+      icon: Building2,
+      title: "Commercial Buildings",
+      desc: "Showrooms, retail and office facades combining architectural design and engineered performance.",
+    },
+    {
+      tag: "19",
+      img: t19,
+      icon: Warehouse,
+      title: "Food Processing Facilities",
+      desc: "Hygienic HACCP-compliant panels with food-grade coatings and sealed sanitary joints.",
+    },
+    {
+      tag: "20",
+      img: t20,
+      icon: Snowflake,
+      title: "Cold Rooms & Clean Rooms",
+      desc: "Airtight cam-lock panels for low-temperature and controlled-environment applications.",
+    },
   ];
   return (
     <Section id="buildings" className="bg-white">
@@ -653,11 +794,36 @@ function BuildingTypes() {
 
 function ConstructionDetails() {
   const items = [
-    { tag: "21", img: t21, title: "Corner Detail", desc: "Clean and precise finishing between wall panels." },
-    { tag: "22", img: t22, title: "Window Detail", desc: "Factory-made insulated window units matched to panel thickness." },
-    { tag: "23", img: t23, title: "Door Detail", desc: "Insulated personnel and service doors, certified to panel envelope." },
-    { tag: "24", img: t24, title: "Base Connection", desc: "Strong and secure base installation with EPDM sealing." },
-    { tag: "25", img: t25, title: "Fastening System", desc: "Hidden and visible options — engineered for load and aesthetics." },
+    {
+      tag: "21",
+      img: t21,
+      title: "Corner Detail",
+      desc: "Clean and precise finishing between wall panels.",
+    },
+    {
+      tag: "22",
+      img: t22,
+      title: "Window Detail",
+      desc: "Factory-made insulated window units matched to panel thickness.",
+    },
+    {
+      tag: "23",
+      img: t23,
+      title: "Door Detail",
+      desc: "Insulated personnel and service doors, certified to panel envelope.",
+    },
+    {
+      tag: "24",
+      img: t24,
+      title: "Base Connection",
+      desc: "Strong and secure base installation with EPDM sealing.",
+    },
+    {
+      tag: "25",
+      img: t25,
+      title: "Fastening System",
+      desc: "Hidden and visible options — engineered for load and aesthetics.",
+    },
   ];
   return (
     <Section id="details" className="bg-secondary/40">
@@ -670,7 +836,12 @@ function ConstructionDetails() {
         {items.map((it) => (
           <SurfaceCard key={it.tag} className="overflow-hidden p-0">
             <div className="relative aspect-square bg-black">
-              <img src={it.img} alt={it.title} className="h-full w-full object-cover" loading="lazy" />
+              <img
+                src={it.img}
+                alt={it.title}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
               <span className="absolute top-3 left-3 rounded bg-accent px-2 py-1 font-mono text-xs text-accent-foreground">
                 {it.tag}
               </span>
@@ -705,7 +876,12 @@ function WhyNevo() {
     <Section id="why-nevo" className="bg-white">
       <div className="grid items-center gap-12 lg:grid-cols-2">
         <div className="relative overflow-hidden rounded-xl bg-black">
-          <img src={t26} alt="Why NEVO Panels" className="h-full w-full object-cover" loading="lazy" />
+          <img
+            src={t26}
+            alt="Why NEVO Panels"
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
         </div>
         <div>
           <Eyebrow>26 · Why NEVO Panels</Eyebrow>
@@ -713,9 +889,9 @@ function WhyNevo() {
             The industrial standard for engineered panels.
           </h2>
           <p className="mt-5 max-w-xl text-muted-foreground">
-            NEVO panels combine industrial-grade raw materials, continuous double-belt
-            lamination and disciplined quality control — the same engineering ethos we
-            deliver to factory-builders around the world.
+            NEVO panels combine industrial-grade raw materials, continuous double-belt lamination
+            and disciplined quality control — the same engineering ethos we deliver to
+            factory-builders around the world.
           </p>
           <ul className="mt-8 grid gap-3 sm:grid-cols-2">
             {bullets.map((b) => (
@@ -756,8 +932,8 @@ function TechSpecs() {
             Engineered to specification.
           </h2>
           <p className="mt-5 max-w-xl text-white/70">
-            Every panel is manufactured to a locked technical envelope — with certificates,
-            batch traceability and third-party testing behind every dimension.
+            Every panel is manufactured to a locked technical envelope — with certificates, batch
+            traceability and third-party testing behind every dimension.
           </p>
           <div className="mt-8 overflow-hidden rounded-lg border border-white/10">
             <table className="w-full font-mono text-sm">
@@ -775,9 +951,17 @@ function TechSpecs() {
         <div>
           <Eyebrow className="text-white/60">28 · Panel Connection Systems</Eyebrow>
           <h3 className="mt-4 text-2xl font-medium text-white">Three joint systems.</h3>
-          <p className="mt-2 text-white/70">Tongue &amp; Groove · EZ Lock · Hidden Screw — matched to structural, thermal and architectural intent.</p>
+          <p className="mt-2 text-white/70">
+            Tongue &amp; Groove · EZ Lock · Hidden Screw — matched to structural, thermal and
+            architectural intent.
+          </p>
           <div className="mt-6 overflow-hidden rounded-lg border border-white/10 bg-white/[0.03]">
-            <img src={t28} alt="NEVO panel connection systems" className="h-full w-full object-cover" loading="lazy" />
+            <img
+              src={t28}
+              alt="NEVO panel connection systems"
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
           </div>
         </div>
       </div>
@@ -796,15 +980,22 @@ function Sustainability() {
         <div>
           <Eyebrow>29 · Sustainability</Eyebrow>
           <h2 className="mt-4 text-4xl font-medium tracking-tight text-foreground md:text-5xl">
-            Eco-friendly materials.<br/>Energy-efficient buildings.
+            Eco-friendly materials.
+            <br />
+            Energy-efficient buildings.
           </h2>
           <p className="mt-5 max-w-xl text-muted-foreground">
-            HFC-free PIR blowing agents, 100% recyclable rock wool, up to 30% recycled
-            steel content and lifetime energy savings from certified thermal envelopes —
-            NEVO panels are engineered for a sustainable industrial future.
+            HFC-free PIR blowing agents, 100% recyclable rock wool, up to 30% recycled steel content
+            and lifetime energy savings from certified thermal envelopes — NEVO panels are
+            engineered for a sustainable industrial future.
           </p>
           <ul className="mt-8 space-y-3 text-sm text-foreground">
-            {["HFC-free blowing agents", "100% recyclable rock wool core", "EPD & GWP declarations available", "Long-life durability = lower embodied carbon"].map((b) => (
+            {[
+              "HFC-free blowing agents",
+              "100% recyclable rock wool core",
+              "EPD & GWP declarations available",
+              "Long-life durability = lower embodied carbon",
+            ].map((b) => (
               <li key={b} className="flex items-start gap-3">
                 <Leaf className="mt-0.5 size-4 flex-none text-accent" /> {b}
               </li>
@@ -812,7 +1003,12 @@ function Sustainability() {
           </ul>
         </div>
         <div className="relative overflow-hidden rounded-xl bg-black">
-          <img src={t29} alt="Sustainability — NEVO panels" className="h-full w-full object-cover" loading="lazy" />
+          <img
+            src={t29}
+            alt="Sustainability — NEVO panels"
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
         </div>
       </div>
     </Section>
@@ -825,10 +1021,19 @@ function Sustainability() {
 
 function Downloads() {
   const docs = [
-    { title: "Panel Product Catalogue", desc: "Complete PIR & Rock Wool panel range with specifications." },
-    { title: "Technical Datasheet — PIR Wall", desc: "Thermal, fire, structural and acoustic data." },
+    {
+      title: "Panel Product Catalogue",
+      desc: "Complete PIR & Rock Wool panel range with specifications.",
+    },
+    {
+      title: "Technical Datasheet — PIR Wall",
+      desc: "Thermal, fire, structural and acoustic data.",
+    },
     { title: "Technical Datasheet — PIR Roof", desc: "Load tables, span limits, weathering data." },
-    { title: "Technical Datasheet — Rock Wool", desc: "Fire, acoustic, density and structural data." },
+    {
+      title: "Technical Datasheet — Rock Wool",
+      desc: "Fire, acoustic, density and structural data.",
+    },
     { title: "Installation Manual", desc: "Handling, fixing details, joint sealing and QA." },
     { title: "Detail Library (DWG / PDF)", desc: "Corners, openings, base and fastening details." },
   ];
@@ -860,10 +1065,7 @@ function Downloads() {
 function FAQSection() {
   return (
     <Section id="faq" className="bg-white">
-      <SectionHeader
-        eyebrow="FAQ"
-        title="Answers from NEVO's panel engineers."
-      />
+      <SectionHeader eyebrow="FAQ" title="Answers from NEVO's panel engineers." />
       <div className="mx-auto max-w-3xl">
         <Accordion type="single" collapsible className="w-full">
           {FAQS.map((f, i) => (
@@ -892,8 +1094,8 @@ function InquiryForm() {
             Request a technical proposal.
           </h2>
           <p className="mt-5 max-w-lg text-white/70">
-            Share your project specifications and a NEVO panel specialist will reply within
-            one business day with a technical and commercial proposal.
+            Share your project specifications and a NEVO panel specialist will reply within one
+            business day with a technical and commercial proposal.
           </p>
           <ul className="mt-8 space-y-3 text-sm text-white/70">
             {[
@@ -924,7 +1126,11 @@ function InquiryForm() {
             <Field label="Panel Type" name="type" placeholder="PIR wall / Rock wool / Roof …" />
             <Field label="Thickness (mm)" name="thickness" placeholder="e.g. 100" />
             <Field label="Quantity (m²)" name="quantity" placeholder="e.g. 12,000" />
-            <Field label="Application" name="application" placeholder="Industrial / Cold storage …" />
+            <Field
+              label="Application"
+              name="application"
+              placeholder="Industrial / Cold storage …"
+            />
           </div>
           <Field label="Message" name="message" textarea className="mt-4" />
           <Button type="submit" size="lg" variant="primary" className="mt-6 w-full sm:w-auto">
@@ -958,12 +1164,19 @@ function Field({
   return (
     <label className={"block " + (className ?? "")}>
       <span className="text-xs font-mono uppercase tracking-widest text-white/60">
-        {label}{required && <span className="text-accent"> *</span>}
+        {label}
+        {required && <span className="text-accent"> *</span>}
       </span>
       {textarea ? (
         <textarea name={name} rows={4} placeholder={placeholder} className={cls} />
       ) : (
-        <input type={type} name={name} required={required} placeholder={placeholder} className={cls} />
+        <input
+          type={type}
+          name={name}
+          required={required}
+          placeholder={placeholder}
+          className={cls}
+        />
       )}
     </label>
   );
@@ -983,12 +1196,14 @@ function FinalCTA() {
             Premium panels for the world's most demanding envelopes.
           </h2>
           <p className="mt-5 max-w-2xl text-white/75">
-            Engineered performance, certified data and reliable global supply — from Dubai
-            to every industrial market where NEVO ships.
+            Engineered performance, certified data and reliable global supply — from Dubai to every
+            industrial market where NEVO ships.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button size="lg" variant="primary" asChild>
-              <a href="/project-inquiry">Request Panel Quotation <ArrowRight className="ml-2 size-4" /></a>
+              <a href="/project-inquiry">
+                Request Panel Quotation <ArrowRight className="ml-2 size-4" />
+              </a>
             </Button>
             <Button size="lg" variant="secondary" asChild>
               <a href="#downloads">Download Datasheet</a>

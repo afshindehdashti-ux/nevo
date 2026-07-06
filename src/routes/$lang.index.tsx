@@ -17,8 +17,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { SITE, buildSeo } from "@/lib/seo";
 import { ogImageMeta } from "@/lib/og-images";
 
-const TITLE =
-  "NEVO Industrial — Sandwich Panel Engineering, Factory Development & Raw Materials";
+const TITLE = "NEVO Industrial — Sandwich Panel Engineering, Factory Development & Raw Materials";
 const DESCRIPTION =
   "Dubai-based industrial engineering & supply company for the sandwich panel industry — factory development, engineering consultancy, PIR/PUR raw materials, production lines and finished panels.";
 

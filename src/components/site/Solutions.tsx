@@ -13,12 +13,12 @@ import { GridBoard, BoardCell } from "@/components/site/cards";
 import { Link } from "@/components/site/LocalizedLink";
 
 const SOLUTIONS = [
-  { n: "01", icon: Building2,     key: "factory",         href: "/solutions/factory-development" },
-  { n: "02", icon: ClipboardList, key: "consultancy",     href: "/solutions/engineering-consultancy" },
-  { n: "03", icon: Wrench,        key: "productionLines", href: "/solutions/production-lines" },
-  { n: "04", icon: Layers,        key: "rawMaterials",    href: "/solutions/raw-materials" },
-  { n: "05", icon: PackageCheck,  key: "finishedPanels",  href: "/solutions/sandwich-panels" },
-  { n: "06", icon: LifeBuoy,      key: "aiAssistant",     href: "/ai-assistant" },
+  { n: "01", icon: Building2, key: "factory", href: "/solutions/factory-development" },
+  { n: "02", icon: ClipboardList, key: "consultancy", href: "/solutions/engineering-consultancy" },
+  { n: "03", icon: Wrench, key: "productionLines", href: "/solutions/production-lines" },
+  { n: "04", icon: Layers, key: "rawMaterials", href: "/solutions/raw-materials" },
+  { n: "05", icon: PackageCheck, key: "finishedPanels", href: "/solutions/sandwich-panels" },
+  { n: "06", icon: LifeBuoy, key: "aiAssistant", href: "/ai-assistant" },
 ] as const;
 
 export function Solutions() {
@@ -58,7 +58,9 @@ export function Solutions() {
               />
             </div>
             <div className="flex-1">
-              <h3 className="text-h3 text-foreground">{t(`home.solutionsSection.${s.key}.title`)}</h3>
+              <h3 className="text-h3 text-foreground">
+                {t(`home.solutionsSection.${s.key}.title`)}
+              </h3>
               <p className="text-body mt-2">{t(`home.solutionsSection.${s.key}.desc`)}</p>
             </div>
             <div className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-widest text-foreground">

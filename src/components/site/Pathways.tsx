@@ -7,10 +7,10 @@ import { Link } from "@/components/site/LocalizedLink";
 export function Pathways() {
   const { t } = useTranslation();
   const PATHS = [
-    { n: "01", icon: Factory,       key: "build",   href: "/solutions/factory-development" },
-    { n: "02", icon: Cog,           key: "improve", href: "/solutions/engineering-consultancy" },
-    { n: "03", icon: Layers,        key: "source",  href: "/solutions/raw-materials" },
-    { n: "04", icon: PackageCheck,  key: "buy",     href: "/solutions/sandwich-panels" },
+    { n: "01", icon: Factory, key: "build", href: "/solutions/factory-development" },
+    { n: "02", icon: Cog, key: "improve", href: "/solutions/engineering-consultancy" },
+    { n: "03", icon: Layers, key: "source", href: "/solutions/raw-materials" },
+    { n: "04", icon: PackageCheck, key: "buy", href: "/solutions/sandwich-panels" },
   ] as const;
 
   return (
@@ -44,7 +44,9 @@ export function Pathways() {
                     strokeWidth={1.5}
                   />
                 </div>
-                <h3 className="text-h3 mt-8 text-foreground">{t(`home.pathways.${p.key}.title`)}</h3>
+                <h3 className="text-h3 mt-8 text-foreground">
+                  {t(`home.pathways.${p.key}.title`)}
+                </h3>
                 <p className="text-body mt-3">{t(`home.pathways.${p.key}.desc`)}</p>
               </div>
               <div className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-widest text-foreground">

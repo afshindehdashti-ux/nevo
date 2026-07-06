@@ -9,10 +9,7 @@
  *    when the API is available; still resolves the JSON when it isn't
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  buildLogoTelemetryDump,
-  dumpLogoTelemetryAsJSON,
-} from "../logo-telemetry-debug";
+import { buildLogoTelemetryDump, dumpLogoTelemetryAsJSON } from "../logo-telemetry-debug";
 import {
   LOGO_DECISION_BUFFER_SIZE,
   clearLogoDecisions,
@@ -122,9 +119,7 @@ describe("logo telemetry QA dump", () => {
   });
 
   it("downloadLogoTelemetryDump triggers a synthetic download of the JSON", async () => {
-    const { downloadLogoTelemetryDump } = await import(
-      "../logo-telemetry-debug"
-    );
+    const { downloadLogoTelemetryDump } = await import("../logo-telemetry-debug");
     shouldLogRender({ state: createLogoRateState(), config: cfg() });
 
     const created: string[] = [];
@@ -171,9 +166,7 @@ describe("logo telemetry QA dump", () => {
     expect(() => JSON.parse(json)).not.toThrow();
     expect(clicks).toHaveLength(1);
     expect(clicks[0].href).toBe(created[0]);
-    expect(clicks[0].download).toMatch(
-      /^nevo-logo-telemetry-button-.+\.json$/,
-    );
+    expect(clicks[0].download).toMatch(/^nevo-logo-telemetry-button-.+\.json$/);
     expect(anchor.remove).toHaveBeenCalled();
 
     vi.runAllTimers();

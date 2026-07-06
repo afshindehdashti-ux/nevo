@@ -409,10 +409,7 @@ function matchField<T>(want: T | T[] | undefined, actual: T): boolean {
   return Array.isArray(want) ? (want as T[]).includes(actual) : want === actual;
 }
 
-export function matchesLogoDumpFilter(
-  d: LogoDecisionRecord,
-  f: LogoDumpFilter,
-): boolean {
+export function matchesLogoDumpFilter(d: LogoDecisionRecord, f: LogoDumpFilter): boolean {
   return (
     matchField(f.kind, d.kind) &&
     matchField(f.decision, d.decision) &&
@@ -639,9 +636,7 @@ export function buildLogoTelemetryDump(
   const nav = typeof navigator !== "undefined" ? (navigator.userAgent ?? null) : null;
   const url = typeof window !== "undefined" && window.location ? window.location.href : null;
   const legacyCid =
-    criteria &&
-    typeof criteria.correlationId === "string" &&
-    Object.keys(criteria).length === 1
+    criteria && typeof criteria.correlationId === "string" && Object.keys(criteria).length === 1
       ? criteria.correlationId
       : undefined;
   const raw: LogoTelemetryDump = {
@@ -752,7 +747,6 @@ export function buildLogoTelemetryStats(opts: LogoDumpOptions = {}): LogoTelemet
 
   return stats;
 }
-
 
 export function dumpLogoTelemetryAsJSON(
   origin: LogoTelemetryDump["origin"] = "console",
@@ -923,10 +917,7 @@ export function attachLogoDebugUtil(): void {
         filter: LogoDumpFilter,
         origin?: LogoTelemetryDump["origin"],
       ) => LogoTelemetryDump;
-      dumpForFilterAsJSON: (
-        filter: LogoDumpFilter,
-        origin?: LogoTelemetryDump["origin"],
-      ) => string;
+      dumpForFilterAsJSON: (filter: LogoDumpFilter, origin?: LogoTelemetryDump["origin"]) => string;
       copyDumpForFilter: (
         filter: LogoDumpFilter,
         origin?: LogoTelemetryDump["origin"],
@@ -971,12 +962,10 @@ export function attachLogoDebugUtil(): void {
       copyLogoTelemetryDump(origin, { correlationId }),
     downloadDumpForCorrelationId: (correlationId, origin = "console") =>
       downloadLogoTelemetryDump(origin, { correlationId }),
-    dumpForFilter: (filter, origin = "console") =>
-      buildLogoTelemetryDump(origin, { filter }),
+    dumpForFilter: (filter, origin = "console") => buildLogoTelemetryDump(origin, { filter }),
     dumpForFilterAsJSON: (filter, origin = "console") =>
       dumpLogoTelemetryAsJSON(origin, { filter }),
-    copyDumpForFilter: (filter, origin = "console") =>
-      copyLogoTelemetryDump(origin, { filter }),
+    copyDumpForFilter: (filter, origin = "console") => copyLogoTelemetryDump(origin, { filter }),
     downloadDumpForFilter: (filter, origin = "console") =>
       downloadLogoTelemetryDump(origin, { filter }),
     getStats: buildLogoTelemetryStats,

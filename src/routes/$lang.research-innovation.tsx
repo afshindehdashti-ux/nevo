@@ -23,8 +23,7 @@ import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
 import { ogImageMeta } from "@/lib/og-images";
 
-const TITLE =
-  "Research & Innovation Center — Sandwich Panel R&D | NEVO Industrial";
+const TITLE = "Research & Innovation Center — Sandwich Panel R&D | NEVO Industrial";
 const DESCRIPTION =
   "Inside the NEVO Research & Innovation Center: PIR foam research, fire and thermal testing, digital twins, AI analytics and prototype production for next-generation sandwich panels.";
 const URL_PATH = "/research-innovation";
@@ -116,7 +115,9 @@ function ResearchInnovationPage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-graphite text-white">
         <div className="absolute inset-0 opacity-40">
-          <img loading="lazy" decoding="async"
+          <img
+            loading="lazy"
+            decoding="async"
             src={ri01}
             alt=""
             className="h-full w-full object-cover"
@@ -137,9 +138,9 @@ function ResearchInnovationPage() {
               Research and innovation, engineered into every panel.
             </h1>
             <p className="mt-6 text-lg text-white/70 max-w-2xl">
-              Our Research & Innovation Center advances the science of insulated
-              sandwich panels — from PIR chemistry and fire performance to digital
-              twins and AI-driven manufacturing intelligence.
+              Our Research & Innovation Center advances the science of insulated sandwich panels —
+              from PIR chemistry and fire performance to digital twins and AI-driven manufacturing
+              intelligence.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="bg-emerald text-graphite hover:bg-emerald/90">
@@ -192,9 +193,7 @@ function ResearchInnovationPage() {
                 </div>
                 <div className="p-6">
                   <h3 className="text-lg font-semibold tracking-tight">{tile.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                    {tile.body}
-                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{tile.body}</p>
                 </div>
               </SurfaceCard>
             </motion.div>
@@ -204,10 +203,7 @@ function ResearchInnovationPage() {
 
       {/* Pillars */}
       <Section className="bg-muted/30">
-        <SectionHeader
-          eyebrow="Innovation Pillars"
-          title="Where our research investment goes."
-        />
+        <SectionHeader eyebrow="Innovation Pillars" title="Where our research investment goes." />
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {PILLARS.map((p) => (
             <div
@@ -232,17 +228,14 @@ function ResearchInnovationPage() {
           <div className="flex-1">
             <div className="flex items-center gap-3 text-emerald">
               <Cpu className="h-5 w-5" />
-              <span className="text-xs font-mono uppercase tracking-widest">
-                Co-development
-              </span>
+              <span className="text-xs font-mono uppercase tracking-widest">Co-development</span>
             </div>
             <h2 className="mt-3 text-3xl md:text-4xl font-semibold tracking-tight">
               Build the next generation of panels with our engineers.
             </h2>
             <p className="mt-3 text-white/70 max-w-2xl">
-              Joint development, custom formulations and prototype runs — bring
-              your specification to our R&D team and take a proven solution to
-              production.
+              Joint development, custom formulations and prototype runs — bring your specification
+              to our R&D team and take a proven solution to production.
             </p>
           </div>
           <div className="flex gap-3">

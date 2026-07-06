@@ -34,7 +34,6 @@ import {
   LineChart,
   ScrollText,
   Calculator,
-  
   Handshake,
   Briefcase,
   Mail,
@@ -70,7 +69,7 @@ const LOGO_FALLBACK_SVG =
       <polygon points="18,86 46,30 74,86" fill="#22c55e"/>
       <text x="92" y="78" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="72" fill="#ffffff" letter-spacing="2">NEVO</text>
       <text x="94" y="106" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="18" fill="#22c55e" letter-spacing="6">INDUSTRIAL</text>
-    </svg>`
+    </svg>`,
   );
 
 /**
@@ -98,7 +97,8 @@ function getLogoCorrelationId(): string {
     // a per-tab in-memory ID hung off window so events still correlate.
     const w = window as unknown as Record<string, string | undefined>;
     if (!w[LOGO_CID_KEY]) {
-      w[LOGO_CID_KEY] = `cid-mem-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+      w[LOGO_CID_KEY] =
+        `cid-mem-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
     }
     return w[LOGO_CID_KEY]!;
   }
@@ -123,10 +123,6 @@ import { shouldLogRender, shouldLogError } from "@/lib/logo-telemetry";
 import { withLogoEventSchema } from "@/lib/logo-event-schema";
 
 const LOGO_RENDER_SAMPLE_RATE = LOGO_TELEMETRY_CONFIG.renderSampleRate;
-
-
-
-
 
 /* ─────────────────────────────────────────────────────────────
    Navigation model
@@ -159,15 +155,60 @@ const SOLUTIONS: MenuGroup = {
   layout: "cards",
   width: "xl",
   items: [
-    { label: "Factory Development", desc: "Feasibility, layout, commissioning.", icon: Factory, href: "/solutions/factory-development" },
-    { label: "Engineering Consultancy", desc: "Process design & optimization.", icon: Cog, href: "/solutions/engineering-consultancy" },
-    { label: "Production Lines", desc: "Continuous, discontinuous, roll forming.", icon: Wrench, href: "/solutions/production-lines" },
-    { label: "Raw Materials", desc: "PIR, PUR, PPGI, GI, rock wool, adhesives.", icon: PackageSearch, href: "/solutions/raw-materials" },
-    { label: "Finished Panels", desc: "Premium sandwich panels, delivered.", icon: Layers, href: "/solutions/sandwich-panels" },
-    { label: "Panel Configurator", desc: "Configure panels in 3D with live engineering results.", icon: Boxes, href: "/product-configurator" },
-    { label: "Panel Thickness Calculator", desc: "Recommend the correct panel thickness by application, climate & fire.", icon: Calculator, href: "/panel-thickness-calculator" },
-    { label: "Factory Layout Generator", desc: "Design your sandwich panel factory — capacity, core, automation, utilities.", icon: Factory, href: "/factory-layout-generator" },
-    { label: "AI Engineering Assistant", desc: "Calculators, estimators and guided scoping.", icon: LifeBuoy, href: "/ai-assistant" },
+    {
+      label: "Factory Development",
+      desc: "Feasibility, layout, commissioning.",
+      icon: Factory,
+      href: "/solutions/factory-development",
+    },
+    {
+      label: "Engineering Consultancy",
+      desc: "Process design & optimization.",
+      icon: Cog,
+      href: "/solutions/engineering-consultancy",
+    },
+    {
+      label: "Production Lines",
+      desc: "Continuous, discontinuous, roll forming.",
+      icon: Wrench,
+      href: "/solutions/production-lines",
+    },
+    {
+      label: "Raw Materials",
+      desc: "PIR, PUR, PPGI, GI, rock wool, adhesives.",
+      icon: PackageSearch,
+      href: "/solutions/raw-materials",
+    },
+    {
+      label: "Finished Panels",
+      desc: "Premium sandwich panels, delivered.",
+      icon: Layers,
+      href: "/solutions/sandwich-panels",
+    },
+    {
+      label: "Panel Configurator",
+      desc: "Configure panels in 3D with live engineering results.",
+      icon: Boxes,
+      href: "/product-configurator",
+    },
+    {
+      label: "Panel Thickness Calculator",
+      desc: "Recommend the correct panel thickness by application, climate & fire.",
+      icon: Calculator,
+      href: "/panel-thickness-calculator",
+    },
+    {
+      label: "Factory Layout Generator",
+      desc: "Design your sandwich panel factory — capacity, core, automation, utilities.",
+      icon: Factory,
+      href: "/factory-layout-generator",
+    },
+    {
+      label: "AI Engineering Assistant",
+      desc: "Calculators, estimators and guided scoping.",
+      icon: LifeBuoy,
+      href: "/ai-assistant",
+    },
   ],
   featured: {
     eyebrow: "Featured service",
@@ -198,19 +239,84 @@ const KNOWLEDGE: MenuGroup = {
   layout: "list",
   width: "xl",
   items: [
-    { label: "Engineering Articles", desc: "Deep technical writing from our engineers.", icon: BookOpen, href: "/knowledge-hub" },
-    { label: "Technical Library", desc: "Specs, datasheets, drawings.", icon: Library, href: "/download-center" },
-    { label: "Download Center", desc: "Engineering guides, catalogs, datasheets.", icon: Download, href: "/download-center" },
-    { label: "Case Studies", desc: "Factories built with NEVO.", icon: FileText, href: "/factory-layouts" },
-    { label: "FAQ", desc: "Common industrial questions.", icon: HelpCircle, href: "/knowledge-hub" },
-    { label: "Investment Guides", desc: "Feasibility and CAPEX planning.", icon: LineChart, href: "/knowledge-hub" },
-    { label: "Investment Calculator", desc: "Model CAPEX, OPEX, ROI, IRR & payback.", icon: Calculator, href: "/investment-calculator" },
-    { label: "AI Project Estimator", desc: "Instant AI feasibility: investment, utilities, ROI, IRR.", icon: Sparkles, href: "/ai-project-estimator" },
-    { label: "PIR vs Rock Wool", desc: "Complete side-by-side comparison guide.", icon: Layers, href: "/pir-vs-rock-wool" },
-    { label: "Research & Innovation", desc: "R&D roadmap, prototypes and applied testing.", icon: ScrollText, href: "/research-innovation" },
-    { label: "Engineering Tools", desc: "Calculators, selectors, references.", icon: Calculator, href: "/engineering-tools" },
-    { label: "Customer Portal", desc: "Secure client dashboard: projects, tracking, documents.", icon: ShieldCheck, href: "/customer-portal" },
-    { label: "Partner Portal", desc: "Global distributor & EPC workspace: leads, marketing, AI sales.", icon: Handshake, href: "/partner-portal" },
+    {
+      label: "Engineering Articles",
+      desc: "Deep technical writing from our engineers.",
+      icon: BookOpen,
+      href: "/knowledge-hub",
+    },
+    {
+      label: "Technical Library",
+      desc: "Specs, datasheets, drawings.",
+      icon: Library,
+      href: "/download-center",
+    },
+    {
+      label: "Download Center",
+      desc: "Engineering guides, catalogs, datasheets.",
+      icon: Download,
+      href: "/download-center",
+    },
+    {
+      label: "Case Studies",
+      desc: "Factories built with NEVO.",
+      icon: FileText,
+      href: "/factory-layouts",
+    },
+    {
+      label: "FAQ",
+      desc: "Common industrial questions.",
+      icon: HelpCircle,
+      href: "/knowledge-hub",
+    },
+    {
+      label: "Investment Guides",
+      desc: "Feasibility and CAPEX planning.",
+      icon: LineChart,
+      href: "/knowledge-hub",
+    },
+    {
+      label: "Investment Calculator",
+      desc: "Model CAPEX, OPEX, ROI, IRR & payback.",
+      icon: Calculator,
+      href: "/investment-calculator",
+    },
+    {
+      label: "AI Project Estimator",
+      desc: "Instant AI feasibility: investment, utilities, ROI, IRR.",
+      icon: Sparkles,
+      href: "/ai-project-estimator",
+    },
+    {
+      label: "PIR vs Rock Wool",
+      desc: "Complete side-by-side comparison guide.",
+      icon: Layers,
+      href: "/pir-vs-rock-wool",
+    },
+    {
+      label: "Research & Innovation",
+      desc: "R&D roadmap, prototypes and applied testing.",
+      icon: ScrollText,
+      href: "/research-innovation",
+    },
+    {
+      label: "Engineering Tools",
+      desc: "Calculators, selectors, references.",
+      icon: Calculator,
+      href: "/engineering-tools",
+    },
+    {
+      label: "Customer Portal",
+      desc: "Secure client dashboard: projects, tracking, documents.",
+      icon: ShieldCheck,
+      href: "/customer-portal",
+    },
+    {
+      label: "Partner Portal",
+      desc: "Global distributor & EPC workspace: leads, marketing, AI sales.",
+      icon: Handshake,
+      href: "/partner-portal",
+    },
   ],
   featured: {
     eyebrow: "Latest article",
@@ -219,7 +325,6 @@ const KNOWLEDGE: MenuGroup = {
     href: "/pir-vs-rock-wool",
   },
 };
-
 
 const MARKETS: MenuGroup = {
   label: "Markets",
@@ -253,7 +358,6 @@ const COMPANY: MenuGroup = {
     { label: "Project Inquiry", icon: Handshake, href: "/project-inquiry" },
     { label: "Contact", icon: Mail, href: "/contact" },
   ],
-
 };
 
 const NAV: MenuGroup[] = [SOLUTIONS, INDUSTRIES, KNOWLEDGE, MARKETS, COMPANY];
@@ -327,7 +431,11 @@ export function SiteHeader() {
 
         <header>
           <div className="container-wide flex h-[72px] items-center justify-between gap-6 px-5 sm:px-6 md:h-20 md:px-6 lg:h-[88px] lg:px-8">
-            <Link to="/" className="relative flex items-center py-2" aria-label="NEVO Industrial home">
+            <Link
+              to="/"
+              className="relative flex items-center py-2"
+              aria-label="NEVO Industrial home"
+            >
               <span className="relative block w-[165px] md:w-[180px] lg:w-[200px]">
                 {/*
                   Header background is dark in both scroll states (transparent
@@ -362,22 +470,27 @@ export function SiteHeader() {
                     const img = event.currentTarget;
                     const step = img.dataset.fallbackStep ?? "0";
                     const variant =
-                      step === "0" ? "primary-light-png"
-                      : step === "1" ? "fallback-cdn-full"
-                      : "fallback-inline-svg";
-                    logClientEvent("header.logo.render", withLogoEventSchema({
-                      correlationId: getLogoCorrelationId(),
-                      variant,
-                      sampleRate: LOGO_RENDER_SAMPLE_RATE,
-                      naturalWidth: img.naturalWidth,
-                      naturalHeight: img.naturalHeight,
-                      viewportWidth: window.innerWidth,
-                      viewportHeight: window.innerHeight,
-                      dpr: window.devicePixelRatio,
-                      src: img.currentSrc || img.src,
-                    }), "info");
+                      step === "0"
+                        ? "primary-light-png"
+                        : step === "1"
+                          ? "fallback-cdn-full"
+                          : "fallback-inline-svg";
+                    logClientEvent(
+                      "header.logo.render",
+                      withLogoEventSchema({
+                        correlationId: getLogoCorrelationId(),
+                        variant,
+                        sampleRate: LOGO_RENDER_SAMPLE_RATE,
+                        naturalWidth: img.naturalWidth,
+                        naturalHeight: img.naturalHeight,
+                        viewportWidth: window.innerWidth,
+                        viewportHeight: window.innerHeight,
+                        dpr: window.devicePixelRatio,
+                        src: img.currentSrc || img.src,
+                      }),
+                      "info",
+                    );
                   }}
-
                   onError={(event) => {
                     // Defensive fallback chain: if the bundled light logo
                     // fails to load (bundle miss, cache poisoning, blocked
@@ -392,54 +505,66 @@ export function SiteHeader() {
                       img.dataset.fallbackStep = "1";
                       img.dataset.logoVariant = "fallback-cdn";
                       if (shouldLogError("primary-light-png", false)) {
-                        logClientEvent("header.logo.error", withLogoEventSchema({
-                          correlationId,
-                          stage: "primary-light-png",
-                          failedSrc,
-                          nextSrc: LOGO_FALLBACK_CDN,
-                          viewportWidth: window.innerWidth,
-                          online: navigator.onLine,
-                        }), "error");
+                        logClientEvent(
+                          "header.logo.error",
+                          withLogoEventSchema({
+                            correlationId,
+                            stage: "primary-light-png",
+                            failedSrc,
+                            nextSrc: LOGO_FALLBACK_CDN,
+                            viewportWidth: window.innerWidth,
+                            online: navigator.onLine,
+                          }),
+                          "error",
+                        );
                       }
                       img.src = LOGO_FALLBACK_CDN;
                     } else if (step === "1") {
                       img.dataset.fallbackStep = "2";
                       img.dataset.logoVariant = "fallback-svg";
                       if (shouldLogError("fallback-cdn-full", false)) {
-                        logClientEvent("header.logo.error", withLogoEventSchema({
-                          correlationId,
-                          stage: "fallback-cdn-full",
-                          failedSrc,
-                          nextSrc: "inline-svg",
-                          viewportWidth: window.innerWidth,
-                          online: navigator.onLine,
-                        }), "error");
+                        logClientEvent(
+                          "header.logo.error",
+                          withLogoEventSchema({
+                            correlationId,
+                            stage: "fallback-cdn-full",
+                            failedSrc,
+                            nextSrc: "inline-svg",
+                            viewportWidth: window.innerWidth,
+                            online: navigator.onLine,
+                          }),
+                          "error",
+                        );
                       }
                       img.src = LOGO_FALLBACK_SVG;
                     } else if (shouldLogError("fallback-inline-svg", true)) {
-                      logClientEvent("header.logo.error", withLogoEventSchema({
-                        correlationId,
-                        stage: "fallback-inline-svg",
-                        failedSrc,
-                        terminal: true,
-                      }), "error");
+                      logClientEvent(
+                        "header.logo.error",
+                        withLogoEventSchema({
+                          correlationId,
+                          stage: "fallback-inline-svg",
+                          failedSrc,
+                          terminal: true,
+                        }),
+                        "error",
+                      );
                     }
-
-
                   }}
                 />
-
-
               </span>
             </Link>
-
 
             <nav
               className="hidden items-center gap-0.5 lg:flex"
               aria-label="Primary"
               onMouseLeave={() => setActiveMenu(null)}
             >
-              <TopLink label={t("nav.home")} href="/" onLight={!solid} onEnter={() => setActiveMenu(null)} />
+              <TopLink
+                label={t("nav.home")}
+                href="/"
+                onLight={!solid}
+                onEnter={() => setActiveMenu(null)}
+              />
               {NAV.map((group) => (
                 <MegaTrigger
                   key={group.label}
@@ -491,9 +616,12 @@ export function SiteHeader() {
                   setOpen((v) => !v);
                 }}
               >
-                {open ? <X className="size-6" strokeWidth={1.75} /> : <Menu className="size-6" strokeWidth={1.75} />}
+                {open ? (
+                  <X className="size-6" strokeWidth={1.75} />
+                ) : (
+                  <Menu className="size-6" strokeWidth={1.75} />
+                )}
               </button>
-
             </div>
           </div>
 
@@ -516,7 +644,15 @@ export function SiteHeader() {
         </header>
       </div>
 
-      {open && <MobileMenu onClose={() => setOpen(false)} onOpenSearch={() => { setOpen(false); setSearchOpen(true); }} />}
+      {open && (
+        <MobileMenu
+          onClose={() => setOpen(false)}
+          onOpenSearch={() => {
+            setOpen(false);
+            setSearchOpen(true);
+          }}
+        />
+      )}
       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
     </>
   );
@@ -534,7 +670,9 @@ function UtilityBar({ solid }: { solid: boolean }) {
     <div
       className={cn(
         "hidden border-b transition-colors duration-[250ms] md:block",
-        solid ? "border-border/60 bg-surface/60 text-foreground/70" : "border-white/10 bg-black/20 text-white/75",
+        solid
+          ? "border-border/60 bg-surface/60 text-foreground/70"
+          : "border-white/10 bg-black/20 text-white/75",
       )}
     >
       <div className="container-wide flex h-9 items-center justify-between gap-6 px-6 text-[11px] font-medium tracking-wide lg:px-8">
@@ -543,9 +681,15 @@ function UtilityBar({ solid }: { solid: boolean }) {
             <MapPin className="size-3.5 opacity-80" strokeWidth={1.75} />
             {t("brand.location")}
           </span>
-          <span className={cn("hidden h-3 w-px", solid ? "bg-border" : "bg-white/20")} aria-hidden />
+          <span
+            className={cn("hidden h-3 w-px", solid ? "bg-border" : "bg-white/20")}
+            aria-hidden
+          />
           <span className="hidden lg:inline">{t("brand.sector")}</span>
-          <span className={cn("hidden h-3 w-px lg:block", solid ? "bg-border" : "bg-white/20")} aria-hidden />
+          <span
+            className={cn("hidden h-3 w-px lg:block", solid ? "bg-border" : "bg-white/20")}
+            aria-hidden
+          />
           <span className="hidden lg:inline-flex items-center gap-1.5">
             <Globe2 className="size-3.5 opacity-80" strokeWidth={1.75} />
             {t("brand.worldwide")}
@@ -641,7 +785,10 @@ function PrimaryCTA({ solid }: { solid: boolean }) {
       )}
     >
       <span className="relative z-10">{t("cta.startProject")}</span>
-      <ArrowUpRight className="relative z-10 size-3.5 transition-transform duration-[220ms] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" strokeWidth={2} />
+      <ArrowUpRight
+        className="relative z-10 size-3.5 transition-transform duration-[220ms] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+        strokeWidth={2}
+      />
       <span
         aria-hidden
         className="absolute inset-x-4 bottom-1 h-px origin-left scale-x-0 bg-[color:var(--accent)] transition-transform duration-[260ms] group-hover:scale-x-100"
@@ -710,7 +857,10 @@ function CardsLayout({ group }: { group: MenuGroup }) {
                 <span className="min-w-0">
                   <span className="flex items-center gap-1 text-[14px] font-semibold tracking-tight text-foreground">
                     {item.label}
-                    <ArrowRight className="size-3.5 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" strokeWidth={2} />
+                    <ArrowRight
+                      className="size-3.5 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+                      strokeWidth={2}
+                    />
                   </span>
                   {item.desc && (
                     <span className="mt-0.5 block text-[12.5px] leading-snug text-muted-foreground">
@@ -786,7 +936,10 @@ function ListLayout({ group }: { group: MenuGroup }) {
                     </span>
                   )}
                 </span>
-                <ArrowRight className="size-3.5 -translate-x-1 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" strokeWidth={2} />
+                <ArrowRight
+                  className="size-3.5 -translate-x-1 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+                  strokeWidth={2}
+                />
               </a>
             </li>
           ))}
@@ -813,7 +966,10 @@ function MarketsLayout({ group }: { group: MenuGroup }) {
                   <MapPin className="size-3.5 text-[color:var(--accent)]" strokeWidth={2} />
                   {item.label}
                 </span>
-                <ArrowRight className="size-3.5 -translate-x-1 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" strokeWidth={2} />
+                <ArrowRight
+                  className="size-3.5 -translate-x-1 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+                  strokeWidth={2}
+                />
               </a>
             </li>
           ))}
@@ -912,7 +1068,10 @@ function FeaturedCard({ featured, tone }: { featured: Featured; tone: "dark" | "
           )}
         />
         Explore
-        <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" strokeWidth={2} />
+        <ArrowUpRight
+          className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          strokeWidth={2}
+        />
       </div>
     </a>
   );
@@ -922,37 +1081,199 @@ function FeaturedCard({ featured, tone }: { featured: Featured; tone: "dark" | "
    Search overlay
    ───────────────────────────────────────────────────────────── */
 
-const SEARCH_INDEX: { title: string; desc: string; href: string; group: string; keywords: string }[] = [
+const SEARCH_INDEX: {
+  title: string;
+  desc: string;
+  href: string;
+  group: string;
+  keywords: string;
+}[] = [
   // Solutions
-  { title: "Sandwich Panels", desc: "PIR, PUR, rock wool wall and roof panels.", href: "/solutions/sandwich-panels", group: "Solutions", keywords: "pir pur rockwool rock wool wall roof panel insulation" },
-  { title: "Production Lines", desc: "Continuous and discontinuous PIR / rock wool lines.", href: "/solutions/production-lines", group: "Solutions", keywords: "line laminator continuous discontinuous factory equipment" },
-  { title: "Engineering Consultancy", desc: "Feasibility, layout, commissioning, operations.", href: "/solutions/engineering-consultancy", group: "Solutions", keywords: "consultancy feasibility engineering advisory" },
-  { title: "Raw Materials", desc: "PPGI, GI coils, PIR chemicals, adhesives, rock wool.", href: "/solutions/raw-materials", group: "Solutions", keywords: "ppgi gi steel coil chemicals polyol mdi adhesive rockwool" },
-  { title: "Installation & Commissioning", desc: "Site installation, start-up, after-sales support.", href: "/installation-commissioning", group: "Solutions", keywords: "installation commissioning start-up support after sales" },
+  {
+    title: "Sandwich Panels",
+    desc: "PIR, PUR, rock wool wall and roof panels.",
+    href: "/solutions/sandwich-panels",
+    group: "Solutions",
+    keywords: "pir pur rockwool rock wool wall roof panel insulation",
+  },
+  {
+    title: "Production Lines",
+    desc: "Continuous and discontinuous PIR / rock wool lines.",
+    href: "/solutions/production-lines",
+    group: "Solutions",
+    keywords: "line laminator continuous discontinuous factory equipment",
+  },
+  {
+    title: "Engineering Consultancy",
+    desc: "Feasibility, layout, commissioning, operations.",
+    href: "/solutions/engineering-consultancy",
+    group: "Solutions",
+    keywords: "consultancy feasibility engineering advisory",
+  },
+  {
+    title: "Raw Materials",
+    desc: "PPGI, GI coils, PIR chemicals, adhesives, rock wool.",
+    href: "/solutions/raw-materials",
+    group: "Solutions",
+    keywords: "ppgi gi steel coil chemicals polyol mdi adhesive rockwool",
+  },
+  {
+    title: "Installation & Commissioning",
+    desc: "Site installation, start-up, after-sales support.",
+    href: "/installation-commissioning",
+    group: "Solutions",
+    keywords: "installation commissioning start-up support after sales",
+  },
   // Tools
-  { title: "Engineering Tools Center", desc: "20 calculators — thickness, U-value, ROI, layout.", href: "/engineering-tools", group: "Tools", keywords: "tools calculator engineering thickness u-value roi layout" },
-  { title: "Panel Thickness Calculator", desc: "Recommend thickness by climate, fire, application.", href: "/panel-thickness-calculator", group: "Tools", keywords: "thickness u-value climate fire panel calculator" },
-  { title: "Product Configurator", desc: "Configure panel type, core, dimensions, coating.", href: "/product-configurator", group: "Tools", keywords: "configurator panel type core dimensions coating quotation" },
-  { title: "Investment Calculator", desc: "CAPEX, OPEX, ROI, IRR, NPV, payback.", href: "/investment-calculator", group: "Tools", keywords: "investment capex opex roi irr npv payback financial" },
-  { title: "Factory Layout Generator", desc: "Interactive plant layout — line, warehouse, utilities.", href: "/factory-layout-generator", group: "Tools", keywords: "factory layout plant warehouse utilities floor plan" },
-  { title: "AI Project Estimator", desc: "AI feasibility for full factory investment.", href: "/ai-project-estimator", group: "Tools", keywords: "ai project estimator feasibility factory investment" },
-  { title: "AI Engineering Assistant", desc: "Ask any engineering question — 24/7.", href: "/ai-assistant", group: "Tools", keywords: "ai assistant chat engineer help question" },
-  { title: "PIR vs Rock Wool", desc: "Full comparison — thermal, fire, TCO.", href: "/pir-vs-rock-wool", group: "Tools", keywords: "pir rockwool comparison fire thermal tco" },
+  {
+    title: "Engineering Tools Center",
+    desc: "20 calculators — thickness, U-value, ROI, layout.",
+    href: "/engineering-tools",
+    group: "Tools",
+    keywords: "tools calculator engineering thickness u-value roi layout",
+  },
+  {
+    title: "Panel Thickness Calculator",
+    desc: "Recommend thickness by climate, fire, application.",
+    href: "/panel-thickness-calculator",
+    group: "Tools",
+    keywords: "thickness u-value climate fire panel calculator",
+  },
+  {
+    title: "Product Configurator",
+    desc: "Configure panel type, core, dimensions, coating.",
+    href: "/product-configurator",
+    group: "Tools",
+    keywords: "configurator panel type core dimensions coating quotation",
+  },
+  {
+    title: "Investment Calculator",
+    desc: "CAPEX, OPEX, ROI, IRR, NPV, payback.",
+    href: "/investment-calculator",
+    group: "Tools",
+    keywords: "investment capex opex roi irr npv payback financial",
+  },
+  {
+    title: "Factory Layout Generator",
+    desc: "Interactive plant layout — line, warehouse, utilities.",
+    href: "/factory-layout-generator",
+    group: "Tools",
+    keywords: "factory layout plant warehouse utilities floor plan",
+  },
+  {
+    title: "AI Project Estimator",
+    desc: "AI feasibility for full factory investment.",
+    href: "/ai-project-estimator",
+    group: "Tools",
+    keywords: "ai project estimator feasibility factory investment",
+  },
+  {
+    title: "AI Engineering Assistant",
+    desc: "Ask any engineering question — 24/7.",
+    href: "/ai-assistant",
+    group: "Tools",
+    keywords: "ai assistant chat engineer help question",
+  },
+  {
+    title: "PIR vs Rock Wool",
+    desc: "Full comparison — thermal, fire, TCO.",
+    href: "/pir-vs-rock-wool",
+    group: "Tools",
+    keywords: "pir rockwool comparison fire thermal tco",
+  },
   // Knowledge
-  { title: "Knowledge Hub", desc: "Articles, guides, courses, videos, FAQ.", href: "/knowledge-hub", group: "Knowledge", keywords: "knowledge articles guides courses videos faq library" },
-  { title: "Download Center", desc: "Datasheets, brochures, CAD/BIM, certifications.", href: "/download-center", group: "Knowledge", keywords: "downloads datasheet brochure cad bim certification pdf" },
-  { title: "Factory Layouts Library", desc: "Reference plant layouts and case studies.", href: "/factory-layouts", group: "Knowledge", keywords: "factory layouts case studies plant reference" },
-  { title: "Research & Innovation", desc: "R&D roadmap, prototypes, applied testing.", href: "/research-innovation", group: "Knowledge", keywords: "research innovation r&d rd prototypes testing" },
-  { title: "Quality Assurance", desc: "EN 14509 QC, testing, certifications.", href: "/quality", group: "Knowledge", keywords: "quality qc en 14509 testing certification" },
+  {
+    title: "Knowledge Hub",
+    desc: "Articles, guides, courses, videos, FAQ.",
+    href: "/knowledge-hub",
+    group: "Knowledge",
+    keywords: "knowledge articles guides courses videos faq library",
+  },
+  {
+    title: "Download Center",
+    desc: "Datasheets, brochures, CAD/BIM, certifications.",
+    href: "/download-center",
+    group: "Knowledge",
+    keywords: "downloads datasheet brochure cad bim certification pdf",
+  },
+  {
+    title: "Factory Layouts Library",
+    desc: "Reference plant layouts and case studies.",
+    href: "/factory-layouts",
+    group: "Knowledge",
+    keywords: "factory layouts case studies plant reference",
+  },
+  {
+    title: "Research & Innovation",
+    desc: "R&D roadmap, prototypes, applied testing.",
+    href: "/research-innovation",
+    group: "Knowledge",
+    keywords: "research innovation r&d rd prototypes testing",
+  },
+  {
+    title: "Quality Assurance",
+    desc: "EN 14509 QC, testing, certifications.",
+    href: "/quality",
+    group: "Knowledge",
+    keywords: "quality qc en 14509 testing certification",
+  },
   // Company
-  { title: "About NEVO", desc: "Engineering-led industrial group, Dubai.", href: "/about", group: "Company", keywords: "about company nevo dubai group" },
-  { title: "Sustainability & ESG", desc: "Environment, social and governance strategy.", href: "/sustainability", group: "Company", keywords: "sustainability esg environment governance carbon" },
-  { title: "Careers", desc: "Engineering, production and commercial roles.", href: "/careers", group: "Company", keywords: "careers jobs hiring engineer production" },
-  { title: "Investor Relations", desc: "Reports, governance, strategy.", href: "/investors", group: "Company", keywords: "investor relations reports governance" },
-  { title: "Contact & Global Offices", desc: "Dubai HQ, WhatsApp, sales, engineering.", href: "/contact", group: "Company", keywords: "contact offices whatsapp phone sales engineering dubai" },
-  { title: "Customer Portal", desc: "Project timeline, documents, logistics.", href: "/customer-portal", group: "Company", keywords: "customer portal project timeline documents" },
-  { title: "Partner Portal", desc: "Distributors, EPCs, marketing, training.", href: "/partner-portal", group: "Company", keywords: "partner distributor epc portal marketing training" },
-  { title: "Request a Quotation", desc: "7-stage engineering intake wizard.", href: "/project-inquiry", group: "Company", keywords: "quotation quote inquiry rfq request price" },
+  {
+    title: "About NEVO",
+    desc: "Engineering-led industrial group, Dubai.",
+    href: "/about",
+    group: "Company",
+    keywords: "about company nevo dubai group",
+  },
+  {
+    title: "Sustainability & ESG",
+    desc: "Environment, social and governance strategy.",
+    href: "/sustainability",
+    group: "Company",
+    keywords: "sustainability esg environment governance carbon",
+  },
+  {
+    title: "Careers",
+    desc: "Engineering, production and commercial roles.",
+    href: "/careers",
+    group: "Company",
+    keywords: "careers jobs hiring engineer production",
+  },
+  {
+    title: "Investor Relations",
+    desc: "Reports, governance, strategy.",
+    href: "/investors",
+    group: "Company",
+    keywords: "investor relations reports governance",
+  },
+  {
+    title: "Contact & Global Offices",
+    desc: "Dubai HQ, WhatsApp, sales, engineering.",
+    href: "/contact",
+    group: "Company",
+    keywords: "contact offices whatsapp phone sales engineering dubai",
+  },
+  {
+    title: "Customer Portal",
+    desc: "Project timeline, documents, logistics.",
+    href: "/customer-portal",
+    group: "Company",
+    keywords: "customer portal project timeline documents",
+  },
+  {
+    title: "Partner Portal",
+    desc: "Distributors, EPCs, marketing, training.",
+    href: "/partner-portal",
+    group: "Company",
+    keywords: "partner distributor epc portal marketing training",
+  },
+  {
+    title: "Request a Quotation",
+    desc: "7-stage engineering intake wizard.",
+    href: "/project-inquiry",
+    group: "Company",
+    keywords: "quotation quote inquiry rfq request price",
+  },
 ];
 
 function SearchOverlay({ onClose }: { onClose: () => void }) {
@@ -970,24 +1291,33 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
     const query = q.trim().toLowerCase();
     if (!query) return SEARCH_INDEX.slice(0, 8);
     const tokens = query.split(/\s+/).filter(Boolean);
-    return SEARCH_INDEX
-      .map((item) => {
-        const hay = `${item.title} ${item.desc} ${item.keywords} ${item.group}`.toLowerCase();
-        const score = tokens.reduce((s, t) => (hay.includes(t) ? s + 1 : s), 0);
-        return { item, score };
-      })
+    return SEARCH_INDEX.map((item) => {
+      const hay = `${item.title} ${item.desc} ${item.keywords} ${item.group}`.toLowerCase();
+      const score = tokens.reduce((s, t) => (hay.includes(t) ? s + 1 : s), 0);
+      return { item, score };
+    })
       .filter((r) => r.score === tokens.length)
       .map((r) => r.item)
       .slice(0, 12);
   }, [q]);
 
-  useEffect(() => { setActiveIdx(0); }, [q]);
+  useEffect(() => {
+    setActiveIdx(0);
+  }, [q]);
 
-  const go = (href: string) => { onClose(); navigate({ to: href.startsWith("/$lang") ? href : `/$lang${href}` as never, params: { lang } as never }); };
+  const go = (href: string) => {
+    onClose();
+    navigate({
+      to: href.startsWith("/$lang") ? href : (`/$lang${href}` as never),
+      params: { lang } as never,
+    });
+  };
 
   const groups = useMemo(() => {
     const m: Record<string, typeof SEARCH_INDEX> = {};
-    results.forEach((r) => { (m[r.group] ||= []).push(r); });
+    results.forEach((r) => {
+      (m[r.group] ||= []).push(r);
+    });
     return m;
   }, [results]);
 
@@ -1002,9 +1332,16 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "ArrowDown") { e.preventDefault(); setActiveIdx((i) => Math.min(i + 1, results.length - 1)); }
-              else if (e.key === "ArrowUp") { e.preventDefault(); setActiveIdx((i) => Math.max(i - 1, 0)); }
-              else if (e.key === "Enter" && results[activeIdx]) { e.preventDefault(); go(results[activeIdx].href); }
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setActiveIdx((i) => Math.min(i + 1, results.length - 1));
+              } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setActiveIdx((i) => Math.max(i - 1, 0));
+              } else if (e.key === "Enter" && results[activeIdx]) {
+                e.preventDefault();
+                go(results[activeIdx].href);
+              }
             }}
             placeholder="Search pages, tools, downloads, articles…"
             className="flex-1 bg-transparent text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none"
@@ -1021,7 +1358,9 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
           ) : (
             Object.entries(groups).map(([group, items]) => (
               <div key={group} className="mb-4 last:mb-0">
-                <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{group}</div>
+                <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  {group}
+                </div>
                 <ul className="grid gap-0.5">
                   {items.map((r) => {
                     const idx = results.indexOf(r);
@@ -1034,10 +1373,17 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
                           className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition ${active ? "bg-surface" : "hover:bg-surface/70"}`}
                         >
                           <span className="min-w-0">
-                            <span className="block text-[13.5px] text-foreground truncate">{r.title}</span>
-                            <span className="block text-[11.5px] text-muted-foreground truncate">{r.desc}</span>
+                            <span className="block text-[13.5px] text-foreground truncate">
+                              {r.title}
+                            </span>
+                            <span className="block text-[11.5px] text-muted-foreground truncate">
+                              {r.desc}
+                            </span>
                           </span>
-                          <ArrowRight className="size-3.5 text-muted-foreground shrink-0" strokeWidth={2} />
+                          <ArrowRight
+                            className="size-3.5 text-muted-foreground shrink-0"
+                            strokeWidth={2}
+                          />
                         </button>
                       </li>
                     );
@@ -1060,11 +1406,11 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
   const { t } = useTranslation();
   const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
   const sections: { label: string; i18nKey: string; items: NavItem[] }[] = [
-    { label: "Solutions",  i18nKey: "nav.solutions",  items: SOLUTIONS.items },
+    { label: "Solutions", i18nKey: "nav.solutions", items: SOLUTIONS.items },
     { label: "Industries", i18nKey: "nav.industries", items: INDUSTRIES.items },
-    { label: "Knowledge",  i18nKey: "nav.knowledge",  items: KNOWLEDGE.items.slice(0, 6) },
-    { label: "Markets",    i18nKey: "nav.markets",    items: MARKETS.items },
-    { label: "Company",    i18nKey: "nav.company",    items: COMPANY.items },
+    { label: "Knowledge", i18nKey: "nav.knowledge", items: KNOWLEDGE.items.slice(0, 6) },
+    { label: "Markets", i18nKey: "nav.markets", items: MARKETS.items },
+    { label: "Company", i18nKey: "nav.company", items: COMPANY.items },
   ];
 
   return (
@@ -1104,13 +1450,13 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
         </div>
 
         {sections.map((section) => (
-          <details
-            key={section.label}
-            className="group border-b border-border py-2"
-          >
+          <details key={section.label} className="group border-b border-border py-2">
             <summary className="flex cursor-pointer list-none items-center justify-between py-3 text-[18px] font-semibold tracking-tight text-foreground">
               {t(section.i18nKey, section.label)}
-              <ChevronRight className="size-5 transition-transform group-open:rotate-90" strokeWidth={1.75} />
+              <ChevronRight
+                className="size-5 transition-transform group-open:rotate-90"
+                strokeWidth={1.75}
+              />
             </summary>
             <ul className="grid gap-0.5 pb-3">
               {section.items.map((item) => (
@@ -1142,17 +1488,25 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
             {[
               { label: "PIR vs Rock Wool: choosing the right core", href: "/pir-vs-rock-wool" },
               { label: "CAPEX guide for a 50k m² factory", href: "/solutions/factory-development" },
-              { label: "Continuous line commissioning checklist", href: "/solutions/production-lines" },
-            ].map(
-              (t) => (
-                <li key={t.label}>
-                  <a href={t.href} className="flex items-start justify-between gap-3 py-1.5 text-[14px] text-foreground" onClick={onClose}>
-                    <span className="min-w-0 flex-1">{t.label}</span>
-                    <ArrowUpRight className="mt-0.5 size-4 text-muted-foreground" strokeWidth={1.75} />
-                  </a>
-                </li>
-              ),
-            )}
+              {
+                label: "Continuous line commissioning checklist",
+                href: "/solutions/production-lines",
+              },
+            ].map((t) => (
+              <li key={t.label}>
+                <a
+                  href={t.href}
+                  className="flex items-start justify-between gap-3 py-1.5 text-[14px] text-foreground"
+                  onClick={onClose}
+                >
+                  <span className="min-w-0 flex-1">{t.label}</span>
+                  <ArrowUpRight
+                    className="mt-0.5 size-4 text-muted-foreground"
+                    strokeWidth={1.75}
+                  />
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -1170,7 +1524,8 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
             <MapPin className="size-3.5" strokeWidth={1.75} /> Dubai, UAE
           </span>
           <a href={whatsappHref} className="inline-flex items-center gap-1.5" onClick={onClose}>
-            <MessageCircle className="size-3.5" strokeWidth={1.75} /> {SITE.contact.whatsapp ? "WhatsApp" : "Engineering Desk"}
+            <MessageCircle className="size-3.5" strokeWidth={1.75} />{" "}
+            {SITE.contact.whatsapp ? "WhatsApp" : "Engineering Desk"}
           </a>
         </div>
       </div>

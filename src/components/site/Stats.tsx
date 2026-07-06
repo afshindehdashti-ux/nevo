@@ -28,19 +28,18 @@ export function Stats() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => entry.isIntersecting && setVisible(true),
-      { threshold: 0.3 },
-    );
+    const io = new IntersectionObserver(([entry]) => entry.isIntersecting && setVisible(true), {
+      threshold: 0.3,
+    });
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
   const STATS = [
-    { num: 20,   suffix: t("home.stats.yearsSuffix"),    label: t("home.stats.yearsLabel") },
-    { num: 100,  suffix: t("home.stats.projectsSuffix"), label: t("home.stats.projectsLabel") },
+    { num: 20, suffix: t("home.stats.yearsSuffix"), label: t("home.stats.yearsLabel") },
+    { num: 100, suffix: t("home.stats.projectsSuffix"), label: t("home.stats.projectsLabel") },
     { num: 0, text: t("home.stats.worldwide"), label: t("home.stats.worldwideLabel") },
-    { num: 0, text: t("home.stats.multiple"),  label: t("home.stats.multipleLabel") },
+    { num: 0, text: t("home.stats.multiple"), label: t("home.stats.multipleLabel") },
   ];
 
   return (

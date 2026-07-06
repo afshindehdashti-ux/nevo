@@ -60,8 +60,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const TITLE =
-  "Raw Material Solutions — PPGI, PIR, Rock Wool, Polyol & MDI | NEVO Industrial";
+const TITLE = "Raw Material Solutions — PPGI, PIR, Rock Wool, Polyol & MDI | NEVO Industrial";
 const DESCRIPTION =
   "Engineered raw material solutions for sandwich panel manufacturing: PPGI/GI/Aluzinc steel coils, polyol and MDI chemical systems, PIR and rock wool cores, adhesives and finished panels — sourced, tested and delivered by NEVO Industrial, Dubai.";
 const URL_PATH = "/solutions/raw-materials";
@@ -77,33 +76,104 @@ const DOWNLOADS_LD_ITEMS = [
   "Certificates of Analysis Sample Pack",
 ];
 
-
 const FAQS: { q: string; a: string }[] = [
-  { q: "What raw materials do you supply?", a: "Complete raw material systems for sandwich panel manufacturing: PPGI/GI/Aluzinc/prepainted aluminium coils, polyol and MDI chemical systems (IBC and drum), PIR and rock wool insulation cores, structural adhesives, sealants, release films and packaging consumables." },
-  { q: "Do you sell single materials or full systems?", a: "Both. Manufacturers can source a single item (e.g. one polyol tanker) or a fully engineered material package matched to a specific line, panel spectrum and target market." },
-  { q: "What steel thicknesses are available for PPGI?", a: "Standard PPGI facings range 0.30–0.80 mm. For sandwich panels we typically supply 0.40, 0.45, 0.50, 0.55 and 0.60 mm on request. Yield strengths S250GD to S350GD with Z100–Z275 zinc coating." },
-  { q: "What paint systems do you offer on PPGI?", a: "Polyester (SMP), high-durability polyester (HDP), PVDF and food-grade coatings. Top coats 15–35 μm, backer 5–10 μm, in RAL and custom colours. Certificates for VOC, food contact and salt-spray resistance provided." },
-  { q: "What is the difference between PIR and PUR?", a: "PIR (polyisocyanurate) uses a higher isocyanate index, producing a denser cross-linked foam with superior fire behaviour, thermal stability and B-s2,d0 / Bs1d0 classifications. PUR is lower cost with slightly better thermal conductivity but weaker fire performance." },
-  { q: "Which polyol system should I choose?", a: "Selection depends on target density (38–42 kg/m³ typical), reactivity profile, line speed, facing type and required fire class. Our chemists match the polyol/MDI recipe to your line and panel spec before the first delivery." },
-  { q: "Do you supply polyol in IBC or drums?", a: "Both. 1000 L IBCs for continuous lines with bulk consumption, 200 L drums for discontinuous presses, R&D and low-volume operations. Bulk tanker delivery available in select regions." },
-  { q: "How is chemical compatibility guaranteed?", a: "Polyol and MDI are delivered as matched pairs from qualified producers, with batch reactivity profile, viscosity, hydroxyl number and NCO content reported on every certificate of analysis." },
-  { q: "What is the shelf life of the chemicals?", a: "Polyol: 6 months in sealed original packaging at 15–25 °C. MDI: 6 months in sealed original packaging at 20–35 °C, protected from moisture. FIFO stock rotation is documented on every delivery." },
-  { q: "What rock wool densities do you supply?", a: "Lamella density 90–130 kg/m³ for sandwich panels, slab density 40–100 kg/m³ for insulation applications. Fibre orientation, tensile strength and shear performance are certified per batch." },
-  
-  { q: "Can you supply materials to match my existing production line?", a: "Yes. Our engineers analyse your current line — decoiler width, foaming machine head, curing zone, cutting system — and specify facings and chemistry that run stably on your equipment." },
-  { q: "What are the typical PPGI coil weights?", a: "Coil weight 3–10 tons, inner diameter 508 or 610 mm, coil width 1000–1250 mm slit to panel width. Coils are packed with steel straps, VCI paper and edge protectors." },
-  { q: "How do you handle Aluzinc vs GI selection?", a: "Aluzinc (AZ150) offers 3–6× better corrosion resistance than GI in coastal, cold-storage and chemical environments. GI is preferred for cost-sensitive interior applications. We advise per project climate and lifespan target." },
-  { q: "What adhesives do you supply?", a: "Structural PU adhesives for cold-formed metal / rock wool bonding, edge sealants for panel joints, and profile sealants for concealed-fix systems. Application rate and open time matched to your line speed." },
-  { q: "Can you supply finished sandwich panels?", a: "Yes. When local production is not yet online, NEVO can supply finished PIR, PUR and rock wool wall/roof/cold-storage panels from qualified partner factories to bridge demand during factory build-up." },
-  { q: "What quality documentation do you provide?", a: "Mill test certificates (EN 10204 3.1) for steel, certificates of analysis for chemistry, fire and thermal test reports for panels, and full batch traceability from source mill to your factory gate." },
-  { q: "Which incoterms do you work with?", a: "EXW, FOB, CFR, CIF and DAP. For strategic customers we operate DDP with in-country warehousing in the GCC, Levant and East Africa." },
-  { q: "What minimum order quantities apply?", a: "Steel coils: from 25 tons per specification. Polyol / MDI: from one full IBC or drum SKU. Rock wool lamella: from one 20-foot container. Consolidated multi-item containers are supported for pilot orders." },
-  { q: "What is the typical lead time?", a: "Steel coils: 4–8 weeks from confirmed order. Chemicals: 3–6 weeks. Rock wool: 4–6 weeks. Adhesives and consumables: 2–4 weeks. Stocked SKUs ship within days from Dubai." },
-  { q: "How do you ensure supply chain reliability?", a: "Dual-source strategy on every critical SKU, safety stock in Jebel Ali, live production planning with our mills, and transparent shipment tracking from PO to delivery." },
-  { q: "Do you provide technical training on material use?", a: "Yes. Foaming recipe workshops, steel handling and coil storage training, quality inspection procedures and troubleshooting sessions — on site during commissioning or remote via video." },
-  { q: "Can NEVO handle blended containers for small projects?", a: "Yes. LCL and consolidated FCL shipments combining steel, chemistry and consumables are available for pilot production runs and R&D orders." },
-  { q: "What sustainability data can you share?", a: "EPDs for steel and rock wool, GWP declarations on chemistry, HFC-free blowing agents, and take-back programmes for IBCs and drums in select markets." },
-  { q: "How does material selection affect panel quality?", a: "Facing paint chemistry drives corrosion life; steel yield strength drives panel stiffness; polyol reactivity drives foaming consistency; MDI index drives fire behaviour; core density drives compression strength. Materials define the panel — the line only assembles them." },
+  {
+    q: "What raw materials do you supply?",
+    a: "Complete raw material systems for sandwich panel manufacturing: PPGI/GI/Aluzinc/prepainted aluminium coils, polyol and MDI chemical systems (IBC and drum), PIR and rock wool insulation cores, structural adhesives, sealants, release films and packaging consumables.",
+  },
+  {
+    q: "Do you sell single materials or full systems?",
+    a: "Both. Manufacturers can source a single item (e.g. one polyol tanker) or a fully engineered material package matched to a specific line, panel spectrum and target market.",
+  },
+  {
+    q: "What steel thicknesses are available for PPGI?",
+    a: "Standard PPGI facings range 0.30–0.80 mm. For sandwich panels we typically supply 0.40, 0.45, 0.50, 0.55 and 0.60 mm on request. Yield strengths S250GD to S350GD with Z100–Z275 zinc coating.",
+  },
+  {
+    q: "What paint systems do you offer on PPGI?",
+    a: "Polyester (SMP), high-durability polyester (HDP), PVDF and food-grade coatings. Top coats 15–35 μm, backer 5–10 μm, in RAL and custom colours. Certificates for VOC, food contact and salt-spray resistance provided.",
+  },
+  {
+    q: "What is the difference between PIR and PUR?",
+    a: "PIR (polyisocyanurate) uses a higher isocyanate index, producing a denser cross-linked foam with superior fire behaviour, thermal stability and B-s2,d0 / Bs1d0 classifications. PUR is lower cost with slightly better thermal conductivity but weaker fire performance.",
+  },
+  {
+    q: "Which polyol system should I choose?",
+    a: "Selection depends on target density (38–42 kg/m³ typical), reactivity profile, line speed, facing type and required fire class. Our chemists match the polyol/MDI recipe to your line and panel spec before the first delivery.",
+  },
+  {
+    q: "Do you supply polyol in IBC or drums?",
+    a: "Both. 1000 L IBCs for continuous lines with bulk consumption, 200 L drums for discontinuous presses, R&D and low-volume operations. Bulk tanker delivery available in select regions.",
+  },
+  {
+    q: "How is chemical compatibility guaranteed?",
+    a: "Polyol and MDI are delivered as matched pairs from qualified producers, with batch reactivity profile, viscosity, hydroxyl number and NCO content reported on every certificate of analysis.",
+  },
+  {
+    q: "What is the shelf life of the chemicals?",
+    a: "Polyol: 6 months in sealed original packaging at 15–25 °C. MDI: 6 months in sealed original packaging at 20–35 °C, protected from moisture. FIFO stock rotation is documented on every delivery.",
+  },
+  {
+    q: "What rock wool densities do you supply?",
+    a: "Lamella density 90–130 kg/m³ for sandwich panels, slab density 40–100 kg/m³ for insulation applications. Fibre orientation, tensile strength and shear performance are certified per batch.",
+  },
+
+  {
+    q: "Can you supply materials to match my existing production line?",
+    a: "Yes. Our engineers analyse your current line — decoiler width, foaming machine head, curing zone, cutting system — and specify facings and chemistry that run stably on your equipment.",
+  },
+  {
+    q: "What are the typical PPGI coil weights?",
+    a: "Coil weight 3–10 tons, inner diameter 508 or 610 mm, coil width 1000–1250 mm slit to panel width. Coils are packed with steel straps, VCI paper and edge protectors.",
+  },
+  {
+    q: "How do you handle Aluzinc vs GI selection?",
+    a: "Aluzinc (AZ150) offers 3–6× better corrosion resistance than GI in coastal, cold-storage and chemical environments. GI is preferred for cost-sensitive interior applications. We advise per project climate and lifespan target.",
+  },
+  {
+    q: "What adhesives do you supply?",
+    a: "Structural PU adhesives for cold-formed metal / rock wool bonding, edge sealants for panel joints, and profile sealants for concealed-fix systems. Application rate and open time matched to your line speed.",
+  },
+  {
+    q: "Can you supply finished sandwich panels?",
+    a: "Yes. When local production is not yet online, NEVO can supply finished PIR, PUR and rock wool wall/roof/cold-storage panels from qualified partner factories to bridge demand during factory build-up.",
+  },
+  {
+    q: "What quality documentation do you provide?",
+    a: "Mill test certificates (EN 10204 3.1) for steel, certificates of analysis for chemistry, fire and thermal test reports for panels, and full batch traceability from source mill to your factory gate.",
+  },
+  {
+    q: "Which incoterms do you work with?",
+    a: "EXW, FOB, CFR, CIF and DAP. For strategic customers we operate DDP with in-country warehousing in the GCC, Levant and East Africa.",
+  },
+  {
+    q: "What minimum order quantities apply?",
+    a: "Steel coils: from 25 tons per specification. Polyol / MDI: from one full IBC or drum SKU. Rock wool lamella: from one 20-foot container. Consolidated multi-item containers are supported for pilot orders.",
+  },
+  {
+    q: "What is the typical lead time?",
+    a: "Steel coils: 4–8 weeks from confirmed order. Chemicals: 3–6 weeks. Rock wool: 4–6 weeks. Adhesives and consumables: 2–4 weeks. Stocked SKUs ship within days from Dubai.",
+  },
+  {
+    q: "How do you ensure supply chain reliability?",
+    a: "Dual-source strategy on every critical SKU, safety stock in Jebel Ali, live production planning with our mills, and transparent shipment tracking from PO to delivery.",
+  },
+  {
+    q: "Do you provide technical training on material use?",
+    a: "Yes. Foaming recipe workshops, steel handling and coil storage training, quality inspection procedures and troubleshooting sessions — on site during commissioning or remote via video.",
+  },
+  {
+    q: "Can NEVO handle blended containers for small projects?",
+    a: "Yes. LCL and consolidated FCL shipments combining steel, chemistry and consumables are available for pilot production runs and R&D orders.",
+  },
+  {
+    q: "What sustainability data can you share?",
+    a: "EPDs for steel and rock wool, GWP declarations on chemistry, HFC-free blowing agents, and take-back programmes for IBCs and drums in select markets.",
+  },
+  {
+    q: "How does material selection affect panel quality?",
+    a: "Facing paint chemistry drives corrosion life; steel yield strength drives panel stiffness; polyol reactivity drives foaming consistency; MDI index drives fire behaviour; core density drives compression strength. Materials define the panel — the line only assembles them.",
+  },
 ];
 
 export const Route = createFileRoute("/$lang/solutions/raw-materials")({
@@ -123,7 +193,12 @@ export const Route = createFileRoute("/$lang/solutions/raw-materials")({
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/${params.lang}` },
-        { "@type": "ListItem", position: 2, name: "Solutions", item: `${SITE.url}/${params.lang}/solutions` },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Solutions",
+          item: `${SITE.url}/${params.lang}/solutions`,
+        },
         { "@type": "ListItem", position: 3, name: "Raw Materials", item: canonical },
       ],
     };
@@ -136,7 +211,15 @@ export const Route = createFileRoute("/$lang/solutions/raw-materials")({
       areaServed: ["AE", "SA", "OM", "TR", "IQ", "KE", "CM", "RU", "EU"],
       url: canonical,
       description: DESCRIPTION,
-      category: ["PPGI coils", "Galvanized steel", "Aluzinc", "PIR polyol", "MDI", "Rock wool lamella", "Adhesives"],
+      category: [
+        "PPGI coils",
+        "Galvanized steel",
+        "Aluzinc",
+        "PIR polyol",
+        "MDI",
+        "Rock wool lamella",
+        "Adhesives",
+      ],
     };
     const seo = buildSeo({
       title: TITLE,
@@ -171,7 +254,6 @@ export const Route = createFileRoute("/$lang/solutions/raw-materials")({
           }),
         ),
       ],
-
     };
   },
   component: RawMaterialsPage,
@@ -259,16 +341,12 @@ function Hero() {
             <span className="text-accent">Engineered for Sandwich Panel Manufacturing.</span>
           </h1>
           <p className="text-body-lg mt-8 max-w-2xl leading-relaxed text-white/75">
-            Helping manufacturers improve production quality through engineering-driven
-            material selection and global industrial supply — from PPGI facings and PIR
-            chemistry to rock wool cores, adhesives and finished panels.
+            Helping manufacturers improve production quality through engineering-driven material
+            selection and global industrial supply — from PPGI facings and PIR chemistry to rock
+            wool cores, adhesives and finished panels.
           </p>
           <div className="mt-10 flex flex-row items-center gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="bg-white text-primary hover:bg-white/90"
-            >
+            <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
               <a href="/project-inquiry">
                 Request Material Quotation
                 <ArrowRight className="!size-4" />
@@ -437,9 +515,21 @@ function ChemicalSystems() {
       </div>
       <GridBoard className="mt-10 md:grid-cols-3">
         {[
-          { icon: Beaker, k: "Foaming consistency", v: "Reactivity matched to your line speed, mould temperature and belt travel." },
-          { icon: Shield, k: "Chemical compatibility", v: "Polyol/MDI supplied as engineered pairs, tested for hydroxyl number and NCO index." },
-          { icon: Gauge, k: "Production stability", v: "Batch-to-batch consistency documented on every certificate of analysis." },
+          {
+            icon: Beaker,
+            k: "Foaming consistency",
+            v: "Reactivity matched to your line speed, mould temperature and belt travel.",
+          },
+          {
+            icon: Shield,
+            k: "Chemical compatibility",
+            v: "Polyol/MDI supplied as engineered pairs, tested for hydroxyl number and NCO index.",
+          },
+          {
+            icon: Gauge,
+            k: "Production stability",
+            v: "Batch-to-batch consistency documented on every certificate of analysis.",
+          },
         ].map((b) => (
           <BoardCell key={b.k}>
             <b.icon className="size-5 text-accent" strokeWidth={1.5} />
@@ -503,10 +593,7 @@ function SteelSystems() {
           { icon: Shield, k: "Corrosion class", v: "Z100–Z275 · AZ150" },
           { icon: Layers, k: "Surface quality", v: "Class B — panel grade" },
         ].map((b) => (
-          <div
-            key={b.k}
-            className="rounded-lg border border-border bg-surface p-5"
-          >
+          <div key={b.k} className="rounded-lg border border-border bg-surface p-5">
             <b.icon className="size-5 text-accent" strokeWidth={1.5} />
             <div className="mt-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">
               {b.k}
@@ -604,11 +691,26 @@ function Accessories() {
         <SurfaceCard padded={false} className="overflow-hidden">
           <div className="flex flex-col gap-6 p-8 sm:p-10">
             {[
-              { icon: Layers, k: "Panel bonding", v: "PU structural adhesives specified per facing / core combination." },
-              { icon: Shield, k: "Waterproofing", v: "Butyl and hybrid sealants for concealed and standing-seam joints." },
-              { icon: Gauge, k: "Production efficiency", v: "Open times and viscosity tuned to your line speed and belt temperature." },
+              {
+                icon: Layers,
+                k: "Panel bonding",
+                v: "PU structural adhesives specified per facing / core combination.",
+              },
+              {
+                icon: Shield,
+                k: "Waterproofing",
+                v: "Butyl and hybrid sealants for concealed and standing-seam joints.",
+              },
+              {
+                icon: Gauge,
+                k: "Production efficiency",
+                v: "Open times and viscosity tuned to your line speed and belt temperature.",
+              },
             ].map((b) => (
-              <div key={b.k} className="flex gap-4 border-b border-border pb-6 last:border-0 last:pb-0">
+              <div
+                key={b.k}
+                className="flex gap-4 border-b border-border pb-6 last:border-0 last:pb-0"
+              >
                 <b.icon className="size-5 shrink-0 text-accent" strokeWidth={1.5} />
                 <div>
                   <div className="font-semibold text-foreground">{b.k}</div>
@@ -629,13 +731,34 @@ function Accessories() {
 
 function EngineeringBefore() {
   const impacts = [
-    { k: "Panel quality", v: "Facing flatness, core density and adhesive selection define the panel a customer receives." },
-    { k: "Production speed", v: "Reactivity profile and coil geometry determine the maximum stable belt speed." },
-    { k: "Machine stability", v: "Consistent chemistry and steel gauge protect the laminator, cutter and stacker from stoppages." },
-    { k: "Waste reduction", v: "Correct material specification cuts trim, rework and off-grade production." },
-    { k: "Energy efficiency", v: "Reactivity and curing profile directly reduce kWh per ton produced." },
-    { k: "Fire rating", v: "MDI index, polyol chemistry and core density set the panel's classified fire performance." },
-    { k: "Customer satisfaction", v: "Every complaint on a finished building traces back to a material decision made at procurement." },
+    {
+      k: "Panel quality",
+      v: "Facing flatness, core density and adhesive selection define the panel a customer receives.",
+    },
+    {
+      k: "Production speed",
+      v: "Reactivity profile and coil geometry determine the maximum stable belt speed.",
+    },
+    {
+      k: "Machine stability",
+      v: "Consistent chemistry and steel gauge protect the laminator, cutter and stacker from stoppages.",
+    },
+    {
+      k: "Waste reduction",
+      v: "Correct material specification cuts trim, rework and off-grade production.",
+    },
+    {
+      k: "Energy efficiency",
+      v: "Reactivity and curing profile directly reduce kWh per ton produced.",
+    },
+    {
+      k: "Fire rating",
+      v: "MDI index, polyol chemistry and core density set the panel's classified fire performance.",
+    },
+    {
+      k: "Customer satisfaction",
+      v: "Every complaint on a finished building traces back to a material decision made at procurement.",
+    },
   ];
   return (
     <Section tone="primary" bordered={false}>
@@ -649,12 +772,8 @@ function EngineeringBefore() {
         {impacts.map((i) => (
           <div key={i.k} className="bg-primary p-7">
             <Check className="size-5 text-accent" strokeWidth={2} />
-            <div className="mt-4 text-lg font-semibold text-primary-foreground">
-              {i.k}
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-primary-foreground/70">
-              {i.v}
-            </p>
+            <div className="mt-4 text-lg font-semibold text-primary-foreground">{i.k}</div>
+            <p className="mt-2 text-sm leading-relaxed text-primary-foreground/70">{i.v}</p>
           </div>
         ))}
       </div>
@@ -668,18 +787,58 @@ function EngineeringBefore() {
 
 function Logistics() {
   const bays = [
-    { img: imgWhRaw, k: "Raw Material Warehouse", v: "Palletised chemistry, insulation and consumables under climate control." },
-    { img: imgWhCoil, k: "Steel Coil Warehouse", v: "Coil storage on cradles with humidity and temperature monitoring." },
-    { img: imgWhChem, k: "Chemical Storage", v: "IBC and drum bays with bunded flooring, spill kits and FIFO rotation." },
-    { img: imgWhShip, k: "Loading & Shipping", v: "Container loading with lashing plans, seal control and shipment documentation." },
+    {
+      img: imgWhRaw,
+      k: "Raw Material Warehouse",
+      v: "Palletised chemistry, insulation and consumables under climate control.",
+    },
+    {
+      img: imgWhCoil,
+      k: "Steel Coil Warehouse",
+      v: "Coil storage on cradles with humidity and temperature monitoring.",
+    },
+    {
+      img: imgWhChem,
+      k: "Chemical Storage",
+      v: "IBC and drum bays with bunded flooring, spill kits and FIFO rotation.",
+    },
+    {
+      img: imgWhShip,
+      k: "Loading & Shipping",
+      v: "Container loading with lashing plans, seal control and shipment documentation.",
+    },
   ];
   const points = [
-    { icon: Package, k: "Inventory control", v: "Live SKU-level stock in Jebel Ali with safety-stock rules per critical material." },
-    { icon: Ship, k: "International logistics", v: "FCL, LCL and consolidated container programmes across GCC, Levant, Africa and CIS." },
-    { icon: Warehouse, k: "Global sourcing", v: "Dual-source mills and chemical producers qualified against NEVO technical criteria." },
-    { icon: Shield, k: "Quality assurance", v: "Inspection at origin, in-transit tracking and inbound QC at destination." },
-    { icon: Factory, k: "Container loading", v: "Engineered load plans protect coils, IBCs and panels through long-haul transit." },
-    { icon: Check, k: "Supply chain reliability", v: "Transparent ETAs, dedicated coordinators and escalation SLAs on every shipment." },
+    {
+      icon: Package,
+      k: "Inventory control",
+      v: "Live SKU-level stock in Jebel Ali with safety-stock rules per critical material.",
+    },
+    {
+      icon: Ship,
+      k: "International logistics",
+      v: "FCL, LCL and consolidated container programmes across GCC, Levant, Africa and CIS.",
+    },
+    {
+      icon: Warehouse,
+      k: "Global sourcing",
+      v: "Dual-source mills and chemical producers qualified against NEVO technical criteria.",
+    },
+    {
+      icon: Shield,
+      k: "Quality assurance",
+      v: "Inspection at origin, in-transit tracking and inbound QC at destination.",
+    },
+    {
+      icon: Factory,
+      k: "Container loading",
+      v: "Engineered load plans protect coils, IBCs and panels through long-haul transit.",
+    },
+    {
+      icon: Check,
+      k: "Supply chain reliability",
+      v: "Transparent ETAs, dedicated coordinators and escalation SLAs on every shipment.",
+    },
   ];
   return (
     <Section tone="default">
@@ -695,12 +854,7 @@ function Logistics() {
             className="overflow-hidden rounded-lg border border-border bg-background"
           >
             <div className="aspect-[4/3] w-full overflow-hidden bg-black">
-              <img
-                src={b.img}
-                alt={b.k}
-                loading="lazy"
-                className="h-full w-full object-cover"
-              />
+              <img src={b.img} alt={b.k} loading="lazy" className="h-full w-full object-cover" />
             </div>
             <figcaption className="p-5">
               <div className="font-semibold text-foreground">{b.k}</div>
@@ -728,12 +882,30 @@ function Logistics() {
 
 function QualityAssurance() {
   const items = [
-    { k: "Supplier qualification", v: "Mills and chemical producers audited against technical and commercial criteria before onboarding." },
-    { k: "Batch traceability", v: "Every coil, IBC and pallet carries a batch identifier traceable from source to your factory gate." },
-    { k: "Incoming inspection", v: "Dimensional, mechanical and chemical checks at origin and destination warehouse." },
-    { k: "Material compatibility", v: "Cross-validated polyol/MDI/facing combinations avoid foaming and adhesion incidents." },
-    { k: "Technical verification", v: "Certificates of analysis, mill test certificates and fire test reports on every delivery." },
-    { k: "Factory integration", v: "Materials commissioned into your production process with NEVO engineers on the belt." },
+    {
+      k: "Supplier qualification",
+      v: "Mills and chemical producers audited against technical and commercial criteria before onboarding.",
+    },
+    {
+      k: "Batch traceability",
+      v: "Every coil, IBC and pallet carries a batch identifier traceable from source to your factory gate.",
+    },
+    {
+      k: "Incoming inspection",
+      v: "Dimensional, mechanical and chemical checks at origin and destination warehouse.",
+    },
+    {
+      k: "Material compatibility",
+      v: "Cross-validated polyol/MDI/facing combinations avoid foaming and adhesion incidents.",
+    },
+    {
+      k: "Technical verification",
+      v: "Certificates of analysis, mill test certificates and fire test reports on every delivery.",
+    },
+    {
+      k: "Factory integration",
+      v: "Materials commissioned into your production process with NEVO engineers on the belt.",
+    },
   ];
   return (
     <Section tone="surface">
@@ -860,23 +1032,31 @@ function InquiryForm() {
         title="Request a technical quotation."
         lede="A NEVO material specialist responds within one business day with a proposal, specification sheet and indicative pricing."
       />
-      <form
-        ref={formRef}
-        className="grid gap-5 md:grid-cols-2"
-        onSubmit={onSubmit}
-        noValidate
-      >
+      <form ref={formRef} className="grid gap-5 md:grid-cols-2" onSubmit={onSubmit} noValidate>
         <Field label="Company" name="company" required />
         <Field label="Country" name="country" required />
         <Field label="Email" name="email" type="email" placeholder="you@company.com" required />
         <Field label="Phone" name="phone" placeholder="+971 …" />
-        <Field label="Material category" name="category" placeholder="Steel · Chemistry · Insulation · Panels · Adhesives" required />
-        <Field label="Annual demand" name="demand" placeholder="e.g. 2,500 tons steel + 400 t chemistry" />
+        <Field
+          label="Material category"
+          name="category"
+          placeholder="Steel · Chemistry · Insulation · Panels · Adhesives"
+          required
+        />
+        <Field
+          label="Annual demand"
+          name="demand"
+          placeholder="e.g. 2,500 tons steel + 400 t chemistry"
+        />
         <Field label="Panel type" name="paneltype" placeholder="PIR · PUR · Rock wool · Custom" />
         <Field label="Required thickness" name="thickness" placeholder="e.g. 40, 60, 100 mm" />
         <Field label="Required quantity" name="quantity" placeholder="Tons / m² / units" />
         <Field label="Delivery country" name="delivery" />
-        <Field label="Project timeline" name="timeline" placeholder="Immediate · Q3 2026 · Ongoing" />
+        <Field
+          label="Project timeline"
+          name="timeline"
+          placeholder="Immediate · Q3 2026 · Ongoing"
+        />
         <div className="md:col-span-2">
           <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
             Message
@@ -890,7 +1070,15 @@ function InquiryForm() {
         </div>
         <div className="md:col-span-2">
           <Button size="lg" variant="primary" type="submit" disabled={busy}>
-            {busy ? (<><Loader2 className="mr-2 !size-4 animate-spin" /> Sending…</>) : (<>Submit Inquiry <ArrowRight className="!size-4" /></>)}
+            {busy ? (
+              <>
+                <Loader2 className="mr-2 !size-4 animate-spin" /> Sending…
+              </>
+            ) : (
+              <>
+                Submit Inquiry <ArrowRight className="!size-4" />
+              </>
+            )}
           </Button>
           <p className="mt-3 text-xs text-muted-foreground">
             Your details are used only to respond to your inquiry.
@@ -941,16 +1129,22 @@ function Field({
 function FinalCTA() {
   return (
     <section className="relative isolate overflow-hidden bg-primary py-24 text-primary-foreground md:py-32">
-      <div aria-hidden className="absolute -left-40 top-1/3 size-[520px] rounded-full bg-accent/15 blur-3xl" />
-      <div aria-hidden className="absolute -right-32 bottom-0 size-[420px] rounded-full bg-accent/10 blur-3xl" />
+      <div
+        aria-hidden
+        className="absolute -left-40 top-1/3 size-[520px] rounded-full bg-accent/15 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="absolute -right-32 bottom-0 size-[420px] rounded-full bg-accent/10 blur-3xl"
+      />
       <div className="container-wide relative mx-auto max-w-4xl px-6 text-center lg:px-8">
         <Eyebrow className="justify-center text-accent">Ready when you are</Eyebrow>
         <h2 className="text-h1 mt-6 text-balance text-primary-foreground">
           Choose Better Materials. Manufacture Better Panels.
         </h2>
         <p className="text-body-lg mt-6 text-primary-foreground/70">
-          Engineering begins long before production. Talk to a NEVO material engineer
-          about the specification behind your next panel.
+          Engineering begins long before production. Talk to a NEVO material engineer about the
+          specification behind your next panel.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">

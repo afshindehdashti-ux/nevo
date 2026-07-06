@@ -11,16 +11,17 @@ import { Button } from "@/components/ui/button";
 import { SITE, buildSeo } from "@/lib/seo";
 import { ogImageMeta } from "@/lib/og-images";
 
-const TITLE = "Solutions — Factory Development, Production Lines, Consultancy & Raw Materials | NEVO Industrial";
+const TITLE =
+  "Solutions — Factory Development, Production Lines, Consultancy & Raw Materials | NEVO Industrial";
 const DESCRIPTION =
   "Explore NEVO Industrial's engineering-led solutions: turnkey sandwich panel factories, high-speed production lines, engineering consultancy and premium raw materials for global manufacturers.";
 const URL_PATH = "/solutions";
 
 const SOLUTIONS = [
   { to: "/solutions/factory-development", icon: Factory, key: "factory" as const },
-  { to: "/solutions/production-lines",    icon: Cpu,     key: "lines" as const },
+  { to: "/solutions/production-lines", icon: Cpu, key: "lines" as const },
   { to: "/solutions/engineering-consultancy", icon: Wrench, key: "consult" as const },
-  { to: "/solutions/raw-materials",       icon: Layers,  key: "materials" as const },
+  { to: "/solutions/raw-materials", icon: Layers, key: "materials" as const },
 ];
 
 function SolutionsIndex() {
@@ -36,9 +37,7 @@ function SolutionsIndex() {
             <h1 className="mt-4 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
               {t("solutionsIndex.heroTitle")}
             </h1>
-            <p className="mt-6 text-lg text-muted-foreground">
-              {t("solutionsIndex.heroLede")}
-            </p>
+            <p className="mt-6 text-lg text-muted-foreground">{t("solutionsIndex.heroLede")}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" variant="primary">
                 <Link to="/project-inquiry">
@@ -125,12 +124,8 @@ export const Route = createFileRoute("/$lang/solutions/")({
     });
     return {
       ...seo,
-      scripts: [
-        { type: "application/ld+json", children: JSON.stringify(crumbsLd) },
-      ],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify(crumbsLd) }],
     };
-
   },
   component: SolutionsIndex,
 });
-

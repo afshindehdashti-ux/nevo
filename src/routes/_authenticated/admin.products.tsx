@@ -7,14 +7,30 @@ import { supabase } from "@/integrations/supabase/client";
 import { MasterListShell } from "@/components/crm/MasterListShell";
 import { useCanEditProducts, useCanDeleteMasters } from "@/lib/crm-permissions";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,7 +42,9 @@ import { Pencil, Trash2 } from "lucide-react";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/admin/products")({
-  head: () => ({ meta: [{ title: "Products — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Products — NEVO CRM" }, { name: "robots", content: "noindex" }],
+  }),
   component: ProductsPage,
 });
 
@@ -41,7 +59,12 @@ const ProductSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(200),
   description: z.string().trim().max(2000).optional().or(z.literal("")),
   category: z.string().trim().max(100).optional().or(z.literal("")),
-  supplier_id: z.string().uuid().nullable().or(z.literal("")).transform((v) => v || null),
+  supplier_id: z
+    .string()
+    .uuid()
+    .nullable()
+    .or(z.literal(""))
+    .transform((v) => v || null),
   unit: z.string().min(1).max(20),
   unit_price: z.number().min(0),
   currency: z.string().min(3).max(8),
@@ -51,8 +74,17 @@ const ProductSchema = z.object({
 });
 
 const empty = {
-  sku: "", name: "", description: "", category: "", supplier_id: "" as string | null,
-  unit: "pcs", unit_price: 0, currency: "USD", default_commission_pct: 0, hs_code: "", is_active: true,
+  sku: "",
+  name: "",
+  description: "",
+  category: "",
+  supplier_id: "" as string | null,
+  unit: "pcs",
+  unit_price: 0,
+  currency: "USD",
+  default_commission_pct: 0,
+  hs_code: "",
+  is_active: true,
 };
 
 function ProductsPage() {
@@ -68,7 +100,9 @@ function ProductsPage() {
     queryKey: ["products"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("products").select("*").order("created_at", { ascending: false });
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data as Product[];
     },
@@ -78,8 +112,10 @@ function ProductsPage() {
     queryKey: ["suppliers", "options"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("suppliers").select("id, name, default_commission_pct")
-        .eq("is_active", true).order("name");
+        .from("suppliers")
+        .select("id, name, default_commission_pct")
+        .eq("is_active", true)
+        .order("name");
       if (error) throw error;
       return data as Pick<Supplier, "id" | "name" | "default_commission_pct">[];
     },
@@ -91,8 +127,16 @@ function ProductsPage() {
     const q = search.trim().toLowerCase();
     if (!q) return rows;
     return rows.filter((r) =>
-      [r.name, r.sku, r.category, r.hs_code, r.description, r.supplier_id ? supplierMap.get(r.supplier_id) ?? "" : ""]
-        .filter(Boolean).some((v) => String(v).toLowerCase().includes(q))
+      [
+        r.name,
+        r.sku,
+        r.category,
+        r.hs_code,
+        r.description,
+        r.supplier_id ? (supplierMap.get(r.supplier_id) ?? "") : "",
+      ]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(q)),
     );
   }, [rows, search, supplierMap]);
 
@@ -123,7 +167,8 @@ function ProductsPage() {
       toast.success(editing ? "Product updated" : "Product created");
       qc.invalidateQueries({ queryKey: ["products"] });
       qc.invalidateQueries({ queryKey: ["dashboard-counts"] });
-      setDialogOpen(false); setEditing(null);
+      setDialogOpen(false);
+      setEditing(null);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
   });
@@ -151,7 +196,10 @@ function ProductsPage() {
         search={search}
         onSearchChange={setSearch}
         canCreate={canEdit}
-        onCreate={() => { setEditing(null); setDialogOpen(true); }}
+        onCreate={() => {
+          setEditing(null);
+          setDialogOpen(true);
+        }}
         createLabel="New product"
       >
         <div className="overflow-x-auto">
@@ -170,37 +218,66 @@ function ProductsPage() {
             </TableHeader>
             <TableBody>
               {isLoading && (
-                <TableRow><TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Loading…</TableCell></TableRow>
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    Loading…
+                  </TableCell>
+                </TableRow>
               )}
               {!isLoading && filtered.length === 0 && (
-                <TableRow><TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
-                  {rows.length === 0 ? "No products yet. Click \"New product\" to add one." : "No matches."}
-                </TableCell></TableRow>
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
+                    {rows.length === 0
+                      ? 'No products yet. Click "New product" to add one.'
+                      : "No matches."}
+                  </TableCell>
+                </TableRow>
               )}
               {filtered.map((p) => (
                 <TableRow key={p.id}>
-                  <TableCell className="hidden sm:table-cell font-mono text-xs">{p.sku || "—"}</TableCell>
+                  <TableCell className="hidden sm:table-cell font-mono text-xs">
+                    {p.sku || "—"}
+                  </TableCell>
                   <TableCell>
                     <div className="font-medium">{p.name}</div>
-                    {p.category && <div className="text-xs text-muted-foreground">{p.category}</div>}
+                    {p.category && (
+                      <div className="text-xs text-muted-foreground">{p.category}</div>
+                    )}
                   </TableCell>
                   <TableCell className="hidden lg:table-cell">
-                    {p.supplier_id ? supplierMap.get(p.supplier_id) ?? "—" : <span className="text-muted-foreground">—</span>}
+                    {p.supplier_id ? (
+                      (supplierMap.get(p.supplier_id) ?? "—")
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{p.unit}</TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {p.currency} {Number(p.unit_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {p.currency}{" "}
+                    {Number(p.unit_price).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-right tabular-nums">
                     {Number(p.default_commission_pct).toFixed(2)}%
                   </TableCell>
                   <TableCell>
-                    <Badge variant={p.is_active ? "default" : "secondary"}>{p.is_active ? "Active" : "Inactive"}</Badge>
+                    <Badge variant={p.is_active ? "default" : "secondary"}>
+                      {p.is_active ? "Active" : "Inactive"}
+                    </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="inline-flex gap-1">
                       {canEdit && (
-                        <Button size="icon" variant="ghost" onClick={() => { setEditing(p); setDialogOpen(true); }}>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => {
+                            setEditing(p);
+                            setDialogOpen(true);
+                          }}
+                        >
                           <Pencil className="h-4 w-4" />
                         </Button>
                       )}
@@ -220,7 +297,10 @@ function ProductsPage() {
 
       <ProductDialog
         open={dialogOpen}
-        onOpenChange={(o) => { setDialogOpen(o); if (!o) setEditing(null); }}
+        onOpenChange={(o) => {
+          setDialogOpen(o);
+          if (!o) setEditing(null);
+        }}
         initial={editing}
         suppliers={suppliers}
         onSubmit={(f) => save.mutate(f)}
@@ -237,7 +317,10 @@ function ProductsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteTarget && del.mutate(deleteTarget.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={() => deleteTarget && del.mutate(deleteTarget.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -248,7 +331,12 @@ function ProductsPage() {
 }
 
 function ProductDialog({
-  open, onOpenChange, initial, suppliers, onSubmit, saving,
+  open,
+  onOpenChange,
+  initial,
+  suppliers,
+  onSubmit,
+  saving,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -283,7 +371,8 @@ function ProductDialog({
     }
   }, [open, initial]);
 
-  const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((s) => ({ ...s, [k]: v }));
+  const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
+    setForm((s) => ({ ...s, [k]: v }));
 
   // Auto-fill commission from supplier default when supplier changes and commission is 0
   const onSupplierChange = (id: string) => {
@@ -293,7 +382,9 @@ function ProductDialog({
       return {
         ...s,
         supplier_id: id || null,
-        default_commission_pct: shouldFill ? Number(sup!.default_commission_pct) : s.default_commission_pct,
+        default_commission_pct: shouldFill
+          ? Number(sup!.default_commission_pct)
+          : s.default_commission_pct,
       };
     });
   };
@@ -315,7 +406,9 @@ function ProductDialog({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{initial ? "Edit product" : "New product"}</DialogTitle>
-          <DialogDescription>Item master used on quotations, orders and invoices.</DialogDescription>
+          <DialogDescription>
+            Item master used on quotations, orders and invoices.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -326,7 +419,10 @@ function ProductDialog({
               <Input value={form.name} onChange={(e) => set("name", e.target.value)} autoFocus />
             </Field>
             <Field label="Category">
-              <Input value={form.category ?? ""} onChange={(e) => set("category", e.target.value)} />
+              <Input
+                value={form.category ?? ""}
+                onChange={(e) => set("category", e.target.value)}
+              />
             </Field>
             <Field label="Supplier">
               <select
@@ -335,7 +431,11 @@ function ProductDialog({
                 onChange={(e) => onSupplierChange(e.target.value)}
               >
                 <option value="">—</option>
-                {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                {suppliers.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
               </select>
             </Field>
             <Field label="Unit">
@@ -344,7 +444,11 @@ function ProductDialog({
                 value={form.unit}
                 onChange={(e) => set("unit", e.target.value)}
               >
-                {Units.map((u) => <option key={u} value={u}>{u}</option>)}
+                {Units.map((u) => (
+                  <option key={u} value={u}>
+                    {u}
+                  </option>
+                ))}
               </select>
             </Field>
             <Field label="HS code">
@@ -352,7 +456,9 @@ function ProductDialog({
             </Field>
             <Field label="Unit price">
               <Input
-                type="number" step="0.01" min="0"
+                type="number"
+                step="0.01"
+                min="0"
                 value={form.unit_price}
                 onChange={(e) => set("unit_price", Number(e.target.value) || 0)}
               />
@@ -363,29 +469,48 @@ function ProductDialog({
                 value={form.currency}
                 onChange={(e) => set("currency", e.target.value)}
               >
-                {CurrencyList.map((c) => <option key={c} value={c}>{c}</option>)}
+                {CurrencyList.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
               </select>
             </Field>
             <Field label="Default commission %">
               <Input
-                type="number" step="0.01" min="0" max="100"
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
                 value={form.default_commission_pct}
                 onChange={(e) => set("default_commission_pct", Number(e.target.value) || 0)}
               />
             </Field>
             <div className="sm:col-span-2">
               <Field label="Description">
-                <Textarea rows={3} value={form.description ?? ""} onChange={(e) => set("description", e.target.value)} />
+                <Textarea
+                  rows={3}
+                  value={form.description ?? ""}
+                  onChange={(e) => set("description", e.target.value)}
+                />
               </Field>
             </div>
             <div className="sm:col-span-2 flex items-center gap-2">
-              <Switch checked={form.is_active} onCheckedChange={(v) => set("is_active", v)} id="p_active" />
+              <Switch
+                checked={form.is_active}
+                onCheckedChange={(v) => set("is_active", v)}
+                id="p_active"
+              />
               <Label htmlFor="p_active">Active</Label>
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={saving}>{saving ? "Saving…" : initial ? "Save changes" : "Create"}</Button>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Saving…" : initial ? "Save changes" : "Create"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -393,7 +518,15 @@ function ProductDialog({
   );
 }
 
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1">
       <Label className="text-xs font-medium">{label}</Label>

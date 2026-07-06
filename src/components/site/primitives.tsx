@@ -29,11 +29,7 @@ export function Section({
   ...rest
 }: SectionProps) {
   const inner =
-    container === "wide"
-      ? "container-wide"
-      : container === "narrow"
-        ? "container-narrow"
-        : "";
+    container === "wide" ? "container-wide" : container === "narrow" ? "container-narrow" : "";
   return (
     <section
       className={cn(

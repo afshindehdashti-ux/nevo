@@ -20,8 +20,7 @@ const WELCOME: UIMessage = {
   parts: [
     {
       type: "text",
-      text:
-        "Welcome. I'm your **NEVO AI Engineer** — a senior process engineer for the sandwich panel industry.\n\nI can help you with:\n- Factory Development & Layout\n- Production Line Selection (PIR / PUR / Rock Wool)\n- Raw Materials & Panel Specification\n- Capacity Planning & Automation\n- Investment Estimation & Factory Expansion\n- Engineering Consultancy & Technical Documentation\n\nAsk me anything, or pick one of the questions below.",
+      text: "Welcome. I'm your **NEVO AI Engineer** — a senior process engineer for the sandwich panel industry.\n\nI can help you with:\n- Factory Development & Layout\n- Production Line Selection (PIR / PUR / Rock Wool)\n- Raw Materials & Panel Specification\n- Capacity Planning & Automation\n- Investment Estimation & Factory Expansion\n- Engineering Consultancy & Technical Documentation\n\nAsk me anything, or pick one of the questions below.",
     },
   ],
 };
@@ -155,7 +154,11 @@ export function AIChat({
             aria-label="Send"
             className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[color:var(--color-accent)] text-black transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {isBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
+            {isBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ArrowUp className="h-4 w-4" />
+            )}
           </button>
         </div>
         <div className="mx-auto mt-2 max-w-3xl text-center text-[10px] uppercase tracking-[0.16em] text-white/30">

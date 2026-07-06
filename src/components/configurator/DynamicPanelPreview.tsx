@@ -64,8 +64,7 @@ export function DynamicPanelPreview({
   const patternId = `nevo-core-${cfg.core.replace(/\s/g, "")}`;
 
   // Effective profile — roof panels always use trapezoidal ribs.
-  const effectiveProfile: ProfileType =
-    cfg.panelType === "roof" ? "Trapezoidal Roof" : cfg.profile;
+  const effectiveProfile: ProfileType = cfg.panelType === "roof" ? "Trapezoidal Roof" : cfg.profile;
 
   const extPath = buildExteriorPath(
     padX,
@@ -95,7 +94,12 @@ export function DynamicPanelPreview({
         aria-label={`${cfg.core} sandwich panel, ${cfg.thickness}mm, exterior ${cfg.extColor}, interior ${cfg.intColor}, ${effectiveProfile} profile`}
       >
         <defs>
-          <CorePattern id={patternId} kind={coreDef.pattern} base={coreDef.base} accent={coreDef.accent} />
+          <CorePattern
+            id={patternId}
+            kind={coreDef.pattern}
+            base={coreDef.base}
+            accent={coreDef.accent}
+          />
           <linearGradient id="nevo-skin-shade" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" stopColor="rgba(255,255,255,0.45)" />
             <stop offset="100%" stopColor="rgba(0,0,0,0.22)" />
@@ -109,20 +113,8 @@ export function DynamicPanelPreview({
 
         {/* CORE — only changes when core material or thickness changes */}
         <g data-layer="core">
-          <rect
-            x={padX}
-            y={coreTop}
-            width={panelW}
-            height={coreH}
-            fill={`url(#${patternId})`}
-          />
-          <rect
-            x={padX}
-            y={coreTop}
-            width={panelW}
-            height={coreH}
-            fill="url(#nevo-core-shade)"
-          />
+          <rect x={padX} y={coreTop} width={panelW} height={coreH} fill={`url(#${patternId})`} />
+          <rect x={padX} y={coreTop} width={panelW} height={coreH} fill="url(#nevo-core-shade)" />
           <rect
             x={padX}
             y={coreTop}
@@ -163,8 +155,22 @@ export function DynamicPanelPreview({
 
         {/* Joint markers at panel edges */}
         <g data-layer="joints" opacity={0.35}>
-          <rect x={padX - 6} y={startY} width={6} height={coreH + skinExtH + skinIntH} fill="#000" opacity={0.1} />
-          <rect x={padX + panelW} y={startY} width={6} height={coreH + skinExtH + skinIntH} fill="#000" opacity={0.1} />
+          <rect
+            x={padX - 6}
+            y={startY}
+            width={6}
+            height={coreH + skinExtH + skinIntH}
+            fill="#000"
+            opacity={0.1}
+          />
+          <rect
+            x={padX + panelW}
+            y={startY}
+            width={6}
+            height={coreH + skinExtH + skinIntH}
+            fill="#000"
+            opacity={0.1}
+          />
         </g>
 
         {showLabels && (
@@ -177,12 +183,7 @@ export function DynamicPanelPreview({
                 x2={padX + panelW + 28}
                 y2={intTop + skinIntH}
               />
-              <line
-                x1={padX + panelW + 24}
-                y1={startY}
-                x2={padX + panelW + 32}
-                y2={startY}
-              />
+              <line x1={padX + panelW + 24} y1={startY} x2={padX + panelW + 32} y2={startY} />
               <line
                 x1={padX + panelW + 24}
                 y1={intTop + skinIntH}

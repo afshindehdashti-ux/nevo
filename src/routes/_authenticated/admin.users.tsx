@@ -8,14 +8,35 @@ import { useIsSuperAdmin, useCurrentUser } from "@/lib/crm-hooks";
 import { inviteTeamMember, sendPasswordReset } from "@/lib/crm-admin.functions";
 import type { Database } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ShieldAlert, UserPlus, KeyRound } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -31,7 +52,9 @@ const ROLES: { value: AppRole; label: string }[] = [
 ];
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
-  head: () => ({ meta: [{ title: "Users & Roles — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Users & Roles — NEVO CRM" }, { name: "robots", content: "noindex" }],
+  }),
   component: UsersPage,
 });
 
@@ -44,7 +67,9 @@ function UsersPage() {
     queryKey: ["profiles-list"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profiles").select("*").order("created_at", { ascending: false });
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
@@ -85,7 +110,10 @@ function UsersPage() {
 
   const toggleActive = useMutation({
     mutationFn: async ({ userId, active }: { userId: string; active: boolean }) => {
-      const { error } = await supabase.from("profiles").update({ is_active: active }).eq("id", userId);
+      const { error } = await supabase
+        .from("profiles")
+        .update({ is_active: active })
+        .eq("id", userId);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -116,7 +144,10 @@ function UsersPage() {
     onSuccess: () => {
       toast.success(`Invitation sent to ${inviteEmail}`);
       setInviteOpen(false);
-      setInviteEmail(""); setInviteName(""); setInviteTitle(""); setInviteRole("sales");
+      setInviteEmail("");
+      setInviteName("");
+      setInviteTitle("");
+      setInviteRole("sales");
       qc.invalidateQueries({ queryKey: ["profiles-list"] });
       qc.invalidateQueries({ queryKey: ["user-roles-list"] });
     },
@@ -134,12 +165,16 @@ function UsersPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Users & Roles</h1>
-          <p className="text-sm text-muted-foreground">Manage team members and their CRM permissions.</p>
+          <p className="text-sm text-muted-foreground">
+            Manage team members and their CRM permissions.
+          </p>
         </div>
         {isSuperAdmin && (
           <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="gap-2"><UserPlus className="h-4 w-4" /> Invite user</Button>
+              <Button size="sm" className="gap-2">
+                <UserPlus className="h-4 w-4" /> Invite user
+              </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -151,28 +186,49 @@ function UsersPage() {
               <div className="space-y-3">
                 <div className="space-y-1.5">
                   <Label>Full name</Label>
-                  <Input value={inviteName} onChange={(e) => setInviteName(e.target.value)} placeholder="Jane Doe" />
+                  <Input
+                    value={inviteName}
+                    onChange={(e) => setInviteName(e.target.value)}
+                    placeholder="Jane Doe"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Work email</Label>
-                  <Input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="jane@nevoindustrial.com" />
+                  <Input
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    placeholder="jane@nevoindustrial.com"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Job title</Label>
-                  <Input value={inviteTitle} onChange={(e) => setInviteTitle(e.target.value)} placeholder="Sales Manager" />
+                  <Input
+                    value={inviteTitle}
+                    onChange={(e) => setInviteTitle(e.target.value)}
+                    placeholder="Sales Manager"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Role</Label>
                   <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as AppRole)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
-                      {ROLES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
+                      {ROLES.map((r) => (
+                        <SelectItem key={r.value} value={r.value}>
+                          {r.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="ghost" onClick={() => setInviteOpen(false)}>Cancel</Button>
+                <Button variant="ghost" onClick={() => setInviteOpen(false)}>
+                  Cancel
+                </Button>
                 <Button
                   onClick={() => invite.mutate()}
                   disabled={invite.isPending || !inviteEmail || !inviteName}
@@ -197,7 +253,8 @@ function UsersPage() {
         <CardHeader>
           <CardTitle className="text-base">Team members</CardTitle>
           <CardDescription>
-            Access is invite-only. Public sign-ups are disabled — only Super Admins can add new users.
+            Access is invite-only. Public sign-ups are disabled — only Super Admins can add new
+            users.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -214,7 +271,11 @@ function UsersPage() {
             </TableHeader>
             <TableBody>
               {profilesQ.isLoading && (
-                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-6">Loading…</TableCell></TableRow>
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-6">
+                    Loading…
+                  </TableCell>
+                </TableRow>
               )}
               {profilesQ.data?.map((p) => {
                 const roles = rolesByUser.get(p.id) ?? [];
@@ -223,30 +284,48 @@ function UsersPage() {
                   <TableRow key={p.id}>
                     <TableCell className="font-medium">
                       {p.full_name || <span className="text-muted-foreground">Unnamed</span>}
-                      {p.id === me?.id && <Badge variant="outline" className="ml-2 text-[10px]">You</Badge>}
+                      {p.id === me?.id && (
+                        <Badge variant="outline" className="ml-2 text-[10px]">
+                          You
+                        </Badge>
+                      )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">{p.job_title || "—"}</TableCell>
                     <TableCell>
                       {isSuperAdmin ? (
                         <Select
                           value={primary ?? ""}
-                          onValueChange={(v) => setRole.mutate({ userId: p.id, role: v as AppRole })}
+                          onValueChange={(v) =>
+                            setRole.mutate({ userId: p.id, role: v as AppRole })
+                          }
                         >
-                          <SelectTrigger className="w-40 h-8"><SelectValue placeholder="Assign role" /></SelectTrigger>
+                          <SelectTrigger className="w-40 h-8">
+                            <SelectValue placeholder="Assign role" />
+                          </SelectTrigger>
                           <SelectContent>
-                            {ROLES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
+                            {ROLES.map((r) => (
+                              <SelectItem key={r.value} value={r.value}>
+                                {r.label}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       ) : (
-                        <Badge variant="secondary">{primary ? ROLES.find(r => r.value === primary)?.label : "No role"}</Badge>
+                        <Badge variant="secondary">
+                          {primary ? ROLES.find((r) => r.value === primary)?.label : "No role"}
+                        </Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">
-                      {p.last_login_at ? formatDistanceToNow(new Date(p.last_login_at), { addSuffix: true }) : "Never"}
+                      {p.last_login_at
+                        ? formatDistanceToNow(new Date(p.last_login_at), { addSuffix: true })
+                        : "Never"}
                     </TableCell>
                     <TableCell>
                       {p.is_active ? (
-                        <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/15">Active</Badge>
+                        <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/15">
+                          Active
+                        </Badge>
                       ) : (
                         <Badge variant="secondary">Disabled</Badge>
                       )}
@@ -260,7 +339,10 @@ function UsersPage() {
                             className="gap-1"
                             onClick={() => {
                               const email = (p as { email?: string | null }).email;
-                              if (!email) { toast.error("No email on profile"); return; }
+                              if (!email) {
+                                toast.error("No email on profile");
+                                return;
+                              }
                               resetPw.mutate(email);
                             }}
                           >
@@ -269,7 +351,9 @@ function UsersPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => toggleActive.mutate({ userId: p.id, active: !p.is_active })}
+                            onClick={() =>
+                              toggleActive.mutate({ userId: p.id, active: !p.is_active })
+                            }
                           >
                             {p.is_active ? "Disable" : "Enable"}
                           </Button>
@@ -280,7 +364,11 @@ function UsersPage() {
                 );
               })}
               {profilesQ.data?.length === 0 && (
-                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-6">No team members yet.</TableCell></TableRow>
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-6">
+                    No team members yet.
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>

@@ -4,9 +4,26 @@ import { localizedMeta } from "@/lib/seo-meta";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import {
-  ArrowRight, Compass, Layers, Factory, FlaskConical, Cpu, Wrench, Shield,
-  Globe2, Leaf, Sparkles, HeartHandshake, CheckCircle2, Building2, Gauge,
-  BookOpen, Handshake, Target, Rocket, Mail,
+  ArrowRight,
+  Compass,
+  Layers,
+  Factory,
+  FlaskConical,
+  Cpu,
+  Wrench,
+  Shield,
+  Globe2,
+  Leaf,
+  Sparkles,
+  HeartHandshake,
+  CheckCircle2,
+  Building2,
+  Gauge,
+  BookOpen,
+  Handshake,
+  Target,
+  Rocket,
+  Mail,
 } from "lucide-react";
 
 import k02 from "@/assets/knowledge/02_cad.jpg";
@@ -77,13 +94,34 @@ function Hero() {
   return (
     <section className="relative isolate -mt-20 overflow-hidden bg-black text-white md:-mt-24">
       <div className="absolute inset-0 -z-10">
-        <img src={k03} alt="" className="h-full w-full object-cover" style={{ transform: "scale(1.05)" }} fetchPriority="high" />
+        <img
+          src={k03}
+          alt=""
+          className="h-full w-full object-cover"
+          style={{ transform: "scale(1.05)" }}
+          fetchPriority="high"
+        />
         <div aria-hidden className="absolute inset-0 bg-black/70" />
-        <div aria-hidden className="absolute inset-y-0 left-0 w-[75%]" style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.82) 55%, rgba(0,0,0,0.35) 100%)" }} />
-        <div aria-hidden className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/85 to-transparent" />
+        <div
+          aria-hidden
+          className="absolute inset-y-0 left-0 w-[75%]"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.82) 55%, rgba(0,0,0,0.35) 100%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/85 to-transparent"
+        />
       </div>
       <div className="container-wide relative flex min-h-[80vh] flex-col justify-between px-6 pt-36 pb-16 lg:min-h-[92vh] lg:px-8 lg:pt-44">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1] }} className="max-w-4xl">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1] }}
+          className="max-w-4xl"
+        >
           <div className="eyebrow mb-6 flex items-center gap-2 text-white/70">
             <span className="inline-flex size-1.5 rounded-full bg-accent" />
             {t("about.hero.eyebrow")}
@@ -93,15 +131,33 @@ function Hero() {
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-white/80 md:text-xl">{t("about.hero.lede")}</p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
-            <Button size="lg" variant="primary" asChild><a href="#cta">{t("about.hero.ctaProject")} <ArrowRight className="ml-2 size-4" /></a></Button>
-            <Button size="lg" variant="secondary" asChild><a href="#story">{t("about.hero.ctaTeam")}</a></Button>
+            <Button size="lg" variant="primary" asChild>
+              <a href="#cta">
+                {t("about.hero.ctaProject")} <ArrowRight className="ml-2 size-4" />
+              </a>
+            </Button>
+            <Button size="lg" variant="secondary" asChild>
+              <a href="#story">{t("about.hero.ctaTeam")}</a>
+            </Button>
           </div>
         </motion.div>
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.4 }} className="mt-12 grid max-w-4xl grid-cols-2 gap-x-8 gap-y-4 border-t border-white/10 pt-8 md:grid-cols-4">
-          {[["hqK","hqV"],["ctK","ctV"],["prK","prV"],["pnK","pnV"]].map(([k,v]) => (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.4 }}
+          className="mt-12 grid max-w-4xl grid-cols-2 gap-x-8 gap-y-4 border-t border-white/10 pt-8 md:grid-cols-4"
+        >
+          {[
+            ["hqK", "hqV"],
+            ["ctK", "ctV"],
+            ["prK", "prV"],
+            ["pnK", "pnV"],
+          ].map(([k, v]) => (
             <div key={v}>
               <div className="text-3xl font-medium text-white">{stats[k]}</div>
-              <div className="mt-1 text-xs font-mono uppercase tracking-widest text-white/55">{stats[v]}</div>
+              <div className="mt-1 text-xs font-mono uppercase tracking-widest text-white/55">
+                {stats[v]}
+              </div>
             </div>
           ))}
         </motion.div>
@@ -117,7 +173,9 @@ function OurStory() {
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <Eyebrow>{t("about.story.eyebrow")}</Eyebrow>
-          <h2 className="mt-4 text-4xl font-medium tracking-tight md:text-5xl">{t("about.story.title")}</h2>
+          <h2 className="mt-4 text-4xl font-medium tracking-tight md:text-5xl">
+            {t("about.story.title")}
+          </h2>
         </div>
         <div className="space-y-6 text-black/75 lg:col-span-7">
           <p className="text-lg">{t("about.story.p1")}</p>
@@ -128,8 +186,21 @@ function OurStory() {
       </div>
       <div className="mt-14 grid grid-cols-2 gap-4 md:grid-cols-4">
         {[k04, k02, k05, k33].map((img, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.5, delay: i * 0.05 }} className="aspect-[4/5] overflow-hidden rounded-2xl bg-black">
-            <img loading="lazy" decoding="async" src={img} alt="" className="h-full w-full object-cover" />
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5, delay: i * 0.05 }}
+            className="aspect-[4/5] overflow-hidden rounded-2xl bg-black"
+          >
+            <img
+              loading="lazy"
+              decoding="async"
+              src={img}
+              alt=""
+              className="h-full w-full object-cover"
+            />
           </motion.div>
         ))}
       </div>
@@ -139,15 +210,29 @@ function OurStory() {
 
 function OurMission() {
   const { t } = useTranslation();
-  const items = t("about.mission.items", { returnObjects: true }) as Array<{t:string;b:string}>;
+  const items = t("about.mission.items", { returnObjects: true }) as Array<{
+    t: string;
+    b: string;
+  }>;
   return (
     <Section className="bg-[#f6f6f4]">
-      <SectionHeader eyebrow={t("about.mission.eyebrow")} title={t("about.mission.title")} lede={t("about.mission.lede")} />
+      <SectionHeader
+        eyebrow={t("about.mission.eyebrow")}
+        title={t("about.mission.title")}
+        lede={t("about.mission.lede")}
+      />
       <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {items.map((m, i) => {
           const Icon = MISSION_ICONS[i];
           return (
-            <motion.div key={m.t} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.5, delay: (i % 3) * 0.05 }} className="group rounded-2xl bg-white p-7 ring-1 ring-black/5 transition hover:shadow-xl">
+            <motion.div
+              key={m.t}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: (i % 3) * 0.05 }}
+              className="group rounded-2xl bg-white p-7 ring-1 ring-black/5 transition hover:shadow-xl"
+            >
               <Icon className="size-6 text-accent" />
               <h3 className="mt-5 text-lg font-medium">{m.t}</h3>
               <p className="mt-2 text-sm text-black/65">{m.b}</p>
@@ -168,7 +253,8 @@ function OurVision() {
         <div className="lg:col-span-6">
           <Eyebrow className="text-white/60">{t("about.vision.eyebrow")}</Eyebrow>
           <h2 className="mt-4 text-4xl font-medium tracking-tight md:text-5xl">
-            {t("about.vision.titleA")} <span className="text-accent">{t("about.vision.titleB")}</span>
+            {t("about.vision.titleA")}{" "}
+            <span className="text-accent">{t("about.vision.titleB")}</span>
           </h2>
           <p className="mt-6 max-w-xl text-white/70">{t("about.vision.p1")}</p>
           <p className="mt-4 max-w-xl text-white/70">{t("about.vision.p2")}</p>
@@ -178,7 +264,14 @@ function OurVision() {
             {labels.map((label, i) => {
               const Icon = VISION_ICONS[i];
               return (
-                <motion.div key={label} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.4, delay: i * 0.04 }} className="rounded-2xl bg-white/[0.04] p-5 ring-1 ring-white/10">
+                <motion.div
+                  key={label}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.4, delay: i * 0.04 }}
+                  className="rounded-2xl bg-white/[0.04] p-5 ring-1 ring-white/10"
+                >
                   <Icon className="size-5 text-accent" />
                   <div className="mt-3 text-sm font-medium">{label}</div>
                 </motion.div>
@@ -186,7 +279,13 @@ function OurVision() {
             })}
           </div>
           <div className="mt-6 overflow-hidden rounded-2xl ring-1 ring-white/10">
-            <img loading="lazy" decoding="async" src={k31} alt="" className="h-full w-full object-cover" />
+            <img
+              loading="lazy"
+              decoding="async"
+              src={k31}
+              alt=""
+              className="h-full w-full object-cover"
+            />
           </div>
         </div>
       </div>
@@ -196,17 +295,37 @@ function OurVision() {
 
 function WhatWeDo() {
   const { t } = useTranslation();
-  const items = t("about.whatWeDo.items", { returnObjects: true }) as Array<{t:string;b:string}>;
+  const items = t("about.whatWeDo.items", { returnObjects: true }) as Array<{
+    t: string;
+    b: string;
+  }>;
   return (
     <Section className="bg-white">
-      <SectionHeader eyebrow={t("about.whatWeDo.eyebrow")} title={t("about.whatWeDo.title")} lede={t("about.whatWeDo.lede")} />
+      <SectionHeader
+        eyebrow={t("about.whatWeDo.eyebrow")}
+        title={t("about.whatWeDo.title")}
+        lede={t("about.whatWeDo.lede")}
+      />
       <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {items.map((w, i) => {
           const Icon = WHATDO_ICONS[i];
           return (
-            <motion.div key={w.t} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.5, delay: (i % 4) * 0.05 }} className="group overflow-hidden rounded-2xl bg-black text-white ring-1 ring-black/5 transition hover:ring-accent/40">
+            <motion.div
+              key={w.t}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: (i % 4) * 0.05 }}
+              className="group overflow-hidden rounded-2xl bg-black text-white ring-1 ring-black/5 transition hover:ring-accent/40"
+            >
               <div className="aspect-[4/3] overflow-hidden">
-                <img loading="lazy" decoding="async" src={WHATDO_IMGS[i]} alt="" className="h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-105 group-hover:opacity-100" />
+                <img
+                  loading="lazy"
+                  decoding="async"
+                  src={WHATDO_IMGS[i]}
+                  alt=""
+                  className="h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-105 group-hover:opacity-100"
+                />
               </div>
               <div className="p-6">
                 <Icon className="size-5 text-accent" />
@@ -221,17 +340,20 @@ function WhatWeDo() {
   );
 }
 
-
 function GlobalPresence() {
   const { t } = useTranslation();
-  const countries = t("about.presence.countries", { returnObjects: true }) as Array<{n:string;g:string}>;
+  const countries = t("about.presence.countries", { returnObjects: true }) as Array<{
+    n: string;
+    g: string;
+  }>;
   return (
     <Section className="bg-black text-white">
       <div className="grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <Eyebrow className="text-white/60">{t("about.presence.eyebrow")}</Eyebrow>
           <h2 className="mt-4 text-4xl font-medium tracking-tight md:text-5xl">
-            {t("about.presence.titleA")} <span className="text-accent">{t("about.presence.titleB")}</span>
+            {t("about.presence.titleA")}{" "}
+            <span className="text-accent">{t("about.presence.titleB")}</span>
           </h2>
           <p className="mt-6 max-w-xl text-white/70">{t("about.presence.lede")}</p>
           <div className="mt-8 flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-white/50">
@@ -241,9 +363,18 @@ function GlobalPresence() {
         <div className="lg:col-span-7">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {countries.map((c, i) => (
-              <motion.div key={c.n} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.4, delay: i * 0.03 }} className="flex items-center justify-between rounded-xl bg-white/[0.04] px-4 py-3 ring-1 ring-white/10">
+              <motion.div
+                key={c.n}
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.4, delay: i * 0.03 }}
+                className="flex items-center justify-between rounded-xl bg-white/[0.04] px-4 py-3 ring-1 ring-white/10"
+              >
                 <span className="text-sm">{c.n}</span>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-accent">{c.g}</span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-accent">
+                  {c.g}
+                </span>
               </motion.div>
             ))}
           </div>
@@ -261,7 +392,14 @@ function OurValues() {
       <SectionHeader eyebrow={t("about.values.eyebrow")} title={t("about.values.title")} />
       <div className="mt-14 grid grid-cols-2 gap-4 md:grid-cols-4">
         {items.map((v, i) => (
-          <motion.div key={v} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.4, delay: (i % 4) * 0.04 }} className="flex items-center gap-3 rounded-xl bg-[#f6f6f4] px-5 py-4 ring-1 ring-black/5">
+          <motion.div
+            key={v}
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.4, delay: (i % 4) * 0.04 }}
+            className="flex items-center gap-3 rounded-xl bg-[#f6f6f4] px-5 py-4 ring-1 ring-black/5"
+          >
             <CheckCircle2 className="size-4 shrink-0 text-accent" />
             <span className="text-sm font-medium">{v}</span>
           </motion.div>
@@ -279,7 +417,9 @@ function OurDifference() {
       <SectionHeader eyebrow={t("about.difference.eyebrow")} title={t("about.difference.title")} />
       <div className="mt-14 grid gap-6 lg:grid-cols-2">
         <div className="rounded-3xl bg-white p-8 ring-1 ring-black/5 md:p-10">
-          <div className="text-xs font-mono uppercase tracking-widest text-black/50">{t("about.difference.notLabel")}</div>
+          <div className="text-xs font-mono uppercase tracking-widest text-black/50">
+            {t("about.difference.notLabel")}
+          </div>
           <ul className="mt-6 space-y-4 text-black/75">
             {notItems.map((x) => (
               <li key={x} className="flex items-start gap-3">
@@ -290,9 +430,18 @@ function OurDifference() {
           </ul>
         </div>
         <div className="relative overflow-hidden rounded-3xl bg-black p-8 text-white ring-1 ring-black/5 md:p-10">
-          <div aria-hidden className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(60% 60% at 90% 20%, rgba(16,185,129,0.25), transparent 70%)" }} />
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-40"
+            style={{
+              background:
+                "radial-gradient(60% 60% at 90% 20%, rgba(16,185,129,0.25), transparent 70%)",
+            }}
+          />
           <div className="relative">
-            <div className="text-xs font-mono uppercase tracking-widest text-accent">{t("about.difference.isLabel")}</div>
+            <div className="text-xs font-mono uppercase tracking-widest text-accent">
+              {t("about.difference.isLabel")}
+            </div>
             <p className="mt-6 text-lg leading-relaxed">{t("about.difference.isText")}</p>
           </div>
         </div>
@@ -303,15 +452,31 @@ function OurDifference() {
 
 function OurProcess() {
   const { t } = useTranslation();
-  const items = t("about.process.items", { returnObjects: true }) as Array<{t:string;b:string}>;
+  const items = t("about.process.items", { returnObjects: true }) as Array<{
+    t: string;
+    b: string;
+  }>;
   return (
     <Section className="bg-white">
       <SectionHeader eyebrow={t("about.process.eyebrow")} title={t("about.process.title")} />
       <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {items.map((p, i) => (
-          <motion.div key={p.t} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.5, delay: (i % 4) * 0.05 }} className="group overflow-hidden rounded-2xl bg-[#f6f6f4] ring-1 ring-black/5 transition hover:shadow-xl">
+          <motion.div
+            key={p.t}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5, delay: (i % 4) * 0.05 }}
+            className="group overflow-hidden rounded-2xl bg-[#f6f6f4] ring-1 ring-black/5 transition hover:shadow-xl"
+          >
             <div className="aspect-[4/3] overflow-hidden bg-black">
-              <img loading="lazy" decoding="async" src={PROCESS_IMGS[i]} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]" />
+              <img
+                loading="lazy"
+                decoding="async"
+                src={PROCESS_IMGS[i]}
+                alt=""
+                className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
+              />
             </div>
             <div className="p-6">
               <div className="text-[10px] font-mono uppercase tracking-widest text-accent">
@@ -335,12 +500,21 @@ function OurCommitment() {
       <div className="grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <Eyebrow className="text-white/60">{t("about.commitment.eyebrow")}</Eyebrow>
-          <h2 className="mt-4 text-4xl font-medium tracking-tight md:text-5xl">{t("about.commitment.title")}</h2>
+          <h2 className="mt-4 text-4xl font-medium tracking-tight md:text-5xl">
+            {t("about.commitment.title")}
+          </h2>
           <p className="mt-6 max-w-xl text-white/70">{t("about.commitment.lede")}</p>
         </div>
         <ul className="grid gap-3 lg:col-span-7 sm:grid-cols-2">
           {items.map((c, i) => (
-            <motion.li key={c} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.4, delay: i * 0.04 }} className="flex items-start gap-3 rounded-xl bg-white/[0.04] px-5 py-4 ring-1 ring-white/10">
+            <motion.li
+              key={c}
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.4, delay: i * 0.04 }}
+              className="flex items-start gap-3 rounded-xl bg-white/[0.04] px-5 py-4 ring-1 ring-white/10"
+            >
               <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-accent" />
               <span className="text-sm">{c}</span>
             </motion.li>
@@ -356,7 +530,14 @@ function FinalCTA() {
   return (
     <Section id="cta" className="bg-white">
       <div className="relative overflow-hidden rounded-2xl bg-black p-10 md:p-16 text-white">
-        <div aria-hidden className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(60% 60% at 80% 20%, rgba(16,185,129,0.25), transparent 70%)" }} />
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-40"
+          style={{
+            background:
+              "radial-gradient(60% 60% at 80% 20%, rgba(16,185,129,0.25), transparent 70%)",
+          }}
+        />
         <div className="relative z-10 max-w-3xl">
           <Eyebrow className="text-white/60">{t("about.cta.eyebrow")}</Eyebrow>
           <h2 className="mt-4 text-4xl font-medium tracking-tight md:text-5xl">

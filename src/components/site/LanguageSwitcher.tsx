@@ -92,7 +92,10 @@ export function LanguageSwitcher({ variant = "header", onLight = false }: Langua
           <Globe className="size-3.5" strokeWidth={1.75} />
           <span>{current.flag}</span>
           <span>{current.nativeName}</span>
-          <ChevronDown className={cn("size-3 transition-transform", open && "rotate-180")} strokeWidth={2} />
+          <ChevronDown
+            className={cn("size-3 transition-transform", open && "rotate-180")}
+            strokeWidth={2}
+          />
         </button>
         {open && <Menu current={lang} onSelect={select} anchor="up" />}
       </div>
@@ -105,7 +108,9 @@ export function LanguageSwitcher({ variant = "header", onLight = false }: Langua
         onClick={() => setOpen((v) => !v)}
         className={cn(
           "inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium tracking-wide transition-colors",
-          onLight ? "text-white/85 hover:text-white hover:bg-white/10" : "text-foreground/70 hover:text-foreground hover:bg-surface",
+          onLight
+            ? "text-white/85 hover:text-white hover:bg-white/10"
+            : "text-foreground/70 hover:text-foreground hover:bg-surface",
         )}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -114,7 +119,10 @@ export function LanguageSwitcher({ variant = "header", onLight = false }: Langua
         <Globe className="size-3.5" strokeWidth={1.75} />
         <span className="text-sm leading-none">{current.flag}</span>
         <span>{current.code.toUpperCase()}</span>
-        <ChevronDown className={cn("size-3 transition-transform", open && "rotate-180")} strokeWidth={2} />
+        <ChevronDown
+          className={cn("size-3 transition-transform", open && "rotate-180")}
+          strokeWidth={2}
+        />
       </button>
       {open && <Menu current={lang} onSelect={select} anchor="down" />}
     </div>
@@ -149,12 +157,16 @@ function Menu({
                 onClick={() => onSelect(l.code)}
                 className={cn(
                   "flex w-full items-center gap-3 px-3 py-2 text-sm transition-colors",
-                  active ? "bg-accent/10 font-medium text-foreground" : "text-foreground/80 hover:bg-surface",
+                  active
+                    ? "bg-accent/10 font-medium text-foreground"
+                    : "text-foreground/80 hover:bg-surface",
                 )}
               >
                 <span className="text-base leading-none">{l.flag}</span>
                 <span className="flex-1 text-start">{l.nativeName}</span>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{l.code}</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {l.code}
+                </span>
                 {active && <Check className="size-3.5 text-accent" strokeWidth={2} />}
               </button>
             </li>

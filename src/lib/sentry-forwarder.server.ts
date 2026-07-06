@@ -43,7 +43,6 @@ type LogoErrorEvent = {
   history?: LogoHistoryEntry[];
 };
 
-
 type ParsedDsn = {
   publicKey: string;
   host: string;
@@ -148,7 +147,6 @@ function buildBreadcrumbs(e: LogoErrorEvent) {
   return { values: crumbs };
 }
 
-
 function buildFallbackChain(e: LogoErrorEvent): string {
   const parts: string[] = [];
   const history = Array.isArray(e.history) ? e.history : [];
@@ -161,7 +159,10 @@ function buildFallbackChain(e: LogoErrorEvent): string {
   return parts.join(" → ");
 }
 
-export function buildSentryEvent(e: LogoErrorEvent, sampling?: import("./sentry-sampler.server").SamplingDecision) {
+export function buildSentryEvent(
+  e: LogoErrorEvent,
+  sampling?: import("./sentry-sampler.server").SamplingDecision,
+) {
   const stage = e.stage ?? "unknown";
   const terminal = e.terminal === true;
   const nextStep =
@@ -187,12 +188,7 @@ export function buildSentryEvent(e: LogoErrorEvent, sampling?: import("./sentry-
     // Include correlationId in the fingerprint so every event from the same
     // page load groups into one Sentry issue — the full logo sequence lives
     // together instead of splitting across stages.
-    fingerprint: [
-      "header.logo.error",
-      stage,
-      fallbackChain,
-      e.correlationId ?? "no-cid",
-    ],
+    fingerprint: ["header.logo.error", stage, fallbackChain, e.correlationId ?? "no-cid"],
     tags: {
       stage,
       variant: e.variant ?? null,
@@ -203,8 +199,7 @@ export function buildSentryEvent(e: LogoErrorEvent, sampling?: import("./sentry-
       viewport_width: e.viewportWidth ?? null,
       online: typeof e.online === "boolean" ? String(e.online) : null,
       schema: e.schema ?? null,
-      schema_version:
-        typeof e.schemaVersion === "number" ? String(e.schemaVersion) : null,
+      schema_version: typeof e.schemaVersion === "number" ? String(e.schemaVersion) : null,
       correlation_id: e.correlationId ?? null,
       sampled_reason: sampling?.reason ?? "unsampled",
       sampled_window_index: sampling ? String(sampling.windowIndex) : null,
@@ -238,8 +233,6 @@ export function buildSentryEvent(e: LogoErrorEvent, sampling?: import("./sentry-
   };
 }
 
-
-
 function buildEnvelope(dsn: ParsedDsn, events: ReturnType<typeof buildSentryEvent>[]): string {
   const sentAt = new Date().toISOString();
   const header = JSON.stringify({ dsn: process.env.SENTRY_DSN, sent_at: sentAt });
@@ -263,9 +256,7 @@ function buildEnvelope(dsn: ParsedDsn, events: ReturnType<typeof buildSentryEven
  * Fire-and-forget: caller does not await the result.
  * Never throws — Sentry outages MUST NOT break the client-log sink.
  */
-export async function forwardLogoErrorsToSentry(
-  events: LogoErrorEvent[],
-): Promise<void> {
+export async function forwardLogoErrorsToSentry(events: LogoErrorEvent[]): Promise<void> {
   if (events.length === 0) return;
   const dsn = getDsn();
   if (!dsn) return; // no DSN configured — silent no-op
@@ -273,7 +264,10 @@ export async function forwardLogoErrorsToSentry(
     const { decideForwardLogoError } = await import("./sentry-sampler.server");
 
     let dropped = 0;
-    const kept: Array<{ event: LogoErrorEvent; sampling: import("./sentry-sampler.server").SamplingDecision }> = [];
+    const kept: Array<{
+      event: LogoErrorEvent;
+      sampling: import("./sentry-sampler.server").SamplingDecision;
+    }> = [];
     for (const ev of events) {
       const decision = decideForwardLogoError({
         stage: ev.stage,

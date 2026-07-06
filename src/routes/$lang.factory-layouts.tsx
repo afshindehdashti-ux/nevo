@@ -23,8 +23,7 @@ import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
 import { ogImageMeta } from "@/lib/og-images";
 
-const TITLE =
-  "Factory Layouts & Masterplanning — Industrial EPC Design | NEVO Industrial";
+const TITLE = "Factory Layouts & Masterplanning — Industrial EPC Design | NEVO Industrial";
 const DESCRIPTION =
   "Master factory layouts, 3D visualisations, production and material flow planning, utility layouts and future expansion masterplans engineered by NEVO Industrial, Dubai.";
 const URL_PATH = "/factory-layouts";
@@ -116,7 +115,9 @@ function FactoryLayoutsPage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-graphite text-white">
         <div className="absolute inset-0 opacity-40">
-          <img loading="lazy" decoding="async"
+          <img
+            loading="lazy"
+            decoding="async"
             src={fl02}
             alt=""
             className="h-full w-full object-cover"
@@ -132,26 +133,18 @@ function FactoryLayoutsPage() {
             transition={{ duration: 0.6 }}
             className="max-w-3xl"
           >
-            <Eyebrow className="text-emerald">
-              Masterplanning · Layouts · EPC Engineering
-            </Eyebrow>
+            <Eyebrow className="text-emerald">Masterplanning · Layouts · EPC Engineering</Eyebrow>
             <h1 className="mt-4 text-5xl md:text-6xl font-semibold tracking-tight">
               Every factory begins as a masterplan.
             </h1>
             <p className="mt-6 text-lg text-white/70 max-w-2xl">
-              From the first site plot to the final commissioned building, NEVO
-              engineers factories that flow — optimised for production, logistics,
-              utilities and long-term expansion.
+              From the first site plot to the final commissioned building, NEVO engineers factories
+              that flow — optimised for production, logistics, utilities and long-term expansion.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button
-                asChild
-                size="lg"
-                className="bg-emerald text-graphite hover:bg-emerald/90"
-              >
+              <Button asChild size="lg" className="bg-emerald text-graphite hover:bg-emerald/90">
                 <Link to="/factory-layout-generator">
-                  Try the Layout Generator{" "}
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  Try the Layout Generator <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button
@@ -198,12 +191,8 @@ function FactoryLayoutsPage() {
                   </span>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-semibold tracking-tight">
-                    {tile.title}
-                  </h3>
-                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                    {tile.body}
-                  </p>
+                  <h3 className="text-lg font-semibold tracking-tight">{tile.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{tile.body}</p>
                 </div>
               </SurfaceCard>
             </motion.div>
@@ -241,25 +230,18 @@ function FactoryLayoutsPage() {
           <div className="flex-1">
             <div className="flex items-center gap-3 text-emerald">
               <Ruler className="h-5 w-5" />
-              <span className="text-xs font-mono uppercase tracking-widest">
-                EPC Design Studio
-              </span>
+              <span className="text-xs font-mono uppercase tracking-widest">EPC Design Studio</span>
             </div>
             <h2 className="mt-3 text-3xl md:text-4xl font-semibold tracking-tight">
               Turn your site into a construction-ready factory plan.
             </h2>
             <p className="mt-3 text-white/70 max-w-2xl">
-              Share your plot, capacity target and product mix — our engineers
-              will return a complete masterplan with production flow, utilities
-              and expansion strategy.
+              Share your plot, capacity target and product mix — our engineers will return a
+              complete masterplan with production flow, utilities and expansion strategy.
             </p>
           </div>
           <div className="flex gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="bg-emerald text-graphite hover:bg-emerald/90"
-            >
+            <Button asChild size="lg" className="bg-emerald text-graphite hover:bg-emerald/90">
               <Link to="/project-inquiry">
                 Start a Masterplan <Building2 className="ml-2 h-4 w-4" />
               </Link>

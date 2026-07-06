@@ -42,8 +42,6 @@ export const KNOWLEDGE_HUB_PREVIEW: Record<SolutionsRouteKey, KnowledgeHubPrevie
   },
 };
 
-export function getKnowledgeHubPreview(
-  route: SolutionsRouteKey,
-): KnowledgeHubPreviewConfig {
+export function getKnowledgeHubPreview(route: SolutionsRouteKey): KnowledgeHubPreviewConfig {
   return KNOWLEDGE_HUB_PREVIEW[route];
 }

@@ -13,8 +13,7 @@ import fr from "./locales/fr.json";
 import it from "./locales/it.json";
 import zh from "./locales/zh.json";
 
-export type Locale =
-  | "en" | "ar" | "tr" | "ru" | "pt" | "de" | "es" | "fr" | "it" | "zh";
+export type Locale = "en" | "ar" | "tr" | "ru" | "pt" | "de" | "es" | "fr" | "it" | "zh";
 
 export const LOCALES: {
   code: Locale;
@@ -24,16 +23,37 @@ export const LOCALES: {
   dir: "ltr" | "rtl";
   ogLocale: string;
 }[] = [
-  { code: "en", name: "English",    nativeName: "English",    flag: "🇬🇧", dir: "ltr", ogLocale: "en_US" },
-  { code: "ar", name: "Arabic",     nativeName: "العربية",    flag: "🇦🇪", dir: "rtl", ogLocale: "ar_AE" },
-  { code: "tr", name: "Turkish",    nativeName: "Türkçe",     flag: "🇹🇷", dir: "ltr", ogLocale: "tr_TR" },
-  { code: "ru", name: "Russian",    nativeName: "Русский",    flag: "🇷🇺", dir: "ltr", ogLocale: "ru_RU" },
-  { code: "pt", name: "Portuguese", nativeName: "Português",  flag: "🇧🇷", dir: "ltr", ogLocale: "pt_BR" },
-  { code: "de", name: "German",     nativeName: "Deutsch",    flag: "🇩🇪", dir: "ltr", ogLocale: "de_DE" },
-  { code: "es", name: "Spanish",    nativeName: "Español",    flag: "🇪🇸", dir: "ltr", ogLocale: "es_ES" },
-  { code: "fr", name: "French",     nativeName: "Français",   flag: "🇫🇷", dir: "ltr", ogLocale: "fr_FR" },
-  { code: "it", name: "Italian",    nativeName: "Italiano",   flag: "🇮🇹", dir: "ltr", ogLocale: "it_IT" },
-  { code: "zh", name: "Chinese",    nativeName: "简体中文",     flag: "🇨🇳", dir: "ltr", ogLocale: "zh_CN" },
+  { code: "en", name: "English", nativeName: "English", flag: "🇬🇧", dir: "ltr", ogLocale: "en_US" },
+  { code: "ar", name: "Arabic", nativeName: "العربية", flag: "🇦🇪", dir: "rtl", ogLocale: "ar_AE" },
+  { code: "tr", name: "Turkish", nativeName: "Türkçe", flag: "🇹🇷", dir: "ltr", ogLocale: "tr_TR" },
+  { code: "ru", name: "Russian", nativeName: "Русский", flag: "🇷🇺", dir: "ltr", ogLocale: "ru_RU" },
+  {
+    code: "pt",
+    name: "Portuguese",
+    nativeName: "Português",
+    flag: "🇧🇷",
+    dir: "ltr",
+    ogLocale: "pt_BR",
+  },
+  { code: "de", name: "German", nativeName: "Deutsch", flag: "🇩🇪", dir: "ltr", ogLocale: "de_DE" },
+  { code: "es", name: "Spanish", nativeName: "Español", flag: "🇪🇸", dir: "ltr", ogLocale: "es_ES" },
+  { code: "fr", name: "French", nativeName: "Français", flag: "🇫🇷", dir: "ltr", ogLocale: "fr_FR" },
+  {
+    code: "it",
+    name: "Italian",
+    nativeName: "Italiano",
+    flag: "🇮🇹",
+    dir: "ltr",
+    ogLocale: "it_IT",
+  },
+  {
+    code: "zh",
+    name: "Chinese",
+    nativeName: "简体中文",
+    flag: "🇨🇳",
+    dir: "ltr",
+    ogLocale: "zh_CN",
+  },
 ];
 
 export const DEFAULT_LOCALE: Locale = "en";

@@ -194,7 +194,8 @@ export const SEO_META: Record<string, PerLocale> = {
         "12+ sektöre yönelik mühendislik odaklı sandviç panel ve fabrika çözümleri: soğuk depolama, gıda, ilaç temiz odaları, depolama, endüstriyel ve modüler yapı.",
     },
     ru: {
-      title: "Отрасли, для которых мы проектируем — Холодильные склады, чистые помещения, пищевое производство, логистика",
+      title:
+        "Отрасли, для которых мы проектируем — Холодильные склады, чистые помещения, пищевое производство, логистика",
       description:
         "Инженерные решения по сэндвич-панелям и заводам под ключ для 12+ отраслей: холодильные склады, пищевая отрасль, фармацевтические чистые помещения, склады и модульное строительство.",
     },
@@ -204,7 +205,8 @@ export const SEO_META: Record<string, PerLocale> = {
         "Soluções de painéis sandwich e fábricas com base em engenharia para mais de 12 setores: frio industrial, alimentar, salas limpas farmacêuticas, armazenagem e construção industrial e modular.",
     },
     de: {
-      title: "Branchen, für die wir Engineering liefern — Kühllager, Reinräume, Lebensmittel, Logistik",
+      title:
+        "Branchen, für die wir Engineering liefern — Kühllager, Reinräume, Lebensmittel, Logistik",
       description:
         "Ingenieurgetriebene Sandwichpanel- und Fabriklösungen für 12+ Branchen: Kühllager, Lebensmittel, Pharma-Reinräume, Logistik, Industrie- und Modulbau.",
     },
@@ -214,7 +216,8 @@ export const SEO_META: Record<string, PerLocale> = {
         "Soluciones de paneles sándwich y fábricas dirigidas por ingeniería para más de 12 sectores: frío industrial, alimentación, salas limpias farmacéuticas, almacenaje y construcción industrial y modular.",
     },
     fr: {
-      title: "Secteurs pour lesquels nous concevons — Froid, salles blanches, agroalimentaire, logistique",
+      title:
+        "Secteurs pour lesquels nous concevons — Froid, salles blanches, agroalimentaire, logistique",
       description:
         "Solutions de panneaux sandwich et d'usines pilotées par l'ingénierie pour plus de 12 secteurs : froid industriel, agroalimentaire, salles blanches pharma, logistique, construction industrielle et modulaire.",
     },
@@ -755,8 +758,7 @@ export const SEO_META: Record<string, PerLocale> = {
     },
     zh: {
       title: "客户门户 — 项目、文档与支持",
-      description:
-        "在统一安全的客户门户中跟踪夹芯板项目进度、下载工程文档并与 NEVO 支持团队沟通。",
+      description: "在统一安全的客户门户中跟踪夹芯板项目进度、下载工程文档并与 NEVO 支持团队沟通。",
     },
   },
 
@@ -1073,8 +1075,7 @@ export const SEO_META: Record<string, PerLocale> = {
     },
     zh: {
       title: "安装与调试 — 现场投产与操作员培训",
-      description:
-        "面向全球夹芯板生产线的现场安装、机械施工、冷热调试、SAT 测试及操作员培训服务。",
+      description: "面向全球夹芯板生产线的现场安装、机械施工、冷热调试、SAT 测试及操作员培训服务。",
     },
   },
 

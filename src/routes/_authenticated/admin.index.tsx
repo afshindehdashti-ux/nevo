@@ -4,25 +4,50 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Users, Target, TrendingUp, Truck, Factory, Ship, PackageCheck,
-  FileText, Receipt, Percent, AlertCircle, DollarSign, LineChart, CheckSquare,
-  Package, Boxes,
+  Users,
+  Target,
+  TrendingUp,
+  Truck,
+  Factory,
+  Ship,
+  PackageCheck,
+  FileText,
+  Receipt,
+  Percent,
+  AlertCircle,
+  DollarSign,
+  LineChart,
+  CheckSquare,
+  Package,
+  Boxes,
 } from "lucide-react";
 import { useMyProfile, useCurrentUser } from "@/lib/crm-hooks";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
-  head: () => ({ meta: [{ title: "Dashboard — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Dashboard — NEVO CRM" }, { name: "robots", content: "noindex" }],
+  }),
   component: Dashboard,
 });
 
-type Metric = { label: string; value: string; hint?: string; icon: React.ComponentType<{ className?: string }>; tone?: "default" | "success" | "warn" | "danger" };
+type Metric = {
+  label: string;
+  value: string;
+  hint?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  tone?: "default" | "success" | "warn" | "danger";
+};
 
 function toneClass(tone?: Metric["tone"]) {
   switch (tone) {
-    case "success": return "text-emerald-600 dark:text-emerald-400";
-    case "warn": return "text-amber-600 dark:text-amber-400";
-    case "danger": return "text-rose-600 dark:text-rose-400";
-    default: return "text-foreground";
+    case "success":
+      return "text-emerald-600 dark:text-emerald-400";
+    case "warn":
+      return "text-amber-600 dark:text-amber-400";
+    case "danger":
+      return "text-rose-600 dark:text-rose-400";
+    default:
+      return "text-foreground";
   }
 }
 
@@ -31,9 +56,18 @@ function useDashboardCounts() {
     queryKey: ["dashboard-counts"],
     queryFn: async () => {
       const [c, s, p] = await Promise.all([
-        supabase.from("customers").select("id", { count: "exact", head: true }).eq("is_active", true),
-        supabase.from("suppliers").select("id", { count: "exact", head: true }).eq("is_active", true),
-        supabase.from("products").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase
+          .from("customers")
+          .select("id", { count: "exact", head: true })
+          .eq("is_active", true),
+        supabase
+          .from("suppliers")
+          .select("id", { count: "exact", head: true })
+          .eq("is_active", true),
+        supabase
+          .from("products")
+          .select("id", { count: "exact", head: true })
+          .eq("is_active", true),
       ]);
       return {
         customers: c.count ?? 0,
@@ -44,7 +78,6 @@ function useDashboardCounts() {
     staleTime: 30_000,
   });
 }
-
 
 function Dashboard() {
   const { data: profile } = useMyProfile();
@@ -76,13 +109,20 @@ function Dashboard() {
     <div className="p-4 md:p-6 space-y-6 max-w-[1600px] mx-auto">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
         <div>
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">NEVO Industrial · Back Office</p>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Welcome back, {name}</h1>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">
+            NEVO Industrial · Back Office
+          </p>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
+            Welcome back, {name}
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Real-time overview of customers, orders, invoices and commissions.
           </p>
         </div>
-        <Badge variant="outline" className="border-emerald-500/30 text-emerald-700 dark:text-emerald-400">
+        <Badge
+          variant="outline"
+          className="border-emerald-500/30 text-emerald-700 dark:text-emerald-400"
+        >
           Phase 2 · Master data
         </Badge>
       </div>
@@ -103,7 +143,6 @@ function Dashboard() {
           </Card>
         ))}
       </section>
-
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="lg:col-span-2">
@@ -126,7 +165,9 @@ function Dashboard() {
                 <p className="text-xs">Authentication, roles, dashboard and settings are live.</p>
               </div>
             </div>
-            <p className="text-xs">Feed populates as customers, orders and invoices are added in the next phase.</p>
+            <p className="text-xs">
+              Feed populates as customers, orders and invoices are added in the next phase.
+            </p>
           </CardContent>
         </Card>
       </section>

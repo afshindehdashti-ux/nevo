@@ -141,7 +141,7 @@ function colorSignature(buf) {
 // build so the test catches a real regression (e.g. white ink disappearing,
 // green accent turning gray) without flaking on minor render differences.
 const THRESHOLDS = {
-  initial:  { minWhite: 0.02, minGreen: 0.002 },
+  initial: { minWhite: 0.02, minGreen: 0.002 },
   scrolled: { minWhite: 0.02, minGreen: 0.002 },
   menuOpen: { minWhite: 0.02, minGreen: 0.002 },
 };

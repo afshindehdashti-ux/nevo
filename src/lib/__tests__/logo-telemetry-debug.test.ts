@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  explainLogoDecision,
-  simulateLogoDecisions,
-} from "../logo-telemetry-debug";
+import { explainLogoDecision, simulateLogoDecisions } from "../logo-telemetry-debug";
 import { createLogoRateState } from "../logo-telemetry";
 import type { LogoTelemetryConfig } from "../logo-telemetry-config";
 

@@ -64,10 +64,7 @@ function HeroDesktop() {
             Dubai · Factory Development · Production Lines · Raw Materials
           </div>
 
-          <p
-            aria-hidden
-            className="text-display text-balance text-white"
-          >
+          <p aria-hidden className="text-display text-balance text-white">
             {t("home.heroTitle")}
           </p>
 
@@ -155,7 +152,10 @@ function HeroMobile() {
             <span className="inline-flex size-1.5 rounded-full bg-accent" />
             {t("brand.location")} · {t("brand.sector")}
           </div>
-          <p aria-hidden className="text-4xl font-semibold leading-[1.05] tracking-tight text-white">
+          <p
+            aria-hidden
+            className="text-4xl font-semibold leading-[1.05] tracking-tight text-white"
+          >
             {t("home.heroTitle")}
           </p>
           <p className="mt-6 max-w-md text-base leading-relaxed text-white/75">

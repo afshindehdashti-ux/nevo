@@ -3,9 +3,23 @@ import { Link } from "@/components/site/LocalizedLink";
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
-  Search, Download, X, ArrowRight, Factory, Cog, PackageSearch,
-  Layers, Wrench, ClipboardCheck, Building2, FileText, Lock,
-  CheckCircle2, Mail, Loader2, ChevronDown,
+  Search,
+  Download,
+  X,
+  ArrowRight,
+  Factory,
+  Cog,
+  PackageSearch,
+  Layers,
+  Wrench,
+  ClipboardCheck,
+  Building2,
+  FileText,
+  Lock,
+  CheckCircle2,
+  Mail,
+  Loader2,
+  ChevronDown,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -20,8 +34,14 @@ import heroImg from "@/assets/downloads/hero-engineering-portrait.png.asset.json
 /* ─────────────────────────────────────────────────────────────── */
 
 type FilterKey =
-  | "all" | "company" | "factory" | "lines"
-  | "materials" | "panels" | "engineering" | "support";
+  | "all"
+  | "company"
+  | "factory"
+  | "lines"
+  | "materials"
+  | "panels"
+  | "engineering"
+  | "support";
 
 type Access = "download" | "request";
 
@@ -124,31 +144,82 @@ const CATEGORIES: Category[] = [
 ];
 
 const FEATURED: Resource[] = [
-  { id: "corp-profile",      title: "NEVO Corporate Profile",             desc: "Company overview, engineering capabilities and global project references.", access: "download", filter: "company" },
-  { id: "factory-dev",       title: "Factory Development Guide",          desc: "Planning inputs, utilities and layout preparation for a new sandwich panel factory.", access: "request", filter: "factory" },
-  { id: "line-catalogue",    title: "Production Line Catalogue",          desc: "Continuous and discontinuous line configurations, capacities and footprints.", access: "request", filter: "lines" },
-  { id: "raw-materials",     title: "Raw Material Specification Pack",    desc: "Steel coils, PIR/PUR chemistry and rock wool specifications used in NEVO panels.", access: "request", filter: "materials" },
-  { id: "panel-datasheets",  title: "Panel Technical Datasheets",         desc: "U-value, fire class, weight and structural data for standard panel systems.", access: "request", filter: "panels" },
-  { id: "install-commission",title: "Installation & Commissioning Guide", desc: "On-site installation, quality control and commissioning procedures.", access: "request", filter: "support" },
+  {
+    id: "corp-profile",
+    title: "NEVO Corporate Profile",
+    desc: "Company overview, engineering capabilities and global project references.",
+    access: "download",
+    filter: "company",
+  },
+  {
+    id: "factory-dev",
+    title: "Factory Development Guide",
+    desc: "Planning inputs, utilities and layout preparation for a new sandwich panel factory.",
+    access: "request",
+    filter: "factory",
+  },
+  {
+    id: "line-catalogue",
+    title: "Production Line Catalogue",
+    desc: "Continuous and discontinuous line configurations, capacities and footprints.",
+    access: "request",
+    filter: "lines",
+  },
+  {
+    id: "raw-materials",
+    title: "Raw Material Specification Pack",
+    desc: "Steel coils, PIR/PUR chemistry and rock wool specifications used in NEVO panels.",
+    access: "request",
+    filter: "materials",
+  },
+  {
+    id: "panel-datasheets",
+    title: "Panel Technical Datasheets",
+    desc: "U-value, fire class, weight and structural data for standard panel systems.",
+    access: "request",
+    filter: "panels",
+  },
+  {
+    id: "install-commission",
+    title: "Installation & Commissioning Guide",
+    desc: "On-site installation, quality control and commissioning procedures.",
+    access: "request",
+    filter: "support",
+  },
 ];
 
 const FILTERS: { id: FilterKey; label: string }[] = [
-  { id: "all",         label: "All Resources" },
-  { id: "company",     label: "Company" },
-  { id: "factory",     label: "Factory Development" },
-  { id: "lines",       label: "Production Lines" },
-  { id: "materials",   label: "Raw Materials" },
-  { id: "panels",      label: "Finished Panels" },
+  { id: "all", label: "All Resources" },
+  { id: "company", label: "Company" },
+  { id: "factory", label: "Factory Development" },
+  { id: "lines", label: "Production Lines" },
+  { id: "materials", label: "Raw Materials" },
+  { id: "panels", label: "Finished Panels" },
   { id: "engineering", label: "Engineering" },
-  { id: "support",     label: "Installation & Support" },
+  { id: "support", label: "Installation & Support" },
 ];
 
 const FAQ = [
-  { q: "Can I download all documents directly?", a: "No. Only the NEVO Corporate Profile is available as a direct download. All engineering, factory and production line documents are shared upon request so we can tailor them to your project." },
-  { q: "How do I request technical datasheets?", a: "Use the Request Technical Documents form on this page. Our engineering team reviews each request and shares the relevant datasheets by email, typically within 1–3 working days." },
-  { q: "Are engineering documents project-specific?", a: "Yes. Panel datasheets, U-value data and fire performance references are always aligned with the panel system, thickness and application you plan to use." },
-  { q: "Can NEVO provide factory layout documents?", a: "Yes. Factory planning checklists, utility requirement guides and reference layouts are shared upon request after a short project qualification." },
-  { q: "Can I request production line specifications?", a: "Yes. Continuous and discontinuous line catalogues, equipment lists and automation overviews are available on request for qualified projects." },
+  {
+    q: "Can I download all documents directly?",
+    a: "No. Only the NEVO Corporate Profile is available as a direct download. All engineering, factory and production line documents are shared upon request so we can tailor them to your project.",
+  },
+  {
+    q: "How do I request technical datasheets?",
+    a: "Use the Request Technical Documents form on this page. Our engineering team reviews each request and shares the relevant datasheets by email, typically within 1–3 working days.",
+  },
+  {
+    q: "Are engineering documents project-specific?",
+    a: "Yes. Panel datasheets, U-value data and fire performance references are always aligned with the panel system, thickness and application you plan to use.",
+  },
+  {
+    q: "Can NEVO provide factory layout documents?",
+    a: "Yes. Factory planning checklists, utility requirement guides and reference layouts are shared upon request after a short project qualification.",
+  },
+  {
+    q: "Can I request production line specifications?",
+    a: "Yes. Continuous and discontinuous line catalogues, equipment lists and automation overviews are available on request for qualified projects.",
+  },
 ];
 
 /* ─────────────────────────────────────────────────────────────── */
@@ -215,7 +286,8 @@ function DownloadCenterPage() {
   const filteredCategories = useMemo(() => {
     const q = query.trim().toLowerCase();
     return CATEGORIES.filter((c) => {
-      if (filter !== "all" && c.id !== filter && !(filter === "engineering" && c.id === "panels")) return false;
+      if (filter !== "all" && c.id !== filter && !(filter === "engineering" && c.id === "panels"))
+        return false;
       if (!q) return true;
       return (
         c.title.toLowerCase().includes(q) ||
@@ -232,14 +304,22 @@ function DownloadCenterPage() {
       {/* HERO */}
       <section className="relative overflow-hidden pt-40 pb-24 border-b border-white/5">
         <div className="absolute inset-0 -z-10">
-          <img loading="lazy" decoding="async" src={heroImg.url} alt="" className="h-full w-full object-cover opacity-20" />
+          <img
+            loading="lazy"
+            decoding="async"
+            src={heroImg.url}
+            alt=""
+            className="h-full w-full object-cover opacity-20"
+          />
           <div className="absolute inset-0 bg-gradient-to-br from-[#0a0d10] via-[#0a0d10]/80 to-[#0a0d10]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.12),transparent_55%)]" />
         </div>
 
         <div className="mx-auto max-w-6xl px-6">
           <nav className="text-xs text-white/50 font-mono uppercase tracking-widest">
-            <Link to="/" className="hover:text-emerald-300">Home</Link>
+            <Link to="/" className="hover:text-emerald-300">
+              Home
+            </Link>
             <span className="mx-2">/</span>
             <span className="text-white/80">Knowledge Center</span>
           </nav>
@@ -258,10 +338,9 @@ function DownloadCenterPage() {
               <span className="text-emerald-400">Technical Resources</span>
             </h1>
             <p className="mt-6 text-lg text-white/70 max-w-2xl leading-relaxed">
-              A curated technical library for sandwich panel manufacturing.
-              Corporate profile, factory development, production lines, raw
-              materials, panel systems and installation — reviewed and shared
-              based on your project.
+              A curated technical library for sandwich panel manufacturing. Corporate profile,
+              factory development, production lines, raw materials, panel systems and installation —
+              reviewed and shared based on your project.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -287,9 +366,8 @@ function DownloadCenterPage() {
 
             <p className="mt-6 flex items-start gap-2 text-xs text-white/50 max-w-2xl leading-relaxed">
               <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400/70" />
-              Some technical documents are shared after project review to
-              ensure the correct specifications are provided for each
-              application.
+              Some technical documents are shared after project review to ensure the correct
+              specifications are provided for each application.
             </p>
           </motion.div>
         </div>
@@ -304,8 +382,8 @@ function DownloadCenterPage() {
                 Curated Technical Resources for Sandwich Panel Manufacturing
               </h2>
               <p className="mt-3 text-white/60 max-w-2xl">
-                Six featured resources covering the full lifecycle — from
-                corporate profile to installation on site.
+                Six featured resources covering the full lifecycle — from corporate profile to
+                installation on site.
               </p>
             </div>
           </div>
@@ -349,8 +427,8 @@ function DownloadCenterPage() {
             Available Resource Categories
           </h2>
           <p className="mt-3 text-white/60 max-w-2xl">
-            Six categories organize every technical document we share.
-            Select a category to see what is available.
+            Six categories organize every technical document we share. Select a category to see what
+            is available.
           </p>
 
           {/* Search + filters */}
@@ -405,7 +483,10 @@ function DownloadCenterPage() {
 
                   <ul className="mt-6 grid gap-2">
                     {c.items.map((item) => (
-                      <li key={item} className="flex items-center justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5 text-sm">
+                      <li
+                        key={item}
+                        className="flex items-center justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5 text-sm"
+                      >
                         <span className="text-white/80">{item}</span>
                         <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest text-emerald-300/80">
                           <Lock className="h-3 w-3" /> On Request
@@ -448,9 +529,8 @@ function DownloadCenterPage() {
                   Request Technical Documents
                 </h2>
                 <p className="mt-3 text-white/70 leading-relaxed">
-                  Our engineering team reviews each request and shares the
-                  relevant documents based on your project requirements —
-                  usually within 1–3 working days.
+                  Our engineering team reviews each request and shares the relevant documents based
+                  on your project requirements — usually within 1–3 working days.
                 </p>
               </div>
               <button
@@ -482,10 +562,7 @@ function DownloadCenterPage() {
 
       <AnimatePresence>
         {requestOpen && (
-          <RequestDialog
-            onClose={() => setRequestOpen(false)}
-            prefillCategory={prefill}
-          />
+          <RequestDialog onClose={() => setRequestOpen(false)} prefillCategory={prefill} />
         )}
       </AnimatePresence>
     </div>
@@ -544,11 +621,11 @@ function FaqRow({ q, a }: { q: string; a: string }) {
 /* ─────────────────────────────────────────────────────────────── */
 
 const requestSchema = z.object({
-  name:    z.string().trim().min(2, "Enter your name").max(100),
+  name: z.string().trim().min(2, "Enter your name").max(100),
   company: z.string().trim().min(2, "Enter your company").max(120),
   country: z.string().trim().min(2, "Enter your country").max(80),
-  email:   z.string().trim().email("Enter a valid email").max(160),
-  phone:   z.string().trim().min(4, "Enter a phone number").max(40),
+  email: z.string().trim().email("Enter a valid email").max(160),
+  phone: z.string().trim().min(4, "Enter a phone number").max(40),
   category: z.string().trim().min(2).max(120),
   projectType: z.string().trim().max(120).optional().or(z.literal("")),
   message: z.string().trim().max(1200).optional().or(z.literal("")),
@@ -592,7 +669,9 @@ function RequestDialog({
       parsed.data.projectType ? `Project type: ${parsed.data.projectType}` : "",
       `Preferred contact: ${parsed.data.contact}`,
       parsed.data.message ? `\n${parsed.data.message}` : "",
-    ].filter(Boolean).join("\n");
+    ]
+      .filter(Boolean)
+      .join("\n");
 
     try {
       await submitInquiry({
@@ -645,8 +724,8 @@ function RequestDialog({
             </div>
             <h3 className="mt-6 text-2xl font-semibold">Request received</h3>
             <p className="mt-3 text-white/65 max-w-md mx-auto">
-              Our engineering team will review your request and share the
-              relevant documents based on your project requirements.
+              Our engineering team will review your request and share the relevant documents based
+              on your project requirements.
             </p>
             <button
               onClick={onClose}
@@ -664,17 +743,17 @@ function RequestDialog({
               <div>
                 <h3 className="text-xl font-semibold">Request Technical Documents</h3>
                 <p className="mt-1 text-sm text-white/60">
-                  Our engineering team will review your request and share the
-                  relevant documents based on your project requirements.
+                  Our engineering team will review your request and share the relevant documents
+                  based on your project requirements.
                 </p>
               </div>
             </div>
 
             <form onSubmit={handleSubmit} className="mt-8 grid gap-4 md:grid-cols-2">
-              <Field label="Name *"    name="name"    placeholder="Your full name" />
+              <Field label="Name *" name="name" placeholder="Your full name" />
               <Field label="Company *" name="company" placeholder="Company name" />
               <Field label="Country *" name="country" placeholder="Country" />
-              <Field label="Email *"   name="email"   type="email" placeholder="you@company.com" />
+              <Field label="Email *" name="email" type="email" placeholder="you@company.com" />
               <Field label="Phone / WhatsApp *" name="phone" placeholder="+00 000 000 000" />
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-white/70">Document Category *</label>
@@ -683,17 +762,25 @@ function RequestDialog({
                   defaultValue={prefillCategory || CATEGORIES[0].title}
                   className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm outline-none focus:border-emerald-500/40"
                 >
-                  {prefillCategory && !CATEGORIES.some(c => c.title === prefillCategory) && (
+                  {prefillCategory && !CATEGORIES.some((c) => c.title === prefillCategory) && (
                     <option value={prefillCategory}>{prefillCategory}</option>
                   )}
                   {CATEGORIES.map((c) => (
-                    <option key={c.id} value={c.title}>{c.title}</option>
+                    <option key={c.id} value={c.title}>
+                      {c.title}
+                    </option>
                   ))}
                 </select>
               </div>
-              <Field label="Project Type" name="projectType" placeholder="e.g. New factory, panel supply, upgrade" />
+              <Field
+                label="Project Type"
+                name="projectType"
+                placeholder="e.g. New factory, panel supply, upgrade"
+              />
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-white/70">Preferred Contact Method *</label>
+                <label className="text-xs font-medium text-white/70">
+                  Preferred Contact Method *
+                </label>
                 <select
                   name="contact"
                   defaultValue="Email"
@@ -722,15 +809,18 @@ function RequestDialog({
 
               <div className="md:col-span-2 mt-2 flex flex-col-reverse md:flex-row items-stretch md:items-center gap-3 md:justify-between">
                 <p className="text-xs text-white/45 max-w-md">
-                  We will use these details only to review your document
-                  request and follow up.
+                  We will use these details only to review your document request and follow up.
                 </p>
                 <button
                   type="submit"
                   disabled={submitting}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-black hover:bg-emerald-400 transition disabled:opacity-60"
                 >
-                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+                  {submitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ArrowRight className="h-4 w-4" />
+                  )}
                   {submitting ? "Sending…" : "Submit Request"}
                 </button>
               </div>
@@ -743,8 +833,16 @@ function RequestDialog({
 }
 
 function Field({
-  label, name, type = "text", placeholder,
-}: { label: string; name: string; type?: string; placeholder?: string }) {
+  label,
+  name,
+  type = "text",
+  placeholder,
+}: {
+  label: string;
+  name: string;
+  type?: string;
+  placeholder?: string;
+}) {
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-xs font-medium text-white/70">{label}</label>

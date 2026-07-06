@@ -41,8 +41,12 @@ export function AIAssistantLauncher() {
           <Sparkles className="h-4 w-4 text-[color:var(--color-accent)]" />
           <span className="absolute -bottom-0 -right-0 h-2 w-2 rounded-full bg-[color:var(--color-accent)] ring-2 ring-[#0B0F14]" />
         </span>
-        <span className="hidden sm:inline font-medium tracking-tight">{t("home.aiLauncher.askEngineer")}</span>
-        <span className="sm:hidden font-medium tracking-tight">{t("home.aiLauncher.aiEngineer")}</span>
+        <span className="hidden sm:inline font-medium tracking-tight">
+          {t("home.aiLauncher.askEngineer")}
+        </span>
+        <span className="sm:hidden font-medium tracking-tight">
+          {t("home.aiLauncher.aiEngineer")}
+        </span>
       </button>
 
       <div

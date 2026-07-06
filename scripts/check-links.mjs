@@ -45,8 +45,10 @@ function globToRegExp(glob) {
   for (let i = 0; i < glob.length; i++) {
     const c = glob[i];
     if (c === "*") {
-      if (glob[i + 1] === "*") { src += ".*"; i++; }
-      else src += "[^/]*";
+      if (glob[i + 1] === "*") {
+        src += ".*";
+        i++;
+      } else src += "[^/]*";
     } else if (/[.+?^${}()|[\]\\]/.test(c)) src += "\\" + c;
     else src += c;
   }
@@ -61,8 +63,9 @@ function loadIgnoreFile(path) {
 }
 function loadConfig(path) {
   if (!existsSync(path)) return {};
-  try { return JSON.parse(readFileSync(path, "utf8")); }
-  catch (e) {
+  try {
+    return JSON.parse(readFileSync(path, "utf8"));
+  } catch (e) {
     console.error(`✗ Failed to parse ${relative(ROOT, path)}: ${e.message}`);
     process.exit(2);
   }
@@ -76,7 +79,11 @@ const ignoreSitemapExtra = new Set(config.ignoreSitemapExtra ?? []);
 const ignoreExternalREs = (config.ignoreExternal ?? []).map(globToRegExp);
 const usedPatterns = new Set();
 function matchAny(res, value) {
-  for (const re of res) if (re.test(value)) { usedPatterns.add(re.source); return true; }
+  for (const re of res)
+    if (re.test(value)) {
+      usedPatterns.add(re.source);
+      return true;
+    }
   return false;
 }
 const isIgnoredLink = (l) => matchAny(ignoreLinkREs, l);
@@ -95,16 +102,14 @@ const externalCfg = {
   enabled: !args.has("--no-external"),
   timeoutMs: Number(process.env.EXTERNAL_TIMEOUT_MS) || (config.external?.timeoutMs ?? 10_000),
   retries: Number(process.env.EXTERNAL_RETRIES) || (config.external?.retries ?? 2),
-  concurrency:
-    Number(process.env.EXTERNAL_CONCURRENCY) || (config.external?.concurrency ?? 8),
-  userAgent:
-    config.external?.userAgent ??
-    "NEVO-LinkCheck/1.0 (+https://nevoindustrial.com)",
+  concurrency: Number(process.env.EXTERNAL_CONCURRENCY) || (config.external?.concurrency ?? 8),
+  userAgent: config.external?.userAgent ?? "NEVO-LinkCheck/1.0 (+https://nevoindustrial.com)",
   // Some servers return 403/405 to bots — treat these as OK when configured.
-  acceptStatuses: new Set(config.external?.acceptStatuses ?? [200, 201, 202, 203, 204, 206, 301, 302, 303, 307, 308]),
+  acceptStatuses: new Set(
+    config.external?.acceptStatuses ?? [200, 201, 202, 203, 204, 206, 301, 302, 303, 307, 308],
+  ),
 };
 const internalEnabled = !args.has("--external-only");
-
 
 // -------- Route discovery (mirrors TanStack file-based routing) ----------
 function fileToRoute(file) {
@@ -152,12 +157,10 @@ function resolveLink(path) {
   const clean = path.split("#")[0].split("?")[0] || "/";
   if (REDIRECTS[clean]) return { ok: true, redirected: REDIRECTS[clean] };
   for (const [from, to] of Object.entries(REDIRECT_PREFIXES)) {
-    if (clean.startsWith(from))
-      return { ok: true, redirected: to + clean.slice(from.length) };
+    if (clean.startsWith(from)) return { ok: true, redirected: to + clean.slice(from.length) };
   }
   if (knownRoutes.has(clean)) return { ok: true };
-  if (wildcards.some((w) => clean === w || clean.startsWith(w + "/")))
-    return { ok: true };
+  if (wildcards.some((w) => clean === w || clean.startsWith(w + "/"))) return { ok: true };
   return { ok: false };
 }
 
@@ -198,9 +201,11 @@ if (internalEnabled) {
         const raw = m[1];
         if (raw.startsWith("//")) continue;
         if (raw.startsWith("/api/")) continue;
-        if (raw.match(/\.(png|jpg|jpeg|svg|webp|pdf|xml|txt|ico|json|mp4|webm)$/i))
+        if (raw.match(/\.(png|jpg|jpeg|svg|webp|pdf|xml|txt|ico|json|mp4|webm)$/i)) continue;
+        if (isIgnoredLink(raw)) {
+          ignoredLinkCount++;
           continue;
-        if (isIgnoredLink(raw)) { ignoredLinkCount++; continue; }
+        }
         const result = resolveLink(raw);
         const line = lineOf(text, m.index);
         if (!result.ok) {
@@ -233,9 +238,11 @@ if (externalCfg.enabled) {
       // Skip obvious asset URLs — they were already excluded for internal.
       if (/\.(png|jpg|jpeg|svg|webp|gif|ico|mp4|webm|woff2?)(\?|$)/i.test(url)) continue;
       // Skip localhost / example / placeholder hosts.
-      if (/^https?:\/\/(localhost|127\.|0\.0\.0\.0|example\.(com|org|net))/i.test(url))
+      if (/^https?:\/\/(localhost|127\.|0\.0\.0\.0|example\.(com|org|net))/i.test(url)) continue;
+      if (isIgnoredExternal(url)) {
+        ignoredExternalCount++;
         continue;
-      if (isIgnoredExternal(url)) { ignoredExternalCount++; continue; }
+      }
       const line = lineOf(text, m.index);
       const entry = externalUrls.get(url) ?? { url, occurrences: [] };
       entry.occurrences.push({ file: relFile, line });
@@ -243,7 +250,6 @@ if (externalCfg.enabled) {
     }
   }
 }
-
 
 // -------- Sitemap parity --------
 /** @type {Set<string>} */
@@ -317,12 +323,17 @@ if (internalEnabled) {
 
     if (hrefs.length === 0) {
       if (usesBuildSeo) continue;
-      canonicalErrors.push({ route: routePath, file: relFile, reason: "missing <link rel=\"canonical\"> in head()" });
+      canonicalErrors.push({
+        route: routePath,
+        file: relFile,
+        reason: 'missing <link rel="canonical"> in head()',
+      });
       continue;
     }
     if (hrefs.length > 1) {
       canonicalErrors.push({
-        route: routePath, file: relFile,
+        route: routePath,
+        file: relFile,
         reason: `${hrefs.length} canonical entries declared (expected exactly 1)`,
         found: hrefs.join(", "),
       });
@@ -341,14 +352,14 @@ if (internalEnabled) {
     const expected = routePath;
     if (href !== expected) {
       canonicalErrors.push({
-        route: routePath, file: relFile,
+        route: routePath,
+        file: relFile,
         reason: `canonical points to "${href}" but route is "${expected}" (must self-reference)`,
         found: hrefs[0],
       });
     }
   }
 }
-
 
 // -------- External URL validation ----------
 /** @type {{url:string, status:number|null, error:string|null, attempts:number, occurrences:{file:string,line:number}[]}[]} */
@@ -379,9 +390,13 @@ async function checkOne(entry) {
       }
       clearTimeout(timer);
       lastStatus = res.status;
-      if (acceptStatuses.has(res.status)) return { ok: true, status: res.status, attempts: attempt };
+      if (acceptStatuses.has(res.status))
+        return { ok: true, status: res.status, attempts: attempt };
       // Retry 5xx / 429; hard-fail other 4xx.
-      if (res.status >= 500 || res.status === 429) { lastErr = `HTTP ${res.status}`; continue; }
+      if (res.status >= 500 || res.status === 429) {
+        lastErr = `HTTP ${res.status}`;
+        continue;
+      }
       return { ok: false, status: res.status, error: `HTTP ${res.status}`, attempts: attempt };
     } catch (e) {
       clearTimeout(timer);
@@ -396,22 +411,28 @@ async function checkOne(entry) {
 async function runExternalChecks() {
   const items = [...externalUrls.values()];
   if (!items.length) return;
-  console.log(`\nChecking ${items.length} external URL(s) (concurrency=${externalCfg.concurrency}, timeout=${externalCfg.timeoutMs}ms, retries=${externalCfg.retries})…`);
+  console.log(
+    `\nChecking ${items.length} external URL(s) (concurrency=${externalCfg.concurrency}, timeout=${externalCfg.timeoutMs}ms, retries=${externalCfg.retries})…`,
+  );
   let idx = 0;
-  const workers = Array.from({ length: Math.min(externalCfg.concurrency, items.length) }, async () => {
-    while (idx < items.length) {
-      const entry = items[idx++];
-      const res = await checkOne(entry);
-      if (res.ok) externalOkCount++;
-      else externalFailures.push({
-        url: entry.url,
-        status: res.status,
-        error: res.error,
-        attempts: res.attempts,
-        occurrences: entry.occurrences,
-      });
-    }
-  });
+  const workers = Array.from(
+    { length: Math.min(externalCfg.concurrency, items.length) },
+    async () => {
+      while (idx < items.length) {
+        const entry = items[idx++];
+        const res = await checkOne(entry);
+        if (res.ok) externalOkCount++;
+        else
+          externalFailures.push({
+            url: entry.url,
+            status: res.status,
+            error: res.error,
+            attempts: res.attempts,
+            occurrences: entry.occurrences,
+          });
+      }
+    },
+  );
   await Promise.all(workers);
 }
 await runExternalChecks();
@@ -423,10 +444,7 @@ const allDeclared = [
   ...(config.ignoreFiles ?? []),
   ...(config.ignoreExternal ?? []),
 ];
-const staleIgnorePatterns = allDeclared.filter(
-  (p) => !usedPatterns.has(globToRegExp(p).source),
-);
-
+const staleIgnorePatterns = allDeclared.filter((p) => !usedPatterns.has(globToRegExp(p).source));
 
 // -------- Reports --------
 const totalErrors =
@@ -486,10 +504,7 @@ function ensureDir(p) {
 }
 
 function esc(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function htmlReport(r) {
@@ -498,12 +513,7 @@ function htmlReport(r) {
       ? `<table><thead><tr>${cols
           .map((c) => `<th>${esc(c.label)}</th>`)
           .join("")}</tr></thead><tbody>${arr
-          .map(
-            (row) =>
-              `<tr>${cols
-                .map((c) => `<td>${esc(row[c.key] ?? "")}</td>`)
-                .join("")}</tr>`,
-          )
+          .map((row) => `<tr>${cols.map((c) => `<td>${esc(row[c.key] ?? "")}</td>`).join("")}</tr>`)
           .join("")}</tbody></table>`
       : `<p class="empty">None 🎉</p>`;
   return `<!doctype html><html><head><meta charset="utf-8"><title>NEVO Link Check Report</title>
@@ -635,16 +645,12 @@ function mdSummary(r) {
     lines.push("");
   }
   if (r.redirectWarnings.length) {
-    lines.push(
-      `<details><summary>⚠️ ${r.redirectWarnings.length} redirect warning(s)</summary>`,
-    );
+    lines.push(`<details><summary>⚠️ ${r.redirectWarnings.length} redirect warning(s)</summary>`);
     lines.push("");
     lines.push(`| Link | Prefer | Source file:line |`);
     lines.push(`| --- | --- | --- |`);
     for (const w of r.redirectWarnings)
-      lines.push(
-        `| \`${w.link}\` | \`${w.redirectedTo}\` | \`${w.file}:${w.line}\` |`,
-      );
+      lines.push(`| \`${w.link}\` | \`${w.redirectedTo}\` | \`${w.file}:${w.line}\` |`);
     lines.push("");
     lines.push(`</details>`);
     lines.push("");
@@ -690,11 +696,12 @@ if (warnings.length) {
 }
 if (errors.length || sitemapErrors.length || externalFailures.length || canonicalErrors.length) {
   console.log("\nErrors:");
-  for (const e of errors)
-    console.log(`  ✗ Dead internal link "${e.link}" in ${e.file}:${e.line}`);
+  for (const e of errors) console.log(`  ✗ Dead internal link "${e.link}" in ${e.file}:${e.line}`);
   for (const s of sitemapErrors) console.log(`  ✗ Sitemap ${s.path} — ${s.reason}`);
   for (const c of canonicalErrors)
-    console.log(`  ✗ Canonical ${c.route} (${c.file}) — ${c.reason}${c.found ? ` [found: ${c.found}]` : ""}`);
+    console.log(
+      `  ✗ Canonical ${c.route} (${c.file}) — ${c.reason}${c.found ? ` [found: ${c.found}]` : ""}`,
+    );
   for (const f of externalFailures) {
     const first = f.occurrences[0];
     console.log(

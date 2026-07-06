@@ -32,10 +32,14 @@ export function MasterListShell({
     <div className="p-4 md:p-6 space-y-4 max-w-[1600px] mx-auto">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">NEVO · Back Office</p>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">
+            NEVO · Back Office
+          </p>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight flex items-center gap-3">
             {title}
-            <Badge variant="secondary" className="font-normal">{count}</Badge>
+            <Badge variant="secondary" className="font-normal">
+              {count}
+            </Badge>
           </h1>
           <p className="text-sm text-muted-foreground mt-1">{description}</p>
         </div>
