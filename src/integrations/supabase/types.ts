@@ -277,6 +277,7 @@ export type Database = {
           is_active: boolean
           name: string
           notes: string | null
+          partner_id: string | null
           payment_terms: string | null
           phone: string | null
           updated_at: string
@@ -299,6 +300,7 @@ export type Database = {
           is_active?: boolean
           name: string
           notes?: string | null
+          partner_id?: string | null
           payment_terms?: string | null
           phone?: string | null
           updated_at?: string
@@ -321,6 +323,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           notes?: string | null
+          partner_id?: string | null
           payment_terms?: string | null
           phone?: string | null
           updated_at?: string
@@ -328,7 +331,15 @@ export type Database = {
           vat_number?: string | null
           whatsapp?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "customers_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       doc_intel_audit_logs: {
         Row: {
@@ -1309,6 +1320,89 @@ export type Database = {
           },
         ]
       }
+      partner_commissions: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string | null
+          earned_at: string
+          id: string
+          invoice_id: string | null
+          notes: string | null
+          order_id: string | null
+          paid_at: string | null
+          partner_id: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          earned_at?: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          order_id?: string | null
+          paid_at?: string | null
+          partner_id: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          earned_at?: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          order_id?: string | null
+          paid_at?: string | null
+          partner_id?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_commissions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_commissions_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_commissions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_commissions_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partner_users: {
         Row: {
           created_at: string
@@ -1549,6 +1643,7 @@ export type Database = {
           message: string | null
           name: string
           next_action_date: string | null
+          partner_id: string | null
           phone: string | null
           priority: string
           project_type: string | null
@@ -1579,6 +1674,7 @@ export type Database = {
           message?: string | null
           name: string
           next_action_date?: string | null
+          partner_id?: string | null
           phone?: string | null
           priority?: string
           project_type?: string | null
@@ -1609,6 +1705,7 @@ export type Database = {
           message?: string | null
           name?: string
           next_action_date?: string | null
+          partner_id?: string | null
           phone?: string | null
           priority?: string
           project_type?: string | null
@@ -1632,6 +1729,13 @@ export type Database = {
             columns: ["converted_project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_inquiries_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
             referencedColumns: ["id"]
           },
         ]

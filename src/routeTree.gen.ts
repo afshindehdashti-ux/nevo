@@ -24,6 +24,7 @@ import { Route as KnowledgeSplatRouteImport } from './routes/knowledge.$'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
+import { Route as AuthenticatedPartnerPortalRouteImport } from './routes/_authenticated/partner-portal'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as LangSustainabilityRouteImport } from './routes/$lang.sustainability'
 import { Route as LangResearchInnovationRouteImport } from './routes/$lang.research-innovation'
@@ -172,6 +173,12 @@ const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPartnerPortalRoute =
+  AuthenticatedPartnerPortalRouteImport.update({
+    id: '/partner-portal',
+    path: '/partner-portal',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -613,6 +620,7 @@ export interface FileRoutesByFullPath {
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/partner-portal': typeof AuthenticatedPartnerPortalRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/chat': typeof ApiChatRoute
@@ -700,6 +708,7 @@ export interface FileRoutesByTo {
   '/$lang/quality': typeof LangQualityRoute
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
+  '/partner-portal': typeof AuthenticatedPartnerPortalRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/chat': typeof ApiChatRoute
@@ -791,6 +800,7 @@ export interface FileRoutesById {
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/partner-portal': typeof AuthenticatedPartnerPortalRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/chat': typeof ApiChatRoute
@@ -882,6 +892,7 @@ export interface FileRouteTypes {
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
     | '/admin'
+    | '/partner-portal'
     | '/portal'
     | '/admin/login'
     | '/api/chat'
@@ -969,6 +980,7 @@ export interface FileRouteTypes {
     | '/$lang/quality'
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
+    | '/partner-portal'
     | '/portal'
     | '/admin/login'
     | '/api/chat'
@@ -1059,6 +1071,7 @@ export interface FileRouteTypes {
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
     | '/_authenticated/admin'
+    | '/_authenticated/partner-portal'
     | '/_authenticated/portal'
     | '/admin/login'
     | '/api/chat'
@@ -1242,6 +1255,13 @@ declare module '@tanstack/react-router' {
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof AuthenticatedPortalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/partner-portal': {
+      id: '/_authenticated/partner-portal'
+      path: '/partner-portal'
+      fullPath: '/partner-portal'
+      preLoaderRoute: typeof AuthenticatedPartnerPortalRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin': {
@@ -1929,11 +1949,13 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedPartnerPortalRoute: typeof AuthenticatedPartnerPortalRoute
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedPartnerPortalRoute: AuthenticatedPartnerPortalRoute,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
 }
 
