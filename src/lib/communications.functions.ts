@@ -254,12 +254,12 @@ export const listCommsCustomersLite = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data } = await context.supabase
       .from("customers")
-      .select("id, company_name, contact_name")
-      .order("company_name", { ascending: true })
+      .select("id, name, contact_person")
+      .order("name", { ascending: true })
       .limit(1000);
     return (data ?? []).map((c) => ({
       id: c.id,
-      label: c.company_name || c.contact_name || "Customer",
+      label: c.name || c.contact_person || "Customer",
     }));
   });
 
@@ -282,12 +282,12 @@ export const listCommsProjectsLite = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data } = await context.supabase
       .from("projects")
-      .select("id, name, code")
+      .select("id, project_name")
       .order("created_at", { ascending: false })
       .limit(1000);
     return (data ?? []).map((c) => ({
       id: c.id,
-      label: c.name || c.code || "Project",
+      label: c.project_name || "Project",
     }));
   });
 
