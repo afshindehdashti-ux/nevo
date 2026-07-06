@@ -109,6 +109,12 @@ export const CRM_NAV: CrmNavGroup[] = [
     label: "Workspace",
     items: [
       { title: "Tasks", url: "/admin/tasks", icon: CheckSquare, allowedRoles: ALL_STAFF },
+      {
+        title: "Communications",
+        url: "/admin/communications",
+        icon: MessagesSquare,
+        allowedRoles: ALL_STAFF,
+      },
       { title: "Files", url: "/admin/files", icon: FolderOpen, allowedRoles: ALL_STAFF },
       {
         title: "Document Intelligence",
