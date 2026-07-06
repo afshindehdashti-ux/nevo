@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentUser, useMyRoles, useMyProfile, type AppRole } from "@/lib/crm-hooks";
+import { getMySignInHistory } from "@/lib/auth-audit.functions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +16,8 @@ import {
   Mail,
   LogOut,
   RefreshCw,
+  Globe,
+  Monitor,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/session")({
