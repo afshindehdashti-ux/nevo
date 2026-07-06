@@ -229,7 +229,7 @@ function AuditRow({ row }: { row: ApprovalAuditEntry }) {
   );
 }
 
-function formatVal(v: unknown): string {
+function formatVal(v: string | number | boolean | null): string {
   if (v === null || v === undefined) return "—";
   if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") return String(v);
   try {
