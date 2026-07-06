@@ -51,6 +51,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as LangSolutionsIndexRouteImport } from './routes/$lang.solutions.index'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicClientLogRouteImport } from './routes/api/public/client-log'
+import { Route as ApiPublicBootstrapSuperAdminRouteImport } from './routes/api/public/bootstrap-super-admin'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTasksRouteImport } from './routes/_authenticated/admin.tasks'
 import { Route as AuthenticatedAdminSuppliersRouteImport } from './routes/_authenticated/admin.suppliers'
@@ -68,6 +69,7 @@ import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authenticated/admin.invoices'
 import { Route as AuthenticatedAdminFilesRouteImport } from './routes/_authenticated/admin.files'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
+import { Route as AuthenticatedAdminControlPanelRouteImport } from './routes/_authenticated/admin.control-panel'
 import { Route as AuthenticatedAdminCommissionInvoicesRouteImport } from './routes/_authenticated/admin.commission-invoices'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
 import { Route as LangSolutionsSandwichPanelsRouteImport } from './routes/$lang.solutions.sandwich-panels'
@@ -291,6 +293,12 @@ const ApiPublicClientLogRoute = ApiPublicClientLogRouteImport.update({
   path: '/api/public/client-log',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicBootstrapSuperAdminRoute =
+  ApiPublicBootstrapSuperAdminRouteImport.update({
+    id: '/api/public/bootstrap-super-admin',
+    path: '/api/public/bootstrap-super-admin',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -387,6 +395,12 @@ const AuthenticatedAdminCustomersRoute =
   AuthenticatedAdminCustomersRouteImport.update({
     id: '/customers',
     path: '/customers',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminControlPanelRoute =
+  AuthenticatedAdminControlPanelRouteImport.update({
+    id: '/control-panel',
+    path: '/control-panel',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminCommissionInvoicesRoute =
@@ -489,6 +503,7 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
+  '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
@@ -506,6 +521,7 @@ export interface FileRoutesByFullPath {
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
+  '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
@@ -556,6 +572,7 @@ export interface FileRoutesByTo {
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
+  '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
@@ -573,6 +590,7 @@ export interface FileRoutesByTo {
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
+  '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
@@ -627,6 +645,7 @@ export interface FileRoutesById {
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/_authenticated/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
+  '/_authenticated/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/_authenticated/admin/files': typeof AuthenticatedAdminFilesRoute
   '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
@@ -644,6 +663,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/_authenticated/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
+  '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
@@ -698,6 +718,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/sandwich-panels'
     | '/admin/activity'
     | '/admin/commission-invoices'
+    | '/admin/control-panel'
     | '/admin/customers'
     | '/admin/files'
     | '/admin/invoices'
@@ -715,6 +736,7 @@ export interface FileRouteTypes {
     | '/admin/suppliers'
     | '/admin/tasks'
     | '/admin/users'
+    | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions/'
@@ -765,6 +787,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/sandwich-panels'
     | '/admin/activity'
     | '/admin/commission-invoices'
+    | '/admin/control-panel'
     | '/admin/customers'
     | '/admin/files'
     | '/admin/invoices'
@@ -782,6 +805,7 @@ export interface FileRouteTypes {
     | '/admin/suppliers'
     | '/admin/tasks'
     | '/admin/users'
+    | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions'
@@ -835,6 +859,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/sandwich-panels'
     | '/_authenticated/admin/activity'
     | '/_authenticated/admin/commission-invoices'
+    | '/_authenticated/admin/control-panel'
     | '/_authenticated/admin/customers'
     | '/_authenticated/admin/files'
     | '/_authenticated/admin/invoices'
@@ -852,6 +877,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/suppliers'
     | '/_authenticated/admin/tasks'
     | '/_authenticated/admin/users'
+    | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
     | '/$lang/solutions/'
@@ -872,6 +898,7 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   KnowledgeSplatRoute: typeof KnowledgeSplatRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
+  ApiPublicBootstrapSuperAdminRoute: typeof ApiPublicBootstrapSuperAdminRoute
   ApiPublicClientLogRoute: typeof ApiPublicClientLogRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
 }
@@ -1172,6 +1199,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicClientLogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/bootstrap-super-admin': {
+      id: '/api/public/bootstrap-super-admin'
+      path: '/api/public/bootstrap-super-admin'
+      fullPath: '/api/public/bootstrap-super-admin'
+      preLoaderRoute: typeof ApiPublicBootstrapSuperAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
       path: '/users'
@@ -1291,6 +1325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCustomersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/control-panel': {
+      id: '/_authenticated/admin/control-panel'
+      path: '/control-panel'
+      fullPath: '/admin/control-panel'
+      preLoaderRoute: typeof AuthenticatedAdminControlPanelRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/commission-invoices': {
       id: '/_authenticated/admin/commission-invoices'
       path: '/commission-invoices'
@@ -1374,6 +1415,7 @@ const AuthenticatedAdminUsersRouteWithChildren =
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
   AuthenticatedAdminCommissionInvoicesRoute: typeof AuthenticatedAdminCommissionInvoicesRoute
+  AuthenticatedAdminControlPanelRoute: typeof AuthenticatedAdminControlPanelRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
   AuthenticatedAdminFilesRoute: typeof AuthenticatedAdminFilesRoute
   AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRoute
@@ -1398,6 +1440,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
   AuthenticatedAdminCommissionInvoicesRoute:
     AuthenticatedAdminCommissionInvoicesRoute,
+  AuthenticatedAdminControlPanelRoute: AuthenticatedAdminControlPanelRoute,
   AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
   AuthenticatedAdminFilesRoute: AuthenticatedAdminFilesRoute,
   AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRoute,
@@ -1528,6 +1571,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   KnowledgeSplatRoute: KnowledgeSplatRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
+  ApiPublicBootstrapSuperAdminRoute: ApiPublicBootstrapSuperAdminRoute,
   ApiPublicClientLogRoute: ApiPublicClientLogRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
 }
