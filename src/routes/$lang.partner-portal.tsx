@@ -50,6 +50,7 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { RoutedDocumentsList } from "@/components/site/RoutedDocumentsList";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 
 import p01 from "@/assets/partner-portal/partner-01.png.asset.json";
@@ -562,6 +563,9 @@ function PartnerPortalPage() {
         </div>
       </section>
 
+      <section className="container mx-auto px-4 py-10">
+        <RoutedDocumentsList visibility="partner" title="Partner Documents" />
+      </section>
       <SiteFooter />
     </div>
   );

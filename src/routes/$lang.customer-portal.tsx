@@ -56,6 +56,7 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { RoutedDocumentsList } from "@/components/site/RoutedDocumentsList";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 
 import p01 from "@/assets/portal/portal-01.png.asset.json";
@@ -281,6 +282,9 @@ function CustomerPortalPage() {
       ) : (
         <PortalShell onLogout={() => setAuthed(false)} />
       )}
+      <div className="container mx-auto px-4 py-10">
+        <RoutedDocumentsList visibility="customer" title="Project Documents" />
+      </div>
       <SiteFooter />
     </div>
   );
