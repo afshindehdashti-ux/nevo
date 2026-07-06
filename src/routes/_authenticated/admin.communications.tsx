@@ -50,7 +50,7 @@ import {
   Download,
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/communications")({
   head: () => ({ meta: [{ title: "Communications · NEVO CRM" }] }),
@@ -138,7 +138,7 @@ function CommunicationsCenter() {
       updFn({ data: { id, follow_up_done: true } }),
     onSuccess: invalidate,
     onError: (e: any) =>
-      toast({ title: "Could not mark done", description: e?.message, variant: "destructive" }),
+      toast.error("Could not mark done", { description: e?.message }),
   });
 
   const openAttachment = async (path: string) => {
@@ -146,7 +146,7 @@ function CommunicationsCenter() {
       const { url } = await urlFn({ data: { path } });
       window.open(url, "_blank", "noopener");
     } catch (e: any) {
-      toast({ title: "Attachment unavailable", description: e?.message, variant: "destructive" });
+      toast.error("Attachment unavailable", { description: e?.message });
     }
   };
 
@@ -451,7 +451,7 @@ function NewCommunicationDialog({
       }
       setAttachments((prev) => [...prev, ...uploaded]);
     } catch (e: any) {
-      toast({ title: "Upload failed", description: e?.message, variant: "destructive" });
+      toast.error("Upload failed", { description: e?.message });
     } finally {
       setUploading(false);
     }
@@ -475,13 +475,13 @@ function NewCommunicationDialog({
         },
       }),
     onSuccess: () => {
-      toast({ title: "Communication logged" });
+      toast.success("Communication logged");
       onCreated();
       setOpen(false);
       reset();
     },
     onError: (e: any) =>
-      toast({ title: "Could not save", description: e?.message, variant: "destructive" }),
+      toast.error("Could not save", { description: e?.message }),
   });
 
   const canSave = entityId && body.trim().length > 0 && !create.isPending;
