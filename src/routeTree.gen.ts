@@ -98,6 +98,7 @@ import { Route as AuthenticatedAdminOrdersIdRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminLeadsIdRouteImport } from './routes/_authenticated/admin.leads.$id'
 import { Route as AuthenticatedAdminInvoicesIdRouteImport } from './routes/_authenticated/admin.invoices.$id'
 import { Route as AuthenticatedAdminCustomersIdRouteImport } from './routes/_authenticated/admin.customers.$id'
+import { Route as AuthenticatedAdminQuotationsIdPrintRouteImport } from './routes/_authenticated/admin.quotations.$id.print'
 
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
@@ -585,6 +586,12 @@ const AuthenticatedAdminCustomersIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedAdminCustomersRoute,
   } as any)
+const AuthenticatedAdminQuotationsIdPrintRoute =
+  AuthenticatedAdminQuotationsIdPrintRouteImport.update({
+    id: '/print',
+    path: '/print',
+    getParentRoute: () => AuthenticatedAdminQuotationsIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -669,12 +676,13 @@ export interface FileRoutesByFullPath {
   '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
   '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
-  '/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRoute
+  '/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -757,12 +765,13 @@ export interface FileRoutesByTo {
   '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
   '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
-  '/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRoute
+  '/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -849,12 +858,13 @@ export interface FileRoutesById {
   '/_authenticated/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
   '/_authenticated/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
   '/_authenticated/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
-  '/_authenticated/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRoute
+  '/_authenticated/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
   '/_authenticated/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/_authenticated/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/_authenticated/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -947,6 +957,7 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/admin/quotations/$id/print'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1035,6 +1046,7 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/admin/quotations/$id/print'
   id:
     | '__root__'
     | '/'
@@ -1126,6 +1138,7 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/_authenticated/admin/quotations/$id/print'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1775,6 +1788,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCustomersIdRouteImport
       parentRoute: typeof AuthenticatedAdminCustomersRoute
     }
+    '/_authenticated/admin/quotations/$id/print': {
+      id: '/_authenticated/admin/quotations/$id/print'
+      path: '/print'
+      fullPath: '/admin/quotations/$id/print'
+      preLoaderRoute: typeof AuthenticatedAdminQuotationsIdPrintRouteImport
+      parentRoute: typeof AuthenticatedAdminQuotationsIdRoute
+    }
   }
 }
 
@@ -1834,13 +1854,29 @@ const AuthenticatedAdminOrdersRouteWithChildren =
     AuthenticatedAdminOrdersRouteChildren,
   )
 
+interface AuthenticatedAdminQuotationsIdRouteChildren {
+  AuthenticatedAdminQuotationsIdPrintRoute: typeof AuthenticatedAdminQuotationsIdPrintRoute
+}
+
+const AuthenticatedAdminQuotationsIdRouteChildren: AuthenticatedAdminQuotationsIdRouteChildren =
+  {
+    AuthenticatedAdminQuotationsIdPrintRoute:
+      AuthenticatedAdminQuotationsIdPrintRoute,
+  }
+
+const AuthenticatedAdminQuotationsIdRouteWithChildren =
+  AuthenticatedAdminQuotationsIdRoute._addFileChildren(
+    AuthenticatedAdminQuotationsIdRouteChildren,
+  )
+
 interface AuthenticatedAdminQuotationsRouteChildren {
-  AuthenticatedAdminQuotationsIdRoute: typeof AuthenticatedAdminQuotationsIdRoute
+  AuthenticatedAdminQuotationsIdRoute: typeof AuthenticatedAdminQuotationsIdRouteWithChildren
 }
 
 const AuthenticatedAdminQuotationsRouteChildren: AuthenticatedAdminQuotationsRouteChildren =
   {
-    AuthenticatedAdminQuotationsIdRoute: AuthenticatedAdminQuotationsIdRoute,
+    AuthenticatedAdminQuotationsIdRoute:
+      AuthenticatedAdminQuotationsIdRouteWithChildren,
   }
 
 const AuthenticatedAdminQuotationsRouteWithChildren =
