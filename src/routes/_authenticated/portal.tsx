@@ -596,12 +596,20 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                         <div
                           key={m.id}
                           className={
-                            "rounded-md p-3 " +
+                            "rounded-md p-3 relative " +
                             (m.direction === "inbound"
                               ? "bg-muted/40 border border-border"
-                              : "bg-blue-50/60 border border-blue-100")
+                              : (m as any).read
+                                ? "bg-blue-50/60 border border-blue-100"
+                                : "bg-blue-50 border border-blue-300 ring-1 ring-blue-200")
                           }
                         >
+                          {m.direction === "outbound" && !(m as any).read && (
+                            <span
+                              className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary"
+                              aria-label="Unread"
+                            />
+                          )}
                           <div className="flex items-center justify-between gap-2 mb-1">
                             <div className="flex items-center gap-2 text-xs">
                               {m.direction === "inbound" ? (
@@ -610,7 +618,10 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                                 <ArrowUpRight className="h-3.5 w-3.5 text-blue-600" />
                               )}
                               <Badge variant="outline">{m.kind}</Badge>
-                              <span className="text-muted-foreground">
+                              <span className={
+                                "text-muted-foreground " +
+                                (m.direction === "outbound" && !(m as any).read ? "font-semibold text-foreground" : "")
+                              }>
                                 {m.contact_name ?? (m.direction === "inbound" ? "From you" : "From NEVO")}
                               </span>
                             </div>
