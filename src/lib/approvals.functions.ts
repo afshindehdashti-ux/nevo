@@ -39,6 +39,7 @@ const SubmitInput = z.object({
   reason: z.string().min(1),
   details: z.record(z.string(), z.any()).optional(),
 });
+type SubmitDetails = Record<string, string | number | boolean | null>;
 
 export const submitApprovalRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
