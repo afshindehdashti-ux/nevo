@@ -785,9 +785,17 @@ function DocumentDrawer({ id, onClose }: { id: string | null; onClose: () => voi
               </div>
             </div>
 
+            <AiSuggestionsPanel
+              analysis={data?.extract?.extracted_json as Record<string, unknown> | undefined}
+              confidence={doc.ai_confidence ?? null}
+              reasoning={doc.ai_reasoning ?? null}
+              onApply={(patch) => setEdited((p) => ({ ...p, ...patch }))}
+            />
+
             <Separator />
 
             <div className="space-y-3">
+
               <FieldRow label="Recommended title">
                 <Input
                   value={currentEdits.title}
