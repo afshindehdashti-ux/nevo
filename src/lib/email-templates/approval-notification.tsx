@@ -3,7 +3,6 @@ import {
   Body,
   Button,
   Container,
-  Head,
   Heading,
   Html,
   Link,
@@ -12,6 +11,7 @@ import {
   Text,
 } from '@react-email/components'
 import { brand, styles } from './_shared'
+import { EmailHead } from './EmailHead'
 import { BrandHeader } from './BrandHeader'
 import type { TemplateEntry } from './registry'
 
@@ -65,64 +65,64 @@ export const ApprovalNotificationEmail = ({
   const headline = HEADLINE[kind]
   return (
     <Html lang="en" dir="ltr">
-      <Head />
+      <EmailHead />
       <Preview>{PREVIEW[kind]}</Preview>
-      <Body style={styles.main}>
+      <Body style={styles.main} className="body">
         <Container style={styles.container}>
           <BrandHeader />
 
-          <Section style={styles.card}>
-            <Heading style={styles.h1}>{headline}</Heading>
+          <Section style={styles.card} className="card">
+            <Heading style={styles.h1} className="h1">{headline}</Heading>
 
-            <Text style={rowLabel}>Type</Text>
-            <Text style={rowValue}>{entityTypeLabel}</Text>
+            <Text style={rowLabel} className="row-label">Type</Text>
+            <Text style={rowValue} className="row-value">{entityTypeLabel}</Text>
 
             {entityLabel ? (
               <>
-                <Text style={rowLabel}>Item</Text>
-                <Text style={rowValue}>{entityLabel}</Text>
+                <Text style={rowLabel} className="row-label">Item</Text>
+                <Text style={rowValue} className="row-value">{entityLabel}</Text>
               </>
             ) : null}
 
             {reason ? (
               <>
-                <Text style={rowLabel}>Reason</Text>
-                <Text style={rowValue}>{reason}</Text>
+                <Text style={rowLabel} className="row-label">Reason</Text>
+                <Text style={rowValue} className="row-value">{reason}</Text>
               </>
             ) : null}
 
             {requesterName ? (
               <>
-                <Text style={rowLabel}>Requested by</Text>
-                <Text style={rowValue}>{requesterName}</Text>
+                <Text style={rowLabel} className="row-label">Requested by</Text>
+                <Text style={rowValue} className="row-value">{requesterName}</Text>
               </>
             ) : null}
 
             {kind !== 'submitted' && deciderName ? (
               <>
-                <Text style={rowLabel}>Decided by</Text>
-                <Text style={rowValue}>{deciderName}</Text>
+                <Text style={rowLabel} className="row-label">Decided by</Text>
+                <Text style={rowValue} className="row-value">{deciderName}</Text>
               </>
             ) : null}
 
             {notes ? (
               <>
-                <Text style={rowLabel}>Decision notes</Text>
-                <Text style={rowValue}>{notes}</Text>
+                <Text style={rowLabel} className="row-label">Decision notes</Text>
+                <Text style={rowValue} className="row-value">{notes}</Text>
               </>
             ) : null}
 
-            <Button style={styles.button} href={approvalUrl}>
+            <Button style={styles.button} className="button" href={approvalUrl}>
               {CTA[kind]}
             </Button>
           </Section>
 
-          <Section style={styles.footerWrap}>
-            <Text style={styles.footerText}>
+          <Section style={styles.footerWrap} className="footer-wrap">
+            <Text style={styles.footerText} className="footer-text">
               {brand.name} — {brand.tagline}
             </Text>
-            <Text style={styles.footerText}>
-              <Link href={brand.siteUrl} style={styles.link}>
+            <Text style={styles.footerText} className="footer-text">
+              <Link href={brand.siteUrl} style={styles.link} className="link">
                 nevoindustrial.com
               </Link>
             </Text>
