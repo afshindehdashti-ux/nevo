@@ -140,5 +140,5 @@ jobs:
       - name: Surface failure summary
         if: failure()
         run: |
-          echo "::error title=CI check failed::One of typecheck / lint / build:dev failed. Inline PR annotations point at the exact locations; full logs are attached as the 'build-dev-diagnostics' artifact (typecheck.log, lint.log, build-dev.log)."
+          echo "::error title=CI check failed::One of format / typecheck / lint / build:dev failed. Inline PR annotations point at the exact locations; full logs are attached as the 'build-dev-diagnostics' artifact (prettier.log, typecheck.log, lint.log, build-dev.log)."
           exit 1
