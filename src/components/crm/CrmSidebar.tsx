@@ -26,6 +26,8 @@ export function CrmSidebar() {
   const isSuperAdmin = useIsSuperAdmin();
   const { data: profile } = useMyProfile();
   const { data: user } = useCurrentUser();
+  const { data: roles } = useMyRoles();
+  const effectiveRoles = roles ?? [];
 
   const isActive = (url: string) =>
     url === "/admin" ? pathname === "/admin" : pathname === url || pathname.startsWith(url + "/");
