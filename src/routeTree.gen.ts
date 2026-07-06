@@ -84,6 +84,7 @@ import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as AuthenticatedAdminUsersInviteRouteImport } from './routes/_authenticated/admin.users.invite'
 import { Route as AuthenticatedAdminOrdersIdRouteImport } from './routes/_authenticated/admin.orders.$id'
+import { Route as AuthenticatedAdminInvoicesIdRouteImport } from './routes/_authenticated/admin.invoices.$id'
 import { Route as AuthenticatedAdminCustomersIdRouteImport } from './routes/_authenticated/admin.customers.$id'
 
 const StatusRoute = StatusRouteImport.update({
@@ -490,6 +491,12 @@ const AuthenticatedAdminOrdersIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedAdminOrdersRoute,
   } as any)
+const AuthenticatedAdminInvoicesIdRoute =
+  AuthenticatedAdminInvoicesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminInvoicesRoute,
+  } as any)
 const AuthenticatedAdminCustomersIdRoute =
   AuthenticatedAdminCustomersIdRouteImport.update({
     id: '/$id',
@@ -547,7 +554,7 @@ export interface FileRoutesByFullPath {
   '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
   '/admin/files': typeof AuthenticatedAdminFilesRoute
-  '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
+  '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
   '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
@@ -568,6 +575,7 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
+  '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -622,7 +630,7 @@ export interface FileRoutesByTo {
   '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
   '/admin/files': typeof AuthenticatedAdminFilesRoute
-  '/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
+  '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
   '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
@@ -643,6 +651,7 @@ export interface FileRoutesByTo {
   '/$lang/solutions': typeof LangSolutionsIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
+  '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -701,7 +710,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
   '/_authenticated/admin/files': typeof AuthenticatedAdminFilesRoute
-  '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRoute
+  '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/_authenticated/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
   '/_authenticated/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
@@ -722,6 +731,7 @@ export interface FileRoutesById {
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
+  '/_authenticated/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
   '/_authenticated/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/_authenticated/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -801,6 +811,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/'
     | '/admin/'
     | '/admin/customers/$id'
+    | '/admin/invoices/$id'
     | '/admin/orders/$id'
     | '/admin/users/invite'
     | '/lovable/email/auth/preview'
@@ -876,6 +887,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions'
     | '/admin'
     | '/admin/customers/$id'
+    | '/admin/invoices/$id'
     | '/admin/orders/$id'
     | '/admin/users/invite'
     | '/lovable/email/auth/preview'
@@ -954,6 +966,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/customers/$id'
+    | '/_authenticated/admin/invoices/$id'
     | '/_authenticated/admin/orders/$id'
     | '/_authenticated/admin/users/invite'
     | '/lovable/email/auth/preview'
@@ -1509,6 +1522,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminOrdersIdRouteImport
       parentRoute: typeof AuthenticatedAdminOrdersRoute
     }
+    '/_authenticated/admin/invoices/$id': {
+      id: '/_authenticated/admin/invoices/$id'
+      path: '/$id'
+      fullPath: '/admin/invoices/$id'
+      preLoaderRoute: typeof AuthenticatedAdminInvoicesIdRouteImport
+      parentRoute: typeof AuthenticatedAdminInvoicesRoute
+    }
     '/_authenticated/admin/customers/$id': {
       id: '/_authenticated/admin/customers/$id'
       path: '/$id'
@@ -1531,6 +1551,20 @@ const AuthenticatedAdminCustomersRouteChildren: AuthenticatedAdminCustomersRoute
 const AuthenticatedAdminCustomersRouteWithChildren =
   AuthenticatedAdminCustomersRoute._addFileChildren(
     AuthenticatedAdminCustomersRouteChildren,
+  )
+
+interface AuthenticatedAdminInvoicesRouteChildren {
+  AuthenticatedAdminInvoicesIdRoute: typeof AuthenticatedAdminInvoicesIdRoute
+}
+
+const AuthenticatedAdminInvoicesRouteChildren: AuthenticatedAdminInvoicesRouteChildren =
+  {
+    AuthenticatedAdminInvoicesIdRoute: AuthenticatedAdminInvoicesIdRoute,
+  }
+
+const AuthenticatedAdminInvoicesRouteWithChildren =
+  AuthenticatedAdminInvoicesRoute._addFileChildren(
+    AuthenticatedAdminInvoicesRouteChildren,
   )
 
 interface AuthenticatedAdminOrdersRouteChildren {
@@ -1568,7 +1602,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminControlPanelRoute: typeof AuthenticatedAdminControlPanelRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRouteWithChildren
   AuthenticatedAdminFilesRoute: typeof AuthenticatedAdminFilesRoute
-  AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRoute
+  AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRouteWithChildren
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
   AuthenticatedAdminLogoEventsRoute: typeof AuthenticatedAdminLogoEventsRoute
   AuthenticatedAdminOpportunitiesRoute: typeof AuthenticatedAdminOpportunitiesRoute
@@ -1595,7 +1629,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCustomersRoute:
     AuthenticatedAdminCustomersRouteWithChildren,
   AuthenticatedAdminFilesRoute: AuthenticatedAdminFilesRoute,
-  AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRoute,
+  AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRouteWithChildren,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
   AuthenticatedAdminLogoEventsRoute: AuthenticatedAdminLogoEventsRoute,
   AuthenticatedAdminOpportunitiesRoute: AuthenticatedAdminOpportunitiesRoute,
