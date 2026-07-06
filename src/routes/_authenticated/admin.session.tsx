@@ -26,23 +26,30 @@ export const Route = createFileRoute("/_authenticated/admin/session")({
   component: SessionStatusPage,
 });
 
-const ROLE_LABEL: Record<AppRole, string> = {
+const ROLE_LABEL: Partial<Record<AppRole, string>> = {
   super_admin: "Super Admin",
   management: "Management",
   sales: "Sales",
   operations: "Operations",
   finance: "Finance",
   read_only: "Read Only",
+  admin: "Admin",
+  moderator: "Moderator",
+  user: "User",
 };
 
-const ROLE_TONE: Record<AppRole, string> = {
+const ROLE_TONE: Partial<Record<AppRole, string>> = {
   super_admin: "bg-primary/10 text-primary border-primary/30",
   management: "bg-amber-500/10 text-amber-700 border-amber-500/30",
   sales: "bg-blue-500/10 text-blue-700 border-blue-500/30",
   operations: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
   finance: "bg-purple-500/10 text-purple-700 border-purple-500/30",
   read_only: "bg-muted text-muted-foreground border-border",
+  admin: "bg-primary/10 text-primary border-primary/30",
+  moderator: "bg-amber-500/10 text-amber-700 border-amber-500/30",
+  user: "bg-muted text-muted-foreground border-border",
 };
+
 
 function fmt(ts?: string | number | null): string {
   if (!ts) return "—";

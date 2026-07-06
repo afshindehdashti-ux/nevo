@@ -59,6 +59,7 @@ import { Route as AuthenticatedAdminSuppliersRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminSolutionsSeoRouteImport } from './routes/_authenticated/admin.solutions-seo'
 import { Route as AuthenticatedAdminShipmentsRouteImport } from './routes/_authenticated/admin.shipments'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
+import { Route as AuthenticatedAdminSessionRouteImport } from './routes/_authenticated/admin.session'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminPurchaseOrdersRouteImport } from './routes/_authenticated/admin.purchase-orders'
 import { Route as AuthenticatedAdminProformaInvoicesRouteImport } from './routes/_authenticated/admin.proforma-invoices'
@@ -351,6 +352,12 @@ const AuthenticatedAdminSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminSessionRoute =
+  AuthenticatedAdminSessionRouteImport.update({
+    id: '/session',
+    path: '/session',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminReportsRoute =
   AuthenticatedAdminReportsRouteImport.update({
     id: '/reports',
@@ -609,6 +616,7 @@ export interface FileRoutesByFullPath {
   '/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
   '/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/session': typeof AuthenticatedAdminSessionRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
@@ -691,6 +699,7 @@ export interface FileRoutesByTo {
   '/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
   '/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/session': typeof AuthenticatedAdminSessionRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
@@ -777,6 +786,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
   '/_authenticated/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/_authenticated/admin/session': typeof AuthenticatedAdminSessionRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
   '/_authenticated/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
@@ -863,6 +873,7 @@ export interface FileRouteTypes {
     | '/admin/proforma-invoices'
     | '/admin/purchase-orders'
     | '/admin/reports'
+    | '/admin/session'
     | '/admin/settings'
     | '/admin/shipments'
     | '/admin/solutions-seo'
@@ -945,6 +956,7 @@ export interface FileRouteTypes {
     | '/admin/proforma-invoices'
     | '/admin/purchase-orders'
     | '/admin/reports'
+    | '/admin/session'
     | '/admin/settings'
     | '/admin/shipments'
     | '/admin/solutions-seo'
@@ -1030,6 +1042,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/proforma-invoices'
     | '/_authenticated/admin/purchase-orders'
     | '/_authenticated/admin/reports'
+    | '/_authenticated/admin/session'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/shipments'
     | '/_authenticated/admin/solutions-seo'
@@ -1425,6 +1438,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/session': {
+      id: '/_authenticated/admin/session'
+      path: '/session'
+      fullPath: '/admin/session'
+      preLoaderRoute: typeof AuthenticatedAdminSessionRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/reports': {
       id: '/_authenticated/admin/reports'
       path: '/reports'
@@ -1749,6 +1769,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminProformaInvoicesRoute: typeof AuthenticatedAdminProformaInvoicesRoute
   AuthenticatedAdminPurchaseOrdersRoute: typeof AuthenticatedAdminPurchaseOrdersRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
+  AuthenticatedAdminSessionRoute: typeof AuthenticatedAdminSessionRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminShipmentsRoute: typeof AuthenticatedAdminShipmentsRouteWithChildren
   AuthenticatedAdminSolutionsSeoRoute: typeof AuthenticatedAdminSolutionsSeoRoute
@@ -1782,6 +1803,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
     AuthenticatedAdminProformaInvoicesRoute,
   AuthenticatedAdminPurchaseOrdersRoute: AuthenticatedAdminPurchaseOrdersRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
+  AuthenticatedAdminSessionRoute: AuthenticatedAdminSessionRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminShipmentsRoute:
     AuthenticatedAdminShipmentsRouteWithChildren,
