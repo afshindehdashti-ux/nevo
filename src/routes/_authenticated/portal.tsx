@@ -99,6 +99,10 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
   const quotesFn = useServerFn(getMyQuotations);
   const docsFn = useServerFn(getMyDocuments);
   const docUrlFn = useServerFn(getMyDocumentUrl);
+  const projectsFn = useServerFn(getMyProjects);
+  const paymentsFn = useServerFn(getMyPayments);
+  const messagesFn = useServerFn(getMyMessages);
+  const timelineFn = useServerFn(getMyTimeline);
 
   const { data: orders = [] } = useQuery({
     queryKey: ["portal", "orders", customerId],
@@ -120,6 +124,28 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
     queryKey: ["portal", "docs", customerId],
     queryFn: () => docsFn({ data: { customer_id: customerId } }),
   });
+  const { data: projects = [] } = useQuery({
+    queryKey: ["portal", "projects", customerId],
+    queryFn: () => projectsFn({ data: { customer_id: customerId } }),
+  });
+  const { data: payments = [] } = useQuery({
+    queryKey: ["portal", "payments", customerId],
+    queryFn: () => paymentsFn({ data: { customer_id: customerId } }),
+  });
+  const { data: messages = [] } = useQuery({
+    queryKey: ["portal", "messages", customerId],
+    queryFn: () => messagesFn({ data: { customer_id: customerId } }),
+  });
+  const { data: timeline = [] } = useQuery({
+    queryKey: ["portal", "timeline", customerId],
+    queryFn: () => timelineFn({ data: { customer_id: customerId } }),
+  });
+
+  const proformas = invoices.filter((i) => i.type === "proforma");
+  const commercialInvoices = invoices.filter((i) => i.type !== "proforma");
+  const approvedProjects = projects.filter((p) =>
+    ["approved", "active", "in_progress", "delivered"].includes((p.status ?? "").toLowerCase()),
+  );
 
   const openOrders = orders.filter((o) => o.status !== "delivered" && o.status !== "cancelled").length;
   const inTransit = shipments.filter((s) => s.status === "in_transit").length;
