@@ -48,7 +48,7 @@ function AccessDenied({ reason, fallback }: { reason: string; fallback?: string 
         <p className="text-sm text-muted-foreground">{reason}</p>
         {fallback && (
           <Button asChild size="sm">
-            <Link to={fallback}>Go to your dashboard</Link>
+            <a href={fallback}>Go to your dashboard</a>
           </Button>
         )}
       </div>
