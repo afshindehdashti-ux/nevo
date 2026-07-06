@@ -36,6 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CommunicationTimeline } from "@/components/crm/CommunicationTimeline";
+import { ApprovalPanel } from "@/components/crm/ApprovalPanel";
 import { Trash2, Plus, Send, Check, X, FileDown, ArrowRightCircle } from "lucide-react";
 import { toast } from "sonner";
 
