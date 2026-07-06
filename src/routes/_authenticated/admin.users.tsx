@@ -114,36 +114,7 @@ function UsersPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
-  const inviteFn = useServerFn(inviteTeamMember);
   const resetFn = useServerFn(sendPasswordReset);
-  const [inviteOpen, setInviteOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteName, setInviteName] = useState("");
-  const [inviteTitle, setInviteTitle] = useState("");
-  const [inviteRole, setInviteRole] = useState<AppRole>("sales");
-
-  const invite = useMutation({
-    mutationFn: () =>
-      inviteFn({
-        data: {
-          email: inviteEmail.trim(),
-          fullName: inviteName.trim(),
-          jobTitle: inviteTitle.trim() || null,
-          role: inviteRole,
-        },
-      }),
-    onSuccess: () => {
-      toast.success(`Invitation sent to ${inviteEmail}`);
-      setInviteOpen(false);
-      setInviteEmail("");
-      setInviteName("");
-      setInviteTitle("");
-      setInviteRole("sales");
-      qc.invalidateQueries({ queryKey: ["profiles-list"] });
-      qc.invalidateQueries({ queryKey: ["user-roles-list"] });
-    },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to invite user"),
-  });
 
   const resetPw = useMutation({
     mutationFn: (email: string) => resetFn({ data: { email } }),
