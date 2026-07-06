@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
 import {
   getMyCustomerContext,
   getMyOrders,
@@ -10,6 +9,10 @@ import {
   getMyQuotations,
   getMyDocuments,
   getMyDocumentUrl,
+  getMyProjects,
+  getMyPayments,
+  getMyMessages,
+  getMyTimeline,
 } from "@/lib/customer-portal.functions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +35,12 @@ import {
   LayoutDashboard,
   User,
   AlertCircle,
+  FolderKanban,
+  Wallet,
+  MessagesSquare,
+  Activity as ActivityIcon,
+  ArrowDownLeft,
+  ArrowUpRight,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/portal")({
