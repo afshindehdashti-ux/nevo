@@ -19,7 +19,7 @@ export type ApprovalRequest = {
   entity_type: ApprovalEntityType;
   entity_id: string;
   reason: string | null;
-  details: Record<string, unknown>;
+  details: Record<string, string | number | boolean | null> | null;
   status: ApprovalStatus;
   requested_by: string | null;
   requested_at: string;
