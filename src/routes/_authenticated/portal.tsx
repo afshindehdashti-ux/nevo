@@ -183,15 +183,66 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
           <KpiCard icon={FileText} label="Documents" value={docs.length} />
         </div>
 
-        <Tabs defaultValue="orders">
-          <TabsList>
+        <Tabs defaultValue="timeline">
+          <TabsList className="flex-wrap h-auto">
+            <TabsTrigger value="timeline"><ActivityIcon className="h-3.5 w-3.5 mr-1" />Timeline</TabsTrigger>
+            <TabsTrigger value="projects"><FolderKanban className="h-3.5 w-3.5 mr-1" />Projects</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
             <TabsTrigger value="quotes">Quotations</TabsTrigger>
+            <TabsTrigger value="proformas">Proformas</TabsTrigger>
             <TabsTrigger value="invoices">Invoices</TabsTrigger>
+            <TabsTrigger value="payments"><Wallet className="h-3.5 w-3.5 mr-1" />Payments</TabsTrigger>
             <TabsTrigger value="shipments">Shipments</TabsTrigger>
             <TabsTrigger value="docs">Documents</TabsTrigger>
+            <TabsTrigger value="messages"><MessagesSquare className="h-3.5 w-3.5 mr-1" />Messages</TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="timeline">
+            <Card className="p-6">
+              {timeline.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  No activity recorded yet.
+                </p>
+              ) : (
+                <ol className="relative border-l border-border ml-3 space-y-4">
+                  {timeline.map((e) => (
+                    <li key={e.id} className="pl-4 relative">
+                      <span className="absolute -left-[7px] top-1.5 h-3 w-3 rounded-full bg-primary" />
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="text-sm font-medium">{e.title}</div>
+                          {e.detail && (
+                            <div className="text-xs text-muted-foreground">{e.detail}</div>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground whitespace-nowrap">
+                          <Badge variant="outline" className="mr-2">{e.kind}</Badge>
+                          {new Date(e.at).toLocaleString()}
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="projects">
+            <Card>
+              <PortalTable
+                empty="No projects assigned yet."
+                headers={["Project", "Type", "Country", "Status", "Updated"]}
+                rows={approvedProjects.map((p) => [
+                  <span className="font-medium">{p.project_name}</span>,
+                  p.project_type ?? "—",
+                  p.country ?? "—",
+                  <Badge variant="outline">{p.status ?? "—"}</Badge>,
+                  new Date(p.updated_at).toLocaleDateString(),
+                ])}
+              />
+            </Card>
+          </TabsContent>
 
           <TabsContent value="orders">
             <Card>
@@ -225,22 +276,56 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
             </Card>
           </TabsContent>
 
-          <TabsContent value="invoices">
+          <TabsContent value="proformas">
             <Card>
               <PortalTable
-                empty="No invoices."
-                headers={["Number", "Type", "Issued", "Due", "Status", "Balance"]}
-                rows={invoices.map((i) => [
+                empty="No proforma invoices."
+                headers={["Number", "Issued", "Due", "Status", "Total", "Balance"]}
+                rows={proformas.map((i) => [
                   <span className="font-mono text-xs">{i.invoice_number}</span>,
-                  i.type,
                   i.issue_date,
                   i.due_date ?? "—",
                   <Badge variant="outline">{i.status}</Badge>,
+                  <span className="tabular-nums">{i.currency} {Number(i.total).toLocaleString()}</span>,
                   <span className="tabular-nums">{i.currency} {Number(i.balance).toLocaleString()}</span>,
                 ])}
               />
             </Card>
           </TabsContent>
+
+          <TabsContent value="invoices">
+            <Card>
+              <PortalTable
+                empty="No invoices."
+                headers={["Number", "Issued", "Due", "Status", "Total", "Balance"]}
+                rows={commercialInvoices.map((i) => [
+                  <span className="font-mono text-xs">{i.invoice_number}</span>,
+                  i.issue_date,
+                  i.due_date ?? "—",
+                  <Badge variant={i.status === "paid" ? "default" : i.status === "overdue" ? "destructive" : "outline"}>{i.status}</Badge>,
+                  <span className="tabular-nums">{i.currency} {Number(i.total).toLocaleString()}</span>,
+                  <span className="tabular-nums">{i.currency} {Number(i.balance).toLocaleString()}</span>,
+                ])}
+              />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="payments">
+            <Card>
+              <PortalTable
+                empty="No payments received yet."
+                headers={["Received", "Invoice", "Method", "Reference", "Amount"]}
+                rows={payments.map((p) => [
+                  new Date(p.received_at).toLocaleDateString(),
+                  <span className="font-mono text-xs">{p.invoice_number ?? "—"}</span>,
+                  p.method,
+                  p.reference ?? "—",
+                  <span className="tabular-nums font-medium">{p.currency} {Number(p.amount).toLocaleString()}</span>,
+                ])}
+              />
+            </Card>
+          </TabsContent>
+
 
           <TabsContent value="shipments">
             <Card>
