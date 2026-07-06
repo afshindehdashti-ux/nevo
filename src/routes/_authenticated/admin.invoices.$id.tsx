@@ -601,6 +601,19 @@ function InvoiceDetailPage() {
             </Card>
           )}
 
+          {invoice && (
+            <ApprovalPanel
+              entityType={invoice.type === "proforma" ? "proforma" : "invoice"}
+              entityId={id}
+              suggestedReason={`${invoice.type === "proforma" ? "Proforma" : "Invoice"} ${invoice.invoice_number ?? "(draft)"} — ${invoice.currency} ${Number(invoice.total).toLocaleString()}`}
+              details={{
+                total: Number(invoice.total),
+                currency: invoice.currency,
+                type: invoice.type,
+                invoice_number: invoice.invoice_number,
+              }}
+            />
+          )}
           <DocumentsPanel entityType="invoice" entityId={id} />
         </div>
       </div>
