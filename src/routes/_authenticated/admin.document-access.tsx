@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/tabs";
 import { Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { listDocAccess, grantDocAccess, revokeDocAccess } from "@/lib/doc-access.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/document-access")({
   head: () => ({
@@ -54,86 +56,69 @@ function DocumentAccessPage() {
 
 type Kind = "customer" | "partner";
 
+function useParents(kind: Kind) {
+  return useQuery({
+    queryKey: ["doc-access-parents", kind],
+    queryFn: async () => {
+      if (kind === "customer") {
+        const { data, error } = await supabase
+          .from("customers")
+          .select("id, name")
+          .order("name")
+          .limit(500);
+        if (error) throw error;
+        return (data ?? []).map((c) => ({ id: c.id, name: c.name }));
+      }
+      const { data, error } = await supabase
+        .from("partners")
+        .select("id, company_name")
+        .order("company_name")
+        .limit(500);
+      if (error) throw error;
+      return (data ?? []).map((p) => ({ id: p.id, name: p.company_name }));
+    },
+  });
+}
+
 function MappingManager({ kind }: { kind: Kind }) {
   const qc = useQueryClient();
-  const table = kind === "customer" ? "customer_users" : "partner_users";
-  const fk = kind === "customer" ? "customer_id" : "partner_id";
-  const parentTable = kind === "customer" ? "customers" : "partners";
+  const listFn = useServerFn(listDocAccess);
+  const grantFn = useServerFn(grantDocAccess);
+  const revokeFn = useServerFn(revokeDocAccess);
 
   const [entityId, setEntityId] = useState<string>("");
   const [email, setEmail] = useState("");
 
-  const parents = useQuery({
-    queryKey: [parentTable, "list-min"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from(parentTable)
-        .select("id, name")
-        .order("name")
-        .limit(500);
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
+  const parents = useParents(kind);
 
   const mappings = useQuery({
-    queryKey: [table, entityId],
+    queryKey: ["doc-access", kind, entityId],
     enabled: !!entityId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from(table)
-        .select("id, user_id, created_at")
-        .eq(fk, entityId)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      const ids = (data ?? []).map((r) => r.user_id);
-      if (ids.length === 0) return [];
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, full_name, email")
-        .in("id", ids);
-      const byId = new Map((profs ?? []).map((p) => [p.id, p]));
-      return (data ?? []).map((r) => ({
-        ...r,
-        profile: byId.get(r.user_id) as { full_name?: string; email?: string } | undefined,
-      }));
-    },
+    queryFn: () => listFn({ data: { kind, entityId } }),
   });
 
   const addMutation = useMutation({
     mutationFn: async () => {
-      if (!entityId) throw new Error("Choose a " + kind + " first");
-      const cleanEmail = email.trim().toLowerCase();
-      if (!cleanEmail) throw new Error("Enter user email");
-      const { data: prof, error: pErr } = await supabase
-        .from("profiles")
-        .select("id, email")
-        .ilike("email", cleanEmail)
-        .maybeSingle();
-      if (pErr) throw pErr;
-      if (!prof) throw new Error("No user found with that email. They must sign in first.");
-      const { error } = await supabase.from(table).insert({
-        [fk]: entityId,
-        user_id: prof.id,
-      } as never);
-      if (error) throw error;
+      if (!entityId) throw new Error(`Choose a ${kind} first`);
+      const clean = email.trim().toLowerCase();
+      if (!clean) throw new Error("Enter user email");
+      await grantFn({ data: { kind, entityId, email: clean } });
     },
     onSuccess: () => {
       toast.success("Access granted");
       setEmail("");
-      qc.invalidateQueries({ queryKey: [table, entityId] });
+      qc.invalidateQueries({ queryKey: ["doc-access", kind, entityId] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
   const removeMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from(table).delete().eq("id", id);
-      if (error) throw error;
+      await revokeFn({ data: { kind, mappingId: id } });
     },
     onSuccess: () => {
       toast.success("Access revoked");
-      qc.invalidateQueries({ queryKey: [table, entityId] });
+      qc.invalidateQueries({ queryKey: ["doc-access", kind, entityId] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
@@ -194,10 +179,10 @@ function MappingManager({ kind }: { kind: Kind }) {
             <div key={row.id} className="p-3 flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-sm font-medium truncate">
-                  {row.profile?.full_name ?? row.profile?.email ?? row.user_id}
+                  {row.full_name ?? row.email ?? row.user_id}
                 </p>
-                {row.profile?.email && (
-                  <p className="text-xs text-muted-foreground truncate">{row.profile.email}</p>
+                {row.email && (
+                  <p className="text-xs text-muted-foreground truncate">{row.email}</p>
                 )}
               </div>
               <Button
