@@ -44,6 +44,10 @@ import {
   Activity as ActivityIcon,
   ArrowDownLeft,
   ArrowUpRight,
+  Paperclip,
+  Send,
+  X,
+  Loader2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/portal")({
