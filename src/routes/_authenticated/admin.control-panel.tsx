@@ -229,7 +229,7 @@ function ControlPanel() {
             <CardDescription>Assigned across the team</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {(Object.keys(ROLE_LABEL) as AppRole[]).map((r) => (
+            {ROLE_ORDER.map((r) => (
               <div
                 key={r}
                 className="flex items-center justify-between text-sm py-1 border-b border-border/50 last:border-0"
