@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   getMyCustomerContext,
@@ -17,6 +17,7 @@ import {
   getMyTimeline,
   sendMyMessage,
   getMyMessageAttachmentUrl,
+  markMyMessagesRead,
 } from "@/lib/customer-portal.functions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
