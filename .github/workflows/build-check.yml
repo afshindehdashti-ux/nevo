@@ -119,9 +119,8 @@ jobs:
 
       - name: Run build:dev with diagnostics
         id: build
-        # Skip the build if either typecheck or lint failed — no point spending
-        # minutes on Vite when the code already fails a blocking gate.
-        if: steps.typecheck.conclusion == 'success' && steps.lint.conclusion == 'success'
+        # Skip the build if any blocking gate (format, typecheck, lint) failed.
+        if: steps.format.conclusion == 'success' && steps.typecheck.conclusion == 'success' && steps.lint.conclusion == 'success'
         run: |
           mkdir -p build-logs
           set -o pipefail
