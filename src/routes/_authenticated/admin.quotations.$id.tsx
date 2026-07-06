@@ -150,8 +150,16 @@ function QuotationEditor() {
   });
 
   const changeStatus = useMutation({
-    mutationFn: (status: Parameters<typeof statusFn>[0]["data"]["status"]) =>
-      statusFn({ data: { id, status } }),
+    mutationFn: (status:
+      | "draft"
+      | "pending_approval"
+      | "approved"
+      | "sent"
+      | "accepted"
+      | "rejected"
+      | "expired"
+      | "converted"
+      | "void") => statusFn({ data: { id, status } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["quotation", id] });
       qc.invalidateQueries({ queryKey: ["quotations"] });
