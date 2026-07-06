@@ -154,6 +154,8 @@ export type Database = {
       customers: {
         Row: {
           address: string | null
+          ai_summary: string | null
+          ai_summary_at: string | null
           city: string | null
           contact_person: string | null
           country: string | null
@@ -174,6 +176,8 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          ai_summary?: string | null
+          ai_summary_at?: string | null
           city?: string | null
           contact_person?: string | null
           country?: string | null
@@ -194,6 +198,8 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          ai_summary?: string | null
+          ai_summary_at?: string | null
           city?: string | null
           contact_person?: string | null
           country?: string | null
@@ -1417,60 +1423,113 @@ export type Database = {
           application: string | null
           approved_at: string | null
           approved_by: string | null
+          assigned_to: string | null
+          budget_range: string | null
           calculator_state: Json | null
           company: string | null
+          converted_customer_id: string | null
+          converted_project_id: string | null
           country: string | null
           created_at: string
           email: string
           id: string
+          internal_notes: string | null
+          internal_score: number | null
           ip: string | null
           message: string | null
           name: string
+          next_action_date: string | null
           phone: string | null
+          priority: string
+          project_type: string | null
           source_page: string | null
           status: string
+          timeline: string | null
+          updated_at: string
+          updated_by: string | null
           user_agent: string | null
         }
         Insert: {
           application?: string | null
           approved_at?: string | null
           approved_by?: string | null
+          assigned_to?: string | null
+          budget_range?: string | null
           calculator_state?: Json | null
           company?: string | null
+          converted_customer_id?: string | null
+          converted_project_id?: string | null
           country?: string | null
           created_at?: string
           email: string
           id?: string
+          internal_notes?: string | null
+          internal_score?: number | null
           ip?: string | null
           message?: string | null
           name: string
+          next_action_date?: string | null
           phone?: string | null
+          priority?: string
+          project_type?: string | null
           source_page?: string | null
           status?: string
+          timeline?: string | null
+          updated_at?: string
+          updated_by?: string | null
           user_agent?: string | null
         }
         Update: {
           application?: string | null
           approved_at?: string | null
           approved_by?: string | null
+          assigned_to?: string | null
+          budget_range?: string | null
           calculator_state?: Json | null
           company?: string | null
+          converted_customer_id?: string | null
+          converted_project_id?: string | null
           country?: string | null
           created_at?: string
           email?: string
           id?: string
+          internal_notes?: string | null
+          internal_score?: number | null
           ip?: string | null
           message?: string | null
           name?: string
+          next_action_date?: string | null
           phone?: string | null
+          priority?: string
+          project_type?: string | null
           source_page?: string | null
           status?: string
+          timeline?: string | null
+          updated_at?: string
+          updated_by?: string | null
           user_agent?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "project_inquiries_converted_customer_id_fkey"
+            columns: ["converted_customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_inquiries_converted_project_id_fkey"
+            columns: ["converted_project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects: {
         Row: {
+          ai_summary: string | null
+          ai_summary_at: string | null
           country: string | null
           created_at: string
           customer_id: string | null
@@ -1481,6 +1540,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_summary?: string | null
+          ai_summary_at?: string | null
           country?: string | null
           created_at?: string
           customer_id?: string | null
@@ -1491,6 +1552,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_summary?: string | null
+          ai_summary_at?: string | null
           country?: string | null
           created_at?: string
           customer_id?: string | null

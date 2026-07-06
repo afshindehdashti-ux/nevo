@@ -91,6 +91,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as AuthenticatedAdminUsersInviteRouteImport } from './routes/_authenticated/admin.users.invite'
 import { Route as AuthenticatedAdminShipmentsIdRouteImport } from './routes/_authenticated/admin.shipments.$id'
 import { Route as AuthenticatedAdminOrdersIdRouteImport } from './routes/_authenticated/admin.orders.$id'
+import { Route as AuthenticatedAdminLeadsIdRouteImport } from './routes/_authenticated/admin.leads.$id'
 import { Route as AuthenticatedAdminInvoicesIdRouteImport } from './routes/_authenticated/admin.invoices.$id'
 import { Route as AuthenticatedAdminCustomersIdRouteImport } from './routes/_authenticated/admin.customers.$id'
 
@@ -539,6 +540,12 @@ const AuthenticatedAdminOrdersIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedAdminOrdersRoute,
   } as any)
+const AuthenticatedAdminLeadsIdRoute =
+  AuthenticatedAdminLeadsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminLeadsRoute,
+  } as any)
 const AuthenticatedAdminInvoicesIdRoute =
   AuthenticatedAdminInvoicesIdRouteImport.update({
     id: '/$id',
@@ -607,7 +614,7 @@ export interface FileRoutesByFullPath {
   '/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
-  '/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
   '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRouteWithChildren
@@ -630,6 +637,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
   '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
+  '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
@@ -690,7 +698,7 @@ export interface FileRoutesByTo {
   '/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
-  '/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
   '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRouteWithChildren
@@ -713,6 +721,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
   '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
+  '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
@@ -777,7 +786,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
   '/_authenticated/admin/files': typeof AuthenticatedAdminFilesRoute
   '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
-  '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
   '/_authenticated/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
   '/_authenticated/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRouteWithChildren
@@ -800,6 +809,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
   '/_authenticated/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
+  '/_authenticated/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
   '/_authenticated/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/_authenticated/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/_authenticated/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
@@ -887,6 +897,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/admin/customers/$id'
     | '/admin/invoices/$id'
+    | '/admin/leads/$id'
     | '/admin/orders/$id'
     | '/admin/shipments/$id'
     | '/admin/users/invite'
@@ -970,6 +981,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin/customers/$id'
     | '/admin/invoices/$id'
+    | '/admin/leads/$id'
     | '/admin/orders/$id'
     | '/admin/shipments/$id'
     | '/admin/users/invite'
@@ -1056,6 +1068,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/admin/customers/$id'
     | '/_authenticated/admin/invoices/$id'
+    | '/_authenticated/admin/leads/$id'
     | '/_authenticated/admin/orders/$id'
     | '/_authenticated/admin/shipments/$id'
     | '/_authenticated/admin/users/invite'
@@ -1662,6 +1675,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminOrdersIdRouteImport
       parentRoute: typeof AuthenticatedAdminOrdersRoute
     }
+    '/_authenticated/admin/leads/$id': {
+      id: '/_authenticated/admin/leads/$id'
+      path: '/$id'
+      fullPath: '/admin/leads/$id'
+      preLoaderRoute: typeof AuthenticatedAdminLeadsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminLeadsRoute
+    }
     '/_authenticated/admin/invoices/$id': {
       id: '/_authenticated/admin/invoices/$id'
       path: '/$id'
@@ -1705,6 +1725,20 @@ const AuthenticatedAdminInvoicesRouteChildren: AuthenticatedAdminInvoicesRouteCh
 const AuthenticatedAdminInvoicesRouteWithChildren =
   AuthenticatedAdminInvoicesRoute._addFileChildren(
     AuthenticatedAdminInvoicesRouteChildren,
+  )
+
+interface AuthenticatedAdminLeadsRouteChildren {
+  AuthenticatedAdminLeadsIdRoute: typeof AuthenticatedAdminLeadsIdRoute
+}
+
+const AuthenticatedAdminLeadsRouteChildren: AuthenticatedAdminLeadsRouteChildren =
+  {
+    AuthenticatedAdminLeadsIdRoute: AuthenticatedAdminLeadsIdRoute,
+  }
+
+const AuthenticatedAdminLeadsRouteWithChildren =
+  AuthenticatedAdminLeadsRoute._addFileChildren(
+    AuthenticatedAdminLeadsRouteChildren,
   )
 
 interface AuthenticatedAdminOrdersRouteChildren {
@@ -1760,7 +1794,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminDocumentIntelligenceRoute: typeof AuthenticatedAdminDocumentIntelligenceRoute
   AuthenticatedAdminFilesRoute: typeof AuthenticatedAdminFilesRoute
   AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRouteWithChildren
-  AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
+  AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRouteWithChildren
   AuthenticatedAdminLogoEventsRoute: typeof AuthenticatedAdminLogoEventsRoute
   AuthenticatedAdminOpportunitiesRoute: typeof AuthenticatedAdminOpportunitiesRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRouteWithChildren
@@ -1793,7 +1827,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
     AuthenticatedAdminDocumentIntelligenceRoute,
   AuthenticatedAdminFilesRoute: AuthenticatedAdminFilesRoute,
   AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRouteWithChildren,
-  AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
+  AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRouteWithChildren,
   AuthenticatedAdminLogoEventsRoute: AuthenticatedAdminLogoEventsRoute,
   AuthenticatedAdminOpportunitiesRoute: AuthenticatedAdminOpportunitiesRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRouteWithChildren,
@@ -1934,13 +1968,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +19,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { formatMoney, formatDate } from "@/lib/crm-money";
 import {
   invoiceStatusVariant,
@@ -29,6 +31,7 @@ import {
   shipmentStatusLabel,
 } from "@/lib/crm-status";
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
+import { generateEntitySummary } from "@/lib/ai-summary.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/customers/$id")({
   head: () => ({
@@ -39,6 +42,8 @@ export const Route = createFileRoute("/_authenticated/admin/customers/$id")({
 
 function CustomerDetailPage() {
   const { id } = useParams({ from: "/_authenticated/admin/customers/$id" });
+  const qc = useQueryClient();
+  const generateSummary = useServerFn(generateEntitySummary);
 
   const { data: customer, isLoading } = useQuery({
     queryKey: ["customer", id],
@@ -51,6 +56,16 @@ function CustomerDetailPage() {
       if (error) throw error;
       return data;
     },
+  });
+
+  const summaryMutation = useMutation({
+    mutationFn: async () =>
+      await generateSummary({ data: { entity: "customer" as const, id } }),
+    onSuccess: () => {
+      toast.success("AI summary updated");
+      qc.invalidateQueries({ queryKey: ["customer", id] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "AI failed"),
   });
 
   const { data: orders = [] } = useQuery({
@@ -157,6 +172,45 @@ function CustomerDetailPage() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
+          <Card className="border-primary/30">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                AI summary
+              </CardTitle>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => summaryMutation.mutate()}
+                disabled={summaryMutation.isPending}
+              >
+                {summaryMutation.isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                ) : (
+                  <Sparkles className="h-3.5 w-3.5 mr-1" />
+                )}
+                {customer.ai_summary ? "Regenerate" : "Generate"}
+              </Button>
+            </CardHeader>
+            <CardContent className="text-sm">
+              {customer.ai_summary ? (
+                <>
+                  <p className="whitespace-pre-wrap leading-relaxed">{customer.ai_summary}</p>
+                  {customer.ai_summary_at && (
+                    <p className="text-[11px] text-muted-foreground mt-3">
+                      Generated {formatDate(customer.ai_summary_at)}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p className="text-muted-foreground">
+                  Generate a live AI briefing based on this customer's orders, invoices, and
+                  shipments.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Contact & billing</CardTitle>
