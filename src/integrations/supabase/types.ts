@@ -423,6 +423,84 @@ export type Database = {
           },
         ]
       }
+      doc_intel_routing_rules: {
+        Row: {
+          action_add_tags: string[]
+          action_block_public: boolean
+          action_min_confidence: number | null
+          action_require_approval: boolean
+          action_set_confidentiality: string | null
+          action_set_destination: string | null
+          action_set_folder_path: string | null
+          action_set_visibility: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          enabled: boolean
+          id: string
+          match_categories: string[]
+          match_confidentiality: string[]
+          match_doc_type_ilike: string | null
+          match_filename_ilike: string | null
+          match_keywords: string[]
+          match_visibility: string[]
+          name: string
+          priority: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          action_add_tags?: string[]
+          action_block_public?: boolean
+          action_min_confidence?: number | null
+          action_require_approval?: boolean
+          action_set_confidentiality?: string | null
+          action_set_destination?: string | null
+          action_set_folder_path?: string | null
+          action_set_visibility?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          match_categories?: string[]
+          match_confidentiality?: string[]
+          match_doc_type_ilike?: string | null
+          match_filename_ilike?: string | null
+          match_keywords?: string[]
+          match_visibility?: string[]
+          name: string
+          priority?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          action_add_tags?: string[]
+          action_block_public?: boolean
+          action_min_confidence?: number | null
+          action_require_approval?: boolean
+          action_set_confidentiality?: string | null
+          action_set_destination?: string | null
+          action_set_folder_path?: string | null
+          action_set_visibility?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          match_categories?: string[]
+          match_confidentiality?: string[]
+          match_doc_type_ilike?: string | null
+          match_filename_ilike?: string | null
+          match_keywords?: string[]
+          match_visibility?: string[]
+          name?: string
+          priority?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       doc_intel_tags: {
         Row: {
           created_at: string
