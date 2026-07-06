@@ -163,7 +163,12 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
   const [composeBody, setComposeBody] = useState("");
   const [composeFiles, setComposeFiles] = useState<File[]>([]);
   const [replyParentId, setReplyParentId] = useState<string | null>(null);
+  const [messageSearch, setMessageSearch] = useState("");
+  const [messageKindFilter, setMessageKindFilter] = useState<"all" | "email" | "whatsapp" | "note">("all");
+  const [messageReadFilter, setMessageReadFilter] = useState<"all" | "unread" | "read">("all");
+  const [messageSort, setMessageSort] = useState<"newest" | "oldest">("newest");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
 
   const sendMessage = useMutation({
     mutationFn: async (opts: { parentId?: string | null }) => {
