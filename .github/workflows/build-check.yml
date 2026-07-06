@@ -100,7 +100,7 @@ jobs:
       - name: ESLint
         id: lint
         # Run even if an earlier gate failed so contributors see all issues in one run.
-        # Lint is now blocking: any Error-level finding fails the build.
+        # Lint is now blocking: both errors and warnings fail the build (--max-warnings=0).
         if: always()
         run: |
           mkdir -p build-logs
