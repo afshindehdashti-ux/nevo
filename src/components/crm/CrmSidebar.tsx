@@ -13,8 +13,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { CRM_NAV } from "@/lib/crm-nav";
-import { useIsSuperAdmin, useMyProfile, useCurrentUser } from "@/lib/crm-hooks";
+import { CRM_NAV, canSeeNavItem } from "@/lib/crm-nav";
+import { useIsSuperAdmin, useMyProfile, useCurrentUser, useMyRoles } from "@/lib/crm-hooks";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/nevo-logo-light.png";
@@ -26,6 +26,8 @@ export function CrmSidebar() {
   const isSuperAdmin = useIsSuperAdmin();
   const { data: profile } = useMyProfile();
   const { data: user } = useCurrentUser();
+  const { data: roles } = useMyRoles();
+  const effectiveRoles = roles ?? [];
 
   const isActive = (url: string) =>
     url === "/admin" ? pathname === "/admin" : pathname === url || pathname.startsWith(url + "/");
@@ -53,7 +55,7 @@ export function CrmSidebar() {
 
       <SidebarContent>
         {CRM_NAV.map((group) => {
-          const items = group.items.filter((i) => !i.requiresSuperAdmin || isSuperAdmin);
+          const items = group.items.filter((i) => canSeeNavItem(i, effectiveRoles));
           if (items.length === 0) return null;
           return (
             <SidebarGroup key={group.label}>
