@@ -330,6 +330,7 @@ const SendMessageInput = z.object({
   subject: z.string().max(300).nullable().optional(),
   body: z.string().min(1).max(20000),
   attachments: z.array(AttachmentInput).max(10).optional(),
+  parent_id: z.string().uuid().nullable().optional(),
 });
 
 export const sendMyMessage = createServerFn({ method: "POST" })
