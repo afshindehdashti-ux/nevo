@@ -12,6 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 import { brand, styles } from './_shared'
+import { BrandHeader } from './BrandHeader'
 
 interface SignupEmailProps {
   siteName: string
@@ -26,10 +27,7 @@ export const SignupEmail = ({ recipient, confirmationUrl }: SignupEmailProps) =>
     <Preview>Confirm your email for NEVO Industrial</Preview>
     <Body style={styles.main}>
       <Container style={styles.container}>
-        <Section style={styles.header}>
-          <Text style={styles.brandMark}>{brand.name}</Text>
-          <Text style={styles.brandTagline}>{brand.tagline}</Text>
-        </Section>
+        <BrandHeader />
 
         <Section style={styles.card}>
           <Heading style={styles.h1}>Confirm your email</Heading>

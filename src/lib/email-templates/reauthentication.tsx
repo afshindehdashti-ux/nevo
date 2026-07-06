@@ -10,6 +10,7 @@ import {
   Text,
 } from '@react-email/components'
 import { brand, styles } from './_shared'
+import { BrandHeader } from './BrandHeader'
 
 interface ReauthenticationEmailProps {
   token: string
@@ -21,10 +22,7 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
     <Preview>Your NEVO Industrial verification code</Preview>
     <Body style={styles.main}>
       <Container style={styles.container}>
-        <Section style={styles.header}>
-          <Text style={styles.brandMark}>{brand.name}</Text>
-          <Text style={styles.brandTagline}>{brand.tagline}</Text>
-        </Section>
+        <BrandHeader />
 
         <Section style={styles.card}>
           <Heading style={styles.h1}>Confirm it's you</Heading>

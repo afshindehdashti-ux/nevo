@@ -12,6 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 import { brand, styles } from './_shared'
+import { BrandHeader } from './BrandHeader'
 import type { TemplateEntry } from './registry'
 
 export type ApprovalEmailKind = 'submitted' | 'approved' | 'rejected' | 'cancelled'
@@ -68,10 +69,7 @@ export const ApprovalNotificationEmail = ({
       <Preview>{PREVIEW[kind]}</Preview>
       <Body style={styles.main}>
         <Container style={styles.container}>
-          <Section style={styles.header}>
-            <Text style={styles.brandMark}>{brand.name}</Text>
-            <Text style={styles.brandTagline}>{brand.tagline}</Text>
-          </Section>
+          <BrandHeader />
 
           <Section style={styles.card}>
             <Heading style={styles.h1}>{headline}</Heading>
