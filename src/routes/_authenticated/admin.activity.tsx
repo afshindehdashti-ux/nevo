@@ -31,8 +31,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ShieldAlert, ScrollText, Search } from "lucide-react";
+import { ShieldAlert, ScrollText, Search, Download } from "lucide-react";
 import { format } from "date-fns";
+import type { Database } from "@/integrations/supabase/types";
+
+type AppRole = Database["public"]["Enums"]["app_role"];
+
+const ROLE_OPTIONS: { value: string; label: string }[] = [
+  { value: "all", label: "All roles" },
+  { value: "super_admin", label: "Super Admin" },
+  { value: "management", label: "Management" },
+  { value: "sales", label: "Sales" },
+  { value: "operations", label: "Operations" },
+  { value: "finance", label: "Finance" },
+  { value: "read_only", label: "Read Only" },
+  { value: "none", label: "No role / system" },
+];
 
 type LogRow = {
   id: string;
@@ -79,12 +93,15 @@ function ActivityPage() {
   const [actor, setActor] = useState<string>("all");
   const [action, setAction] = useState<string>("all");
   const [entity, setEntity] = useState<string>("all");
+  const [role, setRole] = useState<string>("all");
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<LogRow | null>(null);
 
   const logsQ = useQuery({
     enabled: isSuperAdmin,
-    queryKey: ["activity-logs", { actor, action, entity }],
+    queryKey: ["activity-logs", { actor, action, entity, dateFrom, dateTo }],
     queryFn: async () => {
       let q = supabase
         .from("activity_logs")
@@ -94,11 +111,18 @@ function ActivityPage() {
       if (actor !== "all") q = actor === "system" ? q.is("user_id", null) : q.eq("user_id", actor);
       if (action !== "all") q = q.eq("action", action);
       if (entity !== "all") q = q.eq("entity_type", entity);
+      if (dateFrom) q = q.gte("created_at", new Date(dateFrom).toISOString());
+      if (dateTo) {
+        const end = new Date(dateTo);
+        end.setHours(23, 59, 59, 999);
+        q = q.lte("created_at", end.toISOString());
+      }
       const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as LogRow[];
     },
   });
+
 
   const actorIds = useMemo(() => {
     const ids = new Set<string>();
@@ -121,6 +145,25 @@ function ActivityPage() {
     },
   });
 
+  const rolesQ = useQuery({
+    enabled: isSuperAdmin && actorIds.length > 0,
+    queryKey: ["activity-log-actor-roles", actorIds.sort().join(",")],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("user_id, role")
+        .in("user_id", actorIds);
+      if (error) throw error;
+      const map = new Map<string, AppRole[]>();
+      (data ?? []).forEach((r) => {
+        const arr = map.get(r.user_id) ?? [];
+        arr.push(r.role as AppRole);
+        map.set(r.user_id, arr);
+      });
+      return map;
+    },
+  });
+
   const actorOptions = useMemo(() => {
     const opts: { value: string; label: string }[] = [
       { value: "all", label: "All actors" },
@@ -132,9 +175,19 @@ function ActivityPage() {
 
   const filteredRows = useMemo(() => {
     const rows = logsQ.data ?? [];
-    if (!search.trim()) return rows;
-    const q = search.toLowerCase();
+    const q = search.trim().toLowerCase();
     return rows.filter((r) => {
+      // Role filter
+      if (role !== "all") {
+        if (role === "none") {
+          if (r.user_id) return false;
+        } else {
+          if (!r.user_id) return false;
+          const rs = rolesQ.data?.get(r.user_id) ?? [];
+          if (!rs.includes(role as AppRole)) return false;
+        }
+      }
+      if (!q) return true;
       const meta = JSON.stringify(r.metadata).toLowerCase();
       return (
         (r.entity_id ?? "").toLowerCase().includes(q) ||
@@ -143,7 +196,38 @@ function ActivityPage() {
         meta.includes(q)
       );
     });
-  }, [logsQ.data, search]);
+  }, [logsQ.data, search, role, rolesQ.data]);
+
+  function exportCsv() {
+    const header = ["when", "actor_id", "actor_name", "actor_roles", "action", "entity_type", "entity_id", "ip", "country", "metadata"];
+    const escape = (v: unknown) => {
+      const s = v === null || v === undefined ? "" : typeof v === "string" ? v : JSON.stringify(v);
+      return `"${s.replace(/"/g, '""')}"`;
+    };
+    const lines = [header.join(",")];
+    filteredRows.forEach((r) => {
+      const md = r.metadata as { ip?: string | null; country?: string | null };
+      lines.push([
+        format(new Date(r.created_at), "yyyy-MM-dd HH:mm:ss"),
+        r.user_id ?? "",
+        r.user_id ? profilesQ.data?.get(r.user_id) ?? "" : "system",
+        r.user_id ? (rolesQ.data?.get(r.user_id) ?? []).join("|") : "",
+        r.action,
+        r.entity_type ?? "",
+        r.entity_id ?? "",
+        md?.ip ?? "",
+        md?.country ?? "",
+        r.metadata,
+      ].map(escape).join(","));
+    });
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `activity-log-${format(new Date(), "yyyyMMdd-HHmmss")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   if (rolesLoading) {
     return (
@@ -167,14 +251,20 @@ function ActivityPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <ScrollText className="h-6 w-6 text-primary" />
-        <div>
-          <h1 className="text-2xl font-semibold">Activity Log</h1>
-          <p className="text-sm text-muted-foreground">
-            Every important action across the CRM — creates, edits, approvals, deletes.
-          </p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <ScrollText className="h-6 w-6 text-primary" />
+          <div>
+            <h1 className="text-2xl font-semibold">Activity Log</h1>
+            <p className="text-sm text-muted-foreground">
+              Every important action across the CRM — creates, edits, approvals, deletes.
+            </p>
+          </div>
         </div>
+        <Button variant="outline" size="sm" onClick={exportCsv} disabled={!filteredRows.length}>
+          <Download className="h-4 w-4 mr-2" />
+          Export CSV
+        </Button>
       </div>
 
       <Card>
@@ -184,7 +274,26 @@ function ActivityPage() {
             Narrow the log by actor, action type or record type. Showing latest 500 matches.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-4">
+        <CardContent className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+          <div className="space-y-1">
+            <Label>Role</Label>
+            <Select value={role} onValueChange={setRole}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {ROLE_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label>From</Label>
+            <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label>To</Label>
+            <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+          </div>
           <div className="space-y-1">
             <Label>Actor</Label>
             <Select value={actor} onValueChange={setActor}>
