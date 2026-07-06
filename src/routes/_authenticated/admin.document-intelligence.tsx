@@ -785,9 +785,17 @@ function DocumentDrawer({ id, onClose }: { id: string | null; onClose: () => voi
               </div>
             </div>
 
+            <AiSuggestionsPanel
+              analysis={data?.extract?.extracted_json as Record<string, unknown> | undefined}
+              confidence={doc.ai_confidence ?? null}
+              reasoning={doc.ai_reasoning ?? null}
+              onApply={(patch) => setEdited((p) => ({ ...p, ...patch }))}
+            />
+
             <Separator />
 
             <div className="space-y-3">
+
               <FieldRow label="Recommended title">
                 <Input
                   value={currentEdits.title}
@@ -998,6 +1006,226 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
     <div className="grid grid-cols-[160px_1fr] items-start gap-3">
       <Label className="text-xs pt-2">{label}</Label>
       <div>{children}</div>
+    </div>
+  );
+}
+
+function AiSuggestionsPanel({
+  analysis,
+  confidence,
+  reasoning,
+  onApply,
+}: {
+  analysis: Record<string, unknown> | undefined;
+  confidence: number | null;
+  reasoning: string | null;
+  onApply: (patch: Record<string, unknown>) => void;
+}) {
+  if (!analysis) {
+    return (
+      <div className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
+        <Brain className="inline h-3.5 w-3.5 mr-1" />
+        No AI analysis yet. Run analysis to populate suggestions.
+      </div>
+    );
+  }
+
+  const conf = typeof confidence === "number" ? confidence : null;
+  const confTone =
+    conf === null ? "muted" : conf >= 0.85 ? "ok" : conf >= 0.6 ? "warn" : "bad";
+  const confLabel =
+    conf === null
+      ? "Unknown confidence"
+      : conf >= 0.85
+        ? "High confidence"
+        : conf >= 0.6
+          ? "Medium confidence — verify below"
+          : "Low confidence — manual review required";
+
+  const suggested = {
+    title: (analysis.document_title as string) ?? "",
+    stored_filename: (analysis.recommended_filename as string) ?? "",
+    category: (analysis.category as string) ?? "",
+    destination: (analysis.recommended_destination as string) ?? "",
+    folder_path: (analysis.recommended_folder_path as string) ?? "",
+    confidentiality_level: (analysis.confidentiality_level as string) ?? "internal",
+    portal_visibility: (analysis.portal_visibility as string) ?? "none",
+    summary: (analysis.summary as string) ?? "",
+  };
+
+  const signals: [string, unknown, string][] = [
+    ["Type", analysis.document_type, "The kind of document the AI detected."],
+    ["Company", analysis.detected_company, "Company mentioned as issuer or owner."],
+    ["Customer", analysis.detected_customer, "Customer named in the document."],
+    ["Project", analysis.detected_project, "Project reference found in the text."],
+    ["Country", analysis.detected_country, "Country of origin or destination."],
+    ["Language", analysis.detected_language, "Primary language of the content."],
+    ["Business area", analysis.related_business_area, "NEVO business unit this belongs to."],
+  ];
+
+  const products = (analysis.detected_products as string[] | undefined) ?? [];
+  const standards = (analysis.detected_standards as string[] | undefined) ?? [];
+  const tags = (analysis.tags as string[] | undefined) ?? [];
+
+  const toneClass =
+    confTone === "ok"
+      ? "border-emerald-300 bg-emerald-50 dark:bg-emerald-950/20"
+      : confTone === "warn"
+        ? "border-amber-300 bg-amber-50 dark:bg-amber-950/20"
+        : confTone === "bad"
+          ? "border-red-300 bg-red-50 dark:bg-red-950/20"
+          : "border-muted bg-muted/20";
+
+  return (
+    <div className={`rounded-md border p-3 space-y-3 text-xs ${toneClass}`}>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Brain className="h-4 w-4 text-primary" />
+          <span className="font-medium">AI review panel</span>
+        </div>
+        <span className="font-medium">
+          {confLabel}
+          {conf !== null && ` · ${Math.round(conf * 100)}%`}
+        </span>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        <SuggestField
+          label="Title"
+          value={suggested.title}
+          hint="Human-readable title derived from headings and body."
+          onApply={() => onApply({ title: suggested.title })}
+        />
+        <SuggestField
+          label="Filename"
+          value={suggested.stored_filename}
+          hint="Professional filename: type_customer_project_date convention."
+          onApply={() => onApply({ stored_filename: suggested.stored_filename })}
+        />
+        <SuggestField
+          label="Destination"
+          value={suggested.destination}
+          hint="Where this document should live: internal library or portal."
+          onApply={() => onApply({ destination: suggested.destination })}
+        />
+        <SuggestField
+          label="Folder path"
+          value={suggested.folder_path}
+          hint="Suggested folder inside the destination."
+          onApply={() => onApply({ folder_path: suggested.folder_path })}
+        />
+        <SuggestField
+          label="Category"
+          value={suggested.category}
+          hint="Business category used for filtering and routing."
+          onApply={() => onApply({ category: suggested.category })}
+        />
+        <SuggestField
+          label="Confidentiality"
+          value={suggested.confidentiality_level}
+          hint="How sensitive the AI thinks the content is."
+          onApply={() =>
+            onApply({ confidentiality_level: suggested.confidentiality_level })
+          }
+        />
+        <SuggestField
+          label="Portal visibility"
+          value={suggested.portal_visibility}
+          hint="Who can see this once approved. Defaults to none unless clearly public."
+          onApply={() => onApply({ portal_visibility: suggested.portal_visibility })}
+        />
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        {signals.map(([k, v, hint]) => (
+          <div key={k} className="border rounded-md p-2 bg-background/60">
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">{k}</span>
+              <Info className="h-3 w-3 text-muted-foreground" aria-label={hint} />
+            </div>
+            <p className="font-medium truncate">
+              {typeof v === "string" && v ? v : <span className="text-muted-foreground">—</span>}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {(products.length > 0 || standards.length > 0 || tags.length > 0) && (
+        <div className="space-y-1.5">
+          {products.length > 0 && (
+            <ChipRow label="Products" items={products} />
+          )}
+          {standards.length > 0 && (
+            <ChipRow label="Standards" items={standards} />
+          )}
+          {tags.length > 0 && (
+            <div className="flex items-start gap-2 flex-wrap">
+              <span className="text-muted-foreground">Tags</span>
+              {tags.map((t) => (
+                <Badge key={t} variant="secondary" className="text-[10px]">
+                  {t}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {reasoning && (
+        <details>
+          <summary className="cursor-pointer text-muted-foreground">
+            Why the AI suggested this
+          </summary>
+          <p className="mt-1 whitespace-pre-wrap border rounded-md p-2 bg-background/60">
+            {reasoning}
+          </p>
+        </details>
+      )}
+    </div>
+  );
+}
+
+function SuggestField({
+  label,
+  value,
+  hint,
+  onApply,
+}: {
+  label: string;
+  value: string;
+  hint: string;
+  onApply: () => void;
+}) {
+  return (
+    <div className="border rounded-md p-2 bg-background/60">
+      <div className="flex items-center justify-between">
+        <span className="text-muted-foreground">{label}</span>
+        <button
+          type="button"
+          onClick={onApply}
+          disabled={!value}
+          className="text-primary text-[10px] hover:underline disabled:opacity-40"
+        >
+          Apply
+        </button>
+      </div>
+      <p className="font-medium truncate" title={value}>
+        {value || <span className="text-muted-foreground">—</span>}
+      </p>
+      <p className="text-[10px] text-muted-foreground mt-0.5">{hint}</p>
+    </div>
+  );
+}
+
+function ChipRow({ label, items }: { label: string; items: string[] }) {
+  return (
+    <div className="flex items-start gap-2 flex-wrap">
+      <span className="text-muted-foreground">{label}</span>
+      {items.map((it) => (
+        <Badge key={it} variant="outline" className="text-[10px]">
+          {it}
+        </Badge>
+      ))}
     </div>
   );
 }
