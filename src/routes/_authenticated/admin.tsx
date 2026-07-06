@@ -68,7 +68,9 @@ function AdminLayout() {
             </div>
           </header>
           <main className="flex-1 overflow-auto">
-            <Outlet />
+            <AdminRouteGuard>
+              <Outlet />
+            </AdminRouteGuard>
           </main>
         </div>
       </div>
