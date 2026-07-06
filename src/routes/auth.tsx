@@ -25,8 +25,11 @@ function AuthPage() {
   const [resetMode, setResetMode] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/admin" });
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (data.user) {
+        const to = await resolveLandingRoute(data.user.id);
+        navigate({ to });
+      }
     });
   }, [navigate]);
 
@@ -43,9 +46,10 @@ function AuthPage() {
         if (error) throw error;
         setInfo("If that email is registered, a reset link has been sent.");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        navigate({ to: "/admin" });
+        const to = data.user ? await resolveLandingRoute(data.user.id) : "/admin";
+        navigate({ to });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign in failed");
