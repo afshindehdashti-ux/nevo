@@ -94,10 +94,22 @@ function SessionStatusPage() {
     };
   }, [user?.id]);
 
+  const {
+    data: history,
+    isLoading: historyLoading,
+    refetch: refetchHistory,
+  } = useQuery({
+    queryKey: ["crm", "sign-in-history", user?.id],
+    enabled: !!user?.id,
+    queryFn: () => getMySignInHistory(),
+    staleTime: 30_000,
+  });
+
   const mine: AppRole[] = roles ?? [];
   const isSuper = mine.includes("super_admin");
   const isAdminTier = isSuper || mine.includes("management");
   const loading = userLoading || rolesLoading || profileLoading;
+  const currentEvent = history?.[0] ?? null;
 
   async function handleSignOut() {
     await supabase.auth.signOut();
