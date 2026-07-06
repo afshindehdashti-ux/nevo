@@ -332,6 +332,35 @@ function getConfig(report: ReportKey): ReportConfig {
           { key: "created_at", header: "Created", format: fmtDate },
         ],
       };
+    case "leads_pipeline":
+      return {
+        statusOptions: [
+          "new",
+          "contacted",
+          "qualified",
+          "quotation_preparing",
+          "proposal_sent",
+          "negotiation",
+          "won",
+          "converted",
+          "lost",
+          "archived",
+        ],
+        columns: [
+          { key: "created_at", header: "Received", format: fmtDate },
+          { key: "name", header: "Contact" },
+          { key: "email", header: "Email" },
+          { key: "company", header: "Company" },
+          { key: "country", header: "Country" },
+          { key: "application", header: "Interest" },
+          { key: "status", header: "Status" },
+          { key: "priority", header: "Priority" },
+          { key: "assignee_name", header: "Assigned" },
+          { key: "internal_score", header: "Score", align: "right" },
+          { key: "next_action_date", header: "Next action", format: fmtDate },
+          { key: "budget_range", header: "Budget" },
+        ],
+      };
     case "sales_orders":
       return {
         statusOptions: [
