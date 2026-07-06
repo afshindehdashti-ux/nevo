@@ -200,9 +200,29 @@ export const analyzeDocument = createServerFn({ method: "POST" })
     // Sanitize AI recommendations against server-enforced policy
     const isSensitive = SENSITIVE_CATEGORIES.has(analysis.category);
     const lowConfidence = (analysis.confidence_score ?? 0) < 0.85;
-    const requiresApproval = isSensitive || lowConfidence || analysis.requires_human_approval;
+    let requiresApproval = isSensitive || lowConfidence || analysis.requires_human_approval;
     let visibility = analysis.portal_visibility;
+    let confidentiality = analysis.confidentiality_level;
+    let destination = analysis.recommended_destination;
+    let folderPath = analysis.recommended_folder_path;
     if (isSensitive && visibility === "public") visibility = "none";
+
+    // Apply admin-defined routing rules
+    const { fetchEnabledRules, applyRulesToAnalysis, snapshotFromAnalysis } = await import(
+      "./doc-intel-rules.server"
+    );
+    const rules = await fetchEnabledRules(context.supabase as never);
+    const snap = snapshotFromAnalysis(analysis, doc.original_filename);
+    const ruleOutcome = applyRulesToAnalysis(
+      { ...snap, confidentiality_level: confidentiality, portal_visibility: visibility },
+      rules,
+    );
+    confidentiality = ruleOutcome.confidentiality;
+    visibility = ruleOutcome.visibility;
+    destination = ruleOutcome.destination;
+    folderPath = ruleOutcome.folder_path;
+    if (ruleOutcome.requires_approval) requiresApproval = true;
+    const extraTags = ruleOutcome.added_tags;
 
     // Persist extraction + AI fields
     await context.supabase.from("doc_intel_extractions").insert({
@@ -220,10 +240,10 @@ export const analyzeDocument = createServerFn({ method: "POST" })
         document_type: analysis.document_type,
         category: analysis.category,
         language: analysis.detected_language ?? null,
-        destination: analysis.recommended_destination,
-        folder_path: analysis.recommended_folder_path,
+        destination: destination,
+        folder_path: folderPath,
         stored_filename: analysis.recommended_filename,
-        confidentiality_level: analysis.confidentiality_level,
+        confidentiality_level: confidentiality,
         portal_visibility: visibility,
         ai_confidence: analysis.confidence_score,
         ai_reasoning: analysis.reasoning,
@@ -238,12 +258,13 @@ export const analyzeDocument = createServerFn({ method: "POST" })
       .single();
     if (uErr) throw new Error(uErr.message);
 
-    // Refresh tags
+    // Refresh tags (AI tags + rule-added tags, deduped)
     await context.supabase.from("doc_intel_tags").delete().eq("document_id", doc.id);
-    if (analysis.tags.length > 0) {
+    const allTags = Array.from(new Set([...(analysis.tags ?? []), ...extraTags]));
+    if (allTags.length > 0) {
       await context.supabase
         .from("doc_intel_tags")
-        .insert(analysis.tags.map((tag) => ({ document_id: doc.id, tag })));
+        .insert(allTags.map((tag) => ({ document_id: doc.id, tag })));
     }
 
     await context.supabase.from("doc_intel_audit_logs").insert({
@@ -255,6 +276,7 @@ export const analyzeDocument = createServerFn({ method: "POST" })
         confidence: analysis.confidence_score,
         sensitive: isSensitive,
         note: extraction.note ?? null,
+        matched_rules: ruleOutcome.matched.map((m) => ({ id: m.id, name: m.name })),
       },
     });
 

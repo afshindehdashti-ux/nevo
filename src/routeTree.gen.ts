@@ -71,6 +71,7 @@ import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminFilesRouteImport } from './routes/_authenticated/admin.files'
 import { Route as AuthenticatedAdminDocumentIntelligenceRouteImport } from './routes/_authenticated/admin.document-intelligence'
 import { Route as AuthenticatedAdminDocumentAccessRouteImport } from './routes/_authenticated/admin.document-access'
+import { Route as AuthenticatedAdminDocIntelRulesRouteImport } from './routes/_authenticated/admin.doc-intel-rules'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
 import { Route as AuthenticatedAdminControlPanelRouteImport } from './routes/_authenticated/admin.control-panel'
 import { Route as AuthenticatedAdminCommissionInvoicesRouteImport } from './routes/_authenticated/admin.commission-invoices'
@@ -420,6 +421,12 @@ const AuthenticatedAdminDocumentAccessRoute =
     path: '/document-access',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminDocIntelRulesRoute =
+  AuthenticatedAdminDocIntelRulesRouteImport.update({
+    id: '/doc-intel-rules',
+    path: '/doc-intel-rules',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminCustomersRoute =
   AuthenticatedAdminCustomersRouteImport.update({
     id: '/customers',
@@ -581,6 +588,7 @@ export interface FileRoutesByFullPath {
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
+  '/admin/doc-intel-rules': typeof AuthenticatedAdminDocIntelRulesRoute
   '/admin/document-access': typeof AuthenticatedAdminDocumentAccessRoute
   '/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
@@ -661,6 +669,7 @@ export interface FileRoutesByTo {
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
+  '/admin/doc-intel-rules': typeof AuthenticatedAdminDocIntelRulesRoute
   '/admin/document-access': typeof AuthenticatedAdminDocumentAccessRoute
   '/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
@@ -745,6 +754,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/_authenticated/admin/control-panel': typeof AuthenticatedAdminControlPanelRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRouteWithChildren
+  '/_authenticated/admin/doc-intel-rules': typeof AuthenticatedAdminDocIntelRulesRoute
   '/_authenticated/admin/document-access': typeof AuthenticatedAdminDocumentAccessRoute
   '/_authenticated/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
   '/_authenticated/admin/files': typeof AuthenticatedAdminFilesRoute
@@ -829,6 +839,7 @@ export interface FileRouteTypes {
     | '/admin/commission-invoices'
     | '/admin/control-panel'
     | '/admin/customers'
+    | '/admin/doc-intel-rules'
     | '/admin/document-access'
     | '/admin/document-intelligence'
     | '/admin/files'
@@ -909,6 +920,7 @@ export interface FileRouteTypes {
     | '/admin/commission-invoices'
     | '/admin/control-panel'
     | '/admin/customers'
+    | '/admin/doc-intel-rules'
     | '/admin/document-access'
     | '/admin/document-intelligence'
     | '/admin/files'
@@ -992,6 +1004,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/commission-invoices'
     | '/_authenticated/admin/control-panel'
     | '/_authenticated/admin/customers'
+    | '/_authenticated/admin/doc-intel-rules'
     | '/_authenticated/admin/document-access'
     | '/_authenticated/admin/document-intelligence'
     | '/_authenticated/admin/files'
@@ -1483,6 +1496,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDocumentAccessRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/doc-intel-rules': {
+      id: '/_authenticated/admin/doc-intel-rules'
+      path: '/doc-intel-rules'
+      fullPath: '/admin/doc-intel-rules'
+      preLoaderRoute: typeof AuthenticatedAdminDocIntelRulesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/customers': {
       id: '/_authenticated/admin/customers'
       path: '/customers'
@@ -1695,6 +1715,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCommissionInvoicesRoute: typeof AuthenticatedAdminCommissionInvoicesRoute
   AuthenticatedAdminControlPanelRoute: typeof AuthenticatedAdminControlPanelRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRouteWithChildren
+  AuthenticatedAdminDocIntelRulesRoute: typeof AuthenticatedAdminDocIntelRulesRoute
   AuthenticatedAdminDocumentAccessRoute: typeof AuthenticatedAdminDocumentAccessRoute
   AuthenticatedAdminDocumentIntelligenceRoute: typeof AuthenticatedAdminDocumentIntelligenceRoute
   AuthenticatedAdminFilesRoute: typeof AuthenticatedAdminFilesRoute
@@ -1725,6 +1746,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminControlPanelRoute: AuthenticatedAdminControlPanelRoute,
   AuthenticatedAdminCustomersRoute:
     AuthenticatedAdminCustomersRouteWithChildren,
+  AuthenticatedAdminDocIntelRulesRoute: AuthenticatedAdminDocIntelRulesRoute,
   AuthenticatedAdminDocumentAccessRoute: AuthenticatedAdminDocumentAccessRoute,
   AuthenticatedAdminDocumentIntelligenceRoute:
     AuthenticatedAdminDocumentIntelligenceRoute,
