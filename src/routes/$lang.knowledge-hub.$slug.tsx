@@ -16,52 +16,56 @@ import { Button } from "@/components/ui/button";
 import { SITE, buildSeo } from "@/lib/seo";
 import { ARTICLES, ARTICLES_BY_SLUG, type Article } from "@/lib/knowledge-articles";
 
+function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+  const router = useRouter();
+  return (
+    <div className="min-h-screen bg-[#05070a] text-white grid place-items-center p-8">
+      <div className="max-w-md text-center">
+        <h1 className="text-2xl font-semibold">Something went wrong</h1>
+        <p className="mt-3 text-sm text-white/60">{error.message}</p>
+        <div className="mt-6 flex justify-center gap-3">
+          <Button
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
+            className="bg-emerald-500 text-black"
+          >
+            Retry
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/knowledge-hub">Back to Knowledge Hub</Link>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NotFoundComponent() {
+  const { slug } = useParams({ strict: false });
+  return (
+    <div className="min-h-screen bg-[#05070a] text-white grid place-items-center p-8">
+      <div className="max-w-md text-center">
+        <div className="text-[10px] font-mono uppercase tracking-widest text-emerald-400">
+          404
+        </div>
+        <h1 className="mt-2 text-2xl font-semibold">Article "{slug}" not found</h1>
+        <p className="mt-3 text-sm text-white/60">The article may have moved or been archived.</p>
+        <div className="mt-6">
+          <Button asChild className="bg-emerald-500 text-black">
+            <Link to="/knowledge-hub">Browse Knowledge Hub</Link>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/$lang/knowledge-hub/$slug")({
   component: ArticlePage,
-  errorComponent: ({ error, reset }) => {
-    const router = useRouter();
-    return (
-      <div className="min-h-screen bg-[#05070a] text-white grid place-items-center p-8">
-        <div className="max-w-md text-center">
-          <h1 className="text-2xl font-semibold">Something went wrong</h1>
-          <p className="mt-3 text-sm text-white/60">{error.message}</p>
-          <div className="mt-6 flex justify-center gap-3">
-            <Button
-              onClick={() => {
-                router.invalidate();
-                reset();
-              }}
-              className="bg-emerald-500 text-black"
-            >
-              Retry
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/knowledge-hub">Back to Knowledge Hub</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  },
-  notFoundComponent: () => {
-    const { slug } = Route.useParams();
-    return (
-      <div className="min-h-screen bg-[#05070a] text-white grid place-items-center p-8">
-        <div className="max-w-md text-center">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-emerald-400">
-            404
-          </div>
-          <h1 className="mt-2 text-2xl font-semibold">Article "{slug}" not found</h1>
-          <p className="mt-3 text-sm text-white/60">The article may have moved or been archived.</p>
-          <div className="mt-6">
-            <Button asChild className="bg-emerald-500 text-black">
-              <Link to="/knowledge-hub">Browse Knowledge Hub</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  },
+  errorComponent: ErrorComponent,
+  notFoundComponent: NotFoundComponent,
   loader: ({ params }) => {
     const article = ARTICLES_BY_SLUG[params.slug];
     if (!article) throw notFound();
