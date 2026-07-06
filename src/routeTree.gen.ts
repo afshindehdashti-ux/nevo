@@ -49,7 +49,6 @@ import { Route as LangAiAssistantRouteImport } from './routes/$lang.ai-assistant
 import { Route as LangAboutRouteImport } from './routes/$lang.about'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as LangSolutionsIndexRouteImport } from './routes/$lang.solutions.index'
-import { Route as ApiPublicSetUserCredRouteImport } from './routes/api/public/set-user-cred'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicClientLogRouteImport } from './routes/api/public/client-log'
 import { Route as ApiPublicBootstrapSuperAdminRouteImport } from './routes/api/public/bootstrap-super-admin'
@@ -284,11 +283,6 @@ const LangSolutionsIndexRoute = LangSolutionsIndexRouteImport.update({
   id: '/solutions/',
   path: '/solutions/',
   getParentRoute: () => LangRoute,
-} as any)
-const ApiPublicSetUserCredRoute = ApiPublicSetUserCredRouteImport.update({
-  id: '/api/public/set-user-cred',
-  path: '/api/public/set-user-cred',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
@@ -537,7 +531,6 @@ export interface FileRoutesByFullPath {
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
-  '/api/public/set-user-cred': typeof ApiPublicSetUserCredRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
@@ -608,7 +601,6 @@ export interface FileRoutesByTo {
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
-  '/api/public/set-user-cred': typeof ApiPublicSetUserCredRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
@@ -683,7 +675,6 @@ export interface FileRoutesById {
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/health': typeof ApiPublicHealthRoute
-  '/api/public/set-user-cred': typeof ApiPublicSetUserCredRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
@@ -758,7 +749,6 @@ export interface FileRouteTypes {
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
-    | '/api/public/set-user-cred'
     | '/$lang/solutions/'
     | '/admin/'
     | '/admin/users/invite'
@@ -829,7 +819,6 @@ export interface FileRouteTypes {
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
-    | '/api/public/set-user-cred'
     | '/$lang/solutions'
     | '/admin'
     | '/admin/users/invite'
@@ -903,7 +892,6 @@ export interface FileRouteTypes {
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
     | '/api/public/health'
-    | '/api/public/set-user-cred'
     | '/$lang/solutions/'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/users/invite'
@@ -926,7 +914,6 @@ export interface RootRouteChildren {
   ApiPublicBootstrapSuperAdminRoute: typeof ApiPublicBootstrapSuperAdminRoute
   ApiPublicClientLogRoute: typeof ApiPublicClientLogRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
-  ApiPublicSetUserCredRoute: typeof ApiPublicSetUserCredRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
@@ -1211,13 +1198,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/$lang/solutions/'
       preLoaderRoute: typeof LangSolutionsIndexRouteImport
       parentRoute: typeof LangRoute
-    }
-    '/api/public/set-user-cred': {
-      id: '/api/public/set-user-cred'
-      path: '/api/public/set-user-cred'
-      fullPath: '/api/public/set-user-cred'
-      preLoaderRoute: typeof ApiPublicSetUserCredRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/api/public/health': {
       id: '/api/public/health'
@@ -1615,7 +1595,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicBootstrapSuperAdminRoute: ApiPublicBootstrapSuperAdminRoute,
   ApiPublicClientLogRoute: ApiPublicClientLogRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
-  ApiPublicSetUserCredRoute: ApiPublicSetUserCredRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
