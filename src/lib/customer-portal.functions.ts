@@ -211,10 +211,10 @@ export const getMyMessages = createServerFn({ method: "GET" })
 
     const { data: rows, error } = await admin
       .from("communications")
-      .select("id, entity_type, entity_id, kind, direction, subject, body, occurred_at, contact_name, attachments")
+      .select("id, entity_type, entity_id, kind, direction, subject, body, occurred_at, contact_name, attachments, thread_id, parent_id")
       .or(filters.join(","))
-      .order("occurred_at", { ascending: false })
-      .limit(200);
+      .order("occurred_at", { ascending: true })
+      .limit(500);
     if (error) throw new Error(error.message);
     return rows ?? [];
   });
@@ -330,6 +330,7 @@ const SendMessageInput = z.object({
   subject: z.string().max(300).nullable().optional(),
   body: z.string().min(1).max(20000),
   attachments: z.array(AttachmentInput).max(10).optional(),
+  parent_id: z.string().uuid().nullable().optional(),
 });
 
 export const sendMyMessage = createServerFn({ method: "POST" })
@@ -359,19 +360,50 @@ export const sendMyMessage = createServerFn({ method: "POST" })
       .eq("id", context.userId)
       .maybeSingle();
 
+    let parentEntityType: string | null = null;
+    let parentEntityId: string | null = null;
+    let parentSubject: string | null = null;
+    if (data.parent_id) {
+      const { data: parent, error: pErr } = await admin
+        .from("communications")
+        .select("id, entity_type, entity_id, subject")
+        .eq("id", data.parent_id)
+        .maybeSingle();
+      if (pErr) throw new Error(pErr.message);
+      if (!parent) throw new Error("Parent message not found");
+      // Verify the parent is visible to this customer via the same scoping used in getMyMessages
+      const scoped =
+        (parent.entity_type === "customer" && parent.entity_id === data.customer_id) ||
+        (parent.entity_type === "project" && (
+          await admin.from("projects").select("id").eq("customer_id", data.customer_id).eq("id", parent.entity_id).maybeSingle()
+        ).data) ||
+        (parent.entity_type === "order" && (
+          await admin.from("orders").select("id").eq("customer_id", data.customer_id).eq("id", parent.entity_id).maybeSingle()
+        ).data);
+      if (!scoped) throw new Error("Not authorized to reply to this message");
+      parentEntityType = parent.entity_type;
+      parentEntityId = parent.entity_id;
+      parentSubject = parent.subject;
+    }
+
+    const finalSubject =
+      data.subject ??
+      (parentSubject ? (parentSubject.startsWith("Re:") ? parentSubject : `Re: ${parentSubject}`) : null);
+
     const { data: row, error } = await admin
       .from("communications")
       .insert({
-        entity_type: "customer",
-        entity_id: data.customer_id,
+        entity_type: parentEntityType ?? "customer",
+        entity_id: parentEntityId ?? data.customer_id,
         kind: data.kind,
         direction: "inbound",
-        subject: data.subject ?? null,
+        subject: finalSubject,
         body: data.body,
         attachments: uploaded,
         contact_name: prof?.full_name ?? null,
         user_id: context.userId,
         occurred_at: new Date().toISOString(),
+        parent_id: data.parent_id ?? null,
       })
       .select("id")
       .single();
