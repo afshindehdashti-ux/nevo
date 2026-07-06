@@ -4,6 +4,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { CrmSidebar } from "@/components/crm/CrmSidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentUser } from "@/lib/crm-hooks";
+import { AdminRouteGuard } from "@/components/crm/AdminRouteGuard";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -67,7 +68,9 @@ function AdminLayout() {
             </div>
           </header>
           <main className="flex-1 overflow-auto">
-            <Outlet />
+            <AdminRouteGuard>
+              <Outlet />
+            </AdminRouteGuard>
           </main>
         </div>
       </div>
