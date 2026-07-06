@@ -566,6 +566,26 @@ function QuotationEditor() {
         </Table>
       </Card>
 
+      {(() => {
+        const maxDisc = data.items.reduce(
+          (m, it) => Math.max(m, Number(it.discount_pct) || 0),
+          0,
+        );
+        return (
+          <ApprovalPanel
+            entityType="quotation_discount"
+            entityId={id}
+            suggestedReason={`Quotation ${q.quotation_number ?? "(draft)"} — max line discount ${maxDisc}% · total ${q.currency} ${Number(q.total).toLocaleString()}`}
+            details={{
+              quotation_number: q.quotation_number,
+              max_discount_pct: maxDisc,
+              total: Number(q.total),
+              currency: q.currency,
+            }}
+          />
+        );
+      })()}
+
       <CommunicationTimeline entityType="quotation" entityId={id} />
     </div>
   );
