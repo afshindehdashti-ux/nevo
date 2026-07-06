@@ -563,6 +563,9 @@ function PartnerPortalPage() {
         </div>
       </section>
 
+      <section className="container mx-auto px-4 py-10">
+        <RoutedDocumentsList visibility="partner" title="Partner Documents" />
+      </section>
       <SiteFooter />
     </div>
   );
