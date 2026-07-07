@@ -1060,7 +1060,10 @@ function InvoiceDetailPage() {
     }
     const blob = new Blob([bytes], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const filename = `invoice-${invoice?.invoice_number ?? id}-purge-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+    // Include a short SHA-256 prefix in the filename so compliance workflows
+    // can match a file to its checksum without opening it.
+    const shortSha = sha256 ? sha256.slice(0, 12) : "nochecksum";
+    const filename = `invoice-${invoice?.invoice_number ?? id}-purge-audit-${new Date().toISOString().slice(0, 10)}-sha256-${shortSha}.csv`;
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
