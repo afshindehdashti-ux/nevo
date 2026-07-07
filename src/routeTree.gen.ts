@@ -90,6 +90,7 @@ import { Route as AuthenticatedAdminControlPanelRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminCommunicationsRouteImport } from './routes/_authenticated/admin.communications'
 import { Route as AuthenticatedAdminCommissionInvoicesRouteImport } from './routes/_authenticated/admin.commission-invoices'
 import { Route as AuthenticatedAdminChangePasswordRouteImport } from './routes/_authenticated/admin.change-password'
+import { Route as AuthenticatedAdminBackendHealthRouteImport } from './routes/_authenticated/admin.backend-health'
 import { Route as AuthenticatedAdminApprovalsRouteImport } from './routes/_authenticated/admin.approvals'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
 import { Route as LangSolutionsSandwichPanelsRouteImport } from './routes/$lang.solutions.sandwich-panels'
@@ -555,6 +556,12 @@ const AuthenticatedAdminChangePasswordRoute =
     path: '/change-password',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminBackendHealthRoute =
+  AuthenticatedAdminBackendHealthRouteImport.update({
+    id: '/backend-health',
+    path: '/backend-health',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminApprovalsRoute =
   AuthenticatedAdminApprovalsRouteImport.update({
     id: '/approvals',
@@ -777,6 +784,7 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/approvals': typeof AuthenticatedAdminApprovalsRouteWithChildren
+  '/admin/backend-health': typeof AuthenticatedAdminBackendHealthRoute
   '/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/admin/communications': typeof AuthenticatedAdminCommunicationsRoute
@@ -886,6 +894,7 @@ export interface FileRoutesByTo {
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/approvals': typeof AuthenticatedAdminApprovalsRouteWithChildren
+  '/admin/backend-health': typeof AuthenticatedAdminBackendHealthRoute
   '/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/admin/communications': typeof AuthenticatedAdminCommunicationsRoute
@@ -998,6 +1007,7 @@ export interface FileRoutesById {
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/_authenticated/admin/approvals': typeof AuthenticatedAdminApprovalsRouteWithChildren
+  '/_authenticated/admin/backend-health': typeof AuthenticatedAdminBackendHealthRoute
   '/_authenticated/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
   '/_authenticated/admin/commission-invoices': typeof AuthenticatedAdminCommissionInvoicesRoute
   '/_authenticated/admin/communications': typeof AuthenticatedAdminCommunicationsRoute
@@ -1111,6 +1121,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/sandwich-panels'
     | '/admin/activity'
     | '/admin/approvals'
+    | '/admin/backend-health'
     | '/admin/change-password'
     | '/admin/commission-invoices'
     | '/admin/communications'
@@ -1220,6 +1231,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/sandwich-panels'
     | '/admin/activity'
     | '/admin/approvals'
+    | '/admin/backend-health'
     | '/admin/change-password'
     | '/admin/commission-invoices'
     | '/admin/communications'
@@ -1331,6 +1343,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/sandwich-panels'
     | '/_authenticated/admin/activity'
     | '/_authenticated/admin/approvals'
+    | '/_authenticated/admin/backend-health'
     | '/_authenticated/admin/change-password'
     | '/_authenticated/admin/commission-invoices'
     | '/_authenticated/admin/communications'
@@ -1992,6 +2005,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminChangePasswordRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/backend-health': {
+      id: '/_authenticated/admin/backend-health'
+      path: '/backend-health'
+      fullPath: '/admin/backend-health'
+      preLoaderRoute: typeof AuthenticatedAdminBackendHealthRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/approvals': {
       id: '/_authenticated/admin/approvals'
       path: '/approvals'
@@ -2353,6 +2373,7 @@ const AuthenticatedAdminUsersRouteWithChildren =
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
   AuthenticatedAdminApprovalsRoute: typeof AuthenticatedAdminApprovalsRouteWithChildren
+  AuthenticatedAdminBackendHealthRoute: typeof AuthenticatedAdminBackendHealthRoute
   AuthenticatedAdminChangePasswordRoute: typeof AuthenticatedAdminChangePasswordRoute
   AuthenticatedAdminCommissionInvoicesRoute: typeof AuthenticatedAdminCommissionInvoicesRoute
   AuthenticatedAdminCommunicationsRoute: typeof AuthenticatedAdminCommunicationsRoute
@@ -2390,6 +2411,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
   AuthenticatedAdminApprovalsRoute:
     AuthenticatedAdminApprovalsRouteWithChildren,
+  AuthenticatedAdminBackendHealthRoute: AuthenticatedAdminBackendHealthRoute,
   AuthenticatedAdminChangePasswordRoute: AuthenticatedAdminChangePasswordRoute,
   AuthenticatedAdminCommissionInvoicesRoute:
     AuthenticatedAdminCommissionInvoicesRoute,
