@@ -1110,6 +1110,16 @@ function InvoiceDetailPage() {
                 disabled={emailSending}
               />
             </div>
+            <div>
+              <Label>Internal PDF note (optional)</Label>
+              <Input
+                value={pdfNote}
+                onChange={(e) => setPdfNote(e.target.value)}
+                maxLength={500}
+                placeholder="Saved with the archived PDF version. Not sent to the customer."
+                disabled={emailSending}
+              />
+            </div>
             <p className="text-xs text-muted-foreground">
               The current PDF is uploaded to secure storage and shared via a
               7-day download link. The audit log records who sent it.
