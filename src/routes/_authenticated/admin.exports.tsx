@@ -649,7 +649,7 @@ function ExportsHistoryPage() {
           }
         }}
       >
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Export details</DialogTitle>
             <DialogDescription>
