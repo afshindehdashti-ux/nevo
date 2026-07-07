@@ -250,25 +250,105 @@ function MailboxSettings() {
         <TabsContent value="gmail" className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Gmail / Google Workspace</CardTitle>
+              <CardTitle className="text-base">Gmail / Google Workspace (OAuth)</CardTitle>
               <CardDescription>
-                For full OAuth Gmail support (labels, threading, native reply), the Google Mail connector must
-                be linked at the workspace level. If you'd rather use username + password, switch to the IMAP
-                tab with <span className="font-mono">imap.gmail.com : 993</span> and a Google App Password.
+                Connect via your own Google Cloud OAuth client. Create one at{" "}
+                <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noreferrer" className="underline">
+                  Google Cloud Console → Credentials
+                </a>{" "}
+                (Application type: Web) and add the redirect URI below.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="gmail">Mailbox email</Label>
-                <Input id="gmail" type="email" placeholder="info@nevoindustrial.com" value={gmailEmail} onChange={(e) => setGmailEmail(e.target.value)} maxLength={255} />
+                <Label>Authorized redirect URI</Label>
+                <div className="flex items-center gap-2">
+                  <Input readOnly value={redirectUri} className="font-mono text-xs" />
+                  <Button type="button" variant="outline" size="sm" onClick={copyRedirectUri}>
+                    <Copy className="h-3.5 w-3.5 mr-1" />Copy
+                  </Button>
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  Saving this alone does not connect Gmail — it just records the intended mailbox. Ask your
-                  Lovable agent to link the Google Mail connector when ready.
+                  Paste this exact URL into your Google OAuth client's <span className="font-mono">Authorized redirect URIs</span>.
+                  Add both the preview and production origins if you use both.
                 </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="gmail">Mailbox email</Label>
+                  <Input id="gmail" type="email" placeholder="info@nevoindustrial.com" value={gmailEmail} onChange={(e) => setGmailEmail(e.target.value)} maxLength={255} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="gcid">Google Client ID</Label>
+                  <Input id="gcid" placeholder="xxxx.apps.googleusercontent.com" value={gmailClientId} onChange={(e) => setGmailClientId(e.target.value)} maxLength={255} />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="gcs">
+                    Google Client Secret{" "}
+                    {config?.gmail_client_secret_set ? (
+                      <span className="text-xs text-muted-foreground">(leave blank to keep existing)</span>
+                    ) : null}
+                  </Label>
+                  <Input
+                    id="gcs"
+                    type="password"
+                    placeholder={config?.gmail_client_secret_set ? "••••••••" : "GOCSPX-..."}
+                    value={gmailClientSecret}
+                    onChange={(e) => setGmailClientSecret(e.target.value)}
+                    maxLength={500}
+                    autoComplete="new-password"
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-md border p-3 text-sm">
+                {config?.gmail_authorized ? (
+                  <div className="flex items-start gap-2">
+                    <ShieldCheck className="h-4 w-4 text-emerald-600 mt-0.5" />
+                    <div className="flex-1">
+                      <div className="font-medium">Authorized</div>
+                      <div className="text-xs text-muted-foreground">
+                        Google account: {config.gmail_authorized_email ?? "(unknown)"} · scopes:{" "}
+                        <span className="font-mono">{config.gmail_scope ?? "n/a"}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={onAuthorizeGmail} disabled={authorizing}>
+                        {authorizing && <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />}Re-authorize
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-destructive" onClick={onDisconnectGmail}>
+                        Disconnect
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground mt-0.5" />
+                    <div className="flex-1">
+                      <div className="font-medium">Not authorized yet</div>
+                      <div className="text-xs text-muted-foreground">
+                        Save your Client ID/Secret, then click Authorize to complete Google's consent flow.
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={onAuthorizeGmail}
+                      disabled={
+                        authorizing ||
+                        !gmailClientId ||
+                        (!config?.gmail_client_secret_set && !gmailClientSecret)
+                      }
+                    >
+                      {authorizing && <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />}Authorize with Google
+                    </Button>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
+
       </Tabs>
 
       <div className="space-y-1.5">
