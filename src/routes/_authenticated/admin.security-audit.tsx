@@ -733,39 +733,41 @@ function MiniStat({
 
 const EVENT_LABELS: Record<string, string> = {
   sign_in: "sign in",
+  sign_in_failed: "sign-in failed",
+  security_alert: "security alert",
+  revoke_session: "session revoked",
+  sign_out_all: "all sessions revoked",
   approve: "approve",
   reject: "reject",
   cancel: "cancel",
   delete: "delete",
+  user_invited: "user invited",
+  bootstrap_super_admin: "super admin bootstrap",
 };
 
 function EventBadge({ action }: { action: string }) {
+  const danger = "bg-rose-500/15 text-rose-600 dark:text-rose-400";
+  const warn = "bg-amber-500/15 text-amber-600 dark:text-amber-400";
+  const ok = "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400";
+  const info = "bg-sky-500/15 text-sky-600 dark:text-sky-400";
+  const muted = "bg-muted text-muted-foreground";
   const map: Record<
     string,
     { icon: React.ComponentType<{ className?: string }>; cls: string }
   > = {
-    sign_in: {
-      icon: LogIn,
-      cls: "bg-sky-500/15 text-sky-600 dark:text-sky-400",
-    },
-    approve: {
-      icon: CheckCircle2,
-      cls: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-    },
-    reject: {
-      icon: XCircle,
-      cls: "bg-rose-500/15 text-rose-600 dark:text-rose-400",
-    },
-    cancel: {
-      icon: XCircle,
-      cls: "bg-muted text-muted-foreground",
-    },
-    delete: {
-      icon: Trash2,
-      cls: "bg-rose-500/15 text-rose-600 dark:text-rose-400",
-    },
+    sign_in: { icon: LogIn, cls: info },
+    sign_in_failed: { icon: ShieldAlert, cls: warn },
+    security_alert: { icon: Bell, cls: warn },
+    revoke_session: { icon: LogOut, cls: warn },
+    sign_out_all: { icon: LogOut, cls: danger },
+    approve: { icon: CheckCircle2, cls: ok },
+    reject: { icon: XCircle, cls: danger },
+    cancel: { icon: XCircle, cls: muted },
+    delete: { icon: Trash2, cls: danger },
+    user_invited: { icon: UserPlus, cls: info },
+    bootstrap_super_admin: { icon: KeyRound, cls: danger },
   };
-  const cfg = map[action] ?? { icon: ShieldCheck, cls: "bg-muted text-muted-foreground" };
+  const cfg = map[action] ?? { icon: ShieldCheck, cls: muted };
   const Icon = cfg.icon;
   const label = EVENT_LABELS[action] ?? action;
   return (
