@@ -812,6 +812,14 @@ function InvoiceDetailPage() {
               <Button size="sm" variant="outline" onClick={openPdfPreview} disabled={pdfLoading}>
                 {pdfLoading ? "Refreshing…" : "Refresh"}
               </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={openEmailDialog}
+                disabled={!pdfPreview}
+              >
+                <Mail className="h-4 w-4 mr-1" /> Email
+              </Button>
               <Button size="sm" onClick={downloadCurrentPdf} disabled={!pdfPreview}>
                 <FileDown className="h-4 w-4 mr-1" /> Download
               </Button>
