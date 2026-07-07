@@ -922,6 +922,102 @@ function InvoiceDetailPage() {
     });
   }
 
+  async function openPurgeExportConfirm(scope: "filtered" | "selected") {
+    if (!canPurgePdf) {
+      toast.error("You don't have permission to export the purge audit log.", {
+        description: "Only Super Admin, Management, or Finance can export purge history.",
+      });
+      return;
+    }
+    setPurgeExportConfirmOpen(true);
+    setPurgeExportConfirmState({ scope, rows: [], loading: true });
+    try {
+      let source: PurgeLogRow[] = [];
+      if (scope === "selected") {
+        const ids = Array.from(selectedPurgeIds);
+        if (ids.length === 0) {
+          toast.info("No rows selected");
+          setPurgeExportConfirmOpen(false);
+          setPurgeExportConfirmState(null);
+          return;
+        }
+        const data = await fetchPurgeAuditByIds({
+          data: { invoice_id: id, ids },
+        });
+        source = data as PurgeLogRow[];
+      } else {
+        const data = await fetchPurgeAuditForExport({
+          data: {
+            invoice_id: id,
+            user_filter: purgeUserFilter,
+            from_date: purgeFromDate || undefined,
+            to_date: purgeToDate || undefined,
+            sort_column: purgeSort.column === "user" ? "user_id" : "created_at",
+            sort_ascending: purgeSort.direction === "asc",
+            limit: 10000,
+          },
+        });
+        source = data as PurgeLogRow[];
+        // Apply client-side version-id filter.
+        const idQ = purgeVersionQuery.trim().toLowerCase();
+        if (idQ) {
+          source = source.filter((log) => {
+            const meta = (log.metadata ?? {}) as { version_ids?: string[] };
+            const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+            return ids.some((v) => v.toLowerCase().includes(idQ));
+          });
+        }
+        // Apply client-side file-size filter.
+        const minBytes = mbToBytes(purgeMinBytes);
+        const maxBytes = mbToBytes(purgeMaxBytes);
+        if (minBytes != null || maxBytes != null) {
+          source = source.filter((log) => {
+            const total = ((log.metadata ?? {}) as { total_bytes?: number }).total_bytes ?? 0;
+            if (minBytes != null && total < minBytes) return false;
+            if (maxBytes != null && total > maxBytes) return false;
+            return true;
+          });
+        }
+      }
+      // Apply the current audit-log sort.
+      if (purgeSort.column === "user") {
+        source = [...source].sort((a, b) => {
+          const nameA = a.user_id ? purgeActorMap[a.user_id] ?? "Unknown user" : "System";
+          const nameB = b.user_id ? purgeActorMap[b.user_id] ?? "Unknown user" : "System";
+          return purgeSort.direction === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+        });
+      } else if (purgeSort.column === "created_at") {
+        source = [...source].sort((a, b) => {
+          const cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          return purgeSort.direction === "asc" ? cmp : -cmp;
+        });
+      }
+      if (source.length === 0) {
+        toast.info("No purge audit entries to export");
+        setPurgeExportConfirmOpen(false);
+        setPurgeExportConfirmState(null);
+        return;
+      }
+      setPurgeExportConfirmState({ scope, rows: source, loading: false });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to prepare purge audit export");
+      setPurgeExportConfirmOpen(false);
+      setPurgeExportConfirmState(null);
+    }
+  }
+
+  async function executePurgeExportConfirm() {
+    if (!purgeExportConfirmState || purgeExportConfirmState.loading || purgeExporting) return;
+    setPurgeExporting(true);
+    try {
+      await exportPurgeAuditCsv(purgeExportConfirmState.rows, purgeExportConfirmState.scope);
+    } finally {
+      setPurgeExporting(false);
+      setPurgeExportConfirmOpen(false);
+      setPurgeExportConfirmState(null);
+    }
+  }
+
   useEffect(() => {
     return () => {
       if (pdfPreview) URL.revokeObjectURL(pdfPreview.url);
