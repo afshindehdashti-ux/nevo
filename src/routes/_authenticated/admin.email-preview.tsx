@@ -149,7 +149,7 @@ function EmailPreviewAdmin() {
         </div>
       </header>
 
-      <div className="grid grid-cols-[260px_1fr] gap-4 min-h-[70vh]">
+      <div className="grid grid-cols-[240px_260px_1fr] gap-4 min-h-[70vh]">
         <aside className="border border-border rounded-md bg-background p-2 space-y-4 overflow-auto">
           {list.isLoading && (
             <div className="p-2 space-y-2">
