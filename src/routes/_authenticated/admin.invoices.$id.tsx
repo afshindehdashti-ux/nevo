@@ -194,6 +194,15 @@ function InvoiceDetailPage() {
   const purgeVersionQuery = search.purgeVersion;
   const purgePage = search.purgePage;
   const purgePageSize = search.purgeSize;
+  const purgeSort = useMemo(() => {
+    const [column, direction] = search.purgeSort.split("_");
+    return {
+      column: column === "user" ? ("user" as const) : ("created_at" as const),
+      direction: direction === "asc" ? ("asc" as const) : ("desc" as const),
+    };
+  }, [search.purgeSort]);
+  const setPurgeSort = (column: "created_at" | "user", direction: "asc" | "desc") =>
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeSort: `${column}_${direction}`, purgePage: 0 }) });
 
   const setPurgeUserFilter = (value: string) =>
     navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeUser: value, purgePage: 0 }) });
