@@ -136,6 +136,43 @@ function MailboxSettings() {
     }
   }
 
+  async function onAuthorizeGmail() {
+    setAuthorizing(true);
+    try {
+      // Persist any unsaved client id/secret first so the server has them
+      if (
+        tab === "gmail" &&
+        ((gmailClientId && gmailClientId !== (config?.gmail_client_id ?? "")) ||
+          gmailClientSecret ||
+          gmailEmail !== (config?.gmail_email ?? ""))
+      ) {
+        await onSave();
+      }
+      const res = await startOAuth({ data: { redirect_uri: redirectUri } });
+      window.location.href = res.url;
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not start Google authorization");
+      setAuthorizing(false);
+    }
+  }
+
+  async function onDisconnectGmail() {
+    if (!confirm("Disconnect Gmail? You'll need to authorize again to reconnect.")) return;
+    try {
+      await disconnect({});
+      toast.success("Gmail disconnected");
+      await router.invalidate();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Disconnect failed");
+    }
+  }
+
+  function copyRedirectUri() {
+    navigator.clipboard?.writeText(redirectUri);
+    toast.success("Redirect URI copied");
+  }
+
+
   return (
     <div className="max-w-3xl space-y-4">
       <div>
