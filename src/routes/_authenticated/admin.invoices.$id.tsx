@@ -168,24 +168,82 @@ function InvoiceDetailPage() {
     created_at: string;
     metadata: Record<string, unknown> | null;
   };
-  const { data: purgeLogs = [], refetch: refetchPurgeLogs } = useQuery({
-    queryKey: ["invoice-purge-logs", id],
+
+  // -------- Purge audit log filters + pagination --------
+  const [purgeUserFilter, setPurgeUserFilter] = useState<string>("all");
+  const [purgeFromDate, setPurgeFromDate] = useState<string>("");
+  const [purgeToDate, setPurgeToDate] = useState<string>("");
+  const [purgeVersionQuery, setPurgeVersionQuery] = useState<string>("");
+  const [purgePage, setPurgePage] = useState(0);
+  const [purgePageSize, setPurgePageSize] = useState(25);
+  // Reset to first page whenever server-side filters change.
+  useEffect(() => {
+    setPurgePage(0);
+  }, [purgeUserFilter, purgeFromDate, purgeToDate, purgePageSize]);
+
+
+  const purgeLogsQuery = useQuery({
+    queryKey: ["invoice-purge-logs", id, purgeUserFilter, purgeFromDate, purgeToDate, purgePage, purgePageSize],
+    queryFn: async () => {
+      const from = purgePage * purgePageSize;
+      const to = from + purgePageSize - 1;
+      let query = supabase
+        .from("activity_logs")
+        .select("id, user_id, created_at, metadata", { count: "exact" })
+        .eq("action", "purge_pdf_versions")
+        .eq("entity_type", "invoice")
+        .eq("entity_id", id);
+      if (purgeUserFilter === "__system__") {
+        query = query.is("user_id", null);
+      } else if (purgeUserFilter !== "all") {
+        query = query.eq("user_id", purgeUserFilter);
+      }
+      if (purgeFromDate) query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
+      if (purgeToDate) query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
+      const { data, error, count } = await query
+        .order("created_at", { ascending: false })
+        .range(from, to);
+      if (error) throw error;
+      return { rows: (data ?? []) as PurgeLogRow[], total: count ?? 0 };
+    },
+    placeholderData: (prev) => prev,
+  });
+  const purgeLogs = purgeLogsQuery.data?.rows ?? [];
+  const purgeTotal = purgeLogsQuery.data?.total ?? 0;
+  const refetchPurgeLogs = purgeLogsQuery.refetch;
+  const purgeLoading = purgeLogsQuery.isFetching;
+  const purgePageCount = Math.max(1, Math.ceil(purgeTotal / purgePageSize));
+
+  // Distinct users across all purge logs for this invoice (for the filter dropdown).
+  const { data: purgeDistinctUsers = [] } = useQuery({
+    queryKey: ["invoice-purge-log-users", id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("activity_logs")
-        .select("id, user_id, created_at, metadata")
+        .select("user_id")
         .eq("action", "purge_pdf_versions")
         .eq("entity_type", "invoice")
         .eq("entity_id", id)
-        .order("created_at", { ascending: false })
-        .limit(100);
+        .limit(2000);
       if (error) throw error;
-      return (data ?? []) as PurgeLogRow[];
+      const seen = new Set<string | null>();
+      const out: Array<string | null> = [];
+      for (const r of data ?? []) {
+        const uid = r.user_id ?? null;
+        if (seen.has(uid)) continue;
+        seen.add(uid);
+        out.push(uid);
+      }
+      return out;
     },
   });
+
   const purgeActorIds = useMemo(
-    () => Array.from(new Set(purgeLogs.map((l) => l.user_id).filter((x): x is string => !!x))),
-    [purgeLogs],
+    () => Array.from(new Set([
+      ...purgeDistinctUsers.filter((x): x is string => !!x),
+      ...purgeLogs.map((l) => l.user_id).filter((x): x is string => !!x),
+    ])),
+    [purgeDistinctUsers, purgeLogs],
   );
   const { data: purgeActorMap = {} } = useQuery({
     queryKey: ["purge-log-actors", purgeActorIds.sort().join(",")],
@@ -202,45 +260,26 @@ function InvoiceDetailPage() {
     },
   });
 
-  // -------- Purge audit log filters --------
-  const [purgeUserFilter, setPurgeUserFilter] = useState<string>("all");
-  const [purgeFromDate, setPurgeFromDate] = useState<string>("");
-  const [purgeToDate, setPurgeToDate] = useState<string>("");
-  const [purgeVersionQuery, setPurgeVersionQuery] = useState<string>("");
   const purgeUserOptions = useMemo(() => {
-    const seen = new Set<string>();
-    const opts: Array<{ id: string; label: string }> = [];
-    for (const log of purgeLogs) {
-      const key = log.user_id ?? "__system__";
-      if (seen.has(key)) continue;
-      seen.add(key);
-      opts.push({
-        id: key,
-        label: log.user_id ? purgeActorMap[log.user_id] ?? "Unknown user" : "System",
-      });
-    }
-    return opts.sort((a, b) => a.label.localeCompare(b.label));
-  }, [purgeLogs, purgeActorMap]);
+    return purgeDistinctUsers
+      .map((uid) => ({
+        id: uid ?? "__system__",
+        label: uid ? purgeActorMap[uid] ?? "Unknown user" : "System",
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [purgeDistinctUsers, purgeActorMap]);
+
+  // Version-ID search only filters the current page (metadata is JSON, not indexed
+  // for text search server-side). Everything else is filtered server-side.
   const filteredPurgeLogs = useMemo(() => {
-    const fromMs = purgeFromDate ? new Date(purgeFromDate + "T00:00:00").getTime() : null;
-    const toMs = purgeToDate ? new Date(purgeToDate + "T23:59:59.999").getTime() : null;
     const idQ = purgeVersionQuery.trim().toLowerCase();
+    if (!idQ) return purgeLogs;
     return purgeLogs.filter((log) => {
-      if (purgeUserFilter !== "all") {
-        const key = log.user_id ?? "__system__";
-        if (key !== purgeUserFilter) return false;
-      }
-      const t = new Date(log.created_at).getTime();
-      if (fromMs != null && t < fromMs) return false;
-      if (toMs != null && t > toMs) return false;
-      if (idQ) {
-        const meta = (log.metadata ?? {}) as { version_ids?: string[] };
-        const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
-        if (!ids.some((v) => v.toLowerCase().includes(idQ))) return false;
-      }
-      return true;
+      const meta = (log.metadata ?? {}) as { version_ids?: string[] };
+      const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+      return ids.some((v) => v.toLowerCase().includes(idQ));
     });
-  }, [purgeLogs, purgeUserFilter, purgeFromDate, purgeToDate, purgeVersionQuery]);
+  }, [purgeLogs, purgeVersionQuery]);
   const purgeFiltersActive =
     purgeUserFilter !== "all" || purgeFromDate !== "" || purgeToDate !== "" || purgeVersionQuery.trim() !== "";
   const resetPurgeFilters = () => {
@@ -248,7 +287,9 @@ function InvoiceDetailPage() {
     setPurgeFromDate("");
     setPurgeToDate("");
     setPurgeVersionQuery("");
+    setPurgePage(0);
   };
+
 
   // -------- Purge audit row selection --------
   const [selectedPurgeIds, setSelectedPurgeIds] = useState<Set<string>>(new Set());
@@ -386,6 +427,7 @@ function InvoiceDetailPage() {
           .limit(1)
           .maybeSingle();
         await refetchPurgeLogs();
+        qc.invalidateQueries({ queryKey: ["invoice-purge-log-users", id] });
         toast.success(`Purged ${removed} PDF version${removed === 1 ? "" : "s"}`, {
           description: `Automatic prune to retention of ${effectiveRetentionPersisted}. A new entry has been added to the audit log.`,
           action: {
@@ -533,6 +575,7 @@ function InvoiceDetailPage() {
         .limit(1)
         .maybeSingle();
       await refetchPurgeLogs();
+      qc.invalidateQueries({ queryKey: ["invoice-purge-log-users", id] });
 
       setRemovedItems(snapshots);
       toast.success(`Purged ${removed} PDF version${removed === 1 ? "" : "s"}`, {
@@ -588,14 +631,46 @@ function InvoiceDetailPage() {
     URL.revokeObjectURL(url);
   }
 
-  function exportPurgeAuditCsv(rows?: PurgeLogRow[], scopeLabel = "filtered") {
+  async function exportPurgeAuditCsv(rows?: PurgeLogRow[], scopeLabel = "filtered") {
     if (!canPurgePdf) {
       toast.error("You don't have permission to export the purge audit log.", {
         description: "Only Super Admin, Management, or Finance can export purge history.",
       });
       return;
     }
-    const source = rows ?? filteredPurgeLogs;
+    // Resolve the actual rows to export. For "filtered" we fetch all matching
+    // rows across pages; for "selected" we fetch by id. Callers may pass rows
+    // directly to skip the network round-trip.
+    let source: PurgeLogRow[] = rows ?? [];
+    try {
+      if (!rows) {
+        let query = supabase
+          .from("activity_logs")
+          .select("id, user_id, created_at, metadata")
+          .eq("action", "purge_pdf_versions")
+          .eq("entity_type", "invoice")
+          .eq("entity_id", id);
+        if (purgeUserFilter === "__system__") query = query.is("user_id", null);
+        else if (purgeUserFilter !== "all") query = query.eq("user_id", purgeUserFilter);
+        if (purgeFromDate) query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
+        if (purgeToDate) query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
+        const { data, error } = await query.order("created_at", { ascending: false }).limit(10000);
+        if (error) throw error;
+        source = (data ?? []) as PurgeLogRow[];
+        // Apply client-side version-id filter (JSON metadata; not queryable).
+        const idQ = purgeVersionQuery.trim().toLowerCase();
+        if (idQ) {
+          source = source.filter((log) => {
+            const meta = (log.metadata ?? {}) as { version_ids?: string[] };
+            const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+            return ids.some((v) => v.toLowerCase().includes(idQ));
+          });
+        }
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to load audit entries for export");
+      return;
+    }
     if (source.length === 0) {
       toast.info("No purge audit entries to export");
       return;
@@ -1546,7 +1621,7 @@ function InvoiceDetailPage() {
                   <History className="h-4 w-4" />
                   PDF purge audit log
                   <Badge variant="secondary" className="ml-2">
-                    {purgeFiltersActive ? `${filteredPurgeLogs.length} / ${purgeLogs.length}` : purgeLogs.length}
+                    {purgeTotal}
                   </Badge>
                   {selectedPurgeIds.size > 0 && (
                     <Badge variant="outline" className="ml-1">{selectedPurgeIds.size} selected</Badge>
@@ -1561,9 +1636,18 @@ function InvoiceDetailPage() {
                         className="h-8"
                         disabled={!canPurgePdf}
                         title={!canPurgePdf ? "Only Super Admin, Management, or Finance can export purge history." : undefined}
-                        onClick={() => {
-                          const rows = purgeLogs.filter((l) => selectedPurgeIds.has(l.id));
-                          exportPurgeAuditCsv(rows, "selected");
+                        onClick={async () => {
+                          const ids = Array.from(selectedPurgeIds);
+                          const { data, error } = await supabase
+                            .from("activity_logs")
+                            .select("id, user_id, created_at, metadata")
+                            .in("id", ids)
+                            .order("created_at", { ascending: false });
+                          if (error) {
+                            toast.error(error.message);
+                            return;
+                          }
+                          await exportPurgeAuditCsv((data ?? []) as PurgeLogRow[], "selected");
                         }}
                       >
                         <FileDown className="h-3.5 w-3.5 mr-1" />
@@ -1578,8 +1662,8 @@ function InvoiceDetailPage() {
                     variant="outline"
                     size="sm"
                     className="h-8"
-                    onClick={() => exportPurgeAuditCsv()}
-                    disabled={!canPurgePdf || filteredPurgeLogs.length === 0}
+                    onClick={() => { void exportPurgeAuditCsv(); }}
+                    disabled={!canPurgePdf || (purgeTotal === 0)}
                     title={!canPurgePdf ? "Only Super Admin, Management, or Finance can export purge history." : undefined}
                   >
                     <FileDown className="h-3.5 w-3.5 mr-1" />
@@ -1589,7 +1673,7 @@ function InvoiceDetailPage() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {purgeLogs.length === 0 ? (
+              {purgeTotal === 0 && !purgeFiltersActive ? (
                 <p className="px-4 py-6 text-sm text-muted-foreground text-center">
                   No purge actions recorded for this invoice.
                 </p>
@@ -1725,7 +1809,46 @@ function InvoiceDetailPage() {
                       </TableBody>
                     </Table>
                   )}
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-t px-4 py-2 text-xs text-muted-foreground">
+                    <div>
+                      {purgeTotal === 0
+                        ? "0 entries"
+                        : `Showing ${purgePage * purgePageSize + 1}–${Math.min((purgePage + 1) * purgePageSize, purgeTotal)} of ${purgeTotal}`}
+                      {purgeLoading && <span className="ml-2 italic">loading…</span>}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs">Rows</Label>
+                      <Select value={String(purgePageSize)} onValueChange={(v) => setPurgePageSize(parseInt(v, 10))}>
+                        <SelectTrigger className="h-7 w-[70px]"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {[10, 25, 50, 100].map((n) => (
+                            <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7"
+                        disabled={purgePage === 0 || purgeLoading}
+                        onClick={() => setPurgePage((p) => Math.max(0, p - 1))}
+                      >
+                        Prev
+                      </Button>
+                      <span>Page {purgePage + 1} / {purgePageCount}</span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7"
+                        disabled={purgePage + 1 >= purgePageCount || purgeLoading}
+                        onClick={() => setPurgePage((p) => p + 1)}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
                 </>
+
               )}
             </CardContent>
           </Card>
