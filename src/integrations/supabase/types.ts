@@ -1429,6 +1429,7 @@ export type Database = {
           issue_date: string
           notes: string | null
           order_id: string | null
+          pdf_version_retention_count: number | null
           status: Database["public"]["Enums"]["invoice_status"]
           subtotal: number
           total: number
@@ -1450,6 +1451,7 @@ export type Database = {
           issue_date?: string
           notes?: string | null
           order_id?: string | null
+          pdf_version_retention_count?: number | null
           status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
           total?: number
@@ -1471,6 +1473,7 @@ export type Database = {
           issue_date?: string
           notes?: string | null
           order_id?: string | null
+          pdf_version_retention_count?: number | null
           status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
           total?: number
