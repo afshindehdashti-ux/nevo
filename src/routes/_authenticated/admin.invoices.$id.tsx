@@ -521,6 +521,14 @@ function InvoiceDetailPage() {
         embeddedSha?: string;
         embeddedExportedAt?: string;
       }
+    | {
+        status: "malformed";
+        filename: string;
+        messages: string[];
+        verifiedAt: string;
+        embeddedSha?: string;
+        embeddedExportedAt?: string;
+      }
   >({ status: "idle" });
 
   async function verifyDownloadedCsv(file: File) {
