@@ -69,3 +69,44 @@ export async function signInvoicePdfUrl(
   if (error || !data?.signedUrl) throw error ?? new Error("Failed to sign URL");
   return data.signedUrl;
 }
+
+/**
+ * Delete PDF versions beyond the retention window (keeps the newest `keep`).
+ * Removes storage objects first, then deletes the DB rows. Returns the number
+ * of versions purged.
+ */
+export async function purgeOlderInvoicePdfVersions(
+  invoiceId: string,
+  keep: number,
+): Promise<number> {
+  const keepCount = Math.max(0, Math.floor(keep));
+  const { data: rows, error } = await supabase
+    .from("invoice_pdf_versions")
+    .select("id, storage_bucket, storage_path")
+    .eq("invoice_id", invoiceId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  const toDelete = (rows ?? []).slice(keepCount);
+  if (toDelete.length === 0) return 0;
+
+  // Group storage removals by bucket (currently always crm-docs).
+  const byBucket = new Map<string, string[]>();
+  for (const r of toDelete) {
+    const arr = byBucket.get(r.storage_bucket) ?? [];
+    arr.push(r.storage_path);
+    byBucket.set(r.storage_bucket, arr);
+  }
+  for (const [bucket, paths] of byBucket) {
+    const { error: rmErr } = await supabase.storage.from(bucket).remove(paths);
+    if (rmErr) console.warn("purge storage remove failed", rmErr);
+  }
+
+  const ids = toDelete.map((r) => r.id);
+  const { error: delErr } = await supabase
+    .from("invoice_pdf_versions")
+    .delete()
+    .in("id", ids);
+  if (delErr) throw delErr;
+  return toDelete.length;
+}
+
