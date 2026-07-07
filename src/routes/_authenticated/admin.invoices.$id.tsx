@@ -629,14 +629,46 @@ function InvoiceDetailPage() {
     URL.revokeObjectURL(url);
   }
 
-  function exportPurgeAuditCsv(rows?: PurgeLogRow[], scopeLabel = "filtered") {
+  async function exportPurgeAuditCsv(rows?: PurgeLogRow[], scopeLabel = "filtered") {
     if (!canPurgePdf) {
       toast.error("You don't have permission to export the purge audit log.", {
         description: "Only Super Admin, Management, or Finance can export purge history.",
       });
       return;
     }
-    const source = rows ?? filteredPurgeLogs;
+    // Resolve the actual rows to export. For "filtered" we fetch all matching
+    // rows across pages; for "selected" we fetch by id. Callers may pass rows
+    // directly to skip the network round-trip.
+    let source: PurgeLogRow[] = rows ?? [];
+    try {
+      if (!rows) {
+        let query = supabase
+          .from("activity_logs")
+          .select("id, user_id, created_at, metadata")
+          .eq("action", "purge_pdf_versions")
+          .eq("entity_type", "invoice")
+          .eq("entity_id", id);
+        if (purgeUserFilter === "__system__") query = query.is("user_id", null);
+        else if (purgeUserFilter !== "all") query = query.eq("user_id", purgeUserFilter);
+        if (purgeFromDate) query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
+        if (purgeToDate) query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
+        const { data, error } = await query.order("created_at", { ascending: false }).limit(10000);
+        if (error) throw error;
+        source = (data ?? []) as PurgeLogRow[];
+        // Apply client-side version-id filter (JSON metadata; not queryable).
+        const idQ = purgeVersionQuery.trim().toLowerCase();
+        if (idQ) {
+          source = source.filter((log) => {
+            const meta = (log.metadata ?? {}) as { version_ids?: string[] };
+            const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+            return ids.some((v) => v.toLowerCase().includes(idQ));
+          });
+        }
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to load audit entries for export");
+      return;
+    }
     if (source.length === 0) {
       toast.info("No purge audit entries to export");
       return;
