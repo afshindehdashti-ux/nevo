@@ -2230,7 +2230,9 @@ function InvoiceDetailPage() {
                       Last 30 days
                     </Button>
                   </div>
-                  {filteredPurgeLogs.length === 0 ? (
+                  {purgeLoading ? (
+                    <PurgeAuditSkeleton rows={purgePageSize} />
+                  ) : filteredPurgeLogs.length === 0 ? (
                     <p className="px-4 py-6 text-sm text-muted-foreground text-center">
                       No entries match the current filters.
                     </p>
