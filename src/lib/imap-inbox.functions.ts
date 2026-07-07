@@ -50,9 +50,12 @@ const saveConfigSchema = z.object({
   imap_password: z.string().max(500).optional().nullable(), // empty string = don't change
   imap_tls: z.boolean().optional(),
   gmail_email: z.string().trim().email().max(255).optional().nullable(),
+  gmail_client_id: z.string().trim().max(255).optional().nullable(),
+  gmail_client_secret: z.string().max(500).optional().nullable(), // empty = don't change
   notes: z.string().max(1000).optional().nullable(),
 });
 export type SaveMailboxConfigInput = z.infer<typeof saveConfigSchema>;
+
 
 export const saveMailboxConfig = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
