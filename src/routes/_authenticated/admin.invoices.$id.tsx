@@ -119,6 +119,43 @@ function InvoiceDetailPage() {
   const [payMethod, setPayMethod] = useState<PaymentMethod>("bank_transfer");
   const [payDate, setPayDate] = useState(new Date().toISOString().slice(0, 10));
   const [payRef, setPayRef] = useState("");
+  const [pdfPreview, setPdfPreview] = useState<{
+    url: string;
+    filename: string;
+    blob: Blob;
+  } | null>(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (pdfPreview) URL.revokeObjectURL(pdfPreview.url);
+    };
+  }, [pdfPreview]);
+
+  async function openPdfPreview() {
+    setPdfLoading(true);
+    try {
+      const res = await generateInvoicePdf(id, "blob");
+      setPdfPreview((prev) => {
+        if (prev) URL.revokeObjectURL(prev.url);
+        return res;
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "PDF failed");
+    } finally {
+      setPdfLoading(false);
+    }
+  }
+
+  function downloadCurrentPdf() {
+    if (!pdfPreview) return;
+    const a = document.createElement("a");
+    a.href = pdfPreview.url;
+    a.download = pdfPreview.filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
 
   useEffect(() => {
     if (items.length) {
