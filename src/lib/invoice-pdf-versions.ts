@@ -12,6 +12,7 @@ export type InvoicePdfVersionRow = {
   byte_size: number | null;
   source: string;
   generated_by: string | null;
+  note: string | null;
   created_at: string;
 };
 
