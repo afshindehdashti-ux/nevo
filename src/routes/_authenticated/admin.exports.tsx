@@ -367,6 +367,41 @@ function ExportsHistoryPage() {
                 </span>
                 <span className="text-muted-foreground">Rows / Size</span>
                 <span>{detail.row_count} · {formatBytes(detail.byte_size)}</span>
+                {(() => {
+                  const md = (detail.metadata ?? {}) as {
+                    embedded_sha256?: string;
+                    embedded_exported_at_iso?: string;
+                  };
+                  if (!md.embedded_sha256 && !md.embedded_exported_at_iso) return null;
+                  return (
+                    <>
+                      <span className="text-muted-foreground">Embedded SHA-256</span>
+                      <span
+                        className="font-mono text-xs break-all"
+                        title="SHA-256 as it was written into the CSV preamble"
+                      >
+                        {md.embedded_sha256 ?? "—"}
+                        {md.embedded_sha256 && md.embedded_sha256 !== detail.sha256 && (
+                          <span className="ml-2 text-destructive">
+                            (differs from column value)
+                          </span>
+                        )}
+                      </span>
+                      <span className="text-muted-foreground">Embedded timestamp</span>
+                      <span className="font-mono text-xs break-all">
+                        {md.embedded_exported_at_iso ?? "—"}
+                        {md.embedded_exported_at_iso && (
+                          <span className="ml-2 text-muted-foreground">
+                            ({(() => {
+                              const d = new Date(md.embedded_exported_at_iso);
+                              return isNaN(d.getTime()) ? "invalid" : d.toLocaleString();
+                            })()})
+                          </span>
+                        )}
+                      </span>
+                    </>
+                  );
+                })()}
               </div>
               <div>
                 <div className="text-xs text-muted-foreground mb-1">Filters</div>
