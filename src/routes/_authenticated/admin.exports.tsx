@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2, Save, X, Bookmark, FileSpreadsheet } from "lucide-react";
+import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2, Save, X, Bookmark, FileSpreadsheet, AlertTriangle } from "lucide-react";
 
 import { listCsvExportAudit } from "@/lib/invoice-purge-audit.functions";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
@@ -276,15 +276,35 @@ function ExportsHistoryPage() {
     return m;
   }, [actors]);
 
+  // --- Drift-only filter (client-side over currently loaded rows) ---
+  const TIMESTAMP_DRIFT_TOLERANCE_S = 2;
+  const [driftOnly, setDriftOnly] = useState(false);
+
+  function rowHasDrift(r: CsvExportAuditRecord): boolean {
+    if (detectShaDrift({ sha256: r.sha256, metadata: r.metadata })) return true;
+    const md = (r.metadata ?? {}) as { embedded_exported_at_iso?: unknown };
+    if (typeof md.embedded_exported_at_iso !== "string") return false;
+    const a = new Date(r.created_at).getTime();
+    const b = new Date(md.embedded_exported_at_iso).getTime();
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return true; // invalid embedded timestamp = drift
+    return Math.abs(b - a) / 1000 > TIMESTAMP_DRIFT_TOLERANCE_S;
+  }
+
+  const driftCount = useMemo(() => rows.filter(rowHasDrift).length, [rows]);
+  const visibleRows = useMemo(
+    () => (driftOnly ? rows.filter(rowHasDrift) : rows),
+    [rows, driftOnly],
+  );
+
   const allVisibleSelected =
-    rows.length > 0 && rows.every((r) => selectedIds.has(r.id));
+    visibleRows.length > 0 && visibleRows.every((r) => selectedIds.has(r.id));
   function toggleAllVisible() {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (allVisibleSelected) {
-        for (const r of rows) next.delete(r.id);
+        for (const r of visibleRows) next.delete(r.id);
       } else {
-        for (const r of rows) next.add(r.id);
+        for (const r of visibleRows) next.add(r.id);
       }
       return next;
     });
@@ -572,8 +592,22 @@ function ExportsHistoryPage() {
             <span>
               {query.isFetching
                 ? "Loading…"
-                : `${rows.length} shown · ${total} total match${total === 1 ? "" : "es"}`}
+                : driftOnly
+                  ? `${visibleRows.length} with drift · ${rows.length} loaded · ${total} total match${total === 1 ? "" : "es"}`
+                  : `${rows.length} shown · ${total} total match${total === 1 ? "" : "es"}`}
             </span>
+            <Button
+              type="button"
+              variant={driftOnly ? "default" : "outline"}
+              size="sm"
+              className="h-7 px-2"
+              onClick={() => setDriftOnly((v) => !v)}
+              disabled={!driftOnly && driftCount === 0 && !query.isFetching}
+              title="Only show exports where the embedded SHA-256 or timestamp differs from the recorded value"
+            >
+              <AlertTriangle className="h-3 w-3 mr-1" />
+              Drift only ({driftCount})
+            </Button>
             {activeFilters > 0 && (
               <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={clearAll}>
                 Clear filters ({activeFilters})
@@ -645,14 +679,16 @@ function ExportsHistoryPage() {
                       ))}
                     </TableRow>
                   ))
-                ) : rows.length === 0 ? (
+                ) : visibleRows.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-8">
-                      No CSV exports match these filters.
+                      {driftOnly
+                        ? "No drift detected in the currently loaded exports."
+                        : "No CSV exports match these filters."}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  rows.map((r) => (
+                  visibleRows.map((r) => (
                     <TableRow key={r.id} data-state={selectedIds.has(r.id) ? "selected" : undefined}>
                       <TableCell>
                         <Checkbox
