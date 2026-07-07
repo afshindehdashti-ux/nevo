@@ -1279,15 +1279,53 @@ function InvoiceDetailPage() {
       </Dialog>
 
       <Dialog open={purgeOpen} onOpenChange={setPurgeOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>Purge older PDF versions?</DialogTitle>
+            <DialogTitle>Purge {overRetentionCount} older PDF version{overRetentionCount === 1 ? "" : "s"}?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            You are about to permanently delete {overRetentionCount} older PDF
-            {overRetentionCount === 1 ? "" : "s"} for this invoice, keeping the latest{" "}
-            {retentionCount}. This action cannot be undone.
-          </p>
+          <div className="space-y-3 overflow-hidden flex flex-col">
+            <p className="text-sm text-muted-foreground">
+              Keeping the latest {retentionCount} version{retentionCount === 1 ? "" : "s"}. The following{" "}
+              {overRetentionCount} version{overRetentionCount === 1 ? "" : "s"} will be permanently deleted:
+            </p>
+            <div className="border rounded-md overflow-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs">Generated</TableHead>
+                    <TableHead className="text-xs">By</TableHead>
+                    <TableHead className="text-xs">Source</TableHead>
+                    <TableHead className="text-xs">Type</TableHead>
+                    <TableHead className="text-xs">Filename</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {toPurgeVersions.map((v) => {
+                    const dt = new Date(v.created_at);
+                    const stamp = `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+                    const who = v.generated_by ? generatorMap[v.generated_by] ?? "Unknown user" : "System";
+                    return (
+                      <TableRow key={v.id}>
+                        <TableCell className="text-xs whitespace-nowrap">{stamp}</TableCell>
+                        <TableCell className="text-xs max-w-[140px] truncate" title={who}>{who}</TableCell>
+                        <TableCell className="text-xs">
+                          {v.source === "download" && "Download"}
+                          {v.source === "email" && "Emailed"}
+                          {v.source === "bulk" && "Bulk export"}
+                          {v.source === "preview" && "Preview"}
+                          {!["download", "email", "bulk", "preview"].includes(v.source) && v.source}
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {v.doc_type === "proforma" ? "Proforma" : "Commercial"}
+                        </TableCell>
+                        <TableCell className="text-xs font-mono max-w-[200px] truncate" title={v.filename}>{v.filename}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setPurgeOpen(false)} disabled={purging}>
               Cancel
