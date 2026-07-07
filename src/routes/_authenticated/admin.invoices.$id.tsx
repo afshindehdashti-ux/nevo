@@ -60,8 +60,18 @@ import { useCanEditInvoices, useCanEditPayments, useCanPurgeInvoicePdfVersions }
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
 import { ApprovalPanel } from "@/components/crm/ApprovalPanel";
 
+const invoiceDetailSearchSchema = z.object({
+  purgeUser: fallback(z.string(), "all").default("all"),
+  purgeFrom: fallback(z.string(), "").default(""),
+  purgeTo: fallback(z.string(), "").default(""),
+  purgeVersion: fallback(z.string(), "").default(""),
+  purgePage: fallback(z.number().int(), 0).default(0),
+  purgeSize: fallback(z.number().int(), 25).default(25),
+});
+
 export const Route = createFileRoute("/_authenticated/admin/invoices/$id")({
   head: () => ({ meta: [{ title: "Invoice — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  validateSearch: zodValidator(invoiceDetailSearchSchema),
   component: InvoiceDetailPage,
 });
 
