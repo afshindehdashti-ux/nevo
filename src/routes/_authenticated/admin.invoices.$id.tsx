@@ -197,20 +197,36 @@ function InvoiceDetailPage() {
       setRetentionInput(String(retentionSetting.pdf_version_retention_count));
     }
   }, [retentionSetting?.pdf_version_retention_count]);
-  const retentionCount = Math.max(1, Math.min(500, parseInt(retentionInput || "20", 10) || 20));
-  const overRetentionCount = Math.max(0, pdfVersions.length - retentionCount);
+  const globalRetentionCount = Math.max(1, Math.min(500, parseInt(retentionInput || "20", 10) || 20));
+
+  // -------- Per-invoice retention override --------
+  const invoiceOverride = (invoice as { pdf_version_retention_count?: number | null } | undefined)
+    ?.pdf_version_retention_count ?? null;
+  const [overrideEnabled, setOverrideEnabled] = useState(false);
+  const [overrideInput, setOverrideInput] = useState<string>("20");
+  const [savingOverride, setSavingOverride] = useState(false);
+  useEffect(() => {
+    if (invoiceOverride != null) {
+      setOverrideEnabled(true);
+      setOverrideInput(String(invoiceOverride));
+    } else {
+      setOverrideEnabled(false);
+    }
+  }, [invoiceOverride]);
+  const overrideCount = Math.max(1, Math.min(500, parseInt(overrideInput || "20", 10) || 20));
+  const effectiveRetention = overrideEnabled ? overrideCount : globalRetentionCount;
+  const effectiveRetentionPersisted = invoiceOverride ?? retentionSetting?.pdf_version_retention_count ?? null;
+
+  const overRetentionCount = Math.max(0, pdfVersions.length - effectiveRetention);
   const toPurgeVersions = useMemo(
-    () => pdfVersions.slice(retentionCount),
-    [pdfVersions, retentionCount],
+    () => pdfVersions.slice(effectiveRetention),
+    [pdfVersions, effectiveRetention],
   );
 
   async function autoPruneIfNeeded() {
-    if (!retentionSetting?.pdf_version_retention_count) return;
+    if (!effectiveRetentionPersisted) return;
     try {
-      const removed = await purgeOlderInvoicePdfVersions(
-        id,
-        retentionSetting.pdf_version_retention_count,
-      );
+      const removed = await purgeOlderInvoicePdfVersions(id, effectiveRetentionPersisted);
       if (removed > 0) refetchPdfVersions();
     } catch (e) {
       console.warn("auto-prune failed", e);
@@ -226,15 +242,36 @@ function InvoiceDetailPage() {
     try {
       const { error } = await supabase
         .from("company_settings")
-        .update({ pdf_version_retention_count: retentionCount })
+        .update({ pdf_version_retention_count: globalRetentionCount })
         .eq("id", retentionSetting.id);
       if (error) throw error;
-      toast.success(`Retention set to ${retentionCount} versions`);
+      toast.success(`Global retention set to ${globalRetentionCount} versions`);
       refetchRetention();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to save setting");
     } finally {
       setSavingRetention(false);
+    }
+  }
+
+  async function saveInvoiceOverride(nextValue: number | null) {
+    setSavingOverride(true);
+    try {
+      const { error } = await supabase
+        .from("invoices")
+        .update({ pdf_version_retention_count: nextValue } as never)
+        .eq("id", id);
+      if (error) throw error;
+      toast.success(
+        nextValue == null
+          ? "Per-invoice override cleared"
+          : `Per-invoice retention set to ${nextValue}`,
+      );
+      qc.invalidateQueries({ queryKey: ["invoice", id] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save override");
+    } finally {
+      setSavingOverride(false);
     }
   }
 
@@ -249,7 +286,7 @@ function InvoiceDetailPage() {
   async function confirmPurge() {
     setPurging(true);
     try {
-      const removed = await purgeOlderInvoicePdfVersions(id, retentionCount);
+      const removed = await purgeOlderInvoicePdfVersions(id, effectiveRetention);
       toast.success(`Purged ${removed} version(s)`);
       refetchPdfVersions();
       setPurgeOpen(false);
@@ -258,6 +295,7 @@ function InvoiceDetailPage() {
     } finally {
       setPurging(false);
     }
+
   }
 
   useEffect(() => {
