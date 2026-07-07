@@ -144,6 +144,7 @@ function OrdersPage() {
         canCreate={canEdit}
         onCreate={() => setDialogOpen(true)}
         createLabel="New order"
+        headerExtra={<GuideMeButton sectionId="orders" />}
       >
         <div className="p-3 border-b flex gap-2 items-center">
           <Label className="text-xs text-muted-foreground">Status</Label>
