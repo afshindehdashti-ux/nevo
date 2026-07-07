@@ -37,7 +37,7 @@
     "test:visual": "node scripts/visual/header-logo.mjs",
     "test:visual:update": "node scripts/visual/header-logo.mjs --update",
     "test:e2e:logo-fallback": "node scripts/e2e/header-logo-fallback.mjs",
-    "test:e2e:homepage-contact": "node scripts/e2e/homepage-contact-submit.mjs",
+    "test:e2e:homepage-contact": "python3 scripts/e2e/homepage_contact_submit.py",
     "test:e2e:logo-sequencing": "node scripts/e2e/header-logo-sequencing.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
