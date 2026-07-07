@@ -510,8 +510,15 @@ function InvoiceDetailPage() {
     }
     setPurgeVerifyState({ status: "verifying", filename: file.name });
     try {
-      const buf = await file.arrayBuffer();
-      const digest = await crypto.subtle.digest("SHA-256", buf);
+      // The exported CSV prepends a preamble with the checksum + timestamp
+      // followed by a "--- PAYLOAD BELOW ---" marker. Hash only the bytes
+      // after that marker so the embedded hash stays self-consistent.
+      const text = await file.text();
+      const marker = '"--- PAYLOAD BELOW ---"\n';
+      const idx = text.indexOf(marker);
+      const payload = idx >= 0 ? text.slice(idx + marker.length) : text;
+      const payloadBytes = new TextEncoder().encode(payload);
+      const digest = await crypto.subtle.digest("SHA-256", payloadBytes);
       const sha = Array.from(new Uint8Array(digest))
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
@@ -1046,18 +1053,30 @@ function InvoiceDetailPage() {
         ].join(",");
       }),
     ];
-    const csv = lines.join("\n");
-    const bytes = new TextEncoder().encode(csv);
-    // Compute SHA-256 checksum for compliance traceability.
+    const payloadCsv = lines.join("\n");
+    const payloadBytes = new TextEncoder().encode(payloadCsv);
+    // Compute SHA-256 of the payload so it can be embedded in the file itself.
+    // The embedded hash covers everything AFTER the PAYLOAD BELOW marker line,
+    // so verification stays stable even though the file also carries the hash.
     let sha256 = "";
     try {
-      const digest = await crypto.subtle.digest("SHA-256", bytes);
+      const digest = await crypto.subtle.digest("SHA-256", payloadBytes);
       sha256 = Array.from(new Uint8Array(digest))
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
     } catch {
       sha256 = "";
     }
+    const exportedAtIso = new Date().toISOString();
+    const escapeHeader = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
+    const preamble = [
+      `${escapeHeader("SHA-256 (of payload below)")},${escapeHeader(sha256 || "(unavailable)")}`,
+      `${escapeHeader("Export Timestamp (ISO)")},${escapeHeader(exportedAtIso)}`,
+      escapeHeader("--- PAYLOAD BELOW ---"),
+      "",
+    ].join("\n");
+    const fullCsv = preamble + payloadCsv;
+    const bytes = new TextEncoder().encode(fullCsv);
     const blob = new Blob([bytes], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     // Include a short SHA-256 prefix in the filename so compliance workflows
