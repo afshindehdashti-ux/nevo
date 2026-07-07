@@ -337,6 +337,7 @@ function InvoiceDetailPage() {
       });
       setPdfNote("");
       refetchPdfVersions();
+      autoPruneIfNeeded();
       // 3) Ask the server to sign the URL and send the email.
       const res = await emailFn({
         data: {
