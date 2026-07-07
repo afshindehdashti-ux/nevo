@@ -199,6 +199,10 @@ function InvoiceDetailPage() {
   }, [retentionSetting?.pdf_version_retention_count]);
   const retentionCount = Math.max(1, Math.min(500, parseInt(retentionInput || "20", 10) || 20));
   const overRetentionCount = Math.max(0, pdfVersions.length - retentionCount);
+  const toPurgeVersions = useMemo(
+    () => pdfVersions.slice(retentionCount),
+    [pdfVersions, retentionCount],
+  );
 
   async function autoPruneIfNeeded() {
     if (!retentionSetting?.pdf_version_retention_count) return;
