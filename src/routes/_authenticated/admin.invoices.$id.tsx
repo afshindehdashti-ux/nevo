@@ -800,6 +800,17 @@ function InvoiceDetailPage() {
             return ids.some((v) => v.toLowerCase().includes(idQ));
           });
         }
+        // Apply client-side file-size filter.
+        const minBytes = mbToBytes(purgeMinBytes);
+        const maxBytes = mbToBytes(purgeMaxBytes);
+        if (minBytes != null || maxBytes != null) {
+          source = source.filter((log) => {
+            const total = ((log.metadata ?? {}) as { total_bytes?: number }).total_bytes ?? 0;
+            if (minBytes != null && total < minBytes) return false;
+            if (maxBytes != null && total > maxBytes) return false;
+            return true;
+          });
+        }
       }
       // Apply the same audit-log sort to the exported rows.
       if (purgeSort.column === "user") {
