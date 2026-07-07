@@ -80,6 +80,7 @@ function InvoiceDetailPage() {
   const qc = useQueryClient();
   const canEdit = useCanEditInvoices();
   const canPay = useCanEditPayments();
+  const canPurgePdf = useCanPurgeInvoicePdfVersions();
 
   const { data: invoice, isLoading } = useQuery({
     queryKey: ["invoice", id],
