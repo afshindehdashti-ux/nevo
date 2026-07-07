@@ -46,6 +46,8 @@ function EmailPreviewAdmin() {
   const [selected, setSelected] = useState<string | null>(null);
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
   const [testRecipient, setTestRecipient] = useState("");
+  const [overridesByTemplate, setOverridesByTemplate] = useState<Record<string, Overrides>>({});
+  const [debouncedOverrides, setDebouncedOverrides] = useState<Overrides>({});
 
   const list = useQuery({
     queryKey: ["email-previews"],
@@ -53,16 +55,46 @@ function EmailPreviewAdmin() {
   });
 
   const current = selected ?? list.data?.[0]?.name ?? null;
+  const currentMeta = useMemo(
+    () => list.data?.find((t) => t.name === current) ?? null,
+    [list.data, current],
+  );
+
+  const currentOverrides = current ? overridesByTemplate[current] ?? {} : {};
+
+  // Build serializable override map: only include keys the user changed,
+  // and coerce back to the type of the default value.
+  const serializableOverrides = useMemo(() => {
+    if (!currentMeta) return {};
+    const out: Record<string, string | number | boolean | null> = {};
+    for (const [k, raw] of Object.entries(debouncedOverrides)) {
+      out[k] = coerceOverride(currentMeta.defaultData[k], raw);
+    }
+    return out;
+  }, [debouncedOverrides, currentMeta]);
+
+  // Debounce override edits to avoid rendering on every keystroke.
+  const debounceRef = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    debounceRef.current = window.setTimeout(() => {
+      setDebouncedOverrides(currentOverrides);
+    }, 350);
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
+  }, [currentOverrides]);
 
   const preview = useQuery({
-    queryKey: ["email-preview", current],
-    queryFn: () => renderFn({ data: { name: current! } }),
+    queryKey: ["email-preview", current, serializableOverrides],
+    queryFn: () =>
+      renderFn({ data: { name: current!, overrides: serializableOverrides } }),
     enabled: !!current,
   });
 
   const sendTest = useMutation({
     mutationFn: (vars: { name: string; recipientEmail: string }) =>
-      sendFn({ data: vars }),
+      sendFn({ data: { ...vars, overrides: serializableOverrides } }),
     onSuccess: () => {
       toast.success(`Test email queued to ${testRecipient}`);
     },
@@ -77,6 +109,18 @@ function EmailPreviewAdmin() {
     (list.data ?? []).forEach((t) => (t.category === "auth" ? auth : app).push(t));
     return { auth, app };
   }, [list.data]);
+
+  function updateOverride(key: string, value: string) {
+    if (!current) return;
+    setOverridesByTemplate((prev) => ({
+      ...prev,
+      [current]: { ...(prev[current] ?? {}), [key]: value },
+    }));
+  }
+  function resetOverrides() {
+    if (!current) return;
+    setOverridesByTemplate((prev) => ({ ...prev, [current]: {} }));
+  }
 
   return (
     <div className="p-6 space-y-4">
