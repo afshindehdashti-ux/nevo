@@ -2806,6 +2806,7 @@ export type Database = {
           invoice: number
         }[]
       }
+      has_admin_role: { Args: { required_role: string }; Returns: boolean }
       has_any_role: {
         Args: {
           _roles: Database["public"]["Enums"]["app_role"][]
