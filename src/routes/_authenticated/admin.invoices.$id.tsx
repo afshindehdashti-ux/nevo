@@ -191,6 +191,7 @@ function InvoiceDetailPage() {
   const [retentionInput, setRetentionInput] = useState<string>("20");
   const [savingRetention, setSavingRetention] = useState(false);
   const [purging, setPurging] = useState(false);
+  const [purgeOpen, setPurgeOpen] = useState(false);
   useEffect(() => {
     if (retentionSetting?.pdf_version_retention_count != null) {
       setRetentionInput(String(retentionSetting.pdf_version_retention_count));
@@ -233,19 +234,21 @@ function InvoiceDetailPage() {
     }
   }
 
-  async function purgeOlderNow() {
+  function openPurgeConfirm() {
     if (overRetentionCount === 0) {
       toast.info("Nothing to purge");
       return;
     }
-    if (!window.confirm(`Delete ${overRetentionCount} older PDF version(s)? This cannot be undone.`)) {
-      return;
-    }
+    setPurgeOpen(true);
+  }
+
+  async function confirmPurge() {
     setPurging(true);
     try {
       const removed = await purgeOlderInvoicePdfVersions(id, retentionCount);
       toast.success(`Purged ${removed} version(s)`);
       refetchPdfVersions();
+      setPurgeOpen(false);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Purge failed");
     } finally {
@@ -1036,7 +1039,7 @@ function InvoiceDetailPage() {
                       variant="destructive"
                       size="sm"
                       className="h-8"
-                      onClick={purgeOlderNow}
+                      onClick={openPurgeConfirm}
                       disabled={purging || overRetentionCount === 0}
                     >
                       <Trash2 className="h-3.5 w-3.5 mr-1" />
@@ -1266,6 +1269,28 @@ function InvoiceDetailPage() {
             <Button onClick={sendInvoiceEmail} disabled={emailSending}>
               <Mail className="h-4 w-4 mr-1" />
               {emailSending ? "Sending…" : "Send email"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={purgeOpen} onOpenChange={setPurgeOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Purge older PDF versions?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            You are about to permanently delete {overRetentionCount} older PDF
+            {overRetentionCount === 1 ? "" : "s"} for this invoice, keeping the latest{" "}
+            {retentionCount}. This action cannot be undone.
+          </p>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setPurgeOpen(false)} disabled={purging}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmPurge} disabled={purging}>
+              <Trash2 className="h-4 w-4 mr-1" />
+              {purging ? "Purging…" : `Purge ${overRetentionCount}`}
             </Button>
           </DialogFooter>
         </DialogContent>
