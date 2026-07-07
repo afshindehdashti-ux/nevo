@@ -1323,7 +1323,7 @@ function InvoiceDetailPage() {
                         : "System";
                       const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
                       return (
-                        <TableRow key={log.id}>
+                        <TableRow key={log.id} id={`purge-log-${log.id}`} className="transition-shadow">
                           <TableCell className="whitespace-nowrap text-sm">
                             {new Date(log.created_at).toLocaleString()}
                           </TableCell>
