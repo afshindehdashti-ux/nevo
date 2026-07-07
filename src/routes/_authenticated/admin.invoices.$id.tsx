@@ -66,6 +66,8 @@ const invoiceDetailSearchSchema = z.object({
   purgeFrom: fallback(z.string(), "").default(""),
   purgeTo: fallback(z.string(), "").default(""),
   purgeVersion: fallback(z.string(), "").default(""),
+  purgeMinBytes: fallback(z.string(), "").default(""),
+  purgeMaxBytes: fallback(z.string(), "").default(""),
   purgePage: fallback(z.number().int(), 0).default(0),
   purgeSize: fallback(z.number().int(), 25).default(25),
   purgeSort: fallback(z.string(), "created_at_desc").default("created_at_desc"),
@@ -98,6 +100,12 @@ function formatBytes(bytes: number): string {
   const i = Math.min(units.length - 1, Math.floor(Math.log10(bytes) / 3));
   const value = bytes / Math.pow(1000, i);
   return `${value.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+}
+
+function mbToBytes(value: string): number | null {
+  const n = value.trim() === "" ? NaN : parseFloat(value);
+  if (Number.isNaN(n) || n < 0) return null;
+  return Math.round(n * 1_000_000);
 }
 
 function InvoiceDetailPage() {
@@ -192,6 +200,8 @@ function InvoiceDetailPage() {
   const purgeFromDate = search.purgeFrom;
   const purgeToDate = search.purgeTo;
   const purgeVersionQuery = search.purgeVersion;
+  const purgeMinBytes = search.purgeMinBytes;
+  const purgeMaxBytes = search.purgeMaxBytes;
   const purgePage = search.purgePage;
   const purgePageSize = search.purgeSize;
   const purgeSort = useMemo(() => {
@@ -229,6 +239,10 @@ function InvoiceDetailPage() {
     navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeTo: value, purgePage: 0 }) });
   const setPurgeVersionQuery = (value: string) =>
     navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeVersion: value, purgePage: 0 }) });
+  const setPurgeMinBytes = (value: string) =>
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeMinBytes: value, purgePage: 0 }) });
+  const setPurgeMaxBytes = (value: string) =>
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeMaxBytes: value, purgePage: 0 }) });
   const setPurgePageSize = (value: number) =>
     navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeSize: value, purgePage: 0 }) });
   const setPurgePage = (updater: number | ((prev: number) => number)) =>
@@ -324,10 +338,13 @@ function InvoiceDetailPage() {
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [purgeDistinctUsers, purgeActorMap]);
 
-  // Version-ID search only filters the current page (metadata is JSON, not indexed
-  // for text search server-side). Everything else is filtered server-side.
+  // Version-ID search and file-size filters are applied client-side to the
+  // current page (metadata is JSON and not indexed server-side). Everything
+  // else is filtered server-side.
   const filteredPurgeLogs = useMemo(() => {
     const idQ = purgeVersionQuery.trim().toLowerCase();
+    const minBytes = mbToBytes(purgeMinBytes);
+    const maxBytes = mbToBytes(purgeMaxBytes);
     let rows = idQ
       ? purgeLogs.filter((log) => {
           const meta = (log.metadata ?? {}) as { version_ids?: string[] };
@@ -335,6 +352,14 @@ function InvoiceDetailPage() {
           return ids.some((v) => v.toLowerCase().includes(idQ));
         })
       : purgeLogs;
+    if (minBytes != null || maxBytes != null) {
+      rows = rows.filter((log) => {
+        const total = ((log.metadata ?? {}) as { total_bytes?: number }).total_bytes ?? 0;
+        if (minBytes != null && total < minBytes) return false;
+        if (maxBytes != null && total > maxBytes) return false;
+        return true;
+      });
+    }
     if (purgeSort.column === "user") {
       rows = [...rows].sort((a, b) => {
         const nameA = a.user_id ? purgeActorMap[a.user_id] ?? "Unknown user" : "System";
@@ -348,9 +373,14 @@ function InvoiceDetailPage() {
       });
     }
     return rows;
-  }, [purgeLogs, purgeVersionQuery, purgeSort, purgeActorMap]);
+  }, [purgeLogs, purgeVersionQuery, purgeMinBytes, purgeMaxBytes, purgeSort, purgeActorMap]);
   const purgeFiltersActive =
-    purgeUserFilter !== "all" || purgeFromDate !== "" || purgeToDate !== "" || purgeVersionQuery.trim() !== "";
+    purgeUserFilter !== "all" ||
+    purgeFromDate !== "" ||
+    purgeToDate !== "" ||
+    purgeVersionQuery.trim() !== "" ||
+    purgeMinBytes !== "" ||
+    purgeMaxBytes !== "";
   const resetPurgeFilters = () => {
     navigate({
       search: (prev: InvoiceDetailSearch) => ({
@@ -359,6 +389,8 @@ function InvoiceDetailPage() {
         purgeFrom: "",
         purgeTo: "",
         purgeVersion: "",
+        purgeMinBytes: "",
+        purgeMaxBytes: "",
         purgePage: 0,
       }),
     });
@@ -768,6 +800,17 @@ function InvoiceDetailPage() {
             return ids.some((v) => v.toLowerCase().includes(idQ));
           });
         }
+        // Apply client-side file-size filter.
+        const minBytes = mbToBytes(purgeMinBytes);
+        const maxBytes = mbToBytes(purgeMaxBytes);
+        if (minBytes != null || maxBytes != null) {
+          source = source.filter((log) => {
+            const total = ((log.metadata ?? {}) as { total_bytes?: number }).total_bytes ?? 0;
+            if (minBytes != null && total < minBytes) return false;
+            if (maxBytes != null && total > maxBytes) return false;
+            return true;
+          });
+        }
       }
       // Apply the same audit-log sort to the exported rows.
       if (purgeSort.column === "user") {
@@ -800,6 +843,8 @@ function InvoiceDetailPage() {
       "Invoice Number",
       "Removed Count",
       "Kept",
+      "Removed Size (Bytes)",
+      "Removed Size",
       "Removed Version IDs",
     ];
     const escape = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
@@ -810,9 +855,11 @@ function InvoiceDetailPage() {
           removed_count?: number;
           kept?: number;
           version_ids?: string[];
+          total_bytes?: number;
         };
         const who = log.user_id ? purgeActorMap[log.user_id] ?? "Unknown user" : "System";
         const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+        const totalBytes = meta.total_bytes ?? 0;
         return [
           escape(log.id),
           escape(log.created_at),
@@ -823,6 +870,8 @@ function InvoiceDetailPage() {
           escape(invoice?.invoice_number ?? ""),
           escape(String(meta.removed_count ?? ids.length)),
           escape(meta.kept != null ? String(meta.kept) : ""),
+          escape(String(totalBytes)),
+          escape(formatBytes(totalBytes)),
           escape(ids.join("; ")),
         ].join(",");
       }),
@@ -1898,6 +1947,32 @@ function InvoiceDetailPage() {
                       </Button>
                     </div>
                   </div>
+                  <div className="px-4 pb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4 items-end">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Min removed size (MB)</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        className="h-8"
+                        placeholder="0"
+                        value={purgeMinBytes}
+                        onChange={(e) => setPurgeMinBytes(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Max removed size (MB)</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        className="h-8"
+                        placeholder="∞"
+                        value={purgeMaxBytes}
+                        onChange={(e) => setPurgeMaxBytes(e.target.value)}
+                      />
+                    </div>
+                  </div>
                   <div className="px-4 pb-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                     Quick range
                     <Button
@@ -1936,6 +2011,7 @@ function InvoiceDetailPage() {
                           <SortHeader column="created_at" label="When" />
                           <SortHeader column="user" label="User" />
                           <TableHead className="text-right">Removed</TableHead>
+                          <TableHead className="text-right">Size</TableHead>
                           <TableHead className="text-right">Kept</TableHead>
                           <TableHead>Version IDs</TableHead>
                           <TableHead className="w-10"></TableHead>
@@ -1947,6 +2023,7 @@ function InvoiceDetailPage() {
                             removed_count?: number;
                             kept?: number;
                             version_ids?: string[];
+                            total_bytes?: number;
                           };
                           const who = log.user_id
                             ? purgeActorMap[log.user_id] ?? "Unknown user"
@@ -1974,6 +2051,9 @@ function InvoiceDetailPage() {
                               <TableCell className="text-sm">{who}</TableCell>
                               <TableCell className="text-right font-medium">
                                 {meta.removed_count ?? ids.length}
+                              </TableCell>
+                              <TableCell className="text-right text-muted-foreground">
+                                {formatBytes(meta.total_bytes ?? 0)}
                               </TableCell>
                               <TableCell className="text-right text-muted-foreground">
                                 {meta.kept ?? "—"}

@@ -99,12 +99,13 @@ export async function purgeOlderInvoicePdfVersions(
   const keepCount = Math.max(0, Math.floor(keep));
   const { data: rows, error } = await supabase
     .from("invoice_pdf_versions")
-    .select("id, storage_bucket, storage_path")
+    .select("id, storage_bucket, storage_path, byte_size")
     .eq("invoice_id", invoiceId)
     .order("created_at", { ascending: false });
   if (error) throw error;
   const toDelete = (rows ?? []).slice(keepCount);
   if (toDelete.length === 0) return 0;
+  const totalBytes = toDelete.reduce((sum, r) => sum + (r.byte_size ?? 0), 0);
 
   // Group storage removals by bucket (currently always crm-docs).
   const byBucket = new Map<string, string[]>();
@@ -131,7 +132,7 @@ export async function purgeOlderInvoicePdfVersions(
     _removed_count: toDelete.length,
     _kept: keepCount,
     _version_ids: ids,
-    _details: {},
+    _details: { total_bytes: totalBytes },
   });
   if (logErr) console.warn("purge audit log failed", logErr);
 
