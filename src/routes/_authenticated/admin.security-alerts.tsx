@@ -50,8 +50,16 @@ import {
   Bell,
   KeyRound,
   ExternalLink,
+  Download,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
+import { downloadCsv, downloadPdf } from "@/lib/security-export";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 /**
  * Security Alerts dashboard — a focused, at-a-glance view of recent
