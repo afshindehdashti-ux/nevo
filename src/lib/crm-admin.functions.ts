@@ -1,4 +1,5 @@
-import { createServerFn, getRequestHeader } from "@tanstack/react-start";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -14,9 +15,10 @@ async function sendWelcomeEmail(params: {
   userId: string;
 }) {
   try {
-    const authHeader = getRequestHeader("authorization") ?? getRequestHeader("Authorization");
-    const host = getRequestHeader("host");
-    const proto = getRequestHeader("x-forwarded-proto") ?? "https";
+    const req = getRequest();
+    const authHeader = req?.headers.get("authorization") ?? req?.headers.get("Authorization");
+    const host = req?.headers.get("host");
+    const proto = req?.headers.get("x-forwarded-proto") ?? "https";
     if (!authHeader || !host) return;
     const siteUrl = process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
     const res = await fetch(`${proto}://${host}/lovable/email/transactional/send`, {
