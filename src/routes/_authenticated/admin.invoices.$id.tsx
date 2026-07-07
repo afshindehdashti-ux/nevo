@@ -840,7 +840,6 @@ function InvoiceDetailPage() {
           </div>
         </DialogContent>
       </Dialog>
-      </Dialog>
 
       <Dialog open={emailOpen} onOpenChange={(o) => !emailSending && setEmailOpen(o)}>
         <DialogContent className="max-w-lg">
