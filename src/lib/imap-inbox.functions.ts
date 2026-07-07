@@ -22,9 +22,15 @@ async function loadActiveConfig(supabase: SupabaseClient<Database>) {
 
 function maskPassword(row: any) {
   if (!row) return null;
-  const { imap_password, ...rest } = row;
-  return { ...rest, imap_password_set: Boolean(imap_password) };
+  const { imap_password, gmail_client_secret, gmail_refresh_token, gmail_access_token, gmail_oauth_state, ...rest } = row;
+  return {
+    ...rest,
+    imap_password_set: Boolean(imap_password),
+    gmail_client_secret_set: Boolean(gmail_client_secret),
+    gmail_authorized: Boolean(gmail_refresh_token),
+  };
 }
+
 
 // ============ SETTINGS ============
 
@@ -44,9 +50,12 @@ const saveConfigSchema = z.object({
   imap_password: z.string().max(500).optional().nullable(), // empty string = don't change
   imap_tls: z.boolean().optional(),
   gmail_email: z.string().trim().email().max(255).optional().nullable(),
+  gmail_client_id: z.string().trim().max(255).optional().nullable(),
+  gmail_client_secret: z.string().max(500).optional().nullable(), // empty = don't change
   notes: z.string().max(1000).optional().nullable(),
 });
 export type SaveMailboxConfigInput = z.infer<typeof saveConfigSchema>;
+
 
 export const saveMailboxConfig = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -62,13 +71,18 @@ export const saveMailboxConfig = createServerFn({ method: "POST" })
       imap_username: data.imap_username ?? null,
       imap_tls: data.imap_tls ?? true,
       gmail_email: data.gmail_email ?? null,
+      gmail_client_id: data.gmail_client_id ?? null,
       notes: data.notes ?? null,
       is_active: true,
     };
-    // Only overwrite password if a new one supplied
+    // Only overwrite secrets if new ones supplied
     if (data.imap_password && data.imap_password.length > 0) {
       payload.imap_password = data.imap_password;
     }
+    if (data.gmail_client_secret && data.gmail_client_secret.length > 0) {
+      payload.gmail_client_secret = data.gmail_client_secret;
+    }
+
 
     if (existing) {
       const { error } = await context.supabase
@@ -356,4 +370,79 @@ export const deleteImapMessage = createServerFn({ method: "POST" })
     } finally {
       try { if (client) await client.logout(); } catch {}
     }
+  });
+
+// ============ GMAIL OAUTH ============
+
+const GMAIL_SCOPES = [
+  "https://www.googleapis.com/auth/gmail.readonly",
+  "https://www.googleapis.com/auth/gmail.modify",
+  "https://www.googleapis.com/auth/userinfo.email",
+].join(" ");
+
+function randomState() {
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+const startOAuthSchema = z.object({
+  redirect_uri: z.string().url().max(500),
+});
+
+export const startGmailOAuth = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: z.infer<typeof startOAuthSchema>) => startOAuthSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    await ensureSuperAdmin(context.supabase, context.userId);
+    const row: any = await loadActiveConfig(context.supabase);
+    if (!row || row.provider !== "gmail") {
+      throw new Error("Save the Gmail configuration first (mailbox email).");
+    }
+    if (!row.gmail_client_id || !row.gmail_client_secret) {
+      throw new Error("Set the Google Client ID and Client Secret first, then Save.");
+    }
+    const state = randomState();
+    const { error } = await context.supabase
+      .from("mailbox_connections")
+      .update({ gmail_oauth_state: state, gmail_redirect_uri: data.redirect_uri } as any)
+      .eq("id", row.id);
+    if (error) throw new Error(error.message);
+
+    const params = new URLSearchParams({
+      client_id: row.gmail_client_id,
+      redirect_uri: data.redirect_uri,
+      response_type: "code",
+      scope: GMAIL_SCOPES,
+      access_type: "offline",
+      prompt: "consent",
+      include_granted_scopes: "true",
+      state,
+      ...(row.gmail_email ? { login_hint: row.gmail_email } : {}),
+    });
+    return { url: `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}` };
+  });
+
+export const disconnectGmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureSuperAdmin(context.supabase, context.userId);
+    const row: any = await loadActiveConfig(context.supabase);
+    if (!row) return { ok: true as const };
+    const { error } = await context.supabase
+      .from("mailbox_connections")
+      .update({
+        gmail_refresh_token: null,
+        gmail_access_token: null,
+        gmail_token_expires_at: null,
+        gmail_scope: null,
+        gmail_authorized_email: null,
+        gmail_oauth_state: null,
+        last_test_ok: null,
+        last_test_error: null,
+        last_test_at: null,
+      } as any)
+      .eq("id", row.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
   });

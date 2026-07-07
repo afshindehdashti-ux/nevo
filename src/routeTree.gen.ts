@@ -115,6 +115,7 @@ import { Route as AuthenticatedAdminLeadsIdRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminInvoicesIdRouteImport } from './routes/_authenticated/admin.invoices.$id'
 import { Route as AuthenticatedAdminCustomersIdRouteImport } from './routes/_authenticated/admin.customers.$id'
 import { Route as AuthenticatedAdminApprovalsAuditRouteImport } from './routes/_authenticated/admin.approvals.audit'
+import { Route as ApiPublicOauthGoogleCallbackRouteImport } from './routes/api/public/oauth.google.callback'
 import { Route as AuthenticatedAdminQuotationsIdPrintRouteImport } from './routes/_authenticated/admin.quotations.$id.print'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
@@ -700,6 +701,12 @@ const AuthenticatedAdminApprovalsAuditRoute =
     path: '/audit',
     getParentRoute: () => AuthenticatedAdminApprovalsRoute,
   } as any)
+const ApiPublicOauthGoogleCallbackRoute =
+  ApiPublicOauthGoogleCallbackRouteImport.update({
+    id: '/api/public/oauth/google/callback',
+    path: '/api/public/oauth/google/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminQuotationsIdPrintRoute =
   AuthenticatedAdminQuotationsIdPrintRouteImport.update({
     id: '/print',
@@ -814,6 +821,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/admin/mails/': typeof AuthenticatedAdminMailsIndexRoute
   '/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
+  '/api/public/oauth/google/callback': typeof ApiPublicOauthGoogleCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -919,6 +927,7 @@ export interface FileRoutesByTo {
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/admin/mails': typeof AuthenticatedAdminMailsIndexRoute
   '/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
+  '/api/public/oauth/google/callback': typeof ApiPublicOauthGoogleCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1029,6 +1038,7 @@ export interface FileRoutesById {
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/_authenticated/admin/mails/': typeof AuthenticatedAdminMailsIndexRoute
   '/_authenticated/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
+  '/api/public/oauth/google/callback': typeof ApiPublicOauthGoogleCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1139,6 +1149,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/send'
     | '/admin/mails/'
     | '/admin/quotations/$id/print'
+    | '/api/public/oauth/google/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1244,6 +1255,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/send'
     | '/admin/mails'
     | '/admin/quotations/$id/print'
+    | '/api/public/oauth/google/callback'
   id:
     | '__root__'
     | '/'
@@ -1353,6 +1365,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/send'
     | '/_authenticated/admin/mails/'
     | '/_authenticated/admin/quotations/$id/print'
+    | '/api/public/oauth/google/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1381,6 +1394,7 @@ export interface RootRouteChildren {
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
+  ApiPublicOauthGoogleCallbackRoute: typeof ApiPublicOauthGoogleCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2127,6 +2141,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminApprovalsAuditRouteImport
       parentRoute: typeof AuthenticatedAdminApprovalsRoute
     }
+    '/api/public/oauth/google/callback': {
+      id: '/api/public/oauth/google/callback'
+      path: '/api/public/oauth/google/callback'
+      fullPath: '/api/public/oauth/google/callback'
+      preLoaderRoute: typeof ApiPublicOauthGoogleCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/quotations/$id/print': {
       id: '/_authenticated/admin/quotations/$id/print'
       path: '/print'
@@ -2494,6 +2515,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
+  ApiPublicOauthGoogleCallbackRoute: ApiPublicOauthGoogleCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
