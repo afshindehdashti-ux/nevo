@@ -168,24 +168,92 @@ function InvoiceDetailPage() {
     created_at: string;
     metadata: Record<string, unknown> | null;
   };
-  const { data: purgeLogs = [], refetch: refetchPurgeLogs } = useQuery({
-    queryKey: ["invoice-purge-logs", id],
+
+  // -------- Purge audit log filters + pagination --------
+  const [purgeUserFilter, setPurgeUserFilter] = useState<string>("all");
+  const [purgeFromDate, setPurgeFromDate] = useState<string>("");
+  const [purgeToDate, setPurgeToDate] = useState<string>("");
+  const [purgeVersionQuery, setPurgeVersionQuery] = useState<string>("");
+  const [purgePage, setPurgePage] = useState(0);
+  const [purgePageSize, setPurgePageSize] = useState(25);
+  // Reset to first page whenever server-side filters change.
+  useEffect(() => {
+    setPurgePage(0);
+  }, [purgeUserFilter, purgeFromDate, purgeToDate, purgePageSize]);
+
+  // Helper: apply the current server-side filters to a Supabase query builder.
+  const applyPurgeFilters = <T extends {
+    eq: (col: string, val: unknown) => T;
+    gte: (col: string, val: unknown) => T;
+    lte: (col: string, val: unknown) => T;
+    is: (col: string, val: unknown) => T;
+  }>(q: T): T => {
+    let query = q
+      .eq("action", "purge_pdf_versions")
+      .eq("entity_type", "invoice")
+      .eq("entity_id", id);
+    if (purgeUserFilter === "__system__") {
+      query = query.is("user_id", null);
+    } else if (purgeUserFilter !== "all") {
+      query = query.eq("user_id", purgeUserFilter);
+    }
+    if (purgeFromDate) query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
+    if (purgeToDate) query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
+    return query;
+  };
+
+  const purgeLogsQuery = useQuery({
+    queryKey: ["invoice-purge-logs", id, purgeUserFilter, purgeFromDate, purgeToDate, purgePage, purgePageSize],
+    queryFn: async () => {
+      const from = purgePage * purgePageSize;
+      const to = from + purgePageSize - 1;
+      const base = supabase
+        .from("activity_logs")
+        .select("id, user_id, created_at, metadata", { count: "exact" });
+      const { data, error, count } = await applyPurgeFilters(base)
+        .order("created_at", { ascending: false })
+        .range(from, to);
+      if (error) throw error;
+      return { rows: (data ?? []) as PurgeLogRow[], total: count ?? 0 };
+    },
+    placeholderData: (prev) => prev,
+  });
+  const purgeLogs = purgeLogsQuery.data?.rows ?? [];
+  const purgeTotal = purgeLogsQuery.data?.total ?? 0;
+  const refetchPurgeLogs = purgeLogsQuery.refetch;
+  const purgeLoading = purgeLogsQuery.isFetching;
+  const purgePageCount = Math.max(1, Math.ceil(purgeTotal / purgePageSize));
+
+  // Distinct users across all purge logs for this invoice (for the filter dropdown).
+  const { data: purgeDistinctUsers = [] } = useQuery({
+    queryKey: ["invoice-purge-log-users", id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("activity_logs")
-        .select("id, user_id, created_at, metadata")
+        .select("user_id")
         .eq("action", "purge_pdf_versions")
         .eq("entity_type", "invoice")
         .eq("entity_id", id)
-        .order("created_at", { ascending: false })
-        .limit(100);
+        .limit(2000);
       if (error) throw error;
-      return (data ?? []) as PurgeLogRow[];
+      const seen = new Set<string | null>();
+      const out: Array<string | null> = [];
+      for (const r of data ?? []) {
+        const uid = r.user_id ?? null;
+        if (seen.has(uid)) continue;
+        seen.add(uid);
+        out.push(uid);
+      }
+      return out;
     },
   });
+
   const purgeActorIds = useMemo(
-    () => Array.from(new Set(purgeLogs.map((l) => l.user_id).filter((x): x is string => !!x))),
-    [purgeLogs],
+    () => Array.from(new Set([
+      ...purgeDistinctUsers.filter((x): x is string => !!x),
+      ...purgeLogs.map((l) => l.user_id).filter((x): x is string => !!x),
+    ])),
+    [purgeDistinctUsers, purgeLogs],
   );
   const { data: purgeActorMap = {} } = useQuery({
     queryKey: ["purge-log-actors", purgeActorIds.sort().join(",")],
@@ -202,45 +270,26 @@ function InvoiceDetailPage() {
     },
   });
 
-  // -------- Purge audit log filters --------
-  const [purgeUserFilter, setPurgeUserFilter] = useState<string>("all");
-  const [purgeFromDate, setPurgeFromDate] = useState<string>("");
-  const [purgeToDate, setPurgeToDate] = useState<string>("");
-  const [purgeVersionQuery, setPurgeVersionQuery] = useState<string>("");
   const purgeUserOptions = useMemo(() => {
-    const seen = new Set<string>();
-    const opts: Array<{ id: string; label: string }> = [];
-    for (const log of purgeLogs) {
-      const key = log.user_id ?? "__system__";
-      if (seen.has(key)) continue;
-      seen.add(key);
-      opts.push({
-        id: key,
-        label: log.user_id ? purgeActorMap[log.user_id] ?? "Unknown user" : "System",
-      });
-    }
-    return opts.sort((a, b) => a.label.localeCompare(b.label));
-  }, [purgeLogs, purgeActorMap]);
+    return purgeDistinctUsers
+      .map((uid) => ({
+        id: uid ?? "__system__",
+        label: uid ? purgeActorMap[uid] ?? "Unknown user" : "System",
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [purgeDistinctUsers, purgeActorMap]);
+
+  // Version-ID search only filters the current page (metadata is JSON, not indexed
+  // for text search server-side). Everything else is filtered server-side.
   const filteredPurgeLogs = useMemo(() => {
-    const fromMs = purgeFromDate ? new Date(purgeFromDate + "T00:00:00").getTime() : null;
-    const toMs = purgeToDate ? new Date(purgeToDate + "T23:59:59.999").getTime() : null;
     const idQ = purgeVersionQuery.trim().toLowerCase();
+    if (!idQ) return purgeLogs;
     return purgeLogs.filter((log) => {
-      if (purgeUserFilter !== "all") {
-        const key = log.user_id ?? "__system__";
-        if (key !== purgeUserFilter) return false;
-      }
-      const t = new Date(log.created_at).getTime();
-      if (fromMs != null && t < fromMs) return false;
-      if (toMs != null && t > toMs) return false;
-      if (idQ) {
-        const meta = (log.metadata ?? {}) as { version_ids?: string[] };
-        const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
-        if (!ids.some((v) => v.toLowerCase().includes(idQ))) return false;
-      }
-      return true;
+      const meta = (log.metadata ?? {}) as { version_ids?: string[] };
+      const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+      return ids.some((v) => v.toLowerCase().includes(idQ));
     });
-  }, [purgeLogs, purgeUserFilter, purgeFromDate, purgeToDate, purgeVersionQuery]);
+  }, [purgeLogs, purgeVersionQuery]);
   const purgeFiltersActive =
     purgeUserFilter !== "all" || purgeFromDate !== "" || purgeToDate !== "" || purgeVersionQuery.trim() !== "";
   const resetPurgeFilters = () => {
@@ -248,7 +297,9 @@ function InvoiceDetailPage() {
     setPurgeFromDate("");
     setPurgeToDate("");
     setPurgeVersionQuery("");
+    setPurgePage(0);
   };
+
 
   // -------- Purge audit row selection --------
   const [selectedPurgeIds, setSelectedPurgeIds] = useState<Set<string>>(new Set());
