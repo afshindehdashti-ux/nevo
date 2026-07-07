@@ -314,6 +314,16 @@ function InvoiceDetailPage() {
   };
   const clearPurgeSelection = () => setSelectedPurgeIds(new Set());
 
+  // Last CSV export metadata (for compliance traceability).
+  const [lastPurgeExport, setLastPurgeExport] = useState<{
+    filename: string;
+    sha256: string;
+    rowCount: number;
+    scope: string;
+    exportedAt: string;
+    byteSize: number;
+  } | null>(null);
+
 
 
 
@@ -713,16 +723,38 @@ function InvoiceDetailPage() {
       }),
     ];
     const csv = lines.join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const bytes = new TextEncoder().encode(csv);
+    // Compute SHA-256 checksum for compliance traceability.
+    let sha256 = "";
+    try {
+      const digest = await crypto.subtle.digest("SHA-256", bytes);
+      sha256 = Array.from(new Uint8Array(digest))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+    } catch {
+      sha256 = "";
+    }
+    const blob = new Blob([bytes], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
+    const filename = `invoice-${invoice?.invoice_number ?? id}-purge-audit-${new Date().toISOString().slice(0, 10)}.csv`;
     const a = document.createElement("a");
     a.href = url;
-    a.download = `invoice-${invoice?.invoice_number ?? id}-purge-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    toast.success(`Exported ${source.length} ${scopeLabel} audit entr${source.length === 1 ? "y" : "ies"}`);
+    setLastPurgeExport({
+      filename,
+      sha256,
+      rowCount: source.length,
+      scope: scopeLabel,
+      exportedAt: new Date().toISOString(),
+      byteSize: bytes.byteLength,
+    });
+    toast.success(`Exported ${source.length} ${scopeLabel} audit entr${source.length === 1 ? "y" : "ies"}`, {
+      description: sha256 ? `SHA-256: ${sha256.slice(0, 16)}…` : undefined,
+    });
   }
 
   useEffect(() => {
@@ -1671,6 +1703,46 @@ function InvoiceDetailPage() {
                   </Button>
                 </div>
               </div>
+              {lastPurgeExport && (
+                <div className="mt-3 rounded-md border bg-muted/40 px-3 py-2 text-xs">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className="font-medium">Last export:</span>
+                    <span className="text-muted-foreground">{lastPurgeExport.filename}</span>
+                    <Badge variant="outline">{lastPurgeExport.scope}</Badge>
+                    <span className="text-muted-foreground">
+                      {lastPurgeExport.rowCount} row{lastPurgeExport.rowCount === 1 ? "" : "s"} · {lastPurgeExport.byteSize} B
+                    </span>
+                    <span className="text-muted-foreground">
+                      {new Date(lastPurgeExport.exportedAt).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="font-medium">SHA-256:</span>
+                    <code className="break-all font-mono text-[11px]">
+                      {lastPurgeExport.sha256 || "(unavailable)"}
+                    </code>
+                    {lastPurgeExport.sha256 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2"
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(lastPurgeExport.sha256);
+                            toast.success("SHA-256 checksum copied");
+                          } catch {
+                            toast.error("Failed to copy checksum");
+                          }
+                        }}
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        Copy
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
             </CardHeader>
             <CardContent className="p-0">
               {purgeTotal === 0 && !purgeFiltersActive ? (
