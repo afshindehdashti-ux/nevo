@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsSuperAdmin, useMyRoles } from "@/lib/crm-hooks";
 import {
@@ -104,6 +104,7 @@ export const Route = createFileRoute("/_authenticated/admin/security-audit")({
 function SecurityAuditPage() {
   const isSuperAdmin = useIsSuperAdmin();
   const { isLoading: rolesLoading } = useMyRoles();
+  const queryClient = useQueryClient();
 
   const [category, setCategory] =
     useState<(typeof CATEGORIES)[number]["value"]>("all");
@@ -112,6 +113,39 @@ function SecurityAuditPage() {
   const [actor, setActor] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<LogRow | null>(null);
+  const [liveStatus, setLiveStatus] = useState<"connecting" | "live" | "off">(
+    "connecting",
+  );
+
+  // Real-time refresh — subscribe to inserts on activity_logs and invalidate
+  // the audit query whenever a security-significant event lands. Filtering on
+  // `action=in.(...)` at the server keeps this quiet: no traffic for ordinary
+  // approvals-log/updated-by chatter that doesn't belong on this page.
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    const channel = supabase
+      .channel("security-audit-live")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "activity_logs",
+          filter: "action=in.(sign_in,approve,reject,cancel,delete)",
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["security-audit"] });
+        },
+      )
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") setLiveStatus("live");
+        else if (status === "CHANNEL_ERROR" || status === "CLOSED")
+          setLiveStatus("off");
+      });
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isSuperAdmin, queryClient]);
 
   const logsQ = useQuery({
     enabled: isSuperAdmin,
