@@ -92,3 +92,83 @@ export const listPurgeAuditByIds = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return (rows ?? []) as PurgeAuditRow[];
   });
+
+const RecordExportInput = z.object({
+  export_type: z.string().min(1).max(64),
+  filename: z.string().min(1).max(255),
+  sha256: z.string().regex(/^[a-f0-9]{64}$/i),
+  byte_size: z.number().int().nonnegative(),
+  row_count: z.number().int().nonnegative(),
+  scope: z.string().max(64).optional(),
+  entity_type: z.string().max(64).optional(),
+  entity_id: z.string().max(255).optional(),
+  filters: z.record(z.string(), z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
+});
+
+export type CsvExportAuditRecord = {
+  id: string;
+  created_at: string;
+  user_id: string | null;
+  export_type: string;
+  filename: string;
+  sha256: string;
+  byte_size: number;
+  row_count: number;
+  scope: string | null;
+  entity_type: string | null;
+  entity_id: string | null;
+  filters: Json;
+  metadata: Json;
+};
+
+export const recordCsvExportAudit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => RecordExportInput.parse(v))
+  .handler(async ({ context, data }): Promise<{ id: string }> => {
+    await assertCanPurge(context);
+    const { data: row, error } = await context.supabase
+      .from("csv_export_audit")
+      .insert({
+        user_id: context.userId,
+        export_type: data.export_type,
+        filename: data.filename,
+        sha256: data.sha256.toLowerCase(),
+        byte_size: data.byte_size,
+        row_count: data.row_count,
+        scope: data.scope ?? null,
+        entity_type: data.entity_type ?? null,
+        entity_id: data.entity_id ?? null,
+        filters: (data.filters ?? {}) as Json,
+        metadata: (data.metadata ?? {}) as Json,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { id: row.id as string };
+  });
+
+const ListExportInput = z.object({
+  entity_type: z.string().max(64).optional(),
+  entity_id: z.string().max(255).optional(),
+  limit: z.number().int().min(1).max(200).default(50),
+});
+
+export const listCsvExportAudit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => ListExportInput.parse(v))
+  .handler(async ({ context, data }): Promise<CsvExportAuditRecord[]> => {
+    await assertCanPurge(context);
+    let q = context.supabase
+      .from("csv_export_audit")
+      .select(
+        "id, created_at, user_id, export_type, filename, sha256, byte_size, row_count, scope, entity_type, entity_id, filters, metadata",
+      );
+    if (data.entity_type) q = q.eq("entity_type", data.entity_type);
+    if (data.entity_id) q = q.eq("entity_id", data.entity_id);
+    const { data: rows, error } = await q
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as CsvExportAuditRecord[];
+  });

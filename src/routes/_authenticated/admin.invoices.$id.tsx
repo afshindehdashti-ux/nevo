@@ -50,6 +50,7 @@ import {
 import {
   listPurgeAuditForExport,
   listPurgeAuditByIds,
+  recordCsvExportAudit,
 } from "@/lib/invoice-purge-audit.functions";
 
 import { formatDate, formatMoney } from "@/lib/crm-money";
@@ -156,6 +157,7 @@ function InvoiceDetailPage() {
   const canPurgePdf = useCanPurgeInvoicePdfVersions();
   const fetchPurgeAuditForExport = useServerFn(listPurgeAuditForExport);
   const fetchPurgeAuditByIds = useServerFn(listPurgeAuditByIds);
+  const recordExportAudit = useServerFn(recordCsvExportAudit);
 
   const { data: invoice, isLoading } = useQuery({
     queryKey: ["invoice", id],
@@ -1029,6 +1031,53 @@ function InvoiceDetailPage() {
       exportedAt: new Date().toISOString(),
       byteSize: bytes.byteLength,
     });
+    // Persist export record to the audit history table for later traceability.
+    if (sha256) {
+      const filters =
+        meta.scope === "filtered"
+          ? {
+              user: meta.userLabel ?? "All users",
+              from_date: meta.fromDate ?? "",
+              to_date: meta.toDate ?? "",
+              version_query: meta.versionQuery ?? "",
+              min_bytes_mb: meta.minBytes ?? "",
+              max_bytes_mb: meta.maxBytes ?? "",
+            }
+          : {};
+      const extraMeta =
+        meta.scope === "selected" && selectedVersionInfo
+          ? {
+              selected_row_count: source.length,
+              selected_version_count: selectedVersionInfo.count,
+              selected_version_ids: selectedVersionInfo.ids
+                .split("; ")
+                .filter(Boolean),
+            }
+          : {};
+      try {
+        await recordExportAudit({
+          data: {
+            export_type: "invoice_purge_audit",
+            filename,
+            sha256,
+            byte_size: bytes.byteLength,
+            row_count: source.length,
+            scope: meta.scope,
+            entity_type: "invoice",
+            entity_id: id,
+            filters,
+            metadata: {
+              invoice_number: invoice?.invoice_number ?? null,
+              ...extraMeta,
+            },
+          },
+        });
+      } catch (e) {
+        toast.warning("Export saved locally but audit history could not be recorded", {
+          description: e instanceof Error ? e.message : undefined,
+        });
+      }
+    }
     toast.success(`Exported ${source.length} ${meta.scope} audit entr${source.length === 1 ? "y" : "ies"}`, {
       description: sha256 ? `SHA-256: ${sha256.slice(0, 16)}…` : undefined,
     });
