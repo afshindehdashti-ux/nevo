@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -494,6 +494,51 @@ function InvoiceDetailPage() {
     exportedAt: string;
     byteSize: number;
   } | null>(null);
+  const purgeVerifyInputRef = useRef<HTMLInputElement | null>(null);
+  const [purgeVerifyState, setPurgeVerifyState] = useState<
+    | { status: "idle" }
+    | { status: "verifying"; filename: string }
+    | { status: "match"; filename: string; sha256: string; verifiedAt: string }
+    | { status: "mismatch"; filename: string; sha256: string; expected: string; verifiedAt: string }
+  >({ status: "idle" });
+
+  async function verifyDownloadedCsv(file: File) {
+    const expected = lastPurgeExport?.sha256;
+    if (!expected) {
+      toast.error("No checksum to verify against. Export a CSV first.");
+      return;
+    }
+    setPurgeVerifyState({ status: "verifying", filename: file.name });
+    try {
+      const buf = await file.arrayBuffer();
+      const digest = await crypto.subtle.digest("SHA-256", buf);
+      const sha = Array.from(new Uint8Array(digest))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+      const now = new Date().toISOString();
+      if (sha.toLowerCase() === expected.toLowerCase()) {
+        setPurgeVerifyState({ status: "match", filename: file.name, sha256: sha, verifiedAt: now });
+        toast.success("Checksum matches", {
+          description: `${file.name} · SHA-256 verified`,
+        });
+      } else {
+        setPurgeVerifyState({
+          status: "mismatch",
+          filename: file.name,
+          sha256: sha,
+          expected,
+          verifiedAt: now,
+        });
+        toast.error("Checksum mismatch — file may be altered or corrupted", {
+          description: `Expected ${expected.slice(0, 16)}… got ${sha.slice(0, 16)}…`,
+          duration: 10000,
+        });
+      }
+    } catch (e) {
+      setPurgeVerifyState({ status: "idle" });
+      toast.error(e instanceof Error ? e.message : "Failed to compute checksum");
+    }
+  }
 
   // Export confirmation modal state.
   const [purgeExportConfirmOpen, setPurgeExportConfirmOpen] = useState(false);
@@ -2200,7 +2245,47 @@ function InvoiceDetailPage() {
                         Copy
                       </Button>
                     )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-6 px-2"
+                      disabled={!lastPurgeExport.sha256 || purgeVerifyState.status === "verifying"}
+                      onClick={() => purgeVerifyInputRef.current?.click()}
+                    >
+                      {purgeVerifyState.status === "verifying" ? "Verifying…" : "Verify downloaded file"}
+                    </Button>
+                    <input
+                      ref={purgeVerifyInputRef}
+                      type="file"
+                      accept=".csv,text/csv"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = "";
+                        if (file) void verifyDownloadedCsv(file);
+                      }}
+                    />
                   </div>
+                  {purgeVerifyState.status === "match" && (
+                    <div className="mt-2 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2 py-1.5 text-[11px] text-emerald-700 dark:text-emerald-300">
+                      ✓ {purgeVerifyState.filename} matches the displayed SHA-256
+                      · verified {new Date(purgeVerifyState.verifiedAt).toLocaleString()}
+                    </div>
+                  )}
+                  {purgeVerifyState.status === "mismatch" && (
+                    <div className="mt-2 rounded-md border border-destructive/50 bg-destructive/10 px-2 py-1.5 text-[11px] text-destructive space-y-0.5">
+                      <div className="font-medium">
+                        ✗ Checksum mismatch — {purgeVerifyState.filename} may be altered or corrupted.
+                      </div>
+                      <div className="font-mono break-all">
+                        expected: {purgeVerifyState.expected}
+                      </div>
+                      <div className="font-mono break-all">
+                        actual:&nbsp;&nbsp; {purgeVerifyState.sha256}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </CardHeader>
