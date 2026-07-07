@@ -870,6 +870,8 @@ function InvoiceDetailPage() {
           escape(invoice?.invoice_number ?? ""),
           escape(String(meta.removed_count ?? ids.length)),
           escape(meta.kept != null ? String(meta.kept) : ""),
+          escape(String(totalBytes)),
+          escape(formatBytes(totalBytes)),
           escape(ids.join("; ")),
         ].join(",");
       }),
