@@ -6,8 +6,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
 
-const WINDOW_MINUTES = 10
-const THRESHOLD = 5
+const DEFAULT_WINDOW_MINUTES = 10
+const DEFAULT_THRESHOLD = 5
 
 function normalizeEmail(v: unknown): string | null {
   if (typeof v !== 'string') return null
