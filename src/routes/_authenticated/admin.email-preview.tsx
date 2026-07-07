@@ -424,3 +424,34 @@ function EmailPreviewAdmin() {
     </div>
   );
 }
+
+function A11yRow({ issue }: { issue: A11yIssue }) {
+  const Icon =
+    issue.severity === "critical"
+      ? AlertCircle
+      : issue.severity === "warning"
+        ? AlertTriangle
+        : Info;
+  const tone =
+    issue.severity === "critical"
+      ? "text-destructive"
+      : issue.severity === "warning"
+        ? "text-amber-600"
+        : "text-muted-foreground";
+  return (
+    <li className="flex gap-2 items-start">
+      <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${tone}`} aria-hidden />
+      <div className="min-w-0">
+        <div className="text-xs uppercase tracking-wide text-muted-foreground">
+          {issue.rule}
+        </div>
+        <div>{issue.message}</div>
+        {issue.snippet && (
+          <div className="mt-0.5 text-xs font-mono text-muted-foreground truncate">
+            {issue.snippet}
+          </div>
+        )}
+      </div>
+    </li>
+  );
+}
