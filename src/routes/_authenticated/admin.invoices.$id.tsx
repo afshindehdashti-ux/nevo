@@ -499,16 +499,26 @@ function InvoiceDetailPage() {
   const [purgeVerifyState, setPurgeVerifyState] = useState<
     | { status: "idle" }
     | { status: "verifying"; filename: string }
-    | { status: "match"; filename: string; sha256: string; verifiedAt: string }
-    | { status: "mismatch"; filename: string; sha256: string; expected: string; verifiedAt: string }
+    | {
+        status: "match";
+        filename: string;
+        sha256: string;
+        verifiedAt: string;
+        embeddedSha?: string;
+        embeddedExportedAt?: string;
+      }
+    | {
+        status: "mismatch";
+        filename: string;
+        sha256: string;
+        expected: string;
+        verifiedAt: string;
+        embeddedSha?: string;
+        embeddedExportedAt?: string;
+      }
   >({ status: "idle" });
 
   async function verifyDownloadedCsv(file: File) {
-    const expected = lastPurgeExport?.sha256;
-    if (!expected) {
-      toast.error("No checksum to verify against. Export a CSV first.");
-      return;
-    }
     setPurgeVerifyState({ status: "verifying", filename: file.name });
     try {
       // The exported CSV prepends a preamble with the checksum + timestamp
@@ -517,15 +527,54 @@ function InvoiceDetailPage() {
       const text = await file.text();
       const marker = '"--- PAYLOAD BELOW ---"\n';
       const idx = text.indexOf(marker);
+      const preamble = idx >= 0 ? text.slice(0, idx) : "";
       const payload = idx >= 0 ? text.slice(idx + marker.length) : text;
+
+      // Parse embedded SHA-256 and export timestamp from the preamble rows
+      // (both are simple `"label","value"` CSV rows written by the exporter).
+      const unquote = (v: string) =>
+        v.startsWith('"') && v.endsWith('"')
+          ? v.slice(1, -1).replace(/""/g, '"')
+          : v;
+      let embeddedSha: string | undefined;
+      let embeddedExportedAt: string | undefined;
+      for (const line of preamble.split("\n")) {
+        const m = line.match(/^("(?:[^"]|"")*"),("(?:[^"]|"")*")$/);
+        if (!m) continue;
+        const label = unquote(m[1]);
+        const value = unquote(m[2]);
+        if (/^SHA-256/i.test(label)) embeddedSha = value;
+        else if (/^Export Timestamp/i.test(label)) embeddedExportedAt = value;
+      }
+
       const payloadBytes = new TextEncoder().encode(payload);
       const digest = await crypto.subtle.digest("SHA-256", payloadBytes);
       const sha = Array.from(new Uint8Array(digest))
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
       const now = new Date().toISOString();
+
+      // Prefer the session's known-good checksum; otherwise fall back to the
+      // one embedded in the file (useful when verifying an old export after
+      // the page has been reloaded).
+      const expected =
+        lastPurgeExport?.sha256 ||
+        (embeddedSha && /^[a-f0-9]{64}$/i.test(embeddedSha) ? embeddedSha : undefined);
+      if (!expected) {
+        setPurgeVerifyState({ status: "idle" });
+        toast.error("No checksum to verify against — file preamble is missing SHA-256.");
+        return;
+      }
+
       if (sha.toLowerCase() === expected.toLowerCase()) {
-        setPurgeVerifyState({ status: "match", filename: file.name, sha256: sha, verifiedAt: now });
+        setPurgeVerifyState({
+          status: "match",
+          filename: file.name,
+          sha256: sha,
+          verifiedAt: now,
+          embeddedSha,
+          embeddedExportedAt,
+        });
         toast.success("Checksum matches", {
           description: `${file.name} · SHA-256 verified`,
         });
@@ -536,6 +585,8 @@ function InvoiceDetailPage() {
           sha256: sha,
           expected,
           verifiedAt: now,
+          embeddedSha,
+          embeddedExportedAt,
         });
         toast.error("Checksum mismatch — file may be altered or corrupted", {
           description: `Expected ${expected.slice(0, 16)}… got ${sha.slice(0, 16)}…`,
@@ -547,6 +598,7 @@ function InvoiceDetailPage() {
       toast.error(e instanceof Error ? e.message : "Failed to compute checksum");
     }
   }
+
 
   // Export confirmation modal state.
   const [purgeExportConfirmOpen, setPurgeExportConfirmOpen] = useState(false);
