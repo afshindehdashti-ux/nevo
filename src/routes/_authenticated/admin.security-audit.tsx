@@ -43,20 +43,27 @@ import {
   Download,
   Search,
   LogIn,
+  LogOut,
   UserCog,
+  UserPlus,
   Trash2,
   CheckCircle2,
   XCircle,
+  Bell,
+  KeyRound,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 
 /**
  * Security Audit — filtered view of activity_logs focused on
- * security-sensitive events emitted by SECURITY DEFINER functions:
- *   - sign_in (auth-audit server fn)
+ * security-sensitive events emitted by SECURITY DEFINER functions
+ * and admin server functions:
+ *   - sign_in / sign_in_failed / security_alert (auth-audit + alerts)
+ *   - revoke_session / sign_out_all (session revocations)
  *   - approve / reject / cancel (decide_approval_request)
- *   - delete (log_row_delete trigger on privileged tables)
  *   - role changes on user_roles
+ *   - user_invited / bootstrap_super_admin (user management)
+ *   - delete (log_row_delete trigger on privileged tables)
  * Super Admin only. Includes filters + CSV export.
  */
 
@@ -70,12 +77,38 @@ type LogRow = {
   created_at: string;
 };
 
+// Every security-significant action tracked on this page. Kept in one place
+// so the "all" server-side pre-filter and the client-side category filters
+// stay in sync.
+const SECURITY_ACTIONS = [
+  "sign_in",
+  "sign_in_failed",
+  "security_alert",
+  "revoke_session",
+  "sign_out_all",
+  "approve",
+  "reject",
+  "cancel",
+  "delete",
+  "user_invited",
+  "bootstrap_super_admin",
+] as const;
+
+const SESSION_ACTIONS = ["revoke_session", "sign_out_all"];
+const APPROVAL_ACTIONS = ["approve", "reject", "cancel"];
+const USER_MGMT_ACTIONS = ["user_invited", "bootstrap_super_admin"];
+const ALERT_ACTIONS = ["sign_in_failed", "security_alert"];
+
 const CATEGORIES = [
   { value: "all", label: "All security events" },
   { value: "sign_in", label: "Sign-ins" },
+  { value: "sessions", label: "Session revocations" },
+  { value: "alerts", label: "Security alerts (failed sign-in, anomalies)" },
   { value: "approvals", label: "Approvals (approve/reject/cancel)" },
   { value: "role_changes", label: "Role changes" },
+  { value: "user_mgmt", label: "User management (invite, bootstrap)" },
   { value: "deletes", label: "Deletes (audited tables)" },
+  { value: "definer_other", label: "Other security-definer actions" },
 ] as const;
 
 const CATEGORY_FILTER: Record<
@@ -84,11 +117,27 @@ const CATEGORY_FILTER: Record<
 > = {
   all: () => true,
   sign_in: (r) => r.action === "sign_in",
+  sessions: (r) => SESSION_ACTIONS.includes(r.action),
+  alerts: (r) => ALERT_ACTIONS.includes(r.action),
   approvals: (r) =>
-    ["approve", "reject", "cancel"].includes(r.action) ||
+    APPROVAL_ACTIONS.includes(r.action) ||
     (r.entity_type ?? "").startsWith("approval:"),
   role_changes: (r) => r.entity_type === "user_roles",
+  user_mgmt: (r) => USER_MGMT_ACTIONS.includes(r.action),
   deletes: (r) => r.action === "delete",
+  // Anything security-tracked that isn't one of the buckets above — a
+  // catch-all for future SECURITY DEFINER actions we haven't categorised yet.
+  definer_other: (r) =>
+    !(
+      r.action === "sign_in" ||
+      SESSION_ACTIONS.includes(r.action) ||
+      ALERT_ACTIONS.includes(r.action) ||
+      APPROVAL_ACTIONS.includes(r.action) ||
+      (r.entity_type ?? "").startsWith("approval:") ||
+      r.entity_type === "user_roles" ||
+      USER_MGMT_ACTIONS.includes(r.action) ||
+      r.action === "delete"
+    ),
 };
 
 export const Route = createFileRoute("/_authenticated/admin/security-audit")({
@@ -132,7 +181,7 @@ function SecurityAuditPage() {
           event: "INSERT",
           schema: "public",
           table: "activity_logs",
-          filter: "action=in.(sign_in,approve,reject,cancel,delete)",
+          filter: `action=in.(${SECURITY_ACTIONS.join(",")})`,
         },
         () => {
           queryClient.invalidateQueries({ queryKey: ["security-audit"] });
@@ -158,21 +207,19 @@ function SecurityAuditPage() {
         .order("created_at", { ascending: false })
         .limit(1000);
 
-      // Server-side pre-filter for the categories that map to a single column
+      // Server-side pre-filter for categories that map to a single column
       if (category === "sign_in") q = q.eq("action", "sign_in");
-      else if (category === "role_changes") q = q.eq("entity_type", "user_roles");
+      else if (category === "role_changes")
+        q = q.eq("entity_type", "user_roles");
       else if (category === "deletes") q = q.eq("action", "delete");
-      else if (category === "approvals")
-        q = q.in("action", ["approve", "reject", "cancel"]);
+      else if (category === "approvals") q = q.in("action", APPROVAL_ACTIONS);
+      else if (category === "sessions") q = q.in("action", SESSION_ACTIONS);
+      else if (category === "alerts") q = q.in("action", ALERT_ACTIONS);
+      else if (category === "user_mgmt") q = q.in("action", USER_MGMT_ACTIONS);
       else {
-        // "all" — only security-significant actions
-        q = q.in("action", [
-          "sign_in",
-          "approve",
-          "reject",
-          "cancel",
-          "delete",
-        ]);
+        // "all" and "definer_other" — pull every security-significant action,
+        // then let the client-side CATEGORY_FILTER narrow further.
+        q = q.in("action", [...SECURITY_ACTIONS]);
       }
 
       if (actor !== "all")
@@ -238,12 +285,23 @@ function SecurityAuditPage() {
   }, [logsQ.data, category, search]);
 
   const stats = useMemo(() => {
-    const s = { signIn: 0, approvals: 0, deletes: 0, roleChanges: 0 };
+    const s = {
+      signIn: 0,
+      sessions: 0,
+      alerts: 0,
+      approvals: 0,
+      deletes: 0,
+      roleChanges: 0,
+      userMgmt: 0,
+    };
     for (const r of filteredRows) {
       if (r.action === "sign_in") s.signIn++;
-      if (["approve", "reject", "cancel"].includes(r.action)) s.approvals++;
+      if (SESSION_ACTIONS.includes(r.action)) s.sessions++;
+      if (ALERT_ACTIONS.includes(r.action)) s.alerts++;
+      if (APPROVAL_ACTIONS.includes(r.action)) s.approvals++;
       if (r.action === "delete") s.deletes++;
       if (r.entity_type === "user_roles") s.roleChanges++;
+      if (USER_MGMT_ACTIONS.includes(r.action)) s.userMgmt++;
     }
     return s;
   }, [filteredRows]);
@@ -367,12 +425,15 @@ function SecurityAuditPage() {
 
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <MiniStat icon={LogIn} label="Sign-ins" value={stats.signIn} />
+        <MiniStat icon={LogOut} label="Session revocations" value={stats.sessions} />
+        <MiniStat icon={Bell} label="Security alerts" value={stats.alerts} />
         <MiniStat
           icon={CheckCircle2}
           label="Approval decisions"
           value={stats.approvals}
         />
         <MiniStat icon={UserCog} label="Role changes" value={stats.roleChanges} />
+        <MiniStat icon={UserPlus} label="User management" value={stats.userMgmt} />
         <MiniStat icon={Trash2} label="Deletes" value={stats.deletes} />
       </div>
 
@@ -672,39 +733,41 @@ function MiniStat({
 
 const EVENT_LABELS: Record<string, string> = {
   sign_in: "sign in",
+  sign_in_failed: "sign-in failed",
+  security_alert: "security alert",
+  revoke_session: "session revoked",
+  sign_out_all: "all sessions revoked",
   approve: "approve",
   reject: "reject",
   cancel: "cancel",
   delete: "delete",
+  user_invited: "user invited",
+  bootstrap_super_admin: "super admin bootstrap",
 };
 
 function EventBadge({ action }: { action: string }) {
+  const danger = "bg-rose-500/15 text-rose-600 dark:text-rose-400";
+  const warn = "bg-amber-500/15 text-amber-600 dark:text-amber-400";
+  const ok = "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400";
+  const info = "bg-sky-500/15 text-sky-600 dark:text-sky-400";
+  const muted = "bg-muted text-muted-foreground";
   const map: Record<
     string,
     { icon: React.ComponentType<{ className?: string }>; cls: string }
   > = {
-    sign_in: {
-      icon: LogIn,
-      cls: "bg-sky-500/15 text-sky-600 dark:text-sky-400",
-    },
-    approve: {
-      icon: CheckCircle2,
-      cls: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-    },
-    reject: {
-      icon: XCircle,
-      cls: "bg-rose-500/15 text-rose-600 dark:text-rose-400",
-    },
-    cancel: {
-      icon: XCircle,
-      cls: "bg-muted text-muted-foreground",
-    },
-    delete: {
-      icon: Trash2,
-      cls: "bg-rose-500/15 text-rose-600 dark:text-rose-400",
-    },
+    sign_in: { icon: LogIn, cls: info },
+    sign_in_failed: { icon: ShieldAlert, cls: warn },
+    security_alert: { icon: Bell, cls: warn },
+    revoke_session: { icon: LogOut, cls: warn },
+    sign_out_all: { icon: LogOut, cls: danger },
+    approve: { icon: CheckCircle2, cls: ok },
+    reject: { icon: XCircle, cls: danger },
+    cancel: { icon: XCircle, cls: muted },
+    delete: { icon: Trash2, cls: danger },
+    user_invited: { icon: UserPlus, cls: info },
+    bootstrap_super_admin: { icon: KeyRound, cls: danger },
   };
-  const cfg = map[action] ?? { icon: ShieldCheck, cls: "bg-muted text-muted-foreground" };
+  const cfg = map[action] ?? { icon: ShieldCheck, cls: muted };
   const Icon = cfg.icon;
   const label = EVENT_LABELS[action] ?? action;
   return (
@@ -761,7 +824,7 @@ function ActorDetailDialog({
         .from("activity_logs")
         .select("id,user_id,action,entity_type,entity_id,metadata,created_at")
         .eq("user_id", userId!)
-        .in("action", ["sign_in", "approve", "reject", "cancel", "delete"])
+        .in("action", [...SECURITY_ACTIONS])
         .order("created_at", { ascending: false })
         .limit(25);
       if (error) throw error;
