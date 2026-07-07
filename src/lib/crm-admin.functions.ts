@@ -1,10 +1,51 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, getRequestHeader } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
+
+async function sendWelcomeEmail(params: {
+  recipientEmail: string;
+  fullName: string;
+  role: string;
+  invitedBy?: string | null;
+  userId: string;
+}) {
+  try {
+    const authHeader = getRequestHeader("authorization") ?? getRequestHeader("Authorization");
+    const host = getRequestHeader("host");
+    const proto = getRequestHeader("x-forwarded-proto") ?? "https";
+    if (!authHeader || !host) return;
+    const siteUrl = process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
+    const res = await fetch(`${proto}://${host}/lovable/email/transactional/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+      },
+      body: JSON.stringify({
+        templateName: "welcome",
+        recipientEmail: params.recipientEmail,
+        idempotencyKey: `welcome-${params.userId}`,
+        templateData: {
+          fullName: params.fullName,
+          role: params.role,
+          invitedBy: params.invitedBy ?? undefined,
+          loginUrl: `${siteUrl}/admin/login`,
+        },
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`welcome email send failed [${res.status}]: ${body}`);
+    }
+  } catch (err) {
+    console.error("welcome email send error", err);
+  }
+}
+
 
 const inviteSchema = z.object({
   email: z.string().email(),
