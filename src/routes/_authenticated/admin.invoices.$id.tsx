@@ -46,6 +46,10 @@ import {
   purgeOlderInvoicePdfVersions,
   type InvoicePdfVersionRow,
 } from "@/lib/invoice-pdf-versions";
+import {
+  listPurgeAuditForExport,
+  listPurgeAuditByIds,
+} from "@/lib/invoice-purge-audit.functions";
 
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import {
