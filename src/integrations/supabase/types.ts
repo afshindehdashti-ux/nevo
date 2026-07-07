@@ -420,6 +420,54 @@ export type Database = {
           },
         ]
       }
+      csv_export_audit: {
+        Row: {
+          byte_size: number
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          export_type: string
+          filename: string
+          filters: Json
+          id: string
+          metadata: Json
+          row_count: number
+          scope: string | null
+          sha256: string
+          user_id: string | null
+        }
+        Insert: {
+          byte_size: number
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          export_type: string
+          filename: string
+          filters?: Json
+          id?: string
+          metadata?: Json
+          row_count: number
+          scope?: string | null
+          sha256: string
+          user_id?: string | null
+        }
+        Update: {
+          byte_size?: number
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          export_type?: string
+          filename?: string
+          filters?: Json
+          id?: string
+          metadata?: Json
+          row_count?: number
+          scope?: string | null
+          sha256?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       customer_users: {
         Row: {
           created_at: string
