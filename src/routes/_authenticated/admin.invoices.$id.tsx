@@ -249,6 +249,29 @@ function InvoiceDetailPage() {
     setPurgeVersionQuery("");
   };
 
+  // -------- Purge audit row selection --------
+  const [selectedPurgeIds, setSelectedPurgeIds] = useState<Set<string>>(new Set());
+  const togglePurgeSelected = (logId: string, checked: boolean) => {
+    setSelectedPurgeIds((prev) => {
+      const next = new Set(prev);
+      if (checked) next.add(logId); else next.delete(logId);
+      return next;
+    });
+  };
+  const allFilteredSelected =
+    filteredPurgeLogs.length > 0 && filteredPurgeLogs.every((l) => selectedPurgeIds.has(l.id));
+  const someFilteredSelected =
+    !allFilteredSelected && filteredPurgeLogs.some((l) => selectedPurgeIds.has(l.id));
+  const toggleAllFiltered = (checked: boolean) => {
+    setSelectedPurgeIds((prev) => {
+      const next = new Set(prev);
+      if (checked) filteredPurgeLogs.forEach((l) => next.add(l.id));
+      else filteredPurgeLogs.forEach((l) => next.delete(l.id));
+      return next;
+    });
+  };
+  const clearPurgeSelection = () => setSelectedPurgeIds(new Set());
+
 
 
 
