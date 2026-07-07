@@ -207,10 +207,20 @@ function InvoiceDetailPage() {
     queryFn: async () => {
       const from = purgePage * purgePageSize;
       const to = from + purgePageSize - 1;
-      const base = supabase
+      let query = supabase
         .from("activity_logs")
-        .select("id, user_id, created_at, metadata", { count: "exact" });
-      const { data, error, count } = await applyPurgeFilters(base)
+        .select("id, user_id, created_at, metadata", { count: "exact" })
+        .eq("action", "purge_pdf_versions")
+        .eq("entity_type", "invoice")
+        .eq("entity_id", id);
+      if (purgeUserFilter === "__system__") {
+        query = query.is("user_id", null);
+      } else if (purgeUserFilter !== "all") {
+        query = query.eq("user_id", purgeUserFilter);
+      }
+      if (purgeFromDate) query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
+      if (purgeToDate) query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
+      const { data, error, count } = await query
         .order("created_at", { ascending: false })
         .range(from, to);
       if (error) throw error;
