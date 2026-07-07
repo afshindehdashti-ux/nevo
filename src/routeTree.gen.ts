@@ -60,6 +60,7 @@ import { Route as ApiPublicContactSubmitRouteImport } from './routes/api/public/
 import { Route as ApiPublicClientLogRouteImport } from './routes/api/public/client-log'
 import { Route as ApiPublicBootstrapSuperAdminRouteImport } from './routes/api/public/bootstrap-super-admin'
 import { Route as ApiPublicApprovalNotifyRouteImport } from './routes/api/public/approval-notify'
+import { Route as ApiAdminCsvExportAuditRouteImport } from './routes/api/admin/csv-export-audit'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTasksRouteImport } from './routes/_authenticated/admin.tasks'
 import { Route as AuthenticatedAdminSuppliersRouteImport } from './routes/_authenticated/admin.suppliers'
@@ -387,6 +388,11 @@ const ApiPublicBootstrapSuperAdminRoute =
 const ApiPublicApprovalNotifyRoute = ApiPublicApprovalNotifyRouteImport.update({
   id: '/api/public/approval-notify',
   path: '/api/public/approval-notify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminCsvExportAuditRoute = ApiAdminCsvExportAuditRouteImport.update({
+  id: '/api/admin/csv-export-audit',
+  path: '/api/admin/csv-export-audit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
@@ -875,6 +881,7 @@ export interface FileRoutesByFullPath {
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
+  '/api/admin/csv-export-audit': typeof ApiAdminCsvExportAuditRoute
   '/api/public/approval-notify': typeof ApiPublicApprovalNotifyRoute
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
@@ -992,6 +999,7 @@ export interface FileRoutesByTo {
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
+  '/api/admin/csv-export-audit': typeof ApiAdminCsvExportAuditRoute
   '/api/public/approval-notify': typeof ApiPublicApprovalNotifyRoute
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
@@ -1114,6 +1122,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/_authenticated/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
+  '/api/admin/csv-export-audit': typeof ApiAdminCsvExportAuditRoute
   '/api/public/approval-notify': typeof ApiPublicApprovalNotifyRoute
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
@@ -1236,6 +1245,7 @@ export interface FileRouteTypes {
     | '/admin/suppliers'
     | '/admin/tasks'
     | '/admin/users'
+    | '/api/admin/csv-export-audit'
     | '/api/public/approval-notify'
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
@@ -1353,6 +1363,7 @@ export interface FileRouteTypes {
     | '/admin/suppliers'
     | '/admin/tasks'
     | '/admin/users'
+    | '/api/admin/csv-export-audit'
     | '/api/public/approval-notify'
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
@@ -1474,6 +1485,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/suppliers'
     | '/_authenticated/admin/tasks'
     | '/_authenticated/admin/users'
+    | '/api/admin/csv-export-audit'
     | '/api/public/approval-notify'
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
@@ -1525,6 +1537,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   KnowledgeSplatRoute: typeof KnowledgeSplatRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
+  ApiAdminCsvExportAuditRoute: typeof ApiAdminCsvExportAuditRoute
   ApiPublicApprovalNotifyRoute: typeof ApiPublicApprovalNotifyRoute
   ApiPublicBootstrapSuperAdminRoute: typeof ApiPublicBootstrapSuperAdminRoute
   ApiPublicClientLogRoute: typeof ApiPublicClientLogRoute
@@ -1898,6 +1911,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/approval-notify'
       fullPath: '/api/public/approval-notify'
       preLoaderRoute: typeof ApiPublicApprovalNotifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/csv-export-audit': {
+      id: '/api/admin/csv-export-audit'
+      path: '/api/admin/csv-export-audit'
+      fullPath: '/api/admin/csv-export-audit'
+      preLoaderRoute: typeof ApiAdminCsvExportAuditRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/users': {
@@ -2745,6 +2765,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   KnowledgeSplatRoute: KnowledgeSplatRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
+  ApiAdminCsvExportAuditRoute: ApiAdminCsvExportAuditRoute,
   ApiPublicApprovalNotifyRoute: ApiPublicApprovalNotifyRoute,
   ApiPublicBootstrapSuperAdminRoute: ApiPublicBootstrapSuperAdminRoute,
   ApiPublicClientLogRoute: ApiPublicClientLogRoute,
