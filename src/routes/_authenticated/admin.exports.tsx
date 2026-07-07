@@ -12,7 +12,42 @@ import { listCsvExportAudit } from "@/lib/invoice-purge-audit.functions";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
 import { useMyRoles } from "@/lib/crm-hooks";
 import type { AppRole } from "@/lib/crm-hooks";
-import { verifyCsvText } from "@/lib/purge-csv-preamble";
+import { verifyCsvText, type VerifyResult } from "@/lib/purge-csv-preamble";
+
+const PREVIEW_ROW_LIMIT = 10;
+
+/** Minimal RFC-4180 CSV parser — stops once `maxRows` records are produced. */
+function parseCsvRows(text: string, maxRows: number): string[][] {
+  const rows: string[][] = [];
+  let field = "";
+  let row: string[] = [];
+  let inQuotes = false;
+  for (let i = 0; i < text.length && rows.length < maxRows; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else field += ch;
+      continue;
+    }
+    if (ch === '"') { inQuotes = true; continue; }
+    if (ch === ",") { row.push(field); field = ""; continue; }
+    if (ch === "\n" || ch === "\r") {
+      if (ch === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); field = "";
+      if (row.length > 1 || row[0] !== "") rows.push(row);
+      row = [];
+      continue;
+    }
+    field += ch;
+  }
+  if (rows.length < maxRows && (field !== "" || row.length > 0)) {
+    row.push(field);
+    if (row.length > 1 || row[0] !== "") rows.push(row);
+  }
+  return rows;
+}
 import {
   loadExportPresets,
   saveExportPresets,
