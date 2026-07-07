@@ -177,6 +177,7 @@ export const sendTestEmail = createServerFn({ method: "POST" })
     z.object({
       name: z.string().min(1),
       recipientEmail: z.string().email(),
+      overrides: overridesSchema,
     }).parse(data),
   )
   .handler(async ({ data, context }): Promise<{ success: boolean; messageId: string }> => {
@@ -192,6 +193,7 @@ export const sendTestEmail = createServerFn({ method: "POST" })
     if (!supabaseUrl || !serviceKey) throw new Error("Server misconfigured");
     const admin = createClient(supabaseUrl, serviceKey);
 
+    const overrides = data.overrides ?? {};
     const isAuth = !!AUTH_TEMPLATE_LOADERS[data.name];
     let html: string;
     let text: string;
@@ -199,7 +201,12 @@ export const sendTestEmail = createServerFn({ method: "POST" })
 
     if (isAuth) {
       const Component = await AUTH_TEMPLATE_LOADERS[data.name]!();
-      const props = { ...(AUTH_SAMPLE_DATA[data.name] ?? {}), recipient: data.recipientEmail, email: data.recipientEmail };
+      const props = {
+        ...(AUTH_SAMPLE_DATA[data.name] ?? {}),
+        recipient: data.recipientEmail,
+        email: data.recipientEmail,
+        ...overrides,
+      };
       const element = React.createElement(Component, props);
       html = await render(element);
       text = await render(element, { plainText: true });
@@ -207,7 +214,7 @@ export const sendTestEmail = createServerFn({ method: "POST" })
     } else {
       const entry = TEMPLATES[data.name];
       if (!entry) throw new Error(`Unknown template: ${data.name}`);
-      const previewData = entry.previewData ?? {};
+      const previewData = { ...(entry.previewData ?? {}), ...overrides };
       const element = React.createElement(entry.component, previewData);
       html = await render(element);
       text = await render(element, { plainText: true });
