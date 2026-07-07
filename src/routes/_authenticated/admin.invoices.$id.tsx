@@ -575,6 +575,7 @@ function InvoiceDetailPage() {
         .limit(1)
         .maybeSingle();
       await refetchPurgeLogs();
+      qc.invalidateQueries({ queryKey: ["invoice-purge-log-users", id] });
 
       setRemovedItems(snapshots);
       toast.success(`Purged ${removed} PDF version${removed === 1 ? "" : "s"}`, {
