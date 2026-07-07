@@ -66,6 +66,8 @@ const invoiceDetailSearchSchema = z.object({
   purgeFrom: fallback(z.string(), "").default(""),
   purgeTo: fallback(z.string(), "").default(""),
   purgeVersion: fallback(z.string(), "").default(""),
+  purgeMinBytes: fallback(z.string(), "").default(""),
+  purgeMaxBytes: fallback(z.string(), "").default(""),
   purgePage: fallback(z.number().int(), 0).default(0),
   purgeSize: fallback(z.number().int(), 25).default(25),
   purgeSort: fallback(z.string(), "created_at_desc").default("created_at_desc"),
