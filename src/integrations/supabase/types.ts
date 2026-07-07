@@ -3016,6 +3016,16 @@ export type Database = {
         Args: { _entity_id: string; _entity_type: string; _metadata?: Json }
         Returns: string
       }
+      log_pdf_version_purge: {
+        Args: {
+          _details?: Json
+          _invoice_id: string
+          _kept: number
+          _removed_count: number
+          _version_ids?: Json
+        }
+        Returns: string
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
