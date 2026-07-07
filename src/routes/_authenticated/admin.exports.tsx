@@ -3,15 +3,16 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileDown, Search, ShieldAlert, Copy, RefreshCw } from "lucide-react";
+import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2 } from "lucide-react";
 
 import { listCsvExportAudit } from "@/lib/invoice-purge-audit.functions";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
 import { useMyRoles } from "@/lib/crm-hooks";
 import type { AppRole } from "@/lib/crm-hooks";
+import { verifyCsvText } from "@/lib/purge-csv-preamble";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
