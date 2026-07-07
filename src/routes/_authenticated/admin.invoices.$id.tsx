@@ -1671,7 +1671,7 @@ function InvoiceDetailPage() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {purgeLogs.length === 0 ? (
+              {purgeTotal === 0 && !purgeFiltersActive ? (
                 <p className="px-4 py-6 text-sm text-muted-foreground text-center">
                   No purge actions recorded for this invoice.
                 </p>
