@@ -194,17 +194,17 @@ function InvoiceDetailPage() {
   const purgePageSize = search.purgeSize;
 
   const setPurgeUserFilter = (value: string) =>
-    navigate({ search: (prev) => ({ ...prev, purgeUser: value, purgePage: 0 }) });
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeUser: value, purgePage: 0 }) });
   const setPurgeFromDate = (value: string) =>
-    navigate({ search: (prev) => ({ ...prev, purgeFrom: value, purgePage: 0 }) });
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeFrom: value, purgePage: 0 }) });
   const setPurgeToDate = (value: string) =>
-    navigate({ search: (prev) => ({ ...prev, purgeTo: value, purgePage: 0 }) });
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeTo: value, purgePage: 0 }) });
   const setPurgeVersionQuery = (value: string) =>
-    navigate({ search: (prev) => ({ ...prev, purgeVersion: value, purgePage: 0 }) });
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeVersion: value, purgePage: 0 }) });
   const setPurgePageSize = (value: number) =>
-    navigate({ search: (prev) => ({ ...prev, purgeSize: value, purgePage: 0 }) });
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeSize: value, purgePage: 0 }) });
   const setPurgePage = (updater: number | ((prev: number) => number)) =>
-    navigate({ search: (prev) => ({ ...prev, purgePage: typeof updater === "function" ? updater(prev.purgePage) : updater }) });
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgePage: typeof updater === "function" ? updater(prev.purgePage) : updater }) });
 
 
 
