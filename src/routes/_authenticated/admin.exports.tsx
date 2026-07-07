@@ -10,6 +10,7 @@ import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2, Save, X, Bookm
 
 import { listCsvExportAudit } from "@/lib/invoice-purge-audit.functions";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
+import { verifyCsvExportOnServer } from "@/lib/verify-csv-export.functions";
 import { useMyRoles } from "@/lib/crm-hooks";
 import type { AppRole } from "@/lib/crm-hooks";
 import { verifyCsvText, type VerifyResult } from "@/lib/purge-csv-preamble";
@@ -124,6 +125,7 @@ function ExportsHistoryPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const listFn = useServerFn(listCsvExportAudit);
+  const verifyFn = useServerFn(verifyCsvExportOnServer);
 
   const [detail, setDetail] = useState<CsvExportAuditRecord | null>(null);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
@@ -219,7 +221,12 @@ function ExportsHistoryPage() {
     setVerifyingId(row.id);
     try {
       const text = await file.text();
-      const result = await verifyCsvText(text, { expectedSha: row.sha256 });
+      // Server is the source of truth: it fetches the stored SHA under RLS,
+      // computes the hash on the uploaded bytes, and returns the verdict.
+      // The browser only opens the file if the server says "match".
+      const { result } = await verifyFn({
+        data: { audit_id: row.id, file_text: text },
+      });
       if (result.status === "malformed") {
         setBlocked({ filename: file.name, row, result });
         toast.error("CSV structure is malformed — see details", {
@@ -230,17 +237,21 @@ function ExportsHistoryPage() {
       if (result.status === "mismatch") {
         setBlocked({ filename: file.name, row, result });
         toast.error("SHA-256 mismatch — file will not open", {
-          description: `Expected ${row.sha256.slice(0, 12)}… but computed ${result.computedSha.slice(0, 12)}…`,
+          description: `Expected ${row.sha256.slice(0, 12)}… but server computed ${result.computedSha.slice(0, 12)}…`,
         });
         return;
       }
-      // status === "match" (expected was always supplied)
+      if (result.status !== "match") {
+        toast.error("Server could not verify file", {
+          description: `Unexpected status: ${result.status}`,
+        });
+        return;
+      }
       const url = URL.createObjectURL(file);
       window.open(url, "_blank", "noopener,noreferrer");
-      // Revoke shortly after so the new tab has time to load the content.
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      toast.success("SHA-256 verified — opening file", {
-        description: `Computed ${result.computedSha.slice(0, 12)}… matches audit record.`,
+      toast.success("SHA-256 verified by server — opening file", {
+        description: `Server computed ${result.computedSha.slice(0, 12)}… matches audit record.`,
       });
     } catch (err) {
       toast.error("Verification failed", {
