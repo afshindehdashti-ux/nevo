@@ -44,6 +44,7 @@ function SettingsPage() {
         <TabsList>
           <TabsTrigger value="company">Company Profile</TabsTrigger>
           <TabsTrigger value="documents">Document Defaults</TabsTrigger>
+          <TabsTrigger value="security">Security Alerts</TabsTrigger>
           <TabsTrigger value="team">Team</TabsTrigger>
         </TabsList>
         <TabsContent value="company">
@@ -51,6 +52,9 @@ function SettingsPage() {
         </TabsContent>
         <TabsContent value="documents">
           <DocumentForm canEdit={isSuperAdmin} />
+        </TabsContent>
+        <TabsContent value="security">
+          <SecurityAlertsForm canEdit={isSuperAdmin} />
         </TabsContent>
         <TabsContent value="team">
           <TeamPanel />
@@ -400,5 +404,159 @@ function TeamPanel() {
         the roster is seeded.
       </p>
     </div>
+  );
+}
+
+function SecurityAlertsForm({ canEdit }: { canEdit: boolean }) {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["company_settings", "security"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("company_settings")
+        .select(
+          "id, security_signin_failure_threshold, security_signin_failure_window_minutes, security_new_country_dedup_minutes",
+        )
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const [form, setForm] = useState<{
+    threshold: string;
+    windowMin: string;
+    dedupMin: string;
+  }>({ threshold: "5", windowMin: "10", dedupMin: "1440" });
+
+  useEffect(() => {
+    if (data) {
+      setForm({
+        threshold: String(data.security_signin_failure_threshold ?? 5),
+        windowMin: String(data.security_signin_failure_window_minutes ?? 10),
+        dedupMin: String(data.security_new_country_dedup_minutes ?? 1440),
+      });
+    }
+  }, [data]);
+
+  const save = useMutation({
+    mutationFn: async () => {
+      if (!data?.id) throw new Error("Settings row missing");
+      const threshold = Number(form.threshold);
+      const windowMin = Number(form.windowMin);
+      const dedupMin = Number(form.dedupMin);
+      if (!Number.isFinite(threshold) || threshold < 1 || threshold > 1000)
+        throw new Error("Failure threshold must be between 1 and 1000");
+      if (!Number.isFinite(windowMin) || windowMin < 1 || windowMin > 1440)
+        throw new Error("Failure window must be 1–1440 minutes");
+      if (!Number.isFinite(dedupMin) || dedupMin < 1 || dedupMin > 43200)
+        throw new Error("New-country dedup must be 1–43200 minutes");
+      const payload: TablesUpdate<"company_settings"> = {
+        security_signin_failure_threshold: Math.floor(threshold),
+        security_signin_failure_window_minutes: Math.floor(windowMin),
+        security_new_country_dedup_minutes: Math.floor(dedupMin),
+      };
+      const { error } = await supabase
+        .from("company_settings")
+        .update(payload)
+        .eq("id", data.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Security alert thresholds saved");
+      qc.invalidateQueries({ queryKey: ["company_settings"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to save"),
+  });
+
+  if (isLoading) return <p className="text-sm text-muted-foreground p-4">Loading…</p>;
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        save.mutate();
+      }}
+      className="space-y-6 mt-4"
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Failed sign-in alerts</CardTitle>
+          <CardDescription>
+            Trigger a security-alert email when a single email address hits this many
+            failed sign-in attempts inside the rolling window.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="threshold">Failure threshold</Label>
+            <Input
+              id="threshold"
+              type="number"
+              min={1}
+              max={1000}
+              value={form.threshold}
+              onChange={(e) => setForm({ ...form, threshold: e.target.value })}
+              disabled={!canEdit}
+            />
+            <p className="text-xs text-muted-foreground">
+              Number of failed attempts before an alert is sent.
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="window">Rolling window (minutes)</Label>
+            <Input
+              id="window"
+              type="number"
+              min={1}
+              max={1440}
+              value={form.windowMin}
+              onChange={(e) => setForm({ ...form, windowMin: e.target.value })}
+              disabled={!canEdit}
+            />
+            <p className="text-xs text-muted-foreground">
+              Failures older than this are not counted. 1–1440 minutes.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">New-country sign-in alerts</CardTitle>
+          <CardDescription>
+            Suppress repeat &ldquo;new country&rdquo; alerts for the same user and
+            country during this window.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="dedup">Dedup window (minutes)</Label>
+            <Input
+              id="dedup"
+              type="number"
+              min={1}
+              max={43200}
+              value={form.dedupMin}
+              onChange={(e) => setForm({ ...form, dedupMin: e.target.value })}
+              disabled={!canEdit}
+            />
+            <p className="text-xs text-muted-foreground">
+              Default 1440 (24h). Max 43200 (30 days).
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {canEdit && (
+        <div className="flex justify-end">
+          <Button type="submit" disabled={save.isPending}>
+            {save.isPending ? "Saving…" : "Save changes"}
+          </Button>
+        </div>
+      )}
+    </form>
   );
 }

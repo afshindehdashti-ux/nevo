@@ -79,10 +79,21 @@ export const logAdminSignIn = createServerFn({ method: "POST" })
           const name =
             (profile as { full_name?: string | null } | null)?.full_name ??
             context.userId;
+          let dedupMinutes = 24 * 60;
+          try {
+            const { data: cfg } = await supabaseAdmin.rpc("get_security_alert_settings");
+            const row = Array.isArray(cfg) ? cfg[0] : cfg;
+            const m = Number(
+              (row as { new_country_dedup_minutes?: number } | null)?.new_country_dedup_minutes,
+            );
+            if (Number.isFinite(m) && m >= 1) dedupMinutes = Math.floor(m);
+          } catch (err) {
+            console.warn("new-country dedup setting lookup failed", err);
+          }
           void enqueueSecurityAlert({
             kind: "new_country_sign_in",
             dedupKey: `new-country:${context.userId}:${country}`,
-            dedupWindowMinutes: 24 * 60,
+            dedupWindowMinutes: dedupMinutes,
             userId: context.userId,
             headline: `${name} signed in from a new country: ${country}`,
             summary:
