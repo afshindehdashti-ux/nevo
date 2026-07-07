@@ -52,7 +52,22 @@ function AuthPage() {
         navigate({ to });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign in failed");
+      const message = err instanceof Error ? err.message : "Sign in failed";
+      setError(message);
+      // Fire-and-forget: report failed sign-in so the backend can log and,
+      // if this email crosses the threshold, page the security recipient.
+      if (!resetMode && email) {
+        try {
+          void fetch("/api/public/alerts/sign-in-failed", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, reason: message }),
+            keepalive: true,
+          });
+        } catch {
+          /* ignore — best-effort */
+        }
+      }
     } finally {
       setLoading(false);
     }
