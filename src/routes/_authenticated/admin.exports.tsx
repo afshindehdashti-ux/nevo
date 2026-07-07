@@ -13,6 +13,7 @@ import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
 import { useMyRoles } from "@/lib/crm-hooks";
 import type { AppRole } from "@/lib/crm-hooks";
 import { verifyCsvText, type VerifyResult } from "@/lib/purge-csv-preamble";
+import { detectShaDrift } from "@/lib/csv-export-audit-metadata";
 
 const PREVIEW_ROW_LIMIT = 10;
 
