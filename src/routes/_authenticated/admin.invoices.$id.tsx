@@ -1078,6 +1078,11 @@ function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
       <TableCell>
         <Badge variant="secondary">{sourceLabel[v.source] ?? v.source}</Badge>
       </TableCell>
+      <TableCell>
+        <Badge variant="outline">
+          {v.doc_type === "proforma" ? "Proforma" : "Commercial"}
+        </Badge>
+      </TableCell>
       <TableCell className="text-xs font-mono truncate max-w-[220px]" title={v.filename}>
         {v.filename}
       </TableCell>
