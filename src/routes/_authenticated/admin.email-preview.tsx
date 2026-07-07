@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { AlertCircle, AlertTriangle, CheckCircle2, Info, ShieldCheck } from "lucide-react";
+import { ExternalLink, AlertCircle, AlertTriangle, CheckCircle2, Info, ShieldCheck } from "lucide-react";
 import { auditEmailHtml, type A11yIssue } from "@/lib/email-a11y";
 
 type OverrideValue = string;
@@ -338,6 +338,22 @@ function EmailPreviewAdmin() {
             <span className="text-xs text-muted-foreground">
               Sends the current template with sample data. Subject is prefixed with [TEST].
             </span>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={!preview.data?.html || !current}
+              onClick={() => {
+                if (!preview.data?.html || !current) return;
+                const blob = new Blob([preview.data.html], { type: "text/html;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+                window.open(url, "_blank", "noopener,noreferrer");
+                // Revoke after the tab has had time to read the blob.
+                window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+              }}
+            >
+              <ExternalLink className="h-4 w-4 mr-1.5" aria-hidden />
+              Open in new tab
+            </Button>
             <Button
               size="sm"
               variant="outline"
