@@ -724,10 +724,118 @@ function ExportsHistoryPage() {
                 </pre>
               </div>
             </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <div className="text-xs text-muted-foreground">
+                      Payload preview
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      Load the CSV file to re-verify its SHA-256 and preview the first {PREVIEW_ROW_LIMIT - 1} data rows.
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={triggerPreview}
+                      disabled={previewLoading}
+                    >
+                      {previewLoading ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <FileDown className="h-3.5 w-3.5" />
+                      )}
+                      {preview ? "Load different file" : "Load CSV to preview"}
+                    </Button>
+                    {preview && (
+                      <Button size="sm" variant="ghost" onClick={resetPreview}>
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {preview && (
+                  <div className="space-y-2">
+                    {preview.result.status === "match" && (
+                      <Alert>
+                        <AlertTitle>SHA-256 verified</AlertTitle>
+                        <AlertDescription className="font-mono text-[11px] break-all">
+                          {preview.filename} · computed {preview.result.computedSha.slice(0, 16)}… matches audit record.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    {preview.result.status === "mismatch" && (
+                      <Alert variant="destructive">
+                        <ShieldAlert className="h-4 w-4" />
+                        <AlertTitle>SHA-256 mismatch</AlertTitle>
+                        <AlertDescription className="font-mono text-[11px] break-all">
+                          Expected {preview.result.expected.slice(0, 16)}… but computed {preview.result.computedSha.slice(0, 16)}…. Preview shown for inspection only — do NOT trust this file.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    {preview.result.status === "malformed" && (
+                      <Alert variant="destructive">
+                        <ShieldAlert className="h-4 w-4" />
+                        <AlertTitle>CSV structure is malformed</AlertTitle>
+                        <AlertDescription>
+                          {preview.result.messages.join(" · ")}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {preview.result.status !== "malformed" && preview.headers.length > 0 && (
+                      <div className="rounded-md border overflow-auto max-h-80">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              {preview.headers.map((h, i) => (
+                                <TableHead key={i} className="text-xs whitespace-nowrap">
+                                  {h}
+                                </TableHead>
+                              ))}
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {preview.rows.map((r, ri) => (
+                              <TableRow key={ri}>
+                                {preview.headers.map((_, ci) => (
+                                  <TableCell
+                                    key={ci}
+                                    className="text-[11px] font-mono whitespace-nowrap max-w-[240px] truncate"
+                                    title={r[ci] ?? ""}
+                                  >
+                                    {r[ci] ?? ""}
+                                  </TableCell>
+                                ))}
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                        {preview.truncated && (
+                          <div className="px-3 py-1.5 text-[11px] text-muted-foreground border-t bg-muted/30">
+                            Showing first {preview.rows.length} of {detail.row_count} data rows.
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </DialogContent>
-      >
-        <DialogContent className="max-w-3xl">
+      </Dialog>
 
+      <input
+        ref={previewInputRef}
+        type="file"
+        accept=".csv,text/csv"
+        className="hidden"
+        onChange={handlePreviewPicked}
+      />
+    </div>
   );
 }
+
