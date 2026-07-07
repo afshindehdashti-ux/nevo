@@ -421,15 +421,26 @@ function SecurityAuditPage() {
                 ? "Connecting…"
                 : "Offline"}
           </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={exportCsv}
-            disabled={!filteredRows.length}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!filteredRows.length}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={exportCsv}>
+                Download CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={exportPdf}>
+                Download PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
