@@ -3,16 +3,21 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2 } from "lucide-react";
+import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2, Save, X, Bookmark } from "lucide-react";
 
 import { listCsvExportAudit } from "@/lib/invoice-purge-audit.functions";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
 import { useMyRoles } from "@/lib/crm-hooks";
 import type { AppRole } from "@/lib/crm-hooks";
 import { verifyCsvText } from "@/lib/purge-csv-preamble";
+import {
+  loadExportPresets,
+  saveExportPresets,
+  type ExportFilterPreset,
+} from "@/lib/export-filter-presets";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -182,6 +187,67 @@ function ExportsHistoryPage() {
     (search.from ? 1 : 0) +
     (search.to ? 1 : 0);
 
+  // --- Saved filter presets (per-browser via localStorage) ---
+  const [presets, setPresets] = useState<ExportFilterPreset[]>([]);
+  const [presetName, setPresetName] = useState("");
+
+  useEffect(() => {
+    setPresets(loadExportPresets());
+  }, []);
+
+  function persistPresets(next: ExportFilterPreset[]) {
+    setPresets(next);
+    saveExportPresets(next);
+  }
+
+  function savePreset() {
+    const name = presetName.trim();
+    if (!name) {
+      toast.error("Give the preset a name first.");
+      return;
+    }
+    if (activeFilters === 0) {
+      toast.error("Set at least one filter before saving a preset.");
+      return;
+    }
+    const next: ExportFilterPreset = {
+      id: crypto.randomUUID(),
+      name,
+      filters: {
+        q: search.q ?? "",
+        scope: search.scope ?? "all",
+        user: search.user ?? "all",
+        from: search.from ?? "",
+        to: search.to ?? "",
+      },
+    };
+    const existing = presets.filter((p) => p.name !== name);
+    persistPresets([next, ...existing].slice(0, 20));
+    setPresetName("");
+    toast.success(`Preset "${name}" saved.`);
+  }
+
+  function applyPreset(p: ExportFilterPreset) {
+    void navigate({ search: () => ({ ...p.filters }) });
+  }
+
+  function deletePreset(id: string) {
+    persistPresets(presets.filter((p) => p.id !== id));
+  }
+
+  const activePresetId = useMemo(() => {
+    return (
+      presets.find(
+        (p) =>
+          p.filters.q === (search.q ?? "") &&
+          p.filters.scope === (search.scope ?? "all") &&
+          p.filters.user === (search.user ?? "all") &&
+          p.filters.from === (search.from ?? "") &&
+          p.filters.to === (search.to ?? ""),
+      )?.id ?? null
+    );
+  }, [presets, search.q, search.scope, search.user, search.from, search.to]);
+
   if (rolesLoading) {
     return (
       <div className="p-6 space-y-3">
@@ -287,6 +353,75 @@ function ExportsHistoryPage() {
               />
             </div>
           </div>
+
+          <div className="flex flex-wrap items-end gap-2 rounded-md border bg-muted/30 p-2">
+            <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+              <Bookmark className="h-3.5 w-3.5" />
+              Saved presets
+            </div>
+            {presets.length === 0 ? (
+              <span className="text-xs text-muted-foreground">
+                None yet — set filters, name it, then Save.
+              </span>
+            ) : (
+              <div className="flex flex-wrap gap-1">
+                {presets.map((p) => (
+                  <div
+                    key={p.id}
+                    className={`inline-flex items-center gap-1 rounded-full border pl-2 pr-1 py-0.5 text-xs ${
+                      activePresetId === p.id
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-background"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      className="max-w-[160px] truncate"
+                      onClick={() => applyPreset(p)}
+                      title={`Apply "${p.name}"`}
+                    >
+                      {p.name}
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-full p-0.5 hover:bg-muted"
+                      onClick={() => deletePreset(p.id)}
+                      title={`Delete "${p.name}"`}
+                      aria-label={`Delete preset ${p.name}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="ml-auto flex items-end gap-1">
+              <Input
+                value={presetName}
+                onChange={(e) => setPresetName(e.target.value)}
+                placeholder="Preset name"
+                className="h-8 w-40 text-xs"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    savePreset();
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-8"
+                onClick={savePreset}
+                disabled={activeFilters === 0 || !presetName.trim()}
+              >
+                <Save className="h-3 w-3 mr-1" />
+                Save
+              </Button>
+            </div>
+          </div>
+
 
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <span>
