@@ -233,6 +233,10 @@ function InvoiceDetailPage() {
     navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeTo: value, purgePage: 0 }) });
   const setPurgeVersionQuery = (value: string) =>
     navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeVersion: value, purgePage: 0 }) });
+  const setPurgeMinBytes = (value: string) =>
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeMinBytes: value, purgePage: 0 }) });
+  const setPurgeMaxBytes = (value: string) =>
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeMaxBytes: value, purgePage: 0 }) });
   const setPurgePageSize = (value: number) =>
     navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeSize: value, purgePage: 0 }) });
   const setPurgePage = (updater: number | ((prev: number) => number)) =>
