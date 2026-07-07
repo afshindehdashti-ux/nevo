@@ -1943,7 +1943,7 @@ function InvoiceDetailPage() {
                     variant="outline"
                     size="sm"
                     className="h-8"
-                    onClick={() => { void exportPurgeAuditCsv(); }}
+                    onClick={() => { void openPurgeExportConfirm("filtered"); }}
                     disabled={!canPurgePdf || (purgeTotal === 0)}
                     title={!canPurgePdf ? "Only Super Admin, Management, or Finance can export purge history." : undefined}
                   >
