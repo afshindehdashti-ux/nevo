@@ -113,6 +113,7 @@ function SecurityAuditPage() {
   const [actor, setActor] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<LogRow | null>(null);
+  const [actorDetail, setActorDetail] = useState<string | null>(null);
   const [liveStatus, setLiveStatus] = useState<"connecting" | "live" | "off">(
     "connecting",
   );
