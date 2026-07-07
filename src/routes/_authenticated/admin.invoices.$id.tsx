@@ -1830,16 +1830,14 @@ function InvoiceDetailPage() {
                         title={!canPurgePdf ? "Only Super Admin, Management, or Finance can export purge history." : undefined}
                         onClick={async () => {
                           const ids = Array.from(selectedPurgeIds);
-                          const { data, error } = await supabase
-                            .from("activity_logs")
-                            .select("id, user_id, created_at, metadata")
-                            .in("id", ids)
-                            .order("created_at", { ascending: false });
-                          if (error) {
-                            toast.error(error.message);
-                            return;
+                          try {
+                            const data = await fetchPurgeAuditByIds({
+                              data: { invoice_id: id, ids },
+                            });
+                            await exportPurgeAuditCsv(data as PurgeLogRow[], "selected");
+                          } catch (e) {
+                            toast.error(e instanceof Error ? e.message : "Failed to load selected audit entries");
                           }
-                          await exportPurgeAuditCsv((data ?? []) as PurgeLogRow[], "selected");
                         }}
                       >
                         <FileDown className="h-3.5 w-3.5 mr-1" />
