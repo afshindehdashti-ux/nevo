@@ -46,6 +46,10 @@ import {
   purgeOlderInvoicePdfVersions,
   type InvoicePdfVersionRow,
 } from "@/lib/invoice-pdf-versions";
+import {
+  listPurgeAuditForExport,
+  listPurgeAuditByIds,
+} from "@/lib/invoice-purge-audit.functions";
 
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import {
@@ -116,6 +120,8 @@ function InvoiceDetailPage() {
   const canEdit = useCanEditInvoices();
   const canPay = useCanEditPayments();
   const canPurgePdf = useCanPurgeInvoicePdfVersions();
+  const fetchPurgeAuditForExport = useServerFn(listPurgeAuditForExport);
+  const fetchPurgeAuditByIds = useServerFn(listPurgeAuditByIds);
 
   const { data: invoice, isLoading } = useQuery({
     queryKey: ["invoice", id],
@@ -775,22 +781,18 @@ function InvoiceDetailPage() {
     let source: PurgeLogRow[] = rows ?? [];
     try {
       if (!rows) {
-        let query = supabase
-          .from("activity_logs")
-          .select("id, user_id, created_at, metadata")
-          .eq("action", "purge_pdf_versions")
-          .eq("entity_type", "invoice")
-          .eq("entity_id", id);
-        if (purgeUserFilter === "__system__") query = query.is("user_id", null);
-        else if (purgeUserFilter !== "all") query = query.eq("user_id", purgeUserFilter);
-        if (purgeFromDate) query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
-        if (purgeToDate) query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
-        const sortColumn = purgeSort.column === "user" ? "user_id" : "created_at";
-        const { data, error } = await query
-          .order(sortColumn, { ascending: purgeSort.direction === "asc" })
-          .limit(10000);
-        if (error) throw error;
-        source = (data ?? []) as PurgeLogRow[];
+        const data = await fetchPurgeAuditForExport({
+          data: {
+            invoice_id: id,
+            user_filter: purgeUserFilter,
+            from_date: purgeFromDate || undefined,
+            to_date: purgeToDate || undefined,
+            sort_column: purgeSort.column === "user" ? "user_id" : "created_at",
+            sort_ascending: purgeSort.direction === "asc",
+            limit: 10000,
+          },
+        });
+        source = data as PurgeLogRow[];
         // Apply client-side version-id filter (JSON metadata; not queryable).
         const idQ = purgeVersionQuery.trim().toLowerCase();
         if (idQ) {
@@ -1824,16 +1826,14 @@ function InvoiceDetailPage() {
                         title={!canPurgePdf ? "Only Super Admin, Management, or Finance can export purge history." : undefined}
                         onClick={async () => {
                           const ids = Array.from(selectedPurgeIds);
-                          const { data, error } = await supabase
-                            .from("activity_logs")
-                            .select("id, user_id, created_at, metadata")
-                            .in("id", ids)
-                            .order("created_at", { ascending: false });
-                          if (error) {
-                            toast.error(error.message);
-                            return;
+                          try {
+                            const data = await fetchPurgeAuditByIds({
+                              data: { invoice_id: id, ids },
+                            });
+                            await exportPurgeAuditCsv(data as PurgeLogRow[], "selected");
+                          } catch (e) {
+                            toast.error(e instanceof Error ? e.message : "Failed to load selected audit entries");
                           }
-                          await exportPurgeAuditCsv((data ?? []) as PurgeLogRow[], "selected");
                         }}
                       >
                         <FileDown className="h-3.5 w-3.5 mr-1" />
