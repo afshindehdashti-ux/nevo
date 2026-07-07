@@ -1287,7 +1287,7 @@ function InvoiceDetailPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card id="purge-audit-log">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <History className="h-4 w-4" />
