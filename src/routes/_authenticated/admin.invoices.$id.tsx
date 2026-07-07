@@ -183,17 +183,27 @@ function InvoiceDetailPage() {
     metadata: Record<string, unknown> | null;
   };
 
-  // -------- Purge audit log filters + pagination --------
-  const [purgeUserFilter, setPurgeUserFilter] = useState<string>("all");
-  const [purgeFromDate, setPurgeFromDate] = useState<string>("");
-  const [purgeToDate, setPurgeToDate] = useState<string>("");
-  const [purgeVersionQuery, setPurgeVersionQuery] = useState<string>("");
-  const [purgePage, setPurgePage] = useState(0);
-  const [purgePageSize, setPurgePageSize] = useState(25);
-  // Reset to first page whenever server-side filters change.
-  useEffect(() => {
-    setPurgePage(0);
-  }, [purgeUserFilter, purgeFromDate, purgeToDate, purgePageSize]);
+  // -------- Purge audit log filters + pagination (URL-backed) --------
+  const purgeUserFilter = search.purgeUser;
+  const purgeFromDate = search.purgeFrom;
+  const purgeToDate = search.purgeTo;
+  const purgeVersionQuery = search.purgeVersion;
+  const purgePage = search.purgePage;
+  const purgePageSize = search.purgeSize;
+
+  const setPurgeUserFilter = (value: string) =>
+    navigate({ search: (prev) => ({ ...prev, purgeUser: value, purgePage: 0 }) });
+  const setPurgeFromDate = (value: string) =>
+    navigate({ search: (prev) => ({ ...prev, purgeFrom: value, purgePage: 0 }) });
+  const setPurgeToDate = (value: string) =>
+    navigate({ search: (prev) => ({ ...prev, purgeTo: value, purgePage: 0 }) });
+  const setPurgeVersionQuery = (value: string) =>
+    navigate({ search: (prev) => ({ ...prev, purgeVersion: value, purgePage: 0 }) });
+  const setPurgePageSize = (value: number) =>
+    navigate({ search: (prev) => ({ ...prev, purgeSize: value, purgePage: 0 }) });
+  const setPurgePage = (updater: number | ((prev: number) => number)) =>
+    navigate({ search: (prev) => ({ ...prev, purgePage: typeof updater === "function" ? updater(prev.purgePage) : updater }) });
+
 
 
   const purgeLogsQuery = useQuery({
