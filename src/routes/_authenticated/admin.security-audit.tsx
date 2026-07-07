@@ -339,15 +339,44 @@ function SecurityAuditPage() {
             </p>
           </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={exportCsv}
-          disabled={!filteredRows.length}
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Export CSV
-        </Button>
+        <div className="flex items-center gap-2">
+          <span
+            className={
+              "inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-full border " +
+              (liveStatus === "live"
+                ? "border-emerald-500/40 text-emerald-600 dark:text-emerald-400"
+                : liveStatus === "connecting"
+                  ? "border-muted-foreground/30 text-muted-foreground"
+                  : "border-destructive/40 text-destructive")
+            }
+            aria-live="polite"
+          >
+            <span
+              className={
+                "h-1.5 w-1.5 rounded-full " +
+                (liveStatus === "live"
+                  ? "bg-emerald-500 animate-pulse"
+                  : liveStatus === "connecting"
+                    ? "bg-muted-foreground/60"
+                    : "bg-destructive")
+              }
+            />
+            {liveStatus === "live"
+              ? "Live"
+              : liveStatus === "connecting"
+                ? "Connecting…"
+                : "Offline"}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={exportCsv}
+            disabled={!filteredRows.length}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
