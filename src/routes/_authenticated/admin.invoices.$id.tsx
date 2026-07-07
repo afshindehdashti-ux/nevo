@@ -408,16 +408,11 @@ function InvoiceDetailPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={async () => {
-                try {
-                  await generateInvoicePdf(invoice.id);
-                } catch (e) {
-                  toast.error(e instanceof Error ? e.message : "PDF failed");
-                }
-              }}
+              onClick={openPdfPreview}
+              disabled={pdfLoading}
             >
               <FileDown className="h-4 w-4 mr-1" />
-              Download PDF
+              {pdfLoading ? "Preparing…" : "Preview PDF"}
             </Button>
             {canPay && invoice.type === "commercial" && Number(invoice.balance) > 0 && (
               <Button size="sm" onClick={() => setPayOpen(true)}>
