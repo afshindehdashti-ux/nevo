@@ -1080,7 +1080,7 @@ function InvoiceDetailPage() {
     try {
       const exportMeta: PurgeExportMeta =
         purgeExportConfirmState.scope === "selected"
-          ? { scope: "selected", selectedIds: Array.from(selectedPurgeIds) }
+          ? { scope: "selected" }
           : {
               scope: "filtered",
               userLabel:
