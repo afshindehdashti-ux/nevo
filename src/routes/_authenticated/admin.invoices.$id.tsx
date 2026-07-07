@@ -961,6 +961,56 @@ function InvoiceDetailPage() {
   );
 }
 
+function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
+  const [busy, setBusy] = useState(false);
+  const sourceLabel: Record<string, string> = {
+    download: "Download",
+    email: "Emailed",
+    bulk: "Bulk export",
+    preview: "Preview",
+  };
+  const sizeKb = v.byte_size ? `${(v.byte_size / 1024).toFixed(0)} KB` : "—";
+  const dt = new Date(v.created_at);
+  const stamp = `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  async function download() {
+    setBusy(true);
+    try {
+      const url = await signInvoicePdfUrl(v.storage_path, 300);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = v.filename;
+      a.target = "_blank";
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Download failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <TableRow>
+      <TableCell className="whitespace-nowrap text-sm">{stamp}</TableCell>
+      <TableCell>
+        <Badge variant="secondary">{sourceLabel[v.source] ?? v.source}</Badge>
+      </TableCell>
+      <TableCell className="text-xs font-mono truncate max-w-[220px]" title={v.filename}>
+        {v.filename}
+      </TableCell>
+      <TableCell className="text-right text-sm">{sizeKb}</TableCell>
+      <TableCell className="text-right">
+        <Button size="sm" variant="outline" onClick={download} disabled={busy}>
+          <FileDown className="h-3.5 w-3.5 mr-1" />
+          {busy ? "…" : "Get"}
+        </Button>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+
 function Row({ label, value }: { label: React.ReactNode; value: React.ReactNode }) {
   return (
     <div className="flex justify-between">
