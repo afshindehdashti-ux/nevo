@@ -152,6 +152,46 @@ function InvoiceDetailPage() {
     },
   });
 
+  type PurgeLogRow = {
+    id: string;
+    user_id: string | null;
+    created_at: string;
+    metadata: Record<string, unknown> | null;
+  };
+  const { data: purgeLogs = [], refetch: refetchPurgeLogs } = useQuery({
+    queryKey: ["invoice-purge-logs", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .select("id, user_id, created_at, metadata")
+        .eq("action", "purge_pdf_versions")
+        .eq("entity_type", "invoice")
+        .eq("entity_id", id)
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data ?? []) as PurgeLogRow[];
+    },
+  });
+  const purgeActorIds = useMemo(
+    () => Array.from(new Set(purgeLogs.map((l) => l.user_id).filter((x): x is string => !!x))),
+    [purgeLogs],
+  );
+  const { data: purgeActorMap = {} } = useQuery({
+    queryKey: ["purge-log-actors", purgeActorIds.sort().join(",")],
+    enabled: purgeActorIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", purgeActorIds);
+      if (error) throw error;
+      const map: Record<string, string> = {};
+      for (const p of data ?? []) map[p.id] = p.full_name ?? "";
+      return map;
+    },
+  });
+
 
   const [lines, setLines] = useState<Line[]>([]);
   const [notes, setNotes] = useState("");
