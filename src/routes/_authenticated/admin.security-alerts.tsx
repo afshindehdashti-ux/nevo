@@ -226,6 +226,26 @@ function SecurityAlertsPage() {
               <ShieldCheck className="h-4 w-4" /> Full audit
             </Link>
           </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                disabled={filtered.length === 0}
+              >
+                <Download className="h-4 w-4" /> Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => exportAlerts("csv")}>
+                Download CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => exportAlerts("pdf")}>
+                Download PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
             variant="outline"
             size="sm"
@@ -238,6 +258,7 @@ function SecurityAlertsPage() {
           </Button>
         </div>
       </div>
+
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <StatTile label="High severity" value={totalHigh} tone={totalHigh > 0 ? "bad" : undefined} />
