@@ -85,7 +85,7 @@ export const listEmailPreviews = createServerFn({ method: "GET" })
         displayName: entry.displayName ?? name,
         category: "app" as const,
         subject,
-        defaultData: previewData,
+        defaultData: flattenScalar(previewData),
       };
     });
 
