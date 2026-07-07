@@ -1042,9 +1042,11 @@ function InvoiceDetailPage() {
       return;
     }
     setPurgeExportConfirmOpen(true);
-    setPurgeExportConfirmState({ scope, rows: [], loading: true });
+    setPurgeExportConfirmState({ scope, rows: [], total: 0, capped: false, loading: true });
     try {
       let source: PurgeLogRow[] = [];
+      let total = 0;
+      let capped = false;
       if (scope === "selected") {
         const ids = Array.from(selectedPurgeIds);
         if (ids.length === 0) {
@@ -1057,8 +1059,9 @@ function InvoiceDetailPage() {
           data: { invoice_id: id, ids },
         });
         source = data as PurgeLogRow[];
+        total = source.length;
       } else {
-        const data = await fetchPurgeAuditForExport({
+        const result = await fetchPurgeAuditForExport({
           data: {
             invoice_id: id,
             user_filter: purgeUserFilter,
@@ -1069,7 +1072,9 @@ function InvoiceDetailPage() {
             limit: 10000,
           },
         });
-        source = data as PurgeLogRow[];
+        source = result.rows as PurgeLogRow[];
+        total = result.total;
+        capped = result.total > source.length;
         // Apply client-side version-id filter.
         const idQ = purgeVersionQuery.trim().toLowerCase();
         if (idQ) {
@@ -1110,7 +1115,19 @@ function InvoiceDetailPage() {
         setPurgeExportConfirmState(null);
         return;
       }
-      setPurgeExportConfirmState({ scope, rows: source, loading: false });
+      if (capped) {
+        toast.warning("Filtered export is capped at 10,000 rows", {
+          description: `${total.toLocaleString()} entries match your filters. Narrow the date range, user, or version filters to export the rest.`,
+          action: {
+            label: "View filters",
+            onClick: () => {
+              const filterEl = document.getElementById("purge-audit-filters");
+              if (filterEl) filterEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            },
+          },
+        });
+      }
+      setPurgeExportConfirmState({ scope, rows: source, total, capped, loading: false });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to prepare purge audit export");
       setPurgeExportConfirmOpen(false);
