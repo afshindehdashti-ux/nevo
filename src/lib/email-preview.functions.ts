@@ -20,7 +20,7 @@ function generateToken(): string {
 const SAMPLE_EMAIL = "user@example.test";
 const SAMPLE_URL = "https://www.nevoindustrial.com";
 
-const AUTH_SAMPLE_DATA: Record<string, Record<string, unknown>> = {
+const AUTH_SAMPLE_DATA: Record<string, Record<string, string>> = {
   signup: {
     siteName: "NEVO Industrial",
     siteUrl: SAMPLE_URL,
