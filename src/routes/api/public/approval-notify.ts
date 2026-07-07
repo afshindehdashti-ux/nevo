@@ -321,6 +321,39 @@ export const Route = createFileRoute('/api/public/approval-notify')({
           skipped,
         })
 
+        // High-risk security alert: every rejection of a pending request also
+        // pages the security recipient. Dedup keyed by request id so retries
+        // of this endpoint don't re-alert.
+        if (kind === 'rejected') {
+          try {
+            const { enqueueSecurityAlert } = await import('@/lib/security-alerts.server')
+            void enqueueSecurityAlert({
+              kind: 'approval_rejected',
+              dedupKey: `approval-rejected:${requestId}`,
+              dedupWindowMinutes: 24 * 60,
+              userId: r.decided_by ?? null,
+              headline: `${ENTITY_TYPE_LABEL[r.entity_type] ?? 'Approval request'} rejected${entityLabel ? ` — ${entityLabel}` : ''}`,
+              summary:
+                'An approval request was rejected. Confirm the rejection was intended and review the requester and decider below.',
+              details: [
+                {
+                  label: 'Type',
+                  value: ENTITY_TYPE_LABEL[r.entity_type] ?? r.entity_type,
+                },
+                ...(entityLabel ? [{ label: 'Item', value: entityLabel }] : []),
+                ...(requesterName ? [{ label: 'Requested by', value: requesterName }] : []),
+                ...(deciderName ? [{ label: 'Rejected by', value: deciderName }] : []),
+                ...(r.reason ? [{ label: 'Original reason', value: String(r.reason) }] : []),
+                ...(r.decision_notes
+                  ? [{ label: 'Decision notes', value: String(r.decision_notes) }]
+                  : []),
+              ],
+            })
+          } catch (err) {
+            console.warn('approval rejection security-alert failed', err)
+          }
+        }
+
         return Response.json({ ok: true, queued, skipped })
       },
     },

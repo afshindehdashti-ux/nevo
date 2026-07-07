@@ -31,6 +31,7 @@ export const logAdminSignIn = createServerFn({ method: "POST" })
       .eq("id", context.userId);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const nowIso = new Date().toISOString();
     const { error } = await supabaseAdmin.from("activity_logs").insert({
       user_id: context.userId,
       action: "sign_in",
@@ -40,10 +41,69 @@ export const logAdminSignIn = createServerFn({ method: "POST" })
         ip,
         user_agent: userAgent,
         country,
-        at: new Date().toISOString(),
+        at: nowIso,
       },
     });
     if (error) throw new Error(error.message);
+
+    // New-country detection: alert if this country hasn't been seen for this
+    // user before. Best-effort; failures are logged and do not block sign-in.
+    if (country) {
+      try {
+        const { data: prior } = await supabaseAdmin
+          .from("activity_logs")
+          .select("id, metadata, created_at")
+          .eq("user_id", context.userId)
+          .eq("action", "sign_in")
+          .eq("entity_type", "auth")
+          .order("created_at", { ascending: false })
+          .limit(200);
+        const rows = (prior ?? []) as Array<{
+          metadata: Record<string, unknown> | null;
+          created_at: string;
+        }>;
+        const priorCountries = new Set(
+          rows
+            .slice(1) // exclude the row we just inserted
+            .map((r) => (r.metadata?.country as string | null | undefined) ?? null)
+            .filter((v): v is string => !!v),
+        );
+        const hasPriorSignIns = rows.length > 1;
+        if (hasPriorSignIns && !priorCountries.has(country)) {
+          const { enqueueSecurityAlert } = await import("@/lib/security-alerts.server");
+          const { data: profile } = await supabaseAdmin
+            .from("profiles")
+            .select("full_name")
+            .eq("id", context.userId)
+            .maybeSingle();
+          const name =
+            (profile as { full_name?: string | null } | null)?.full_name ??
+            context.userId;
+          void enqueueSecurityAlert({
+            kind: "new_country_sign_in",
+            dedupKey: `new-country:${context.userId}:${country}`,
+            dedupWindowMinutes: 24 * 60,
+            userId: context.userId,
+            headline: `${name} signed in from a new country: ${country}`,
+            summary:
+              "A back-office user just signed in from a country they haven't used before. " +
+              "Confirm this is expected — if not, revoke sessions and reset credentials.",
+            details: [
+              { label: "User", value: String(name) },
+              { label: "Country", value: country },
+              { label: "IP", value: ip ?? "unknown" },
+              {
+                label: "Previously seen countries",
+                value: [...priorCountries].join(", ") || "none",
+              },
+            ],
+          });
+        }
+      } catch (err) {
+        console.warn("new-country alert check failed", err);
+      }
+    }
+
     return { ok: true, ip, country };
   });
 
