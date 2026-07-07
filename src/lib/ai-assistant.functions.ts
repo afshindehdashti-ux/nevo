@@ -454,14 +454,14 @@ export const checkInvoiceIntegrity = createServerFn({ method: "POST" })
     const { data: inv, error } = await supabase
       .from("invoices")
       .select(
-        "id,invoice_number,type,status,issue_date,due_date,currency,subtotal,vat_amount,total,amount_paid,balance,payment_terms,customer_id,supplier_id,order_id,notes",
+        "id,invoice_number,type,status,issue_date,due_date,currency,subtotal,vat_amount,total,amount_paid,balance,customer_id,order_id,notes",
       )
       .eq("id", data.invoice_id)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!inv) throw new Error("Invoice not found");
 
-    const [{ data: items }, { data: customer }, { data: supplier }] = await Promise.all([
+    const [{ data: items }, { data: customer }] = await Promise.all([
       supabase
         .from("invoice_items")
         .select("description,quantity,unit_price,vat_rate,line_total")
@@ -473,20 +473,12 @@ export const checkInvoiceIntegrity = createServerFn({ method: "POST" })
             .eq("id", inv.customer_id)
             .maybeSingle()
         : Promise.resolve({ data: null }),
-      inv.supplier_id
-        ? supabase
-            .from("suppliers")
-            .select("company_name,contact_person,email,phone,country,payment_terms")
-            .eq("id", inv.supplier_id)
-            .maybeSingle()
-        : Promise.resolve({ data: null }),
     ]);
 
     const payload = {
       invoice: inv,
       items: items ?? [],
       customer: customer ?? null,
-      supplier: supplier ?? null,
     };
 
     const system = `You are an internal invoice-integrity checker for NEVO Industrial. Given an invoice JSON payload, identify missing, inconsistent, or risky fields for a ${
