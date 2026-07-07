@@ -1654,7 +1654,7 @@ function InvoiceDetailPage() {
                           {v.source === "email" && "Emailed"}
                           {v.source === "bulk" && "Bulk export"}
                           {v.source === "preview" && "Preview"}
-                          {!["download", "email", "bulk", "preview"].includes(v.source) && v.source}
+                          {! ["download", "email", "bulk", "preview"].includes(v.source) && v.source}
                         </TableCell>
                         <TableCell className="text-xs">
                           {v.doc_type === "proforma" ? "Proforma" : "Commercial"}
