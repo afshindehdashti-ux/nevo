@@ -23,6 +23,7 @@ import {
   Brain,
   MessagesSquare,
   Mail,
+  Upload,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
