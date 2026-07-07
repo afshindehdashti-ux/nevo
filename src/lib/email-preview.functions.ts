@@ -165,7 +165,7 @@ async function assertAdmin(context: { supabase: any; userId: string }) {
     .from("user_roles")
     .select("role")
     .eq("user_id", context.userId)
-    .eq("role", "admin")
+    .eq("role", "super_admin")
     .maybeSingle();
   if (error || !data) throw new Error("Forbidden");
 }
