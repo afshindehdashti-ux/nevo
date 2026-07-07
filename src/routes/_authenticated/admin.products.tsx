@@ -202,6 +202,7 @@ function ProductsPage() {
           setDialogOpen(true);
         }}
         createLabel="New product"
+        headerExtra={<GuideMeButton sectionId="products" />}
       >
         <div className="overflow-x-auto">
           <Table>
