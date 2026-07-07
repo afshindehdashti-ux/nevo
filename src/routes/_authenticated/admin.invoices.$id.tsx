@@ -1994,6 +1994,7 @@ function InvoiceDetailPage() {
                           <SortHeader column="created_at" label="When" />
                           <SortHeader column="user" label="User" />
                           <TableHead className="text-right">Removed</TableHead>
+                          <TableHead className="text-right">Size</TableHead>
                           <TableHead className="text-right">Kept</TableHead>
                           <TableHead>Version IDs</TableHead>
                           <TableHead className="w-10"></TableHead>
