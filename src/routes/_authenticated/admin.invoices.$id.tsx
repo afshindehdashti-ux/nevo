@@ -201,6 +201,56 @@ function InvoiceDetailPage() {
     },
   });
 
+  // -------- Purge audit log filters --------
+  const [purgeUserFilter, setPurgeUserFilter] = useState<string>("all");
+  const [purgeFromDate, setPurgeFromDate] = useState<string>("");
+  const [purgeToDate, setPurgeToDate] = useState<string>("");
+  const [purgeVersionQuery, setPurgeVersionQuery] = useState<string>("");
+  const purgeUserOptions = useMemo(() => {
+    const seen = new Set<string>();
+    const opts: Array<{ id: string; label: string }> = [];
+    for (const log of purgeLogs) {
+      const key = log.user_id ?? "__system__";
+      if (seen.has(key)) continue;
+      seen.add(key);
+      opts.push({
+        id: key,
+        label: log.user_id ? purgeActorMap[log.user_id] ?? "Unknown user" : "System",
+      });
+    }
+    return opts.sort((a, b) => a.label.localeCompare(b.label));
+  }, [purgeLogs, purgeActorMap]);
+  const filteredPurgeLogs = useMemo(() => {
+    const fromMs = purgeFromDate ? new Date(purgeFromDate + "T00:00:00").getTime() : null;
+    const toMs = purgeToDate ? new Date(purgeToDate + "T23:59:59.999").getTime() : null;
+    const idQ = purgeVersionQuery.trim().toLowerCase();
+    return purgeLogs.filter((log) => {
+      if (purgeUserFilter !== "all") {
+        const key = log.user_id ?? "__system__";
+        if (key !== purgeUserFilter) return false;
+      }
+      const t = new Date(log.created_at).getTime();
+      if (fromMs != null && t < fromMs) return false;
+      if (toMs != null && t > toMs) return false;
+      if (idQ) {
+        const meta = (log.metadata ?? {}) as { version_ids?: string[] };
+        const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+        if (!ids.some((v) => v.toLowerCase().includes(idQ))) return false;
+      }
+      return true;
+    });
+  }, [purgeLogs, purgeUserFilter, purgeFromDate, purgeToDate, purgeVersionQuery]);
+  const purgeFiltersActive =
+    purgeUserFilter !== "all" || purgeFromDate !== "" || purgeToDate !== "" || purgeVersionQuery.trim() !== "";
+  const resetPurgeFilters = () => {
+    setPurgeUserFilter("all");
+    setPurgeFromDate("");
+    setPurgeToDate("");
+    setPurgeVersionQuery("");
+  };
+
+
+
 
   const [lines, setLines] = useState<Line[]>([]);
   const [notes, setNotes] = useState("");
@@ -498,7 +548,8 @@ function InvoiceDetailPage() {
   }
 
   function exportPurgeAuditCsv() {
-    if (purgeLogs.length === 0) {
+    const source = filteredPurgeLogs;
+    if (source.length === 0) {
       toast.info("No purge audit entries to export");
       return;
     }
@@ -517,7 +568,7 @@ function InvoiceDetailPage() {
     const escape = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
     const lines = [
       header.join(","),
-      ...purgeLogs.map((log) => {
+      ...source.map((log) => {
         const meta = (log.metadata ?? {}) as {
           removed_count?: number;
           kept?: number;
@@ -549,7 +600,7 @@ function InvoiceDetailPage() {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    toast.success(`Exported ${purgeLogs.length} audit entr${purgeLogs.length === 1 ? "y" : "ies"}`);
+    toast.success(`Exported ${source.length} audit entr${source.length === 1 ? "y" : "ies"}`);
   }
 
   useEffect(() => {
@@ -1447,17 +1498,19 @@ function InvoiceDetailPage() {
                 <CardTitle className="flex items-center gap-2 text-base">
                   <History className="h-4 w-4" />
                   PDF purge audit log
-                  <Badge variant="secondary" className="ml-2">{purgeLogs.length}</Badge>
+                  <Badge variant="secondary" className="ml-2">
+                    {purgeFiltersActive ? `${filteredPurgeLogs.length} / ${purgeLogs.length}` : purgeLogs.length}
+                  </Badge>
                 </CardTitle>
                 <Button
                   variant="outline"
                   size="sm"
                   className="h-8"
                   onClick={exportPurgeAuditCsv}
-                  disabled={purgeLogs.length === 0}
+                  disabled={filteredPurgeLogs.length === 0}
                 >
                   <FileDown className="h-3.5 w-3.5 mr-1" />
-                  Export CSV
+                  Export CSV{purgeFiltersActive ? " (filtered)" : ""}
                 </Button>
               </div>
             </CardHeader>
@@ -1467,65 +1520,119 @@ function InvoiceDetailPage() {
                   No purge actions recorded for this invoice.
                 </p>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>When</TableHead>
-                      <TableHead>User</TableHead>
-                      <TableHead className="text-right">Removed</TableHead>
-                      <TableHead className="text-right">Kept</TableHead>
-                      <TableHead>Version IDs</TableHead>
-                      <TableHead className="w-10"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {purgeLogs.map((log) => {
-                      const meta = (log.metadata ?? {}) as {
-                        removed_count?: number;
-                        kept?: number;
-                        version_ids?: string[];
-                      };
-                      const who = log.user_id
-                        ? purgeActorMap[log.user_id] ?? "Unknown user"
-                        : "System";
-                      const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
-                      return (
-                        <TableRow key={log.id} id={`purge-log-${log.id}`} className="transition-shadow">
-                          <TableCell className="whitespace-nowrap text-sm">
-                            {new Date(log.created_at).toLocaleString()}
-                          </TableCell>
-                          <TableCell className="text-sm">{who}</TableCell>
-                          <TableCell className="text-right font-medium">
-                            {meta.removed_count ?? ids.length}
-                          </TableCell>
-                          <TableCell className="text-right text-muted-foreground">
-                            {meta.kept ?? "—"}
-                          </TableCell>
-                          <TableCell className="text-xs font-mono text-muted-foreground max-w-md">
-                            {ids.length === 0 ? (
-                              "—"
-                            ) : (
-                              <span title={ids.join("\n")} className="line-clamp-2 break-all">
-                                {ids.join(", ")}
-                              </span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-8 w-8"
-                              title="Copy link to this entry"
-                              onClick={() => copyPurgeLogLink(log.id)}
-                            >
-                              <Copy className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
+                <>
+                  <div className="px-4 pb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5 items-end">
+                    <div className="space-y-1">
+                      <Label className="text-xs">User</Label>
+                      <Select value={purgeUserFilter} onValueChange={setPurgeUserFilter}>
+                        <SelectTrigger className="h-8"><SelectValue placeholder="All users" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All users</SelectItem>
+                          {purgeUserOptions.map((u) => (
+                            <SelectItem key={u.id} value={u.id}>{u.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">From</Label>
+                      <Input type="date" className="h-8" value={purgeFromDate} onChange={(e) => setPurgeFromDate(e.target.value)} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">To</Label>
+                      <Input type="date" className="h-8" value={purgeToDate} onChange={(e) => setPurgeToDate(e.target.value)} />
+                    </div>
+                    <div className="space-y-1 lg:col-span-1">
+                      <Label className="text-xs">Version ID contains</Label>
+                      <Input
+                        className="h-8 font-mono text-xs"
+                        placeholder="e.g. 3f2a…"
+                        value={purgeVersionQuery}
+                        onChange={(e) => setPurgeVersionQuery(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-full"
+                        onClick={resetPurgeFilters}
+                        disabled={!purgeFiltersActive}
+                      >
+                        Reset
+                      </Button>
+                    </div>
+                  </div>
+                  {filteredPurgeLogs.length === 0 ? (
+                    <p className="px-4 py-6 text-sm text-muted-foreground text-center">
+                      No entries match the current filters.
+                    </p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>When</TableHead>
+                          <TableHead>User</TableHead>
+                          <TableHead className="text-right">Removed</TableHead>
+                          <TableHead className="text-right">Kept</TableHead>
+                          <TableHead>Version IDs</TableHead>
+                          <TableHead className="w-10"></TableHead>
                         </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredPurgeLogs.map((log) => {
+                          const meta = (log.metadata ?? {}) as {
+                            removed_count?: number;
+                            kept?: number;
+                            version_ids?: string[];
+                          };
+                          const who = log.user_id
+                            ? purgeActorMap[log.user_id] ?? "Unknown user"
+                            : "System";
+                          const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+                          const idQ = purgeVersionQuery.trim().toLowerCase();
+                          const displayIds = idQ ? ids.filter((v) => v.toLowerCase().includes(idQ)) : ids;
+                          return (
+                            <TableRow key={log.id} id={`purge-log-${log.id}`} className="transition-shadow">
+                              <TableCell className="whitespace-nowrap text-sm">
+                                {new Date(log.created_at).toLocaleString()}
+                              </TableCell>
+                              <TableCell className="text-sm">{who}</TableCell>
+                              <TableCell className="text-right font-medium">
+                                {meta.removed_count ?? ids.length}
+                              </TableCell>
+                              <TableCell className="text-right text-muted-foreground">
+                                {meta.kept ?? "—"}
+                              </TableCell>
+                              <TableCell className="text-xs font-mono text-muted-foreground max-w-md">
+                                {ids.length === 0 ? (
+                                  "—"
+                                ) : (
+                                  <span title={ids.join("\n")} className="line-clamp-2 break-all">
+                                    {idQ && displayIds.length !== ids.length
+                                      ? `${displayIds.join(", ")} (+${ids.length - displayIds.length} more)`
+                                      : ids.join(", ")}
+                                  </span>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-8 w-8"
+                                  title="Copy link to this entry"
+                                  onClick={() => copyPurgeLogLink(log.id)}
+                                >
+                                  <Copy className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
