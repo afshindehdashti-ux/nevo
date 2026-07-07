@@ -504,11 +504,18 @@ function SecurityAuditPage() {
                         </TableCell>
                         <TableCell>
                           {row.user_id ? (
-                            profilesQ.data?.get(row.user_id) ?? (
-                              <span className="font-mono text-xs">
-                                {row.user_id.slice(0, 8)}…
-                              </span>
-                            )
+                            <button
+                              type="button"
+                              onClick={() => setActorDetail(row.user_id)}
+                              className="text-left text-primary hover:underline focus:outline-none focus:underline"
+                              title="View actor profile and recent events"
+                            >
+                              {profilesQ.data?.get(row.user_id) ?? (
+                                <span className="font-mono text-xs">
+                                  {row.user_id.slice(0, 8)}…
+                                </span>
+                              )}
+                            </button>
                           ) : (
                             <span className="text-muted-foreground italic">
                               system
