@@ -375,7 +375,12 @@ function InvoiceDetailPage() {
     return rows;
   }, [purgeLogs, purgeVersionQuery, purgeMinBytes, purgeMaxBytes, purgeSort, purgeActorMap]);
   const purgeFiltersActive =
-    purgeUserFilter !== "all" || purgeFromDate !== "" || purgeToDate !== "" || purgeVersionQuery.trim() !== "";
+    purgeUserFilter !== "all" ||
+    purgeFromDate !== "" ||
+    purgeToDate !== "" ||
+    purgeVersionQuery.trim() !== "" ||
+    purgeMinBytes !== "" ||
+    purgeMaxBytes !== "";
   const resetPurgeFilters = () => {
     navigate({
       search: (prev: InvoiceDetailSearch) => ({
@@ -384,6 +389,8 @@ function InvoiceDetailPage() {
         purgeFrom: "",
         purgeTo: "",
         purgeVersion: "",
+        purgeMinBytes: "",
+        purgeMaxBytes: "",
         purgePage: 0,
       }),
     });
