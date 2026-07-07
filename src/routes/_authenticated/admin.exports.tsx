@@ -127,6 +127,63 @@ function ExportsHistoryPage() {
   const pendingRowRef = useRef<CsvExportAuditRecord | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // --- Payload preview (loaded from a user-picked file inside the dialog) ---
+  const previewInputRef = useRef<HTMLInputElement | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [preview, setPreview] = useState<{
+    filename: string;
+    result: VerifyResult;
+    headers: string[];
+    rows: string[][];
+    truncated: boolean;
+  } | null>(null);
+
+  function resetPreview() {
+    setPreview(null);
+    if (previewInputRef.current) previewInputRef.current.value = "";
+  }
+
+  function triggerPreview() {
+    const input = previewInputRef.current;
+    if (!input) return;
+    input.value = "";
+    input.click();
+  }
+
+  async function handlePreviewPicked(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !detail) return;
+    setPreviewLoading(true);
+    try {
+      const text = await file.text();
+      const result = await verifyCsvText(text, { expectedSha: detail.sha256 });
+      let headers: string[] = [];
+      let rows: string[][] = [];
+      let truncated = false;
+      if (result.status !== "malformed") {
+        // Re-split payload out of the file (verifyCsvText already validated it).
+        const markerLine = '"--- PAYLOAD BELOW ---"\n';
+        const idx = text.indexOf(markerLine);
+        const payload = idx >= 0 ? text.slice(idx + markerLine.length) : text;
+        const parsed = parseCsvRows(payload, PREVIEW_ROW_LIMIT + 1);
+        truncated = parsed.length > PREVIEW_ROW_LIMIT;
+        const capped = parsed.slice(0, PREVIEW_ROW_LIMIT);
+        if (capped.length > 0) {
+          headers = capped[0];
+          rows = capped.slice(1);
+        }
+      }
+      setPreview({ filename: file.name, result, headers, rows, truncated });
+    } catch (err) {
+      toast.error("Preview failed", {
+        description: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      setPreviewLoading(false);
+    }
+  }
+
+
   function triggerVerifyAndOpen(row: CsvExportAuditRecord) {
     pendingRowRef.current = row;
     const input = fileInputRef.current;
