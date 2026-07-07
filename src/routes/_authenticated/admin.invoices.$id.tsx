@@ -473,6 +473,10 @@ function InvoiceDetailPage() {
               <FileDown className="h-4 w-4 mr-1" />
               {pdfLoading ? "Preparing…" : "Preview PDF"}
             </Button>
+            <Button variant="outline" size="sm" onClick={openEmailDialog}>
+              <Mail className="h-4 w-4 mr-1" />
+              Email to customer
+            </Button>
             {canPay && invoice.type === "commercial" && Number(invoice.balance) > 0 && (
               <Button size="sm" onClick={() => setPayOpen(true)}>
                 <Wallet className="h-4 w-4 mr-1" /> Record payment
