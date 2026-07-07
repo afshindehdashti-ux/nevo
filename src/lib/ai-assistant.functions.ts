@@ -552,18 +552,18 @@ export const getRecordSummary = createServerFn({ method: "POST" })
     if (data.module === "supplier") {
       const { data: s } = await supabase
         .from("suppliers")
-        .select("company_name,contact_person,email,country,payment_terms")
+        .select("name,contact_person,email,country,payment_terms")
         .eq("id", data.id)
         .maybeSingle();
       if (!s) return { summary: null };
       return {
-        summary: `Supplier: ${s.company_name}${s.contact_person ? ` (${s.contact_person})` : ""}. Country: ${s.country ?? "?"}. Terms: ${s.payment_terms ?? "n/a"}.`,
+        summary: `Supplier: ${s.name}${s.contact_person ? ` (${s.contact_person})` : ""}. Country: ${s.country ?? "?"}. Terms: ${s.payment_terms ?? "n/a"}.`,
       };
     }
     if (data.module === "order") {
       const { data: o } = await supabase
         .from("orders")
-        .select("order_number,status,total,currency,order_date,customer_id")
+        .select("id,order_number,status,total,currency,order_date,customer_id")
         .eq("id", data.id)
         .maybeSingle();
       if (!o) return { summary: null };
@@ -596,12 +596,12 @@ export const getRecordSummary = createServerFn({ method: "POST" })
     if (data.module === "lead") {
       const { data: l } = await supabase
         .from("leads")
-        .select("company_name,contact_name,status,country,source")
+        .select("name,company,status,country,source")
         .eq("id", data.id)
         .maybeSingle();
       if (!l) return { summary: null };
       return {
-        summary: `Lead: ${l.company_name ?? ""}${l.contact_name ? ` (${l.contact_name})` : ""}. Status ${l.status}. Country ${l.country ?? "?"}. Source ${l.source ?? "?"}.`,
+        summary: `Lead: ${l.company ?? l.name ?? ""}${l.name && l.company ? ` (${l.name})` : ""}. Status ${l.status}. Country ${l.country ?? "?"}. Source ${l.source ?? "?"}.`,
       };
     }
     return { summary: null };
