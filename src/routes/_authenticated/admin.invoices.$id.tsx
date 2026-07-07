@@ -209,7 +209,9 @@ function InvoiceDetailPage() {
         blob: pdfPreview.blob,
         filename: pdfPreview.filename,
         source: "download",
+        note: pdfNote,
       });
+      setPdfNote("");
       refetchPdfVersions();
     } catch (e) {
       console.warn("Failed to archive PDF version", e);
