@@ -600,7 +600,7 @@ function InvoiceDetailPage() {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    toast.success(`Exported ${purgeLogs.length} audit entr${purgeLogs.length === 1 ? "y" : "ies"}`);
+    toast.success(`Exported ${source.length} audit entr${source.length === 1 ? "y" : "ies"}`);
   }
 
   useEffect(() => {
