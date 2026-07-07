@@ -45,6 +45,17 @@ function EmailPreviewAdmin() {
     enabled: !!current,
   });
 
+  const sendTest = useMutation({
+    mutationFn: (vars: { name: string; recipientEmail: string }) =>
+      sendFn({ data: vars }),
+    onSuccess: () => {
+      toast.success(`Test email queued to ${testRecipient}`);
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || "Failed to send test");
+    },
+  });
+
   const grouped = useMemo(() => {
     const auth: EmailPreviewMeta[] = [];
     const app: EmailPreviewMeta[] = [];
