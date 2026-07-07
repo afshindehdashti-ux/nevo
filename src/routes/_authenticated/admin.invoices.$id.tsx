@@ -194,6 +194,8 @@ function InvoiceDetailPage() {
   const purgeFromDate = search.purgeFrom;
   const purgeToDate = search.purgeTo;
   const purgeVersionQuery = search.purgeVersion;
+  const purgeMinBytes = search.purgeMinBytes;
+  const purgeMaxBytes = search.purgeMaxBytes;
   const purgePage = search.purgePage;
   const purgePageSize = search.purgeSize;
   const purgeSort = useMemo(() => {
