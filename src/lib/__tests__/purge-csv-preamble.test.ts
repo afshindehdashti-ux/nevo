@@ -11,6 +11,8 @@ import {
   computeSha256Hex,
   isValidSha256Hex,
   verifyCsvText,
+  inspectCsvStructure,
+  describeStructureIssue,
 } from "../purge-csv-preamble";
 
 const ISO = "2026-07-07T22:05:50.123Z";
