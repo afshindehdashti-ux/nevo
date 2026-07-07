@@ -141,6 +141,33 @@ function EmailPreviewAdmin() {
             </div>
             {current && <Badge variant="outline">{current}</Badge>}
           </div>
+          <div className="border-b border-border px-4 py-3 flex flex-wrap items-center gap-2 bg-muted/20">
+            <Input
+              type="email"
+              placeholder="you@example.com"
+              value={testRecipient}
+              onChange={(e) => setTestRecipient(e.target.value)}
+              className="max-w-xs h-9"
+            />
+            <Button
+              size="sm"
+              disabled={
+                !current ||
+                !testRecipient ||
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testRecipient) ||
+                sendTest.isPending
+              }
+              onClick={() =>
+                current &&
+                sendTest.mutate({ name: current, recipientEmail: testRecipient })
+              }
+            >
+              {sendTest.isPending ? "Sending…" : "Send test email"}
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Sends the current template with sample data. Subject is prefixed with [TEST].
+            </span>
+          </div>
           <div className="flex-1 bg-muted/40 p-4 flex justify-center overflow-auto">
             {preview.isFetching && !preview.data && (
               <Skeleton className="w-full max-w-2xl h-96" />
