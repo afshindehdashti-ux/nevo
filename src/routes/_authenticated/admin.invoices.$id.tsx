@@ -510,8 +510,15 @@ function InvoiceDetailPage() {
     }
     setPurgeVerifyState({ status: "verifying", filename: file.name });
     try {
-      const buf = await file.arrayBuffer();
-      const digest = await crypto.subtle.digest("SHA-256", buf);
+      // The exported CSV prepends a preamble with the checksum + timestamp
+      // followed by a "--- PAYLOAD BELOW ---" marker. Hash only the bytes
+      // after that marker so the embedded hash stays self-consistent.
+      const text = await file.text();
+      const marker = '"--- PAYLOAD BELOW ---"\n';
+      const idx = text.indexOf(marker);
+      const payload = idx >= 0 ? text.slice(idx + marker.length) : text;
+      const payloadBytes = new TextEncoder().encode(payload);
+      const digest = await crypto.subtle.digest("SHA-256", payloadBytes);
       const sha = Array.from(new Uint8Array(digest))
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
