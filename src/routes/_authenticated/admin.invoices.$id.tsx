@@ -2335,7 +2335,7 @@ function InvoiceDetailPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs">Rows</Label>
-                      <Select value={String(purgePageSize)} onValueChange={(v) => setPurgePageSize(parseInt(v, 10))}>
+                      <Select value={String(purgePageSize)} onValueChange={(v) => setPurgePageSize(parseInt(v, 10))} disabled={purgeLoading}>
                         <SelectTrigger className="h-7 w-[70px]"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           {[10, 25, 50, 100].map((n) => (
