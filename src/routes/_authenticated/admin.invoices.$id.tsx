@@ -855,6 +855,18 @@ function InvoiceDetailPage() {
       toast.info("No purge audit entries to export");
       return;
     }
+    const selectedVersionInfo =
+      meta.scope === "selected"
+        ? (() => {
+            const allVersionIds: string[] = [];
+            for (const log of source) {
+              const logMeta = (log.metadata ?? {}) as { version_ids?: string[] };
+              const ids = Array.isArray(logMeta.version_ids) ? logMeta.version_ids : [];
+              allVersionIds.push(...ids);
+            }
+            return { count: allVersionIds.length, ids: allVersionIds.join("; ") };
+          })()
+        : null;
     const metadataRows = [
       ["Export Scope", meta.scope],
       ["Export Timestamp", new Date().toISOString()],
@@ -871,10 +883,11 @@ function InvoiceDetailPage() {
             ["Filter Max Size MB", meta.maxBytes ?? ""],
           ]
         : []),
-      ...(meta.scope === "selected"
+      ...(meta.scope === "selected" && selectedVersionInfo
         ? [
-            ["Selected Count", String(meta.selectedIds?.length ?? source.length)],
-            ["Selected IDs", (meta.selectedIds ?? []).join("; ")],
+            ["Selected Row Count", String(source.length)],
+            ["Selected Version Count", String(selectedVersionInfo.count)],
+            ["Selected Version IDs", selectedVersionInfo.ids],
           ]
         : []),
       [], // empty separator
@@ -887,8 +900,9 @@ function InvoiceDetailPage() {
       "Filter Version ID Contains",
       "Filter Min Size MB",
       "Filter Max Size MB",
-      "Selected Count",
-      "Selected IDs",
+      "Selected Row Count",
+      "Selected Version Count",
+      "Selected Version IDs",
       "Log ID",
       "Timestamp (ISO)",
       "Timestamp (Local)",
@@ -924,8 +938,9 @@ function InvoiceDetailPage() {
           escape(meta.scope === "filtered" ? (meta.versionQuery ?? "") : ""),
           escape(meta.scope === "filtered" ? (meta.minBytes ?? "") : ""),
           escape(meta.scope === "filtered" ? (meta.maxBytes ?? "") : ""),
-          escape(meta.scope === "selected" ? String(meta.selectedIds?.length ?? source.length) : ""),
-          escape(meta.scope === "selected" ? (meta.selectedIds ?? []).join("; ") : ""),
+          escape(meta.scope === "selected" ? String(source.length) : ""),
+          escape(meta.scope === "selected" && selectedVersionInfo ? String(selectedVersionInfo.count) : ""),
+          escape(meta.scope === "selected" && selectedVersionInfo ? selectedVersionInfo.ids : ""),
           escape(log.id),
           escape(log.created_at),
           escape(new Date(log.created_at).toLocaleString()),
