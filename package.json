@@ -95,6 +95,7 @@
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "lucide-react": "^0.575.0",
+    "mailparser": "^3.9.14",
     "mammoth": "^1.12.0",
     "motion": "^12.42.2",
     "react": "^19.2.0",
@@ -117,6 +118,7 @@
   "devDependencies": {
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "2.7.0",
+    "@types/mailparser": "^3.4.6",
     "@types/node": "^22.16.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
