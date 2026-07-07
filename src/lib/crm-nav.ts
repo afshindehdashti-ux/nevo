@@ -24,6 +24,7 @@ import {
   MessagesSquare,
   Mail,
   Upload,
+  Activity,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
