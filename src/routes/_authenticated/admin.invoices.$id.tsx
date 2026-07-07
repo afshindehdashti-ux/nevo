@@ -314,6 +314,16 @@ function InvoiceDetailPage() {
   };
   const clearPurgeSelection = () => setSelectedPurgeIds(new Set());
 
+  // Last CSV export metadata (for compliance traceability).
+  const [lastPurgeExport, setLastPurgeExport] = useState<{
+    filename: string;
+    sha256: string;
+    rowCount: number;
+    scope: string;
+    exportedAt: string;
+    byteSize: number;
+  } | null>(null);
+
 
 
 
