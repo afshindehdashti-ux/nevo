@@ -125,6 +125,7 @@ import { Route as AuthenticatedAdminInvoicesIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminCustomersIdRouteImport } from './routes/_authenticated/admin.customers.$id'
 import { Route as AuthenticatedAdminApprovalsAuditRouteImport } from './routes/_authenticated/admin.approvals.audit'
 import { Route as AuthenticatedAdminAiAssistantKnowledgeBaseRouteImport } from './routes/_authenticated/admin.ai-assistant.knowledge-base'
+import { Route as AuthenticatedAdminAiAssistantGuideModeRouteImport } from './routes/_authenticated/admin.ai-assistant.guide-mode'
 import { Route as ApiPublicOauthGoogleCallbackRouteImport } from './routes/api/public/oauth.google.callback'
 import { Route as AuthenticatedAdminQuotationsIdPrintRouteImport } from './routes/_authenticated/admin.quotations.$id.print'
 
@@ -769,6 +770,12 @@ const AuthenticatedAdminAiAssistantKnowledgeBaseRoute =
     path: '/ai-assistant/knowledge-base',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAiAssistantGuideModeRoute =
+  AuthenticatedAdminAiAssistantGuideModeRouteImport.update({
+    id: '/ai-assistant/guide-mode',
+    path: '/ai-assistant/guide-mode',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ApiPublicOauthGoogleCallbackRoute =
   ApiPublicOauthGoogleCallbackRouteImport.update({
     id: '/api/public/oauth/google/callback',
@@ -876,6 +883,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/ai-assistant/guide-mode': typeof AuthenticatedAdminAiAssistantGuideModeRoute
   '/admin/ai-assistant/knowledge-base': typeof AuthenticatedAdminAiAssistantKnowledgeBaseRoute
   '/admin/approvals/audit': typeof AuthenticatedAdminApprovalsAuditRoute
   '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
@@ -992,6 +1000,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/ai-assistant/guide-mode': typeof AuthenticatedAdminAiAssistantGuideModeRoute
   '/admin/ai-assistant/knowledge-base': typeof AuthenticatedAdminAiAssistantKnowledgeBaseRoute
   '/admin/approvals/audit': typeof AuthenticatedAdminApprovalsAuditRoute
   '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
@@ -1113,6 +1122,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/ai-assistant/guide-mode': typeof AuthenticatedAdminAiAssistantGuideModeRoute
   '/_authenticated/admin/ai-assistant/knowledge-base': typeof AuthenticatedAdminAiAssistantKnowledgeBaseRoute
   '/_authenticated/admin/approvals/audit': typeof AuthenticatedAdminApprovalsAuditRoute
   '/_authenticated/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
@@ -1234,6 +1244,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/$lang/solutions/'
     | '/admin/'
+    | '/admin/ai-assistant/guide-mode'
     | '/admin/ai-assistant/knowledge-base'
     | '/admin/approvals/audit'
     | '/admin/customers/$id'
@@ -1350,6 +1361,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/$lang/solutions'
     | '/admin'
+    | '/admin/ai-assistant/guide-mode'
     | '/admin/ai-assistant/knowledge-base'
     | '/admin/approvals/audit'
     | '/admin/customers/$id'
@@ -1470,6 +1482,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/$lang/solutions/'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/ai-assistant/guide-mode'
     | '/_authenticated/admin/ai-assistant/knowledge-base'
     | '/_authenticated/admin/approvals/audit'
     | '/_authenticated/admin/customers/$id'
@@ -2342,6 +2355,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAiAssistantKnowledgeBaseRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/ai-assistant/guide-mode': {
+      id: '/_authenticated/admin/ai-assistant/guide-mode'
+      path: '/ai-assistant/guide-mode'
+      fullPath: '/admin/ai-assistant/guide-mode'
+      preLoaderRoute: typeof AuthenticatedAdminAiAssistantGuideModeRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/oauth/google/callback': {
       id: '/api/public/oauth/google/callback'
       path: '/api/public/oauth/google/callback'
@@ -2550,6 +2570,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminTasksRoute: typeof AuthenticatedAdminTasksRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminAiAssistantGuideModeRoute: typeof AuthenticatedAdminAiAssistantGuideModeRoute
   AuthenticatedAdminAiAssistantKnowledgeBaseRoute: typeof AuthenticatedAdminAiAssistantKnowledgeBaseRoute
   AuthenticatedAdminAiAssistantIndexRoute: typeof AuthenticatedAdminAiAssistantIndexRoute
 }
@@ -2600,6 +2621,8 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminTasksRoute: AuthenticatedAdminTasksRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRouteWithChildren,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminAiAssistantGuideModeRoute:
+    AuthenticatedAdminAiAssistantGuideModeRoute,
   AuthenticatedAdminAiAssistantKnowledgeBaseRoute:
     AuthenticatedAdminAiAssistantKnowledgeBaseRoute,
   AuthenticatedAdminAiAssistantIndexRoute:

@@ -30,6 +30,7 @@ import {
   FileDown,
   Sparkles,
   BookOpen,
+  GraduationCap,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
