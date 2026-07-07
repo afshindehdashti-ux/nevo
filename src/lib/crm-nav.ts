@@ -27,6 +27,7 @@ import {
   Upload,
   Activity,
   Bell,
+  FileDown,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -181,6 +182,12 @@ export const CRM_NAV: CrmNavGroup[] = [
         title: "Approvals audit",
         url: "/admin/approvals/audit",
         icon: ScrollText,
+        allowedRoles: ["management", "finance"],
+      },
+      {
+        title: "CSV Export History",
+        url: "/admin/exports",
+        icon: FileDown,
         allowedRoles: ["management", "finance"],
       },
       {

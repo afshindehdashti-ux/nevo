@@ -151,24 +151,67 @@ export const recordCsvExportAudit = createServerFn({ method: "POST" })
 const ListExportInput = z.object({
   entity_type: z.string().max(64).optional(),
   entity_id: z.string().max(255).optional(),
-  limit: z.number().int().min(1).max(200).default(50),
+  scope: z.string().max(64).optional(),
+  user_id: z.string().uuid().optional(),
+  from_date: z.string().optional(), // yyyy-mm-dd
+  to_date: z.string().optional(),
+  search: z.string().max(200).optional(), // filename / sha256 / entity id contains
+  limit: z.number().int().min(1).max(500).default(100),
 });
+
+export type CsvExportAuditListResult = {
+  rows: CsvExportAuditRecord[];
+  total: number;
+  actors: Array<{ user_id: string; full_name: string | null }>;
+};
 
 export const listCsvExportAudit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => ListExportInput.parse(v))
-  .handler(async ({ context, data }): Promise<CsvExportAuditRecord[]> => {
+  .handler(async ({ context, data }): Promise<CsvExportAuditListResult> => {
     await assertCanPurge(context);
     let q = context.supabase
       .from("csv_export_audit")
       .select(
         "id, created_at, user_id, export_type, filename, sha256, byte_size, row_count, scope, entity_type, entity_id, filters, metadata",
+        { count: "exact" },
       );
     if (data.entity_type) q = q.eq("entity_type", data.entity_type);
     if (data.entity_id) q = q.eq("entity_id", data.entity_id);
-    const { data: rows, error } = await q
+    if (data.scope) q = q.eq("scope", data.scope);
+    if (data.user_id) q = q.eq("user_id", data.user_id);
+    if (data.from_date)
+      q = q.gte("created_at", new Date(data.from_date + "T00:00:00").toISOString());
+    if (data.to_date)
+      q = q.lte("created_at", new Date(data.to_date + "T23:59:59.999").toISOString());
+    if (data.search && data.search.trim()) {
+      const term = data.search.trim().replace(/[%,]/g, "");
+      // Filename, sha256, or entity id contains term (case-insensitive).
+      q = q.or(
+        `filename.ilike.%${term}%,sha256.ilike.%${term}%,entity_id.ilike.%${term}%`,
+      );
+    }
+    const { data: rows, error, count } = await q
       .order("created_at", { ascending: false })
       .limit(data.limit);
     if (error) throw new Error(error.message);
-    return (rows ?? []) as CsvExportAuditRecord[];
+    const list = (rows ?? []) as CsvExportAuditRecord[];
+
+    // Distinct actor lookup for the filter dropdown.
+    const userIds = Array.from(
+      new Set(list.map((r) => r.user_id).filter((v): v is string => !!v)),
+    );
+    let actors: Array<{ user_id: string; full_name: string | null }> = [];
+    if (userIds.length > 0) {
+      const { data: profs } = await context.supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+      actors = (profs ?? []).map((p) => ({
+        user_id: p.id as string,
+        full_name: (p.full_name as string | null) ?? null,
+      }));
+    }
+
+    return { rows: list, total: count ?? 0, actors };
   });
