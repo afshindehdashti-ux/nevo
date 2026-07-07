@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail, History, Archive } from "lucide-react";
+import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail, History, Archive, Copy } from "lucide-react";
 import JSZip from "jszip";
 import { useServerFn } from "@tanstack/react-start";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
@@ -353,6 +353,32 @@ function InvoiceDetailPage() {
       setTimeout(() => target.classList.remove("ring-2", "ring-primary"), 2000);
     }
   }
+
+  function getPurgeLogDeepLink(logId: string) {
+    return `${window.location.origin}${window.location.pathname}#purge-log-${logId}`;
+  }
+
+  async function copyPurgeLogLink(logId: string) {
+    try {
+      await navigator.clipboard.writeText(getPurgeLogDeepLink(logId));
+      toast.success("Link copied", { description: "Deep link to this audit entry is on the clipboard." });
+    } catch {
+      toast.error("Copy failed", { description: "Could not access the clipboard." });
+    }
+  }
+
+  function useDeepLinkedPurgeLogHighlight() {
+    useEffect(() => {
+      const hash = window.location.hash;
+      if (!hash.startsWith("#purge-log-")) return;
+      const logId = hash.replace("#purge-log-", "");
+      // Wait a tick for the table to render.
+      const timer = setTimeout(() => scrollToPurgeLog(logId), 100);
+      return () => clearTimeout(timer);
+    }, [purgeLogs.length]);
+  }
+
+  useDeepLinkedPurgeLogHighlight();
 
   async function confirmPurge() {
     setPurging(true);
@@ -1399,6 +1425,7 @@ function InvoiceDetailPage() {
                       <TableHead className="text-right">Removed</TableHead>
                       <TableHead className="text-right">Kept</TableHead>
                       <TableHead>Version IDs</TableHead>
+                      <TableHead className="w-10"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1432,6 +1459,17 @@ function InvoiceDetailPage() {
                                 {ids.join(", ")}
                               </span>
                             )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8"
+                              title="Copy link to this entry"
+                              onClick={() => copyPurgeLogLink(log.id)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
                           </TableCell>
                         </TableRow>
                       );
