@@ -285,12 +285,23 @@ function SecurityAuditPage() {
   }, [logsQ.data, category, search]);
 
   const stats = useMemo(() => {
-    const s = { signIn: 0, approvals: 0, deletes: 0, roleChanges: 0 };
+    const s = {
+      signIn: 0,
+      sessions: 0,
+      alerts: 0,
+      approvals: 0,
+      deletes: 0,
+      roleChanges: 0,
+      userMgmt: 0,
+    };
     for (const r of filteredRows) {
       if (r.action === "sign_in") s.signIn++;
-      if (["approve", "reject", "cancel"].includes(r.action)) s.approvals++;
+      if (SESSION_ACTIONS.includes(r.action)) s.sessions++;
+      if (ALERT_ACTIONS.includes(r.action)) s.alerts++;
+      if (APPROVAL_ACTIONS.includes(r.action)) s.approvals++;
       if (r.action === "delete") s.deletes++;
       if (r.entity_type === "user_roles") s.roleChanges++;
+      if (USER_MGMT_ACTIONS.includes(r.action)) s.userMgmt++;
     }
     return s;
   }, [filteredRows]);
