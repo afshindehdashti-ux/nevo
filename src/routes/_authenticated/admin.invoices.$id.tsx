@@ -159,6 +159,63 @@ function InvoiceDetailPage() {
     a.remove();
   }
 
+  // -------- Email to customer --------
+  const emailFn = useServerFn(emailInvoicePdf);
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [emailTo, setEmailTo] = useState("");
+  const [emailMessage, setEmailMessage] = useState("");
+  const [emailSending, setEmailSending] = useState(false);
+
+  function openEmailDialog() {
+    const custEmail = (invoice?.customers as { email?: string | null } | null)?.email ?? "";
+    setEmailTo(custEmail);
+    setEmailMessage("");
+    setEmailOpen(true);
+  }
+
+  async function sendInvoiceEmail() {
+    if (!invoice) return;
+    const to = emailTo.trim();
+    if (!/^\S+@\S+\.\S+$/.test(to)) {
+      toast.error("Enter a valid email address");
+      return;
+    }
+    setEmailSending(true);
+    try {
+      // 1) Build the PDF (reuse the current preview if available).
+      const built = pdfPreview ?? (await generateInvoicePdf(invoice.id, "blob"));
+      // 2) Upload to crm-docs under invoices/<id>/… (matches server-side prefix check).
+      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const storagePath = `invoices/${invoice.id}/${stamp}-${built.filename}`;
+      const { error: upErr } = await supabase.storage
+        .from("crm-docs")
+        .upload(storagePath, built.blob, {
+          contentType: "application/pdf",
+          upsert: false,
+        });
+      if (upErr) throw upErr;
+      // 3) Ask the server to sign the URL and send the email.
+      const res = await emailFn({
+        data: {
+          invoiceId: invoice.id,
+          storagePath,
+          recipientEmail: to,
+          message: emailMessage.trim() || null,
+        },
+      });
+      if (!res.ok) {
+        toast.error(`Send failed: ${res.reason}`);
+        return;
+      }
+      toast.success(`Emailed to ${to}. Link expires in ${res.expiresInHours}h.`);
+      setEmailOpen(false);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Send failed");
+    } finally {
+      setEmailSending(false);
+    }
+  }
+
   useEffect(() => {
     if (items.length) {
       setLines(
