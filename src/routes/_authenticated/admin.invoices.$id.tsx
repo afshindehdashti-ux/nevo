@@ -1176,6 +1176,16 @@ function InvoiceDetailPage() {
             filters,
             metadata: {
               invoice_number: invoice?.invoice_number ?? null,
+              // Preamble values as they were embedded in the CSV file itself.
+              // Compliance can reference these to prove what the file carried,
+              // independent of the top-level `sha256` column.
+              embedded_sha256: sha256,
+              embedded_exported_at_iso: exportedAtIso,
+              preamble: {
+                sha_label: "SHA-256 (of payload below)",
+                timestamp_label: "Export Timestamp (ISO)",
+                payload_marker: "--- PAYLOAD BELOW ---",
+              },
               ...extraMeta,
             },
           },
