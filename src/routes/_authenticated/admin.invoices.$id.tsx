@@ -1930,6 +1930,32 @@ function InvoiceDetailPage() {
                       </Button>
                     </div>
                   </div>
+                  <div className="px-4 pb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4 items-end">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Min removed size (MB)</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        className="h-8"
+                        placeholder="0"
+                        value={purgeMinBytes}
+                        onChange={(e) => setPurgeMinBytes(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Max removed size (MB)</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        className="h-8"
+                        placeholder="∞"
+                        value={purgeMaxBytes}
+                        onChange={(e) => setPurgeMaxBytes(e.target.value)}
+                      />
+                    </div>
+                  </div>
                   <div className="px-4 pb-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                     Quick range
                     <Button
