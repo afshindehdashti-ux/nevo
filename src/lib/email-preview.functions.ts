@@ -106,11 +106,13 @@ export const listEmailPreviews = createServerFn({ method: "GET" })
   });
 
 
+const overridesSchema = z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).optional();
+
 /** Render a single template to HTML using its sample/preview data. */
 export const renderEmailPreview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
-    z.object({ name: z.string().min(1) }).parse(data),
+    z.object({ name: z.string().min(1), overrides: overridesSchema }).parse(data),
   )
   .handler(async ({ data, context }): Promise<{ html: string; subject: string }> => {
     await assertAdmin(context);
@@ -118,20 +120,21 @@ export const renderEmailPreview = createServerFn({ method: "POST" })
     const React = await import("react");
     const { render } = await import("@react-email/render");
     const { TEMPLATES } = await import("@/lib/email-templates/registry");
+    const overrides = data.overrides ?? {};
 
     // Auth templates
     if (data.name in AUTH_SAMPLE_DATA || AUTH_TEMPLATE_LOADERS[data.name]) {
       const load = AUTH_TEMPLATE_LOADERS[data.name];
       if (!load) throw new Error(`Unknown auth template: ${data.name}`);
       const Component = await load();
-      const props = AUTH_SAMPLE_DATA[data.name] ?? {};
+      const props = { ...(AUTH_SAMPLE_DATA[data.name] ?? {}), ...overrides };
       const html = await render(React.createElement(Component, props));
       return { html, subject: AUTH_SUBJECTS[data.name] ?? "Notification" };
     }
 
     const entry = TEMPLATES[data.name];
     if (!entry) throw new Error(`Unknown template: ${data.name}`);
-    const previewData = entry.previewData ?? {};
+    const previewData = { ...(entry.previewData ?? {}), ...overrides };
     const html = await render(React.createElement(entry.component, previewData));
     const subject =
       typeof entry.subject === "function" ? entry.subject(previewData) : entry.subject;
