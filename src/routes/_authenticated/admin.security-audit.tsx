@@ -714,3 +714,192 @@ function EventBadge({ action }: { action: string }) {
     </Badge>
   );
 }
+
+function ActorDetailDialog({
+  userId,
+  onOpenChange,
+  onFilterByActor,
+  onViewEvent,
+}: {
+  userId: string | null;
+  onOpenChange: (open: boolean) => void;
+  onFilterByActor: (id: string) => void;
+  onViewEvent: (row: LogRow) => void;
+}) {
+  const profileQ = useQuery({
+    enabled: !!userId,
+    queryKey: ["security-audit-actor-profile", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, phone, created_at")
+        .eq("id", userId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const rolesQ = useQuery({
+    enabled: !!userId,
+    queryKey: ["security-audit-actor-roles", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId!);
+      if (error) throw error;
+      return (data ?? []).map((r) => r.role as string);
+    },
+  });
+
+  const eventsQ = useQuery({
+    enabled: !!userId,
+    queryKey: ["security-audit-actor-events", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .select("id,user_id,action,entity_type,entity_id,metadata,created_at")
+        .eq("user_id", userId!)
+        .in("action", ["sign_in", "approve", "reject", "cancel", "delete"])
+        .order("created_at", { ascending: false })
+        .limit(25);
+      if (error) throw error;
+      return (data ?? []) as LogRow[];
+    },
+  });
+
+  const profile = profileQ.data as
+    | {
+        id: string;
+        full_name: string | null;
+        email: string | null;
+        phone: string | null;
+        created_at: string | null;
+      }
+    | null
+    | undefined;
+
+  return (
+    <Dialog open={!!userId} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>Actor profile</DialogTitle>
+          <DialogDescription>
+            Recent security events attributed to this user.
+          </DialogDescription>
+        </DialogHeader>
+
+        {!userId ? null : profileQ.isLoading ? (
+          <div className="text-sm text-muted-foreground">Loading profile…</div>
+        ) : (
+          <div className="space-y-4 text-sm">
+            <div className="grid grid-cols-2 gap-3">
+              <MetaField label="Name">{profile?.full_name ?? "—"}</MetaField>
+              <MetaField label="Email">{profile?.email ?? "—"}</MetaField>
+              <MetaField label="Phone">{profile?.phone ?? "—"}</MetaField>
+              <MetaField label="User ID">{userId}</MetaField>
+              <MetaField label="Joined">
+                {profile?.created_at
+                  ? format(new Date(profile.created_at), "PPpp")
+                  : "—"}
+              </MetaField>
+              <MetaField label="Roles">
+                {rolesQ.data && rolesQ.data.length > 0 ? (
+                  <div className="flex flex-wrap gap-1">
+                    {rolesQ.data.map((r) => (
+                      <Badge key={r} variant="secondary" className="text-[10px]">
+                        {r}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  "—"
+                )}
+              </MetaField>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" asChild>
+                <Link to="/admin/users">Manage in Users & Roles</Link>
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onFilterByActor(userId)}
+              >
+                Filter audit by this actor
+              </Button>
+            </div>
+
+            <div>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                Recent security events (25 most recent)
+              </Label>
+              <div className="mt-2 max-h-[360px] overflow-auto rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[160px]">When</TableHead>
+                      <TableHead>Event</TableHead>
+                      <TableHead>Scope</TableHead>
+                      <TableHead className="w-[70px] text-right"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {eventsQ.isLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center text-muted-foreground py-4">
+                          Loading…
+                        </TableCell>
+                      </TableRow>
+                    ) : (eventsQ.data ?? []).length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center text-muted-foreground py-4">
+                          No security events recorded for this user.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      (eventsQ.data ?? []).map((row) => (
+                        <TableRow key={row.id}>
+                          <TableCell className="whitespace-nowrap font-mono text-xs">
+                            {format(new Date(row.created_at), "yyyy-MM-dd HH:mm")}
+                            <div className="text-[10px] text-muted-foreground">
+                              {formatDistanceToNow(new Date(row.created_at), {
+                                addSuffix: true,
+                              })}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <EventBadge action={row.action} />
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            {row.entity_type ?? "—"}
+                            {row.entity_id && (
+                              <div className="font-mono text-[10px] text-muted-foreground">
+                                {row.entity_id.slice(0, 8)}…
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onViewEvent(row)}
+                            >
+                              View
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
