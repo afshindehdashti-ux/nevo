@@ -777,7 +777,17 @@ function InvoiceDetailPage() {
     URL.revokeObjectURL(url);
   }
 
-  async function exportPurgeAuditCsv(rows?: PurgeLogRow[], scopeLabel = "filtered") {
+  type PurgeExportMeta = {
+    scope: "filtered" | "selected";
+    userLabel?: string;
+    fromDate?: string;
+    toDate?: string;
+    versionQuery?: string;
+    minBytes?: string;
+    maxBytes?: string;
+  };
+
+  async function exportPurgeAuditCsv(rows?: PurgeLogRow[], meta: PurgeExportMeta = { scope: "filtered" }) {
     if (!canPurgePdf) {
       toast.error("You don't have permission to export the purge audit log.", {
         description: "Only Super Admin, Management, or Finance can export purge history.",
@@ -844,7 +854,54 @@ function InvoiceDetailPage() {
       toast.info("No purge audit entries to export");
       return;
     }
+    const selectedVersionInfo =
+      meta.scope === "selected"
+        ? (() => {
+            const allVersionIds: string[] = [];
+            for (const log of source) {
+              const logMeta = (log.metadata ?? {}) as { version_ids?: string[] };
+              const ids = Array.isArray(logMeta.version_ids) ? logMeta.version_ids : [];
+              allVersionIds.push(...ids);
+            }
+            return { count: allVersionIds.length, ids: allVersionIds.join("; ") };
+          })()
+        : null;
+    const metadataRows = [
+      ["Export Scope", meta.scope],
+      ["Export Timestamp", new Date().toISOString()],
+      ["Invoice ID", id],
+      ["Invoice Number", invoice?.invoice_number ?? ""],
+      ["Row Count", String(source.length)],
+      ...(meta.scope === "filtered"
+        ? [
+            ["Filter User", meta.userLabel ?? "All users"],
+            ["Filter From Date", meta.fromDate ?? ""],
+            ["Filter To Date", meta.toDate ?? ""],
+            ["Filter Version ID Contains", meta.versionQuery ?? ""],
+            ["Filter Min Size MB", meta.minBytes ?? ""],
+            ["Filter Max Size MB", meta.maxBytes ?? ""],
+          ]
+        : []),
+      ...(meta.scope === "selected" && selectedVersionInfo
+        ? [
+            ["Selected Row Count", String(source.length)],
+            ["Selected Version Count", String(selectedVersionInfo.count)],
+            ["Selected Version IDs", selectedVersionInfo.ids],
+          ]
+        : []),
+      [], // empty separator
+    ];
     const header = [
+      "Export Scope",
+      "Filter User",
+      "Filter From Date",
+      "Filter To Date",
+      "Filter Version ID Contains",
+      "Filter Min Size MB",
+      "Filter Max Size MB",
+      "Selected Row Count",
+      "Selected Version Count",
+      "Selected Version IDs",
       "Log ID",
       "Timestamp (ISO)",
       "Timestamp (Local)",
@@ -860,18 +917,29 @@ function InvoiceDetailPage() {
     ];
     const escape = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
     const lines = [
+      ...metadataRows.map((row) => row.map(escape).join(",")),
       header.join(","),
       ...source.map((log) => {
-        const meta = (log.metadata ?? {}) as {
+        const logMeta = (log.metadata ?? {}) as {
           removed_count?: number;
           kept?: number;
           version_ids?: string[];
           total_bytes?: number;
         };
         const who = log.user_id ? purgeActorMap[log.user_id] ?? "Unknown user" : "System";
-        const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
-        const totalBytes = meta.total_bytes ?? 0;
+        const ids = Array.isArray(logMeta.version_ids) ? logMeta.version_ids : [];
+        const totalBytes = logMeta.total_bytes ?? 0;
         return [
+          escape(meta.scope),
+          escape(meta.scope === "filtered" ? (meta.userLabel ?? "All users") : ""),
+          escape(meta.scope === "filtered" ? (meta.fromDate ?? "") : ""),
+          escape(meta.scope === "filtered" ? (meta.toDate ?? "") : ""),
+          escape(meta.scope === "filtered" ? (meta.versionQuery ?? "") : ""),
+          escape(meta.scope === "filtered" ? (meta.minBytes ?? "") : ""),
+          escape(meta.scope === "filtered" ? (meta.maxBytes ?? "") : ""),
+          escape(meta.scope === "selected" ? String(source.length) : ""),
+          escape(meta.scope === "selected" && selectedVersionInfo ? String(selectedVersionInfo.count) : ""),
+          escape(meta.scope === "selected" && selectedVersionInfo ? selectedVersionInfo.ids : ""),
           escape(log.id),
           escape(log.created_at),
           escape(new Date(log.created_at).toLocaleString()),
@@ -879,8 +947,8 @@ function InvoiceDetailPage() {
           escape(who),
           escape(id),
           escape(invoice?.invoice_number ?? ""),
-          escape(String(meta.removed_count ?? ids.length)),
-          escape(meta.kept != null ? String(meta.kept) : ""),
+          escape(String(logMeta.removed_count ?? ids.length)),
+          escape(logMeta.kept != null ? String(logMeta.kept) : ""),
           escape(String(totalBytes)),
           escape(formatBytes(totalBytes)),
           escape(ids.join("; ")),
@@ -913,11 +981,11 @@ function InvoiceDetailPage() {
       filename,
       sha256,
       rowCount: source.length,
-      scope: scopeLabel,
+      scope: meta.scope,
       exportedAt: new Date().toISOString(),
       byteSize: bytes.byteLength,
     });
-    toast.success(`Exported ${source.length} ${scopeLabel} audit entr${source.length === 1 ? "y" : "ies"}`, {
+    toast.success(`Exported ${source.length} ${meta.scope} audit entr${source.length === 1 ? "y" : "ies"}`, {
       description: sha256 ? `SHA-256: ${sha256.slice(0, 16)}…` : undefined,
     });
   }
@@ -1010,7 +1078,22 @@ function InvoiceDetailPage() {
     if (!purgeExportConfirmState || purgeExportConfirmState.loading || purgeExporting) return;
     setPurgeExporting(true);
     try {
-      await exportPurgeAuditCsv(purgeExportConfirmState.rows, purgeExportConfirmState.scope);
+      const exportMeta: PurgeExportMeta =
+        purgeExportConfirmState.scope === "selected"
+          ? { scope: "selected" }
+          : {
+              scope: "filtered",
+              userLabel:
+                purgeUserFilter === "all"
+                  ? "All users"
+                  : purgeUserOptions.find((u) => u.id === purgeUserFilter)?.label ?? purgeUserFilter,
+              fromDate: purgeFromDate,
+              toDate: purgeToDate,
+              versionQuery: purgeVersionQuery,
+              minBytes: purgeMinBytes,
+              maxBytes: purgeMaxBytes,
+            };
+      await exportPurgeAuditCsv(purgeExportConfirmState.rows, exportMeta);
     } finally {
       setPurgeExporting(false);
       setPurgeExportConfirmOpen(false);
