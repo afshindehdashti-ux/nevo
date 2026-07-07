@@ -157,6 +157,7 @@ function InvoiceDetailPage() {
   const canPurgePdf = useCanPurgeInvoicePdfVersions();
   const fetchPurgeAuditForExport = useServerFn(listPurgeAuditForExport);
   const fetchPurgeAuditByIds = useServerFn(listPurgeAuditByIds);
+  const recordExportAudit = useServerFn(recordCsvExportAudit);
 
   const { data: invoice, isLoading } = useQuery({
     queryKey: ["invoice", id],
