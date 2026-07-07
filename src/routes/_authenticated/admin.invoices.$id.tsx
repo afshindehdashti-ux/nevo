@@ -1665,7 +1665,19 @@ function InvoiceDetailPage() {
                           const idQ = purgeVersionQuery.trim().toLowerCase();
                           const displayIds = idQ ? ids.filter((v) => v.toLowerCase().includes(idQ)) : ids;
                           return (
-                            <TableRow key={log.id} id={`purge-log-${log.id}`} className="transition-shadow">
+                            <TableRow
+                              key={log.id}
+                              id={`purge-log-${log.id}`}
+                              data-state={selectedPurgeIds.has(log.id) ? "selected" : undefined}
+                              className="transition-shadow"
+                            >
+                              <TableCell className="w-10">
+                                <Checkbox
+                                  checked={selectedPurgeIds.has(log.id)}
+                                  onCheckedChange={(v) => togglePurgeSelected(log.id, v === true)}
+                                  aria-label="Select row"
+                                />
+                              </TableCell>
                               <TableCell className="whitespace-nowrap text-sm">
                                 {new Date(log.created_at).toLocaleString()}
                               </TableCell>
