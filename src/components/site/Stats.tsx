@@ -36,8 +36,8 @@ export function Stats() {
   }, []);
 
   const STATS = [
-    { num: 20, suffix: t("home.stats.yearsSuffix"), label: t("home.stats.yearsLabel") },
-    { num: 100, suffix: t("home.stats.projectsSuffix"), label: t("home.stats.projectsLabel") },
+    { num: 0, text: t("home.stats.yearsValue"), label: t("home.stats.yearsLabel") },
+    { num: 0, text: t("home.stats.projectsValue"), label: t("home.stats.projectsLabel") },
     { num: 0, text: t("home.stats.worldwide"), label: t("home.stats.worldwideLabel") },
     { num: 0, text: t("home.stats.multiple"), label: t("home.stats.multipleLabel") },
   ];
