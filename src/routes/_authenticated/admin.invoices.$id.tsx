@@ -1636,6 +1636,13 @@ function InvoiceDetailPage() {
                     <Table>
                       <TableHeader>
                         <TableRow>
+                          <TableHead className="w-10">
+                            <Checkbox
+                              checked={allFilteredSelected ? true : someFilteredSelected ? "indeterminate" : false}
+                              onCheckedChange={(v) => toggleAllFiltered(v === true)}
+                              aria-label="Select all filtered rows"
+                            />
+                          </TableHead>
                           <TableHead>When</TableHead>
                           <TableHead>User</TableHead>
                           <TableHead className="text-right">Removed</TableHead>
