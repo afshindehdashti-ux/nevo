@@ -44,6 +44,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_actions_log: {
+        Row: {
+          action_type: string
+          ai_summary: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          related_module: string | null
+          related_record_id: string | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          ai_summary?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          related_module?: string | null
+          related_record_id?: string | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          ai_summary?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          related_module?: string | null
+          related_record_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_assistant_conversations: {
         Row: {
           created_at: string
@@ -90,6 +123,219 @@ export type Database = {
             columns: ["inquiry_id"]
             isOneToOne: false
             referencedRelation: "project_inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          parts: Json
+          role: Database["public"]["Enums"]["ai_chat_role"]
+          session_id: string
+          sources: Json
+          tokens_in: number | null
+          tokens_out: number | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          parts?: Json
+          role: Database["public"]["Enums"]["ai_chat_role"]
+          session_id: string
+          sources?: Json
+          tokens_in?: number | null
+          tokens_out?: number | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          parts?: Json
+          role?: Database["public"]["Enums"]["ai_chat_role"]
+          session_id?: string
+          sources?: Json
+          tokens_in?: number | null
+          tokens_out?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "ai_chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_chat_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          related_module: string | null
+          related_record_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          related_module?: string | null
+          related_record_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          related_module?: string | null
+          related_record_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_document_chunks: {
+        Row: {
+          chunk_index: number
+          chunk_text: string
+          created_at: string
+          document_id: string
+          embedding: string | null
+          id: string
+          metadata: Json
+          page_number: number | null
+        }
+        Insert: {
+          chunk_index: number
+          chunk_text: string
+          created_at?: string
+          document_id: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json
+          page_number?: number | null
+        }
+        Update: {
+          chunk_index?: number
+          chunk_text?: string
+          created_at?: string
+          document_id?: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json
+          page_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_document_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "ai_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_documents: {
+        Row: {
+          access_level: Database["public"]["Enums"]["ai_document_access_level"]
+          byte_size: number | null
+          category: Database["public"]["Enums"]["ai_document_category"]
+          chunk_count: number
+          created_at: string
+          description: string | null
+          error_message: string | null
+          file_type: string | null
+          file_url: string | null
+          id: string
+          related_customer_id: string | null
+          related_invoice_id: string | null
+          related_order_id: string | null
+          related_supplier_id: string | null
+          status: Database["public"]["Enums"]["ai_document_status"]
+          tags: string[]
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          access_level?: Database["public"]["Enums"]["ai_document_access_level"]
+          byte_size?: number | null
+          category?: Database["public"]["Enums"]["ai_document_category"]
+          chunk_count?: number
+          created_at?: string
+          description?: string | null
+          error_message?: string | null
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          related_customer_id?: string | null
+          related_invoice_id?: string | null
+          related_order_id?: string | null
+          related_supplier_id?: string | null
+          status?: Database["public"]["Enums"]["ai_document_status"]
+          tags?: string[]
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          access_level?: Database["public"]["Enums"]["ai_document_access_level"]
+          byte_size?: number | null
+          category?: Database["public"]["Enums"]["ai_document_category"]
+          chunk_count?: number
+          created_at?: string
+          description?: string | null
+          error_message?: string | null
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          related_customer_id?: string | null
+          related_invoice_id?: string | null
+          related_order_id?: string | null
+          related_supplier_id?: string | null
+          status?: Database["public"]["Enums"]["ai_document_status"]
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_documents_related_customer_id_fkey"
+            columns: ["related_customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_documents_related_invoice_id_fkey"
+            columns: ["related_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_documents_related_order_id_fkey"
+            columns: ["related_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_documents_related_supplier_id_fkey"
+            columns: ["related_supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
         ]
@@ -2976,6 +3222,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_read_ai_access_level: {
+        Args: {
+          _level: Database["public"]["Enums"]["ai_document_access_level"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       decide_approval_request: {
         Args: { _decision: string; _id: string; _notes?: string }
         Returns: {
@@ -3077,6 +3330,22 @@ export type Database = {
         }
         Returns: string
       }
+      match_ai_chunks: {
+        Args: {
+          _user_id?: string
+          match_count?: number
+          query_embedding: string
+        }
+        Returns: {
+          chunk_id: string
+          chunk_text: string
+          document_category: Database["public"]["Enums"]["ai_document_category"]
+          document_id: string
+          document_title: string
+          page_number: number
+          similarity: number
+        }[]
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -3101,6 +3370,28 @@ export type Database = {
       }
     }
     Enums: {
+      ai_chat_role: "user" | "assistant" | "system"
+      ai_document_access_level:
+        | "all_internal"
+        | "management_only"
+        | "finance_only"
+        | "operations_only"
+        | "sales_only"
+        | "super_admin_only"
+      ai_document_category:
+        | "crm_user_guide"
+        | "company_profile"
+        | "product_datasheet"
+        | "supplier_agreement"
+        | "customer_document"
+        | "invoice_template"
+        | "commission_agreement"
+        | "sop_procedure"
+        | "sales_training"
+        | "technical_document"
+        | "legal_compliance"
+        | "general"
+      ai_document_status: "processing" | "ready" | "failed" | "archived"
       app_role:
         | "admin"
         | "moderator"
@@ -3324,6 +3615,30 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      ai_chat_role: ["user", "assistant", "system"],
+      ai_document_access_level: [
+        "all_internal",
+        "management_only",
+        "finance_only",
+        "operations_only",
+        "sales_only",
+        "super_admin_only",
+      ],
+      ai_document_category: [
+        "crm_user_guide",
+        "company_profile",
+        "product_datasheet",
+        "supplier_agreement",
+        "customer_document",
+        "invoice_template",
+        "commission_agreement",
+        "sop_procedure",
+        "sales_training",
+        "technical_document",
+        "legal_compliance",
+        "general",
+      ],
+      ai_document_status: ["processing", "ready", "failed", "archived"],
       app_role: [
         "admin",
         "moderator",
