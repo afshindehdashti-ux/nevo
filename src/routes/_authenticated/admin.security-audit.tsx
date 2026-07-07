@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsSuperAdmin, useMyRoles } from "@/lib/crm-hooks";
 import {
@@ -104,6 +104,7 @@ export const Route = createFileRoute("/_authenticated/admin/security-audit")({
 function SecurityAuditPage() {
   const isSuperAdmin = useIsSuperAdmin();
   const { isLoading: rolesLoading } = useMyRoles();
+  const queryClient = useQueryClient();
 
   const [category, setCategory] =
     useState<(typeof CATEGORIES)[number]["value"]>("all");
@@ -112,6 +113,39 @@ function SecurityAuditPage() {
   const [actor, setActor] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<LogRow | null>(null);
+  const [liveStatus, setLiveStatus] = useState<"connecting" | "live" | "off">(
+    "connecting",
+  );
+
+  // Real-time refresh — subscribe to inserts on activity_logs and invalidate
+  // the audit query whenever a security-significant event lands. Filtering on
+  // `action=in.(...)` at the server keeps this quiet: no traffic for ordinary
+  // approvals-log/updated-by chatter that doesn't belong on this page.
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    const channel = supabase
+      .channel("security-audit-live")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "activity_logs",
+          filter: "action=in.(sign_in,approve,reject,cancel,delete)",
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["security-audit"] });
+        },
+      )
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") setLiveStatus("live");
+        else if (status === "CHANNEL_ERROR" || status === "CLOSED")
+          setLiveStatus("off");
+      });
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isSuperAdmin, queryClient]);
 
   const logsQ = useQuery({
     enabled: isSuperAdmin,
@@ -305,15 +339,44 @@ function SecurityAuditPage() {
             </p>
           </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={exportCsv}
-          disabled={!filteredRows.length}
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Export CSV
-        </Button>
+        <div className="flex items-center gap-2">
+          <span
+            className={
+              "inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-full border " +
+              (liveStatus === "live"
+                ? "border-emerald-500/40 text-emerald-600 dark:text-emerald-400"
+                : liveStatus === "connecting"
+                  ? "border-muted-foreground/30 text-muted-foreground"
+                  : "border-destructive/40 text-destructive")
+            }
+            aria-live="polite"
+          >
+            <span
+              className={
+                "h-1.5 w-1.5 rounded-full " +
+                (liveStatus === "live"
+                  ? "bg-emerald-500 animate-pulse"
+                  : liveStatus === "connecting"
+                    ? "bg-muted-foreground/60"
+                    : "bg-destructive")
+              }
+            />
+            {liveStatus === "live"
+              ? "Live"
+              : liveStatus === "connecting"
+                ? "Connecting…"
+                : "Offline"}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={exportCsv}
+            disabled={!filteredRows.length}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
