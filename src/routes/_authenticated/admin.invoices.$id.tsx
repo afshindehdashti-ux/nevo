@@ -1452,6 +1452,10 @@ function InvoiceDetailPage() {
             <Button variant="ghost" onClick={() => setPurgeOpen(false)} disabled={purging}>
               Cancel
             </Button>
+            <Button variant="outline" onClick={exportPurgeListCsv} disabled={purging || toPurgeVersions.length === 0}>
+              <FileDown className="h-4 w-4 mr-1" />
+              Export CSV
+            </Button>
             <Button variant="destructive" onClick={confirmPurge} disabled={purging}>
               <Trash2 className="h-4 w-4 mr-1" />
               {purging ? "Purging…" : `Purge ${overRetentionCount}`}
