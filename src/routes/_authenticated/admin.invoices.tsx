@@ -175,14 +175,35 @@ export function InvoicesList({
             ))}
           </SelectContent>
         </Select>
-        <p className="text-xs text-muted-foreground ml-auto">
-          Create from an <Link to="/admin/orders" className="text-primary hover:underline">order</Link>.
-        </p>
+        <div className="ml-auto flex items-center gap-2">
+          {selected.size > 0 && (
+            <span className="text-xs text-muted-foreground">{selected.size} selected</span>
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleBulkExport}
+            disabled={selected.size === 0 || exporting}
+          >
+            {exporting ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <FileDown className="h-3.5 w-3.5 mr-1" />}
+            Export PDF{selected.size > 1 ? "s" : ""}
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            Create from an <Link to="/admin/orders" className="text-primary hover:underline">order</Link>.
+          </p>
+        </div>
       </div>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-10">
+                <Checkbox
+                  checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                  onCheckedChange={(v) => toggleAll(v === true)}
+                  aria-label="Select all"
+                />
+              </TableHead>
               <TableHead>Invoice #</TableHead>
               <TableHead>Customer</TableHead>
               <TableHead>Date</TableHead>
@@ -195,14 +216,14 @@ export function InvoicesList({
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   Loading…
                 </TableCell>
               </TableRow>
             )}
             {!isLoading && filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
                   {invoices.length === 0
                     ? `No ${type === "proforma" ? "proforma " : ""}invoices yet.`
                     : "No matches."}
@@ -210,7 +231,14 @@ export function InvoicesList({
               </TableRow>
             )}
             {filtered.map((i) => (
-              <TableRow key={i.id}>
+              <TableRow key={i.id} data-state={selected.has(i.id) ? "selected" : undefined}>
+                <TableCell>
+                  <Checkbox
+                    checked={selected.has(i.id)}
+                    onCheckedChange={(v) => toggleOne(i.id, v === true)}
+                    aria-label={`Select ${i.invoice_number ?? i.id}`}
+                  />
+                </TableCell>
                 <TableCell>
                   <Link
                     to="/admin/invoices/$id"
@@ -232,6 +260,7 @@ export function InvoicesList({
                 <TableCell className="text-right">{formatMoney(i.balance, i.currency)}</TableCell>
               </TableRow>
             ))}
+
           </TableBody>
         </Table>
       </div>
