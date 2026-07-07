@@ -185,6 +185,12 @@ export const CRM_NAV: CrmNavGroup[] = [
         allowedRoles: ["management", "finance"],
       },
       {
+        title: "CSV Export History",
+        url: "/admin/exports",
+        icon: FileDown,
+        allowedRoles: ["management", "finance"],
+      },
+      {
         title: "Import Data",
         url: "/admin/import",
         icon: Upload,
