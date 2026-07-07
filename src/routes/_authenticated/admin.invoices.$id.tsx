@@ -587,8 +587,8 @@ function InvoiceDetailPage() {
     URL.revokeObjectURL(url);
   }
 
-  function exportPurgeAuditCsv() {
-    const source = filteredPurgeLogs;
+  function exportPurgeAuditCsv(rows?: PurgeLogRow[], scopeLabel = "filtered") {
+    const source = rows ?? filteredPurgeLogs;
     if (source.length === 0) {
       toast.info("No purge audit entries to export");
       return;
