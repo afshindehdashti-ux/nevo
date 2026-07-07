@@ -1929,17 +1929,7 @@ function InvoiceDetailPage() {
                         className="h-8"
                         disabled={!canPurgePdf}
                         title={!canPurgePdf ? "Only Super Admin, Management, or Finance can export purge history." : undefined}
-                        onClick={async () => {
-                          const ids = Array.from(selectedPurgeIds);
-                          try {
-                            const data = await fetchPurgeAuditByIds({
-                              data: { invoice_id: id, ids },
-                            });
-                            await exportPurgeAuditCsv(data as PurgeLogRow[], "selected");
-                          } catch (e) {
-                            toast.error(e instanceof Error ? e.message : "Failed to load selected audit entries");
-                          }
-                        }}
+                        onClick={() => { void openPurgeExportConfirm("selected"); }}
                       >
                         <FileDown className="h-3.5 w-3.5 mr-1" />
                         Export selected ({selectedPurgeIds.size})
