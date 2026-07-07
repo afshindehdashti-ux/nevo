@@ -67,6 +67,7 @@ import { Route as AuthenticatedAdminSolutionsSeoRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminShipmentsRouteImport } from './routes/_authenticated/admin.shipments'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminSessionRouteImport } from './routes/_authenticated/admin.session'
+import { Route as AuthenticatedAdminSecurityAuditRouteImport } from './routes/_authenticated/admin.security-audit'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminQuotationsRouteImport } from './routes/_authenticated/admin.quotations'
 import { Route as AuthenticatedAdminPurchaseOrdersRouteImport } from './routes/_authenticated/admin.purchase-orders'
@@ -419,6 +420,12 @@ const AuthenticatedAdminSessionRoute =
   AuthenticatedAdminSessionRouteImport.update({
     id: '/session',
     path: '/session',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSecurityAuditRoute =
+  AuthenticatedAdminSecurityAuditRouteImport.update({
+    id: '/security-audit',
+    path: '/security-audit',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminReportsRoute =
@@ -808,6 +815,7 @@ export interface FileRoutesByFullPath {
   '/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
   '/admin/quotations': typeof AuthenticatedAdminQuotationsRouteWithChildren
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/security-audit': typeof AuthenticatedAdminSecurityAuditRoute
   '/admin/session': typeof AuthenticatedAdminSessionRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
@@ -917,6 +925,7 @@ export interface FileRoutesByTo {
   '/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
   '/admin/quotations': typeof AuthenticatedAdminQuotationsRouteWithChildren
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/security-audit': typeof AuthenticatedAdminSecurityAuditRoute
   '/admin/session': typeof AuthenticatedAdminSessionRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
@@ -1031,6 +1040,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
   '/_authenticated/admin/quotations': typeof AuthenticatedAdminQuotationsRouteWithChildren
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/_authenticated/admin/security-audit': typeof AuthenticatedAdminSecurityAuditRoute
   '/_authenticated/admin/session': typeof AuthenticatedAdminSessionRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
@@ -1145,6 +1155,7 @@ export interface FileRouteTypes {
     | '/admin/purchase-orders'
     | '/admin/quotations'
     | '/admin/reports'
+    | '/admin/security-audit'
     | '/admin/session'
     | '/admin/settings'
     | '/admin/shipments'
@@ -1254,6 +1265,7 @@ export interface FileRouteTypes {
     | '/admin/purchase-orders'
     | '/admin/quotations'
     | '/admin/reports'
+    | '/admin/security-audit'
     | '/admin/session'
     | '/admin/settings'
     | '/admin/shipments'
@@ -1367,6 +1379,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/purchase-orders'
     | '/_authenticated/admin/quotations'
     | '/_authenticated/admin/reports'
+    | '/_authenticated/admin/security-audit'
     | '/_authenticated/admin/session'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/shipments'
@@ -1842,6 +1855,13 @@ declare module '@tanstack/react-router' {
       path: '/session'
       fullPath: '/admin/session'
       preLoaderRoute: typeof AuthenticatedAdminSessionRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/security-audit': {
+      id: '/_authenticated/admin/security-audit'
+      path: '/security-audit'
+      fullPath: '/admin/security-audit'
+      preLoaderRoute: typeof AuthenticatedAdminSecurityAuditRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/reports': {
@@ -2397,6 +2417,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminPurchaseOrdersRoute: typeof AuthenticatedAdminPurchaseOrdersRoute
   AuthenticatedAdminQuotationsRoute: typeof AuthenticatedAdminQuotationsRouteWithChildren
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
+  AuthenticatedAdminSecurityAuditRoute: typeof AuthenticatedAdminSecurityAuditRoute
   AuthenticatedAdminSessionRoute: typeof AuthenticatedAdminSessionRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminShipmentsRoute: typeof AuthenticatedAdminShipmentsRouteWithChildren
@@ -2440,6 +2461,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminQuotationsRoute:
     AuthenticatedAdminQuotationsRouteWithChildren,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
+  AuthenticatedAdminSecurityAuditRoute: AuthenticatedAdminSecurityAuditRoute,
   AuthenticatedAdminSessionRoute: AuthenticatedAdminSessionRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminShipmentsRoute:
