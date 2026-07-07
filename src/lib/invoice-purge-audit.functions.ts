@@ -1,12 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import type { Json } from "@/integrations/supabase/types";
 
 export type PurgeAuditRow = {
   id: string;
   user_id: string | null;
   created_at: string;
-  metadata: unknown;
+  metadata: Json;
 };
 
 const PURGE_ROLES = ["super_admin", "management", "finance"] as const;
