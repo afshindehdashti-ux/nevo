@@ -104,6 +104,7 @@ import { Route as LangSolutionsFactoryDevelopmentRouteImport } from './routes/$l
 import { Route as LangSolutionsEngineeringConsultancyRouteImport } from './routes/$lang.solutions.engineering-consultancy'
 import { Route as LangKnowledgeHubSlugRouteImport } from './routes/$lang.knowledge-hub.$slug'
 import { Route as AuthenticatedAdminMailsIndexRouteImport } from './routes/_authenticated/admin.mails.index'
+import { Route as AuthenticatedAdminAiAssistantIndexRouteImport } from './routes/_authenticated/admin.ai-assistant.index'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -123,6 +124,7 @@ import { Route as AuthenticatedAdminLeadsIdRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminInvoicesIdRouteImport } from './routes/_authenticated/admin.invoices.$id'
 import { Route as AuthenticatedAdminCustomersIdRouteImport } from './routes/_authenticated/admin.customers.$id'
 import { Route as AuthenticatedAdminApprovalsAuditRouteImport } from './routes/_authenticated/admin.approvals.audit'
+import { Route as AuthenticatedAdminAiAssistantKnowledgeBaseRouteImport } from './routes/_authenticated/admin.ai-assistant.knowledge-base'
 import { Route as ApiPublicOauthGoogleCallbackRouteImport } from './routes/api/public/oauth.google.callback'
 import { Route as AuthenticatedAdminQuotationsIdPrintRouteImport } from './routes/_authenticated/admin.quotations.$id.print'
 
@@ -644,6 +646,12 @@ const AuthenticatedAdminMailsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAdminMailsRoute,
   } as any)
+const AuthenticatedAdminAiAssistantIndexRoute =
+  AuthenticatedAdminAiAssistantIndexRouteImport.update({
+    id: '/ai-assistant/',
+    path: '/ai-assistant/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -755,6 +763,12 @@ const AuthenticatedAdminApprovalsAuditRoute =
     path: '/audit',
     getParentRoute: () => AuthenticatedAdminApprovalsRoute,
   } as any)
+const AuthenticatedAdminAiAssistantKnowledgeBaseRoute =
+  AuthenticatedAdminAiAssistantKnowledgeBaseRouteImport.update({
+    id: '/ai-assistant/knowledge-base',
+    path: '/ai-assistant/knowledge-base',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ApiPublicOauthGoogleCallbackRoute =
   ApiPublicOauthGoogleCallbackRouteImport.update({
     id: '/api/public/oauth/google/callback',
@@ -862,6 +876,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/ai-assistant/knowledge-base': typeof AuthenticatedAdminAiAssistantKnowledgeBaseRoute
   '/admin/approvals/audit': typeof AuthenticatedAdminApprovalsAuditRoute
   '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
   '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
@@ -881,6 +896,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/admin/ai-assistant/': typeof AuthenticatedAdminAiAssistantIndexRoute
   '/admin/mails/': typeof AuthenticatedAdminMailsIndexRoute
   '/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
   '/api/public/oauth/google/callback': typeof ApiPublicOauthGoogleCallbackRoute
@@ -976,6 +992,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/ai-assistant/knowledge-base': typeof AuthenticatedAdminAiAssistantKnowledgeBaseRoute
   '/admin/approvals/audit': typeof AuthenticatedAdminApprovalsAuditRoute
   '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
   '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
@@ -995,6 +1012,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/admin/ai-assistant': typeof AuthenticatedAdminAiAssistantIndexRoute
   '/admin/mails': typeof AuthenticatedAdminMailsIndexRoute
   '/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
   '/api/public/oauth/google/callback': typeof ApiPublicOauthGoogleCallbackRoute
@@ -1095,6 +1113,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/ai-assistant/knowledge-base': typeof AuthenticatedAdminAiAssistantKnowledgeBaseRoute
   '/_authenticated/admin/approvals/audit': typeof AuthenticatedAdminApprovalsAuditRoute
   '/_authenticated/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
   '/_authenticated/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
@@ -1114,6 +1133,7 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/_authenticated/admin/ai-assistant/': typeof AuthenticatedAdminAiAssistantIndexRoute
   '/_authenticated/admin/mails/': typeof AuthenticatedAdminMailsIndexRoute
   '/_authenticated/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
   '/api/public/oauth/google/callback': typeof ApiPublicOauthGoogleCallbackRoute
@@ -1214,6 +1234,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/$lang/solutions/'
     | '/admin/'
+    | '/admin/ai-assistant/knowledge-base'
     | '/admin/approvals/audit'
     | '/admin/customers/$id'
     | '/admin/invoices/$id'
@@ -1233,6 +1254,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/admin/ai-assistant/'
     | '/admin/mails/'
     | '/admin/quotations/$id/print'
     | '/api/public/oauth/google/callback'
@@ -1328,6 +1350,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/$lang/solutions'
     | '/admin'
+    | '/admin/ai-assistant/knowledge-base'
     | '/admin/approvals/audit'
     | '/admin/customers/$id'
     | '/admin/invoices/$id'
@@ -1347,6 +1370,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/admin/ai-assistant'
     | '/admin/mails'
     | '/admin/quotations/$id/print'
     | '/api/public/oauth/google/callback'
@@ -1446,6 +1470,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/$lang/solutions/'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/ai-assistant/knowledge-base'
     | '/_authenticated/admin/approvals/audit'
     | '/_authenticated/admin/customers/$id'
     | '/_authenticated/admin/invoices/$id'
@@ -1465,6 +1490,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/_authenticated/admin/ai-assistant/'
     | '/_authenticated/admin/mails/'
     | '/_authenticated/admin/quotations/$id/print'
     | '/api/public/oauth/google/callback'
@@ -2169,6 +2195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMailsIndexRouteImport
       parentRoute: typeof AuthenticatedAdminMailsRoute
     }
+    '/_authenticated/admin/ai-assistant/': {
+      id: '/_authenticated/admin/ai-assistant/'
+      path: '/ai-assistant'
+      fullPath: '/admin/ai-assistant/'
+      preLoaderRoute: typeof AuthenticatedAdminAiAssistantIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -2301,6 +2334,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/approvals/audit'
       preLoaderRoute: typeof AuthenticatedAdminApprovalsAuditRouteImport
       parentRoute: typeof AuthenticatedAdminApprovalsRoute
+    }
+    '/_authenticated/admin/ai-assistant/knowledge-base': {
+      id: '/_authenticated/admin/ai-assistant/knowledge-base'
+      path: '/ai-assistant/knowledge-base'
+      fullPath: '/admin/ai-assistant/knowledge-base'
+      preLoaderRoute: typeof AuthenticatedAdminAiAssistantKnowledgeBaseRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/api/public/oauth/google/callback': {
       id: '/api/public/oauth/google/callback'
@@ -2510,6 +2550,8 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminTasksRoute: typeof AuthenticatedAdminTasksRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminAiAssistantKnowledgeBaseRoute: typeof AuthenticatedAdminAiAssistantKnowledgeBaseRoute
+  AuthenticatedAdminAiAssistantIndexRoute: typeof AuthenticatedAdminAiAssistantIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
@@ -2558,6 +2600,10 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminTasksRoute: AuthenticatedAdminTasksRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRouteWithChildren,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminAiAssistantKnowledgeBaseRoute:
+    AuthenticatedAdminAiAssistantKnowledgeBaseRoute,
+  AuthenticatedAdminAiAssistantIndexRoute:
+    AuthenticatedAdminAiAssistantIndexRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =

@@ -5,6 +5,7 @@ import { CrmSidebar } from "@/components/crm/CrmSidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentUser } from "@/lib/crm-hooks";
 import { AdminRouteGuard } from "@/components/crm/AdminRouteGuard";
+import { AiAssistDrawer } from "@/components/ai/AiAssistDrawer";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -73,6 +74,7 @@ function AdminLayout() {
             </AdminRouteGuard>
           </main>
         </div>
+        <AiAssistDrawer />
       </div>
     </SidebarProvider>
   );
