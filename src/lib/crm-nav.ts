@@ -129,7 +129,7 @@ export const CRM_NAV: CrmNavGroup[] = [
       {
         title: "Routing Rules",
         url: "/admin/doc-intel-rules",
-        icon: ShieldCheck, requiresSuperAdmin: true },
+        icon: ShieldCheck,
         requiresSuperAdmin: true,
       },
       { title: "Reports", url: "/admin/reports", icon: BarChart3, allowedRoles: ALL_STAFF },
