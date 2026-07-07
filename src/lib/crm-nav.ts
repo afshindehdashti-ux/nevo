@@ -144,6 +144,12 @@ export const CRM_NAV: CrmNavGroup[] = [
         requiresSuperAdmin: true,
       },
       {
+        title: "Mail Hub",
+        url: "/admin/mails",
+        icon: Mail,
+        allowedRoles: ["management"],
+      },
+      {
         title: "Email Templates",
         url: "/admin/email-preview",
         icon: Mail,

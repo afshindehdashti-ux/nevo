@@ -74,6 +74,7 @@ import { Route as AuthenticatedAdminProductsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
 import { Route as AuthenticatedAdminOpportunitiesRouteImport } from './routes/_authenticated/admin.opportunities'
+import { Route as AuthenticatedAdminMailsRouteImport } from './routes/_authenticated/admin.mails'
 import { Route as AuthenticatedAdminLogoEventsRouteImport } from './routes/_authenticated/admin.logo-events'
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
 import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authenticated/admin.invoices'
@@ -96,6 +97,7 @@ import { Route as LangSolutionsProductionLinesRouteImport } from './routes/$lang
 import { Route as LangSolutionsFactoryDevelopmentRouteImport } from './routes/$lang.solutions.factory-development'
 import { Route as LangSolutionsEngineeringConsultancyRouteImport } from './routes/$lang.solutions.engineering-consultancy'
 import { Route as LangKnowledgeHubSlugRouteImport } from './routes/$lang.knowledge-hub.$slug'
+import { Route as AuthenticatedAdminMailsIndexRouteImport } from './routes/_authenticated/admin.mails.index'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -105,6 +107,9 @@ import { Route as AuthenticatedAdminUsersInviteRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminShipmentsIdRouteImport } from './routes/_authenticated/admin.shipments.$id'
 import { Route as AuthenticatedAdminQuotationsIdRouteImport } from './routes/_authenticated/admin.quotations.$id'
 import { Route as AuthenticatedAdminOrdersIdRouteImport } from './routes/_authenticated/admin.orders.$id'
+import { Route as AuthenticatedAdminMailsSuppressedRouteImport } from './routes/_authenticated/admin.mails.suppressed'
+import { Route as AuthenticatedAdminMailsInboxRouteImport } from './routes/_authenticated/admin.mails.inbox'
+import { Route as AuthenticatedAdminMailsComposeRouteImport } from './routes/_authenticated/admin.mails.compose'
 import { Route as AuthenticatedAdminLeadsIdRouteImport } from './routes/_authenticated/admin.leads.$id'
 import { Route as AuthenticatedAdminInvoicesIdRouteImport } from './routes/_authenticated/admin.invoices.$id'
 import { Route as AuthenticatedAdminCustomersIdRouteImport } from './routes/_authenticated/admin.customers.$id'
@@ -454,6 +459,11 @@ const AuthenticatedAdminOpportunitiesRoute =
     path: '/opportunities',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminMailsRoute = AuthenticatedAdminMailsRouteImport.update({
+  id: '/mails',
+  path: '/mails',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminLogoEventsRoute =
   AuthenticatedAdminLogoEventsRouteImport.update({
     id: '/logo-events',
@@ -583,6 +593,12 @@ const LangKnowledgeHubSlugRoute = LangKnowledgeHubSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => LangKnowledgeHubRoute,
 } as any)
+const AuthenticatedAdminMailsIndexRoute =
+  AuthenticatedAdminMailsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminMailsRoute,
+  } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -634,6 +650,24 @@ const AuthenticatedAdminOrdersIdRoute =
     id: '/$id',
     path: '/$id',
     getParentRoute: () => AuthenticatedAdminOrdersRoute,
+  } as any)
+const AuthenticatedAdminMailsSuppressedRoute =
+  AuthenticatedAdminMailsSuppressedRouteImport.update({
+    id: '/suppressed',
+    path: '/suppressed',
+    getParentRoute: () => AuthenticatedAdminMailsRoute,
+  } as any)
+const AuthenticatedAdminMailsInboxRoute =
+  AuthenticatedAdminMailsInboxRouteImport.update({
+    id: '/inbox',
+    path: '/inbox',
+    getParentRoute: () => AuthenticatedAdminMailsRoute,
+  } as any)
+const AuthenticatedAdminMailsComposeRoute =
+  AuthenticatedAdminMailsComposeRouteImport.update({
+    id: '/compose',
+    path: '/compose',
+    getParentRoute: () => AuthenticatedAdminMailsRoute,
   } as any)
 const AuthenticatedAdminLeadsIdRoute =
   AuthenticatedAdminLeadsIdRouteImport.update({
@@ -731,6 +765,7 @@ export interface FileRoutesByFullPath {
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
+  '/admin/mails': typeof AuthenticatedAdminMailsRouteWithChildren
   '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRouteWithChildren
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
@@ -757,6 +792,9 @@ export interface FileRoutesByFullPath {
   '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
   '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
   '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
+  '/admin/mails/compose': typeof AuthenticatedAdminMailsComposeRoute
+  '/admin/mails/inbox': typeof AuthenticatedAdminMailsInboxRoute
+  '/admin/mails/suppressed': typeof AuthenticatedAdminMailsSuppressedRoute
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
@@ -766,6 +804,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/admin/mails/': typeof AuthenticatedAdminMailsIndexRoute
   '/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
 }
 export interface FileRoutesByTo {
@@ -857,6 +896,9 @@ export interface FileRoutesByTo {
   '/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
   '/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
   '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
+  '/admin/mails/compose': typeof AuthenticatedAdminMailsComposeRoute
+  '/admin/mails/inbox': typeof AuthenticatedAdminMailsInboxRoute
+  '/admin/mails/suppressed': typeof AuthenticatedAdminMailsSuppressedRoute
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
@@ -866,6 +908,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/admin/mails': typeof AuthenticatedAdminMailsIndexRoute
   '/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
 }
 export interface FileRoutesById {
@@ -935,6 +978,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
   '/_authenticated/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
+  '/_authenticated/admin/mails': typeof AuthenticatedAdminMailsRouteWithChildren
   '/_authenticated/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRouteWithChildren
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
@@ -961,6 +1005,9 @@ export interface FileRoutesById {
   '/_authenticated/admin/customers/$id': typeof AuthenticatedAdminCustomersIdRoute
   '/_authenticated/admin/invoices/$id': typeof AuthenticatedAdminInvoicesIdRoute
   '/_authenticated/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
+  '/_authenticated/admin/mails/compose': typeof AuthenticatedAdminMailsComposeRoute
+  '/_authenticated/admin/mails/inbox': typeof AuthenticatedAdminMailsInboxRoute
+  '/_authenticated/admin/mails/suppressed': typeof AuthenticatedAdminMailsSuppressedRoute
   '/_authenticated/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/_authenticated/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
   '/_authenticated/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
@@ -970,6 +1017,7 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/_authenticated/admin/mails/': typeof AuthenticatedAdminMailsIndexRoute
   '/_authenticated/admin/quotations/$id/print': typeof AuthenticatedAdminQuotationsIdPrintRoute
 }
 export interface FileRouteTypes {
@@ -1039,6 +1087,7 @@ export interface FileRouteTypes {
     | '/admin/invoices'
     | '/admin/leads'
     | '/admin/logo-events'
+    | '/admin/mails'
     | '/admin/opportunities'
     | '/admin/orders'
     | '/admin/payments'
@@ -1065,6 +1114,9 @@ export interface FileRouteTypes {
     | '/admin/customers/$id'
     | '/admin/invoices/$id'
     | '/admin/leads/$id'
+    | '/admin/mails/compose'
+    | '/admin/mails/inbox'
+    | '/admin/mails/suppressed'
     | '/admin/orders/$id'
     | '/admin/quotations/$id'
     | '/admin/shipments/$id'
@@ -1074,6 +1126,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/admin/mails/'
     | '/admin/quotations/$id/print'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -1165,6 +1218,9 @@ export interface FileRouteTypes {
     | '/admin/customers/$id'
     | '/admin/invoices/$id'
     | '/admin/leads/$id'
+    | '/admin/mails/compose'
+    | '/admin/mails/inbox'
+    | '/admin/mails/suppressed'
     | '/admin/orders/$id'
     | '/admin/quotations/$id'
     | '/admin/shipments/$id'
@@ -1174,6 +1230,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/admin/mails'
     | '/admin/quotations/$id/print'
   id:
     | '__root__'
@@ -1242,6 +1299,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/invoices'
     | '/_authenticated/admin/leads'
     | '/_authenticated/admin/logo-events'
+    | '/_authenticated/admin/mails'
     | '/_authenticated/admin/opportunities'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/payments'
@@ -1268,6 +1326,9 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/customers/$id'
     | '/_authenticated/admin/invoices/$id'
     | '/_authenticated/admin/leads/$id'
+    | '/_authenticated/admin/mails/compose'
+    | '/_authenticated/admin/mails/inbox'
+    | '/_authenticated/admin/mails/suppressed'
     | '/_authenticated/admin/orders/$id'
     | '/_authenticated/admin/quotations/$id'
     | '/_authenticated/admin/shipments/$id'
@@ -1277,6 +1338,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/_authenticated/admin/mails/'
     | '/_authenticated/admin/quotations/$id/print'
   fileRoutesById: FileRoutesById
 }
@@ -1765,6 +1827,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminOpportunitiesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/mails': {
+      id: '/_authenticated/admin/mails'
+      path: '/mails'
+      fullPath: '/admin/mails'
+      preLoaderRoute: typeof AuthenticatedAdminMailsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/logo-events': {
       id: '/_authenticated/admin/logo-events'
       path: '/logo-events'
@@ -1919,6 +1988,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangKnowledgeHubSlugRouteImport
       parentRoute: typeof LangKnowledgeHubRoute
     }
+    '/_authenticated/admin/mails/': {
+      id: '/_authenticated/admin/mails/'
+      path: '/'
+      fullPath: '/admin/mails/'
+      preLoaderRoute: typeof AuthenticatedAdminMailsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminMailsRoute
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -1981,6 +2057,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/orders/$id'
       preLoaderRoute: typeof AuthenticatedAdminOrdersIdRouteImport
       parentRoute: typeof AuthenticatedAdminOrdersRoute
+    }
+    '/_authenticated/admin/mails/suppressed': {
+      id: '/_authenticated/admin/mails/suppressed'
+      path: '/suppressed'
+      fullPath: '/admin/mails/suppressed'
+      preLoaderRoute: typeof AuthenticatedAdminMailsSuppressedRouteImport
+      parentRoute: typeof AuthenticatedAdminMailsRoute
+    }
+    '/_authenticated/admin/mails/inbox': {
+      id: '/_authenticated/admin/mails/inbox'
+      path: '/inbox'
+      fullPath: '/admin/mails/inbox'
+      preLoaderRoute: typeof AuthenticatedAdminMailsInboxRouteImport
+      parentRoute: typeof AuthenticatedAdminMailsRoute
+    }
+    '/_authenticated/admin/mails/compose': {
+      id: '/_authenticated/admin/mails/compose'
+      path: '/compose'
+      fullPath: '/admin/mails/compose'
+      preLoaderRoute: typeof AuthenticatedAdminMailsComposeRouteImport
+      parentRoute: typeof AuthenticatedAdminMailsRoute
     }
     '/_authenticated/admin/leads/$id': {
       id: '/_authenticated/admin/leads/$id'
@@ -2077,6 +2174,27 @@ const AuthenticatedAdminLeadsRouteWithChildren =
     AuthenticatedAdminLeadsRouteChildren,
   )
 
+interface AuthenticatedAdminMailsRouteChildren {
+  AuthenticatedAdminMailsComposeRoute: typeof AuthenticatedAdminMailsComposeRoute
+  AuthenticatedAdminMailsInboxRoute: typeof AuthenticatedAdminMailsInboxRoute
+  AuthenticatedAdminMailsSuppressedRoute: typeof AuthenticatedAdminMailsSuppressedRoute
+  AuthenticatedAdminMailsIndexRoute: typeof AuthenticatedAdminMailsIndexRoute
+}
+
+const AuthenticatedAdminMailsRouteChildren: AuthenticatedAdminMailsRouteChildren =
+  {
+    AuthenticatedAdminMailsComposeRoute: AuthenticatedAdminMailsComposeRoute,
+    AuthenticatedAdminMailsInboxRoute: AuthenticatedAdminMailsInboxRoute,
+    AuthenticatedAdminMailsSuppressedRoute:
+      AuthenticatedAdminMailsSuppressedRoute,
+    AuthenticatedAdminMailsIndexRoute: AuthenticatedAdminMailsIndexRoute,
+  }
+
+const AuthenticatedAdminMailsRouteWithChildren =
+  AuthenticatedAdminMailsRoute._addFileChildren(
+    AuthenticatedAdminMailsRouteChildren,
+  )
+
 interface AuthenticatedAdminOrdersRouteChildren {
   AuthenticatedAdminOrdersIdRoute: typeof AuthenticatedAdminOrdersIdRoute
 }
@@ -2166,6 +2284,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRouteWithChildren
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRouteWithChildren
   AuthenticatedAdminLogoEventsRoute: typeof AuthenticatedAdminLogoEventsRoute
+  AuthenticatedAdminMailsRoute: typeof AuthenticatedAdminMailsRouteWithChildren
   AuthenticatedAdminOpportunitiesRoute: typeof AuthenticatedAdminOpportunitiesRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRouteWithChildren
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
@@ -2205,6 +2324,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRouteWithChildren,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRouteWithChildren,
   AuthenticatedAdminLogoEventsRoute: AuthenticatedAdminLogoEventsRoute,
+  AuthenticatedAdminMailsRoute: AuthenticatedAdminMailsRouteWithChildren,
   AuthenticatedAdminOpportunitiesRoute: AuthenticatedAdminOpportunitiesRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRouteWithChildren,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,

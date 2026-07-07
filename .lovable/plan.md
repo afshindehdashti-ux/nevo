@@ -1,49 +1,75 @@
-# NEVO Backend Upgrade Plan
+# Mail Hub at `/admin/mails`
 
-Reusing existing routes, NEVO brand shell, Supabase schema, `_authenticated` gate, activity_logs, PDF generator, and doc-intel plumbing. No new UI shells — extend what's there.
+A super-admin-only mail center inside the existing admin shell, split into three tabs.
 
-## Phase 1 — Customer Portal (real data)
-**Route:** existing `$lang.customer-portal.tsx`
-- Add auth gate: sign in via existing `/auth`, then match user via `customer_users` mapping.
-- Server fns in `src/lib/customer-portal.functions.ts` (RLS via `requireSupabaseAuth` + `is_customer_user`):
-  - `getMyCustomerContext` → customer profile, contact, balance
-  - `getMyOrders`, `getMyInvoices`, `getMyProformas`, `getMyShipments`, `getMyDocuments`
-  - `getMyDocumentSignedUrl` (documents-private bucket, log to `download_events`)
-- Portal UI: tabs — Overview (KPIs: open orders, balance due, in-transit shipments, latest docs) · Orders · Invoices · Shipments · Documents · Profile. Reuse `Card`, `Table`, `Badge` from admin.
+## 1. Log Dashboard (`/admin/mails` — default tab)
 
-## Phase 2 — AI Assistant (real backend)
-**Route:** existing `$lang.ai-assistant.tsx`
-- Server route `src/routes/api/ai-assistant.ts` — streaming `useChat` endpoint via Lovable AI Gateway (`google/gemini-2.5-flash`).
-- System prompt loaded server-side with NEVO context: solutions list, industries, product categories (fetched from `products`/`solutions_inspection`), contact + factory-layout tool links.
-- Tool-lite behavior via prompt: when user shows buying intent, model asks for name/email/company/need and returns a JSON block → client posts to `submitAssistantLead` server fn which inserts into `project_inquiries` (source='ai_assistant') and triggers existing lead pipeline.
-- Conversation persisted in `localStorage` only (no new table); rate-limit by IP via existing `email_send_state`-style guard using in-memory + 429 fallback.
+Read-only monitoring of every email your app sends (auth + app emails). Data source: existing `email_send_log` table, deduped by `message_id`.
 
-## Phase 3 — Quotations module + shared PDF
-**New table:** `quotations` + `quotation_items` (mirrors invoices shape; status: draft/sent/accepted/rejected/expired/converted).
-- Server fns: create/update/send/convert-to-proforma/convert-to-invoice.
-- PDF: reuse existing invoice PDF generator (`src/lib/pdf/*` if present, else extend) → NEVO-branded template with logo from `company_settings`, numbering via new sequence `quotation_number_seq` + `next_quotation_number()`.
-- Admin route: `/admin/quotations` list + `/admin/quotations/$id` editor (mirror `admin.invoices.tsx` layout).
+Includes all six required dashboard features:
+- Time range: Last 24h / 7d / 30d + custom picker (default 7d)
+- Template filter (multi-select of all distinct `template_name`)
+- Status filter (All / Sent / Failed / Suppressed) with color badges
+- Summary stat cards: total unique / sent / failed / suppressed
+- Sortable, paginated table (50/page): Template, Recipient, Status, Timestamp, Error
+- Row click → detail drawer with full metadata + error trace
 
-## Phase 4 — Communication Center (polymorphic timeline)
-**New table:** `communications (id, entity_type, entity_id, kind[note|email|call|meeting|file], subject, body, direction[in|out], user_id, occurred_at, metadata, attachments jsonb)`.
-- RLS: admins full; scoped read for customer/partner via existing `is_customer_user`/`is_partner_user` when `entity_type='customer'|'partner'` and matches.
-- Component `<CommunicationTimeline entityType entityId />` reused across `admin.customers.$id`, `admin.leads.$id`, `admin.orders.$id`, `admin.projects` (future).
+Extras:
+- Suppressed emails panel (from `suppressed_emails`) with reason + date
+- "Resend" button on failed rows (re-queues via existing send route)
 
-## Phase 5 — Tasks & Approvals workflow
-- Extend existing `tasks` table (columns: assigned_to, due_date, status, priority, entity_type, entity_id, approval_required, approved_by, approved_at) — add missing via migration.
-- Approval chain on quotations/proformas/invoices: `status='pending_approval'` blocks send until `has_role('admin')` clicks Approve → uses existing `log_status_approval` trigger.
-- Admin `/admin/tasks` upgraded to real board (kanban by status) + due-date filter + email placeholder (log-only for now).
+## 2. Compose & Send (`/admin/mails/compose`)
 
-## Phase 6 — Wiring & polish
-- Add nav links in sidebar (`admin.tsx`) for Quotations.
-- CSV export helper on quotations + communications.
-- Update `admin.reports.tsx` with Quotation win-rate and Communication volume reports.
-- Verify build + type-check after each phase.
+Admin composer to send app emails to any customer/lead/contact/partner.
 
-## Technical notes
-- All new tables: `GRANT` block + RLS + `set_updated_at` + `stamp_updated_by` triggers + `log_row_delete` where relevant.
-- Reuse existing `Section`, `PageHeader`, `DataTable`, `EmptyState`, `StatusBadge` primitives (verified present in codebase).
-- No new brand tokens — pull from `src/index.css` / existing shell.
-- Partner Portal deferred (user picked Customer Portal only for now); communications table designed to accept `entity_type='partner'` when it comes.
+- Recipient picker: search across `customers`, `contacts`, `leads`, `partners` (or free-form email)
+- Template picker: choose any registered React Email template OR "Custom message"
+- Template data fields render dynamically from the template's `previewData` shape
+- Custom message mode: subject + rich text body (uses a generic `admin-broadcast` template we'll add)
+- Preview pane (calls existing `/lovable/email/transactional/preview`)
+- Send → POSTs to `/lovable/email/transactional/send` with idempotency key `admin-manual-<uuid>`
+- One recipient per send (Lovable rule: no bulk). For multi-recipient, sends sequentially with progress + logs each in `email_send_log`
 
-Total: ~1 migration + ~20 new/edited files. I'll execute phases in sequence, run typecheck between each.
+## 3. Inbox (`/admin/mails/inbox`)
+
+**Important caveat:** Lovable's built-in email system is send-only — it does not receive mail. To read incoming email to `@nevoindustrial.com` addresses, we need one of:
+
+- **Option A (recommended): Gmail connector** — connects YOUR business Gmail (e.g. info@nevoindustrial.com if it's a Google Workspace mailbox) via the built-in Google Mail connector. Full read/reply/label support through the Lovable gateway. Works only if that mailbox is on Google Workspace.
+- **Option B: IMAP integration** — custom code + credentials for a non-Gmail mailbox. More work, less reliable.
+- **Option C: skip inbox for now** — ship dashboard + compose, add inbox later.
+
+Assuming **Option A**: I'll wire the Gmail connector and build:
+- Thread list (INBOX label, unread first, search, pagination)
+- Thread reader with full message HTML
+- Reply / reply-all / forward (uses `gmail.send`)
+- Mark read / archive / trash (uses `gmail.modify`)
+- Label sidebar
+
+If your business mailbox isn't Google Workspace, tell me and we'll do B or C.
+
+## Access control
+
+- All routes under `_authenticated/admin/mails*`
+- Guarded by existing `AdminRouteGuard` requiring `super_admin` role
+- Compose + Inbox actions also re-check role server-side before hitting Gmail/send routes
+
+## Technical details
+
+Files to add:
+- `src/routes/_authenticated/admin.mails.tsx` — layout with tabs + Outlet
+- `src/routes/_authenticated/admin.mails.index.tsx` — log dashboard
+- `src/routes/_authenticated/admin.mails.compose.tsx` — composer
+- `src/routes/_authenticated/admin.mails.inbox.tsx` — Gmail inbox list
+- `src/routes/_authenticated/admin.mails.inbox.$threadId.tsx` — thread reader
+- `src/lib/mail-hub.functions.ts` — `listEmailLogs`, `getEmailLogDetail`, `listSuppressed`, `resendEmail`, `searchRecipients`, `listGmailThreads`, `getGmailThread`, `sendGmailReply`, `modifyGmailMessage` (all `requireSupabaseAuth` + `has_role('super_admin')` check)
+- `src/lib/email-templates/admin-broadcast.tsx` — generic admin-authored email template
+- Sidebar link added to `AdminSidebar` for "Mail Hub"
+
+No new DB tables needed — reuses `email_send_log`, `suppressed_emails`, `customers`, `contacts`, `leads`, `partners`.
+
+If you pick Option A for inbox, I'll trigger the Gmail connector link during implementation.
+
+## Confirm
+
+1. Inbox option: **A** (Gmail connector), **B** (IMAP — tell me the mailbox provider), or **C** (skip)?
+2. Which mailbox address should the inbox connect to?
