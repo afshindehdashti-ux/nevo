@@ -75,6 +75,14 @@ type Line = {
   _deleted?: boolean;
 };
 
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  const i = Math.min(units.length - 1, Math.floor(Math.log10(bytes) / 3));
+  const value = bytes / Math.pow(1000, i);
+  return `${value.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+}
+
 function InvoiceDetailPage() {
   const { id } = useParams({ from: "/_authenticated/admin/invoices/$id" });
   const qc = useQueryClient();
@@ -1620,33 +1628,45 @@ function InvoiceDetailPage() {
       </Dialog>
 
       <Dialog open={purgeOpen} onOpenChange={setPurgeOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+        <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>Purge {overRetentionCount} older PDF version{overRetentionCount === 1 ? "" : "s"}?</DialogTitle>
+            <DialogTitle>
+              Purge {overRetentionCount} older PDF version{overRetentionCount === 1 ? "" : "s"}?
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 overflow-hidden flex flex-col">
-            <p className="text-sm text-muted-foreground">
-              Keeping the latest {effectiveRetention} version{effectiveRetention === 1 ? "" : "s"}. The following{" "}
-              {overRetentionCount} version{overRetentionCount === 1 ? "" : "s"} will be permanently deleted:
-            </p>
+          <div className="space-y-4 overflow-hidden flex flex-col">
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              <p className="text-muted-foreground">
+                Keeping the latest {effectiveRetention} version{effectiveRetention === 1 ? "" : "s"}. The following{" "}
+                {overRetentionCount} version{overRetentionCount === 1 ? "" : "s"} will be permanently deleted:
+              </p>
+              <div className="ml-auto flex items-center gap-2 text-xs">
+                <span className="text-muted-foreground">Total size:</span>
+                <span className="font-medium font-mono">{formatBytes(toPurgeVersions.reduce((sum, v) => sum + (v.byte_size ?? 0), 0))}</span>
+              </div>
+            </div>
             <div className="border rounded-md overflow-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="text-xs w-10 text-center">#</TableHead>
                     <TableHead className="text-xs">Generated</TableHead>
                     <TableHead className="text-xs">By</TableHead>
                     <TableHead className="text-xs">Source</TableHead>
                     <TableHead className="text-xs">Type</TableHead>
                     <TableHead className="text-xs">Filename</TableHead>
+                    <TableHead className="text-xs text-right">Size</TableHead>
+                    <TableHead className="text-xs">Note</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {toPurgeVersions.map((v) => {
+                  {toPurgeVersions.map((v, idx) => {
                     const dt = new Date(v.created_at);
                     const stamp = `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
                     const who = v.generated_by ? generatorMap[v.generated_by] ?? "Unknown user" : "System";
                     return (
                       <TableRow key={v.id}>
+                        <TableCell className="text-xs text-center text-muted-foreground">{idx + 1}</TableCell>
                         <TableCell className="text-xs whitespace-nowrap">{stamp}</TableCell>
                         <TableCell className="text-xs max-w-[140px] truncate" title={who}>{who}</TableCell>
                         <TableCell className="text-xs">
@@ -1654,18 +1674,23 @@ function InvoiceDetailPage() {
                           {v.source === "email" && "Emailed"}
                           {v.source === "bulk" && "Bulk export"}
                           {v.source === "preview" && "Preview"}
-                          {!["download", "email", "bulk", "preview"].includes(v.source) && v.source}
+                          {! ["download", "email", "bulk", "preview"].includes(v.source) && v.source}
                         </TableCell>
                         <TableCell className="text-xs">
                           {v.doc_type === "proforma" ? "Proforma" : "Commercial"}
                         </TableCell>
                         <TableCell className="text-xs font-mono max-w-[200px] truncate" title={v.filename}>{v.filename}</TableCell>
+                        <TableCell className="text-xs text-right font-mono">{formatBytes(v.byte_size ?? 0)}</TableCell>
+                        <TableCell className="text-xs max-w-[180px] truncate" title={v.note ?? ""}>{v.note ?? "—"}</TableCell>
                       </TableRow>
                     );
                   })}
                 </TableBody>
               </Table>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Review the list carefully. Export a CSV below for compliance records before confirming.
+            </p>
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setPurgeOpen(false)} disabled={purging}>
