@@ -150,6 +150,12 @@ export const CRM_NAV: CrmNavGroup[] = [
         icon: BookOpen,
         allowedRoles: ["management"],
       },
+      {
+        title: "Guide Mode",
+        url: "/admin/ai-assistant/guide-mode",
+        icon: GraduationCap,
+        allowedRoles: ALL_STAFF,
+      },
     ],
   },
   {
