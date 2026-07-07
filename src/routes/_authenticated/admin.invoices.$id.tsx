@@ -568,7 +568,7 @@ function InvoiceDetailPage() {
     const escape = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
     const lines = [
       header.join(","),
-      ...purgeLogs.map((log) => {
+      ...source.map((log) => {
         const meta = (log.metadata ?? {}) as {
           removed_count?: number;
           kept?: number;
