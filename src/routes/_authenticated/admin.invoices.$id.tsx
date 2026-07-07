@@ -1243,14 +1243,21 @@ function InvoiceDetailPage() {
                       size="sm"
                       className="h-8"
                       onClick={openPurgeConfirm}
-                      disabled={purging || overRetentionCount === 0}
+                      disabled={purging || overRetentionCount === 0 || !canPurgePdf}
+                      title={
+                        !canPurgePdf
+                          ? "Only Super Admin, Management, or Finance can purge PDF versions."
+                          : undefined
+                      }
                     >
                       <Trash2 className="h-3.5 w-3.5 mr-1" />
                       {purging
                         ? "Purging…"
-                        : overRetentionCount > 0
-                          ? `Purge ${overRetentionCount} older`
-                          : "Nothing to purge"}
+                        : !canPurgePdf
+                          ? "Purge (restricted)"
+                          : overRetentionCount > 0
+                            ? `Purge ${overRetentionCount} older`
+                            : "Nothing to purge"}
                     </Button>
                     <p className="text-xs text-muted-foreground ml-auto max-w-xs">
                       Effective limit: {effectiveRetention}
