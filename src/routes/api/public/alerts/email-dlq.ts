@@ -61,13 +61,39 @@ export const Route = createFileRoute('/api/public/alerts/email-dlq')({
 
         if (!result.ok) {
           console.error('email-dlq alert enqueue failed', result)
+        }
+
+        // Fire critical SMS in parallel — dedup keyed by template so a
+        // storm of failures for one template only pages once per window.
+        const { sendCriticalSms } = await import('@/lib/sms-alerts.server')
+        const dedupKey = `email-dlq:${body.template_name ?? 'unknown'}`
+        const smsBody =
+          `[NEVO] Email DLQ: ${body.template_name ?? 'unknown'}` +
+          ` -> ${body.recipient_email ?? 'unknown'}` +
+          (body.error_message ? ` | ${String(body.error_message).slice(0, 180)}` : '')
+        const sms = await sendCriticalSms({
+          dedupKey,
+          message: smsBody,
+          payload: {
+            message_id: body.message_id,
+            template_name: body.template_name,
+            recipient_email: body.recipient_email,
+            error_message: body.error_message,
+            failed_at: body.failed_at,
+          },
+        })
+        if (!sms.ok) {
+          console.error('email-dlq sms alert failed', sms)
+        }
+
+        if (!result.ok) {
           return Response.json(
-            { ok: false, reason: result.reason, message: result.message },
+            { ok: false, reason: result.reason, message: result.message, sms },
             { status: 502 },
           )
         }
 
-        return Response.json({ ok: true, messageId: result.messageId })
+        return Response.json({ ok: true, messageId: result.messageId, sms })
       },
     },
   },
