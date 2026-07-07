@@ -149,3 +149,123 @@ async function assertAdmin(context: { supabase: any; userId: string }) {
     .maybeSingle();
   if (error || !data) throw new Error("Forbidden");
 }
+
+/** Send a real test email of the selected template to a specified address. */
+export const sendTestEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({
+      name: z.string().min(1),
+      recipientEmail: z.string().email(),
+    }).parse(data),
+  )
+  .handler(async ({ data, context }): Promise<{ success: boolean; messageId: string }> => {
+    await assertAdmin(context);
+
+    const React = await import("react");
+    const { render } = await import("@react-email/render");
+    const { TEMPLATES } = await import("@/lib/email-templates/registry");
+    const { createClient } = await import("@supabase/supabase-js");
+
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !serviceKey) throw new Error("Server misconfigured");
+    const admin = createClient(supabaseUrl, serviceKey);
+
+    const isAuth = !!AUTH_TEMPLATE_LOADERS[data.name];
+    let html: string;
+    let text: string;
+    let subject: string;
+
+    if (isAuth) {
+      const Component = await AUTH_TEMPLATE_LOADERS[data.name]!();
+      const props = { ...(AUTH_SAMPLE_DATA[data.name] ?? {}), recipient: data.recipientEmail, email: data.recipientEmail };
+      const element = React.createElement(Component, props);
+      html = await render(element);
+      text = await render(element, { plainText: true });
+      subject = AUTH_SUBJECTS[data.name] ?? "Notification";
+    } else {
+      const entry = TEMPLATES[data.name];
+      if (!entry) throw new Error(`Unknown template: ${data.name}`);
+      const previewData = entry.previewData ?? {};
+      const element = React.createElement(entry.component, previewData);
+      html = await render(element);
+      text = await render(element, { plainText: true });
+      subject = typeof entry.subject === "function" ? entry.subject(previewData) : entry.subject;
+    }
+
+    const normalizedEmail = data.recipientEmail.toLowerCase();
+
+    // Suppression check
+    const { data: suppressed } = await admin
+      .from("suppressed_emails")
+      .select("id")
+      .eq("email", normalizedEmail)
+      .maybeSingle();
+    if (suppressed) throw new Error("Recipient is on the suppression list");
+
+    // Get or create unsubscribe token
+    let unsubscribeToken: string;
+    const { data: existing } = await admin
+      .from("email_unsubscribe_tokens")
+      .select("token, used_at")
+      .eq("email", normalizedEmail)
+      .maybeSingle();
+    if (existing && !existing.used_at) {
+      unsubscribeToken = existing.token;
+    } else {
+      unsubscribeToken = generateToken();
+      await admin
+        .from("email_unsubscribe_tokens")
+        .upsert({ token: unsubscribeToken, email: normalizedEmail }, { onConflict: "email", ignoreDuplicates: true });
+      const { data: stored } = await admin
+        .from("email_unsubscribe_tokens")
+        .select("token")
+        .eq("email", normalizedEmail)
+        .maybeSingle();
+      if (stored?.token) unsubscribeToken = stored.token;
+    }
+
+    const messageId = crypto.randomUUID();
+    const testSubject = `[TEST] ${subject}`;
+    const queueName = isAuth ? "auth_emails" : "transactional_emails";
+    const label = isAuth ? `test-${data.name}` : data.name;
+
+    await admin.from("email_send_log").insert({
+      message_id: messageId,
+      template_name: data.name,
+      recipient_email: data.recipientEmail,
+      status: "pending",
+    });
+
+    const { error: enqueueError } = await admin.rpc("enqueue_email", {
+      queue_name: queueName,
+      payload: {
+        message_id: messageId,
+        to: data.recipientEmail,
+        from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+        sender_domain: SENDER_DOMAIN,
+        subject: testSubject,
+        html,
+        text,
+        purpose: isAuth ? "auth" : "transactional",
+        label,
+        idempotency_key: messageId,
+        unsubscribe_token: unsubscribeToken,
+        queued_at: new Date().toISOString(),
+      },
+    });
+
+    if (enqueueError) {
+      await admin.from("email_send_log").insert({
+        message_id: messageId,
+        template_name: data.name,
+        recipient_email: data.recipientEmail,
+        status: "failed",
+        error_message: enqueueError.message,
+      });
+      throw new Error(`Failed to enqueue: ${enqueueError.message}`);
+    }
+
+    return { success: true, messageId };
+  });
