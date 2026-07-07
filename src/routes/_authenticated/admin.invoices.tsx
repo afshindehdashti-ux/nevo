@@ -49,6 +49,8 @@ export function InvoicesList({
 }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | "all">("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [exporting, setExporting] = useState(false);
 
   const { data: invoices = [], isLoading } = useQuery({
     queryKey: ["invoices", type],
@@ -75,6 +77,74 @@ export function InvoicesList({
       );
     });
   }, [invoices, search, statusFilter]);
+
+  const filteredIds = useMemo(() => filtered.map((i) => i.id), [filtered]);
+  const allSelected = filteredIds.length > 0 && filteredIds.every((id) => selected.has(id));
+  const someSelected = filteredIds.some((id) => selected.has(id));
+
+  const toggleAll = (checked: boolean) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (checked) filteredIds.forEach((id) => next.add(id));
+      else filteredIds.forEach((id) => next.delete(id));
+      return next;
+    });
+  };
+
+  const toggleOne = (id: string, checked: boolean) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (checked) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  };
+
+  const label = type === "proforma" ? "Proforma" : "Commercial";
+
+  const handleBulkExport = async () => {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    setExporting(true);
+    const t = toast.loading(`Generating ${ids.length} PDF${ids.length > 1 ? "s" : ""}…`);
+    try {
+      if (ids.length === 1) {
+        await generateInvoicePdf(ids[0], "download");
+        toast.success("PDF downloaded", { id: t });
+      } else {
+        const zip = new JSZip();
+        let ok = 0;
+        for (const id of ids) {
+          try {
+            const res = await generateInvoicePdf(id, "blob");
+            zip.file(res.filename, res.blob);
+            URL.revokeObjectURL(res.url);
+            ok++;
+          } catch (e) {
+            console.error("PDF failed", id, e);
+          }
+        }
+        if (ok === 0) throw new Error("All PDFs failed to generate");
+        const blob = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        const stamp = new Date().toISOString().slice(0, 10);
+        a.download = `${label}-Invoices-${stamp}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        toast.success(`Exported ${ok} of ${ids.length} PDFs`, { id: t });
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Export failed";
+      toast.error(msg, { id: t });
+    } finally {
+      setExporting(false);
+    }
+  };
+
 
   return (
     <MasterListShell
