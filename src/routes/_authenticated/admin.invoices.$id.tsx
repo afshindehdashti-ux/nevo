@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail, History, Archive, Copy } from "lucide-react";
+import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail, History, Archive, Copy, Download } from "lucide-react";
 import JSZip from "jszip";
 import { useServerFn } from "@tanstack/react-start";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
@@ -241,6 +241,29 @@ function InvoiceDetailPage() {
   const [savingRetention, setSavingRetention] = useState(false);
   const [purging, setPurging] = useState(false);
   const [purgeOpen, setPurgeOpen] = useState(false);
+  type RemovedPdfSnapshot = {
+    id: string;
+    filename: string;
+    byte_size: number | null;
+    source: string;
+    doc_type: string;
+    created_at: string;
+    blobUrl: string;
+  };
+  const [removedOpen, setRemovedOpen] = useState(false);
+  const [removedItems, setRemovedItems] = useState<RemovedPdfSnapshot[]>([]);
+  const closeRemovedModal = () => {
+    setRemovedOpen(false);
+    // Revoke blob URLs to free memory
+    setTimeout(() => {
+      setRemovedItems((prev) => {
+        prev.forEach((r) => {
+          try { URL.revokeObjectURL(r.blobUrl); } catch { /* noop */ }
+        });
+        return [];
+      });
+    }, 300);
+  };
   useEffect(() => {
     if (retentionSetting?.pdf_version_retention_count != null) {
       setRetentionInput(String(retentionSetting.pdf_version_retention_count));
@@ -383,6 +406,30 @@ function InvoiceDetailPage() {
   async function confirmPurge() {
     setPurging(true);
     try {
+      // Snapshot the PDFs into blob URLs BEFORE deletion so users can still
+      // download them from the "View removed PDFs" modal after storage is wiped.
+      const versionsToRemove = toPurgeVersions;
+      const snapshots: RemovedPdfSnapshot[] = [];
+      for (const v of versionsToRemove) {
+        try {
+          const url = await signInvoicePdfUrl(v.storage_path, 300);
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`Fetch failed (${res.status})`);
+          const blob = await res.blob();
+          snapshots.push({
+            id: v.id,
+            filename: v.filename,
+            byte_size: v.byte_size,
+            source: v.source,
+            doc_type: v.doc_type,
+            created_at: v.created_at,
+            blobUrl: URL.createObjectURL(blob),
+          });
+        } catch (e) {
+          console.warn("Failed to snapshot PDF before purge", v.id, e);
+        }
+      }
+
       const removed = await purgeOlderInvoicePdfVersions(id, effectiveRetention);
       refetchPdfVersions();
       const { data: latestLog } = await supabase
@@ -395,12 +442,15 @@ function InvoiceDetailPage() {
         .limit(1)
         .maybeSingle();
       await refetchPurgeLogs();
+
+      setRemovedItems(snapshots);
       toast.success(`Purged ${removed} PDF version${removed === 1 ? "" : "s"}`, {
-        description: "A new entry has been added to the purge audit log.",
-        action: {
-          label: "View log entry",
-          onClick: () => scrollToPurgeLog(latestLog?.id),
-        },
+        description: snapshots.length > 0
+          ? `${snapshots.length} archived for download. A new audit log entry was created.`
+          : "A new entry has been added to the purge audit log.",
+        action: snapshots.length > 0
+          ? { label: "View removed PDFs", onClick: () => setRemovedOpen(true) }
+          : { label: "View log entry", onClick: () => scrollToPurgeLog(latestLog?.id) },
       });
       setPurgeOpen(false);
     } catch (e) {
@@ -1745,7 +1795,74 @@ function InvoiceDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={removedOpen} onOpenChange={(o) => (o ? setRemovedOpen(true) : closeRemovedModal())}>
+        <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>
+              Removed PDF version{removedItems.length === 1 ? "" : "s"} ({removedItems.length})
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 overflow-hidden flex flex-col">
+            <p className="text-xs text-muted-foreground">
+              These versions have been permanently deleted from storage. The archived copies below are held in this browser session only — download them now if you need them for records.
+            </p>
+            <div className="border rounded-md overflow-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs w-10 text-center">#</TableHead>
+                    <TableHead className="text-xs">Generated</TableHead>
+                    <TableHead className="text-xs">Type</TableHead>
+                    <TableHead className="text-xs">Source</TableHead>
+                    <TableHead className="text-xs">Filename</TableHead>
+                    <TableHead className="text-xs text-right">Size</TableHead>
+                    <TableHead className="text-xs text-right">Download</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {removedItems.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-xs text-center text-muted-foreground py-6">
+                        No archived copies available.
+                      </TableCell>
+                    </TableRow>
+                  ) : removedItems.map((r, idx) => {
+                    const dt = new Date(r.created_at);
+                    const stamp = `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+                    return (
+                      <TableRow key={r.id}>
+                        <TableCell className="text-xs text-center text-muted-foreground">{idx + 1}</TableCell>
+                        <TableCell className="text-xs whitespace-nowrap">{stamp}</TableCell>
+                        <TableCell className="text-xs">{r.doc_type === "proforma" ? "Proforma" : "Commercial"}</TableCell>
+                        <TableCell className="text-xs capitalize">{r.source}</TableCell>
+                        <TableCell className="text-xs font-mono max-w-[220px] truncate" title={r.filename}>{r.filename}</TableCell>
+                        <TableCell className="text-xs text-right font-mono">{formatBytes(r.byte_size ?? 0)}</TableCell>
+                        <TableCell className="text-xs text-right">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            asChild
+                          >
+                            <a href={r.blobUrl} download={r.filename}>
+                              <Download className="h-3.5 w-3.5 mr-1" /> Download
+                            </a>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={closeRemovedModal}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+
 
   );
 }
