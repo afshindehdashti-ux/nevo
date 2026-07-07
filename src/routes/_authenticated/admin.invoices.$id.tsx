@@ -1039,7 +1039,7 @@ function InvoiceDetailPage() {
                       variant="destructive"
                       size="sm"
                       className="h-8"
-                      onClick={purgeOlderNow}
+                      onClick={openPurgeConfirm}
                       disabled={purging || overRetentionCount === 0}
                     >
                       <Trash2 className="h-3.5 w-3.5 mr-1" />
