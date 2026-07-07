@@ -592,8 +592,22 @@ function ExportsHistoryPage() {
             <span>
               {query.isFetching
                 ? "Loading…"
-                : `${rows.length} shown · ${total} total match${total === 1 ? "" : "es"}`}
+                : driftOnly
+                  ? `${visibleRows.length} with drift · ${rows.length} loaded · ${total} total match${total === 1 ? "" : "es"}`
+                  : `${rows.length} shown · ${total} total match${total === 1 ? "" : "es"}`}
             </span>
+            <Button
+              type="button"
+              variant={driftOnly ? "default" : "outline"}
+              size="sm"
+              className="h-7 px-2"
+              onClick={() => setDriftOnly((v) => !v)}
+              disabled={!driftOnly && driftCount === 0 && !query.isFetching}
+              title="Only show exports where the embedded SHA-256 or timestamp differs from the recorded value"
+            >
+              <AlertTriangle className="h-3 w-3 mr-1" />
+              Drift only ({driftCount})
+            </Button>
             {activeFilters > 0 && (
               <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={clearAll}>
                 Clear filters ({activeFilters})
