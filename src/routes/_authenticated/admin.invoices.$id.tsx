@@ -1634,9 +1634,18 @@ function InvoiceDetailPage() {
                         className="h-8"
                         disabled={!canPurgePdf}
                         title={!canPurgePdf ? "Only Super Admin, Management, or Finance can export purge history." : undefined}
-                        onClick={() => {
-                          const rows = purgeLogs.filter((l) => selectedPurgeIds.has(l.id));
-                          exportPurgeAuditCsv(rows, "selected");
+                        onClick={async () => {
+                          const ids = Array.from(selectedPurgeIds);
+                          const { data, error } = await supabase
+                            .from("activity_logs")
+                            .select("id, user_id, created_at, metadata")
+                            .in("id", ids)
+                            .order("created_at", { ascending: false });
+                          if (error) {
+                            toast.error(error.message);
+                            return;
+                          }
+                          await exportPurgeAuditCsv((data ?? []) as PurgeLogRow[], "selected");
                         }}
                       >
                         <FileDown className="h-3.5 w-3.5 mr-1" />
@@ -1651,8 +1660,8 @@ function InvoiceDetailPage() {
                     variant="outline"
                     size="sm"
                     className="h-8"
-                    onClick={() => exportPurgeAuditCsv()}
-                    disabled={!canPurgePdf || filteredPurgeLogs.length === 0}
+                    onClick={() => { void exportPurgeAuditCsv(); }}
+                    disabled={!canPurgePdf || (purgeTotal === 0)}
                     title={!canPurgePdf ? "Only Super Admin, Management, or Finance can export purge history." : undefined}
                   >
                     <FileDown className="h-3.5 w-3.5 mr-1" />
