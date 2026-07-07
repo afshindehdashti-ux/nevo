@@ -589,6 +589,12 @@ function InvoiceDetailPage() {
   }
 
   function exportPurgeAuditCsv(rows?: PurgeLogRow[], scopeLabel = "filtered") {
+    if (!canPurgePdf) {
+      toast.error("You don't have permission to export the purge audit log.", {
+        description: "Only Super Admin, Management, or Finance can export purge history.",
+      });
+      return;
+    }
     const source = rows ?? filteredPurgeLogs;
     if (source.length === 0) {
       toast.info("No purge audit entries to export");
