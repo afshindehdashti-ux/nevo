@@ -190,6 +190,73 @@ function EmailPreviewAdmin() {
           ))}
         </aside>
 
+        <aside className="border border-border rounded-md bg-background p-3 space-y-3 overflow-auto">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Template fields
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 px-2 text-xs"
+              onClick={resetOverrides}
+              disabled={Object.keys(currentOverrides).length === 0}
+            >
+              Reset
+            </Button>
+          </div>
+          {!currentMeta && (
+            <p className="text-xs text-muted-foreground">Select a template.</p>
+          )}
+          {currentMeta && Object.keys(currentMeta.defaultData).length === 0 && (
+            <p className="text-xs text-muted-foreground">This template has no editable fields.</p>
+          )}
+          {currentMeta &&
+            Object.entries(currentMeta.defaultData).map(([key, defaultValue]) => {
+              const stringDefault = defaultValue == null ? "" : String(defaultValue);
+              const raw = currentOverrides[key] ?? stringDefault;
+              const isLong =
+                stringDefault.length > 48 ||
+                /url|link|href/i.test(key) ||
+                stringDefault.startsWith("http");
+              const isBool = typeof defaultValue === "boolean";
+              return (
+                <div key={key} className="space-y-1">
+                  <Label htmlFor={`field-${key}`} className="text-xs font-medium">
+                    {key}
+                  </Label>
+                  {isBool ? (
+                    <select
+                      id={`field-${key}`}
+                      value={raw}
+                      onChange={(e) => updateOverride(key, e.target.value)}
+                      className="w-full h-8 rounded-md border border-input bg-background px-2 text-sm"
+                    >
+                      <option value="true">true</option>
+                      <option value="false">false</option>
+                    </select>
+                  ) : isLong ? (
+                    <Textarea
+                      id={`field-${key}`}
+                      value={raw}
+                      onChange={(e) => updateOverride(key, e.target.value)}
+                      rows={2}
+                      className="text-xs font-mono"
+                    />
+                  ) : (
+                    <Input
+                      id={`field-${key}`}
+                      value={raw}
+                      onChange={(e) => updateOverride(key, e.target.value)}
+                      className="h-8 text-sm"
+                    />
+                  )}
+                </div>
+              );
+            })}
+        </aside>
+
+
         <section className="border border-border rounded-md bg-background flex flex-col overflow-hidden">
           <div className="border-b border-border px-4 py-3 flex items-center justify-between gap-4">
             <div className="min-w-0">
