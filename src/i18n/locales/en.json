@@ -703,12 +703,14 @@
       "cm": "Cameroon"
     },
     "stats": {
-      "yearsSuffix": "+",
-      "yearsLabel": "Years of industry experience",
-      "projectsSuffix": "+",
-      "projectsLabel": "Industrial projects",
+      "yearsSuffix": "",
+      "yearsValue": "Experience",
+      "yearsLabel": "Industry-focused engineering experience",
+      "projectsSuffix": "",
+      "projectsValue": "Delivery",
+      "projectsLabel": "Project-based industrial support",
       "worldwide": "Worldwide",
-      "worldwideLabel": "Engineering support",
+      "worldwideLabel": "Engineering coordination",
       "multiple": "Multiple",
       "multipleLabel": "International supply partners"
     },

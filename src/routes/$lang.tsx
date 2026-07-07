@@ -5,11 +5,12 @@ import { useLanguage } from "@/i18n/LanguageProvider";
 import { LocaleLinkGuard } from "@/components/site/LocaleLinkGuard";
 
 export const Route = createFileRoute("/$lang")({
-  beforeLoad: ({ params }) => {
+  beforeLoad: ({ params, location }) => {
     if (!(SUPPORTED_LOCALES as readonly string[]).includes(params.lang)) {
+      // e.g. /product-configurator → /en/product-configurator (preserve full path)
+      const rest = location.pathname.replace(/^\/+/, "");
       throw redirect({
-        to: "/$lang",
-        params: { lang: DEFAULT_LOCALE },
+        href: `/${DEFAULT_LOCALE}/${rest}${location.searchStr ?? ""}`,
         replace: true,
       });
     }
