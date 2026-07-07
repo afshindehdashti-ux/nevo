@@ -293,6 +293,26 @@ function InvoiceDetailPage() {
     return { subtotal, vat, total: subtotal + vat };
   }, [lines]);
 
+  const filteredPdfVersions = useMemo(() => {
+    let rows = pdfVersions;
+    if (pdfDocTypeFilter !== "all") {
+      rows = rows.filter((v) => v.doc_type === pdfDocTypeFilter);
+    }
+    if (pdfFromDate || pdfToDate) {
+      rows = rows.filter((v) => {
+        const d = new Date(v.created_at);
+        if (pdfFromDate && d < new Date(pdfFromDate)) return false;
+        if (pdfToDate) {
+          const end = new Date(pdfToDate);
+          end.setHours(23, 59, 59, 999);
+          if (d > end) return false;
+        }
+        return true;
+      });
+    }
+    return rows;
+  }, [pdfVersions, pdfDocTypeFilter, pdfFromDate, pdfToDate]);
+
   const save = useMutation({
     mutationFn: async () => {
       if (!invoice) return;
