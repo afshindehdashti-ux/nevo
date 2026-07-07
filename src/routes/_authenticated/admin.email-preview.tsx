@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -12,7 +12,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+
+type OverrideValue = string;
+type Overrides = Record<string, OverrideValue>;
+
+function coerceOverride(defaultValue: unknown, raw: string): string | number | boolean | null {
+  if (raw === "") return null;
+  if (typeof defaultValue === "number") {
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : raw;
+  }
+  if (typeof defaultValue === "boolean") return raw === "true";
+  return raw;
+}
 
 export const Route = createFileRoute("/_authenticated/admin/email-preview")({
   head: () => ({
