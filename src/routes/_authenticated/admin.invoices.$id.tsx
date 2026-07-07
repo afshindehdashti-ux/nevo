@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -110,6 +111,39 @@ function mbToBytes(value: string): number | null {
   const n = value.trim() === "" ? NaN : parseFloat(value);
   if (Number.isNaN(n) || n < 0) return null;
   return Math.round(n * 1_000_000);
+}
+
+function PurgeAuditSkeleton({ rows = 5 }: { rows?: number }) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-10"><Skeleton className="h-4 w-4" /></TableHead>
+          <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+          <TableHead><Skeleton className="h-4 w-20" /></TableHead>
+          <TableHead className="text-right"><Skeleton className="h-4 w-10 ml-auto" /></TableHead>
+          <TableHead className="text-right"><Skeleton className="h-4 w-10 ml-auto" /></TableHead>
+          <TableHead className="text-right"><Skeleton className="h-4 w-10 ml-auto" /></TableHead>
+          <TableHead><Skeleton className="h-4 w-48" /></TableHead>
+          <TableHead className="w-10"></TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {[...Array(rows)].map((_, i) => (
+          <TableRow key={i}>
+            <TableCell className="w-10"><Skeleton className="h-4 w-4" /></TableCell>
+            <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+            <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+            <TableCell className="text-right"><Skeleton className="h-4 w-8 ml-auto" /></TableCell>
+            <TableCell className="text-right"><Skeleton className="h-4 w-10 ml-auto" /></TableCell>
+            <TableCell className="text-right"><Skeleton className="h-4 w-8 ml-auto" /></TableCell>
+            <TableCell><Skeleton className="h-4 w-64" /></TableCell>
+            <TableCell className="w-10"></TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
 }
 
 function InvoiceDetailPage() {
@@ -2196,7 +2230,9 @@ function InvoiceDetailPage() {
                       Last 30 days
                     </Button>
                   </div>
-                  {filteredPurgeLogs.length === 0 ? (
+                  {purgeLoading ? (
+                    <PurgeAuditSkeleton rows={purgePageSize} />
+                  ) : filteredPurgeLogs.length === 0 ? (
                     <p className="px-4 py-6 text-sm text-muted-foreground text-center">
                       No entries match the current filters.
                     </p>
@@ -2299,7 +2335,7 @@ function InvoiceDetailPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs">Rows</Label>
-                      <Select value={String(purgePageSize)} onValueChange={(v) => setPurgePageSize(parseInt(v, 10))}>
+                      <Select value={String(purgePageSize)} onValueChange={(v) => setPurgePageSize(parseInt(v, 10))} disabled={purgeLoading}>
                         <SelectTrigger className="h-7 w-[70px]"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           {[10, 25, 50, 100].map((n) => (
