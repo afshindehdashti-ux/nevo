@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { FileSpreadsheet, RefreshCw, Search, Loader2 } from "lucide-react";
+import { GuideMeButton } from "@/components/ai/GuideMeButton";
 import { toast } from "sonner";
 import { exportToExcel } from "@/lib/report-exports";
 import { formatDate } from "@/lib/crm-money";
