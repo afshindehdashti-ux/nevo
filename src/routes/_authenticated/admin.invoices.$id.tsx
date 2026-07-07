@@ -933,16 +933,23 @@ function InvoiceDetailPage() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Generated</TableHead>
+                          <TableHead>By</TableHead>
                           <TableHead>Source</TableHead>
                           <TableHead>Type</TableHead>
-                          <TableHead>Filename</TableHead>
+                          <TableHead>Filename / note</TableHead>
                           <TableHead className="text-right">Size</TableHead>
                           <TableHead className="w-24"></TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {filteredPdfVersions.map((v) => (
-                          <PdfVersionRow key={v.id} v={v} />
+                          <PdfVersionRow
+                            key={v.id}
+                            v={v}
+                            generatorName={
+                              v.generated_by ? generatorMap[v.generated_by] ?? "" : ""
+                            }
+                          />
                         ))}
                       </TableBody>
                     </Table>
