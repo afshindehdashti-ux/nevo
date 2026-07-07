@@ -173,6 +173,12 @@ export const CRM_NAV: CrmNavGroup[] = [
         icon: ScrollText,
         allowedRoles: ["management", "finance"],
       },
+      {
+        title: "Import Data",
+        url: "/admin/import",
+        icon: Upload,
+        allowedRoles: ["management", "operations", "finance"],
+      },
       { title: "Settings", url: "/admin/settings", icon: Settings, requiresSuperAdmin: true },
     ],
   },
