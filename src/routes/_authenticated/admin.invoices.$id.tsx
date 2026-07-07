@@ -118,6 +118,20 @@ function InvoiceDetailPage() {
     },
   });
 
+  const { data: pdfVersions = [], refetch: refetchPdfVersions } = useQuery({
+    queryKey: ["invoice-pdf-versions", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("invoice_pdf_versions")
+        .select("*")
+        .eq("invoice_id", id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as InvoicePdfVersionRow[];
+    },
+  });
+
+
   const [lines, setLines] = useState<Line[]>([]);
   const [notes, setNotes] = useState("");
   const [issueDate, setIssueDate] = useState("");
