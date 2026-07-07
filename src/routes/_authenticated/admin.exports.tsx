@@ -640,7 +640,15 @@ function ExportsHistoryPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+      <Dialog
+        open={!!detail}
+        onOpenChange={(o) => {
+          if (!o) {
+            setDetail(null);
+            resetPreview();
+          }
+        }}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Export details</DialogTitle>
