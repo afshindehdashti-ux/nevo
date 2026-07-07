@@ -451,6 +451,15 @@ function InvoiceDetailPage() {
     byteSize: number;
   } | null>(null);
 
+  // Export confirmation modal state.
+  const [purgeExportConfirmOpen, setPurgeExportConfirmOpen] = useState(false);
+  const [purgeExportConfirmState, setPurgeExportConfirmState] = useState<{
+    scope: "filtered" | "selected";
+    rows: PurgeLogRow[];
+    loading: boolean;
+  } | null>(null);
+  const [purgeExporting, setPurgeExporting] = useState(false);
+
 
 
 
