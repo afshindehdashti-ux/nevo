@@ -329,6 +329,7 @@ function InvoiceDetailPage() {
       const removed = await purgeOlderInvoicePdfVersions(id, effectiveRetention);
       toast.success(`Purged ${removed} version(s)`);
       refetchPdfVersions();
+      refetchPurgeLogs();
       setPurgeOpen(false);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Purge failed");
