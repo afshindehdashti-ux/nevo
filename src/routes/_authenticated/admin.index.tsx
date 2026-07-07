@@ -131,7 +131,7 @@ function useDashboardData() {
         supabase
           .from("payments")
           .select("amount,currency")
-          .gte("paid_at", startIso.slice(0, 10)),
+          .gte("received_at", startIso.slice(0, 10)),
         supabase
           .from("invoices")
           .select("total,currency")

@@ -116,6 +116,7 @@ export function ContactSection() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
                 required
                 className={FIELD}
