@@ -314,6 +314,44 @@ function InvoiceDetailPage() {
     return rows;
   }, [pdfVersions, pdfDocTypeFilter, pdfFromDate, pdfToDate]);
 
+  const [downloadingAll, setDownloadingAll] = useState(false);
+  const handleDownloadAllVersions = async () => {
+    if (filteredPdfVersions.length === 0) return;
+    setDownloadingAll(true);
+    try {
+      const zip = new JSZip();
+      const seen = new Map<string, number>();
+      for (const v of filteredPdfVersions) {
+        const url = await signInvoicePdfUrl(v.storage_path, 300);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Failed to fetch ${v.filename}`);
+        const blob = await res.blob();
+        const stamp = new Date(v.created_at).toISOString().replace(/[:.]/g, "-");
+        let name = `${stamp}__${v.filename}`;
+        const count = seen.get(name) ?? 0;
+        if (count > 0) name = name.replace(/(\.pdf)?$/i, `-${count}$1`);
+        seen.set(name, count + 1);
+        zip.file(name, blob);
+      }
+      const out = await zip.generateAsync({ type: "blob" });
+      const invNo = invoice?.invoice_number ?? id.slice(0, 8);
+      const url = URL.createObjectURL(out);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Invoice-${invNo}-PDF-versions.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success(`Downloaded ${filteredPdfVersions.length} PDF version(s)`);
+    } catch (e) {
+      console.error(e);
+      toast.error(e instanceof Error ? e.message : "Failed to download versions");
+    } finally {
+      setDownloadingAll(false);
+    }
+  };
+
   const save = useMutation({
     mutationFn: async () => {
       if (!invoice) return;
