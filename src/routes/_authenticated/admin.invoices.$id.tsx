@@ -1021,7 +1021,22 @@ function InvoiceDetailPage() {
     if (!purgeExportConfirmState || purgeExportConfirmState.loading || purgeExporting) return;
     setPurgeExporting(true);
     try {
-      await exportPurgeAuditCsv(purgeExportConfirmState.rows, purgeExportConfirmState.scope);
+      const exportMeta: PurgeExportMeta =
+        purgeExportConfirmState.scope === "selected"
+          ? { scope: "selected", selectedIds: Array.from(selectedPurgeIds) }
+          : {
+              scope: "filtered",
+              userLabel:
+                purgeUserFilter === "all"
+                  ? "All users"
+                  : purgeUserOptions.find((u) => u.id === purgeUserFilter)?.label ?? purgeUserFilter,
+              fromDate: purgeFromDate,
+              toDate: purgeToDate,
+              versionQuery: purgeVersionQuery,
+              minBytes: purgeMinBytes,
+              maxBytes: purgeMaxBytes,
+            };
+      await exportPurgeAuditCsv(purgeExportConfirmState.rows, exportMeta);
     } finally {
       setPurgeExporting(false);
       setPurgeExportConfirmOpen(false);
