@@ -20,6 +20,7 @@ import {
   Search,
   ScrollText,
   ShieldCheck,
+  ShieldAlert,
   Brain,
   MessagesSquare,
   Mail,
