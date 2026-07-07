@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -12,7 +12,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+
+type OverrideValue = string;
+type Overrides = Record<string, OverrideValue>;
+
+function coerceOverride(defaultValue: unknown, raw: string): string | number | boolean | null {
+  if (raw === "") return null;
+  if (typeof defaultValue === "number") {
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : raw;
+  }
+  if (typeof defaultValue === "boolean") return raw === "true";
+  return raw;
+}
 
 export const Route = createFileRoute("/_authenticated/admin/email-preview")({
   head: () => ({
@@ -31,6 +46,8 @@ function EmailPreviewAdmin() {
   const [selected, setSelected] = useState<string | null>(null);
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
   const [testRecipient, setTestRecipient] = useState("");
+  const [overridesByTemplate, setOverridesByTemplate] = useState<Record<string, Overrides>>({});
+  const [debouncedOverrides, setDebouncedOverrides] = useState<Overrides>({});
 
   const list = useQuery({
     queryKey: ["email-previews"],
@@ -38,16 +55,46 @@ function EmailPreviewAdmin() {
   });
 
   const current = selected ?? list.data?.[0]?.name ?? null;
+  const currentMeta = useMemo(
+    () => list.data?.find((t) => t.name === current) ?? null,
+    [list.data, current],
+  );
+
+  const currentOverrides = current ? overridesByTemplate[current] ?? {} : {};
+
+  // Build serializable override map: only include keys the user changed,
+  // and coerce back to the type of the default value.
+  const serializableOverrides = useMemo(() => {
+    if (!currentMeta) return {};
+    const out: Record<string, string | number | boolean | null> = {};
+    for (const [k, raw] of Object.entries(debouncedOverrides)) {
+      out[k] = coerceOverride(currentMeta.defaultData[k], raw);
+    }
+    return out;
+  }, [debouncedOverrides, currentMeta]);
+
+  // Debounce override edits to avoid rendering on every keystroke.
+  const debounceRef = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    debounceRef.current = window.setTimeout(() => {
+      setDebouncedOverrides(currentOverrides);
+    }, 350);
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
+  }, [currentOverrides]);
 
   const preview = useQuery({
-    queryKey: ["email-preview", current],
-    queryFn: () => renderFn({ data: { name: current! } }),
+    queryKey: ["email-preview", current, serializableOverrides],
+    queryFn: () =>
+      renderFn({ data: { name: current!, overrides: serializableOverrides } }),
     enabled: !!current,
   });
 
   const sendTest = useMutation({
     mutationFn: (vars: { name: string; recipientEmail: string }) =>
-      sendFn({ data: vars }),
+      sendFn({ data: { ...vars, overrides: serializableOverrides } }),
     onSuccess: () => {
       toast.success(`Test email queued to ${testRecipient}`);
     },
@@ -62,6 +109,18 @@ function EmailPreviewAdmin() {
     (list.data ?? []).forEach((t) => (t.category === "auth" ? auth : app).push(t));
     return { auth, app };
   }, [list.data]);
+
+  function updateOverride(key: string, value: string) {
+    if (!current) return;
+    setOverridesByTemplate((prev) => ({
+      ...prev,
+      [current]: { ...(prev[current] ?? {}), [key]: value },
+    }));
+  }
+  function resetOverrides() {
+    if (!current) return;
+    setOverridesByTemplate((prev) => ({ ...prev, [current]: {} }));
+  }
 
   return (
     <div className="p-6 space-y-4">
@@ -90,7 +149,7 @@ function EmailPreviewAdmin() {
         </div>
       </header>
 
-      <div className="grid grid-cols-[260px_1fr] gap-4 min-h-[70vh]">
+      <div className="grid grid-cols-[240px_260px_1fr] gap-4 min-h-[70vh]">
         <aside className="border border-border rounded-md bg-background p-2 space-y-4 overflow-auto">
           {list.isLoading && (
             <div className="p-2 space-y-2">
@@ -130,6 +189,73 @@ function EmailPreviewAdmin() {
             </div>
           ))}
         </aside>
+
+        <aside className="border border-border rounded-md bg-background p-3 space-y-3 overflow-auto">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Template fields
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 px-2 text-xs"
+              onClick={resetOverrides}
+              disabled={Object.keys(currentOverrides).length === 0}
+            >
+              Reset
+            </Button>
+          </div>
+          {!currentMeta && (
+            <p className="text-xs text-muted-foreground">Select a template.</p>
+          )}
+          {currentMeta && Object.keys(currentMeta.defaultData).length === 0 && (
+            <p className="text-xs text-muted-foreground">This template has no editable fields.</p>
+          )}
+          {currentMeta &&
+            Object.entries(currentMeta.defaultData).map(([key, defaultValue]) => {
+              const stringDefault = defaultValue == null ? "" : String(defaultValue);
+              const raw = currentOverrides[key] ?? stringDefault;
+              const isLong =
+                stringDefault.length > 48 ||
+                /url|link|href/i.test(key) ||
+                stringDefault.startsWith("http");
+              const isBool = typeof defaultValue === "boolean";
+              return (
+                <div key={key} className="space-y-1">
+                  <Label htmlFor={`field-${key}`} className="text-xs font-medium">
+                    {key}
+                  </Label>
+                  {isBool ? (
+                    <select
+                      id={`field-${key}`}
+                      value={raw}
+                      onChange={(e) => updateOverride(key, e.target.value)}
+                      className="w-full h-8 rounded-md border border-input bg-background px-2 text-sm"
+                    >
+                      <option value="true">true</option>
+                      <option value="false">false</option>
+                    </select>
+                  ) : isLong ? (
+                    <Textarea
+                      id={`field-${key}`}
+                      value={raw}
+                      onChange={(e) => updateOverride(key, e.target.value)}
+                      rows={2}
+                      className="text-xs font-mono"
+                    />
+                  ) : (
+                    <Input
+                      id={`field-${key}`}
+                      value={raw}
+                      onChange={(e) => updateOverride(key, e.target.value)}
+                      className="h-8 text-sm"
+                    />
+                  )}
+                </div>
+              );
+            })}
+        </aside>
+
 
         <section className="border border-border rounded-md bg-background flex flex-col overflow-hidden">
           <div className="border-b border-border px-4 py-3 flex items-center justify-between gap-4">

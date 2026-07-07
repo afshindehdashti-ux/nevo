@@ -12,6 +12,19 @@ function generateToken(): string {
   return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+/** Keep only JSON-scalar fields so the payload is safely serializable. */
+function flattenScalar(input: Record<string, unknown>): Record<string, string | number | boolean | null> {
+  const out: Record<string, string | number | boolean | null> = {};
+  for (const [k, v] of Object.entries(input)) {
+    if (v === null || typeof v === "string" || typeof v === "number" || typeof v === "boolean") {
+      out[k] = v;
+    } else {
+      out[k] = JSON.stringify(v);
+    }
+  }
+  return out;
+}
+
 /**
  * Preview data used for auth email templates when rendering internally.
  * Mirrors the samples used by the Lovable auth email preview route so
@@ -20,7 +33,7 @@ function generateToken(): string {
 const SAMPLE_EMAIL = "user@example.test";
 const SAMPLE_URL = "https://www.nevoindustrial.com";
 
-const AUTH_SAMPLE_DATA: Record<string, Record<string, unknown>> = {
+const AUTH_SAMPLE_DATA: Record<string, Record<string, string>> = {
   signup: {
     siteName: "NEVO Industrial",
     siteUrl: SAMPLE_URL,
@@ -55,6 +68,8 @@ export interface EmailPreviewMeta {
   displayName: string;
   category: "auth" | "app";
   subject: string;
+  /** Default preview data — used to seed the override form on the client. */
+  defaultData: Record<string, string | number | boolean | null>;
 }
 
 /** List every previewable template (auth + app) with resolved subjects. */
@@ -66,12 +81,12 @@ export const listEmailPreviews = createServerFn({ method: "GET" })
     const { TEMPLATES } = await import("@/lib/email-templates/registry");
 
     const authTemplates: EmailPreviewMeta[] = [
-      { name: "signup", displayName: "Signup confirmation", category: "auth", subject: "Confirm your email" },
-      { name: "invite", displayName: "Invitation", category: "auth", subject: "You've been invited" },
-      { name: "magiclink", displayName: "Magic link", category: "auth", subject: "Your login link" },
-      { name: "recovery", displayName: "Password recovery", category: "auth", subject: "Reset your password" },
-      { name: "email_change", displayName: "Email change", category: "auth", subject: "Confirm your new email" },
-      { name: "reauthentication", displayName: "Reauthentication", category: "auth", subject: "Your verification code" },
+      { name: "signup", displayName: "Signup confirmation", category: "auth", subject: "Confirm your email", defaultData: AUTH_SAMPLE_DATA.signup },
+      { name: "invite", displayName: "Invitation", category: "auth", subject: "You've been invited", defaultData: AUTH_SAMPLE_DATA.invite },
+      { name: "magiclink", displayName: "Magic link", category: "auth", subject: "Your login link", defaultData: AUTH_SAMPLE_DATA.magiclink },
+      { name: "recovery", displayName: "Password recovery", category: "auth", subject: "Reset your password", defaultData: AUTH_SAMPLE_DATA.recovery },
+      { name: "email_change", displayName: "Email change", category: "auth", subject: "Confirm your new email", defaultData: AUTH_SAMPLE_DATA.email_change },
+      { name: "reauthentication", displayName: "Reauthentication", category: "auth", subject: "Your verification code", defaultData: AUTH_SAMPLE_DATA.reauthentication },
     ];
 
     const appTemplates: EmailPreviewMeta[] = Object.entries(TEMPLATES).map(([name, entry]) => {
@@ -83,17 +98,21 @@ export const listEmailPreviews = createServerFn({ method: "GET" })
         displayName: entry.displayName ?? name,
         category: "app" as const,
         subject,
+        defaultData: flattenScalar(previewData),
       };
     });
 
     return [...authTemplates, ...appTemplates];
   });
 
+
+const overridesSchema = z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).optional();
+
 /** Render a single template to HTML using its sample/preview data. */
 export const renderEmailPreview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
-    z.object({ name: z.string().min(1) }).parse(data),
+    z.object({ name: z.string().min(1), overrides: overridesSchema }).parse(data),
   )
   .handler(async ({ data, context }): Promise<{ html: string; subject: string }> => {
     await assertAdmin(context);
@@ -101,20 +120,21 @@ export const renderEmailPreview = createServerFn({ method: "POST" })
     const React = await import("react");
     const { render } = await import("@react-email/render");
     const { TEMPLATES } = await import("@/lib/email-templates/registry");
+    const overrides = data.overrides ?? {};
 
     // Auth templates
     if (data.name in AUTH_SAMPLE_DATA || AUTH_TEMPLATE_LOADERS[data.name]) {
       const load = AUTH_TEMPLATE_LOADERS[data.name];
       if (!load) throw new Error(`Unknown auth template: ${data.name}`);
       const Component = await load();
-      const props = AUTH_SAMPLE_DATA[data.name] ?? {};
+      const props = { ...(AUTH_SAMPLE_DATA[data.name] ?? {}), ...overrides };
       const html = await render(React.createElement(Component, props));
       return { html, subject: AUTH_SUBJECTS[data.name] ?? "Notification" };
     }
 
     const entry = TEMPLATES[data.name];
     if (!entry) throw new Error(`Unknown template: ${data.name}`);
-    const previewData = entry.previewData ?? {};
+    const previewData = { ...(entry.previewData ?? {}), ...overrides };
     const html = await render(React.createElement(entry.component, previewData));
     const subject =
       typeof entry.subject === "function" ? entry.subject(previewData) : entry.subject;
@@ -157,6 +177,7 @@ export const sendTestEmail = createServerFn({ method: "POST" })
     z.object({
       name: z.string().min(1),
       recipientEmail: z.string().email(),
+      overrides: overridesSchema,
     }).parse(data),
   )
   .handler(async ({ data, context }): Promise<{ success: boolean; messageId: string }> => {
@@ -172,6 +193,7 @@ export const sendTestEmail = createServerFn({ method: "POST" })
     if (!supabaseUrl || !serviceKey) throw new Error("Server misconfigured");
     const admin = createClient(supabaseUrl, serviceKey);
 
+    const overrides = data.overrides ?? {};
     const isAuth = !!AUTH_TEMPLATE_LOADERS[data.name];
     let html: string;
     let text: string;
@@ -179,7 +201,12 @@ export const sendTestEmail = createServerFn({ method: "POST" })
 
     if (isAuth) {
       const Component = await AUTH_TEMPLATE_LOADERS[data.name]!();
-      const props = { ...(AUTH_SAMPLE_DATA[data.name] ?? {}), recipient: data.recipientEmail, email: data.recipientEmail };
+      const props = {
+        ...(AUTH_SAMPLE_DATA[data.name] ?? {}),
+        recipient: data.recipientEmail,
+        email: data.recipientEmail,
+        ...overrides,
+      };
       const element = React.createElement(Component, props);
       html = await render(element);
       text = await render(element, { plainText: true });
@@ -187,7 +214,7 @@ export const sendTestEmail = createServerFn({ method: "POST" })
     } else {
       const entry = TEMPLATES[data.name];
       if (!entry) throw new Error(`Unknown template: ${data.name}`);
-      const previewData = entry.previewData ?? {};
+      const previewData = { ...(entry.previewData ?? {}), ...overrides };
       const element = React.createElement(entry.component, previewData);
       html = await render(element);
       text = await render(element, { plainText: true });
