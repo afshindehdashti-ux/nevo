@@ -115,8 +115,8 @@ function ExportsHistoryPage() {
     return m;
   }, [actors]);
 
-  function update<K extends keyof typeof search>(key: K, value: string) {
-    void navigate({ search: (prev) => ({ ...prev, [key]: value }) as never });
+  function update<K extends keyof z.infer<typeof searchSchema>>(key: K, value: string) {
+    void navigate({ search: (prev: z.infer<typeof searchSchema>) => ({ ...prev, [key]: value }) });
   }
 
   function clearAll() {
