@@ -9,7 +9,33 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { Trash2, Download } from "lucide-react";
+
+function csvEscape(v: unknown): string {
+  if (v === null || v === undefined) return "";
+  const s = String(v);
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function downloadCsv(rows: Array<{ email: string; reason: string | null; source: string | null; created_at: string }>) {
+  const header = ["Recipient", "Reason", "Source", "Suppressed at (ISO)", "Suppressed at (local)"];
+  const lines = [header.join(",")];
+  for (const r of rows) {
+    const iso = r.created_at;
+    const local = new Date(r.created_at).toLocaleString();
+    lines.push([r.email, r.reason, r.source, iso, local].map(csvEscape).join(","));
+  }
+  const csv = "\uFEFF" + lines.join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `suppressed-emails-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 export const Route = createFileRoute("/_authenticated/admin/mails/suppressed")({
   component: SuppressedPage,
@@ -46,7 +72,17 @@ function SuppressedPage() {
             Bounces, complaints, and unsubscribes. Emails to these addresses are blocked automatically.
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={() => query.refetch()}>Refresh</Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => downloadCsv(rows)}
+            disabled={rows.length === 0}
+          >
+            <Download className="h-3.5 w-3.5 mr-1.5" />Export CSV
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => query.refetch()}>Refresh</Button>
+        </div>
       </div>
 
       <div className="border border-border rounded-lg bg-background overflow-hidden">
