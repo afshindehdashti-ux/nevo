@@ -730,7 +730,7 @@ function ExportsHistoryPage() {
                         title="SHA-256 as it was written into the CSV preamble"
                       >
                         {md.embedded_sha256 ?? "—"}
-                        {md.embedded_sha256 && md.embedded_sha256 !== detail.sha256 && (
+                        {detectShaDrift({ sha256: detail.sha256, metadata: detail.metadata }) && (
                           <span className="ml-2 text-destructive">
                             (differs from column value)
                           </span>
