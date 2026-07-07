@@ -53,7 +53,7 @@ import {
   type InvoiceStatus,
   type PaymentMethod,
 } from "@/lib/crm-status";
-import { useCanEditInvoices, useCanEditPayments } from "@/lib/crm-permissions";
+import { useCanEditInvoices, useCanEditPayments, useCanPurgeInvoicePdfVersions } from "@/lib/crm-permissions";
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
 import { ApprovalPanel } from "@/components/crm/ApprovalPanel";
 
