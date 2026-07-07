@@ -28,6 +28,8 @@ import {
   Activity,
   Bell,
   FileDown,
+  Sparkles,
+  BookOpen,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -135,6 +137,18 @@ export const CRM_NAV: CrmNavGroup[] = [
         requiresSuperAdmin: true,
       },
       { title: "Reports", url: "/admin/reports", icon: BarChart3, allowedRoles: ALL_STAFF },
+      {
+        title: "AI Assistant",
+        url: "/admin/ai-assistant",
+        icon: Sparkles,
+        allowedRoles: ALL_STAFF,
+      },
+      {
+        title: "AI Knowledge Base",
+        url: "/admin/ai-assistant/knowledge-base",
+        icon: BookOpen,
+        allowedRoles: ["management"],
+      },
     ],
   },
   {
