@@ -37,6 +37,11 @@ import {
 } from "@/components/ui/select";
 import { ArrowLeft, ArrowUpDown, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail, History, Archive, Copy, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  assembleCsv,
+  computeSha256Hex,
+  verifyCsvText,
+} from "@/lib/purge-csv-preamble";
 import JSZip from "jszip";
 import { useServerFn } from "@tanstack/react-start";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
@@ -521,59 +526,26 @@ function InvoiceDetailPage() {
   async function verifyDownloadedCsv(file: File) {
     setPurgeVerifyState({ status: "verifying", filename: file.name });
     try {
-      // The exported CSV prepends a preamble with the checksum + timestamp
-      // followed by a "--- PAYLOAD BELOW ---" marker. Hash only the bytes
-      // after that marker so the embedded hash stays self-consistent.
       const text = await file.text();
-      const marker = '"--- PAYLOAD BELOW ---"\n';
-      const idx = text.indexOf(marker);
-      const preamble = idx >= 0 ? text.slice(0, idx) : "";
-      const payload = idx >= 0 ? text.slice(idx + marker.length) : text;
-
-      // Parse embedded SHA-256 and export timestamp from the preamble rows
-      // (both are simple `"label","value"` CSV rows written by the exporter).
-      const unquote = (v: string) =>
-        v.startsWith('"') && v.endsWith('"')
-          ? v.slice(1, -1).replace(/""/g, '"')
-          : v;
-      let embeddedSha: string | undefined;
-      let embeddedExportedAt: string | undefined;
-      for (const line of preamble.split("\n")) {
-        const m = line.match(/^("(?:[^"]|"")*"),("(?:[^"]|"")*")$/);
-        if (!m) continue;
-        const label = unquote(m[1]);
-        const value = unquote(m[2]);
-        if (/^SHA-256/i.test(label)) embeddedSha = value;
-        else if (/^Export Timestamp/i.test(label)) embeddedExportedAt = value;
-      }
-
-      const payloadBytes = new TextEncoder().encode(payload);
-      const digest = await crypto.subtle.digest("SHA-256", payloadBytes);
-      const sha = Array.from(new Uint8Array(digest))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
+      const result = await verifyCsvText(text, {
+        expectedSha: lastPurgeExport?.sha256,
+      });
       const now = new Date().toISOString();
 
-      // Prefer the session's known-good checksum; otherwise fall back to the
-      // one embedded in the file (useful when verifying an old export after
-      // the page has been reloaded).
-      const expected =
-        lastPurgeExport?.sha256 ||
-        (embeddedSha && /^[a-f0-9]{64}$/i.test(embeddedSha) ? embeddedSha : undefined);
-      if (!expected) {
+      if (result.status === "no-expected") {
         setPurgeVerifyState({ status: "idle" });
         toast.error("No checksum to verify against — file preamble is missing SHA-256.");
         return;
       }
 
-      if (sha.toLowerCase() === expected.toLowerCase()) {
+      if (result.status === "match") {
         setPurgeVerifyState({
           status: "match",
           filename: file.name,
-          sha256: sha,
+          sha256: result.computedSha,
           verifiedAt: now,
-          embeddedSha,
-          embeddedExportedAt,
+          embeddedSha: result.embeddedSha,
+          embeddedExportedAt: result.embeddedExportedAt,
         });
         toast.success("Checksum matches", {
           description: `${file.name} · SHA-256 verified`,
@@ -582,14 +554,14 @@ function InvoiceDetailPage() {
         setPurgeVerifyState({
           status: "mismatch",
           filename: file.name,
-          sha256: sha,
-          expected,
+          sha256: result.computedSha,
+          expected: result.expected,
           verifiedAt: now,
-          embeddedSha,
-          embeddedExportedAt,
+          embeddedSha: result.embeddedSha,
+          embeddedExportedAt: result.embeddedExportedAt,
         });
         toast.error("Checksum mismatch — file may be altered or corrupted", {
-          description: `Expected ${expected.slice(0, 16)}… got ${sha.slice(0, 16)}…`,
+          description: `Expected ${result.expected.slice(0, 16)}… got ${result.computedSha.slice(0, 16)}…`,
           duration: 10000,
         });
       }
@@ -598,6 +570,7 @@ function InvoiceDetailPage() {
       toast.error(e instanceof Error ? e.message : "Failed to compute checksum");
     }
   }
+
 
 
   // Export confirmation modal state.
@@ -1107,31 +1080,21 @@ function InvoiceDetailPage() {
       }),
     ];
     const payloadCsv = lines.join("\n");
-    const payloadBytes = new TextEncoder().encode(payloadCsv);
     // Compute SHA-256 of the payload so it can be embedded in the file itself.
     // The embedded hash covers everything AFTER the PAYLOAD BELOW marker line,
     // so verification stays stable even though the file also carries the hash.
     let sha256 = "";
     try {
-      const digest = await crypto.subtle.digest("SHA-256", payloadBytes);
-      sha256 = Array.from(new Uint8Array(digest))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
+      sha256 = await computeSha256Hex(payloadCsv);
     } catch {
       sha256 = "";
     }
     const exportedAtIso = new Date().toISOString();
-    const escapeHeader = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
-    const preamble = [
-      `${escapeHeader("SHA-256 (of payload below)")},${escapeHeader(sha256 || "(unavailable)")}`,
-      `${escapeHeader("Export Timestamp (ISO)")},${escapeHeader(exportedAtIso)}`,
-      escapeHeader("--- PAYLOAD BELOW ---"),
-      "",
-    ].join("\n");
-    const fullCsv = preamble + payloadCsv;
+    const fullCsv = assembleCsv({ sha256, exportedAtIso, payloadCsv });
     const bytes = new TextEncoder().encode(fullCsv);
     const blob = new Blob([bytes], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
+
     // Include a short SHA-256 prefix in the filename so compliance workflows
     // can match a file to its checksum without opening it.
     const shortSha = sha256 ? sha256.slice(0, 12) : "nochecksum";
