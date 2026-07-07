@@ -311,13 +311,27 @@ function InvoiceDetailPage() {
   // for text search server-side). Everything else is filtered server-side.
   const filteredPurgeLogs = useMemo(() => {
     const idQ = purgeVersionQuery.trim().toLowerCase();
-    if (!idQ) return purgeLogs;
-    return purgeLogs.filter((log) => {
-      const meta = (log.metadata ?? {}) as { version_ids?: string[] };
-      const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
-      return ids.some((v) => v.toLowerCase().includes(idQ));
-    });
-  }, [purgeLogs, purgeVersionQuery]);
+    let rows = idQ
+      ? purgeLogs.filter((log) => {
+          const meta = (log.metadata ?? {}) as { version_ids?: string[] };
+          const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+          return ids.some((v) => v.toLowerCase().includes(idQ));
+        })
+      : purgeLogs;
+    if (purgeSort.column === "user") {
+      rows = [...rows].sort((a, b) => {
+        const nameA = a.user_id ? purgeActorMap[a.user_id] ?? "Unknown user" : "System";
+        const nameB = b.user_id ? purgeActorMap[b.user_id] ?? "Unknown user" : "System";
+        return purgeSort.direction === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+      });
+    } else if (purgeSort.column === "created_at") {
+      rows = [...rows].sort((a, b) => {
+        const cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        return purgeSort.direction === "asc" ? cmp : -cmp;
+      });
+    }
+    return rows;
+  }, [purgeLogs, purgeVersionQuery, purgeSort, purgeActorMap]);
   const purgeFiltersActive =
     purgeUserFilter !== "all" || purgeFromDate !== "" || purgeToDate !== "" || purgeVersionQuery.trim() !== "";
   const resetPurgeFilters = () => {
