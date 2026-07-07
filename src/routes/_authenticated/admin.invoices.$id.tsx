@@ -31,10 +31,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail } from "lucide-react";
+import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail, History } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
 import { emailInvoicePdf } from "@/lib/invoices.functions";
+import {
+  recordInvoicePdfVersion,
+  signInvoicePdfUrl,
+  type InvoicePdfVersionRow,
+} from "@/lib/invoice-pdf-versions";
+
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import {
   INVOICE_STATUSES,
@@ -112,6 +118,20 @@ function InvoiceDetailPage() {
     },
   });
 
+  const { data: pdfVersions = [], refetch: refetchPdfVersions } = useQuery({
+    queryKey: ["invoice-pdf-versions", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("invoice_pdf_versions")
+        .select("*")
+        .eq("invoice_id", id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as InvoicePdfVersionRow[];
+    },
+  });
+
+
   const [lines, setLines] = useState<Line[]>([]);
   const [notes, setNotes] = useState("");
   const [issueDate, setIssueDate] = useState("");
@@ -149,15 +169,29 @@ function InvoiceDetailPage() {
     }
   }
 
-  function downloadCurrentPdf() {
-    if (!pdfPreview) return;
+  async function downloadCurrentPdf() {
+    if (!pdfPreview || !invoice) return;
     const a = document.createElement("a");
     a.href = pdfPreview.url;
     a.download = pdfPreview.filename;
     document.body.appendChild(a);
     a.click();
     a.remove();
+    // Record this download as a stored version (best-effort, don't block UX).
+    try {
+      await recordInvoicePdfVersion({
+        invoiceId: invoice.id,
+        docType: invoice.type,
+        blob: pdfPreview.blob,
+        filename: pdfPreview.filename,
+        source: "download",
+      });
+      refetchPdfVersions();
+    } catch (e) {
+      console.warn("Failed to archive PDF version", e);
+    }
   }
+
 
   // -------- Email to customer --------
   const emailFn = useServerFn(emailInvoicePdf);
@@ -184,16 +218,15 @@ function InvoiceDetailPage() {
     try {
       // 1) Build the PDF (reuse the current preview if available).
       const built = pdfPreview ?? (await generateInvoicePdf(invoice.id, "blob"));
-      // 2) Upload to crm-docs under invoices/<id>/… (matches server-side prefix check).
-      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const storagePath = `invoices/${invoice.id}/${stamp}-${built.filename}`;
-      const { error: upErr } = await supabase.storage
-        .from("crm-docs")
-        .upload(storagePath, built.blob, {
-          contentType: "application/pdf",
-          upsert: false,
-        });
-      if (upErr) throw upErr;
+      // 2) Upload to crm-docs and record a version row (helper handles both).
+      const { storagePath } = await recordInvoicePdfVersion({
+        invoiceId: invoice.id,
+        docType: invoice.type,
+        blob: built.blob,
+        filename: built.filename,
+        source: "email",
+      });
+      refetchPdfVersions();
       // 3) Ask the server to sign the URL and send the email.
       const res = await emailFn({
         data: {
@@ -203,6 +236,7 @@ function InvoiceDetailPage() {
           message: emailMessage.trim() || null,
         },
       });
+
       if (!res.ok) {
         toast.error(`Send failed: ${res.reason}`);
         return;
@@ -725,6 +759,42 @@ function InvoiceDetailPage() {
             />
           )}
           <DocumentsPanel entityType="invoice" entityId={id} />
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-base flex items-center gap-2">
+                <History className="h-4 w-4" /> PDF history
+              </CardTitle>
+              <span className="text-xs text-muted-foreground">
+                {pdfVersions.length} version{pdfVersions.length === 1 ? "" : "s"}
+              </span>
+            </CardHeader>
+            <CardContent className="p-0">
+              {pdfVersions.length === 0 ? (
+                <p className="px-4 py-6 text-sm text-muted-foreground text-center">
+                  No PDFs generated yet. Downloading or emailing a PDF archives a copy here.
+                </p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Generated</TableHead>
+                      <TableHead>Source</TableHead>
+                      <TableHead>Filename</TableHead>
+                      <TableHead className="text-right">Size</TableHead>
+                      <TableHead className="w-24"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pdfVersions.map((v) => (
+                      <PdfVersionRow key={v.id} v={v} />
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+
         </div>
       </div>
 
@@ -890,6 +960,56 @@ function InvoiceDetailPage() {
 
   );
 }
+
+function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
+  const [busy, setBusy] = useState(false);
+  const sourceLabel: Record<string, string> = {
+    download: "Download",
+    email: "Emailed",
+    bulk: "Bulk export",
+    preview: "Preview",
+  };
+  const sizeKb = v.byte_size ? `${(v.byte_size / 1024).toFixed(0)} KB` : "—";
+  const dt = new Date(v.created_at);
+  const stamp = `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  async function download() {
+    setBusy(true);
+    try {
+      const url = await signInvoicePdfUrl(v.storage_path, 300);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = v.filename;
+      a.target = "_blank";
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Download failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <TableRow>
+      <TableCell className="whitespace-nowrap text-sm">{stamp}</TableCell>
+      <TableCell>
+        <Badge variant="secondary">{sourceLabel[v.source] ?? v.source}</Badge>
+      </TableCell>
+      <TableCell className="text-xs font-mono truncate max-w-[220px]" title={v.filename}>
+        {v.filename}
+      </TableCell>
+      <TableCell className="text-right text-sm">{sizeKb}</TableCell>
+      <TableCell className="text-right">
+        <Button size="sm" variant="outline" onClick={download} disabled={busy}>
+          <FileDown className="h-3.5 w-3.5 mr-1" />
+          {busy ? "…" : "Get"}
+        </Button>
+      </TableCell>
+    </TableRow>
+  );
+}
+
 
 function Row({ label, value }: { label: React.ReactNode; value: React.ReactNode }) {
   return (

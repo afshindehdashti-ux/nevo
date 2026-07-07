@@ -1362,6 +1362,53 @@ export type Database = {
           },
         ]
       }
+      invoice_pdf_versions: {
+        Row: {
+          byte_size: number | null
+          created_at: string
+          doc_type: string
+          filename: string
+          generated_by: string | null
+          id: string
+          invoice_id: string
+          source: string
+          storage_bucket: string
+          storage_path: string
+        }
+        Insert: {
+          byte_size?: number | null
+          created_at?: string
+          doc_type: string
+          filename: string
+          generated_by?: string | null
+          id?: string
+          invoice_id: string
+          source?: string
+          storage_bucket?: string
+          storage_path: string
+        }
+        Update: {
+          byte_size?: number | null
+          created_at?: string
+          doc_type?: string
+          filename?: string
+          generated_by?: string | null
+          id?: string
+          invoice_id?: string
+          source?: string
+          storage_bucket?: string
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_pdf_versions_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           amount_paid: number
