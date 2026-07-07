@@ -218,16 +218,15 @@ function InvoiceDetailPage() {
     try {
       // 1) Build the PDF (reuse the current preview if available).
       const built = pdfPreview ?? (await generateInvoicePdf(invoice.id, "blob"));
-      // 2) Upload to crm-docs under invoices/<id>/… (matches server-side prefix check).
-      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const storagePath = `invoices/${invoice.id}/${stamp}-${built.filename}`;
-      const { error: upErr } = await supabase.storage
-        .from("crm-docs")
-        .upload(storagePath, built.blob, {
-          contentType: "application/pdf",
-          upsert: false,
-        });
-      if (upErr) throw upErr;
+      // 2) Upload to crm-docs and record a version row (helper handles both).
+      const { storagePath } = await recordInvoicePdfVersion({
+        invoiceId: invoice.id,
+        docType: invoice.type,
+        blob: built.blob,
+        filename: built.filename,
+        source: "email",
+      });
+      refetchPdfVersions();
       // 3) Ask the server to sign the URL and send the email.
       const res = await emailFn({
         data: {
@@ -237,6 +236,7 @@ function InvoiceDetailPage() {
           message: emailMessage.trim() || null,
         },
       });
+
       if (!res.ok) {
         toast.error(`Send failed: ${res.reason}`);
         return;
