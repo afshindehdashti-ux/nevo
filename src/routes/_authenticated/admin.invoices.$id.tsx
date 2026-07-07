@@ -354,6 +354,32 @@ function InvoiceDetailPage() {
     }
   }
 
+  function getPurgeLogDeepLink(logId: string) {
+    return `${window.location.origin}${window.location.pathname}#purge-log-${logId}`;
+  }
+
+  async function copyPurgeLogLink(logId: string) {
+    try {
+      await navigator.clipboard.writeText(getPurgeLogDeepLink(logId));
+      toast.success("Link copied", { description: "Deep link to this audit entry is on the clipboard." });
+    } catch {
+      toast.error("Copy failed", { description: "Could not access the clipboard." });
+    }
+  }
+
+  function useDeepLinkedPurgeLogHighlight() {
+    useEffect(() => {
+      const hash = window.location.hash;
+      if (!hash.startsWith("#purge-log-")) return;
+      const logId = hash.replace("#purge-log-", "");
+      // Wait a tick for the table to render.
+      const timer = setTimeout(() => scrollToPurgeLog(logId), 100);
+      return () => clearTimeout(timer);
+    }, [purgeLogs.length]);
+  }
+
+  useDeepLinkedPurgeLogHighlight();
+
   async function confirmPurge() {
     setPurging(true);
     try {
