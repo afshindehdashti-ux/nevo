@@ -108,6 +108,7 @@ import { Route as AuthenticatedAdminShipmentsIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminQuotationsIdRouteImport } from './routes/_authenticated/admin.quotations.$id'
 import { Route as AuthenticatedAdminOrdersIdRouteImport } from './routes/_authenticated/admin.orders.$id'
 import { Route as AuthenticatedAdminMailsSuppressedRouteImport } from './routes/_authenticated/admin.mails.suppressed'
+import { Route as AuthenticatedAdminMailsSettingsRouteImport } from './routes/_authenticated/admin.mails.settings'
 import { Route as AuthenticatedAdminMailsInboxRouteImport } from './routes/_authenticated/admin.mails.inbox'
 import { Route as AuthenticatedAdminMailsComposeRouteImport } from './routes/_authenticated/admin.mails.compose'
 import { Route as AuthenticatedAdminLeadsIdRouteImport } from './routes/_authenticated/admin.leads.$id'
@@ -657,6 +658,12 @@ const AuthenticatedAdminMailsSuppressedRoute =
     path: '/suppressed',
     getParentRoute: () => AuthenticatedAdminMailsRoute,
   } as any)
+const AuthenticatedAdminMailsSettingsRoute =
+  AuthenticatedAdminMailsSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminMailsRoute,
+  } as any)
 const AuthenticatedAdminMailsInboxRoute =
   AuthenticatedAdminMailsInboxRouteImport.update({
     id: '/inbox',
@@ -794,6 +801,7 @@ export interface FileRoutesByFullPath {
   '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
   '/admin/mails/compose': typeof AuthenticatedAdminMailsComposeRoute
   '/admin/mails/inbox': typeof AuthenticatedAdminMailsInboxRoute
+  '/admin/mails/settings': typeof AuthenticatedAdminMailsSettingsRoute
   '/admin/mails/suppressed': typeof AuthenticatedAdminMailsSuppressedRoute
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
@@ -898,6 +906,7 @@ export interface FileRoutesByTo {
   '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
   '/admin/mails/compose': typeof AuthenticatedAdminMailsComposeRoute
   '/admin/mails/inbox': typeof AuthenticatedAdminMailsInboxRoute
+  '/admin/mails/settings': typeof AuthenticatedAdminMailsSettingsRoute
   '/admin/mails/suppressed': typeof AuthenticatedAdminMailsSuppressedRoute
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
@@ -1007,6 +1016,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
   '/_authenticated/admin/mails/compose': typeof AuthenticatedAdminMailsComposeRoute
   '/_authenticated/admin/mails/inbox': typeof AuthenticatedAdminMailsInboxRoute
+  '/_authenticated/admin/mails/settings': typeof AuthenticatedAdminMailsSettingsRoute
   '/_authenticated/admin/mails/suppressed': typeof AuthenticatedAdminMailsSuppressedRoute
   '/_authenticated/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/_authenticated/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
@@ -1116,6 +1126,7 @@ export interface FileRouteTypes {
     | '/admin/leads/$id'
     | '/admin/mails/compose'
     | '/admin/mails/inbox'
+    | '/admin/mails/settings'
     | '/admin/mails/suppressed'
     | '/admin/orders/$id'
     | '/admin/quotations/$id'
@@ -1220,6 +1231,7 @@ export interface FileRouteTypes {
     | '/admin/leads/$id'
     | '/admin/mails/compose'
     | '/admin/mails/inbox'
+    | '/admin/mails/settings'
     | '/admin/mails/suppressed'
     | '/admin/orders/$id'
     | '/admin/quotations/$id'
@@ -1328,6 +1340,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/leads/$id'
     | '/_authenticated/admin/mails/compose'
     | '/_authenticated/admin/mails/inbox'
+    | '/_authenticated/admin/mails/settings'
     | '/_authenticated/admin/mails/suppressed'
     | '/_authenticated/admin/orders/$id'
     | '/_authenticated/admin/quotations/$id'
@@ -2065,6 +2078,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMailsSuppressedRouteImport
       parentRoute: typeof AuthenticatedAdminMailsRoute
     }
+    '/_authenticated/admin/mails/settings': {
+      id: '/_authenticated/admin/mails/settings'
+      path: '/settings'
+      fullPath: '/admin/mails/settings'
+      preLoaderRoute: typeof AuthenticatedAdminMailsSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminMailsRoute
+    }
     '/_authenticated/admin/mails/inbox': {
       id: '/_authenticated/admin/mails/inbox'
       path: '/inbox'
@@ -2177,6 +2197,7 @@ const AuthenticatedAdminLeadsRouteWithChildren =
 interface AuthenticatedAdminMailsRouteChildren {
   AuthenticatedAdminMailsComposeRoute: typeof AuthenticatedAdminMailsComposeRoute
   AuthenticatedAdminMailsInboxRoute: typeof AuthenticatedAdminMailsInboxRoute
+  AuthenticatedAdminMailsSettingsRoute: typeof AuthenticatedAdminMailsSettingsRoute
   AuthenticatedAdminMailsSuppressedRoute: typeof AuthenticatedAdminMailsSuppressedRoute
   AuthenticatedAdminMailsIndexRoute: typeof AuthenticatedAdminMailsIndexRoute
 }
@@ -2185,6 +2206,7 @@ const AuthenticatedAdminMailsRouteChildren: AuthenticatedAdminMailsRouteChildren
   {
     AuthenticatedAdminMailsComposeRoute: AuthenticatedAdminMailsComposeRoute,
     AuthenticatedAdminMailsInboxRoute: AuthenticatedAdminMailsInboxRoute,
+    AuthenticatedAdminMailsSettingsRoute: AuthenticatedAdminMailsSettingsRoute,
     AuthenticatedAdminMailsSuppressedRoute:
       AuthenticatedAdminMailsSuppressedRoute,
     AuthenticatedAdminMailsIndexRoute: AuthenticatedAdminMailsIndexRoute,
