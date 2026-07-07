@@ -13,6 +13,12 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { FileDown, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import JSZip from "jszip";
+import { generateInvoicePdf } from "@/lib/invoice-pdf";
 import {
   Select,
   SelectContent,
@@ -32,6 +38,7 @@ export const Route = createFileRoute("/_authenticated/admin/invoices")({
   head: () => ({ meta: [{ title: "Invoices — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
   component: () => <InvoicesList type="commercial" title="Invoices" />,
 });
+
 
 export function InvoicesList({
   type,
