@@ -53,6 +53,13 @@ import {
   KeyRound,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
+import { downloadCsv, downloadPdf } from "@/lib/security-export";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 /**
  * Security Audit — filtered view of activity_logs focused on
