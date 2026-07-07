@@ -615,6 +615,19 @@ function SecurityAuditPage() {
           ) : null}
         </DialogContent>
       </Dialog>
+
+      <ActorDetailDialog
+        userId={actorDetail}
+        onOpenChange={(open) => !open && setActorDetail(null)}
+        onFilterByActor={(id) => {
+          setActor(id);
+          setActorDetail(null);
+        }}
+        onViewEvent={(row) => {
+          setActorDetail(null);
+          setSelected(row);
+        }}
+      />
     </div>
   );
 }
