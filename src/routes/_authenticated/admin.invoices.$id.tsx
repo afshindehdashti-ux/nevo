@@ -267,7 +267,10 @@ function InvoiceDetailPage() {
     if (!effectiveRetentionPersisted) return;
     try {
       const removed = await purgeOlderInvoicePdfVersions(id, effectiveRetentionPersisted);
-      if (removed > 0) refetchPdfVersions();
+      if (removed > 0) {
+        refetchPdfVersions();
+        refetchPurgeLogs();
+      }
     } catch (e) {
       console.warn("auto-prune failed", e);
     }
