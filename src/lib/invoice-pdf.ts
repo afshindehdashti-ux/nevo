@@ -399,5 +399,8 @@ export async function generateInvoicePdf(
     /[^A-Za-z0-9._-]/g,
     "_",
   );
-  doc.save(`${filenameBase}-${num}.pdf`);
+  const filename = `${filenameBase}-${num}.pdf`;
+  const blob = doc.output("blob");
+  if (mode === "download") doc.save(filename);
+  return { blob, url: URL.createObjectURL(blob), filename };
 }
