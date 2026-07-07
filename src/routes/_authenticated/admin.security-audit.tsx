@@ -53,6 +53,13 @@ import {
   KeyRound,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
+import { downloadCsv, downloadPdf } from "@/lib/security-export";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 /**
  * Security Audit — filtered view of activity_logs focused on
@@ -306,46 +313,49 @@ function SecurityAuditPage() {
     return s;
   }, [filteredRows]);
 
-  function exportCsv() {
-    // Mirror the on-screen table exactly: same columns, same formatting,
-    // and only the rows currently visible after filters + search.
-    const header = ["When", "Actor", "Event", "Scope", "IP / Detail"];
-    const escape = (v: unknown) => {
-      const s = v === null || v === undefined ? "" : String(v);
-      return `"${s.replace(/"/g, '""')}"`;
-    };
-    const lines = [header.map(escape).join(",")];
-    filteredRows.forEach((r) => {
-      const md = r.metadata as {
-        ip?: string | null;
-        country?: string | null;
-      };
-      const when = format(new Date(r.created_at), "yyyy-MM-dd HH:mm:ss");
-      const actor = r.user_id
+  const exportRows = useMemo(() => {
+    return filteredRows.map((r) => {
+      const md = r.metadata as { ip?: string | null; country?: string | null };
+      const actorName = r.user_id
         ? (profilesQ.data?.get(r.user_id) ?? r.user_id)
         : "system";
-      const event = EVENT_LABELS[r.action] ?? r.action;
-      const scope = r.entity_id
-        ? `${r.entity_type ?? "—"} (${r.entity_id})`
-        : (r.entity_type ?? "—");
       const ipDetail =
         r.action === "sign_in" && md?.ip
           ? md.country
             ? `${md.ip} (${md.country})`
             : md.ip
           : "—";
-      lines.push([when, actor, event, scope, ipDetail].map(escape).join(","));
+      return {
+        when: format(new Date(r.created_at), "yyyy-MM-dd HH:mm:ss"),
+        actor: actorName,
+        event: EVENT_LABELS[r.action] ?? r.action,
+        scope: r.entity_id
+          ? `${r.entity_type ?? "—"} (${r.entity_id})`
+          : (r.entity_type ?? "—"),
+        ip: ipDetail,
+      };
     });
-    // BOM so Excel opens UTF-8 correctly.
-    const blob = new Blob(["\ufeff" + lines.join("\r\n")], {
-      type: "text/csv;charset=utf-8",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `security-audit-${format(new Date(), "yyyyMMdd-HHmmss")}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  }, [filteredRows, profilesQ.data]);
+
+  const EXPORT_COLUMNS = [
+    { header: "When", key: "when" },
+    { header: "Actor", key: "actor" },
+    { header: "Event", key: "event" },
+    { header: "Scope", key: "scope" },
+    { header: "IP / Detail", key: "ip" },
+  ];
+
+  function exportCsv() {
+    downloadCsv("security-audit", EXPORT_COLUMNS, exportRows);
+  }
+
+  function exportPdf() {
+    downloadPdf(
+      "security-audit",
+      "NEVO CRM — Security Audit",
+      EXPORT_COLUMNS,
+      exportRows,
+    );
   }
 
   if (rolesLoading) {
@@ -411,15 +421,26 @@ function SecurityAuditPage() {
                 ? "Connecting…"
                 : "Offline"}
           </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={exportCsv}
-            disabled={!filteredRows.length}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!filteredRows.length}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={exportCsv}>
+                Download CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={exportPdf}>
+                Download PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

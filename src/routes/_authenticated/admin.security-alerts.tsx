@@ -50,8 +50,16 @@ import {
   Bell,
   KeyRound,
   ExternalLink,
+  Download,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
+import { downloadCsv, downloadPdf } from "@/lib/security-export";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 /**
  * Security Alerts dashboard — a focused, at-a-glance view of recent
@@ -198,7 +206,49 @@ function SecurityAlertsPage() {
 
   const totalHigh = counts.security_alert + counts.delete;
 
+  const EXPORT_COLUMNS = [
+    { header: "When", key: "when" },
+    { header: "Type", key: "type" },
+    { header: "Severity", key: "severity" },
+    { header: "Actor", key: "actor" },
+    { header: "Entity type", key: "entity_type" },
+    { header: "Entity id", key: "entity_id" },
+    { header: "Metadata", key: "metadata" },
+  ];
+
+  function exportAlerts(kind: "csv" | "pdf") {
+    const rows = filtered.map((r) => {
+      const meta = TYPE_META[r.action as AlertType];
+      const actorName = r.user_id
+        ? (actors.data?.[r.user_id] ?? r.user_id)
+        : "system";
+      return {
+        when: format(new Date(r.created_at), "yyyy-MM-dd HH:mm:ss"),
+        type: meta?.label ?? r.action,
+        severity: meta?.severity ?? "low",
+        actor: actorName,
+        entity_type: r.entity_type ?? "—",
+        entity_id: r.entity_id ?? "—",
+        metadata:
+          r.metadata && Object.keys(r.metadata).length
+            ? JSON.stringify(r.metadata)
+            : "",
+      };
+    });
+    if (kind === "csv") {
+      downloadCsv("security-alerts", EXPORT_COLUMNS, rows);
+    } else {
+      downloadPdf(
+        "security-alerts",
+        `NEVO CRM — Security Alerts (${range})`,
+        EXPORT_COLUMNS,
+        rows,
+      );
+    }
+  }
+
   if (!isSuperAdmin) return <AccessDenied />;
+
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -218,6 +268,26 @@ function SecurityAlertsPage() {
               <ShieldCheck className="h-4 w-4" /> Full audit
             </Link>
           </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                disabled={filtered.length === 0}
+              >
+                <Download className="h-4 w-4" /> Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => exportAlerts("csv")}>
+                Download CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => exportAlerts("pdf")}>
+                Download PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
             variant="outline"
             size="sm"
@@ -230,6 +300,7 @@ function SecurityAlertsPage() {
           </Button>
         </div>
       </div>
+
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <StatTile label="High severity" value={totalHigh} tone={totalHigh > 0 ? "bad" : undefined} />
