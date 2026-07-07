@@ -251,7 +251,9 @@ function InvoiceDetailPage() {
         blob: built.blob,
         filename: built.filename,
         source: "email",
+        note: pdfNote,
       });
+      setPdfNote("");
       refetchPdfVersions();
       // 3) Ask the server to sign the URL and send the email.
       const res = await emailFn({
