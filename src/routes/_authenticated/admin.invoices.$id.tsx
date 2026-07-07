@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
@@ -248,6 +249,29 @@ function InvoiceDetailPage() {
     setPurgeToDate("");
     setPurgeVersionQuery("");
   };
+
+  // -------- Purge audit row selection --------
+  const [selectedPurgeIds, setSelectedPurgeIds] = useState<Set<string>>(new Set());
+  const togglePurgeSelected = (logId: string, checked: boolean) => {
+    setSelectedPurgeIds((prev) => {
+      const next = new Set(prev);
+      if (checked) next.add(logId); else next.delete(logId);
+      return next;
+    });
+  };
+  const allFilteredSelected =
+    filteredPurgeLogs.length > 0 && filteredPurgeLogs.every((l) => selectedPurgeIds.has(l.id));
+  const someFilteredSelected =
+    !allFilteredSelected && filteredPurgeLogs.some((l) => selectedPurgeIds.has(l.id));
+  const toggleAllFiltered = (checked: boolean) => {
+    setSelectedPurgeIds((prev) => {
+      const next = new Set(prev);
+      if (checked) filteredPurgeLogs.forEach((l) => next.add(l.id));
+      else filteredPurgeLogs.forEach((l) => next.delete(l.id));
+      return next;
+    });
+  };
+  const clearPurgeSelection = () => setSelectedPurgeIds(new Set());
 
 
 
@@ -564,8 +588,8 @@ function InvoiceDetailPage() {
     URL.revokeObjectURL(url);
   }
 
-  function exportPurgeAuditCsv() {
-    const source = filteredPurgeLogs;
+  function exportPurgeAuditCsv(rows?: PurgeLogRow[], scopeLabel = "filtered") {
+    const source = rows ?? filteredPurgeLogs;
     if (source.length === 0) {
       toast.info("No purge audit entries to export");
       return;
@@ -617,7 +641,7 @@ function InvoiceDetailPage() {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    toast.success(`Exported ${source.length} audit entr${source.length === 1 ? "y" : "ies"}`);
+    toast.success(`Exported ${source.length} ${scopeLabel} audit entr${source.length === 1 ? "y" : "ies"}`);
   }
 
   useEffect(() => {
@@ -1518,17 +1542,41 @@ function InvoiceDetailPage() {
                   <Badge variant="secondary" className="ml-2">
                     {purgeFiltersActive ? `${filteredPurgeLogs.length} / ${purgeLogs.length}` : purgeLogs.length}
                   </Badge>
+                  {selectedPurgeIds.size > 0 && (
+                    <Badge variant="outline" className="ml-1">{selectedPurgeIds.size} selected</Badge>
+                  )}
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8"
-                  onClick={exportPurgeAuditCsv}
-                  disabled={filteredPurgeLogs.length === 0}
-                >
-                  <FileDown className="h-3.5 w-3.5 mr-1" />
-                  Export CSV{purgeFiltersActive ? " (filtered)" : ""}
-                </Button>
+                <div className="flex items-center gap-2">
+                  {selectedPurgeIds.size > 0 && (
+                    <>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="h-8"
+                        onClick={() => {
+                          const rows = purgeLogs.filter((l) => selectedPurgeIds.has(l.id));
+                          exportPurgeAuditCsv(rows, "selected");
+                        }}
+                      >
+                        <FileDown className="h-3.5 w-3.5 mr-1" />
+                        Export selected ({selectedPurgeIds.size})
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-8" onClick={clearPurgeSelection}>
+                        Clear
+                      </Button>
+                    </>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8"
+                    onClick={() => exportPurgeAuditCsv()}
+                    disabled={filteredPurgeLogs.length === 0}
+                  >
+                    <FileDown className="h-3.5 w-3.5 mr-1" />
+                    Export CSV{purgeFiltersActive ? " (filtered)" : ""}
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -1588,6 +1636,13 @@ function InvoiceDetailPage() {
                     <Table>
                       <TableHeader>
                         <TableRow>
+                          <TableHead className="w-10">
+                            <Checkbox
+                              checked={allFilteredSelected ? true : someFilteredSelected ? "indeterminate" : false}
+                              onCheckedChange={(v) => toggleAllFiltered(v === true)}
+                              aria-label="Select all filtered rows"
+                            />
+                          </TableHead>
                           <TableHead>When</TableHead>
                           <TableHead>User</TableHead>
                           <TableHead className="text-right">Removed</TableHead>
@@ -1610,7 +1665,19 @@ function InvoiceDetailPage() {
                           const idQ = purgeVersionQuery.trim().toLowerCase();
                           const displayIds = idQ ? ids.filter((v) => v.toLowerCase().includes(idQ)) : ids;
                           return (
-                            <TableRow key={log.id} id={`purge-log-${log.id}`} className="transition-shadow">
+                            <TableRow
+                              key={log.id}
+                              id={`purge-log-${log.id}`}
+                              data-state={selectedPurgeIds.has(log.id) ? "selected" : undefined}
+                              className="transition-shadow"
+                            >
+                              <TableCell className="w-10">
+                                <Checkbox
+                                  checked={selectedPurgeIds.has(log.id)}
+                                  onCheckedChange={(v) => togglePurgeSelected(log.id, v === true)}
+                                  aria-label="Select row"
+                                />
+                              </TableCell>
                               <TableCell className="whitespace-nowrap text-sm">
                                 {new Date(log.created_at).toLocaleString()}
                               </TableCell>
