@@ -359,6 +359,42 @@ function EmailPreviewAdmin() {
               Download HTML
             </Button>
           </div>
+          {audit && (
+            <div className="border-b border-border bg-background">
+              <button
+                type="button"
+                aria-expanded={showA11yDetails}
+                onClick={() => setShowA11yDetails((v) => !v)}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted/40 transition-colors"
+              >
+                {audit.counts.critical > 0 ? (
+                  <AlertCircle className="h-4 w-4 text-destructive shrink-0" aria-hidden />
+                ) : audit.counts.warning > 0 ? (
+                  <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" aria-hidden />
+                ) : audit.issues.length === 0 ? (
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" aria-hidden />
+                ) : (
+                  <ShieldCheck className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden />
+                )}
+                <span className="font-medium">Accessibility</span>
+                <span className="text-muted-foreground">
+                  {audit.issues.length === 0
+                    ? "No issues detected"
+                    : `${audit.counts.critical} critical · ${audit.counts.warning} warnings · ${audit.counts.info} info`}
+                </span>
+                <span className="ml-auto text-xs text-muted-foreground">
+                  {showA11yDetails ? "Hide" : "Show details"}
+                </span>
+              </button>
+              {showA11yDetails && audit.issues.length > 0 && (
+                <ul className="px-4 pb-3 space-y-2 max-h-56 overflow-auto text-sm">
+                  {audit.issues.map((issue, i) => (
+                    <A11yRow key={i} issue={issue} />
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
           <div className="flex-1 bg-muted/40 p-4 flex justify-center overflow-auto">
             {preview.isFetching && !preview.data && (
               <Skeleton className="w-full max-w-2xl h-96" />
