@@ -191,6 +191,7 @@ function InvoiceDetailPage() {
   const [retentionInput, setRetentionInput] = useState<string>("20");
   const [savingRetention, setSavingRetention] = useState(false);
   const [purging, setPurging] = useState(false);
+  const [purgeOpen, setPurgeOpen] = useState(false);
   useEffect(() => {
     if (retentionSetting?.pdf_version_retention_count != null) {
       setRetentionInput(String(retentionSetting.pdf_version_retention_count));
@@ -233,19 +234,21 @@ function InvoiceDetailPage() {
     }
   }
 
-  async function purgeOlderNow() {
+  function openPurgeConfirm() {
     if (overRetentionCount === 0) {
       toast.info("Nothing to purge");
       return;
     }
-    if (!window.confirm(`Delete ${overRetentionCount} older PDF version(s)? This cannot be undone.`)) {
-      return;
-    }
+    setPurgeOpen(true);
+  }
+
+  async function confirmPurge() {
     setPurging(true);
     try {
       const removed = await purgeOlderInvoicePdfVersions(id, retentionCount);
       toast.success(`Purged ${removed} version(s)`);
       refetchPdfVersions();
+      setPurgeOpen(false);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Purge failed");
     } finally {
