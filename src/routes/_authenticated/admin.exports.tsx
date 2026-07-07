@@ -10,7 +10,7 @@ import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2, Save, X, Bookm
 
 import { listCsvExportAudit } from "@/lib/invoice-purge-audit.functions";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
-import { verifyCsvExportOnServer } from "@/lib/verify-csv-export.functions";
+import { verifyCsvExportOnServer, shouldOpenAfterVerify } from "@/lib/verify-csv-export.functions";
 import { useMyRoles } from "@/lib/crm-hooks";
 import type { AppRole } from "@/lib/crm-hooks";
 import { verifyCsvText, type VerifyResult } from "@/lib/purge-csv-preamble";
@@ -241,7 +241,7 @@ function ExportsHistoryPage() {
         });
         return;
       }
-      if (result.status !== "match") {
+      if (!shouldOpenAfterVerify(result)) {
         toast.error("Server could not verify file", {
           description: `Unexpected status: ${result.status}`,
         });
