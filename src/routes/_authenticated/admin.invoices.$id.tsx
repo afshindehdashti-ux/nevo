@@ -759,6 +759,42 @@ function InvoiceDetailPage() {
             />
           )}
           <DocumentsPanel entityType="invoice" entityId={id} />
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-base flex items-center gap-2">
+                <History className="h-4 w-4" /> PDF history
+              </CardTitle>
+              <span className="text-xs text-muted-foreground">
+                {pdfVersions.length} version{pdfVersions.length === 1 ? "" : "s"}
+              </span>
+            </CardHeader>
+            <CardContent className="p-0">
+              {pdfVersions.length === 0 ? (
+                <p className="px-4 py-6 text-sm text-muted-foreground text-center">
+                  No PDFs generated yet. Downloading or emailing a PDF archives a copy here.
+                </p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Generated</TableHead>
+                      <TableHead>Source</TableHead>
+                      <TableHead>Filename</TableHead>
+                      <TableHead className="text-right">Size</TableHead>
+                      <TableHead className="w-24"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pdfVersions.map((v) => (
+                      <PdfVersionRow key={v.id} v={v} />
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+
         </div>
       </div>
 
