@@ -266,6 +266,7 @@ function InvoiceDetailPage() {
 
   async function autoPruneIfNeeded() {
     if (!effectiveRetentionPersisted) return;
+    if (!canPurgePdf) return; // silent no-op for non-privileged users
     try {
       const removed = await purgeOlderInvoicePdfVersions(id, effectiveRetentionPersisted);
       if (removed > 0) {
