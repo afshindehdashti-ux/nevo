@@ -1542,17 +1542,41 @@ function InvoiceDetailPage() {
                   <Badge variant="secondary" className="ml-2">
                     {purgeFiltersActive ? `${filteredPurgeLogs.length} / ${purgeLogs.length}` : purgeLogs.length}
                   </Badge>
+                  {selectedPurgeIds.size > 0 && (
+                    <Badge variant="outline" className="ml-1">{selectedPurgeIds.size} selected</Badge>
+                  )}
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8"
-                  onClick={exportPurgeAuditCsv}
-                  disabled={filteredPurgeLogs.length === 0}
-                >
-                  <FileDown className="h-3.5 w-3.5 mr-1" />
-                  Export CSV{purgeFiltersActive ? " (filtered)" : ""}
-                </Button>
+                <div className="flex items-center gap-2">
+                  {selectedPurgeIds.size > 0 && (
+                    <>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="h-8"
+                        onClick={() => {
+                          const rows = purgeLogs.filter((l) => selectedPurgeIds.has(l.id));
+                          exportPurgeAuditCsv(rows, "selected");
+                        }}
+                      >
+                        <FileDown className="h-3.5 w-3.5 mr-1" />
+                        Export selected ({selectedPurgeIds.size})
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-8" onClick={clearPurgeSelection}>
+                        Clear
+                      </Button>
+                    </>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8"
+                    onClick={() => exportPurgeAuditCsv()}
+                    disabled={filteredPurgeLogs.length === 0}
+                  >
+                    <FileDown className="h-3.5 w-3.5 mr-1" />
+                    Export CSV{purgeFiltersActive ? " (filtered)" : ""}
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="p-0">
