@@ -98,6 +98,8 @@ function formatBytes(bytes: number): string {
 
 function InvoiceDetailPage() {
   const { id } = useParams({ from: "/_authenticated/admin/invoices/$id" });
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/_authenticated/admin/invoices/$id" });
   const qc = useQueryClient();
   const canEdit = useCanEditInvoices();
   const canPay = useCanEditPayments();
