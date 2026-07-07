@@ -843,6 +843,8 @@ function InvoiceDetailPage() {
       "Invoice Number",
       "Removed Count",
       "Kept",
+      "Removed Size (Bytes)",
+      "Removed Size",
       "Removed Version IDs",
     ];
     const escape = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
@@ -853,9 +855,11 @@ function InvoiceDetailPage() {
           removed_count?: number;
           kept?: number;
           version_ids?: string[];
+          total_bytes?: number;
         };
         const who = log.user_id ? purgeActorMap[log.user_id] ?? "Unknown user" : "System";
         const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+        const totalBytes = meta.total_bytes ?? 0;
         return [
           escape(log.id),
           escape(log.created_at),
