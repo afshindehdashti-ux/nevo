@@ -165,7 +165,7 @@ export const CRM_NAV: CrmNavGroup[] = [
       {
         title: "Control Panel",
         url: "/admin/control-panel",
-        icon: ShieldCheck, requiresSuperAdmin: true },
+        icon: ShieldCheck,
         requiresSuperAdmin: true,
       },
       { title: "Users & Roles", url: "/admin/users", icon: UserCog, requiresSuperAdmin: true },
@@ -173,7 +173,7 @@ export const CRM_NAV: CrmNavGroup[] = [
       {
         title: "Approvals",
         url: "/admin/approvals",
-        icon: ShieldCheck, requiresSuperAdmin: true },
+        icon: ShieldCheck,
         allowedRoles: ["management", "finance"],
       },
       {
@@ -192,7 +192,6 @@ export const CRM_NAV: CrmNavGroup[] = [
       { title: "Backend Alerts", url: "/admin/alerts", icon: Bell, requiresSuperAdmin: true },
       { title: "Security Alerts", url: "/admin/security-alerts", icon: ShieldAlert, requiresSuperAdmin: true },
       { title: "Security Audit", url: "/admin/security-audit", icon: ShieldCheck, requiresSuperAdmin: true },
-  ShieldAlert, requiresSuperAdmin: true },
       { title: "Settings", url: "/admin/settings", icon: Settings, requiresSuperAdmin: true },
     ],
   },
