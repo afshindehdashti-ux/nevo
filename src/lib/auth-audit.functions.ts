@@ -30,7 +30,8 @@ export const logAdminSignIn = createServerFn({ method: "POST" })
       .update({ last_login_at: new Date().toISOString() })
       .eq("id", context.userId);
 
-    const { error } = await context.supabase.from("activity_logs").insert({
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("activity_logs").insert({
       user_id: context.userId,
       action: "sign_in",
       entity_type: "auth",
