@@ -840,6 +840,53 @@ function InvoiceDetailPage() {
           </div>
         </DialogContent>
       </Dialog>
+      </Dialog>
+
+      <Dialog open={emailOpen} onOpenChange={(o) => !emailSending && setEmailOpen(o)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              Email {invoice?.type === "proforma" ? "proforma" : "invoice"} to customer
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Recipient email</Label>
+              <Input
+                type="email"
+                value={emailTo}
+                onChange={(e) => setEmailTo(e.target.value)}
+                placeholder="name@company.com"
+                disabled={emailSending}
+              />
+            </div>
+            <div>
+              <Label>Message (optional)</Label>
+              <Textarea
+                value={emailMessage}
+                onChange={(e) => setEmailMessage(e.target.value)}
+                rows={4}
+                maxLength={2000}
+                placeholder="Add a short note to include in the email body."
+                disabled={emailSending}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              The current PDF is uploaded to secure storage and shared via a
+              7-day download link. The audit log records who sent it.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setEmailOpen(false)} disabled={emailSending}>
+              Cancel
+            </Button>
+            <Button onClick={sendInvoiceEmail} disabled={emailSending}>
+              <Mail className="h-4 w-4 mr-1" />
+              {emailSending ? "Sending…" : "Send email"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
 
   );
