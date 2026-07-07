@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { AlertCircle, AlertTriangle, CheckCircle2, Info, ShieldCheck } from "lucide-react";
+import { auditEmailHtml, type A11yIssue } from "@/lib/email-a11y";
 
 type OverrideValue = string;
 type Overrides = Record<string, OverrideValue>;
