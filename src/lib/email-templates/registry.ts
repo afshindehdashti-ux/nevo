@@ -20,9 +20,13 @@ export interface TemplateEntry {
 import { template as welcomeTemplate } from './welcome'
 import { template as contactConfirmationTemplate } from './contact-confirmation'
 import { template as orderConfirmationTemplate } from './order-confirmation'
+import { template as inquiryConfirmationTemplate } from './inquiry-confirmation'
+import { template as inquiryNotificationTemplate } from './inquiry-notification'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   welcome: welcomeTemplate,
   'contact-confirmation': contactConfirmationTemplate,
   'order-confirmation': orderConfirmationTemplate,
+  'inquiry-confirmation': inquiryConfirmationTemplate,
+  'inquiry-notification': inquiryNotificationTemplate,
 }
