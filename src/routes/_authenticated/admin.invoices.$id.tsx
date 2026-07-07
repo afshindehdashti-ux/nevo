@@ -2491,6 +2491,90 @@ function InvoiceDetailPage() {
         </DialogContent>
       </Dialog>
 
+      <Dialog
+        open={purgeExportConfirmOpen}
+        onOpenChange={(o) => {
+          if (!o) {
+            setPurgeExportConfirmOpen(false);
+            if (!purgeExporting) setPurgeExportConfirmState(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Export purge audit CSV</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {purgeExportConfirmState?.loading ? (
+              <div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
+                <span className="animate-pulse">Loading export preview…</span>
+              </div>
+            ) : (
+              <>
+                <div className="rounded-md border bg-muted/40 px-3 py-2 text-sm space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Scope</span>
+                    <span className="font-medium">
+                      {purgeExportConfirmState?.scope === "selected" ? "Selected rows" : "Filtered results"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Rows to export</span>
+                    <Badge variant="secondary">{purgeExportConfirmState?.rows.length ?? 0}</Badge>
+                  </div>
+                </div>
+                {purgeExportConfirmState?.scope === "filtered" && purgeFiltersActive && (
+                  <div className="space-y-1 text-sm">
+                    <p className="font-medium text-xs text-muted-foreground uppercase tracking-wider">Active filters</p>
+                    <ul className="space-y-1 text-muted-foreground">
+                      {purgeUserFilter !== "all" && (
+                        <li>
+                          User: {purgeUserOptions.find((u) => u.id === purgeUserFilter)?.label ?? purgeUserFilter}
+                        </li>
+                      )}
+                      {purgeFromDate && <li>From: {purgeFromDate}</li>}
+                      {purgeToDate && <li>To: {purgeToDate}</li>}
+                      {purgeVersionQuery.trim() && <li>Version ID contains: {purgeVersionQuery.trim()}</li>}
+                      {purgeMinBytes !== "" && <li>Min removed size: {purgeMinBytes} MB</li>}
+                      {purgeMaxBytes !== "" && <li>Max removed size: {purgeMaxBytes} MB</li>}
+                    </ul>
+                  </div>
+                )}
+                {purgeExportConfirmState?.scope === "selected" && (
+                  <p className="text-sm text-muted-foreground">
+                    Only the {purgeExportConfirmState.rows.length} selected audit log entr{purgeExportConfirmState.rows.length === 1 ? "y" : "ies"} will be included in the CSV.
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setPurgeExportConfirmOpen(false);
+                if (!purgeExporting) setPurgeExportConfirmState(null);
+              }}
+              disabled={purgeExporting}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={executePurgeExportConfirm}
+              disabled={
+                !purgeExportConfirmState ||
+                purgeExportConfirmState.loading ||
+                purgeExportConfirmState.rows.length === 0 ||
+                purgeExporting
+              }
+            >
+              <FileDown className="h-4 w-4 mr-1" />
+              {purgeExporting ? "Exporting…" : `Export ${purgeExportConfirmState?.rows.length ?? 0} rows`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={removedOpen} onOpenChange={(o) => (o ? setRemovedOpen(true) : closeRemovedModal())}>
         <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
           <DialogHeader>
