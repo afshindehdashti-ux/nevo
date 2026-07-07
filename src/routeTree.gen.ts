@@ -104,6 +104,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicAlertsEmailDlqRouteImport } from './routes/api/public/alerts/email-dlq'
 import { Route as AuthenticatedAdminUsersInviteRouteImport } from './routes/_authenticated/admin.users.invite'
 import { Route as AuthenticatedAdminShipmentsIdRouteImport } from './routes/_authenticated/admin.shipments.$id'
 import { Route as AuthenticatedAdminQuotationsIdRouteImport } from './routes/_authenticated/admin.quotations.$id'
@@ -635,6 +636,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAlertsEmailDlqRoute = ApiPublicAlertsEmailDlqRouteImport.update({
+  id: '/api/public/alerts/email-dlq',
+  path: '/api/public/alerts/email-dlq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminUsersInviteRoute =
   AuthenticatedAdminUsersInviteRouteImport.update({
     id: '/invite',
@@ -821,6 +827,7 @@ export interface FileRoutesByFullPath {
   '/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
+  '/api/public/alerts/email-dlq': typeof ApiPublicAlertsEmailDlqRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -928,6 +935,7 @@ export interface FileRoutesByTo {
   '/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
+  '/api/public/alerts/email-dlq': typeof ApiPublicAlertsEmailDlqRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1040,6 +1048,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
   '/_authenticated/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/_authenticated/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
+  '/api/public/alerts/email-dlq': typeof ApiPublicAlertsEmailDlqRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1152,6 +1161,7 @@ export interface FileRouteTypes {
     | '/admin/quotations/$id'
     | '/admin/shipments/$id'
     | '/admin/users/invite'
+    | '/api/public/alerts/email-dlq'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1259,6 +1269,7 @@ export interface FileRouteTypes {
     | '/admin/quotations/$id'
     | '/admin/shipments/$id'
     | '/admin/users/invite'
+    | '/api/public/alerts/email-dlq'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1370,6 +1381,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/quotations/$id'
     | '/_authenticated/admin/shipments/$id'
     | '/_authenticated/admin/users/invite'
+    | '/api/public/alerts/email-dlq'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1402,6 +1414,7 @@ export interface RootRouteChildren {
   ApiPublicContactSubmitRoute: typeof ApiPublicContactSubmitRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicAlertsEmailDlqRoute: typeof ApiPublicAlertsEmailDlqRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -2077,6 +2090,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/alerts/email-dlq': {
+      id: '/api/public/alerts/email-dlq'
+      path: '/api/public/alerts/email-dlq'
+      fullPath: '/api/public/alerts/email-dlq'
+      preLoaderRoute: typeof ApiPublicAlertsEmailDlqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/users/invite': {
       id: '/_authenticated/admin/users/invite'
       path: '/invite'
@@ -2531,6 +2551,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicContactSubmitRoute: ApiPublicContactSubmitRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicAlertsEmailDlqRoute: ApiPublicAlertsEmailDlqRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
