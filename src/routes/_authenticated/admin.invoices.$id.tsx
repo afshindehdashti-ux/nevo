@@ -1372,7 +1372,7 @@ function InvoiceDetailPage() {
           </DialogHeader>
           <div className="space-y-3 overflow-hidden flex flex-col">
             <p className="text-sm text-muted-foreground">
-              Keeping the latest {retentionCount} version{retentionCount === 1 ? "" : "s"}. The following{" "}
+              Keeping the latest {effectiveRetention} version{effectiveRetention === 1 ? "" : "s"}. The following{" "}
               {overRetentionCount} version{overRetentionCount === 1 ? "" : "s"} will be permanently deleted:
             </p>
             <div className="border rounded-md overflow-auto">
