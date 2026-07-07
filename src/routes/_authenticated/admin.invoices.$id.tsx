@@ -1460,6 +1460,17 @@ function InvoiceDetailPage() {
                               </span>
                             )}
                           </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8"
+                              title="Copy link to this entry"
+                              onClick={() => copyPurgeLogLink(log.id)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
                         </TableRow>
                       );
                     })}
