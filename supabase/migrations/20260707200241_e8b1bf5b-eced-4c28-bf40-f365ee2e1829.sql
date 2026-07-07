@@ -1,0 +1,1 @@
+ALTER TABLE public.invoice_pdf_versions ADD COLUMN IF NOT EXISTS note text;

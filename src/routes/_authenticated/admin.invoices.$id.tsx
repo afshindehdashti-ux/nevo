@@ -132,6 +132,25 @@ function InvoiceDetailPage() {
     },
   });
 
+  const generatorIds = useMemo(
+    () => Array.from(new Set(pdfVersions.map((v) => v.generated_by).filter((x): x is string => !!x))),
+    [pdfVersions],
+  );
+  const { data: generatorMap = {} } = useQuery({
+    queryKey: ["pdf-version-generators", generatorIds.sort().join(",")],
+    enabled: generatorIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", generatorIds);
+      if (error) throw error;
+      const map: Record<string, string> = {};
+      for (const p of data ?? []) map[p.id] = p.full_name ?? "";
+      return map;
+    },
+  });
+
 
   const [lines, setLines] = useState<Line[]>([]);
   const [notes, setNotes] = useState("");
@@ -151,6 +170,7 @@ function InvoiceDetailPage() {
   const [pdfDocTypeFilter, setPdfDocTypeFilter] = useState<"all" | "proforma" | "commercial">("all");
   const [pdfFromDate, setPdfFromDate] = useState("");
   const [pdfToDate, setPdfToDate] = useState("");
+  const [pdfNote, setPdfNote] = useState("");
 
   useEffect(() => {
     return () => {
@@ -189,7 +209,9 @@ function InvoiceDetailPage() {
         blob: pdfPreview.blob,
         filename: pdfPreview.filename,
         source: "download",
+        note: pdfNote,
       });
+      setPdfNote("");
       refetchPdfVersions();
     } catch (e) {
       console.warn("Failed to archive PDF version", e);
@@ -229,7 +251,9 @@ function InvoiceDetailPage() {
         blob: built.blob,
         filename: built.filename,
         source: "email",
+        note: pdfNote,
       });
+      setPdfNote("");
       refetchPdfVersions();
       // 3) Ask the server to sign the URL and send the email.
       const res = await emailFn({
@@ -909,16 +933,23 @@ function InvoiceDetailPage() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Generated</TableHead>
+                          <TableHead>By</TableHead>
                           <TableHead>Source</TableHead>
                           <TableHead>Type</TableHead>
-                          <TableHead>Filename</TableHead>
+                          <TableHead>Filename / note</TableHead>
                           <TableHead className="text-right">Size</TableHead>
                           <TableHead className="w-24"></TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {filteredPdfVersions.map((v) => (
-                          <PdfVersionRow key={v.id} v={v} />
+                          <PdfVersionRow
+                            key={v.id}
+                            v={v}
+                            generatorName={
+                              v.generated_by ? generatorMap[v.generated_by] ?? "" : ""
+                            }
+                          />
                         ))}
                       </TableBody>
                     </Table>
@@ -1028,6 +1059,19 @@ function InvoiceDetailPage() {
               </Button>
             </div>
           </DialogHeader>
+          <div className="px-4 py-2 border-b bg-background flex items-center gap-2">
+            <Label htmlFor="pdf-note-input" className="text-xs text-muted-foreground whitespace-nowrap">
+              Generation note (optional)
+            </Label>
+            <Input
+              id="pdf-note-input"
+              value={pdfNote}
+              onChange={(e) => setPdfNote(e.target.value)}
+              maxLength={500}
+              placeholder="e.g. Revised after client feedback"
+              className="h-8"
+            />
+          </div>
           <div className="flex-1 bg-muted">
             {pdfPreview ? (
               <iframe
@@ -1073,6 +1117,16 @@ function InvoiceDetailPage() {
                 disabled={emailSending}
               />
             </div>
+            <div>
+              <Label>Internal PDF note (optional)</Label>
+              <Input
+                value={pdfNote}
+                onChange={(e) => setPdfNote(e.target.value)}
+                maxLength={500}
+                placeholder="Saved with the archived PDF version. Not sent to the customer."
+                disabled={emailSending}
+              />
+            </div>
             <p className="text-xs text-muted-foreground">
               The current PDF is uploaded to secure storage and shared via a
               7-day download link. The audit log records who sent it.
@@ -1094,7 +1148,13 @@ function InvoiceDetailPage() {
   );
 }
 
-function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
+function PdfVersionRow({
+  v,
+  generatorName,
+}: {
+  v: InvoicePdfVersionRow;
+  generatorName: string;
+}) {
   const [busy, setBusy] = useState(false);
   const sourceLabel: Record<string, string> = {
     download: "Download",
@@ -1105,6 +1165,7 @@ function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
   const sizeKb = v.byte_size ? `${(v.byte_size / 1024).toFixed(0)} KB` : "—";
   const dt = new Date(v.created_at);
   const stamp = `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  const who = generatorName?.trim() || (v.generated_by ? "Unknown user" : "System");
   async function download() {
     setBusy(true);
     try {
@@ -1126,6 +1187,7 @@ function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
   return (
     <TableRow>
       <TableCell className="whitespace-nowrap text-sm">{stamp}</TableCell>
+      <TableCell className="text-sm max-w-[160px] truncate" title={who}>{who}</TableCell>
       <TableCell>
         <Badge variant="secondary">{sourceLabel[v.source] ?? v.source}</Badge>
       </TableCell>
@@ -1134,8 +1196,13 @@ function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
           {v.doc_type === "proforma" ? "Proforma" : "Commercial"}
         </Badge>
       </TableCell>
-      <TableCell className="text-xs font-mono truncate max-w-[220px]" title={v.filename}>
-        {v.filename}
+      <TableCell className="max-w-[260px]">
+        <div className="text-xs font-mono truncate" title={v.filename}>{v.filename}</div>
+        {v.note && (
+          <div className="text-xs text-muted-foreground italic truncate" title={v.note}>
+            “{v.note}”
+          </div>
+        )}
       </TableCell>
       <TableCell className="text-right text-sm">{sizeKb}</TableCell>
       <TableCell className="text-right">
@@ -1144,6 +1211,7 @@ function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
           {busy ? "…" : "Get"}
         </Button>
       </TableCell>
+
     </TableRow>
   );
 }

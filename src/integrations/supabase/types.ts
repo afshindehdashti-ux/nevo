@@ -1371,6 +1371,7 @@ export type Database = {
           generated_by: string | null
           id: string
           invoice_id: string
+          note: string | null
           source: string
           storage_bucket: string
           storage_path: string
@@ -1383,6 +1384,7 @@ export type Database = {
           generated_by?: string | null
           id?: string
           invoice_id: string
+          note?: string | null
           source?: string
           storage_bucket?: string
           storage_path: string
@@ -1395,6 +1397,7 @@ export type Database = {
           generated_by?: string | null
           id?: string
           invoice_id?: string
+          note?: string | null
           source?: string
           storage_bucket?: string
           storage_path?: string
