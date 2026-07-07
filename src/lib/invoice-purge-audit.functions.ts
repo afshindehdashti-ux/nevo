@@ -10,6 +10,11 @@ export type PurgeAuditRow = {
   metadata: Json;
 };
 
+export type PurgeAuditExportResult = {
+  rows: PurgeAuditRow[];
+  total: number;
+};
+
 const PURGE_ROLES = ["super_admin", "management", "finance"] as const;
 
 async function assertCanPurge(context: {
