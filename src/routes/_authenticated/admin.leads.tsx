@@ -247,6 +247,7 @@ function LeadsPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          <GuideMeButton sectionId="leads" />
           <Button variant="outline" size="sm" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4 mr-1" /> Refresh
           </Button>
