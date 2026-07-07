@@ -526,59 +526,26 @@ function InvoiceDetailPage() {
   async function verifyDownloadedCsv(file: File) {
     setPurgeVerifyState({ status: "verifying", filename: file.name });
     try {
-      // The exported CSV prepends a preamble with the checksum + timestamp
-      // followed by a "--- PAYLOAD BELOW ---" marker. Hash only the bytes
-      // after that marker so the embedded hash stays self-consistent.
       const text = await file.text();
-      const marker = '"--- PAYLOAD BELOW ---"\n';
-      const idx = text.indexOf(marker);
-      const preamble = idx >= 0 ? text.slice(0, idx) : "";
-      const payload = idx >= 0 ? text.slice(idx + marker.length) : text;
-
-      // Parse embedded SHA-256 and export timestamp from the preamble rows
-      // (both are simple `"label","value"` CSV rows written by the exporter).
-      const unquote = (v: string) =>
-        v.startsWith('"') && v.endsWith('"')
-          ? v.slice(1, -1).replace(/""/g, '"')
-          : v;
-      let embeddedSha: string | undefined;
-      let embeddedExportedAt: string | undefined;
-      for (const line of preamble.split("\n")) {
-        const m = line.match(/^("(?:[^"]|"")*"),("(?:[^"]|"")*")$/);
-        if (!m) continue;
-        const label = unquote(m[1]);
-        const value = unquote(m[2]);
-        if (/^SHA-256/i.test(label)) embeddedSha = value;
-        else if (/^Export Timestamp/i.test(label)) embeddedExportedAt = value;
-      }
-
-      const payloadBytes = new TextEncoder().encode(payload);
-      const digest = await crypto.subtle.digest("SHA-256", payloadBytes);
-      const sha = Array.from(new Uint8Array(digest))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
+      const result = await verifyCsvText(text, {
+        expectedSha: lastPurgeExport?.sha256,
+      });
       const now = new Date().toISOString();
 
-      // Prefer the session's known-good checksum; otherwise fall back to the
-      // one embedded in the file (useful when verifying an old export after
-      // the page has been reloaded).
-      const expected =
-        lastPurgeExport?.sha256 ||
-        (embeddedSha && /^[a-f0-9]{64}$/i.test(embeddedSha) ? embeddedSha : undefined);
-      if (!expected) {
+      if (result.status === "no-expected") {
         setPurgeVerifyState({ status: "idle" });
         toast.error("No checksum to verify against — file preamble is missing SHA-256.");
         return;
       }
 
-      if (sha.toLowerCase() === expected.toLowerCase()) {
+      if (result.status === "match") {
         setPurgeVerifyState({
           status: "match",
           filename: file.name,
-          sha256: sha,
+          sha256: result.computedSha,
           verifiedAt: now,
-          embeddedSha,
-          embeddedExportedAt,
+          embeddedSha: result.embeddedSha,
+          embeddedExportedAt: result.embeddedExportedAt,
         });
         toast.success("Checksum matches", {
           description: `${file.name} · SHA-256 verified`,
@@ -587,14 +554,14 @@ function InvoiceDetailPage() {
         setPurgeVerifyState({
           status: "mismatch",
           filename: file.name,
-          sha256: sha,
-          expected,
+          sha256: result.computedSha,
+          expected: result.expected,
           verifiedAt: now,
-          embeddedSha,
-          embeddedExportedAt,
+          embeddedSha: result.embeddedSha,
+          embeddedExportedAt: result.embeddedExportedAt,
         });
         toast.error("Checksum mismatch — file may be altered or corrupted", {
-          description: `Expected ${expected.slice(0, 16)}… got ${sha.slice(0, 16)}…`,
+          description: `Expected ${result.expected.slice(0, 16)}… got ${result.computedSha.slice(0, 16)}…`,
           duration: 10000,
         });
       }
@@ -603,6 +570,7 @@ function InvoiceDetailPage() {
       toast.error(e instanceof Error ? e.message : "Failed to compute checksum");
     }
   }
+
 
 
   // Export confirmation modal state.
