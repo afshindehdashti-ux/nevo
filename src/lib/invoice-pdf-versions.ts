@@ -79,6 +79,23 @@ export async function purgeOlderInvoicePdfVersions(
   invoiceId: string,
   keep: number,
 ): Promise<number> {
+  // Pre-flight authorization: give a clear error before hitting storage/RLS.
+  const { data: userRes } = await supabase.auth.getUser();
+  const uid = userRes.user?.id;
+  if (!uid) {
+    throw new Error("You must be signed in to purge PDF versions.");
+  }
+  const { data: allowed, error: roleErr } = await supabase.rpc("has_any_role", {
+    _user_id: uid,
+    _roles: ["super_admin", "management", "finance"],
+  });
+  if (roleErr) throw roleErr;
+  if (!allowed) {
+    throw new Error(
+      "You do not have permission to purge PDF versions. Ask a Super Admin, Management, or Finance user.",
+    );
+  }
+
   const keepCount = Math.max(0, Math.floor(keep));
   const { data: rows, error } = await supabase
     .from("invoice_pdf_versions")
