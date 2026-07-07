@@ -39,6 +39,7 @@ import { emailInvoicePdf } from "@/lib/invoices.functions";
 import {
   recordInvoicePdfVersion,
   signInvoicePdfUrl,
+  purgeOlderInvoicePdfVersions,
   type InvoicePdfVersionRow,
 } from "@/lib/invoice-pdf-versions";
 
@@ -172,6 +173,86 @@ function InvoiceDetailPage() {
   const [pdfToDate, setPdfToDate] = useState("");
   const [pdfNote, setPdfNote] = useState("");
 
+  // -------- PDF retention policy --------
+  const { data: retentionSetting, refetch: refetchRetention } = useQuery({
+    queryKey: ["pdf-retention-setting"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("company_settings")
+        .select("id, pdf_version_retention_count")
+        .eq("is_active", true)
+        .order("updated_at", { ascending: false, nullsFirst: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const [retentionInput, setRetentionInput] = useState<string>("20");
+  const [savingRetention, setSavingRetention] = useState(false);
+  const [purging, setPurging] = useState(false);
+  useEffect(() => {
+    if (retentionSetting?.pdf_version_retention_count != null) {
+      setRetentionInput(String(retentionSetting.pdf_version_retention_count));
+    }
+  }, [retentionSetting?.pdf_version_retention_count]);
+  const retentionCount = Math.max(1, Math.min(500, parseInt(retentionInput || "20", 10) || 20));
+  const overRetentionCount = Math.max(0, pdfVersions.length - retentionCount);
+
+  async function autoPruneIfNeeded() {
+    if (!retentionSetting?.pdf_version_retention_count) return;
+    try {
+      const removed = await purgeOlderInvoicePdfVersions(
+        id,
+        retentionSetting.pdf_version_retention_count,
+      );
+      if (removed > 0) refetchPdfVersions();
+    } catch (e) {
+      console.warn("auto-prune failed", e);
+    }
+  }
+
+  async function saveRetentionSetting() {
+    if (!retentionSetting?.id) {
+      toast.error("Company settings not initialised");
+      return;
+    }
+    setSavingRetention(true);
+    try {
+      const { error } = await supabase
+        .from("company_settings")
+        .update({ pdf_version_retention_count: retentionCount })
+        .eq("id", retentionSetting.id);
+      if (error) throw error;
+      toast.success(`Retention set to ${retentionCount} versions`);
+      refetchRetention();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save setting");
+    } finally {
+      setSavingRetention(false);
+    }
+  }
+
+  async function purgeOlderNow() {
+    if (overRetentionCount === 0) {
+      toast.info("Nothing to purge");
+      return;
+    }
+    if (!window.confirm(`Delete ${overRetentionCount} older PDF version(s)? This cannot be undone.`)) {
+      return;
+    }
+    setPurging(true);
+    try {
+      const removed = await purgeOlderInvoicePdfVersions(id, retentionCount);
+      toast.success(`Purged ${removed} version(s)`);
+      refetchPdfVersions();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Purge failed");
+    } finally {
+      setPurging(false);
+    }
+  }
+
   useEffect(() => {
     return () => {
       if (pdfPreview) URL.revokeObjectURL(pdfPreview.url);
@@ -213,6 +294,7 @@ function InvoiceDetailPage() {
       });
       setPdfNote("");
       refetchPdfVersions();
+      autoPruneIfNeeded();
     } catch (e) {
       console.warn("Failed to archive PDF version", e);
     }
@@ -255,6 +337,7 @@ function InvoiceDetailPage() {
       });
       setPdfNote("");
       refetchPdfVersions();
+      autoPruneIfNeeded();
       // 3) Ask the server to sign the URL and send the email.
       const res = await emailFn({
         data: {
@@ -924,6 +1007,50 @@ function InvoiceDetailPage() {
                       </Button>
                     )}
                   </div>
+                  <div className="px-4 py-3 border-b flex flex-wrap gap-3 items-end bg-muted/30">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Keep latest</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={500}
+                        value={retentionInput}
+                        onChange={(e) => setRetentionInput(e.target.value)}
+                        className="h-8 w-24"
+                      />
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8"
+                      onClick={saveRetentionSetting}
+                      disabled={
+                        savingRetention ||
+                        !retentionSetting ||
+                        retentionCount === retentionSetting.pdf_version_retention_count
+                      }
+                    >
+                      {savingRetention ? "Saving…" : "Save policy"}
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="h-8"
+                      onClick={purgeOlderNow}
+                      disabled={purging || overRetentionCount === 0}
+                    >
+                      <Trash2 className="h-3.5 w-3.5 mr-1" />
+                      {purging
+                        ? "Purging…"
+                        : overRetentionCount > 0
+                          ? `Purge ${overRetentionCount} older`
+                          : "Nothing to purge"}
+                    </Button>
+                    <p className="text-xs text-muted-foreground ml-auto max-w-xs">
+                      New PDFs auto-trim beyond this count. Applies to every invoice.
+                    </p>
+                  </div>
+
                   {filteredPdfVersions.length === 0 ? (
                     <p className="px-4 py-6 text-sm text-muted-foreground text-center">
                       No PDF versions match the selected filters.

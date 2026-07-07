@@ -269,6 +269,7 @@ export type Database = {
           is_active: boolean
           legal_name: string
           logo_url: string | null
+          pdf_version_retention_count: number
           phone: string | null
           security_new_country_dedup_minutes: number
           security_signin_failure_threshold: number
@@ -299,6 +300,7 @@ export type Database = {
           is_active?: boolean
           legal_name: string
           logo_url?: string | null
+          pdf_version_retention_count?: number
           phone?: string | null
           security_new_country_dedup_minutes?: number
           security_signin_failure_threshold?: number
@@ -329,6 +331,7 @@ export type Database = {
           is_active?: boolean
           legal_name?: string
           logo_url?: string | null
+          pdf_version_retention_count?: number
           phone?: string | null
           security_new_country_dedup_minutes?: number
           security_signin_failure_threshold?: number
