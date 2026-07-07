@@ -167,6 +167,26 @@ function EmailPreviewAdmin() {
             <span className="text-xs text-muted-foreground">
               Sends the current template with sample data. Subject is prefixed with [TEST].
             </span>
+            <Button
+              size="sm"
+              variant="outline"
+              className="ml-auto"
+              disabled={!preview.data?.html || !current}
+              onClick={() => {
+                if (!preview.data?.html || !current) return;
+                const blob = new Blob([preview.data.html], { type: "text/html;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${current}.html`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              Download HTML
+            </Button>
           </div>
           <div className="flex-1 bg-muted/40 p-4 flex justify-center overflow-auto">
             {preview.isFetching && !preview.data && (
