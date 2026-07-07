@@ -773,9 +773,11 @@ function ActorDetailDialog({
     | {
         id: string;
         full_name: string | null;
-        email: string | null;
+        job_title: string | null;
         phone: string | null;
         created_at: string | null;
+        last_login_at: string | null;
+        is_active: boolean | null;
       }
     | null
     | undefined;
@@ -796,12 +798,17 @@ function ActorDetailDialog({
           <div className="space-y-4 text-sm">
             <div className="grid grid-cols-2 gap-3">
               <MetaField label="Name">{profile?.full_name ?? "—"}</MetaField>
-              <MetaField label="Email">{profile?.email ?? "—"}</MetaField>
+              <MetaField label="Job title">{profile?.job_title ?? "—"}</MetaField>
               <MetaField label="Phone">{profile?.phone ?? "—"}</MetaField>
               <MetaField label="User ID">{userId}</MetaField>
               <MetaField label="Joined">
                 {profile?.created_at
                   ? format(new Date(profile.created_at), "PPpp")
+                  : "—"}
+              </MetaField>
+              <MetaField label="Last login">
+                {profile?.last_login_at
+                  ? format(new Date(profile.last_login_at), "PPpp")
                   : "—"}
               </MetaField>
               <MetaField label="Roles">
