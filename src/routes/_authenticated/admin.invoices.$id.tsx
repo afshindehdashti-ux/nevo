@@ -842,7 +842,7 @@ function InvoiceDetailPage() {
     let source: PurgeLogRow[] = rows ?? [];
     try {
       if (!rows) {
-        const data = await fetchPurgeAuditForExport({
+        const result = await fetchPurgeAuditForExport({
           data: {
             invoice_id: id,
             user_filter: purgeUserFilter,
@@ -853,7 +853,7 @@ function InvoiceDetailPage() {
             limit: 10000,
           },
         });
-        source = data as PurgeLogRow[];
+        source = result.rows as PurgeLogRow[];
         // Apply client-side version-id filter (JSON metadata; not queryable).
         const idQ = purgeVersionQuery.trim().toLowerCase();
         if (idQ) {
