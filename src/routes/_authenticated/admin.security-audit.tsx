@@ -248,52 +248,37 @@ function SecurityAuditPage() {
   }, [filteredRows]);
 
   function exportCsv() {
-    const header = [
-      "when",
-      "actor_id",
-      "actor_name",
-      "action",
-      "entity_type",
-      "entity_id",
-      "ip",
-      "country",
-      "user_agent",
-      "metadata",
-    ];
+    // Mirror the on-screen table exactly: same columns, same formatting,
+    // and only the rows currently visible after filters + search.
+    const header = ["When", "Actor", "Event", "Scope", "IP / Detail"];
     const escape = (v: unknown) => {
-      const s =
-        v === null || v === undefined
-          ? ""
-          : typeof v === "string"
-            ? v
-            : JSON.stringify(v);
+      const s = v === null || v === undefined ? "" : String(v);
       return `"${s.replace(/"/g, '""')}"`;
     };
-    const lines = [header.join(",")];
+    const lines = [header.map(escape).join(",")];
     filteredRows.forEach((r) => {
       const md = r.metadata as {
         ip?: string | null;
         country?: string | null;
-        user_agent?: string | null;
       };
-      lines.push(
-        [
-          format(new Date(r.created_at), "yyyy-MM-dd HH:mm:ss"),
-          r.user_id ?? "",
-          r.user_id ? (profilesQ.data?.get(r.user_id) ?? "") : "system",
-          r.action,
-          r.entity_type ?? "",
-          r.entity_id ?? "",
-          md?.ip ?? "",
-          md?.country ?? "",
-          md?.user_agent ?? "",
-          r.metadata,
-        ]
-          .map(escape)
-          .join(","),
-      );
+      const when = format(new Date(r.created_at), "yyyy-MM-dd HH:mm:ss");
+      const actor = r.user_id
+        ? (profilesQ.data?.get(r.user_id) ?? r.user_id)
+        : "system";
+      const event = EVENT_LABELS[r.action] ?? r.action;
+      const scope = r.entity_id
+        ? `${r.entity_type ?? "—"} (${r.entity_id})`
+        : (r.entity_type ?? "—");
+      const ipDetail =
+        r.action === "sign_in" && md?.ip
+          ? md.country
+            ? `${md.ip} (${md.country})`
+            : md.ip
+          : "—";
+      lines.push([when, actor, event, scope, ipDetail].map(escape).join(","));
     });
-    const blob = new Blob([lines.join("\n")], {
+    // BOM so Excel opens UTF-8 correctly.
+    const blob = new Blob(["\ufeff" + lines.join("\r\n")], {
       type: "text/csv;charset=utf-8",
     });
     const url = URL.createObjectURL(blob);
@@ -656,47 +641,47 @@ function MiniStat({
   );
 }
 
+const EVENT_LABELS: Record<string, string> = {
+  sign_in: "sign in",
+  approve: "approve",
+  reject: "reject",
+  cancel: "cancel",
+  delete: "delete",
+};
+
 function EventBadge({ action }: { action: string }) {
   const map: Record<
     string,
-    { label: string; icon: React.ComponentType<{ className?: string }>; cls: string }
+    { icon: React.ComponentType<{ className?: string }>; cls: string }
   > = {
     sign_in: {
-      label: "sign in",
       icon: LogIn,
       cls: "bg-sky-500/15 text-sky-600 dark:text-sky-400",
     },
     approve: {
-      label: "approve",
       icon: CheckCircle2,
       cls: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
     },
     reject: {
-      label: "reject",
       icon: XCircle,
       cls: "bg-rose-500/15 text-rose-600 dark:text-rose-400",
     },
     cancel: {
-      label: "cancel",
       icon: XCircle,
       cls: "bg-muted text-muted-foreground",
     },
     delete: {
-      label: "delete",
       icon: Trash2,
       cls: "bg-rose-500/15 text-rose-600 dark:text-rose-400",
     },
   };
-  const cfg = map[action] ?? {
-    label: action,
-    icon: ShieldCheck,
-    cls: "bg-muted text-muted-foreground",
-  };
+  const cfg = map[action] ?? { icon: ShieldCheck, cls: "bg-muted text-muted-foreground" };
   const Icon = cfg.icon;
+  const label = EVENT_LABELS[action] ?? action;
   return (
     <Badge className={`gap-1 border-transparent ${cfg.cls}`}>
       <Icon className="h-3 w-3" />
-      {cfg.label}
+      {label}
     </Badge>
   );
 }
