@@ -6,7 +6,7 @@ export type PurgeAuditRow = {
   id: string;
   user_id: string | null;
   created_at: string;
-  metadata: Record<string, unknown> | null;
+  metadata: unknown;
 };
 
 const PURGE_ROLES = ["super_admin", "management", "finance"] as const;
