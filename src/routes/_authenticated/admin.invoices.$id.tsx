@@ -352,12 +352,29 @@ function InvoiceDetailPage() {
       const removed = await purgeOlderInvoicePdfVersions(id, effectiveRetentionPersisted);
       if (removed > 0) {
         refetchPdfVersions();
-        refetchPurgeLogs();
+        const { data: latestLog } = await supabase
+          .from("activity_logs")
+          .select("id")
+          .eq("action", "purge_pdf_versions")
+          .eq("entity_type", "invoice")
+          .eq("entity_id", id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        await refetchPurgeLogs();
+        toast.success(`Purged ${removed} PDF version${removed === 1 ? "" : "s"}`, {
+          description: `Automatic prune to retention of ${effectiveRetentionPersisted}. A new entry has been added to the audit log.`,
+          action: {
+            label: "View log entry",
+            onClick: () => scrollToPurgeLog(latestLog?.id),
+          },
+        });
       }
     } catch (e) {
       console.warn("auto-prune failed", e);
     }
   }
+
 
   async function saveRetentionSetting() {
     if (!retentionSetting?.id) {
