@@ -36,7 +36,7 @@ export function useCurrentUser() {
       return data.user ?? null;
     },
     staleTime: 60_000,
-    retry: 1,
+    retry: false,
   });
 }
 
@@ -54,7 +54,7 @@ export function useMyRoles() {
       return (data ?? []).map((r) => r.role as AppRole);
     },
     staleTime: 60_000,
-    retry: 1,
+    retry: false,
   });
 }
 
@@ -77,6 +77,6 @@ export function useMyProfile() {
       return data;
     },
     staleTime: 30_000,
-    retry: 1,
+    retry: false,
   });
 }
