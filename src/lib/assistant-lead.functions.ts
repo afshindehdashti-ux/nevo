@@ -47,7 +47,8 @@ export const submitAssistantLead = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     if (data.session_id) {
-      await supabase
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin
         .from("ai_assistant_conversations")
         .update({ lead_captured: true, inquiry_id: row?.id ?? null })
         .eq("session_id", data.session_id);
