@@ -71,13 +71,18 @@ export const saveMailboxConfig = createServerFn({ method: "POST" })
       imap_username: data.imap_username ?? null,
       imap_tls: data.imap_tls ?? true,
       gmail_email: data.gmail_email ?? null,
+      gmail_client_id: data.gmail_client_id ?? null,
       notes: data.notes ?? null,
       is_active: true,
     };
-    // Only overwrite password if a new one supplied
+    // Only overwrite secrets if new ones supplied
     if (data.imap_password && data.imap_password.length > 0) {
       payload.imap_password = data.imap_password;
     }
+    if (data.gmail_client_secret && data.gmail_client_secret.length > 0) {
+      payload.gmail_client_secret = data.gmail_client_secret;
+    }
+
 
     if (existing) {
       const { error } = await context.supabase
