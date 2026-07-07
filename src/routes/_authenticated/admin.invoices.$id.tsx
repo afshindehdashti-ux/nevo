@@ -498,6 +498,8 @@ function InvoiceDetailPage() {
   const [purgeExportConfirmState, setPurgeExportConfirmState] = useState<{
     scope: "filtered" | "selected";
     rows: PurgeLogRow[];
+    total: number;
+    capped: boolean;
     loading: boolean;
   } | null>(null);
   const [purgeExporting, setPurgeExporting] = useState(false);
@@ -842,7 +844,7 @@ function InvoiceDetailPage() {
     let source: PurgeLogRow[] = rows ?? [];
     try {
       if (!rows) {
-        const data = await fetchPurgeAuditForExport({
+        const result = await fetchPurgeAuditForExport({
           data: {
             invoice_id: id,
             user_filter: purgeUserFilter,
@@ -853,7 +855,7 @@ function InvoiceDetailPage() {
             limit: 10000,
           },
         });
-        source = data as PurgeLogRow[];
+        source = result.rows as PurgeLogRow[];
         // Apply client-side version-id filter (JSON metadata; not queryable).
         const idQ = purgeVersionQuery.trim().toLowerCase();
         if (idQ) {
@@ -1040,9 +1042,11 @@ function InvoiceDetailPage() {
       return;
     }
     setPurgeExportConfirmOpen(true);
-    setPurgeExportConfirmState({ scope, rows: [], loading: true });
+    setPurgeExportConfirmState({ scope, rows: [], total: 0, capped: false, loading: true });
     try {
       let source: PurgeLogRow[] = [];
+      let total = 0;
+      let capped = false;
       if (scope === "selected") {
         const ids = Array.from(selectedPurgeIds);
         if (ids.length === 0) {
@@ -1055,8 +1059,9 @@ function InvoiceDetailPage() {
           data: { invoice_id: id, ids },
         });
         source = data as PurgeLogRow[];
+        total = source.length;
       } else {
-        const data = await fetchPurgeAuditForExport({
+        const result = await fetchPurgeAuditForExport({
           data: {
             invoice_id: id,
             user_filter: purgeUserFilter,
@@ -1067,7 +1072,9 @@ function InvoiceDetailPage() {
             limit: 10000,
           },
         });
-        source = data as PurgeLogRow[];
+        source = result.rows as PurgeLogRow[];
+        total = result.total;
+        capped = result.total > source.length;
         // Apply client-side version-id filter.
         const idQ = purgeVersionQuery.trim().toLowerCase();
         if (idQ) {
@@ -1108,7 +1115,19 @@ function InvoiceDetailPage() {
         setPurgeExportConfirmState(null);
         return;
       }
-      setPurgeExportConfirmState({ scope, rows: source, loading: false });
+      if (capped) {
+        toast.warning("Filtered export is capped at 10,000 rows", {
+          description: `${total.toLocaleString()} entries match your filters. Narrow the date range, user, or version filters to export the rest.`,
+          action: {
+            label: "View filters",
+            onClick: () => {
+              const filterEl = document.getElementById("purge-audit-filters");
+              if (filterEl) filterEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            },
+          },
+        });
+      }
+      setPurgeExportConfirmState({ scope, rows: source, total, capped, loading: false });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to prepare purge audit export");
       setPurgeExportConfirmOpen(false);
@@ -2143,7 +2162,7 @@ function InvoiceDetailPage() {
                 </p>
               ) : (
                 <>
-                  <div className="px-4 pb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5 items-end">
+                  <div id="purge-audit-filters" className="px-4 pb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5 items-end">
                     <div className="space-y-1">
                       <Label className="text-xs">User</Label>
                       <Select value={purgeUserFilter} onValueChange={setPurgeUserFilter}>
@@ -2665,9 +2684,21 @@ function InvoiceDetailPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Rows to export</span>
-                    <Badge variant="secondary">{purgeExportConfirmState?.rows.length ?? 0}</Badge>
+                    <Badge variant="secondary">
+                      {purgeExportConfirmState?.capped
+                        ? `${purgeExportConfirmState.rows.length.toLocaleString()} of ${purgeExportConfirmState.total.toLocaleString()}`
+                        : (purgeExportConfirmState?.rows.length ?? 0).toLocaleString()}
+                    </Badge>
                   </div>
                 </div>
+                {purgeExportConfirmState?.capped && (
+                  <div className="rounded-md border border-border bg-muted/40 px-3 py-2 text-sm">
+                    <p className="font-medium text-foreground">Export capped at 10,000 rows</p>
+                    <p className="text-muted-foreground">
+                      {purgeExportConfirmState.total.toLocaleString()} entries match your filters. Narrow the date range, user, or version filters to export the rest.
+                    </p>
+                  </div>
+                )}
                 {purgeExportConfirmState?.scope === "filtered" && purgeFiltersActive && (
                   <div className="space-y-1 text-sm">
                     <p className="font-medium text-xs text-muted-foreground uppercase tracking-wider">Active filters</p>
