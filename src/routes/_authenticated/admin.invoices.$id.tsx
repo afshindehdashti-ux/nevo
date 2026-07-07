@@ -31,8 +31,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown } from "lucide-react";
+import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
+import { emailInvoicePdf } from "@/lib/invoices.functions";
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import {
   INVOICE_STATUSES,
