@@ -1917,8 +1917,8 @@ function InvoiceDetailPage() {
                               aria-label="Select all filtered rows"
                             />
                           </TableHead>
-                          <TableHead>When</TableHead>
-                          <TableHead>User</TableHead>
+                          <SortHeader column="created_at" label="When" />
+                          <SortHeader column="user" label="User" />
                           <TableHead className="text-right">Removed</TableHead>
                           <TableHead className="text-right">Kept</TableHead>
                           <TableHead>Version IDs</TableHead>
