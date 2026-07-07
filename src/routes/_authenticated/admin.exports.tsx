@@ -241,7 +241,7 @@ function ExportsHistoryPage() {
         });
         return;
       }
-      if (result.status !== "match") {
+      if (!shouldOpenAfterVerify(result)) {
         toast.error("Server could not verify file", {
           description: `Unexpected status: ${result.status}`,
         });
