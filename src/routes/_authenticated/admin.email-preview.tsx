@@ -1,15 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   listEmailPreviews,
   renderEmailPreview,
+  sendTestEmail,
   type EmailPreviewMeta,
 } from "@/lib/email-preview.functions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/email-preview")({
   head: () => ({
@@ -24,8 +27,10 @@ export const Route = createFileRoute("/_authenticated/admin/email-preview")({
 function EmailPreviewAdmin() {
   const listFn = useServerFn(listEmailPreviews);
   const renderFn = useServerFn(renderEmailPreview);
+  const sendFn = useServerFn(sendTestEmail);
   const [selected, setSelected] = useState<string | null>(null);
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
+  const [testRecipient, setTestRecipient] = useState("");
 
   const list = useQuery({
     queryKey: ["email-previews"],
@@ -38,6 +43,17 @@ function EmailPreviewAdmin() {
     queryKey: ["email-preview", current],
     queryFn: () => renderFn({ data: { name: current! } }),
     enabled: !!current,
+  });
+
+  const sendTest = useMutation({
+    mutationFn: (vars: { name: string; recipientEmail: string }) =>
+      sendFn({ data: vars }),
+    onSuccess: () => {
+      toast.success(`Test email queued to ${testRecipient}`);
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || "Failed to send test");
+    },
   });
 
   const grouped = useMemo(() => {
@@ -124,6 +140,33 @@ function EmailPreviewAdmin() {
               </div>
             </div>
             {current && <Badge variant="outline">{current}</Badge>}
+          </div>
+          <div className="border-b border-border px-4 py-3 flex flex-wrap items-center gap-2 bg-muted/20">
+            <Input
+              type="email"
+              placeholder="you@example.com"
+              value={testRecipient}
+              onChange={(e) => setTestRecipient(e.target.value)}
+              className="max-w-xs h-9"
+            />
+            <Button
+              size="sm"
+              disabled={
+                !current ||
+                !testRecipient ||
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testRecipient) ||
+                sendTest.isPending
+              }
+              onClick={() =>
+                current &&
+                sendTest.mutate({ name: current, recipientEmail: testRecipient })
+              }
+            >
+              {sendTest.isPending ? "Sending…" : "Send test email"}
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Sends the current template with sample data. Subject is prefixed with [TEST].
+            </span>
           </div>
           <div className="flex-1 bg-muted/40 p-4 flex justify-center overflow-auto">
             {preview.isFetching && !preview.data && (
