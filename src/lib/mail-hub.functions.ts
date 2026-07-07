@@ -130,23 +130,23 @@ export const searchRecipients = createServerFn({ method: "POST" })
     const out: R[] = [];
 
     const [customersR, contactsR, leadsR, partnersR] = await Promise.all([
-      context.supabase.from("customers").select("id, company_name, primary_email").or(`company_name.ilike.${like},primary_email.ilike.${like}`).limit(10),
+      context.supabase.from("customers").select("id, name, email").or(`name.ilike.${like},email.ilike.${like}`).limit(10),
       context.supabase.from("contacts").select("id, full_name, email, customer_id").or(`full_name.ilike.${like},email.ilike.${like}`).limit(10),
-      context.supabase.from("leads").select("id, full_name, email, company_name").or(`full_name.ilike.${like},email.ilike.${like},company_name.ilike.${like}`).limit(10),
-      context.supabase.from("partners").select("id, company_name, primary_email").or(`company_name.ilike.${like},primary_email.ilike.${like}`).limit(10),
+      context.supabase.from("leads").select("id, name, email").or(`name.ilike.${like},email.ilike.${like}`).limit(10),
+      context.supabase.from("partners").select("id, company_name, contact_email").or(`company_name.ilike.${like},contact_email.ilike.${like}`).limit(10),
     ]);
 
     for (const c of customersR.data ?? []) {
-      if (c.primary_email) out.push({ source: "customer", label: c.company_name ?? c.primary_email, email: c.primary_email });
+      if (c.email) out.push({ source: "customer", label: c.name ?? c.email, email: c.email });
     }
     for (const c of contactsR.data ?? []) {
       if (c.email) out.push({ source: "contact", label: c.full_name ?? c.email, email: c.email });
     }
     for (const l of leadsR.data ?? []) {
-      if (l.email) out.push({ source: "lead", label: l.full_name ?? l.email, email: l.email, sublabel: l.company_name ?? undefined });
+      if (l.email) out.push({ source: "lead", label: l.name ?? l.email, email: l.email });
     }
     for (const p of partnersR.data ?? []) {
-      if (p.primary_email) out.push({ source: "partner", label: p.company_name ?? p.primary_email, email: p.primary_email });
+      if (p.contact_email) out.push({ source: "partner", label: p.company_name ?? p.contact_email, email: p.contact_email });
     }
     return { results: out };
   });
