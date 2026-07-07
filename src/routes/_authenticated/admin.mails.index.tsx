@@ -229,7 +229,7 @@ function MailLogDashboard() {
               {selected.metadata && (
                 <div>
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Metadata</div>
-                  <pre className="text-xs bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(selected.metadata, null, 2)}</pre>
+                  <pre className="text-xs bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(selected.metadata as unknown, null, 2)}</pre>
                 </div>
               )}
             </div>
