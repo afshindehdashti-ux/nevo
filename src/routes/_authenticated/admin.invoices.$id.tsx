@@ -152,6 +152,46 @@ function InvoiceDetailPage() {
     },
   });
 
+  type PurgeLogRow = {
+    id: string;
+    user_id: string | null;
+    created_at: string;
+    metadata: Record<string, unknown> | null;
+  };
+  const { data: purgeLogs = [], refetch: refetchPurgeLogs } = useQuery({
+    queryKey: ["invoice-purge-logs", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .select("id, user_id, created_at, metadata")
+        .eq("action", "purge_pdf_versions")
+        .eq("entity_type", "invoice")
+        .eq("entity_id", id)
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data ?? []) as PurgeLogRow[];
+    },
+  });
+  const purgeActorIds = useMemo(
+    () => Array.from(new Set(purgeLogs.map((l) => l.user_id).filter((x): x is string => !!x))),
+    [purgeLogs],
+  );
+  const { data: purgeActorMap = {} } = useQuery({
+    queryKey: ["purge-log-actors", purgeActorIds.sort().join(",")],
+    enabled: purgeActorIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", purgeActorIds);
+      if (error) throw error;
+      const map: Record<string, string> = {};
+      for (const p of data ?? []) map[p.id] = p.full_name ?? "";
+      return map;
+    },
+  });
+
 
   const [lines, setLines] = useState<Line[]>([]);
   const [notes, setNotes] = useState("");
@@ -227,7 +267,10 @@ function InvoiceDetailPage() {
     if (!effectiveRetentionPersisted) return;
     try {
       const removed = await purgeOlderInvoicePdfVersions(id, effectiveRetentionPersisted);
-      if (removed > 0) refetchPdfVersions();
+      if (removed > 0) {
+        refetchPdfVersions();
+        refetchPurgeLogs();
+      }
     } catch (e) {
       console.warn("auto-prune failed", e);
     }
@@ -289,6 +332,7 @@ function InvoiceDetailPage() {
       const removed = await purgeOlderInvoicePdfVersions(id, effectiveRetention);
       toast.success(`Purged ${removed} version(s)`);
       refetchPdfVersions();
+      refetchPurgeLogs();
       setPurgeOpen(false);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Purge failed");
@@ -1211,6 +1255,71 @@ function InvoiceDetailPage() {
                     </Table>
                   )}
                 </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <History className="h-4 w-4" />
+                PDF purge audit log
+                <Badge variant="secondary" className="ml-2">{purgeLogs.length}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {purgeLogs.length === 0 ? (
+                <p className="px-4 py-6 text-sm text-muted-foreground text-center">
+                  No purge actions recorded for this invoice.
+                </p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>When</TableHead>
+                      <TableHead>User</TableHead>
+                      <TableHead className="text-right">Removed</TableHead>
+                      <TableHead className="text-right">Kept</TableHead>
+                      <TableHead>Version IDs</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {purgeLogs.map((log) => {
+                      const meta = (log.metadata ?? {}) as {
+                        removed_count?: number;
+                        kept?: number;
+                        version_ids?: string[];
+                      };
+                      const who = log.user_id
+                        ? purgeActorMap[log.user_id] ?? "Unknown user"
+                        : "System";
+                      const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+                      return (
+                        <TableRow key={log.id}>
+                          <TableCell className="whitespace-nowrap text-sm">
+                            {new Date(log.created_at).toLocaleString()}
+                          </TableCell>
+                          <TableCell className="text-sm">{who}</TableCell>
+                          <TableCell className="text-right font-medium">
+                            {meta.removed_count ?? ids.length}
+                          </TableCell>
+                          <TableCell className="text-right text-muted-foreground">
+                            {meta.kept ?? "—"}
+                          </TableCell>
+                          <TableCell className="text-xs font-mono text-muted-foreground max-w-md">
+                            {ids.length === 0 ? (
+                              "—"
+                            ) : (
+                              <span title={ids.join("\n")} className="line-clamp-2 break-all">
+                                {ids.join(", ")}
+                              </span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
               )}
             </CardContent>
           </Card>
