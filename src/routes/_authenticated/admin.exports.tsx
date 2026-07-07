@@ -3,15 +3,16 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileDown, Search, ShieldAlert, Copy, RefreshCw } from "lucide-react";
+import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2 } from "lucide-react";
 
 import { listCsvExportAudit } from "@/lib/invoice-purge-audit.functions";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
 import { useMyRoles } from "@/lib/crm-hooks";
 import type { AppRole } from "@/lib/crm-hooks";
+import { verifyCsvText } from "@/lib/purge-csv-preamble";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -82,6 +83,55 @@ function ExportsHistoryPage() {
   const listFn = useServerFn(listCsvExportAudit);
 
   const [detail, setDetail] = useState<CsvExportAuditRecord | null>(null);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  const pendingRowRef = useRef<CsvExportAuditRecord | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  function triggerVerifyAndOpen(row: CsvExportAuditRecord) {
+    pendingRowRef.current = row;
+    const input = fileInputRef.current;
+    if (!input) return;
+    input.value = "";
+    input.click();
+  }
+
+  async function handleFilePicked(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    const row = pendingRowRef.current;
+    pendingRowRef.current = null;
+    if (!file || !row) return;
+    setVerifyingId(row.id);
+    try {
+      const text = await file.text();
+      const result = await verifyCsvText(text, { expectedSha: row.sha256 });
+      if (result.status === "malformed") {
+        toast.error("CSV structure is malformed", {
+          description: result.messages.join(" · "),
+        });
+        return;
+      }
+      if (result.status === "mismatch") {
+        toast.error("SHA-256 mismatch — file will not open", {
+          description: `Expected ${row.sha256.slice(0, 12)}… but computed ${result.computedSha.slice(0, 12)}…`,
+        });
+        return;
+      }
+      // status === "match" (expected was always supplied)
+      const url = URL.createObjectURL(file);
+      window.open(url, "_blank", "noopener,noreferrer");
+      // Revoke shortly after so the new tab has time to load the content.
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      toast.success("SHA-256 verified — opening file", {
+        description: `Computed ${result.computedSha.slice(0, 12)}… matches audit record.`,
+      });
+    } catch (err) {
+      toast.error("Verification failed", {
+        description: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      setVerifyingId(null);
+    }
+  }
 
   const query = useQuery({
     queryKey: [
@@ -157,6 +207,13 @@ function ExportsHistoryPage() {
 
   return (
     <div className="p-6 space-y-4">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv,text/csv"
+        className="sr-only"
+        onChange={handleFilePicked}
+      />
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -320,6 +377,22 @@ function ExportsHistoryPage() {
                           }}
                         >
                           <Copy className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2"
+                          onClick={() => triggerVerifyAndOpen(r)}
+                          disabled={verifyingId === r.id}
+                          title="Pick the saved CSV to re-verify its SHA-256 before opening"
+                        >
+                          {verifyingId === r.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <FileDown className="h-3 w-3" />
+                          )}
+                          <span className="ml-1">Verify &amp; open</span>
                         </Button>
                         <Button
                           type="button"
