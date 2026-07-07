@@ -2692,8 +2692,8 @@ function InvoiceDetailPage() {
                   </div>
                 </div>
                 {purgeExportConfirmState?.capped && (
-                  <div className="rounded-md border border-warning bg-warning/10 px-3 py-2 text-sm text-warning-foreground">
-                    <p className="font-medium">Export capped at 10,000 rows</p>
+                  <div className="rounded-md border border-border bg-muted/40 px-3 py-2 text-sm">
+                    <p className="font-medium text-foreground">Export capped at 10,000 rows</p>
                     <p className="text-muted-foreground">
                       {purgeExportConfirmState.total.toLocaleString()} entries match your filters. Narrow the date range, user, or version filters to export the rest.
                     </p>
