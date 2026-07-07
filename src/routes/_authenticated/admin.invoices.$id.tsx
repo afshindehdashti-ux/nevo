@@ -294,6 +294,7 @@ function InvoiceDetailPage() {
       });
       setPdfNote("");
       refetchPdfVersions();
+      autoPruneIfNeeded();
     } catch (e) {
       console.warn("Failed to archive PDF version", e);
     }
