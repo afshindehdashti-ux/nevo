@@ -1273,6 +1273,28 @@ function InvoiceDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={purgeOpen} onOpenChange={setPurgeOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Purge older PDF versions?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            You are about to permanently delete {overRetentionCount} older PDF
+            {overRetentionCount === 1 ? "" : "s"} for this invoice, keeping the latest{" "}
+            {retentionCount}. This action cannot be undone.
+          </p>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setPurgeOpen(false)} disabled={purging}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmPurge} disabled={purging}>
+              <Trash2 className="h-4 w-4 mr-1" />
+              {purging ? "Purging…" : `Purge ${overRetentionCount}`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
 
   );
