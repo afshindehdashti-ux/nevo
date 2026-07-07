@@ -56,7 +56,7 @@ export interface EmailPreviewMeta {
   category: "auth" | "app";
   subject: string;
   /** Default preview data — used to seed the override form on the client. */
-  defaultData: Record<string, unknown>;
+  defaultData: Record<string, string | number | boolean | null>;
 }
 
 /** List every previewable template (auth + app) with resolved subjects. */
