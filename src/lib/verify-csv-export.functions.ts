@@ -23,6 +23,14 @@ export type ServerVerifyResponse = {
 };
 
 /**
+ * Single source of truth for the "may the browser open this file?" decision.
+ * The Verify & open flow MUST only open a file when this returns true.
+ */
+export function shouldOpenAfterVerify(result: VerifyResult): boolean {
+  return result.status === "match";
+}
+
+/**
  * Server-authoritative SHA-256 verification for a downloaded CSV export.
  * The browser never trusts its own hash: it uploads the file bytes, the
  * server fetches the stored checksum under RLS + role gate, runs the hash,
