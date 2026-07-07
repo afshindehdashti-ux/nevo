@@ -132,6 +132,25 @@ function InvoiceDetailPage() {
     },
   });
 
+  const generatorIds = useMemo(
+    () => Array.from(new Set(pdfVersions.map((v) => v.generated_by).filter((x): x is string => !!x))),
+    [pdfVersions],
+  );
+  const { data: generatorMap = {} } = useQuery({
+    queryKey: ["pdf-version-generators", generatorIds.sort().join(",")],
+    enabled: generatorIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", generatorIds);
+      if (error) throw error;
+      const map: Record<string, string> = {};
+      for (const p of data ?? []) map[p.id] = p.full_name ?? "";
+      return map;
+    },
+  });
+
 
   const [lines, setLines] = useState<Line[]>([]);
   const [notes, setNotes] = useState("");
