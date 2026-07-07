@@ -27,6 +27,7 @@ import {
   Upload,
   Activity,
   Bell,
+  FileDown,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
