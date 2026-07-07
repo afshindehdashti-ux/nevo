@@ -77,6 +77,7 @@ import { Route as AuthenticatedAdminOpportunitiesRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminLogoEventsRouteImport } from './routes/_authenticated/admin.logo-events'
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
 import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authenticated/admin.invoices'
+import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
 import { Route as AuthenticatedAdminFilesRouteImport } from './routes/_authenticated/admin.files'
 import { Route as AuthenticatedAdminEmailPreviewRouteImport } from './routes/_authenticated/admin.email-preview'
 import { Route as AuthenticatedAdminDocumentIntelligenceRouteImport } from './routes/_authenticated/admin.document-intelligence'
@@ -470,6 +471,12 @@ const AuthenticatedAdminInvoicesRoute =
     path: '/invoices',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminImportRoute =
+  AuthenticatedAdminImportRouteImport.update({
+    id: '/import',
+    path: '/import',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminFilesRoute = AuthenticatedAdminFilesRouteImport.update({
   id: '/files',
   path: '/files',
@@ -720,6 +727,7 @@ export interface FileRoutesByFullPath {
   '/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
   '/admin/email-preview': typeof AuthenticatedAdminEmailPreviewRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
+  '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
@@ -819,6 +827,7 @@ export interface FileRoutesByTo {
   '/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
   '/admin/email-preview': typeof AuthenticatedAdminEmailPreviewRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
+  '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
   '/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
@@ -922,6 +931,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/document-intelligence': typeof AuthenticatedAdminDocumentIntelligenceRoute
   '/_authenticated/admin/email-preview': typeof AuthenticatedAdminEmailPreviewRoute
   '/_authenticated/admin/files': typeof AuthenticatedAdminFilesRoute
+  '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
   '/_authenticated/admin/logo-events': typeof AuthenticatedAdminLogoEventsRoute
@@ -1025,6 +1035,7 @@ export interface FileRouteTypes {
     | '/admin/document-intelligence'
     | '/admin/email-preview'
     | '/admin/files'
+    | '/admin/import'
     | '/admin/invoices'
     | '/admin/leads'
     | '/admin/logo-events'
@@ -1124,6 +1135,7 @@ export interface FileRouteTypes {
     | '/admin/document-intelligence'
     | '/admin/email-preview'
     | '/admin/files'
+    | '/admin/import'
     | '/admin/invoices'
     | '/admin/leads'
     | '/admin/logo-events'
@@ -1226,6 +1238,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/document-intelligence'
     | '/_authenticated/admin/email-preview'
     | '/_authenticated/admin/files'
+    | '/_authenticated/admin/import'
     | '/_authenticated/admin/invoices'
     | '/_authenticated/admin/leads'
     | '/_authenticated/admin/logo-events'
@@ -1773,6 +1786,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminInvoicesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/import': {
+      id: '/_authenticated/admin/import'
+      path: '/import'
+      fullPath: '/admin/import'
+      preLoaderRoute: typeof AuthenticatedAdminImportRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/files': {
       id: '/_authenticated/admin/files'
       path: '/files'
@@ -2142,6 +2162,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminDocumentIntelligenceRoute: typeof AuthenticatedAdminDocumentIntelligenceRoute
   AuthenticatedAdminEmailPreviewRoute: typeof AuthenticatedAdminEmailPreviewRoute
   AuthenticatedAdminFilesRoute: typeof AuthenticatedAdminFilesRoute
+  AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRouteWithChildren
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRouteWithChildren
   AuthenticatedAdminLogoEventsRoute: typeof AuthenticatedAdminLogoEventsRoute
@@ -2180,6 +2201,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
     AuthenticatedAdminDocumentIntelligenceRoute,
   AuthenticatedAdminEmailPreviewRoute: AuthenticatedAdminEmailPreviewRoute,
   AuthenticatedAdminFilesRoute: AuthenticatedAdminFilesRoute,
+  AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
   AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRouteWithChildren,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRouteWithChildren,
   AuthenticatedAdminLogoEventsRoute: AuthenticatedAdminLogoEventsRoute,
@@ -2334,13 +2356,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

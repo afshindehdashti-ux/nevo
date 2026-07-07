@@ -332,6 +332,82 @@ export type Database = {
         }
         Relationships: []
       }
+      contacts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          email: string | null
+          full_name: string
+          id: string
+          is_primary: boolean
+          notes: string | null
+          partner_id: string | null
+          phone: string | null
+          supplier_id: string | null
+          title: string | null
+          updated_at: string
+          updated_by: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          is_primary?: boolean
+          notes?: string | null
+          partner_id?: string | null
+          phone?: string | null
+          supplier_id?: string | null
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_primary?: boolean
+          notes?: string | null
+          partner_id?: string | null
+          phone?: string | null
+          supplier_id?: string | null
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_users: {
         Row: {
           created_at: string
@@ -1113,6 +1189,107 @@ export type Database = {
         }
         Relationships: []
       }
+      import_job_rows: {
+        Row: {
+          created_at: string
+          created_record_id: string | null
+          error_message: string | null
+          id: string
+          import_job_id: string
+          mapped_data: Json | null
+          raw_data: Json
+          row_number: number
+          status: Database["public"]["Enums"]["import_row_status"]
+        }
+        Insert: {
+          created_at?: string
+          created_record_id?: string | null
+          error_message?: string | null
+          id?: string
+          import_job_id: string
+          mapped_data?: Json | null
+          raw_data: Json
+          row_number: number
+          status?: Database["public"]["Enums"]["import_row_status"]
+        }
+        Update: {
+          created_at?: string
+          created_record_id?: string | null
+          error_message?: string | null
+          id?: string
+          import_job_id?: string
+          mapped_data?: Json | null
+          raw_data?: Json
+          row_number?: number
+          status?: Database["public"]["Enums"]["import_row_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_job_rows_import_job_id_fkey"
+            columns: ["import_job_id"]
+            isOneToOne: false
+            referencedRelation: "import_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          error_summary: string | null
+          failed_rows: number
+          file_name: string
+          file_path: string | null
+          id: string
+          import_type: string
+          mapping: Json
+          mode: string
+          skipped_rows: number
+          started_at: string | null
+          status: Database["public"]["Enums"]["import_job_status"]
+          success_rows: number
+          total_rows: number
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          error_summary?: string | null
+          failed_rows?: number
+          file_name: string
+          file_path?: string | null
+          id?: string
+          import_type: string
+          mapping?: Json
+          mode?: string
+          skipped_rows?: number
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["import_job_status"]
+          success_rows?: number
+          total_rows?: number
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          error_summary?: string | null
+          failed_rows?: number
+          file_name?: string
+          file_path?: string | null
+          id?: string
+          import_type?: string
+          mapping?: Json
+          mode?: string
+          skipped_rows?: number
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["import_job_status"]
+          success_rows?: number
+          total_rows?: number
+        }
+        Relationships: []
+      }
       invoice_items: {
         Row: {
           created_at: string
@@ -1253,6 +1430,184 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          company: string | null
+          country: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string | null
+          email: string | null
+          estimated_value: number | null
+          id: string
+          industry: string | null
+          lost_reason: string | null
+          name: string
+          next_follow_up: string | null
+          notes: string | null
+          owner_id: string | null
+          partner_id: string | null
+          phone: string | null
+          source: Database["public"]["Enums"]["lead_source"]
+          status: Database["public"]["Enums"]["lead_status"]
+          updated_at: string
+          updated_by: string | null
+          whatsapp: string | null
+          won_at: string | null
+        }
+        Insert: {
+          company?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          email?: string | null
+          estimated_value?: number | null
+          id?: string
+          industry?: string | null
+          lost_reason?: string | null
+          name: string
+          next_follow_up?: string | null
+          notes?: string | null
+          owner_id?: string | null
+          partner_id?: string | null
+          phone?: string | null
+          source?: Database["public"]["Enums"]["lead_source"]
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+          updated_by?: string | null
+          whatsapp?: string | null
+          won_at?: string | null
+        }
+        Update: {
+          company?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          email?: string | null
+          estimated_value?: number | null
+          id?: string
+          industry?: string | null
+          lost_reason?: string | null
+          name?: string
+          next_follow_up?: string | null
+          notes?: string | null
+          owner_id?: string | null
+          partner_id?: string | null
+          phone?: string | null
+          source?: Database["public"]["Enums"]["lead_source"]
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+          updated_by?: string | null
+          whatsapp?: string | null
+          won_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      opportunities: {
+        Row: {
+          actual_close_date: string | null
+          amount: number | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string | null
+          expected_close_date: string | null
+          id: string
+          lead_id: string | null
+          loss_reason: string | null
+          name: string
+          notes: string | null
+          owner_id: string | null
+          partner_id: string | null
+          probability: number
+          stage: Database["public"]["Enums"]["opportunity_stage"]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          actual_close_date?: string | null
+          amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          expected_close_date?: string | null
+          id?: string
+          lead_id?: string | null
+          loss_reason?: string | null
+          name: string
+          notes?: string | null
+          owner_id?: string | null
+          partner_id?: string | null
+          probability?: number
+          stage?: Database["public"]["Enums"]["opportunity_stage"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          actual_close_date?: string | null
+          amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          expected_close_date?: string | null
+          id?: string
+          lead_id?: string | null
+          loss_reason?: string | null
+          name?: string
+          notes?: string | null
+          owner_id?: string | null
+          partner_id?: string | null
+          probability?: number
+          stage?: Database["public"]["Enums"]["opportunity_stage"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opportunities_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunities_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
             referencedColumns: ["id"]
           },
         ]
@@ -2465,6 +2820,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_staff_role: { Args: { _user_id: string }; Returns: boolean }
       is_customer_user: {
         Args: { _customer_id: string; _user_id: string }
         Returns: boolean
@@ -2528,6 +2884,15 @@ export type Database = {
         | "coa"
         | "contract"
         | "other"
+      import_job_status:
+        | "draft"
+        | "validating"
+        | "ready"
+        | "running"
+        | "completed"
+        | "failed"
+        | "cancelled"
+      import_row_status: "pending" | "success" | "failed" | "skipped"
       invoice_status:
         | "draft"
         | "issued"
@@ -2536,6 +2901,31 @@ export type Database = {
         | "overdue"
         | "void"
       invoice_type: "proforma" | "commercial"
+      lead_source:
+        | "web"
+        | "referral"
+        | "partner"
+        | "exhibition"
+        | "direct"
+        | "campaign"
+        | "ai_assistant"
+        | "other"
+      lead_status:
+        | "new"
+        | "contacted"
+        | "qualified"
+        | "proposal"
+        | "negotiation"
+        | "won"
+        | "lost"
+        | "archived"
+      opportunity_stage:
+        | "prospecting"
+        | "qualification"
+        | "proposal"
+        | "negotiation"
+        | "won"
+        | "lost"
       order_status:
         | "draft"
         | "confirmed"
@@ -2720,6 +3110,16 @@ export const Constants = {
         "contract",
         "other",
       ],
+      import_job_status: [
+        "draft",
+        "validating",
+        "ready",
+        "running",
+        "completed",
+        "failed",
+        "cancelled",
+      ],
+      import_row_status: ["pending", "success", "failed", "skipped"],
       invoice_status: [
         "draft",
         "issued",
@@ -2729,6 +3129,34 @@ export const Constants = {
         "void",
       ],
       invoice_type: ["proforma", "commercial"],
+      lead_source: [
+        "web",
+        "referral",
+        "partner",
+        "exhibition",
+        "direct",
+        "campaign",
+        "ai_assistant",
+        "other",
+      ],
+      lead_status: [
+        "new",
+        "contacted",
+        "qualified",
+        "proposal",
+        "negotiation",
+        "won",
+        "lost",
+        "archived",
+      ],
+      opportunity_stage: [
+        "prospecting",
+        "qualification",
+        "proposal",
+        "negotiation",
+        "won",
+        "lost",
+      ],
       order_status: [
         "draft",
         "confirmed",

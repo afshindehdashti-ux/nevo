@@ -23,6 +23,7 @@ import {
   Brain,
   MessagesSquare,
   Mail,
+  Upload,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -172,6 +173,12 @@ export const CRM_NAV: CrmNavGroup[] = [
         url: "/admin/approvals/audit",
         icon: ScrollText,
         allowedRoles: ["management", "finance"],
+      },
+      {
+        title: "Import Data",
+        url: "/admin/import",
+        icon: Upload,
+        allowedRoles: ["management", "operations", "finance"],
       },
       { title: "Settings", url: "/admin/settings", icon: Settings, requiresSuperAdmin: true },
     ],
