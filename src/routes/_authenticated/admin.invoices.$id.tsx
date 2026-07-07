@@ -753,7 +753,10 @@ function InvoiceDetailPage() {
         else if (purgeUserFilter !== "all") query = query.eq("user_id", purgeUserFilter);
         if (purgeFromDate) query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
         if (purgeToDate) query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
-        const { data, error } = await query.order("created_at", { ascending: false }).limit(10000);
+        const sortColumn = purgeSort.column === "user" ? "user_id" : "created_at";
+        const { data, error } = await query
+          .order(sortColumn, { ascending: purgeSort.direction === "asc" })
+          .limit(10000);
         if (error) throw error;
         source = (data ?? []) as PurgeLogRow[];
         // Apply client-side version-id filter (JSON metadata; not queryable).
@@ -765,6 +768,19 @@ function InvoiceDetailPage() {
             return ids.some((v) => v.toLowerCase().includes(idQ));
           });
         }
+      }
+      // Apply the same audit-log sort to the exported rows.
+      if (purgeSort.column === "user") {
+        source = [...source].sort((a, b) => {
+          const nameA = a.user_id ? purgeActorMap[a.user_id] ?? "Unknown user" : "System";
+          const nameB = b.user_id ? purgeActorMap[b.user_id] ?? "Unknown user" : "System";
+          return purgeSort.direction === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+        });
+      } else if (purgeSort.column === "created_at") {
+        source = [...source].sort((a, b) => {
+          const cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          return purgeSort.direction === "asc" ? cmp : -cmp;
+        });
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to load audit entries for export");
