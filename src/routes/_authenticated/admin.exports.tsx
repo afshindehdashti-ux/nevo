@@ -182,6 +182,67 @@ function ExportsHistoryPage() {
     (search.from ? 1 : 0) +
     (search.to ? 1 : 0);
 
+  // --- Saved filter presets (per-browser via localStorage) ---
+  const [presets, setPresets] = useState<ExportFilterPreset[]>([]);
+  const [presetName, setPresetName] = useState("");
+
+  useEffect(() => {
+    setPresets(loadExportPresets());
+  }, []);
+
+  function persistPresets(next: ExportFilterPreset[]) {
+    setPresets(next);
+    saveExportPresets(next);
+  }
+
+  function savePreset() {
+    const name = presetName.trim();
+    if (!name) {
+      toast.error("Give the preset a name first.");
+      return;
+    }
+    if (activeFilters === 0) {
+      toast.error("Set at least one filter before saving a preset.");
+      return;
+    }
+    const next: ExportFilterPreset = {
+      id: crypto.randomUUID(),
+      name,
+      filters: {
+        q: search.q ?? "",
+        scope: search.scope ?? "all",
+        user: search.user ?? "all",
+        from: search.from ?? "",
+        to: search.to ?? "",
+      },
+    };
+    const existing = presets.filter((p) => p.name !== name);
+    persistPresets([next, ...existing].slice(0, 20));
+    setPresetName("");
+    toast.success(`Preset "${name}" saved.`);
+  }
+
+  function applyPreset(p: ExportFilterPreset) {
+    void navigate({ search: () => ({ ...p.filters }) });
+  }
+
+  function deletePreset(id: string) {
+    persistPresets(presets.filter((p) => p.id !== id));
+  }
+
+  const activePresetId = useMemo(() => {
+    return (
+      presets.find(
+        (p) =>
+          p.filters.q === (search.q ?? "") &&
+          p.filters.scope === (search.scope ?? "all") &&
+          p.filters.user === (search.user ?? "all") &&
+          p.filters.from === (search.from ?? "") &&
+          p.filters.to === (search.to ?? ""),
+      )?.id ?? null
+    );
+  }, [presets, search.q, search.scope, search.user, search.from, search.to]);
+
   if (rolesLoading) {
     return (
       <div className="p-6 space-y-3">
