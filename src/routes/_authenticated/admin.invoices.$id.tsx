@@ -37,6 +37,11 @@ import {
 } from "@/components/ui/select";
 import { ArrowLeft, ArrowUpDown, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail, History, Archive, Copy, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  assembleCsv,
+  computeSha256Hex,
+  verifyCsvText,
+} from "@/lib/purge-csv-preamble";
 import JSZip from "jszip";
 import { useServerFn } from "@tanstack/react-start";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
