@@ -75,6 +75,14 @@ type Line = {
   _deleted?: boolean;
 };
 
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  const i = Math.min(units.length - 1, Math.floor(Math.log10(bytes) / 3));
+  const value = bytes / Math.pow(1000, i);
+  return `${value.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+}
+
 function InvoiceDetailPage() {
   const { id } = useParams({ from: "/_authenticated/admin/invoices/$id" });
   const qc = useQueryClient();
