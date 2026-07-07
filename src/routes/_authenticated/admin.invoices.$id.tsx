@@ -440,6 +440,14 @@ function InvoiceDetailPage() {
     });
   };
   const clearPurgeSelection = () => setSelectedPurgeIds(new Set());
+  const clearFilteredPurgeSelection = () => {
+    setSelectedPurgeIds((prev) => {
+      const next = new Set(prev);
+      filteredPurgeLogs.forEach((l) => next.delete(l.id));
+      return next;
+    });
+  };
+  const filteredSelectedCount = filteredPurgeLogs.filter((l) => selectedPurgeIds.has(l.id)).length;
 
   // Last CSV export metadata (for compliance traceability).
   const [lastPurgeExport, setLastPurgeExport] = useState<{
