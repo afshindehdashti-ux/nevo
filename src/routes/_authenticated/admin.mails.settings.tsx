@@ -7,6 +7,8 @@ import {
   saveMailboxConfig,
   testMailboxConnection,
   deleteMailboxConfig,
+  startGmailOAuth,
+  disconnectGmail,
 } from "@/lib/imap-inbox.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +19,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { CheckCircle2, XCircle, Loader2, Trash2, Mail, Server } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, Trash2, Mail, Server, ShieldCheck, Copy } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/admin/mails/settings")({
   head: () => ({ meta: [{ title: "Mailbox Connection — NEVO Admin" }, { name: "robots", content: "noindex" }] }),
