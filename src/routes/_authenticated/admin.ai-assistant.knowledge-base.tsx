@@ -196,8 +196,8 @@ function KnowledgeBasePage() {
             Upload internal documents so the assistant can cite them when answering questions.
             {" "}
             <span className="text-neutral-500">
-              {totalReady} indexed · Phase 1 supports text-based files (TXT / MD / CSV / JSON) and
-              pasted text.
+              {totalReady} indexed · TXT, MD, CSV, JSON, PDF, DOCX and XLSX are extracted and
+              embedded automatically.
             </span>
           </p>
         </div>
@@ -264,16 +264,16 @@ function KnowledgeBasePage() {
               />
             </div>
             <div className="space-y-1">
-              <Label>Upload file (TXT / MD / CSV / JSON up to ~500 KB)</Label>
+              <Label>Upload file (TXT, MD, CSV, JSON, PDF, DOCX, XLSX — up to ~10 MB)</Label>
               <Input
                 type="file"
                 ref={fileInputRef}
-                accept=".txt,.md,.markdown,.csv,.tsv,.json,.log,.html,.xml,.yml,.yaml,text/*"
+                accept=".txt,.md,.markdown,.csv,.tsv,.json,.log,.html,.xml,.yml,.yaml,.pdf,.docx,.xlsx,.xls,text/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               />
               <p className="text-[11px] text-neutral-500">
-                PDF / DOCX / XLSX parsing will land in a follow-up release. For now, paste content
-                below or upload a plain-text export.
+                Text is extracted, chunked, and embedded automatically. Scanned/image-only PDFs
+                will not be searchable without OCR.
               </p>
             </div>
             <div className="space-y-1">
