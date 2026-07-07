@@ -220,7 +220,7 @@ function InvoiceDetailPage() {
 
 
   const purgeLogsQuery = useQuery({
-    queryKey: ["invoice-purge-logs", id, purgeUserFilter, purgeFromDate, purgeToDate, purgePage, purgePageSize],
+    queryKey: ["invoice-purge-logs", id, purgeUserFilter, purgeFromDate, purgeToDate, purgePage, purgePageSize, purgeSort],
     queryFn: async () => {
       const from = purgePage * purgePageSize;
       const to = from + purgePageSize - 1;
@@ -237,8 +237,9 @@ function InvoiceDetailPage() {
       }
       if (purgeFromDate) query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
       if (purgeToDate) query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
+      const sortColumn = purgeSort.column === "user" ? "user_id" : "created_at";
       const { data, error, count } = await query
-        .order("created_at", { ascending: false })
+        .order(sortColumn, { ascending: purgeSort.direction === "asc" })
         .range(from, to);
       if (error) throw error;
       return { rows: (data ?? []) as PurgeLogRow[], total: count ?? 0 };
