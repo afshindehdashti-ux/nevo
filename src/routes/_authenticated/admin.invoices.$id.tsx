@@ -498,6 +498,8 @@ function InvoiceDetailPage() {
   const [purgeExportConfirmState, setPurgeExportConfirmState] = useState<{
     scope: "filtered" | "selected";
     rows: PurgeLogRow[];
+    total: number;
+    capped: boolean;
     loading: boolean;
   } | null>(null);
   const [purgeExporting, setPurgeExporting] = useState(false);
