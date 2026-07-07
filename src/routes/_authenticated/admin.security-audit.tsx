@@ -586,10 +586,18 @@ function SecurityAuditPage() {
             <div className="space-y-4 text-sm">
               <div className="grid grid-cols-2 gap-3">
                 <MetaField label="Actor">
-                  {selected.user_id
-                    ? (profilesQ.data?.get(selected.user_id) ??
-                      selected.user_id)
-                    : "system"}
+                  {selected.user_id ? (
+                    <button
+                      type="button"
+                      onClick={() => setActorDetail(selected.user_id)}
+                      className="text-left text-primary hover:underline"
+                    >
+                      {profilesQ.data?.get(selected.user_id) ??
+                        selected.user_id}
+                    </button>
+                  ) : (
+                    "system"
+                  )}
                 </MetaField>
                 <MetaField label="Record ID">
                   {selected.entity_id ?? "—"}
