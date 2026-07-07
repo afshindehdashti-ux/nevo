@@ -220,7 +220,7 @@ export function AiAssistDrawer() {
                 </div>
               ) : null}
             </div>
-          </ScrollArea>
+          </div>
 
           <div className="border-t border-border bg-neutral-50 p-3">
             <div className="flex items-end gap-2">
