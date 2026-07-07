@@ -1703,6 +1703,46 @@ function InvoiceDetailPage() {
                   </Button>
                 </div>
               </div>
+              {lastPurgeExport && (
+                <div className="mt-3 rounded-md border bg-muted/40 px-3 py-2 text-xs">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className="font-medium">Last export:</span>
+                    <span className="text-muted-foreground">{lastPurgeExport.filename}</span>
+                    <Badge variant="outline">{lastPurgeExport.scope}</Badge>
+                    <span className="text-muted-foreground">
+                      {lastPurgeExport.rowCount} row{lastPurgeExport.rowCount === 1 ? "" : "s"} · {lastPurgeExport.byteSize} B
+                    </span>
+                    <span className="text-muted-foreground">
+                      {new Date(lastPurgeExport.exportedAt).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="font-medium">SHA-256:</span>
+                    <code className="break-all font-mono text-[11px]">
+                      {lastPurgeExport.sha256 || "(unavailable)"}
+                    </code>
+                    {lastPurgeExport.sha256 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2"
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(lastPurgeExport.sha256);
+                            toast.success("SHA-256 checksum copied");
+                          } catch {
+                            toast.error("Failed to copy checksum");
+                          }
+                        }}
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        Copy
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
             </CardHeader>
             <CardContent className="p-0">
               {purgeTotal === 0 && !purgeFiltersActive ? (
