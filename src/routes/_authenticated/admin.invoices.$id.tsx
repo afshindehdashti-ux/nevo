@@ -1148,7 +1148,13 @@ function InvoiceDetailPage() {
   );
 }
 
-function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
+function PdfVersionRow({
+  v,
+  generatorName,
+}: {
+  v: InvoicePdfVersionRow;
+  generatorName: string;
+}) {
   const [busy, setBusy] = useState(false);
   const sourceLabel: Record<string, string> = {
     download: "Download",
@@ -1159,6 +1165,7 @@ function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
   const sizeKb = v.byte_size ? `${(v.byte_size / 1024).toFixed(0)} KB` : "—";
   const dt = new Date(v.created_at);
   const stamp = `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  const who = generatorName?.trim() || (v.generated_by ? "Unknown user" : "System");
   async function download() {
     setBusy(true);
     try {
@@ -1180,6 +1187,7 @@ function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
   return (
     <TableRow>
       <TableCell className="whitespace-nowrap text-sm">{stamp}</TableCell>
+      <TableCell className="text-sm max-w-[160px] truncate" title={who}>{who}</TableCell>
       <TableCell>
         <Badge variant="secondary">{sourceLabel[v.source] ?? v.source}</Badge>
       </TableCell>
@@ -1188,8 +1196,13 @@ function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
           {v.doc_type === "proforma" ? "Proforma" : "Commercial"}
         </Badge>
       </TableCell>
-      <TableCell className="text-xs font-mono truncate max-w-[220px]" title={v.filename}>
-        {v.filename}
+      <TableCell className="max-w-[260px]">
+        <div className="text-xs font-mono truncate" title={v.filename}>{v.filename}</div>
+        {v.note && (
+          <div className="text-xs text-muted-foreground italic truncate" title={v.note}>
+            “{v.note}”
+          </div>
+        )}
       </TableCell>
       <TableCell className="text-right text-sm">{sizeKb}</TableCell>
       <TableCell className="text-right">
@@ -1198,6 +1211,7 @@ function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
           {busy ? "…" : "Get"}
         </Button>
       </TableCell>
+
     </TableRow>
   );
 }
