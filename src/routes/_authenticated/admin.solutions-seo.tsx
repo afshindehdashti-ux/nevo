@@ -8,7 +8,7 @@ import {
   type SolutionsInspectionRow,
   type SolutionsInspectionList,
 } from "@/lib/solutions-inspection.functions";
-import { isCurrentUserAdmin } from "@/lib/logo-events.functions";
+import { useMyRoles } from "@/lib/crm-hooks";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow, format } from "date-fns";
@@ -29,15 +29,15 @@ function verdictClass(v: string | null) {
 
 function SolutionsSeoAdmin() {
   const navigate = useNavigate();
-  const checkAdmin = useServerFn(isCurrentUserAdmin);
   const listFn = useServerFn(listSolutionsInspection);
   const runFn = useServerFn(runSolutionsInspection);
+  const rolesQ = useMyRoles();
+  const isSuperAdmin = rolesQ.data?.includes("super_admin") ?? false;
 
-  const adminQ = useQuery({ queryKey: ["is-admin"], queryFn: () => checkAdmin() });
   const dataQ = useQuery<SolutionsInspectionList>({
     queryKey: ["solutions-inspection"],
     queryFn: () => listFn(),
-    enabled: !!adminQ.data?.admin,
+    enabled: isSuperAdmin,
   });
 
   const runM = useMutation({
@@ -97,21 +97,35 @@ function SolutionsSeoAdmin() {
     return ts.length ? new Date(Math.max(...ts)) : null;
   }, [merged]);
 
-  if (adminQ.isLoading) {
+  if (rolesQ.isLoading) {
     return (
       <Shell>
         <p className="text-sm text-muted-foreground">Checking access…</p>
       </Shell>
     );
   }
-  if (!adminQ.data?.admin) {
+  if (rolesQ.error) {
+    return (
+      <Shell>
+        <div className="border border-destructive/40 rounded-lg p-6 bg-card space-y-3 max-w-lg">
+          <h2 className="text-lg font-semibold text-destructive">Could not load your roles</h2>
+          <pre className="text-xs text-muted-foreground whitespace-pre-wrap break-words bg-muted/50 rounded p-3">
+            {rolesQ.error.message}
+          </pre>
+          <Button variant="outline" onClick={() => rolesQ.refetch()}>
+            Retry
+          </Button>
+        </div>
+      </Shell>
+    );
+  }
+  if (!isSuperAdmin) {
     return (
       <Shell>
         <div className="border border-border rounded-lg p-6 bg-card space-y-3 max-w-lg">
           <h2 className="text-lg font-semibold">Not authorized</h2>
           <p className="text-sm text-muted-foreground">
-            Your account isn't an admin. Ask a project owner to grant you the <code>admin</code>{" "}
-            role.
+            Your account does not have the <code>super_admin</code> role.
           </p>
           <Button variant="outline" onClick={() => signOut.mutate()}>
             Sign out

@@ -2,11 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  getLogoEvents,
-  isCurrentUserAdmin,
-  type LogoEventFilters,
-} from "@/lib/logo-events.functions";
+import { getLogoEvents, type LogoEventFilters } from "@/lib/logo-events.functions";
+import { useMyRoles } from "@/lib/crm-hooks";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,10 +71,9 @@ function toLocalInput(iso: string) {
 
 function LogoEventsAdmin() {
   const navigate = useNavigate();
-  const checkAdmin = useServerFn(isCurrentUserAdmin);
   const fetchEvents = useServerFn(getLogoEvents);
-
-  const adminQ = useQuery({ queryKey: ["is-admin"], queryFn: () => checkAdmin() });
+  const rolesQ = useMyRoles();
+  const isSuperAdmin = rolesQ.data?.includes("super_admin") ?? false;
 
   const now = Date.now();
   const [from, setFrom] = useState<string>(
@@ -106,7 +102,7 @@ function LogoEventsAdmin() {
   const eventsQ = useQuery({
     queryKey: ["logo-events", filters],
     queryFn: () => fetchEvents({ data: filters }),
-    enabled: !!adminQ.data?.admin,
+    enabled: isSuperAdmin,
   });
 
   const signOut = useMutation({
@@ -116,22 +112,35 @@ function LogoEventsAdmin() {
     onSuccess: () => navigate({ to: "/auth" }),
   });
 
-  if (adminQ.isLoading) {
+  if (rolesQ.isLoading) {
     return (
       <Shell>
         <p className="text-sm text-muted-foreground">Checking access…</p>
       </Shell>
     );
   }
-  if (!adminQ.data?.admin) {
+  if (rolesQ.error) {
+    return (
+      <Shell>
+        <div className="border border-destructive/40 rounded-lg p-6 bg-card space-y-3 max-w-lg">
+          <h2 className="text-lg font-semibold text-destructive">Could not load your roles</h2>
+          <pre className="text-xs text-muted-foreground whitespace-pre-wrap break-words bg-muted/50 rounded p-3">
+            {rolesQ.error.message}
+          </pre>
+          <Button variant="outline" onClick={() => rolesQ.refetch()}>
+            Retry
+          </Button>
+        </div>
+      </Shell>
+    );
+  }
+  if (!isSuperAdmin) {
     return (
       <Shell>
         <div className="border border-border rounded-lg p-6 bg-card space-y-3 max-w-lg">
           <h2 className="text-lg font-semibold">Not authorized</h2>
           <p className="text-sm text-muted-foreground">
-            Your account isn't an admin. Ask a project owner to grant you the <code>admin</code>{" "}
-            role in Lovable Cloud (insert a row in <code>user_roles</code> with your user id and
-            role <code>admin</code>).
+            Your account does not have the <code>super_admin</code> role.
           </p>
           <Button variant="outline" onClick={() => signOut.mutate()}>
             Sign out
