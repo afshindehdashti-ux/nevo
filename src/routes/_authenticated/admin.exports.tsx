@@ -726,7 +726,8 @@ function ExportsHistoryPage() {
             </div>
           )}
         </DialogContent>
-      </Dialog>
-    </div>
+      >
+        <DialogContent className="max-w-3xl">
+
   );
 }
