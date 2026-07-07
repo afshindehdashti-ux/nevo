@@ -119,6 +119,43 @@ function InvoiceDetailPage() {
   const [payMethod, setPayMethod] = useState<PaymentMethod>("bank_transfer");
   const [payDate, setPayDate] = useState(new Date().toISOString().slice(0, 10));
   const [payRef, setPayRef] = useState("");
+  const [pdfPreview, setPdfPreview] = useState<{
+    url: string;
+    filename: string;
+    blob: Blob;
+  } | null>(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (pdfPreview) URL.revokeObjectURL(pdfPreview.url);
+    };
+  }, [pdfPreview]);
+
+  async function openPdfPreview() {
+    setPdfLoading(true);
+    try {
+      const res = await generateInvoicePdf(id, "blob");
+      setPdfPreview((prev) => {
+        if (prev) URL.revokeObjectURL(prev.url);
+        return res;
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "PDF failed");
+    } finally {
+      setPdfLoading(false);
+    }
+  }
+
+  function downloadCurrentPdf() {
+    if (!pdfPreview) return;
+    const a = document.createElement("a");
+    a.href = pdfPreview.url;
+    a.download = pdfPreview.filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
 
   useEffect(() => {
     if (items.length) {
@@ -371,16 +408,11 @@ function InvoiceDetailPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={async () => {
-                try {
-                  await generateInvoicePdf(invoice.id);
-                } catch (e) {
-                  toast.error(e instanceof Error ? e.message : "PDF failed");
-                }
-              }}
+              onClick={openPdfPreview}
+              disabled={pdfLoading}
             >
               <FileDown className="h-4 w-4 mr-1" />
-              Download PDF
+              {pdfLoading ? "Preparing…" : "Preview PDF"}
             </Button>
             {canPay && invoice.type === "commercial" && Number(invoice.balance) > 0 && (
               <Button size="sm" onClick={() => setPayOpen(true)}>
@@ -695,7 +727,50 @@ function InvoiceDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog
+        open={!!pdfPreview}
+        onOpenChange={(o) => {
+          if (!o) {
+            setPdfPreview((prev) => {
+              if (prev) URL.revokeObjectURL(prev.url);
+              return null;
+            });
+          }
+        }}
+      >
+        <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0 gap-0">
+          <DialogHeader className="px-4 py-3 border-b flex flex-row items-center justify-between gap-3 space-y-0">
+            <DialogTitle className="text-base">
+              {invoice?.type === "proforma" ? "Proforma Invoice" : "Invoice"} preview
+              {pdfPreview ? ` — ${pdfPreview.filename}` : ""}
+            </DialogTitle>
+            <div className="flex items-center gap-2">
+              <Button size="sm" variant="outline" onClick={openPdfPreview} disabled={pdfLoading}>
+                {pdfLoading ? "Refreshing…" : "Refresh"}
+              </Button>
+              <Button size="sm" onClick={downloadCurrentPdf} disabled={!pdfPreview}>
+                <FileDown className="h-4 w-4 mr-1" /> Download
+              </Button>
+            </div>
+          </DialogHeader>
+          <div className="flex-1 bg-muted">
+            {pdfPreview ? (
+              <iframe
+                title="Invoice PDF preview"
+                src={pdfPreview.url}
+                className="w-full h-full border-0"
+              />
+            ) : (
+              <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+                Loading preview…
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 }
 
