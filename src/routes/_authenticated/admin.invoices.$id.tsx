@@ -2245,7 +2245,47 @@ function InvoiceDetailPage() {
                         Copy
                       </Button>
                     )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-6 px-2"
+                      disabled={!lastPurgeExport.sha256 || purgeVerifyState.status === "verifying"}
+                      onClick={() => purgeVerifyInputRef.current?.click()}
+                    >
+                      {purgeVerifyState.status === "verifying" ? "Verifying…" : "Verify downloaded file"}
+                    </Button>
+                    <input
+                      ref={purgeVerifyInputRef}
+                      type="file"
+                      accept=".csv,text/csv"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = "";
+                        if (file) void verifyDownloadedCsv(file);
+                      }}
+                    />
                   </div>
+                  {purgeVerifyState.status === "match" && (
+                    <div className="mt-2 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2 py-1.5 text-[11px] text-emerald-700 dark:text-emerald-300">
+                      ✓ {purgeVerifyState.filename} matches the displayed SHA-256
+                      · verified {new Date(purgeVerifyState.verifiedAt).toLocaleString()}
+                    </div>
+                  )}
+                  {purgeVerifyState.status === "mismatch" && (
+                    <div className="mt-2 rounded-md border border-destructive/50 bg-destructive/10 px-2 py-1.5 text-[11px] text-destructive space-y-0.5">
+                      <div className="font-medium">
+                        ✗ Checksum mismatch — {purgeVerifyState.filename} may be altered or corrupted.
+                      </div>
+                      <div className="font-mono break-all">
+                        expected: {purgeVerifyState.expected}
+                      </div>
+                      <div className="font-mono break-all">
+                        actual:&nbsp;&nbsp; {purgeVerifyState.sha256}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </CardHeader>
