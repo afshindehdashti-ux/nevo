@@ -1559,6 +1559,8 @@ function InvoiceDetailPage() {
                         variant="default"
                         size="sm"
                         className="h-8"
+                        disabled={!canPurgePdf}
+                        title={!canPurgePdf ? "Only Super Admin, Management, or Finance can export purge history." : undefined}
                         onClick={() => {
                           const rows = purgeLogs.filter((l) => selectedPurgeIds.has(l.id));
                           exportPurgeAuditCsv(rows, "selected");
@@ -1577,7 +1579,8 @@ function InvoiceDetailPage() {
                     size="sm"
                     className="h-8"
                     onClick={() => exportPurgeAuditCsv()}
-                    disabled={filteredPurgeLogs.length === 0}
+                    disabled={!canPurgePdf || filteredPurgeLogs.length === 0}
+                    title={!canPurgePdf ? "Only Super Admin, Management, or Finance can export purge history." : undefined}
                   >
                     <FileDown className="h-3.5 w-3.5 mr-1" />
                     Export CSV{purgeFiltersActive ? " (filtered)" : ""}
