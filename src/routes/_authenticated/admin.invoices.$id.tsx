@@ -1425,6 +1425,7 @@ function InvoiceDetailPage() {
                       <TableHead className="text-right">Removed</TableHead>
                       <TableHead className="text-right">Kept</TableHead>
                       <TableHead>Version IDs</TableHead>
+                      <TableHead className="w-10"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
