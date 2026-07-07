@@ -207,21 +207,19 @@ function SecurityAuditPage() {
         .order("created_at", { ascending: false })
         .limit(1000);
 
-      // Server-side pre-filter for the categories that map to a single column
+      // Server-side pre-filter for categories that map to a single column
       if (category === "sign_in") q = q.eq("action", "sign_in");
-      else if (category === "role_changes") q = q.eq("entity_type", "user_roles");
+      else if (category === "role_changes")
+        q = q.eq("entity_type", "user_roles");
       else if (category === "deletes") q = q.eq("action", "delete");
-      else if (category === "approvals")
-        q = q.in("action", ["approve", "reject", "cancel"]);
+      else if (category === "approvals") q = q.in("action", APPROVAL_ACTIONS);
+      else if (category === "sessions") q = q.in("action", SESSION_ACTIONS);
+      else if (category === "alerts") q = q.in("action", ALERT_ACTIONS);
+      else if (category === "user_mgmt") q = q.in("action", USER_MGMT_ACTIONS);
       else {
-        // "all" — only security-significant actions
-        q = q.in("action", [
-          "sign_in",
-          "approve",
-          "reject",
-          "cancel",
-          "delete",
-        ]);
+        // "all" and "definer_other" — pull every security-significant action,
+        // then let the client-side CATEGORY_FILTER narrow further.
+        q = q.in("action", [...SECURITY_ACTIONS]);
       }
 
       if (actor !== "all")
