@@ -1007,6 +1007,50 @@ function InvoiceDetailPage() {
                       </Button>
                     )}
                   </div>
+                  <div className="px-4 py-3 border-b flex flex-wrap gap-3 items-end bg-muted/30">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Keep latest</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={500}
+                        value={retentionInput}
+                        onChange={(e) => setRetentionInput(e.target.value)}
+                        className="h-8 w-24"
+                      />
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8"
+                      onClick={saveRetentionSetting}
+                      disabled={
+                        savingRetention ||
+                        !retentionSetting ||
+                        retentionCount === retentionSetting.pdf_version_retention_count
+                      }
+                    >
+                      {savingRetention ? "Saving…" : "Save policy"}
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="h-8"
+                      onClick={purgeOlderNow}
+                      disabled={purging || overRetentionCount === 0}
+                    >
+                      <Trash2 className="h-3.5 w-3.5 mr-1" />
+                      {purging
+                        ? "Purging…"
+                        : overRetentionCount > 0
+                          ? `Purge ${overRetentionCount} older`
+                          : "Nothing to purge"}
+                    </Button>
+                    <p className="text-xs text-muted-foreground ml-auto max-w-xs">
+                      New PDFs auto-trim beyond this count. Applies to every invoice.
+                    </p>
+                  </div>
+
                   {filteredPdfVersions.length === 0 ? (
                     <p className="px-4 py-6 text-sm text-muted-foreground text-center">
                       No PDF versions match the selected filters.
