@@ -679,14 +679,16 @@ function ExportsHistoryPage() {
                       ))}
                     </TableRow>
                   ))
-                ) : rows.length === 0 ? (
+                ) : visibleRows.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-8">
-                      No CSV exports match these filters.
+                      {driftOnly
+                        ? "No drift detected in the currently loaded exports."
+                        : "No CSV exports match these filters."}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  rows.map((r) => (
+                  visibleRows.map((r) => (
                     <TableRow key={r.id} data-state={selectedIds.has(r.id) ? "selected" : undefined}>
                       <TableCell>
                         <Checkbox
