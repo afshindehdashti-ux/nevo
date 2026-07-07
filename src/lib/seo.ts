@@ -7,28 +7,32 @@ import { SEO_META } from "./seo-meta";
 
 export const SITE = {
   name: "NEVO Industrial",
-  legalName: "NEVO Industrial LLC",
+  legalName: "NEVO TRADING AND CONSULTANCY L.L.C - FZ",
+  tradeLicense: "2528837.01",
   titleSuffix: "NEVO Industrial",
   defaultDescription:
     "Dubai-based engineering consultancy for sandwich panel factory development, production lines, and PIR/PUR raw materials worldwide.",
-  url: "https://nevoindustrial.com",
+  url: "https://www.nevoindustrial.com",
   logo: "/favicon.ico",
   sameAs: [
     "https://www.linkedin.com/company/nevo-industrial",
     "https://www.youtube.com/@nevoindustrial",
   ],
   contact: {
-    email: "solutions@nevoindustrial.com",
+    email: "info@nevoindustrial.com",
+    engineeringEmail: "solutions@nevoindustrial.com",
     phone: "+971 50 242 6167",
     phoneHref: "tel:+971502426167",
     whatsapp: "971502426167",
     whatsappDisplay: "+971 50 242 6167",
+    whatsappHref: "https://wa.me/971502426167",
     whatsappMessage:
       "Hello NEVO Engineering Team,\n\nI am interested in your sandwich panel production solutions and would like to discuss my project.\n\nPlease contact me at your earliest convenience.",
     address: {
-      streetAddress: "Business Bay",
+      streetAddress: "Meydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba",
       addressLocality: "Dubai",
       addressCountry: "AE",
+      full: "Meydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, U.A.E.",
     },
   },
 } as const;
