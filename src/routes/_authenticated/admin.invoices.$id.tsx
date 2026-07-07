@@ -827,9 +827,21 @@ function InvoiceDetailPage() {
               <CardTitle className="text-base flex items-center gap-2">
                 <History className="h-4 w-4" /> PDF history
               </CardTitle>
-              <span className="text-xs text-muted-foreground">
-                {filteredPdfVersions.length} shown · {pdfVersions.length} total
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-muted-foreground">
+                  {filteredPdfVersions.length} shown · {pdfVersions.length} total
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                  disabled={filteredPdfVersions.length === 0 || downloadingAll}
+                  onClick={handleDownloadAllVersions}
+                >
+                  <Archive className="h-4 w-4 mr-2" />
+                  {downloadingAll ? "Zipping…" : "Download all"}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="p-0">
               {pdfVersions.length === 0 ? (
