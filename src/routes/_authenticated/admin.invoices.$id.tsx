@@ -413,6 +413,61 @@ function InvoiceDetailPage() {
     URL.revokeObjectURL(url);
   }
 
+  function exportPurgeAuditCsv() {
+    if (purgeLogs.length === 0) {
+      toast.info("No purge audit entries to export");
+      return;
+    }
+    const header = [
+      "Log ID",
+      "Timestamp (ISO)",
+      "Timestamp (Local)",
+      "User ID",
+      "User Name",
+      "Invoice ID",
+      "Invoice Number",
+      "Removed Count",
+      "Kept",
+      "Removed Version IDs",
+    ];
+    const escape = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
+    const lines = [
+      header.join(","),
+      ...purgeLogs.map((log) => {
+        const meta = (log.metadata ?? {}) as {
+          removed_count?: number;
+          kept?: number;
+          version_ids?: string[];
+        };
+        const who = log.user_id ? purgeActorMap[log.user_id] ?? "Unknown user" : "System";
+        const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+        return [
+          escape(log.id),
+          escape(log.created_at),
+          escape(new Date(log.created_at).toLocaleString()),
+          escape(log.user_id ?? ""),
+          escape(who),
+          escape(id),
+          escape(invoice?.invoice_number ?? ""),
+          escape(String(meta.removed_count ?? ids.length)),
+          escape(meta.kept != null ? String(meta.kept) : ""),
+          escape(ids.join("; ")),
+        ].join(",");
+      }),
+    ];
+    const csv = lines.join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `invoice-${invoice?.invoice_number ?? id}-purge-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${purgeLogs.length} audit entr${purgeLogs.length === 1 ? "y" : "ies"}`);
+  }
+
   useEffect(() => {
     return () => {
       if (pdfPreview) URL.revokeObjectURL(pdfPreview.url);
@@ -1304,11 +1359,23 @@ function InvoiceDetailPage() {
 
           <Card id="purge-audit-log">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <History className="h-4 w-4" />
-                PDF purge audit log
-                <Badge variant="secondary" className="ml-2">{purgeLogs.length}</Badge>
-              </CardTitle>
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <History className="h-4 w-4" />
+                  PDF purge audit log
+                  <Badge variant="secondary" className="ml-2">{purgeLogs.length}</Badge>
+                </CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                  onClick={exportPurgeAuditCsv}
+                  disabled={purgeLogs.length === 0}
+                >
+                  <FileDown className="h-3.5 w-3.5 mr-1" />
+                  Export CSV
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="p-0">
               {purgeLogs.length === 0 ? (
