@@ -425,12 +425,15 @@ function SecurityAuditPage() {
 
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <MiniStat icon={LogIn} label="Sign-ins" value={stats.signIn} />
+        <MiniStat icon={LogOut} label="Session revocations" value={stats.sessions} />
+        <MiniStat icon={Bell} label="Security alerts" value={stats.alerts} />
         <MiniStat
           icon={CheckCircle2}
           label="Approval decisions"
           value={stats.approvals}
         />
         <MiniStat icon={UserCog} label="Role changes" value={stats.roleChanges} />
+        <MiniStat icon={UserPlus} label="User management" value={stats.userMgmt} />
         <MiniStat icon={Trash2} label="Deletes" value={stats.deletes} />
       </div>
 
