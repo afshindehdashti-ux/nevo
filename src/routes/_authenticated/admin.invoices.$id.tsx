@@ -50,6 +50,7 @@ import {
 import {
   listPurgeAuditForExport,
   listPurgeAuditByIds,
+  recordCsvExportAudit,
 } from "@/lib/invoice-purge-audit.functions";
 
 import { formatDate, formatMoney } from "@/lib/crm-money";
