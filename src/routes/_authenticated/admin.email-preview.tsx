@@ -27,8 +27,10 @@ export const Route = createFileRoute("/_authenticated/admin/email-preview")({
 function EmailPreviewAdmin() {
   const listFn = useServerFn(listEmailPreviews);
   const renderFn = useServerFn(renderEmailPreview);
+  const sendFn = useServerFn(sendTestEmail);
   const [selected, setSelected] = useState<string | null>(null);
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
+  const [testRecipient, setTestRecipient] = useState("");
 
   const list = useQuery({
     queryKey: ["email-previews"],
