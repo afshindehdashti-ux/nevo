@@ -74,7 +74,7 @@ export async function sendCriticalSms(
       .from('sms_alert_dedup')
       .update({
         send_count: (existing.send_count ?? 1) + 1,
-        last_payload: (input.payload ?? {}) as Record<string, unknown>,
+        last_payload: (input.payload ?? {}) as any,
       })
       .eq('dedup_key', input.dedupKey)
     if (bumpErr) console.warn('sms-alert dedup bump failed', bumpErr)
@@ -132,7 +132,7 @@ export async function sendCriticalSms(
         first_sent_at: existing ? existing.last_sent_at ?? now : now,
         last_sent_at: now,
         send_count: 1,
-        last_payload: (input.payload ?? {}) as Record<string, unknown>,
+        last_payload: (input.payload ?? {}) as any,
       },
       { onConflict: 'dedup_key' },
     )
