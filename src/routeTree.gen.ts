@@ -56,6 +56,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as LangSolutionsIndexRouteImport } from './routes/$lang.solutions.index'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as ApiPublicContactSubmitRouteImport } from './routes/api/public/contact-submit'
 import { Route as ApiPublicClientLogRouteImport } from './routes/api/public/client-log'
 import { Route as ApiPublicBootstrapSuperAdminRouteImport } from './routes/api/public/bootstrap-super-admin'
 import { Route as ApiPublicApprovalNotifyRouteImport } from './routes/api/public/approval-notify'
@@ -355,6 +356,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
   path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicContactSubmitRoute = ApiPublicContactSubmitRouteImport.update({
+  id: '/api/public/contact-submit',
+  path: '/api/public/contact-submit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicClientLogRoute = ApiPublicClientLogRouteImport.update({
@@ -798,6 +804,7 @@ export interface FileRoutesByFullPath {
   '/api/public/approval-notify': typeof ApiPublicApprovalNotifyRoute
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
+  '/api/public/contact-submit': typeof ApiPublicContactSubmitRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
@@ -904,6 +911,7 @@ export interface FileRoutesByTo {
   '/api/public/approval-notify': typeof ApiPublicApprovalNotifyRoute
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
+  '/api/public/contact-submit': typeof ApiPublicContactSubmitRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/$lang/solutions': typeof LangSolutionsIndexRoute
@@ -1015,6 +1023,7 @@ export interface FileRoutesById {
   '/api/public/approval-notify': typeof ApiPublicApprovalNotifyRoute
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
+  '/api/public/contact-submit': typeof ApiPublicContactSubmitRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/$lang/solutions/': typeof LangSolutionsIndexRoute
@@ -1126,6 +1135,7 @@ export interface FileRouteTypes {
     | '/api/public/approval-notify'
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
+    | '/api/public/contact-submit'
     | '/api/public/health'
     | '/lovable/email/suppression'
     | '/$lang/solutions/'
@@ -1232,6 +1242,7 @@ export interface FileRouteTypes {
     | '/api/public/approval-notify'
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
+    | '/api/public/contact-submit'
     | '/api/public/health'
     | '/lovable/email/suppression'
     | '/$lang/solutions'
@@ -1342,6 +1353,7 @@ export interface FileRouteTypes {
     | '/api/public/approval-notify'
     | '/api/public/bootstrap-super-admin'
     | '/api/public/client-log'
+    | '/api/public/contact-submit'
     | '/api/public/health'
     | '/lovable/email/suppression'
     | '/$lang/solutions/'
@@ -1387,6 +1399,7 @@ export interface RootRouteChildren {
   ApiPublicApprovalNotifyRoute: typeof ApiPublicApprovalNotifyRoute
   ApiPublicBootstrapSuperAdminRoute: typeof ApiPublicBootstrapSuperAdminRoute
   ApiPublicClientLogRoute: typeof ApiPublicClientLogRoute
+  ApiPublicContactSubmitRoute: typeof ApiPublicContactSubmitRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -1726,6 +1739,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/health'
       fullPath: '/api/public/health'
       preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/contact-submit': {
+      id: '/api/public/contact-submit'
+      path: '/api/public/contact-submit'
+      fullPath: '/api/public/contact-submit'
+      preLoaderRoute: typeof ApiPublicContactSubmitRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/client-log': {
@@ -2508,6 +2528,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicApprovalNotifyRoute: ApiPublicApprovalNotifyRoute,
   ApiPublicBootstrapSuperAdminRoute: ApiPublicBootstrapSuperAdminRoute,
   ApiPublicClientLogRoute: ApiPublicClientLogRoute,
+  ApiPublicContactSubmitRoute: ApiPublicContactSubmitRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,

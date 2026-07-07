@@ -110,6 +110,21 @@ function ContactPage() {
       ],
       successTitle: t("contact.callback.successTitle"),
       successDescription: t("contact.callback.successDesc"),
+      deliver: async (payload) => {
+        return fetch("/api/public/contact-submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: String(payload.name ?? ""),
+            email: String(payload.email ?? ""),
+            phone: payload.phone ? String(payload.phone) : undefined,
+            company: payload.company ? String(payload.company) : undefined,
+            country: payload.country ? String(payload.country) : undefined,
+            message: payload.message ? String(payload.message) : undefined,
+            source: "contact-callback",
+          }),
+        });
+      },
       messages: {
         reviewTitle: t("contact.callback.validation.reviewTitle"),
         required: t("contact.callback.validation.required"),
