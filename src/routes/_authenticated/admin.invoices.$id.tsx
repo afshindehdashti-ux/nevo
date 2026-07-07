@@ -2006,6 +2006,7 @@ function InvoiceDetailPage() {
                             removed_count?: number;
                             kept?: number;
                             version_ids?: string[];
+                            total_bytes?: number;
                           };
                           const who = log.user_id
                             ? purgeActorMap[log.user_id] ?? "Unknown user"
@@ -2033,6 +2034,9 @@ function InvoiceDetailPage() {
                               <TableCell className="text-sm">{who}</TableCell>
                               <TableCell className="text-right font-medium">
                                 {meta.removed_count ?? ids.length}
+                              </TableCell>
+                              <TableCell className="text-right text-muted-foreground">
+                                {formatBytes(meta.total_bytes ?? 0)}
                               </TableCell>
                               <TableCell className="text-right text-muted-foreground">
                                 {meta.kept ?? "—"}
