@@ -147,6 +147,9 @@ function InvoiceDetailPage() {
     blob: Blob;
   } | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfDocTypeFilter, setPdfDocTypeFilter] = useState<"all" | "proforma" | "commercial">("all");
+  const [pdfFromDate, setPdfFromDate] = useState("");
+  const [pdfToDate, setPdfToDate] = useState("");
 
   useEffect(() => {
     return () => {
@@ -289,6 +292,26 @@ function InvoiceDetailPage() {
     }
     return { subtotal, vat, total: subtotal + vat };
   }, [lines]);
+
+  const filteredPdfVersions = useMemo(() => {
+    let rows = pdfVersions;
+    if (pdfDocTypeFilter !== "all") {
+      rows = rows.filter((v) => v.doc_type === pdfDocTypeFilter);
+    }
+    if (pdfFromDate || pdfToDate) {
+      rows = rows.filter((v) => {
+        const d = new Date(v.created_at);
+        if (pdfFromDate && d < new Date(pdfFromDate)) return false;
+        if (pdfToDate) {
+          const end = new Date(pdfToDate);
+          end.setHours(23, 59, 59, 999);
+          if (d > end) return false;
+        }
+        return true;
+      });
+    }
+    return rows;
+  }, [pdfVersions, pdfDocTypeFilter, pdfFromDate, pdfToDate]);
 
   const save = useMutation({
     mutationFn: async () => {
@@ -766,7 +789,7 @@ function InvoiceDetailPage() {
                 <History className="h-4 w-4" /> PDF history
               </CardTitle>
               <span className="text-xs text-muted-foreground">
-                {pdfVersions.length} version{pdfVersions.length === 1 ? "" : "s"}
+                {filteredPdfVersions.length} shown · {pdfVersions.length} total
               </span>
             </CardHeader>
             <CardContent className="p-0">
@@ -775,22 +798,81 @@ function InvoiceDetailPage() {
                   No PDFs generated yet. Downloading or emailing a PDF archives a copy here.
                 </p>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Generated</TableHead>
-                      <TableHead>Source</TableHead>
-                      <TableHead>Filename</TableHead>
-                      <TableHead className="text-right">Size</TableHead>
-                      <TableHead className="w-24"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pdfVersions.map((v) => (
-                      <PdfVersionRow key={v.id} v={v} />
-                    ))}
-                  </TableBody>
-                </Table>
+                <>
+                  <div className="px-4 py-3 border-b flex flex-wrap gap-3 items-end">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Type</Label>
+                      <Select
+                        value={pdfDocTypeFilter}
+                        onValueChange={(v) => setPdfDocTypeFilter(v as typeof pdfDocTypeFilter)}
+                      >
+                        <SelectTrigger className="w-36 h-8">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All types</SelectItem>
+                          <SelectItem value="proforma">Proforma</SelectItem>
+                          <SelectItem value="commercial">Commercial</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">From</Label>
+                      <Input
+                        type="date"
+                        value={pdfFromDate}
+                        onChange={(e) => setPdfFromDate(e.target.value)}
+                        className="h-8 w-36"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">To</Label>
+                      <Input
+                        type="date"
+                        value={pdfToDate}
+                        onChange={(e) => setPdfToDate(e.target.value)}
+                        className="h-8 w-36"
+                      />
+                    </div>
+                    {(pdfDocTypeFilter !== "all" || pdfFromDate || pdfToDate) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8"
+                        onClick={() => {
+                          setPdfDocTypeFilter("all");
+                          setPdfFromDate("");
+                          setPdfToDate("");
+                        }}
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                  {filteredPdfVersions.length === 0 ? (
+                    <p className="px-4 py-6 text-sm text-muted-foreground text-center">
+                      No PDF versions match the selected filters.
+                    </p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Generated</TableHead>
+                          <TableHead>Source</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Filename</TableHead>
+                          <TableHead className="text-right">Size</TableHead>
+                          <TableHead className="w-24"></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredPdfVersions.map((v) => (
+                          <PdfVersionRow key={v.id} v={v} />
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
@@ -995,6 +1077,11 @@ function PdfVersionRow({ v }: { v: InvoicePdfVersionRow }) {
       <TableCell className="whitespace-nowrap text-sm">{stamp}</TableCell>
       <TableCell>
         <Badge variant="secondary">{sourceLabel[v.source] ?? v.source}</Badge>
+      </TableCell>
+      <TableCell>
+        <Badge variant="outline">
+          {v.doc_type === "proforma" ? "Proforma" : "Commercial"}
+        </Badge>
       </TableCell>
       <TableCell className="text-xs font-mono truncate max-w-[220px]" title={v.filename}>
         {v.filename}
