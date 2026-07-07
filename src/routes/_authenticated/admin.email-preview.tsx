@@ -46,6 +46,8 @@ function EmailPreviewAdmin() {
   const [selected, setSelected] = useState<string | null>(null);
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
   const [testRecipient, setTestRecipient] = useState("");
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<"all" | "auth" | "app">("all");
   const [overridesByTemplate, setOverridesByTemplate] = useState<Record<string, Overrides>>({});
   const [debouncedOverrides, setDebouncedOverrides] = useState<Overrides>({});
 
