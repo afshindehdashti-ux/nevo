@@ -2612,6 +2612,30 @@ export type Database = {
           },
         ]
       }
+      sms_alert_dedup: {
+        Row: {
+          dedup_key: string
+          first_sent_at: string
+          last_payload: Json | null
+          last_sent_at: string
+          send_count: number
+        }
+        Insert: {
+          dedup_key: string
+          first_sent_at?: string
+          last_payload?: Json | null
+          last_sent_at?: string
+          send_count?: number
+        }
+        Update: {
+          dedup_key?: string
+          first_sent_at?: string
+          last_payload?: Json | null
+          last_sent_at?: string
+          send_count?: number
+        }
+        Relationships: []
+      }
       solutions_inspection: {
         Row: {
           coverage_state: string | null
