@@ -24,6 +24,7 @@ import { template as inquiryConfirmationTemplate } from './inquiry-confirmation'
 import { template as inquiryNotificationTemplate } from './inquiry-notification'
 import { template as emailDlqAlertTemplate } from './email-dlq-alert'
 import { template as securityAlertTemplate } from './security-alert'
+import { template as invoiceShareTemplate } from './invoice-share'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   welcome: welcomeTemplate,
@@ -33,4 +34,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-notification': inquiryNotificationTemplate,
   'email-dlq-alert': emailDlqAlertTemplate,
   'security-alert': securityAlertTemplate,
+  'invoice-share': invoiceShareTemplate,
 }
