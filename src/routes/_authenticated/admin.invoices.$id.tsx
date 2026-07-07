@@ -440,6 +440,14 @@ function InvoiceDetailPage() {
     });
   };
   const clearPurgeSelection = () => setSelectedPurgeIds(new Set());
+  const clearFilteredPurgeSelection = () => {
+    setSelectedPurgeIds((prev) => {
+      const next = new Set(prev);
+      filteredPurgeLogs.forEach((l) => next.delete(l.id));
+      return next;
+    });
+  };
+  const filteredSelectedCount = filteredPurgeLogs.filter((l) => selectedPurgeIds.has(l.id)).length;
 
   // Last CSV export metadata (for compliance traceability).
   const [lastPurgeExport, setLastPurgeExport] = useState<{
@@ -2017,9 +2025,27 @@ function InvoiceDetailPage() {
                         <FileDown className="h-3.5 w-3.5 mr-1" />
                         Export selected ({selectedPurgeIds.size})
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-8" onClick={clearPurgeSelection}>
-                        Clear
-                      </Button>
+                      {filteredSelectedCount > 0 ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8"
+                          onClick={clearFilteredPurgeSelection}
+                          title="Deselect the rows matching the current filter"
+                        >
+                          Clear filtered ({filteredSelectedCount})
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8"
+                          onClick={clearPurgeSelection}
+                          title="Deselect all rows across every page"
+                        >
+                          Clear all ({selectedPurgeIds.size})
+                        </Button>
+                      )}
                     </>
                   )}
                   <Button
