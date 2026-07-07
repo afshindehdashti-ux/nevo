@@ -1054,7 +1054,7 @@ function InvoiceDetailPage() {
                   </div>
                   <div className="px-4 py-3 border-b flex flex-wrap gap-3 items-end bg-muted/30">
                     <div className="space-y-1">
-                      <Label className="text-xs text-muted-foreground">Keep latest</Label>
+                      <Label className="text-xs text-muted-foreground">Global keep latest</Label>
                       <Input
                         type="number"
                         min={1}
@@ -1072,11 +1072,57 @@ function InvoiceDetailPage() {
                       disabled={
                         savingRetention ||
                         !retentionSetting ||
-                        retentionCount === retentionSetting.pdf_version_retention_count
+                        globalRetentionCount === retentionSetting.pdf_version_retention_count
                       }
                     >
-                      {savingRetention ? "Saving…" : "Save policy"}
+                      {savingRetention ? "Saving…" : "Save global"}
                     </Button>
+                    <div className="h-8 w-px bg-border mx-1" />
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground select-none">
+                      <input
+                        type="checkbox"
+                        className="h-3.5 w-3.5"
+                        checked={overrideEnabled}
+                        onChange={(e) => setOverrideEnabled(e.target.checked)}
+                      />
+                      Override for this invoice
+                    </label>
+                    {overrideEnabled && (
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Invoice keep latest</Label>
+                        <Input
+                          type="number"
+                          min={1}
+                          max={500}
+                          value={overrideInput}
+                          onChange={(e) => setOverrideInput(e.target.value)}
+                          className="h-8 w-24"
+                        />
+                      </div>
+                    )}
+                    {overrideEnabled ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8"
+                        onClick={() => saveInvoiceOverride(overrideCount)}
+                        disabled={savingOverride || overrideCount === invoiceOverride}
+                      >
+                        {savingOverride ? "Saving…" : "Save override"}
+                      </Button>
+                    ) : (
+                      invoiceOverride != null && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8"
+                          onClick={() => saveInvoiceOverride(null)}
+                          disabled={savingOverride}
+                        >
+                          Clear override
+                        </Button>
+                      )
+                    )}
                     <Button
                       variant="destructive"
                       size="sm"
@@ -1092,9 +1138,12 @@ function InvoiceDetailPage() {
                           : "Nothing to purge"}
                     </Button>
                     <p className="text-xs text-muted-foreground ml-auto max-w-xs">
-                      New PDFs auto-trim beyond this count. Applies to every invoice.
+                      Effective limit: {effectiveRetention}
+                      {invoiceOverride != null ? " (invoice override)" : " (global)"}. New PDFs
+                      auto-trim beyond this count.
                     </p>
                   </div>
+
 
                   {filteredPdfVersions.length === 0 ? (
                     <p className="px-4 py-6 text-sm text-muted-foreground text-center">
