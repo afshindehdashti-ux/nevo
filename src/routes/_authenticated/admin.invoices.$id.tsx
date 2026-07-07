@@ -727,7 +727,50 @@ function InvoiceDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog
+        open={!!pdfPreview}
+        onOpenChange={(o) => {
+          if (!o) {
+            setPdfPreview((prev) => {
+              if (prev) URL.revokeObjectURL(prev.url);
+              return null;
+            });
+          }
+        }}
+      >
+        <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0 gap-0">
+          <DialogHeader className="px-4 py-3 border-b flex flex-row items-center justify-between gap-3 space-y-0">
+            <DialogTitle className="text-base">
+              {invoice?.type === "proforma" ? "Proforma Invoice" : "Invoice"} preview
+              {pdfPreview ? ` — ${pdfPreview.filename}` : ""}
+            </DialogTitle>
+            <div className="flex items-center gap-2">
+              <Button size="sm" variant="outline" onClick={openPdfPreview} disabled={pdfLoading}>
+                {pdfLoading ? "Refreshing…" : "Refresh"}
+              </Button>
+              <Button size="sm" onClick={downloadCurrentPdf} disabled={!pdfPreview}>
+                <FileDown className="h-4 w-4 mr-1" /> Download
+              </Button>
+            </div>
+          </DialogHeader>
+          <div className="flex-1 bg-muted">
+            {pdfPreview ? (
+              <iframe
+                title="Invoice PDF preview"
+                src={pdfPreview.url}
+                className="w-full h-full border-0"
+              />
+            ) : (
+              <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+                Loading preview…
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 }
 
