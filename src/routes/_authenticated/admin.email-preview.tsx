@@ -107,6 +107,13 @@ function EmailPreviewAdmin() {
     },
   });
 
+  const audit = useMemo(
+    () => (preview.data?.html ? auditEmailHtml(preview.data.html) : null),
+    [preview.data?.html],
+  );
+  const [showA11yDetails, setShowA11yDetails] = useState(false);
+
+
   const grouped = useMemo(() => {
     const auth: EmailPreviewMeta[] = [];
     const app: EmailPreviewMeta[] = [];
