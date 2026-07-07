@@ -732,7 +732,7 @@ function ActorDetailDialog({
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name, email, phone, created_at")
+        .select("id, full_name, job_title, phone, created_at, last_login_at, is_active")
         .eq("id", userId!)
         .maybeSingle();
       if (error) throw error;
