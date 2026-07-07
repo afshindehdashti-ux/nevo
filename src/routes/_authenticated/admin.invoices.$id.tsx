@@ -66,6 +66,7 @@ import {
 import { useCanEditInvoices, useCanEditPayments, useCanPurgeInvoicePdfVersions } from "@/lib/crm-permissions";
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
 import { ApprovalPanel } from "@/components/crm/ApprovalPanel";
+import { InvoiceAiCheckButton } from "@/components/ai/InvoiceAiCheckButton";
 
 const invoiceDetailSearchSchema = z.object({
   purgeUser: fallback(z.string(), "all").default("all"),
@@ -1692,6 +1693,7 @@ function InvoiceDetailPage() {
             <Button variant="outline" size="sm" onClick={() => window.print()}>
               <Printer className="h-4 w-4 mr-1" /> Print
             </Button>
+            <InvoiceAiCheckButton invoiceId={invoice.id} />
             <Button
               variant="outline"
               size="sm"
