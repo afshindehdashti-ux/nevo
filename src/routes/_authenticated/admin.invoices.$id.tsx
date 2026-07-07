@@ -2344,9 +2344,30 @@ function InvoiceDetailPage() {
                     />
                   </div>
                   {purgeVerifyState.status === "match" && (
-                    <div className="mt-2 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2 py-1.5 text-[11px] text-emerald-700 dark:text-emerald-300">
-                      ✓ {purgeVerifyState.filename} matches the displayed SHA-256
-                      · verified {new Date(purgeVerifyState.verifiedAt).toLocaleString()}
+                    <div className="mt-2 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2 py-1.5 text-[11px] text-emerald-700 dark:text-emerald-300 space-y-0.5">
+                      <div>
+                        ✓ {purgeVerifyState.filename} matches the displayed SHA-256
+                        · verified {new Date(purgeVerifyState.verifiedAt).toLocaleString()}
+                      </div>
+                      <div className="font-mono break-all">
+                        computed: {purgeVerifyState.sha256}
+                      </div>
+                      {purgeVerifyState.embeddedSha && (
+                        <div className="font-mono break-all">
+                          embedded: {purgeVerifyState.embeddedSha}
+                        </div>
+                      )}
+                      {purgeVerifyState.embeddedExportedAt && (
+                        <div>
+                          embedded export timestamp:{" "}
+                          {(() => {
+                            const d = new Date(purgeVerifyState.embeddedExportedAt);
+                            return isNaN(d.getTime())
+                              ? purgeVerifyState.embeddedExportedAt
+                              : d.toLocaleString();
+                          })()}
+                        </div>
+                      )}
                     </div>
                   )}
                   {purgeVerifyState.status === "mismatch" && (
@@ -2358,10 +2379,27 @@ function InvoiceDetailPage() {
                         expected: {purgeVerifyState.expected}
                       </div>
                       <div className="font-mono break-all">
-                        actual:&nbsp;&nbsp; {purgeVerifyState.sha256}
+                        computed: {purgeVerifyState.sha256}
                       </div>
+                      {purgeVerifyState.embeddedSha && (
+                        <div className="font-mono break-all">
+                          embedded: {purgeVerifyState.embeddedSha}
+                        </div>
+                      )}
+                      {purgeVerifyState.embeddedExportedAt && (
+                        <div>
+                          embedded export timestamp:{" "}
+                          {(() => {
+                            const d = new Date(purgeVerifyState.embeddedExportedAt);
+                            return isNaN(d.getTime())
+                              ? purgeVerifyState.embeddedExportedAt
+                              : d.toLocaleString();
+                          })()}
+                        </div>
+                      )}
                     </div>
                   )}
+
                 </div>
               )}
             </CardHeader>
