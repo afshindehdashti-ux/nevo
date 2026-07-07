@@ -181,26 +181,6 @@ function InvoiceDetailPage() {
     setPurgePage(0);
   }, [purgeUserFilter, purgeFromDate, purgeToDate, purgePageSize]);
 
-  // Helper: apply the current server-side filters to a Supabase query builder.
-  const applyPurgeFilters = <T extends {
-    eq: (col: string, val: unknown) => T;
-    gte: (col: string, val: unknown) => T;
-    lte: (col: string, val: unknown) => T;
-    is: (col: string, val: unknown) => T;
-  }>(q: T): T => {
-    let query = q
-      .eq("action", "purge_pdf_versions")
-      .eq("entity_type", "invoice")
-      .eq("entity_id", id);
-    if (purgeUserFilter === "__system__") {
-      query = query.is("user_id", null);
-    } else if (purgeUserFilter !== "all") {
-      query = query.eq("user_id", purgeUserFilter);
-    }
-    if (purgeFromDate) query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
-    if (purgeToDate) query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
-    return query;
-  };
 
   const purgeLogsQuery = useQuery({
     queryKey: ["invoice-purge-logs", id, purgeUserFilter, purgeFromDate, purgeToDate, purgePage, purgePageSize],
