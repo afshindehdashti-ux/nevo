@@ -354,6 +354,75 @@ function ExportsHistoryPage() {
             </div>
           </div>
 
+          <div className="flex flex-wrap items-end gap-2 rounded-md border bg-muted/30 p-2">
+            <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+              <Bookmark className="h-3.5 w-3.5" />
+              Saved presets
+            </div>
+            {presets.length === 0 ? (
+              <span className="text-xs text-muted-foreground">
+                None yet — set filters, name it, then Save.
+              </span>
+            ) : (
+              <div className="flex flex-wrap gap-1">
+                {presets.map((p) => (
+                  <div
+                    key={p.id}
+                    className={`inline-flex items-center gap-1 rounded-full border pl-2 pr-1 py-0.5 text-xs ${
+                      activePresetId === p.id
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-background"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      className="max-w-[160px] truncate"
+                      onClick={() => applyPreset(p)}
+                      title={`Apply "${p.name}"`}
+                    >
+                      {p.name}
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-full p-0.5 hover:bg-muted"
+                      onClick={() => deletePreset(p.id)}
+                      title={`Delete "${p.name}"`}
+                      aria-label={`Delete preset ${p.name}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="ml-auto flex items-end gap-1">
+              <Input
+                value={presetName}
+                onChange={(e) => setPresetName(e.target.value)}
+                placeholder="Preset name"
+                className="h-8 w-40 text-xs"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    savePreset();
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-8"
+                onClick={savePreset}
+                disabled={activeFilters === 0 || !presetName.trim()}
+              >
+                <Save className="h-3 w-3 mr-1" />
+                Save
+              </Button>
+            </div>
+          </div>
+
+
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <span>
               {query.isFetching
