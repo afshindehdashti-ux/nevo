@@ -188,6 +188,7 @@ export const CRM_NAV: CrmNavGroup[] = [
         allowedRoles: ["management", "operations", "finance"],
       },
       { title: "Backend Health", url: "/admin/backend-health", icon: Activity, requiresSuperAdmin: true },
+      { title: "Alerts", url: "/admin/alerts", icon: Bell, requiresSuperAdmin: true },
       { title: "Security Audit", url: "/admin/security-audit", icon: ShieldCheck, requiresSuperAdmin: true },
       { title: "Settings", url: "/admin/settings", icon: Settings, requiresSuperAdmin: true },
     ],
