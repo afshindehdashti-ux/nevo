@@ -43,21 +43,34 @@ export const Route = createFileRoute('/api/public/alerts/email-dlq')({
         }
 
         const { enqueueTransactionalEmail } = await import('@/lib/email-enqueue.server')
-        const result = await enqueueTransactionalEmail({
-          templateName: ALERT_TEMPLATE,
-          recipientEmail: 'info@nevoindustrial.com',
-          idempotencyKey: body.message_id
-            ? `email-dlq-alert-${body.message_id}`
-            : undefined,
-          templateData: {
-            messageId: body.message_id ?? undefined,
-            templateName: body.template_name ?? undefined,
-            recipientEmail: body.recipient_email ?? undefined,
-            errorMessage: body.error_message ?? undefined,
-            failedAt: body.failed_at ?? new Date().toISOString(),
-            metadata: body.metadata ?? undefined,
+        const { retryWithBackoff } = await import('@/lib/retry.server')
+        // Retry the enqueue on transient failures (DB blip, network hiccup).
+        // Idempotency key ensures a partially-succeeded enqueue doesn't double-send.
+        const { result } = await retryWithBackoff(
+          () =>
+            enqueueTransactionalEmail({
+              templateName: ALERT_TEMPLATE,
+              recipientEmail: 'info@nevoindustrial.com',
+              idempotencyKey: body.message_id
+                ? `email-dlq-alert-${body.message_id}`
+                : undefined,
+              templateData: {
+                messageId: body.message_id ?? undefined,
+                templateName: body.template_name ?? undefined,
+                recipientEmail: body.recipient_email ?? undefined,
+                errorMessage: body.error_message ?? undefined,
+                failedAt: body.failed_at ?? new Date().toISOString(),
+                metadata: body.metadata ?? undefined,
+              },
+            }),
+          {
+            label: 'email-dlq-enqueue',
+            maxAttempts: 4,
+            baseDelayMs: 250,
+            maxDelayMs: 3000,
+            isTransient: (r) => r.ok === false,
           },
-        })
+        )
 
         if (!result.ok) {
           console.error('email-dlq alert enqueue failed', result)
