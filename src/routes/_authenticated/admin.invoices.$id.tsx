@@ -1359,11 +1359,23 @@ function InvoiceDetailPage() {
 
           <Card id="purge-audit-log">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <History className="h-4 w-4" />
-                PDF purge audit log
-                <Badge variant="secondary" className="ml-2">{purgeLogs.length}</Badge>
-              </CardTitle>
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <History className="h-4 w-4" />
+                  PDF purge audit log
+                  <Badge variant="secondary" className="ml-2">{purgeLogs.length}</Badge>
+                </CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                  onClick={exportPurgeAuditCsv}
+                  disabled={purgeLogs.length === 0}
+                >
+                  <FileDown className="h-3.5 w-3.5 mr-1" />
+                  Export CSV
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="p-0">
               {purgeLogs.length === 0 ? (
