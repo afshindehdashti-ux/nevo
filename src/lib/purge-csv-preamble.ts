@@ -100,6 +100,84 @@ export async function computeSha256Hex(text: string): Promise<string> {
     .join("");
 }
 
+/**
+ * Reasons a CSV can fail structural validation before the hash check runs.
+ * These map to the user-facing "malformed file" alerts in the UI.
+ */
+export type CsvStructureIssue =
+  | "empty-file"
+  | "missing-payload-marker"
+  | "missing-sha-row"
+  | "invalid-sha-format"
+  | "missing-timestamp-row"
+  | "invalid-timestamp-format"
+  | "empty-payload";
+
+export interface CsvStructureReport {
+  ok: boolean;
+  issues: CsvStructureIssue[];
+  hasMarker: boolean;
+  embeddedSha?: string;
+  embeddedExportedAt?: string;
+  payload: string;
+}
+
+const ISO_8601 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
+
+/**
+ * Structural pre-flight for a downloaded export CSV. Runs before hashing so
+ * the UI can surface a clear "file structure is malformed" alert instead of
+ * a bare checksum mismatch when the preamble is missing / corrupt.
+ */
+export function inspectCsvStructure(text: string): CsvStructureReport {
+  const issues: CsvStructureIssue[] = [];
+  if (!text || text.length === 0) {
+    return {
+      ok: false,
+      issues: ["empty-file"],
+      hasMarker: false,
+      payload: "",
+    };
+  }
+  const parsed = parsePreambleAndSplitPayload(text);
+  if (!parsed.hasMarker) issues.push("missing-payload-marker");
+  if (parsed.embeddedSha === undefined) issues.push("missing-sha-row");
+  else if (
+    !isValidSha256Hex(parsed.embeddedSha) &&
+    parsed.embeddedSha !== "(unavailable)"
+  )
+    issues.push("invalid-sha-format");
+  if (parsed.embeddedExportedAt === undefined) issues.push("missing-timestamp-row");
+  else if (!ISO_8601.test(parsed.embeddedExportedAt))
+    issues.push("invalid-timestamp-format");
+  if (parsed.hasMarker && parsed.payload.length === 0) issues.push("empty-payload");
+  return {
+    ok: issues.length === 0,
+    issues,
+    hasMarker: parsed.hasMarker,
+    embeddedSha: parsed.embeddedSha,
+    embeddedExportedAt: parsed.embeddedExportedAt,
+    payload: parsed.payload,
+  };
+}
+
+const STRUCTURE_ISSUE_MESSAGES: Record<CsvStructureIssue, string> = {
+  "empty-file": "The file is empty.",
+  "missing-payload-marker":
+    'The "--- PAYLOAD BELOW ---" marker line is missing — this file was not produced by the NEVO exporter or has been truncated.',
+  "missing-sha-row": "The preamble is missing the SHA-256 row.",
+  "invalid-sha-format":
+    "The embedded SHA-256 value is not a 64-character hex digest.",
+  "missing-timestamp-row": "The preamble is missing the Export Timestamp row.",
+  "invalid-timestamp-format":
+    "The embedded Export Timestamp is not a valid ISO-8601 value.",
+  "empty-payload": "The payload section (after the marker) is empty.",
+};
+
+export function describeStructureIssue(issue: CsvStructureIssue): string {
+  return STRUCTURE_ISSUE_MESSAGES[issue];
+}
+
 export type VerifyResult =
   | {
       status: "match";
@@ -120,28 +198,48 @@ export type VerifyResult =
       computedSha: string;
       embeddedSha?: string;
       embeddedExportedAt?: string;
+    }
+  | {
+      status: "malformed";
+      issues: CsvStructureIssue[];
+      messages: string[];
+      hasMarker: boolean;
+      embeddedSha?: string;
+      embeddedExportedAt?: string;
     };
 
 /**
  * Verify a downloaded CSV against an expected checksum. When no expected
  * value is supplied, falls back to the SHA embedded in the file preamble.
+ * If the file's structure is invalid (e.g. the payload marker is missing),
+ * returns `status: "malformed"` BEFORE attempting a hash comparison.
  */
 export async function verifyCsvText(
   text: string,
   opts: { expectedSha?: string } = {},
 ): Promise<VerifyResult> {
-  const parsed = parsePreambleAndSplitPayload(text);
-  const computedSha = await computeSha256Hex(parsed.payload);
+  const structure = inspectCsvStructure(text);
+  if (!structure.ok) {
+    return {
+      status: "malformed",
+      issues: structure.issues,
+      messages: structure.issues.map(describeStructureIssue),
+      hasMarker: structure.hasMarker,
+      embeddedSha: structure.embeddedSha,
+      embeddedExportedAt: structure.embeddedExportedAt,
+    };
+  }
+  const computedSha = await computeSha256Hex(structure.payload);
   const expected =
     opts.expectedSha ||
-    (isValidSha256Hex(parsed.embeddedSha) ? parsed.embeddedSha : undefined);
+    (isValidSha256Hex(structure.embeddedSha) ? structure.embeddedSha : undefined);
 
   if (!expected) {
     return {
       status: "no-expected",
       computedSha,
-      embeddedSha: parsed.embeddedSha,
-      embeddedExportedAt: parsed.embeddedExportedAt,
+      embeddedSha: structure.embeddedSha,
+      embeddedExportedAt: structure.embeddedExportedAt,
     };
   }
   const matches = computedSha.toLowerCase() === expected.toLowerCase();
@@ -149,7 +247,7 @@ export async function verifyCsvText(
     status: matches ? "match" : "mismatch",
     computedSha,
     expected,
-    embeddedSha: parsed.embeddedSha,
-    embeddedExportedAt: parsed.embeddedExportedAt,
+    embeddedSha: structure.embeddedSha,
+    embeddedExportedAt: structure.embeddedExportedAt,
   };
 }
