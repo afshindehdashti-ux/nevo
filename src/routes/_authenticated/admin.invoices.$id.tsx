@@ -855,7 +855,40 @@ function InvoiceDetailPage() {
       toast.info("No purge audit entries to export");
       return;
     }
+    const metadataRows = [
+      ["Export Scope", meta.scope],
+      ["Export Timestamp", new Date().toISOString()],
+      ["Invoice ID", id],
+      ["Invoice Number", invoice?.invoice_number ?? ""],
+      ["Row Count", String(source.length)],
+      ...(meta.scope === "filtered"
+        ? [
+            ["Filter User", meta.userLabel ?? "All users"],
+            ["Filter From Date", meta.fromDate ?? ""],
+            ["Filter To Date", meta.toDate ?? ""],
+            ["Filter Version ID Contains", meta.versionQuery ?? ""],
+            ["Filter Min Size MB", meta.minBytes ?? ""],
+            ["Filter Max Size MB", meta.maxBytes ?? ""],
+          ]
+        : []),
+      ...(meta.scope === "selected"
+        ? [
+            ["Selected Count", String(meta.selectedIds?.length ?? source.length)],
+            ["Selected IDs", (meta.selectedIds ?? []).join("; ")],
+          ]
+        : []),
+      [], // empty separator
+    ];
     const header = [
+      "Export Scope",
+      "Filter User",
+      "Filter From Date",
+      "Filter To Date",
+      "Filter Version ID Contains",
+      "Filter Min Size MB",
+      "Filter Max Size MB",
+      "Selected Count",
+      "Selected IDs",
       "Log ID",
       "Timestamp (ISO)",
       "Timestamp (Local)",
@@ -871,18 +904,28 @@ function InvoiceDetailPage() {
     ];
     const escape = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
     const lines = [
+      ...metadataRows.map((row) => row.map(escape).join(",")),
       header.join(","),
       ...source.map((log) => {
-        const meta = (log.metadata ?? {}) as {
+        const logMeta = (log.metadata ?? {}) as {
           removed_count?: number;
           kept?: number;
           version_ids?: string[];
           total_bytes?: number;
         };
         const who = log.user_id ? purgeActorMap[log.user_id] ?? "Unknown user" : "System";
-        const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
-        const totalBytes = meta.total_bytes ?? 0;
+        const ids = Array.isArray(logMeta.version_ids) ? logMeta.version_ids : [];
+        const totalBytes = logMeta.total_bytes ?? 0;
         return [
+          escape(meta.scope),
+          escape(meta.scope === "filtered" ? (meta.userLabel ?? "All users") : ""),
+          escape(meta.scope === "filtered" ? (meta.fromDate ?? "") : ""),
+          escape(meta.scope === "filtered" ? (meta.toDate ?? "") : ""),
+          escape(meta.scope === "filtered" ? (meta.versionQuery ?? "") : ""),
+          escape(meta.scope === "filtered" ? (meta.minBytes ?? "") : ""),
+          escape(meta.scope === "filtered" ? (meta.maxBytes ?? "") : ""),
+          escape(meta.scope === "selected" ? String(meta.selectedIds?.length ?? source.length) : ""),
+          escape(meta.scope === "selected" ? (meta.selectedIds ?? []).join("; ") : ""),
           escape(log.id),
           escape(log.created_at),
           escape(new Date(log.created_at).toLocaleString()),
@@ -890,8 +933,8 @@ function InvoiceDetailPage() {
           escape(who),
           escape(id),
           escape(invoice?.invoice_number ?? ""),
-          escape(String(meta.removed_count ?? ids.length)),
-          escape(meta.kept != null ? String(meta.kept) : ""),
+          escape(String(logMeta.removed_count ?? ids.length)),
+          escape(logMeta.kept != null ? String(logMeta.kept) : ""),
           escape(String(totalBytes)),
           escape(formatBytes(totalBytes)),
           escape(ids.join("; ")),
