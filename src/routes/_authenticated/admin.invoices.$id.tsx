@@ -309,19 +309,30 @@ function InvoiceDetailPage() {
   const purgeFiltersActive =
     purgeUserFilter !== "all" || purgeFromDate !== "" || purgeToDate !== "" || purgeVersionQuery.trim() !== "";
   const resetPurgeFilters = () => {
-    setPurgeUserFilter("all");
-    setPurgeFromDate("");
-    setPurgeToDate("");
-    setPurgeVersionQuery("");
-    setPurgePage(0);
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({
+        ...prev,
+        purgeUser: "all",
+        purgeFrom: "",
+        purgeTo: "",
+        purgeVersion: "",
+        purgePage: 0,
+      }),
+    });
   };
   const setPurgeDateRange = (days: number) => {
     const end = new Date();
     const start = new Date();
     start.setDate(end.getDate() - days + 1);
     const fmt = (d: Date) => d.toLocaleDateString("en-CA");
-    setPurgeFromDate(fmt(start));
-    setPurgeToDate(fmt(end));
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({
+        ...prev,
+        purgeFrom: fmt(start),
+        purgeTo: fmt(end),
+        purgePage: 0,
+      }),
+    });
   };
 
 
