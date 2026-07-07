@@ -276,6 +276,45 @@ function ExportsHistoryPage() {
     return m;
   }, [actors]);
 
+  const allVisibleSelected =
+    rows.length > 0 && rows.every((r) => selectedIds.has(r.id));
+  function toggleAllVisible() {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allVisibleSelected) {
+        for (const r of rows) next.delete(r.id);
+      } else {
+        for (const r of rows) next.add(r.id);
+      }
+      return next;
+    });
+  }
+
+  function downloadComplianceReport() {
+    const selected = rows.filter((r) => selectedIds.has(r.id));
+    if (selected.length === 0) {
+      toast.error("Select at least one export to include in the report.");
+      return;
+    }
+    const csv = buildComplianceReportCsv(selected, {
+      generatedAtIso: new Date().toISOString(),
+      actorMap,
+    });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `csv-export-compliance-report-${stamp}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    toast.success(
+      `Compliance report ready · ${selected.length} export${selected.length === 1 ? "" : "s"}`,
+    );
+  }
+
   function update<K extends keyof z.infer<typeof searchSchema>>(key: K, value: string) {
     void navigate({ search: (prev: z.infer<typeof searchSchema>) => ({ ...prev, [key]: value }) });
   }
