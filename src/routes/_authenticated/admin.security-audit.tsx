@@ -43,20 +43,27 @@ import {
   Download,
   Search,
   LogIn,
+  LogOut,
   UserCog,
+  UserPlus,
   Trash2,
   CheckCircle2,
   XCircle,
+  Bell,
+  KeyRound,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 
 /**
  * Security Audit — filtered view of activity_logs focused on
- * security-sensitive events emitted by SECURITY DEFINER functions:
- *   - sign_in (auth-audit server fn)
+ * security-sensitive events emitted by SECURITY DEFINER functions
+ * and admin server functions:
+ *   - sign_in / sign_in_failed / security_alert (auth-audit + alerts)
+ *   - revoke_session / sign_out_all (session revocations)
  *   - approve / reject / cancel (decide_approval_request)
- *   - delete (log_row_delete trigger on privileged tables)
  *   - role changes on user_roles
+ *   - user_invited / bootstrap_super_admin (user management)
+ *   - delete (log_row_delete trigger on privileged tables)
  * Super Admin only. Includes filters + CSV export.
  */
 
@@ -70,12 +77,38 @@ type LogRow = {
   created_at: string;
 };
 
+// Every security-significant action tracked on this page. Kept in one place
+// so the "all" server-side pre-filter and the client-side category filters
+// stay in sync.
+const SECURITY_ACTIONS = [
+  "sign_in",
+  "sign_in_failed",
+  "security_alert",
+  "revoke_session",
+  "sign_out_all",
+  "approve",
+  "reject",
+  "cancel",
+  "delete",
+  "user_invited",
+  "bootstrap_super_admin",
+] as const;
+
+const SESSION_ACTIONS = ["revoke_session", "sign_out_all"];
+const APPROVAL_ACTIONS = ["approve", "reject", "cancel"];
+const USER_MGMT_ACTIONS = ["user_invited", "bootstrap_super_admin"];
+const ALERT_ACTIONS = ["sign_in_failed", "security_alert"];
+
 const CATEGORIES = [
   { value: "all", label: "All security events" },
   { value: "sign_in", label: "Sign-ins" },
+  { value: "sessions", label: "Session revocations" },
+  { value: "alerts", label: "Security alerts (failed sign-in, anomalies)" },
   { value: "approvals", label: "Approvals (approve/reject/cancel)" },
   { value: "role_changes", label: "Role changes" },
+  { value: "user_mgmt", label: "User management (invite, bootstrap)" },
   { value: "deletes", label: "Deletes (audited tables)" },
+  { value: "definer_other", label: "Other security-definer actions" },
 ] as const;
 
 const CATEGORY_FILTER: Record<
@@ -84,11 +117,27 @@ const CATEGORY_FILTER: Record<
 > = {
   all: () => true,
   sign_in: (r) => r.action === "sign_in",
+  sessions: (r) => SESSION_ACTIONS.includes(r.action),
+  alerts: (r) => ALERT_ACTIONS.includes(r.action),
   approvals: (r) =>
-    ["approve", "reject", "cancel"].includes(r.action) ||
+    APPROVAL_ACTIONS.includes(r.action) ||
     (r.entity_type ?? "").startsWith("approval:"),
   role_changes: (r) => r.entity_type === "user_roles",
+  user_mgmt: (r) => USER_MGMT_ACTIONS.includes(r.action),
   deletes: (r) => r.action === "delete",
+  // Anything security-tracked that isn't one of the buckets above — a
+  // catch-all for future SECURITY DEFINER actions we haven't categorised yet.
+  definer_other: (r) =>
+    !(
+      r.action === "sign_in" ||
+      SESSION_ACTIONS.includes(r.action) ||
+      ALERT_ACTIONS.includes(r.action) ||
+      APPROVAL_ACTIONS.includes(r.action) ||
+      (r.entity_type ?? "").startsWith("approval:") ||
+      r.entity_type === "user_roles" ||
+      USER_MGMT_ACTIONS.includes(r.action) ||
+      r.action === "delete"
+    ),
 };
 
 export const Route = createFileRoute("/_authenticated/admin/security-audit")({
