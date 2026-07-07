@@ -1112,31 +1112,21 @@ function InvoiceDetailPage() {
       }),
     ];
     const payloadCsv = lines.join("\n");
-    const payloadBytes = new TextEncoder().encode(payloadCsv);
     // Compute SHA-256 of the payload so it can be embedded in the file itself.
     // The embedded hash covers everything AFTER the PAYLOAD BELOW marker line,
     // so verification stays stable even though the file also carries the hash.
     let sha256 = "";
     try {
-      const digest = await crypto.subtle.digest("SHA-256", payloadBytes);
-      sha256 = Array.from(new Uint8Array(digest))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
+      sha256 = await computeSha256Hex(payloadCsv);
     } catch {
       sha256 = "";
     }
     const exportedAtIso = new Date().toISOString();
-    const escapeHeader = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
-    const preamble = [
-      `${escapeHeader("SHA-256 (of payload below)")},${escapeHeader(sha256 || "(unavailable)")}`,
-      `${escapeHeader("Export Timestamp (ISO)")},${escapeHeader(exportedAtIso)}`,
-      escapeHeader("--- PAYLOAD BELOW ---"),
-      "",
-    ].join("\n");
-    const fullCsv = preamble + payloadCsv;
+    const fullCsv = assembleCsv({ sha256, exportedAtIso, payloadCsv });
     const bytes = new TextEncoder().encode(fullCsv);
     const blob = new Blob([bytes], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
+
     // Include a short SHA-256 prefix in the filename so compliance workflows
     // can match a file to its checksum without opening it.
     const shortSha = sha256 ? sha256.slice(0, 12) : "nochecksum";
