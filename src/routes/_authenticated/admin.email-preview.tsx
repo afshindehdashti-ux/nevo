@@ -341,6 +341,22 @@ function EmailPreviewAdmin() {
             <Button
               size="sm"
               variant="outline"
+              disabled={!preview.data?.html || !current}
+              onClick={() => {
+                if (!preview.data?.html || !current) return;
+                const blob = new Blob([preview.data.html], { type: "text/html;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+                window.open(url, "_blank", "noopener,noreferrer");
+                // Revoke after the tab has had time to read the blob.
+                window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+              }}
+            >
+              <ExternalLink className="h-4 w-4 mr-1.5" aria-hidden />
+              Open in new tab
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
               className="ml-auto"
               disabled={!preview.data?.html || !current}
               onClick={() => {
