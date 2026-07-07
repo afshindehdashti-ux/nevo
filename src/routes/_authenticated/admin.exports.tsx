@@ -657,6 +657,47 @@ function ExportsHistoryPage() {
             </DialogDescription>
           </DialogHeader>
           {detail && (
+            <div className="flex justify-end">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  const md = (detail.metadata ?? {}) as {
+                    embedded_sha256?: string;
+                    embedded_exported_at_iso?: string;
+                  };
+                  const summary = [
+                    `Filename: ${detail.filename}`,
+                    `Exported at: ${detail.created_at}`,
+                    `Export type / scope: ${detail.export_type} / ${detail.scope ?? "—"}`,
+                    `Rows / Size: ${detail.row_count} · ${formatBytes(detail.byte_size)}`,
+                    `SHA-256 (recorded): ${detail.sha256}`,
+                    `SHA-256 (embedded in preamble): ${md.embedded_sha256 ?? "—"}`,
+                    `Export timestamp (embedded in preamble): ${md.embedded_exported_at_iso ?? "—"}`,
+                    `Payload marker line: "--- PAYLOAD BELOW ---"`,
+                    `Metadata JSON:`,
+                    JSON.stringify(detail.metadata ?? {}, null, 2),
+                  ].join("\n");
+                  void navigator.clipboard
+                    .writeText(summary)
+                    .then(() =>
+                      toast.success("Audit summary copied to clipboard"),
+                    )
+                    .catch((err) =>
+                      toast.error("Copy failed", {
+                        description:
+                          err instanceof Error ? err.message : String(err),
+                      }),
+                    );
+                }}
+              >
+                <Copy className="h-3.5 w-3.5" />
+                Copy audit summary
+              </Button>
+            </div>
+          )}
+          {detail && (
+
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-[140px_1fr] gap-y-2">
                 <span className="text-muted-foreground">Filename</span>
