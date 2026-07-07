@@ -196,8 +196,8 @@ function KnowledgeBasePage() {
             Upload internal documents so the assistant can cite them when answering questions.
             {" "}
             <span className="text-neutral-500">
-              {totalReady} indexed · Phase 1 supports text-based files (TXT / MD / CSV / JSON) and
-              pasted text.
+              {totalReady} indexed · TXT, MD, CSV, JSON, PDF, DOCX and XLSX are extracted and
+              embedded automatically.
             </span>
           </p>
         </div>
