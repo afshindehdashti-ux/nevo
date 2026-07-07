@@ -641,47 +641,47 @@ function MiniStat({
   );
 }
 
+const EVENT_LABELS: Record<string, string> = {
+  sign_in: "sign in",
+  approve: "approve",
+  reject: "reject",
+  cancel: "cancel",
+  delete: "delete",
+};
+
 function EventBadge({ action }: { action: string }) {
   const map: Record<
     string,
-    { label: string; icon: React.ComponentType<{ className?: string }>; cls: string }
+    { icon: React.ComponentType<{ className?: string }>; cls: string }
   > = {
     sign_in: {
-      label: "sign in",
       icon: LogIn,
       cls: "bg-sky-500/15 text-sky-600 dark:text-sky-400",
     },
     approve: {
-      label: "approve",
       icon: CheckCircle2,
       cls: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
     },
     reject: {
-      label: "reject",
       icon: XCircle,
       cls: "bg-rose-500/15 text-rose-600 dark:text-rose-400",
     },
     cancel: {
-      label: "cancel",
       icon: XCircle,
       cls: "bg-muted text-muted-foreground",
     },
     delete: {
-      label: "delete",
       icon: Trash2,
       cls: "bg-rose-500/15 text-rose-600 dark:text-rose-400",
     },
   };
-  const cfg = map[action] ?? {
-    label: action,
-    icon: ShieldCheck,
-    cls: "bg-muted text-muted-foreground",
-  };
+  const cfg = map[action] ?? { icon: ShieldCheck, cls: "bg-muted text-muted-foreground" };
   const Icon = cfg.icon;
+  const label = EVENT_LABELS[action] ?? action;
   return (
     <Badge className={`gap-1 border-transparent ${cfg.cls}`}>
       <Icon className="h-3 w-3" />
-      {cfg.label}
+      {label}
     </Badge>
   );
 }
