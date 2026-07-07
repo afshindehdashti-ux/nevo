@@ -521,6 +521,14 @@ function InvoiceDetailPage() {
         embeddedSha?: string;
         embeddedExportedAt?: string;
       }
+    | {
+        status: "malformed";
+        filename: string;
+        messages: string[];
+        verifiedAt: string;
+        embeddedSha?: string;
+        embeddedExportedAt?: string;
+      }
   >({ status: "idle" });
 
   async function verifyDownloadedCsv(file: File) {
@@ -531,6 +539,22 @@ function InvoiceDetailPage() {
         expectedSha: lastPurgeExport?.sha256,
       });
       const now = new Date().toISOString();
+
+      if (result.status === "malformed") {
+        setPurgeVerifyState({
+          status: "malformed",
+          filename: file.name,
+          messages: result.messages,
+          verifiedAt: now,
+          embeddedSha: result.embeddedSha,
+          embeddedExportedAt: result.embeddedExportedAt,
+        });
+        toast.error("CSV structure is malformed — cannot verify", {
+          description: result.messages[0],
+          duration: 12000,
+        });
+        return;
+      }
 
       if (result.status === "no-expected") {
         setPurgeVerifyState({ status: "idle" });
@@ -565,6 +589,7 @@ function InvoiceDetailPage() {
           duration: 10000,
         });
       }
+
     } catch (e) {
       setPurgeVerifyState({ status: "idle" });
       toast.error(e instanceof Error ? e.message : "Failed to compute checksum");
@@ -2362,6 +2387,37 @@ function InvoiceDetailPage() {
                       )}
                     </div>
                   )}
+                  {purgeVerifyState.status === "malformed" && (
+                    <div
+                      role="alert"
+                      className="mt-2 rounded-md border-2 border-destructive/60 bg-destructive/10 px-2 py-2 text-[11px] text-destructive space-y-1"
+                    >
+                      <div className="font-semibold text-xs">
+                        ⚠ Malformed CSV — {purgeVerifyState.filename} cannot be verified
+                      </div>
+                      <div>
+                        The file does not match the NEVO export format. Verification was
+                        aborted before hashing:
+                      </div>
+                      <ul className="list-disc list-inside space-y-0.5">
+                        {purgeVerifyState.messages.map((msg, i) => (
+                          <li key={i}>{msg}</li>
+                        ))}
+                      </ul>
+                      {purgeVerifyState.embeddedSha && (
+                        <div className="font-mono break-all">
+                          embedded sha (as found): {purgeVerifyState.embeddedSha}
+                        </div>
+                      )}
+                      {purgeVerifyState.embeddedExportedAt && (
+                        <div className="font-mono break-all">
+                          embedded timestamp (as found): {purgeVerifyState.embeddedExportedAt}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+
 
                 </div>
               )}

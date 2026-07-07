@@ -11,6 +11,8 @@ import {
   computeSha256Hex,
   isValidSha256Hex,
   verifyCsvText,
+  inspectCsvStructure,
+  describeStructureIssue,
 } from "../purge-csv-preamble";
 
 const ISO = "2026-07-07T22:05:50.123Z";
@@ -177,21 +179,27 @@ describe("verifyCsvText", () => {
     if (r.status === "match") expect(r.expected).toBe(sha);
   });
 
-  it("returns no-expected when neither an override nor a valid embedded sha exists", async () => {
+  it("returns malformed when the file has no preamble (bare CSV, no marker)", async () => {
     const bare = "col_a,col_b\n1,2\n";
     const r = await verifyCsvText(bare);
-    expect(r.status).toBe("no-expected");
+    expect(r.status).toBe("malformed");
+    if (r.status === "malformed") {
+      expect(r.issues).toContain("missing-payload-marker");
+      expect(r.issues).toContain("missing-sha-row");
+      expect(r.issues).toContain("missing-timestamp-row");
+    }
   });
 
-  it("ignores an invalid embedded sha when falling back", async () => {
+  it("returns malformed when the embedded sha is not a valid hex digest", async () => {
     const csv =
       `"${SHA_LABEL}","not-a-real-hash"\n` +
       `"${TIMESTAMP_LABEL}","${ISO}"\n` +
       PAYLOAD_MARKER_LINE +
       PAYLOAD;
     const r = await verifyCsvText(csv);
-    expect(r.status).toBe("no-expected");
-    if (r.status === "no-expected") {
+    expect(r.status).toBe("malformed");
+    if (r.status === "malformed") {
+      expect(r.issues).toContain("invalid-sha-format");
       expect(r.embeddedSha).toBe("not-a-real-hash");
     }
   });
@@ -202,3 +210,133 @@ describe("verifyCsvText", () => {
     expect(r.status).toBe("match");
   });
 });
+
+describe("inspectCsvStructure (payload-marker + preamble validation)", () => {
+  it("passes for a well-formed export", async () => {
+    const { csv } = await makeExport();
+    const report = inspectCsvStructure(csv);
+    expect(report.ok).toBe(true);
+    expect(report.hasMarker).toBe(true);
+    expect(report.issues).toEqual([]);
+  });
+
+  it("flags empty-file for an empty string", () => {
+    const report = inspectCsvStructure("");
+    expect(report.ok).toBe(false);
+    expect(report.issues).toEqual(["empty-file"]);
+    expect(report.hasMarker).toBe(false);
+  });
+
+  it("flags missing-payload-marker when the marker line is gone", () => {
+    const sha = "e".repeat(64);
+    const csv =
+      `"${SHA_LABEL}","${sha}"\n` +
+      `"${TIMESTAMP_LABEL}","${ISO}"\n` +
+      // marker deliberately omitted
+      PAYLOAD;
+    const report = inspectCsvStructure(csv);
+    expect(report.hasMarker).toBe(false);
+    expect(report.issues).toContain("missing-payload-marker");
+    expect(report.ok).toBe(false);
+  });
+
+  it("still flags missing-payload-marker when the marker text appears un-quoted or on the wrong line", () => {
+    const sha = "f".repeat(64);
+    // marker text present but NOT as its own quoted CSV line — should still fail
+    const csv =
+      `"${SHA_LABEL}","${sha}"\n` +
+      `"${TIMESTAMP_LABEL}","${ISO}"\n` +
+      `--- PAYLOAD BELOW ---\n` + // missing surrounding quotes
+      PAYLOAD;
+    const report = inspectCsvStructure(csv);
+    expect(report.issues).toContain("missing-payload-marker");
+  });
+
+  it("flags missing-sha-row when the SHA preamble line is stripped", () => {
+    const csv =
+      `"${TIMESTAMP_LABEL}","${ISO}"\n` +
+      PAYLOAD_MARKER_LINE +
+      PAYLOAD;
+    const report = inspectCsvStructure(csv);
+    expect(report.issues).toContain("missing-sha-row");
+  });
+
+  it("flags missing-timestamp-row when the timestamp preamble line is stripped", () => {
+    const sha = "1".repeat(64);
+    const csv =
+      `"${SHA_LABEL}","${sha}"\n` +
+      PAYLOAD_MARKER_LINE +
+      PAYLOAD;
+    const report = inspectCsvStructure(csv);
+    expect(report.issues).toContain("missing-timestamp-row");
+  });
+
+  it("flags invalid-timestamp-format for a non-ISO timestamp", () => {
+    const sha = "2".repeat(64);
+    const csv =
+      `"${SHA_LABEL}","${sha}"\n` +
+      `"${TIMESTAMP_LABEL}","07/07/2026 5:05 PM"\n` +
+      PAYLOAD_MARKER_LINE +
+      PAYLOAD;
+    const report = inspectCsvStructure(csv);
+    expect(report.issues).toContain("invalid-timestamp-format");
+  });
+
+  it("flags empty-payload when marker is present but nothing follows it", () => {
+    const sha = "3".repeat(64);
+    const csv =
+      `"${SHA_LABEL}","${sha}"\n` +
+      `"${TIMESTAMP_LABEL}","${ISO}"\n` +
+      PAYLOAD_MARKER_LINE;
+    const report = inspectCsvStructure(csv);
+    expect(report.issues).toContain("empty-payload");
+  });
+
+  it("accepts the (unavailable) sha sentinel written when hashing fails", () => {
+    const csv =
+      `"${SHA_LABEL}","(unavailable)"\n` +
+      `"${TIMESTAMP_LABEL}","${ISO}"\n` +
+      PAYLOAD_MARKER_LINE +
+      PAYLOAD;
+    const report = inspectCsvStructure(csv);
+    expect(report.issues).not.toContain("invalid-sha-format");
+  });
+
+  it("describeStructureIssue returns a human-readable message for every issue code", () => {
+    const codes = [
+      "empty-file",
+      "missing-payload-marker",
+      "missing-sha-row",
+      "invalid-sha-format",
+      "missing-timestamp-row",
+      "invalid-timestamp-format",
+      "empty-payload",
+    ] as const;
+    for (const c of codes) {
+      const msg = describeStructureIssue(c);
+      expect(msg.length).toBeGreaterThan(5);
+    }
+    // The marker-missing message must name the marker text so users can act on it.
+    expect(describeStructureIssue("missing-payload-marker")).toContain(
+      PAYLOAD_MARKER,
+    );
+  });
+});
+
+describe("verifyCsvText — malformed path is preferred over hash check", () => {
+  it("returns malformed (not mismatch) when marker is missing, even if a valid expected sha is provided", async () => {
+    const sha = "4".repeat(64);
+    const csv =
+      `"${SHA_LABEL}","${sha}"\n` +
+      `"${TIMESTAMP_LABEL}","${ISO}"\n` +
+      // no marker
+      PAYLOAD;
+    const r = await verifyCsvText(csv, { expectedSha: sha });
+    expect(r.status).toBe("malformed");
+    if (r.status === "malformed") {
+      expect(r.messages.length).toBeGreaterThan(0);
+      expect(r.issues).toContain("missing-payload-marker");
+    }
+  });
+});
+
