@@ -22,9 +22,15 @@ async function loadActiveConfig(supabase: SupabaseClient<Database>) {
 
 function maskPassword(row: any) {
   if (!row) return null;
-  const { imap_password, ...rest } = row;
-  return { ...rest, imap_password_set: Boolean(imap_password) };
+  const { imap_password, gmail_client_secret, gmail_refresh_token, gmail_access_token, gmail_oauth_state, ...rest } = row;
+  return {
+    ...rest,
+    imap_password_set: Boolean(imap_password),
+    gmail_client_secret_set: Boolean(gmail_client_secret),
+    gmail_authorized: Boolean(gmail_refresh_token),
+  };
 }
+
 
 // ============ SETTINGS ============
 
