@@ -9,6 +9,7 @@ export const Route = createFileRoute("/_authenticated/admin/commission-invoices"
     <AdminPlaceholder
       title="Commission Invoices"
       description="Manage Commission Invoices in the NEVO Industrial back office."
+      guideSectionId="commission-invoice"
     />
   ),
 });

@@ -9,6 +9,7 @@ export const Route = createFileRoute("/_authenticated/admin/purchase-orders")({
     <AdminPlaceholder
       title="Purchase Orders"
       description="Manage Purchase Orders in the NEVO Industrial back office."
+      guideSectionId="purchase-order"
     />
   ),
 });

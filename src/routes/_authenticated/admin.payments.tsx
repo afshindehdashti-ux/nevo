@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MasterListShell } from "@/components/crm/MasterListShell";
+import { GuideMeButton } from "@/components/ai/GuideMeButton";
 import {
   Table,
   TableBody,
@@ -64,6 +65,7 @@ function PaymentsPage() {
       onSearchChange={setSearch}
       canCreate={false}
       onCreate={() => {}}
+      headerExtra={<GuideMeButton sectionId="payments" />}
     >
       <div className="p-3 border-b flex justify-between items-center text-sm">
         <span className="text-muted-foreground">

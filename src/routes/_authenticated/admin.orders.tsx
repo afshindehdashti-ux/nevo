@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { sendOrderConfirmation } from "@/lib/orders.functions";
 import { MasterListShell } from "@/components/crm/MasterListShell";
+import { GuideMeButton } from "@/components/ai/GuideMeButton";
 
 import { useCanEditOrders } from "@/lib/crm-permissions";
 import {
@@ -143,6 +144,7 @@ function OrdersPage() {
         canCreate={canEdit}
         onCreate={() => setDialogOpen(true)}
         createLabel="New order"
+        headerExtra={<GuideMeButton sectionId="orders" />}
       >
         <div className="p-3 border-b flex gap-2 items-center">
           <Label className="text-xs text-muted-foreground">Status</Label>

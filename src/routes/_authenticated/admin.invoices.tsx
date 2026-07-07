@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MasterListShell } from "@/components/crm/MasterListShell";
+import { GuideMeButton } from "@/components/ai/GuideMeButton";
 import {
   Table,
   TableBody,
@@ -159,6 +160,11 @@ export function InvoicesList({
       onSearchChange={setSearch}
       canCreate={false}
       onCreate={() => {}}
+      headerExtra={
+        <GuideMeButton
+          sectionId={type === "proforma" ? "proforma-invoice" : "commercial-invoice"}
+        />
+      }
     >
       <div className="p-3 border-b flex gap-2 items-center">
         <Label className="text-xs text-muted-foreground">Status</Label>

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { FileSpreadsheet, RefreshCw, Search, Loader2 } from "lucide-react";
+import { GuideMeButton } from "@/components/ai/GuideMeButton";
 import { toast } from "sonner";
 import { exportToExcel } from "@/lib/report-exports";
 import { formatDate } from "@/lib/crm-money";
@@ -246,6 +247,7 @@ function LeadsPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          <GuideMeButton sectionId="leads" />
           <Button variant="outline" size="sm" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4 mr-1" /> Refresh
           </Button>

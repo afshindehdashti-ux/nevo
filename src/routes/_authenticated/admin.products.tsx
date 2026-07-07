@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { MasterListShell } from "@/components/crm/MasterListShell";
+import { GuideMeButton } from "@/components/ai/GuideMeButton";
 import { useCanEditProducts, useCanDeleteMasters } from "@/lib/crm-permissions";
 import {
   Table,
@@ -201,6 +202,7 @@ function ProductsPage() {
           setDialogOpen(true);
         }}
         createLabel="New product"
+        headerExtra={<GuideMeButton sectionId="products" />}
       >
         <div className="overflow-x-auto">
           <Table>

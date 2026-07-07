@@ -14,6 +14,8 @@ type Props = {
   canCreate: boolean;
   onCreate: () => void;
   createLabel?: string;
+  /** Optional content rendered in the header action row (e.g. a Guide Me button). */
+  headerExtra?: ReactNode;
   children: ReactNode;
 };
 
@@ -26,6 +28,7 @@ export function MasterListShell({
   canCreate,
   onCreate,
   createLabel = "New",
+  headerExtra,
   children,
 }: Props) {
   return (
@@ -53,6 +56,7 @@ export function MasterListShell({
               onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
+          {headerExtra}
           {canCreate && (
             <Button onClick={onCreate} className="gap-1.5">
               <Plus className="h-4 w-4" /> {createLabel}

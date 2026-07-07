@@ -30,6 +30,7 @@ import {
   FileDown,
   Sparkles,
   BookOpen,
+  GraduationCap,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -148,6 +149,12 @@ export const CRM_NAV: CrmNavGroup[] = [
         url: "/admin/ai-assistant/knowledge-base",
         icon: BookOpen,
         allowedRoles: ["management"],
+      },
+      {
+        title: "Guide Mode",
+        url: "/admin/ai-assistant/guide-mode",
+        icon: GraduationCap,
+        allowedRoles: ALL_STAFF,
       },
     ],
   },
