@@ -289,6 +289,15 @@ function InvoiceDetailPage() {
     setPurgeVersionQuery("");
     setPurgePage(0);
   };
+  const setPurgeDateRange = (days: number) => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - days + 1);
+    const fmt = (d: Date) => d.toLocaleDateString("en-CA");
+    setPurgeFromDate(fmt(start));
+    setPurgeToDate(fmt(end));
+  };
+
 
 
   // -------- Purge audit row selection --------
