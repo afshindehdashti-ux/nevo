@@ -86,25 +86,135 @@ export const submitInquiry = createServerFn({ method: "POST" })
     }
     const meta = requestMeta();
     const supabase = serverClient();
-    const { error } = await supabase.from("project_inquiries").insert({
-      name: data.name,
-      email: data.email,
-      phone: data.phone ?? null,
-      company: data.company ?? null,
-      country: data.country ?? null,
-      application: data.application ?? null,
-      message: data.message ?? null,
-      source_page: data.source_page ?? null,
-      calculator_state: (data.calculator_state as never) ?? null,
-      ip: meta.ip,
-      user_agent: meta.ua,
-    });
+    const { data: inserted, error } = await supabase
+      .from("project_inquiries")
+      .insert({
+        name: data.name,
+        email: data.email,
+        phone: data.phone ?? null,
+        company: data.company ?? null,
+        country: data.country ?? null,
+        application: data.application ?? null,
+        message: data.message ?? null,
+        source_page: data.source_page ?? null,
+        calculator_state: (data.calculator_state as never) ?? null,
+        ip: meta.ip,
+        user_agent: meta.ua,
+      })
+      .select("id")
+      .single();
     if (error) {
       // Don't leak DB details to the client
       throw new Error("Failed to submit inquiry");
     }
-    return { ok: true as const };
+    const inquiryId = (inserted as { id: string } | null)?.id ?? null;
+    const referenceId = inquiryId
+      ? `INQ-${inquiryId.slice(0, 8).toUpperCase()}`
+      : undefined;
+    const submittedAt = new Date().toISOString();
+
+    // Fire confirmation to customer + notification to internal team.
+    // Failures are logged but never block the customer response.
+    try {
+      const { enqueueTransactionalEmail } = await import(
+        "@/lib/email-enqueue.server"
+      );
+      const { supabaseAdmin } = await import(
+        "@/integrations/supabase/client.server"
+      );
+
+      // Resolve team recipient(s): company_settings.email, else fallback.
+      let teamRecipient = "info@nevoindustrial.com";
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: settings } = await (supabaseAdmin as any)
+          .from("company_settings")
+          .select("email")
+          .eq("is_active", true)
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        const email = settings?.email?.trim();
+        if (email) teamRecipient = email;
+      } catch (err) {
+        console.warn("submitInquiry: company_settings lookup failed", err);
+      }
+
+      const siteUrl =
+        process.env.APP_URL ||
+        process.env.SITE_URL ||
+        "https://nevoindustrial.com";
+
+      const jobs: Array<Promise<unknown>> = [];
+
+      // 1) Customer confirmation
+      jobs.push(
+        enqueueTransactionalEmail({
+          templateName: "inquiry-confirmation",
+          recipientEmail: data.email,
+          idempotencyKey: inquiryId
+            ? `inquiry-confirm-${inquiryId}`
+            : `inquiry-confirm-${data.email.toLowerCase()}-${Date.now()}`,
+          templateData: {
+            name: data.name,
+            company: data.company ?? undefined,
+            country: data.country ?? undefined,
+            application: data.application ?? undefined,
+            message: data.message ?? undefined,
+            referenceId,
+            submittedAt,
+          },
+        }),
+      );
+
+      // 2) Internal team notification
+      jobs.push(
+        enqueueTransactionalEmail({
+          templateName: "inquiry-notification",
+          recipientEmail: teamRecipient,
+          idempotencyKey: inquiryId
+            ? `inquiry-notify-${inquiryId}`
+            : `inquiry-notify-${data.email.toLowerCase()}-${Date.now()}`,
+          templateData: {
+            name: data.name,
+            email: data.email,
+            phone: data.phone ?? undefined,
+            company: data.company ?? undefined,
+            country: data.country ?? undefined,
+            application: data.application ?? undefined,
+            message: data.message ?? undefined,
+            sourcePage: data.source_page ?? undefined,
+            referenceId,
+            submittedAt,
+            adminUrl: `${siteUrl}/admin/leads`,
+          },
+        }),
+      );
+
+      const results = await Promise.allSettled(jobs);
+      results.forEach((r, i) => {
+        const label = i === 0 ? "customer confirmation" : "team notification";
+        if (r.status === "rejected") {
+          console.error(`submitInquiry: ${label} threw`, r.reason);
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const res = r.value as any;
+          if (res && res.ok === false) {
+            console.warn(
+              `submitInquiry: ${label} not queued`,
+              res.reason,
+              res.message,
+            );
+          }
+        }
+      });
+    } catch (err) {
+      console.error("submitInquiry: email dispatch error", err);
+    }
+
+    return { ok: true as const, referenceId };
   });
+
 
 export const logDownload = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => DownloadSchema.parse(data))
