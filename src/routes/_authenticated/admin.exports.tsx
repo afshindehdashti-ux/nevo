@@ -12,7 +12,42 @@ import { listCsvExportAudit } from "@/lib/invoice-purge-audit.functions";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
 import { useMyRoles } from "@/lib/crm-hooks";
 import type { AppRole } from "@/lib/crm-hooks";
-import { verifyCsvText } from "@/lib/purge-csv-preamble";
+import { verifyCsvText, type VerifyResult } from "@/lib/purge-csv-preamble";
+
+const PREVIEW_ROW_LIMIT = 10;
+
+/** Minimal RFC-4180 CSV parser — stops once `maxRows` records are produced. */
+function parseCsvRows(text: string, maxRows: number): string[][] {
+  const rows: string[][] = [];
+  let field = "";
+  let row: string[] = [];
+  let inQuotes = false;
+  for (let i = 0; i < text.length && rows.length < maxRows; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else field += ch;
+      continue;
+    }
+    if (ch === '"') { inQuotes = true; continue; }
+    if (ch === ",") { row.push(field); field = ""; continue; }
+    if (ch === "\n" || ch === "\r") {
+      if (ch === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); field = "";
+      if (row.length > 1 || row[0] !== "") rows.push(row);
+      row = [];
+      continue;
+    }
+    field += ch;
+  }
+  if (rows.length < maxRows && (field !== "" || row.length > 0)) {
+    row.push(field);
+    if (row.length > 1 || row[0] !== "") rows.push(row);
+  }
+  return rows;
+}
 import {
   loadExportPresets,
   saveExportPresets,
@@ -91,6 +126,63 @@ function ExportsHistoryPage() {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const pendingRowRef = useRef<CsvExportAuditRecord | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // --- Payload preview (loaded from a user-picked file inside the dialog) ---
+  const previewInputRef = useRef<HTMLInputElement | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [preview, setPreview] = useState<{
+    filename: string;
+    result: VerifyResult;
+    headers: string[];
+    rows: string[][];
+    truncated: boolean;
+  } | null>(null);
+
+  function resetPreview() {
+    setPreview(null);
+    if (previewInputRef.current) previewInputRef.current.value = "";
+  }
+
+  function triggerPreview() {
+    const input = previewInputRef.current;
+    if (!input) return;
+    input.value = "";
+    input.click();
+  }
+
+  async function handlePreviewPicked(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !detail) return;
+    setPreviewLoading(true);
+    try {
+      const text = await file.text();
+      const result = await verifyCsvText(text, { expectedSha: detail.sha256 });
+      let headers: string[] = [];
+      let rows: string[][] = [];
+      let truncated = false;
+      if (result.status !== "malformed") {
+        // Re-split payload out of the file (verifyCsvText already validated it).
+        const markerLine = '"--- PAYLOAD BELOW ---"\n';
+        const idx = text.indexOf(markerLine);
+        const payload = idx >= 0 ? text.slice(idx + markerLine.length) : text;
+        const parsed = parseCsvRows(payload, PREVIEW_ROW_LIMIT + 1);
+        truncated = parsed.length > PREVIEW_ROW_LIMIT;
+        const capped = parsed.slice(0, PREVIEW_ROW_LIMIT);
+        if (capped.length > 0) {
+          headers = capped[0];
+          rows = capped.slice(1);
+        }
+      }
+      setPreview({ filename: file.name, result, headers, rows, truncated });
+    } catch (err) {
+      toast.error("Preview failed", {
+        description: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      setPreviewLoading(false);
+    }
+  }
+
 
   function triggerVerifyAndOpen(row: CsvExportAuditRecord) {
     pendingRowRef.current = row;
@@ -548,8 +640,16 @@ function ExportsHistoryPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
-        <DialogContent className="max-w-2xl">
+      <Dialog
+        open={!!detail}
+        onOpenChange={(o) => {
+          if (!o) {
+            setDetail(null);
+            resetPreview();
+          }
+        }}
+      >
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Export details</DialogTitle>
             <DialogDescription>
@@ -623,10 +723,120 @@ function ExportsHistoryPage() {
                   {JSON.stringify(detail.metadata, null, 2)}
                 </pre>
               </div>
+
+              <div className="space-y-2">
+
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <div className="text-xs text-muted-foreground">
+                      Payload preview
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      Load the CSV file to re-verify its SHA-256 and preview the first {PREVIEW_ROW_LIMIT - 1} data rows.
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={triggerPreview}
+                      disabled={previewLoading}
+                    >
+                      {previewLoading ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <FileDown className="h-3.5 w-3.5" />
+                      )}
+                      {preview ? "Load different file" : "Load CSV to preview"}
+                    </Button>
+                    {preview && (
+                      <Button size="sm" variant="ghost" onClick={resetPreview}>
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {preview && (
+                  <div className="space-y-2">
+                    {preview.result.status === "match" && (
+                      <Alert>
+                        <AlertTitle>SHA-256 verified</AlertTitle>
+                        <AlertDescription className="font-mono text-[11px] break-all">
+                          {preview.filename} · computed {preview.result.computedSha.slice(0, 16)}… matches audit record.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    {preview.result.status === "mismatch" && (
+                      <Alert variant="destructive">
+                        <ShieldAlert className="h-4 w-4" />
+                        <AlertTitle>SHA-256 mismatch</AlertTitle>
+                        <AlertDescription className="font-mono text-[11px] break-all">
+                          Expected {preview.result.expected.slice(0, 16)}… but computed {preview.result.computedSha.slice(0, 16)}…. Preview shown for inspection only — do NOT trust this file.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    {preview.result.status === "malformed" && (
+                      <Alert variant="destructive">
+                        <ShieldAlert className="h-4 w-4" />
+                        <AlertTitle>CSV structure is malformed</AlertTitle>
+                        <AlertDescription>
+                          {preview.result.messages.join(" · ")}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {preview.result.status !== "malformed" && preview.headers.length > 0 && (
+                      <div className="rounded-md border overflow-auto max-h-80">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              {preview.headers.map((h, i) => (
+                                <TableHead key={i} className="text-xs whitespace-nowrap">
+                                  {h}
+                                </TableHead>
+                              ))}
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {preview.rows.map((r, ri) => (
+                              <TableRow key={ri}>
+                                {preview.headers.map((_, ci) => (
+                                  <TableCell
+                                    key={ci}
+                                    className="text-[11px] font-mono whitespace-nowrap max-w-[240px] truncate"
+                                    title={r[ci] ?? ""}
+                                  >
+                                    {r[ci] ?? ""}
+                                  </TableCell>
+                                ))}
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                        {preview.truncated && (
+                          <div className="px-3 py-1.5 text-[11px] text-muted-foreground border-t bg-muted/30">
+                            Showing first {preview.rows.length} of {detail.row_count} data rows.
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      <input
+        ref={previewInputRef}
+        type="file"
+        accept=".csv,text/csv"
+        className="hidden"
+        onChange={handlePreviewPicked}
+      />
     </div>
   );
 }
+
