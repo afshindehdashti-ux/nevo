@@ -83,6 +83,55 @@ function ExportsHistoryPage() {
   const listFn = useServerFn(listCsvExportAudit);
 
   const [detail, setDetail] = useState<CsvExportAuditRecord | null>(null);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  const pendingRowRef = useRef<CsvExportAuditRecord | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  function triggerVerifyAndOpen(row: CsvExportAuditRecord) {
+    pendingRowRef.current = row;
+    const input = fileInputRef.current;
+    if (!input) return;
+    input.value = "";
+    input.click();
+  }
+
+  async function handleFilePicked(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    const row = pendingRowRef.current;
+    pendingRowRef.current = null;
+    if (!file || !row) return;
+    setVerifyingId(row.id);
+    try {
+      const text = await file.text();
+      const result = await verifyCsvText(text, { expectedSha: row.sha256 });
+      if (result.status === "malformed") {
+        toast.error("CSV structure is malformed", {
+          description: result.messages.join(" · "),
+        });
+        return;
+      }
+      if (result.status === "mismatch") {
+        toast.error("SHA-256 mismatch — file will not open", {
+          description: `Expected ${row.sha256.slice(0, 12)}… but computed ${result.computedSha.slice(0, 12)}…`,
+        });
+        return;
+      }
+      // status === "match" (expected was always supplied)
+      const url = URL.createObjectURL(file);
+      window.open(url, "_blank", "noopener,noreferrer");
+      // Revoke shortly after so the new tab has time to load the content.
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      toast.success("SHA-256 verified — opening file", {
+        description: `Computed ${result.computedSha.slice(0, 12)}… matches audit record.`,
+      });
+    } catch (err) {
+      toast.error("Verification failed", {
+        description: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      setVerifyingId(null);
+    }
+  }
 
   const query = useQuery({
     queryKey: [
