@@ -65,10 +65,10 @@ async function ensureAdmin(supabase: SupabaseClient<Database>, userId: string) {
     .from("user_roles")
     .select("role")
     .eq("user_id", userId)
-    .eq("role", "admin")
+    .eq("role", "super_admin")
     .maybeSingle();
   if (error) throw new Error("Role check failed");
-  if (!data) throw new Error("Forbidden: admin role required");
+  if (!data) throw new Error("Forbidden: super_admin role required");
 }
 
 export const listSolutionsInspection = createServerFn({ method: "GET" })
