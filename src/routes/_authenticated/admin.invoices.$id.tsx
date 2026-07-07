@@ -1,4 +1,6 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -58,8 +60,20 @@ import { useCanEditInvoices, useCanEditPayments, useCanPurgeInvoicePdfVersions }
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
 import { ApprovalPanel } from "@/components/crm/ApprovalPanel";
 
+const invoiceDetailSearchSchema = z.object({
+  purgeUser: fallback(z.string(), "all").default("all"),
+  purgeFrom: fallback(z.string(), "").default(""),
+  purgeTo: fallback(z.string(), "").default(""),
+  purgeVersion: fallback(z.string(), "").default(""),
+  purgePage: fallback(z.number().int(), 0).default(0),
+  purgeSize: fallback(z.number().int(), 25).default(25),
+});
+
+type InvoiceDetailSearch = z.infer<typeof invoiceDetailSearchSchema>;
+
 export const Route = createFileRoute("/_authenticated/admin/invoices/$id")({
   head: () => ({ meta: [{ title: "Invoice — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  validateSearch: zodValidator(invoiceDetailSearchSchema),
   component: InvoiceDetailPage,
 });
 
@@ -86,6 +100,8 @@ function formatBytes(bytes: number): string {
 
 function InvoiceDetailPage() {
   const { id } = useParams({ from: "/_authenticated/admin/invoices/$id" });
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/_authenticated/admin/invoices/$id" });
   const qc = useQueryClient();
   const canEdit = useCanEditInvoices();
   const canPay = useCanEditPayments();
@@ -169,17 +185,27 @@ function InvoiceDetailPage() {
     metadata: Record<string, unknown> | null;
   };
 
-  // -------- Purge audit log filters + pagination --------
-  const [purgeUserFilter, setPurgeUserFilter] = useState<string>("all");
-  const [purgeFromDate, setPurgeFromDate] = useState<string>("");
-  const [purgeToDate, setPurgeToDate] = useState<string>("");
-  const [purgeVersionQuery, setPurgeVersionQuery] = useState<string>("");
-  const [purgePage, setPurgePage] = useState(0);
-  const [purgePageSize, setPurgePageSize] = useState(25);
-  // Reset to first page whenever server-side filters change.
-  useEffect(() => {
-    setPurgePage(0);
-  }, [purgeUserFilter, purgeFromDate, purgeToDate, purgePageSize]);
+  // -------- Purge audit log filters + pagination (URL-backed) --------
+  const purgeUserFilter = search.purgeUser;
+  const purgeFromDate = search.purgeFrom;
+  const purgeToDate = search.purgeTo;
+  const purgeVersionQuery = search.purgeVersion;
+  const purgePage = search.purgePage;
+  const purgePageSize = search.purgeSize;
+
+  const setPurgeUserFilter = (value: string) =>
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeUser: value, purgePage: 0 }) });
+  const setPurgeFromDate = (value: string) =>
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeFrom: value, purgePage: 0 }) });
+  const setPurgeToDate = (value: string) =>
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeTo: value, purgePage: 0 }) });
+  const setPurgeVersionQuery = (value: string) =>
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeVersion: value, purgePage: 0 }) });
+  const setPurgePageSize = (value: number) =>
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeSize: value, purgePage: 0 }) });
+  const setPurgePage = (updater: number | ((prev: number) => number)) =>
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgePage: typeof updater === "function" ? updater(prev.purgePage) : updater }) });
+
 
 
   const purgeLogsQuery = useQuery({
@@ -283,19 +309,30 @@ function InvoiceDetailPage() {
   const purgeFiltersActive =
     purgeUserFilter !== "all" || purgeFromDate !== "" || purgeToDate !== "" || purgeVersionQuery.trim() !== "";
   const resetPurgeFilters = () => {
-    setPurgeUserFilter("all");
-    setPurgeFromDate("");
-    setPurgeToDate("");
-    setPurgeVersionQuery("");
-    setPurgePage(0);
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({
+        ...prev,
+        purgeUser: "all",
+        purgeFrom: "",
+        purgeTo: "",
+        purgeVersion: "",
+        purgePage: 0,
+      }),
+    });
   };
   const setPurgeDateRange = (days: number) => {
     const end = new Date();
     const start = new Date();
     start.setDate(end.getDate() - days + 1);
     const fmt = (d: Date) => d.toLocaleDateString("en-CA");
-    setPurgeFromDate(fmt(start));
-    setPurgeToDate(fmt(end));
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({
+        ...prev,
+        purgeFrom: fmt(start),
+        purgeTo: fmt(end),
+        purgePage: 0,
+      }),
+    });
   };
 
 
