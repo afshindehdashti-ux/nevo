@@ -723,8 +723,9 @@ function ExportsHistoryPage() {
                   {JSON.stringify(detail.metadata, null, 2)}
                 </pre>
               </div>
-            </div>
+
               <div className="space-y-2">
+
                 <div className="flex items-center justify-between gap-2">
                   <div>
                     <div className="text-xs text-muted-foreground">
