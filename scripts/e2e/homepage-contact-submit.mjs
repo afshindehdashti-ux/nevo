@@ -28,9 +28,7 @@ function assert(cond, msg) {
 let browser;
 try {
   browser = await chromium.launch({ headless: true });
-  const context = await browser.new_context
-    ? await browser.new_context({ viewport: { width: 1280, height: 1800 } })
-    : await browser.newContext({ viewport: { width: 1280, height: 1800 } });
+  const context = await browser.newContext({ viewport: { width: 1280, height: 1800 } });
   const page = await context.newPage();
 
   const consoleErrors = [];
