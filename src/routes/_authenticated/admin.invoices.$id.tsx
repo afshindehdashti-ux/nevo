@@ -548,7 +548,8 @@ function InvoiceDetailPage() {
   }
 
   function exportPurgeAuditCsv() {
-    if (purgeLogs.length === 0) {
+    const source = filteredPurgeLogs;
+    if (source.length === 0) {
       toast.info("No purge audit entries to export");
       return;
     }
