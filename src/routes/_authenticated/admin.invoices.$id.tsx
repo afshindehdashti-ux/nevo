@@ -1802,11 +1802,31 @@ function InvoiceDetailPage() {
                       </Button>
                     </div>
                   </div>
+                  <div className="px-4 pb-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                    Quick range
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7"
+                      onClick={() => setPurgeDateRange(7)}
+                    >
+                      Last 7 days
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7"
+                      onClick={() => setPurgeDateRange(30)}
+                    >
+                      Last 30 days
+                    </Button>
+                  </div>
                   {filteredPurgeLogs.length === 0 ? (
                     <p className="px-4 py-6 text-sm text-muted-foreground text-center">
                       No entries match the current filters.
                     </p>
                   ) : (
+
                     <Table>
                       <TableHeader>
                         <TableRow>
