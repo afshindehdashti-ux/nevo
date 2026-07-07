@@ -181,7 +181,7 @@ function SecurityAuditPage() {
           event: "INSERT",
           schema: "public",
           table: "activity_logs",
-          filter: "action=in.(sign_in,approve,reject,cancel,delete)",
+          filter: `action=in.(${SECURITY_ACTIONS.join(",")})`,
         },
         () => {
           queryClient.invalidateQueries({ queryKey: ["security-audit"] });
