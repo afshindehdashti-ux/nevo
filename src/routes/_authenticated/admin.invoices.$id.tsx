@@ -1619,7 +1619,7 @@ function InvoiceDetailPage() {
                   <History className="h-4 w-4" />
                   PDF purge audit log
                   <Badge variant="secondary" className="ml-2">
-                    {purgeFiltersActive ? `${filteredPurgeLogs.length} / ${purgeLogs.length}` : purgeLogs.length}
+                    {purgeTotal}
                   </Badge>
                   {selectedPurgeIds.size > 0 && (
                     <Badge variant="outline" className="ml-1">{selectedPurgeIds.size} selected</Badge>
