@@ -824,7 +824,7 @@ function ActorDetailDialog({
         .from("activity_logs")
         .select("id,user_id,action,entity_type,entity_id,metadata,created_at")
         .eq("user_id", userId!)
-        .in("action", ["sign_in", "approve", "reject", "cancel", "delete"])
+        .in("action", [...SECURITY_ACTIONS])
         .order("created_at", { ascending: false })
         .limit(25);
       if (error) throw error;
