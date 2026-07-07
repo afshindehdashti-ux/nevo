@@ -113,6 +113,39 @@ function mbToBytes(value: string): number | null {
   return Math.round(n * 1_000_000);
 }
 
+function PurgeAuditSkeleton({ rows = 5 }: { rows?: number }) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-10"><Skeleton className="h-4 w-4" /></TableHead>
+          <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+          <TableHead><Skeleton className="h-4 w-20" /></TableHead>
+          <TableHead className="text-right"><Skeleton className="h-4 w-10 ml-auto" /></TableHead>
+          <TableHead className="text-right"><Skeleton className="h-4 w-10 ml-auto" /></TableHead>
+          <TableHead className="text-right"><Skeleton className="h-4 w-10 ml-auto" /></TableHead>
+          <TableHead><Skeleton className="h-4 w-48" /></TableHead>
+          <TableHead className="w-10"></TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {[...Array(rows)].map((_, i) => (
+          <TableRow key={i}>
+            <TableCell className="w-10"><Skeleton className="h-4 w-4" /></TableCell>
+            <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+            <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+            <TableCell className="text-right"><Skeleton className="h-4 w-8 ml-auto" /></TableCell>
+            <TableCell className="text-right"><Skeleton className="h-4 w-10 ml-auto" /></TableCell>
+            <TableCell className="text-right"><Skeleton className="h-4 w-8 ml-auto" /></TableCell>
+            <TableCell><Skeleton className="h-4 w-64" /></TableCell>
+            <TableCell className="w-10"></TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
 function InvoiceDetailPage() {
   const { id } = useParams({ from: "/_authenticated/admin/invoices/$id" });
   const search = Route.useSearch();
