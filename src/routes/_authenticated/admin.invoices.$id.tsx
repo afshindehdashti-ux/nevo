@@ -2387,6 +2387,37 @@ function InvoiceDetailPage() {
                       )}
                     </div>
                   )}
+                  {purgeVerifyState.status === "malformed" && (
+                    <div
+                      role="alert"
+                      className="mt-2 rounded-md border-2 border-destructive/60 bg-destructive/10 px-2 py-2 text-[11px] text-destructive space-y-1"
+                    >
+                      <div className="font-semibold text-xs">
+                        ⚠ Malformed CSV — {purgeVerifyState.filename} cannot be verified
+                      </div>
+                      <div>
+                        The file does not match the NEVO export format. Verification was
+                        aborted before hashing:
+                      </div>
+                      <ul className="list-disc list-inside space-y-0.5">
+                        {purgeVerifyState.messages.map((msg, i) => (
+                          <li key={i}>{msg}</li>
+                        ))}
+                      </ul>
+                      {purgeVerifyState.embeddedSha && (
+                        <div className="font-mono break-all">
+                          embedded sha (as found): {purgeVerifyState.embeddedSha}
+                        </div>
+                      )}
+                      {purgeVerifyState.embeddedExportedAt && (
+                        <div className="font-mono break-all">
+                          embedded timestamp (as found): {purgeVerifyState.embeddedExportedAt}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+
 
                 </div>
               )}
