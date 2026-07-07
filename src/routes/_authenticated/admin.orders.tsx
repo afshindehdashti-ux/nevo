@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { sendOrderConfirmation } from "@/lib/orders.functions";
 import { MasterListShell } from "@/components/crm/MasterListShell";
+
 import { useCanEditOrders } from "@/lib/crm-permissions";
 import {
   Table,
@@ -87,6 +90,7 @@ function OrdersPage() {
     });
   }, [orders, search, statusFilter]);
 
+  const sendConfirmation = useServerFn(sendOrderConfirmation);
   const create = useMutation({
     mutationFn: async () => {
       if (!customerId) throw new Error("Select a customer");
@@ -112,10 +116,21 @@ function OrdersPage() {
       setDialogOpen(false);
       setCustomerId("");
       setNotes("");
+      // Fire-and-forget confirmation email; don't block navigation.
+      sendConfirmation({ data: { orderId: data.id } })
+        .then((r) => {
+          if (r?.ok) toast.success("Confirmation email sent to customer");
+          else if (r?.reason === "no_customer_email")
+            toast.message("No customer email on file — confirmation not sent");
+        })
+        .catch(() => {
+          /* logged server-side */
+        });
       window.location.href = `/admin/orders/${data.id}`;
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
+
 
   return (
     <>
