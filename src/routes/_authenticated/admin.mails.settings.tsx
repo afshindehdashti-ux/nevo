@@ -40,6 +40,8 @@ function MailboxSettings() {
   const save = useServerFn(saveMailboxConfig);
   const test = useServerFn(testMailboxConnection);
   const remove = useServerFn(deleteMailboxConfig);
+  const startOAuth = useServerFn(startGmailOAuth);
+  const disconnect = useServerFn(disconnectGmail);
 
   const [tab, setTab] = useState<"imap" | "gmail">(config?.provider === "gmail" ? "gmail" : "imap");
   const [host, setHost] = useState<string>(config?.imap_host ?? "");
@@ -48,9 +50,34 @@ function MailboxSettings() {
   const [password, setPassword] = useState<string>("");
   const [tls, setTls] = useState<boolean>(config?.imap_tls !== false);
   const [gmailEmail, setGmailEmail] = useState<string>(config?.gmail_email ?? "");
+  const [gmailClientId, setGmailClientId] = useState<string>(config?.gmail_client_id ?? "");
+  const [gmailClientSecret, setGmailClientSecret] = useState<string>("");
   const [notes, setNotes] = useState<string>(config?.notes ?? "");
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [authorizing, setAuthorizing] = useState(false);
+
+  const redirectUri = typeof window !== "undefined"
+    ? `${window.location.origin}/api/public/oauth/google/callback`
+    : "";
+
+  // Surface callback result from URL
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    const g = url.searchParams.get("gmail");
+    if (g === "ok") {
+      toast.success("Gmail authorized");
+    } else if (g === "error") {
+      toast.error(`Gmail authorization failed: ${url.searchParams.get("reason") ?? "unknown"}`);
+    }
+    if (g) {
+      url.searchParams.delete("gmail");
+      url.searchParams.delete("reason");
+      window.history.replaceState({}, "", url.pathname + (url.search || ""));
+    }
+  }, []);
+
 
   useEffect(() => {
     // Reset password field on config change
