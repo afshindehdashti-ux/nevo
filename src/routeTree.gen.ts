@@ -107,6 +107,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicAlertsSignInFailedRouteImport } from './routes/api/public/alerts/sign-in-failed'
 import { Route as ApiPublicAlertsEmailDlqRouteImport } from './routes/api/public/alerts/email-dlq'
 import { Route as AuthenticatedAdminUsersInviteRouteImport } from './routes/_authenticated/admin.users.invite'
 import { Route as AuthenticatedAdminShipmentsIdRouteImport } from './routes/_authenticated/admin.shipments.$id'
@@ -657,6 +658,12 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAlertsSignInFailedRoute =
+  ApiPublicAlertsSignInFailedRouteImport.update({
+    id: '/api/public/alerts/sign-in-failed',
+    path: '/api/public/alerts/sign-in-failed',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAlertsEmailDlqRoute = ApiPublicAlertsEmailDlqRouteImport.update({
   id: '/api/public/alerts/email-dlq',
   path: '/api/public/alerts/email-dlq',
@@ -852,6 +859,7 @@ export interface FileRoutesByFullPath {
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/api/public/alerts/email-dlq': typeof ApiPublicAlertsEmailDlqRoute
+  '/api/public/alerts/sign-in-failed': typeof ApiPublicAlertsSignInFailedRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -963,6 +971,7 @@ export interface FileRoutesByTo {
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/api/public/alerts/email-dlq': typeof ApiPublicAlertsEmailDlqRoute
+  '/api/public/alerts/sign-in-failed': typeof ApiPublicAlertsSignInFailedRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1079,6 +1088,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/_authenticated/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/api/public/alerts/email-dlq': typeof ApiPublicAlertsEmailDlqRoute
+  '/api/public/alerts/sign-in-failed': typeof ApiPublicAlertsSignInFailedRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1195,6 +1205,7 @@ export interface FileRouteTypes {
     | '/admin/shipments/$id'
     | '/admin/users/invite'
     | '/api/public/alerts/email-dlq'
+    | '/api/public/alerts/sign-in-failed'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1306,6 +1317,7 @@ export interface FileRouteTypes {
     | '/admin/shipments/$id'
     | '/admin/users/invite'
     | '/api/public/alerts/email-dlq'
+    | '/api/public/alerts/sign-in-failed'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1421,6 +1433,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/shipments/$id'
     | '/_authenticated/admin/users/invite'
     | '/api/public/alerts/email-dlq'
+    | '/api/public/alerts/sign-in-failed'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1454,6 +1467,7 @@ export interface RootRouteChildren {
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicAlertsEmailDlqRoute: typeof ApiPublicAlertsEmailDlqRoute
+  ApiPublicAlertsSignInFailedRoute: typeof ApiPublicAlertsSignInFailedRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -2150,6 +2164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/alerts/sign-in-failed': {
+      id: '/api/public/alerts/sign-in-failed'
+      path: '/api/public/alerts/sign-in-failed'
+      fullPath: '/api/public/alerts/sign-in-failed'
+      preLoaderRoute: typeof ApiPublicAlertsSignInFailedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/alerts/email-dlq': {
       id: '/api/public/alerts/email-dlq'
       path: '/api/public/alerts/email-dlq'
@@ -2618,6 +2639,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicAlertsEmailDlqRoute: ApiPublicAlertsEmailDlqRoute,
+  ApiPublicAlertsSignInFailedRoute: ApiPublicAlertsSignInFailedRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
