@@ -413,6 +413,61 @@ function InvoiceDetailPage() {
     URL.revokeObjectURL(url);
   }
 
+  function exportPurgeAuditCsv() {
+    if (purgeLogs.length === 0) {
+      toast.info("No purge audit entries to export");
+      return;
+    }
+    const header = [
+      "Log ID",
+      "Timestamp (ISO)",
+      "Timestamp (Local)",
+      "User ID",
+      "User Name",
+      "Invoice ID",
+      "Invoice Number",
+      "Removed Count",
+      "Kept",
+      "Removed Version IDs",
+    ];
+    const escape = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
+    const lines = [
+      header.join(","),
+      ...purgeLogs.map((log) => {
+        const meta = (log.metadata ?? {}) as {
+          removed_count?: number;
+          kept?: number;
+          version_ids?: string[];
+        };
+        const who = log.user_id ? purgeActorMap[log.user_id] ?? "Unknown user" : "System";
+        const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+        return [
+          escape(log.id),
+          escape(log.created_at),
+          escape(new Date(log.created_at).toLocaleString()),
+          escape(log.user_id ?? ""),
+          escape(who),
+          escape(id),
+          escape(invoice?.invoice_number ?? ""),
+          escape(String(meta.removed_count ?? ids.length)),
+          escape(meta.kept != null ? String(meta.kept) : ""),
+          escape(ids.join("; ")),
+        ].join(",");
+      }),
+    ];
+    const csv = lines.join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `invoice-${invoice?.invoice_number ?? id}-purge-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${purgeLogs.length} audit entr${purgeLogs.length === 1 ? "y" : "ies"}`);
+  }
+
   useEffect(() => {
     return () => {
       if (pdfPreview) URL.revokeObjectURL(pdfPreview.url);
