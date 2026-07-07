@@ -61,14 +61,15 @@ function toneClass(tone?: Tone) {
 
 /** Count helper — returns null on error so the UI can show em-dash instead of 0. */
 async function countRows(
-  table: Parameters<typeof supabase.from>[0],
-  build?: (q: ReturnType<typeof supabase.from>) => any,
+  table: string,
+  build?: (q: any) => any,
 ) {
-  const base = supabase.from(table).select("id", { count: "exact", head: true });
+  const base = (supabase.from(table as any) as any).select("id", { count: "exact", head: true });
   const { count, error } = await (build ? build(base) : base);
   if (error) return null;
   return count ?? 0;
 }
+
 
 function useDashboardData() {
   const startOfMonth = new Date();
