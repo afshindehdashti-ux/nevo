@@ -170,6 +170,7 @@ function InvoiceDetailPage() {
   const [pdfDocTypeFilter, setPdfDocTypeFilter] = useState<"all" | "proforma" | "commercial">("all");
   const [pdfFromDate, setPdfFromDate] = useState("");
   const [pdfToDate, setPdfToDate] = useState("");
+  const [pdfNote, setPdfNote] = useState("");
 
   useEffect(() => {
     return () => {
