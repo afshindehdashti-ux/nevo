@@ -57,6 +57,7 @@ import {
   listPurgeAuditByIds,
   recordCsvExportAudit,
 } from "@/lib/invoice-purge-audit.functions";
+import { buildEmbeddedAuditMetadata } from "@/lib/csv-export-audit-metadata";
 
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import {
