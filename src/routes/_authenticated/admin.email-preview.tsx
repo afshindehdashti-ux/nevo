@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { AlertCircle, AlertTriangle, CheckCircle2, Info, ShieldCheck } from "lucide-react";
+import { auditEmailHtml, type A11yIssue } from "@/lib/email-a11y";
 
 type OverrideValue = string;
 type Overrides = Record<string, OverrideValue>;
@@ -104,6 +106,13 @@ function EmailPreviewAdmin() {
       toast.error(err.message || "Failed to send test");
     },
   });
+
+  const audit = useMemo(
+    () => (preview.data?.html ? auditEmailHtml(preview.data.html) : null),
+    [preview.data?.html],
+  );
+  const [showA11yDetails, setShowA11yDetails] = useState(false);
+
 
   const grouped = useMemo(() => {
     const auth: EmailPreviewMeta[] = [];
@@ -350,6 +359,42 @@ function EmailPreviewAdmin() {
               Download HTML
             </Button>
           </div>
+          {audit && (
+            <div className="border-b border-border bg-background">
+              <button
+                type="button"
+                aria-expanded={showA11yDetails}
+                onClick={() => setShowA11yDetails((v) => !v)}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted/40 transition-colors"
+              >
+                {audit.counts.critical > 0 ? (
+                  <AlertCircle className="h-4 w-4 text-destructive shrink-0" aria-hidden />
+                ) : audit.counts.warning > 0 ? (
+                  <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" aria-hidden />
+                ) : audit.issues.length === 0 ? (
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" aria-hidden />
+                ) : (
+                  <ShieldCheck className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden />
+                )}
+                <span className="font-medium">Accessibility</span>
+                <span className="text-muted-foreground">
+                  {audit.issues.length === 0
+                    ? "No issues detected"
+                    : `${audit.counts.critical} critical · ${audit.counts.warning} warnings · ${audit.counts.info} info`}
+                </span>
+                <span className="ml-auto text-xs text-muted-foreground">
+                  {showA11yDetails ? "Hide" : "Show details"}
+                </span>
+              </button>
+              {showA11yDetails && audit.issues.length > 0 && (
+                <ul className="px-4 pb-3 space-y-2 max-h-56 overflow-auto text-sm">
+                  {audit.issues.map((issue, i) => (
+                    <A11yRow key={i} issue={issue} />
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
           <div className="flex-1 bg-muted/40 p-4 flex justify-center overflow-auto">
             {preview.isFetching && !preview.data && (
               <Skeleton className="w-full max-w-2xl h-96" />
@@ -377,5 +422,36 @@ function EmailPreviewAdmin() {
         </section>
       </div>
     </div>
+  );
+}
+
+function A11yRow({ issue }: { issue: A11yIssue }) {
+  const Icon =
+    issue.severity === "critical"
+      ? AlertCircle
+      : issue.severity === "warning"
+        ? AlertTriangle
+        : Info;
+  const tone =
+    issue.severity === "critical"
+      ? "text-destructive"
+      : issue.severity === "warning"
+        ? "text-amber-600"
+        : "text-muted-foreground";
+  return (
+    <li className="flex gap-2 items-start">
+      <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${tone}`} aria-hidden />
+      <div className="min-w-0">
+        <div className="text-xs uppercase tracking-wide text-muted-foreground">
+          {issue.rule}
+        </div>
+        <div>{issue.message}</div>
+        {issue.snippet && (
+          <div className="mt-0.5 text-xs font-mono text-muted-foreground truncate">
+            {issue.snippet}
+          </div>
+        )}
+      </div>
+    </li>
   );
 }
