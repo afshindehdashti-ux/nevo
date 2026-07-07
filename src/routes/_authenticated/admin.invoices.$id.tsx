@@ -31,7 +31,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet } from "lucide-react";
+import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown } from "lucide-react";
+import { generateInvoicePdf } from "@/lib/invoice-pdf";
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import {
   INVOICE_STATUSES,
@@ -365,7 +366,21 @@ function InvoiceDetailPage() {
               </Select>
             )}
             <Button variant="outline" size="sm" onClick={() => window.print()}>
-              <Printer className="h-4 w-4 mr-1" /> Print / PDF
+              <Printer className="h-4 w-4 mr-1" /> Print
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  await generateInvoicePdf(invoice.id);
+                } catch (e) {
+                  toast.error(e instanceof Error ? e.message : "PDF failed");
+                }
+              }}
+            >
+              <FileDown className="h-4 w-4 mr-1" />
+              Download PDF
             </Button>
             {canPay && invoice.type === "commercial" && Number(invoice.balance) > 0 && (
               <Button size="sm" onClick={() => setPayOpen(true)}>
