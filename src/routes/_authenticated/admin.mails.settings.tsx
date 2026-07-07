@@ -96,9 +96,12 @@ function MailboxSettings() {
           imap_password: tab === "imap" && password ? password : undefined,
           imap_tls: tls,
           gmail_email: tab === "gmail" ? gmailEmail.trim() : null,
+          gmail_client_id: tab === "gmail" ? gmailClientId.trim() || null : null,
+          gmail_client_secret: tab === "gmail" && gmailClientSecret ? gmailClientSecret : undefined,
           notes: notes || null,
         },
       });
+
       toast.success("Mailbox settings saved");
       await router.invalidate();
     } catch (e: any) {
