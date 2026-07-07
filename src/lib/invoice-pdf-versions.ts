@@ -107,6 +107,17 @@ export async function purgeOlderInvoicePdfVersions(
     .delete()
     .in("id", ids);
   if (delErr) throw delErr;
+
+  // Audit log — best-effort; do not fail the purge if logging fails.
+  const { error: logErr } = await supabase.rpc("log_pdf_version_purge", {
+    _invoice_id: invoiceId,
+    _removed_count: toDelete.length,
+    _kept: keepCount,
+    _version_ids: ids,
+    _details: {},
+  });
+  if (logErr) console.warn("purge audit log failed", logErr);
+
   return toDelete.length;
 }
 
