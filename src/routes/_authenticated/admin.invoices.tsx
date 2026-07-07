@@ -160,6 +160,11 @@ export function InvoicesList({
       onSearchChange={setSearch}
       canCreate={false}
       onCreate={() => {}}
+      headerExtra={
+        <GuideMeButton
+          sectionId={type === "proforma" ? "proforma-invoice" : "commercial-invoice"}
+        />
+      }
     >
       <div className="p-3 border-b flex gap-2 items-center">
         <Label className="text-xs text-muted-foreground">Status</Label>
