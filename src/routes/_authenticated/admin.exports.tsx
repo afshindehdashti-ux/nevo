@@ -125,6 +125,7 @@ function ExportsHistoryPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const listFn = useServerFn(listCsvExportAudit);
+  const verifyFn = useServerFn(verifyCsvExportOnServer);
 
   const [detail, setDetail] = useState<CsvExportAuditRecord | null>(null);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
