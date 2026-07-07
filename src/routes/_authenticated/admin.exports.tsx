@@ -276,15 +276,35 @@ function ExportsHistoryPage() {
     return m;
   }, [actors]);
 
+  // --- Drift-only filter (client-side over currently loaded rows) ---
+  const TIMESTAMP_DRIFT_TOLERANCE_S = 2;
+  const [driftOnly, setDriftOnly] = useState(false);
+
+  function rowHasDrift(r: CsvExportAuditRecord): boolean {
+    if (detectShaDrift({ sha256: r.sha256, metadata: r.metadata })) return true;
+    const md = (r.metadata ?? {}) as { embedded_exported_at_iso?: unknown };
+    if (typeof md.embedded_exported_at_iso !== "string") return false;
+    const a = new Date(r.created_at).getTime();
+    const b = new Date(md.embedded_exported_at_iso).getTime();
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return true; // invalid embedded timestamp = drift
+    return Math.abs(b - a) / 1000 > TIMESTAMP_DRIFT_TOLERANCE_S;
+  }
+
+  const driftCount = useMemo(() => rows.filter(rowHasDrift).length, [rows]);
+  const visibleRows = useMemo(
+    () => (driftOnly ? rows.filter(rowHasDrift) : rows),
+    [rows, driftOnly],
+  );
+
   const allVisibleSelected =
-    rows.length > 0 && rows.every((r) => selectedIds.has(r.id));
+    visibleRows.length > 0 && visibleRows.every((r) => selectedIds.has(r.id));
   function toggleAllVisible() {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (allVisibleSelected) {
-        for (const r of rows) next.delete(r.id);
+        for (const r of visibleRows) next.delete(r.id);
       } else {
-        for (const r of rows) next.add(r.id);
+        for (const r of visibleRows) next.add(r.id);
       }
       return next;
     });
