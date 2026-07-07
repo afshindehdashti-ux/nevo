@@ -723,16 +723,38 @@ function InvoiceDetailPage() {
       }),
     ];
     const csv = lines.join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const bytes = new TextEncoder().encode(csv);
+    // Compute SHA-256 checksum for compliance traceability.
+    let sha256 = "";
+    try {
+      const digest = await crypto.subtle.digest("SHA-256", bytes);
+      sha256 = Array.from(new Uint8Array(digest))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+    } catch {
+      sha256 = "";
+    }
+    const blob = new Blob([bytes], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
+    const filename = `invoice-${invoice?.invoice_number ?? id}-purge-audit-${new Date().toISOString().slice(0, 10)}.csv`;
     const a = document.createElement("a");
     a.href = url;
-    a.download = `invoice-${invoice?.invoice_number ?? id}-purge-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    toast.success(`Exported ${source.length} ${scopeLabel} audit entr${source.length === 1 ? "y" : "ies"}`);
+    setLastPurgeExport({
+      filename,
+      sha256,
+      rowCount: source.length,
+      scope: scopeLabel,
+      exportedAt: new Date().toISOString(),
+      byteSize: bytes.byteLength,
+    });
+    toast.success(`Exported ${source.length} ${scopeLabel} audit entr${source.length === 1 ? "y" : "ies"}`, {
+      description: sha256 ? `SHA-256: ${sha256.slice(0, 16)}…` : undefined,
+    });
   }
 
   useEffect(() => {
