@@ -37,11 +37,11 @@ export function AdminRouteGuard({ children }: { children: ReactNode }) {
 
   // Not signed in → send to /auth
   useEffect(() => {
-    if (!userQ.isLoading && !userQ.data) {
+    if (!userQ.isLoading && !userQ.error && !userQ.data) {
       dlog("no user, redirecting to /auth");
       window.location.replace("/auth");
     }
-  }, [userQ.isLoading, userQ.data]);
+  }, [userQ.isLoading, userQ.error, userQ.data]);
 
   if (userQ.isLoading || (stillChecking && !timedOut)) {
     return (
@@ -49,6 +49,19 @@ export function AdminRouteGuard({ children }: { children: ReactNode }) {
         <Loader2 className="h-4 w-4 animate-spin" />
         Checking access…
       </div>
+    );
+  }
+
+  if (userQ.error) {
+    const msg = userQ.error instanceof Error ? userQ.error.message : String(userQ.error);
+    dlog("user query error", userQ.error);
+    return (
+      <ErrorPanel
+        title="Could not verify your session"
+        message={msg}
+        onRetry={() => userQ.refetch()}
+        onSignOut
+      />
     );
   }
 
