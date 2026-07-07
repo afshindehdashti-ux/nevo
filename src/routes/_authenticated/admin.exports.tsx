@@ -129,6 +129,11 @@ function ExportsHistoryPage() {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const pendingRowRef = useRef<CsvExportAuditRecord | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [blocked, setBlocked] = useState<{
+    filename: string;
+    row: CsvExportAuditRecord;
+    result: VerifyResult;
+  } | null>(null);
 
   // --- Selection for compliance report ---
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -216,12 +221,14 @@ function ExportsHistoryPage() {
       const text = await file.text();
       const result = await verifyCsvText(text, { expectedSha: row.sha256 });
       if (result.status === "malformed") {
-        toast.error("CSV structure is malformed", {
+        setBlocked({ filename: file.name, row, result });
+        toast.error("CSV structure is malformed — see details", {
           description: result.messages.join(" · "),
         });
         return;
       }
       if (result.status === "mismatch") {
+        setBlocked({ filename: file.name, row, result });
         toast.error("SHA-256 mismatch — file will not open", {
           description: `Expected ${row.sha256.slice(0, 12)}… but computed ${result.computedSha.slice(0, 12)}…`,
         });
