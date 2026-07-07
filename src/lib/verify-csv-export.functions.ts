@@ -3,7 +3,9 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { verifyCsvText, type VerifyResult } from "@/lib/purge-csv-preamble";
 
-const ALLOWED_ROLES = ["super_admin", "management", "finance"] as const;
+import type { Database } from "@/integrations/supabase/types";
+type AppRole = Database["public"]["Enums"]["app_role"];
+const ALLOWED_ROLES: AppRole[] = ["super_admin", "management", "finance"];
 
 const Input = z.object({
   audit_id: z.string().uuid(),
