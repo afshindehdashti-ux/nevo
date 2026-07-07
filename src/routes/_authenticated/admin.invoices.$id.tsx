@@ -1795,7 +1795,74 @@ function InvoiceDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={removedOpen} onOpenChange={(o) => (o ? setRemovedOpen(true) : closeRemovedModal())}>
+        <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>
+              Removed PDF version{removedItems.length === 1 ? "" : "s"} ({removedItems.length})
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 overflow-hidden flex flex-col">
+            <p className="text-xs text-muted-foreground">
+              These versions have been permanently deleted from storage. The archived copies below are held in this browser session only — download them now if you need them for records.
+            </p>
+            <div className="border rounded-md overflow-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs w-10 text-center">#</TableHead>
+                    <TableHead className="text-xs">Generated</TableHead>
+                    <TableHead className="text-xs">Type</TableHead>
+                    <TableHead className="text-xs">Source</TableHead>
+                    <TableHead className="text-xs">Filename</TableHead>
+                    <TableHead className="text-xs text-right">Size</TableHead>
+                    <TableHead className="text-xs text-right">Download</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {removedItems.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-xs text-center text-muted-foreground py-6">
+                        No archived copies available.
+                      </TableCell>
+                    </TableRow>
+                  ) : removedItems.map((r, idx) => {
+                    const dt = new Date(r.created_at);
+                    const stamp = `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+                    return (
+                      <TableRow key={r.id}>
+                        <TableCell className="text-xs text-center text-muted-foreground">{idx + 1}</TableCell>
+                        <TableCell className="text-xs whitespace-nowrap">{stamp}</TableCell>
+                        <TableCell className="text-xs">{r.doc_type === "proforma" ? "Proforma" : "Commercial"}</TableCell>
+                        <TableCell className="text-xs capitalize">{r.source}</TableCell>
+                        <TableCell className="text-xs font-mono max-w-[220px] truncate" title={r.filename}>{r.filename}</TableCell>
+                        <TableCell className="text-xs text-right font-mono">{formatBytes(r.byte_size ?? 0)}</TableCell>
+                        <TableCell className="text-xs text-right">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            asChild
+                          >
+                            <a href={r.blobUrl} download={r.filename}>
+                              <Download className="h-3.5 w-3.5 mr-1" /> Download
+                            </a>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={closeRemovedModal}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+
 
   );
 }
