@@ -2162,7 +2162,7 @@ function InvoiceDetailPage() {
                 </p>
               ) : (
                 <>
-                  <div className="px-4 pb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5 items-end">
+                  <div id="purge-audit-filters" className="px-4 pb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5 items-end">
                     <div className="space-y-1">
                       <Label className="text-xs">User</Label>
                       <Select value={purgeUserFilter} onValueChange={setPurgeUserFilter}>
