@@ -6,6 +6,7 @@
 // load inside a server route handler.
 
 import { supabaseAdmin } from '@/integrations/supabase/client.server'
+import { retryWithBackoff, isTransientHttpStatus } from '@/lib/retry.server'
 
 export type SmsAlertResult =
   | { ok: true; sid: string; deduped: false }
@@ -95,30 +96,66 @@ export async function sendCriticalSms(
   })
   const basic = Buffer.from(`${accountSid}:${authToken}`).toString('base64')
 
+  // Retry with exponential backoff on network errors and transient HTTP status
+  // (408/425/429/5xx). Non-transient errors (e.g. 400 bad number, 401 auth)
+  // return immediately without retrying.
+  type TwilioAttempt =
+    | { ok: true; sid: string }
+    | { ok: false; transient: boolean; status: number; text: string; message: string }
+
   let sid = ''
   try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${basic}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
+    const { result } = await retryWithBackoff<TwilioAttempt>(
+      async () => {
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+              Authorization: `Basic ${basic}`,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body,
+          })
+          const text = await res.text()
+          if (!res.ok) {
+            return {
+              ok: false,
+              transient: isTransientHttpStatus(res.status),
+              status: res.status,
+              text,
+              message: `HTTP ${res.status}: ${text}`,
+            }
+          }
+          let attemptSid = ''
+          try {
+            const parsed = JSON.parse(text) as { sid?: string }
+            attemptSid = parsed.sid ?? ''
+          } catch {
+            // ignore — success without parseable body
+          }
+          return { ok: true, sid: attemptSid }
+        } catch (err) {
+          // Network / DNS / abort — always transient; rethrow so retry helper
+          // treats it as a throw and backs off.
+          throw err instanceof Error ? err : new Error(String(err))
+        }
       },
-      body,
-    })
-    const text = await res.text()
-    if (!res.ok) {
-      console.error(`Twilio send failed [${res.status}]: ${text}`)
-      return { ok: false, reason: 'twilio-error', message: `HTTP ${res.status}: ${text}` }
+      {
+        label: 'twilio-send',
+        maxAttempts: 4,
+        baseDelayMs: 300,
+        maxDelayMs: 4000,
+        isTransient: (r) => r.ok === false && r.transient,
+      },
+    )
+    if (!result.ok) {
+      console.error(`Twilio send failed [${result.status}]: ${result.text}`)
+      return { ok: false, reason: 'twilio-error', message: result.message }
     }
-    try {
-      const parsed = JSON.parse(text) as { sid?: string }
-      sid = parsed.sid ?? ''
-    } catch {
-      // ignore — success without parseable body
-    }
+    sid = result.sid
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    console.error('Twilio fetch threw', message)
+    console.error('Twilio fetch threw after retries', message)
     return { ok: false, reason: 'twilio-error', message }
   }
 
