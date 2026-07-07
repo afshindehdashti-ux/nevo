@@ -777,7 +777,18 @@ function InvoiceDetailPage() {
     URL.revokeObjectURL(url);
   }
 
-  async function exportPurgeAuditCsv(rows?: PurgeLogRow[], scopeLabel = "filtered") {
+  type PurgeExportMeta = {
+    scope: "filtered" | "selected";
+    userLabel?: string;
+    fromDate?: string;
+    toDate?: string;
+    versionQuery?: string;
+    minBytes?: string;
+    maxBytes?: string;
+    selectedIds?: string[];
+  };
+
+  async function exportPurgeAuditCsv(rows?: PurgeLogRow[], meta: PurgeExportMeta = { scope: "filtered" }) {
     if (!canPurgePdf) {
       toast.error("You don't have permission to export the purge audit log.", {
         description: "Only Super Admin, Management, or Finance can export purge history.",
