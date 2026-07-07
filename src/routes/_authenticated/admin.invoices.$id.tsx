@@ -201,6 +201,56 @@ function InvoiceDetailPage() {
     },
   });
 
+  // -------- Purge audit log filters --------
+  const [purgeUserFilter, setPurgeUserFilter] = useState<string>("all");
+  const [purgeFromDate, setPurgeFromDate] = useState<string>("");
+  const [purgeToDate, setPurgeToDate] = useState<string>("");
+  const [purgeVersionQuery, setPurgeVersionQuery] = useState<string>("");
+  const purgeUserOptions = useMemo(() => {
+    const seen = new Set<string>();
+    const opts: Array<{ id: string; label: string }> = [];
+    for (const log of purgeLogs) {
+      const key = log.user_id ?? "__system__";
+      if (seen.has(key)) continue;
+      seen.add(key);
+      opts.push({
+        id: key,
+        label: log.user_id ? purgeActorMap[log.user_id] ?? "Unknown user" : "System",
+      });
+    }
+    return opts.sort((a, b) => a.label.localeCompare(b.label));
+  }, [purgeLogs, purgeActorMap]);
+  const filteredPurgeLogs = useMemo(() => {
+    const fromMs = purgeFromDate ? new Date(purgeFromDate + "T00:00:00").getTime() : null;
+    const toMs = purgeToDate ? new Date(purgeToDate + "T23:59:59.999").getTime() : null;
+    const idQ = purgeVersionQuery.trim().toLowerCase();
+    return purgeLogs.filter((log) => {
+      if (purgeUserFilter !== "all") {
+        const key = log.user_id ?? "__system__";
+        if (key !== purgeUserFilter) return false;
+      }
+      const t = new Date(log.created_at).getTime();
+      if (fromMs != null && t < fromMs) return false;
+      if (toMs != null && t > toMs) return false;
+      if (idQ) {
+        const meta = (log.metadata ?? {}) as { version_ids?: string[] };
+        const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+        if (!ids.some((v) => v.toLowerCase().includes(idQ))) return false;
+      }
+      return true;
+    });
+  }, [purgeLogs, purgeUserFilter, purgeFromDate, purgeToDate, purgeVersionQuery]);
+  const purgeFiltersActive =
+    purgeUserFilter !== "all" || purgeFromDate !== "" || purgeToDate !== "" || purgeVersionQuery.trim() !== "";
+  const resetPurgeFilters = () => {
+    setPurgeUserFilter("all");
+    setPurgeFromDate("");
+    setPurgeToDate("");
+    setPurgeVersionQuery("");
+  };
+
+
+
 
   const [lines, setLines] = useState<Line[]>([]);
   const [notes, setNotes] = useState("");
