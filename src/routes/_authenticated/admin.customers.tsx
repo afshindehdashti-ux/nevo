@@ -179,6 +179,7 @@ function CustomersPage() {
           setDialogOpen(true);
         }}
         createLabel="New customer"
+        headerExtra={<GuideMeButton sectionId="customers" />}
       >
         <div className="overflow-x-auto">
           <Table>
