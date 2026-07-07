@@ -540,6 +540,22 @@ function InvoiceDetailPage() {
       });
       const now = new Date().toISOString();
 
+      if (result.status === "malformed") {
+        setPurgeVerifyState({
+          status: "malformed",
+          filename: file.name,
+          messages: result.messages,
+          verifiedAt: now,
+          embeddedSha: result.embeddedSha,
+          embeddedExportedAt: result.embeddedExportedAt,
+        });
+        toast.error("CSV structure is malformed — cannot verify", {
+          description: result.messages[0],
+          duration: 12000,
+        });
+        return;
+      }
+
       if (result.status === "no-expected") {
         setPurgeVerifyState({ status: "idle" });
         toast.error("No checksum to verify against — file preamble is missing SHA-256.");
@@ -573,6 +589,7 @@ function InvoiceDetailPage() {
           duration: 10000,
         });
       }
+
     } catch (e) {
       setPurgeVerifyState({ status: "idle" });
       toast.error(e instanceof Error ? e.message : "Failed to compute checksum");
