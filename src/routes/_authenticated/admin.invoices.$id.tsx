@@ -102,6 +102,12 @@ function formatBytes(bytes: number): string {
   return `${value.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
+function mbToBytes(value: string): number | null {
+  const n = value.trim() === "" ? NaN : parseFloat(value);
+  if (Number.isNaN(n) || n < 0) return null;
+  return Math.round(n * 1_000_000);
+}
+
 function InvoiceDetailPage() {
   const { id } = useParams({ from: "/_authenticated/admin/invoices/$id" });
   const search = Route.useSearch();
