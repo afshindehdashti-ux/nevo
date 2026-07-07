@@ -406,6 +406,30 @@ function InvoiceDetailPage() {
   async function confirmPurge() {
     setPurging(true);
     try {
+      // Snapshot the PDFs into blob URLs BEFORE deletion so users can still
+      // download them from the "View removed PDFs" modal after storage is wiped.
+      const versionsToRemove = toPurgeVersions;
+      const snapshots: RemovedPdfSnapshot[] = [];
+      for (const v of versionsToRemove) {
+        try {
+          const url = await signInvoicePdfUrl(v.storage_path, 300);
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`Fetch failed (${res.status})`);
+          const blob = await res.blob();
+          snapshots.push({
+            id: v.id,
+            filename: v.filename,
+            byte_size: v.byte_size,
+            source: v.source,
+            doc_type: v.doc_type,
+            created_at: v.created_at,
+            blobUrl: URL.createObjectURL(blob),
+          });
+        } catch (e) {
+          console.warn("Failed to snapshot PDF before purge", v.id, e);
+        }
+      }
+
       const removed = await purgeOlderInvoicePdfVersions(id, effectiveRetention);
       refetchPdfVersions();
       const { data: latestLog } = await supabase
@@ -418,12 +442,15 @@ function InvoiceDetailPage() {
         .limit(1)
         .maybeSingle();
       await refetchPurgeLogs();
+
+      setRemovedItems(snapshots);
       toast.success(`Purged ${removed} PDF version${removed === 1 ? "" : "s"}`, {
-        description: "A new entry has been added to the purge audit log.",
-        action: {
-          label: "View log entry",
-          onClick: () => scrollToPurgeLog(latestLog?.id),
-        },
+        description: snapshots.length > 0
+          ? `${snapshots.length} archived for download. A new audit log entry was created.`
+          : "A new entry has been added to the purge audit log.",
+        action: snapshots.length > 0
+          ? { label: "View removed PDFs", onClick: () => setRemovedOpen(true) }
+          : { label: "View log entry", onClick: () => scrollToPurgeLog(latestLog?.id) },
       });
       setPurgeOpen(false);
     } catch (e) {
