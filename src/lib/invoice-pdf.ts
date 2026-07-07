@@ -161,8 +161,21 @@ export async function fetchInvoiceForPdf(invoiceId: string) {
   return { invoice, items };
 }
 
-/** Generate and download a branded invoice / proforma PDF. */
-export async function generateInvoicePdf(invoiceId: string): Promise<void> {
+export type InvoicePdfResult = {
+  blob: Blob;
+  url: string;
+  filename: string;
+};
+
+/**
+ * Build a branded invoice / proforma PDF.
+ * mode="download" triggers save() and returns the blob/url too.
+ * mode="blob" returns the blob + object URL for preview (caller must revokeObjectURL).
+ */
+export async function generateInvoicePdf(
+  invoiceId: string,
+  mode: "download" | "blob" = "download",
+): Promise<InvoicePdfResult> {
   const [{ invoice, items }, company] = await Promise.all([
     fetchInvoiceForPdf(invoiceId),
     loadCompany(),
