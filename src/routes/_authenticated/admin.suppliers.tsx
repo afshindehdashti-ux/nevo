@@ -181,6 +181,7 @@ function SuppliersPage() {
           setDialogOpen(true);
         }}
         createLabel="New supplier"
+        headerExtra={<GuideMeButton sectionId="suppliers" />}
       >
         <div className="overflow-x-auto">
           <Table>
