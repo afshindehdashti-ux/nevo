@@ -31,8 +31,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown } from "lucide-react";
+import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
+import { emailInvoicePdf } from "@/lib/invoices.functions";
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import {
   INVOICE_STATUSES,
@@ -155,6 +157,63 @@ function InvoiceDetailPage() {
     document.body.appendChild(a);
     a.click();
     a.remove();
+  }
+
+  // -------- Email to customer --------
+  const emailFn = useServerFn(emailInvoicePdf);
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [emailTo, setEmailTo] = useState("");
+  const [emailMessage, setEmailMessage] = useState("");
+  const [emailSending, setEmailSending] = useState(false);
+
+  function openEmailDialog() {
+    const custEmail = (invoice?.customers as { email?: string | null } | null)?.email ?? "";
+    setEmailTo(custEmail);
+    setEmailMessage("");
+    setEmailOpen(true);
+  }
+
+  async function sendInvoiceEmail() {
+    if (!invoice) return;
+    const to = emailTo.trim();
+    if (!/^\S+@\S+\.\S+$/.test(to)) {
+      toast.error("Enter a valid email address");
+      return;
+    }
+    setEmailSending(true);
+    try {
+      // 1) Build the PDF (reuse the current preview if available).
+      const built = pdfPreview ?? (await generateInvoicePdf(invoice.id, "blob"));
+      // 2) Upload to crm-docs under invoices/<id>/… (matches server-side prefix check).
+      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const storagePath = `invoices/${invoice.id}/${stamp}-${built.filename}`;
+      const { error: upErr } = await supabase.storage
+        .from("crm-docs")
+        .upload(storagePath, built.blob, {
+          contentType: "application/pdf",
+          upsert: false,
+        });
+      if (upErr) throw upErr;
+      // 3) Ask the server to sign the URL and send the email.
+      const res = await emailFn({
+        data: {
+          invoiceId: invoice.id,
+          storagePath,
+          recipientEmail: to,
+          message: emailMessage.trim() || null,
+        },
+      });
+      if (!res.ok) {
+        toast.error(`Send failed: ${res.reason}`);
+        return;
+      }
+      toast.success(`Emailed to ${to}. Link expires in ${res.expiresInHours}h.`);
+      setEmailOpen(false);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Send failed");
+    } finally {
+      setEmailSending(false);
+    }
   }
 
   useEffect(() => {
@@ -413,6 +472,10 @@ function InvoiceDetailPage() {
             >
               <FileDown className="h-4 w-4 mr-1" />
               {pdfLoading ? "Preparing…" : "Preview PDF"}
+            </Button>
+            <Button variant="outline" size="sm" onClick={openEmailDialog}>
+              <Mail className="h-4 w-4 mr-1" />
+              Email to customer
             </Button>
             {canPay && invoice.type === "commercial" && Number(invoice.balance) > 0 && (
               <Button size="sm" onClick={() => setPayOpen(true)}>
@@ -749,6 +812,14 @@ function InvoiceDetailPage() {
               <Button size="sm" variant="outline" onClick={openPdfPreview} disabled={pdfLoading}>
                 {pdfLoading ? "Refreshing…" : "Refresh"}
               </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={openEmailDialog}
+                disabled={!pdfPreview}
+              >
+                <Mail className="h-4 w-4 mr-1" /> Email
+              </Button>
               <Button size="sm" onClick={downloadCurrentPdf} disabled={!pdfPreview}>
                 <FileDown className="h-4 w-4 mr-1" /> Download
               </Button>
@@ -767,6 +838,52 @@ function InvoiceDetailPage() {
               </div>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={emailOpen} onOpenChange={(o) => !emailSending && setEmailOpen(o)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              Email {invoice?.type === "proforma" ? "proforma" : "invoice"} to customer
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Recipient email</Label>
+              <Input
+                type="email"
+                value={emailTo}
+                onChange={(e) => setEmailTo(e.target.value)}
+                placeholder="name@company.com"
+                disabled={emailSending}
+              />
+            </div>
+            <div>
+              <Label>Message (optional)</Label>
+              <Textarea
+                value={emailMessage}
+                onChange={(e) => setEmailMessage(e.target.value)}
+                rows={4}
+                maxLength={2000}
+                placeholder="Add a short note to include in the email body."
+                disabled={emailSending}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              The current PDF is uploaded to secure storage and shared via a
+              7-day download link. The audit log records who sent it.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setEmailOpen(false)} disabled={emailSending}>
+              Cancel
+            </Button>
+            <Button onClick={sendInvoiceEmail} disabled={emailSending}>
+              <Mail className="h-4 w-4 mr-1" />
+              {emailSending ? "Sending…" : "Send email"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
