@@ -2012,7 +2012,7 @@ function InvoiceDetailPage() {
                   )}
                 </CardTitle>
                 <div className="flex items-center gap-2">
-                  {filteredSelectedCount > 0 && (
+                  {selectedPurgeIds.size > 0 && (
                     <>
                       <Button
                         variant="default"
@@ -2025,27 +2025,28 @@ function InvoiceDetailPage() {
                         <FileDown className="h-3.5 w-3.5 mr-1" />
                         Export selected ({selectedPurgeIds.size})
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8"
-                        onClick={clearFilteredPurgeSelection}
-                        title="Deselect the rows matching the current filter"
-                      >
-                        Clear filtered ({filteredSelectedCount})
-                      </Button>
+                      {filteredSelectedCount > 0 ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8"
+                          onClick={clearFilteredPurgeSelection}
+                          title="Deselect the rows matching the current filter"
+                        >
+                          Clear filtered ({filteredSelectedCount})
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8"
+                          onClick={clearPurgeSelection}
+                          title="Deselect all rows across every page"
+                        >
+                          Clear all ({selectedPurgeIds.size})
+                        </Button>
+                      )}
                     </>
-                  )}
-                  {selectedPurgeIds.size > 0 && filteredSelectedCount === 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8"
-                      onClick={clearPurgeSelection}
-                      title="Deselect all rows across every page"
-                    >
-                      Clear all ({selectedPurgeIds.size})
-                    </Button>
                   )}
                   <Button
                     variant="outline"
