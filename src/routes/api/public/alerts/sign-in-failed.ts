@@ -57,6 +57,20 @@ export const Route = createFileRoute('/api/public/alerts/sign-in-failed')({
           auth: { persistSession: false, autoRefreshToken: false },
         })
 
+        // Load admin-configurable thresholds; fall back to defaults on any error.
+        let THRESHOLD = DEFAULT_THRESHOLD
+        let WINDOW_MINUTES = DEFAULT_WINDOW_MINUTES
+        try {
+          const { data: cfg } = await admin.rpc('get_security_alert_settings')
+          const row = Array.isArray(cfg) ? cfg[0] : cfg
+          const t = Number(row?.signin_failure_threshold)
+          const w = Number(row?.signin_failure_window_minutes)
+          if (Number.isFinite(t) && t >= 1) THRESHOLD = Math.floor(t)
+          if (Number.isFinite(w) && w >= 1) WINDOW_MINUTES = Math.floor(w)
+        } catch (err) {
+          console.warn('sign-in-failed: settings lookup failed, using defaults', err)
+        }
+
         const nowIso = new Date().toISOString()
         const windowStart = new Date(
           Date.now() - WINDOW_MINUTES * 60_000,
