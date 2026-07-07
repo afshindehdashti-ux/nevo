@@ -13,6 +13,7 @@ import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
 import { useMyRoles } from "@/lib/crm-hooks";
 import type { AppRole } from "@/lib/crm-hooks";
 import { verifyCsvText, type VerifyResult } from "@/lib/purge-csv-preamble";
+import { detectShaDrift } from "@/lib/csv-export-audit-metadata";
 
 const PREVIEW_ROW_LIMIT = 10;
 
@@ -730,7 +731,7 @@ function ExportsHistoryPage() {
                         title="SHA-256 as it was written into the CSV preamble"
                       >
                         {md.embedded_sha256 ?? "—"}
-                        {md.embedded_sha256 && md.embedded_sha256 !== detail.sha256 && (
+                        {detectShaDrift({ sha256: detail.sha256, metadata: detail.metadata }) && (
                           <span className="ml-2 text-destructive">
                             (differs from column value)
                           </span>
