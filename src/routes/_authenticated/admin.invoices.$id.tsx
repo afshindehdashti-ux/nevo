@@ -1807,7 +1807,46 @@ function InvoiceDetailPage() {
                       </TableBody>
                     </Table>
                   )}
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-t px-4 py-2 text-xs text-muted-foreground">
+                    <div>
+                      {purgeTotal === 0
+                        ? "0 entries"
+                        : `Showing ${purgePage * purgePageSize + 1}–${Math.min((purgePage + 1) * purgePageSize, purgeTotal)} of ${purgeTotal}`}
+                      {purgeLoading && <span className="ml-2 italic">loading…</span>}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs">Rows</Label>
+                      <Select value={String(purgePageSize)} onValueChange={(v) => setPurgePageSize(parseInt(v, 10))}>
+                        <SelectTrigger className="h-7 w-[70px]"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {[10, 25, 50, 100].map((n) => (
+                            <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7"
+                        disabled={purgePage === 0 || purgeLoading}
+                        onClick={() => setPurgePage((p) => Math.max(0, p - 1))}
+                      >
+                        Prev
+                      </Button>
+                      <span>Page {purgePage + 1} / {purgePageCount}</span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7"
+                        disabled={purgePage + 1 >= purgePageCount || purgeLoading}
+                        onClick={() => setPurgePage((p) => p + 1)}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
                 </>
+
               )}
             </CardContent>
           </Card>
