@@ -130,6 +130,17 @@ function ExportsHistoryPage() {
   const pendingRowRef = useRef<CsvExportAuditRecord | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // --- Selection for compliance report ---
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
   // --- Payload preview (loaded from a user-picked file inside the dialog) ---
   const previewInputRef = useRef<HTMLInputElement | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
