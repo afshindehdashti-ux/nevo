@@ -55,6 +55,8 @@ export interface EmailPreviewMeta {
   displayName: string;
   category: "auth" | "app";
   subject: string;
+  /** Default preview data — used to seed the override form on the client. */
+  defaultData: Record<string, unknown>;
 }
 
 /** List every previewable template (auth + app) with resolved subjects. */
@@ -66,12 +68,12 @@ export const listEmailPreviews = createServerFn({ method: "GET" })
     const { TEMPLATES } = await import("@/lib/email-templates/registry");
 
     const authTemplates: EmailPreviewMeta[] = [
-      { name: "signup", displayName: "Signup confirmation", category: "auth", subject: "Confirm your email" },
-      { name: "invite", displayName: "Invitation", category: "auth", subject: "You've been invited" },
-      { name: "magiclink", displayName: "Magic link", category: "auth", subject: "Your login link" },
-      { name: "recovery", displayName: "Password recovery", category: "auth", subject: "Reset your password" },
-      { name: "email_change", displayName: "Email change", category: "auth", subject: "Confirm your new email" },
-      { name: "reauthentication", displayName: "Reauthentication", category: "auth", subject: "Your verification code" },
+      { name: "signup", displayName: "Signup confirmation", category: "auth", subject: "Confirm your email", defaultData: AUTH_SAMPLE_DATA.signup },
+      { name: "invite", displayName: "Invitation", category: "auth", subject: "You've been invited", defaultData: AUTH_SAMPLE_DATA.invite },
+      { name: "magiclink", displayName: "Magic link", category: "auth", subject: "Your login link", defaultData: AUTH_SAMPLE_DATA.magiclink },
+      { name: "recovery", displayName: "Password recovery", category: "auth", subject: "Reset your password", defaultData: AUTH_SAMPLE_DATA.recovery },
+      { name: "email_change", displayName: "Email change", category: "auth", subject: "Confirm your new email", defaultData: AUTH_SAMPLE_DATA.email_change },
+      { name: "reauthentication", displayName: "Reauthentication", category: "auth", subject: "Your verification code", defaultData: AUTH_SAMPLE_DATA.reauthentication },
     ];
 
     const appTemplates: EmailPreviewMeta[] = Object.entries(TEMPLATES).map(([name, entry]) => {
@@ -83,11 +85,13 @@ export const listEmailPreviews = createServerFn({ method: "GET" })
         displayName: entry.displayName ?? name,
         category: "app" as const,
         subject,
+        defaultData: previewData,
       };
     });
 
     return [...authTemplates, ...appTemplates];
   });
+
 
 /** Render a single template to HTML using its sample/preview data. */
 export const renderEmailPreview = createServerFn({ method: "POST" })
