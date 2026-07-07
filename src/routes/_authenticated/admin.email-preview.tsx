@@ -108,9 +108,21 @@ function EmailPreviewAdmin() {
   const grouped = useMemo(() => {
     const auth: EmailPreviewMeta[] = [];
     const app: EmailPreviewMeta[] = [];
-    (list.data ?? []).forEach((t) => (t.category === "auth" ? auth : app).push(t));
+    const q = search.trim().toLowerCase();
+    const matches = (t: EmailPreviewMeta) => {
+      if (categoryFilter !== "all" && t.category !== categoryFilter) return false;
+      if (!q) return true;
+      return (
+        t.name.toLowerCase().includes(q) ||
+        t.displayName.toLowerCase().includes(q) ||
+        t.subject.toLowerCase().includes(q)
+      );
+    };
+    (list.data ?? []).filter(matches).forEach((t) =>
+      (t.category === "auth" ? auth : app).push(t),
+    );
     return { auth, app };
-  }, [list.data]);
+  }, [list.data, search, categoryFilter]);
 
   function updateOverride(key: string, value: string) {
     if (!current) return;
