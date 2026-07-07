@@ -321,6 +321,12 @@ function InvoiceDetailPage() {
   }
 
   function openPurgeConfirm() {
+    if (!canPurgePdf) {
+      toast.error("You don't have permission to purge PDF versions.", {
+        description: "Only Super Admin, Management, or Finance can purge archive history.",
+      });
+      return;
+    }
     if (overRetentionCount === 0) {
       toast.info("Nothing to purge");
       return;
