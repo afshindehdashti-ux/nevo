@@ -46,6 +46,8 @@ function EmailPreviewAdmin() {
   const [selected, setSelected] = useState<string | null>(null);
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
   const [testRecipient, setTestRecipient] = useState("");
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<"all" | "auth" | "app">("all");
   const [overridesByTemplate, setOverridesByTemplate] = useState<Record<string, Overrides>>({});
   const [debouncedOverrides, setDebouncedOverrides] = useState<Overrides>({});
 
@@ -106,9 +108,21 @@ function EmailPreviewAdmin() {
   const grouped = useMemo(() => {
     const auth: EmailPreviewMeta[] = [];
     const app: EmailPreviewMeta[] = [];
-    (list.data ?? []).forEach((t) => (t.category === "auth" ? auth : app).push(t));
+    const q = search.trim().toLowerCase();
+    const matches = (t: EmailPreviewMeta) => {
+      if (categoryFilter !== "all" && t.category !== categoryFilter) return false;
+      if (!q) return true;
+      return (
+        t.name.toLowerCase().includes(q) ||
+        t.displayName.toLowerCase().includes(q) ||
+        t.subject.toLowerCase().includes(q)
+      );
+    };
+    (list.data ?? []).filter(matches).forEach((t) =>
+      (t.category === "auth" ? auth : app).push(t),
+    );
     return { auth, app };
-  }, [list.data]);
+  }, [list.data, search, categoryFilter]);
 
   function updateOverride(key: string, value: string) {
     if (!current) return;
@@ -150,7 +164,29 @@ function EmailPreviewAdmin() {
       </header>
 
       <div className="grid grid-cols-[240px_260px_1fr] gap-4 min-h-[70vh]">
-        <aside className="border border-border rounded-md bg-background p-2 space-y-4 overflow-auto">
+        <aside className="border border-border rounded-md bg-background p-2 space-y-3 overflow-auto">
+          <div className="space-y-2 px-1 pt-1">
+            <Input
+              type="search"
+              placeholder="Search templates…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-8 text-sm"
+            />
+            <div className="flex gap-1">
+              {(["all", "auth", "app"] as const).map((cat) => (
+                <Button
+                  key={cat}
+                  size="sm"
+                  variant={categoryFilter === cat ? "default" : "outline"}
+                  className="h-7 px-2 text-xs flex-1 capitalize"
+                  onClick={() => setCategoryFilter(cat)}
+                >
+                  {cat}
+                </Button>
+              ))}
+            </div>
+          </div>
           {list.isLoading && (
             <div className="p-2 space-y-2">
               <Skeleton className="h-6 w-full" />
