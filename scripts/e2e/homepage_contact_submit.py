@@ -58,13 +58,15 @@ async def run(url: str, locale: str) -> int:
         await page.goto(f"{url}/{locale}", wait_until="domcontentloaded")
         await page.screenshot(path=str(SCREENSHOTS / "1_loaded.png"))
 
-        # Best-effort cookie banner dismissal.
-        try:
-            await page.get_by_role("button", name=re.compile(r"decline|accept", re.I)).first.click(
-                timeout=1500
-            )
-        except Exception:
-            pass
+        # Best-effort cookie banner dismissal (Decline first, then any Accept).
+        for name in ("Decline", "Accept"):
+            try:
+                await page.get_by_role("button", name=name, exact=True).click(timeout=2000)
+                break
+            except Exception:
+                continue
+        # Give the banner time to unmount before we click into the form.
+        await page.wait_for_timeout(300)
 
         contact = page.locator("#contact")
         await contact.scroll_into_view_if_needed()
