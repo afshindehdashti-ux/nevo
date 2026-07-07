@@ -27,8 +27,9 @@ export async function recordInvoicePdfVersion(params: {
   blob: Blob;
   filename: string;
   source: InvoicePdfSource;
+  note?: string | null;
 }): Promise<{ storagePath: string }> {
-  const { invoiceId, docType, blob, filename, source } = params;
+  const { invoiceId, docType, blob, filename, source, note } = params;
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   const storagePath = `invoices/${invoiceId}/${stamp}-${filename}`;
 
@@ -40,6 +41,8 @@ export async function recordInvoicePdfVersion(params: {
   const { data: userRes } = await supabase.auth.getUser();
   const uid = userRes.user?.id ?? null;
 
+  const trimmedNote = note?.trim() ? note.trim().slice(0, 500) : null;
+
   const { error: insErr } = await supabase.from("invoice_pdf_versions").insert({
     invoice_id: invoiceId,
     doc_type: docType,
@@ -49,6 +52,7 @@ export async function recordInvoicePdfVersion(params: {
     byte_size: blob.size,
     source,
     generated_by: uid,
+    note: trimmedNote,
   });
   if (insErr) console.error("invoice_pdf_versions insert failed", insErr);
 
