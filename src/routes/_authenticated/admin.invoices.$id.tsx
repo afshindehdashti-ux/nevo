@@ -1052,6 +1052,19 @@ function InvoiceDetailPage() {
               </Button>
             </div>
           </DialogHeader>
+          <div className="px-4 py-2 border-b bg-background flex items-center gap-2">
+            <Label htmlFor="pdf-note-input" className="text-xs text-muted-foreground whitespace-nowrap">
+              Generation note (optional)
+            </Label>
+            <Input
+              id="pdf-note-input"
+              value={pdfNote}
+              onChange={(e) => setPdfNote(e.target.value)}
+              maxLength={500}
+              placeholder="e.g. Revised after client feedback"
+              className="h-8"
+            />
+          </div>
           <div className="flex-1 bg-muted">
             {pdfPreview ? (
               <iframe
