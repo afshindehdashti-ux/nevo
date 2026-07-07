@@ -427,6 +427,7 @@ function InvoiceDetailPage() {
           .limit(1)
           .maybeSingle();
         await refetchPurgeLogs();
+        qc.invalidateQueries({ queryKey: ["invoice-purge-log-users", id] });
         toast.success(`Purged ${removed} PDF version${removed === 1 ? "" : "s"}`, {
           description: `Automatic prune to retention of ${effectiveRetentionPersisted}. A new entry has been added to the audit log.`,
           action: {
