@@ -65,6 +65,7 @@ function PaymentsPage() {
       onSearchChange={setSearch}
       canCreate={false}
       onCreate={() => {}}
+      headerExtra={<GuideMeButton sectionId="payments" />}
     >
       <div className="p-3 border-b flex justify-between items-center text-sm">
         <span className="text-muted-foreground">
