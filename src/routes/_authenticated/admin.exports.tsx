@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2, Save, X, Bookmark } from "lucide-react";
+import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2, Save, X, Bookmark, FileSpreadsheet } from "lucide-react";
 
 import { listCsvExportAudit } from "@/lib/invoice-purge-audit.functions";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
@@ -14,6 +14,8 @@ import { useMyRoles } from "@/lib/crm-hooks";
 import type { AppRole } from "@/lib/crm-hooks";
 import { verifyCsvText, type VerifyResult } from "@/lib/purge-csv-preamble";
 import { detectShaDrift } from "@/lib/csv-export-audit-metadata";
+import { buildComplianceReportCsv } from "@/lib/compliance-report";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const PREVIEW_ROW_LIMIT = 10;
 
