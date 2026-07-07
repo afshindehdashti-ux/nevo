@@ -744,15 +744,21 @@ function ExportsHistoryPage() {
                           size="sm"
                           className="h-7 px-2"
                           onClick={() => triggerVerifyAndOpen(r)}
-                          disabled={verifyingId === r.id}
+                          disabled={verifyingId !== null}
+                          aria-busy={verifyingId === r.id}
                           title="Pick the saved CSV to re-verify its SHA-256 before opening"
                         >
                           {verifyingId === r.id ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
+                            <>
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                              <span className="ml-1">Verifying…</span>
+                            </>
                           ) : (
-                            <FileDown className="h-3 w-3" />
+                            <>
+                              <FileDown className="h-3 w-3" />
+                              <span className="ml-1">Verify &amp; open</span>
+                            </>
                           )}
-                          <span className="ml-1">Verify &amp; open</span>
                         </Button>
                         <Button
                           type="button"
