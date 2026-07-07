@@ -46,11 +46,11 @@ const FilteredInput = z.object({
 export const listPurgeAuditForExport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => FilteredInput.parse(v))
-  .handler(async ({ context, data }): Promise<PurgeAuditRow[]> => {
+  .handler(async ({ context, data }): Promise<PurgeAuditExportResult> => {
     await assertCanPurge(context);
     let q = context.supabase
       .from("activity_logs")
-      .select("id, user_id, created_at, metadata")
+      .select("id, user_id, created_at, metadata", { count: "exact" })
       .eq("action", "purge_pdf_versions")
       .eq("entity_type", "invoice")
       .eq("entity_id", data.invoice_id);
@@ -61,11 +61,14 @@ export const listPurgeAuditForExport = createServerFn({ method: "POST" })
       q = q.gte("created_at", new Date(data.from_date + "T00:00:00").toISOString());
     if (data.to_date)
       q = q.lte("created_at", new Date(data.to_date + "T23:59:59.999").toISOString());
-    const { data: rows, error } = await q
+    const { data: rows, error, count } = await q
       .order(data.sort_column, { ascending: data.sort_ascending })
       .limit(data.limit);
     if (error) throw new Error(error.message);
-    return (rows ?? []) as PurgeAuditRow[];
+    return {
+      rows: (rows ?? []) as PurgeAuditRow[],
+      total: count ?? 0,
+    };
   });
 
 const SelectedInput = z.object({
