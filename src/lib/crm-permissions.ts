@@ -52,3 +52,6 @@ export function useCanUseDocIntel() {
     "read_only",
   ]);
 }
+export function useCanPurgeInvoicePdfVersions() {
+  return useHasAnyRole(["super_admin", "management", "finance"]);
+}

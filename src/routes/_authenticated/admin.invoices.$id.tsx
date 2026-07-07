@@ -53,7 +53,7 @@ import {
   type InvoiceStatus,
   type PaymentMethod,
 } from "@/lib/crm-status";
-import { useCanEditInvoices, useCanEditPayments } from "@/lib/crm-permissions";
+import { useCanEditInvoices, useCanEditPayments, useCanPurgeInvoicePdfVersions } from "@/lib/crm-permissions";
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
 import { ApprovalPanel } from "@/components/crm/ApprovalPanel";
 
@@ -80,6 +80,7 @@ function InvoiceDetailPage() {
   const qc = useQueryClient();
   const canEdit = useCanEditInvoices();
   const canPay = useCanEditPayments();
+  const canPurgePdf = useCanPurgeInvoicePdfVersions();
 
   const { data: invoice, isLoading } = useQuery({
     queryKey: ["invoice", id],
@@ -265,6 +266,7 @@ function InvoiceDetailPage() {
 
   async function autoPruneIfNeeded() {
     if (!effectiveRetentionPersisted) return;
+    if (!canPurgePdf) return; // silent no-op for non-privileged users
     try {
       const removed = await purgeOlderInvoicePdfVersions(id, effectiveRetentionPersisted);
       if (removed > 0) {
@@ -319,6 +321,12 @@ function InvoiceDetailPage() {
   }
 
   function openPurgeConfirm() {
+    if (!canPurgePdf) {
+      toast.error("You don't have permission to purge PDF versions.", {
+        description: "Only Super Admin, Management, or Finance can purge archive history.",
+      });
+      return;
+    }
     if (overRetentionCount === 0) {
       toast.info("Nothing to purge");
       return;
@@ -1235,14 +1243,21 @@ function InvoiceDetailPage() {
                       size="sm"
                       className="h-8"
                       onClick={openPurgeConfirm}
-                      disabled={purging || overRetentionCount === 0}
+                      disabled={purging || overRetentionCount === 0 || !canPurgePdf}
+                      title={
+                        !canPurgePdf
+                          ? "Only Super Admin, Management, or Finance can purge PDF versions."
+                          : undefined
+                      }
                     >
                       <Trash2 className="h-3.5 w-3.5 mr-1" />
                       {purging
                         ? "Purging…"
-                        : overRetentionCount > 0
-                          ? `Purge ${overRetentionCount} older`
-                          : "Nothing to purge"}
+                        : !canPurgePdf
+                          ? "Purge (restricted)"
+                          : overRetentionCount > 0
+                            ? `Purge ${overRetentionCount} older`
+                            : "Nothing to purge"}
                     </Button>
                     <p className="text-xs text-muted-foreground ml-auto max-w-xs">
                       Effective limit: {effectiveRetention}
