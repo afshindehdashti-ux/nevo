@@ -25,6 +25,7 @@ import {
   Mail,
   Upload,
   Activity,
+  Bell,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
