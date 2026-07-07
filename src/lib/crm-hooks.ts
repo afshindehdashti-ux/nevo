@@ -4,14 +4,37 @@ import type { Database } from "@/integrations/supabase/types";
 
 export type AppRole = Database["public"]["Enums"]["app_role"];
 
+const ACCESS_QUERY_TIMEOUT_MS = 5000;
+
+function withTimeout<T>(promise: Promise<T>, label: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => {
+      reject(new Error(`${label} timed out after ${ACCESS_QUERY_TIMEOUT_MS / 1000}s`));
+    }, ACCESS_QUERY_TIMEOUT_MS);
+
+    promise.then(
+      (value) => {
+        window.clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        window.clearTimeout(timer);
+        reject(error);
+      },
+    );
+  });
+}
+
 export function useCurrentUser() {
   return useQuery({
     queryKey: ["crm", "current-user"],
     queryFn: async () => {
-      const { data } = await supabase.auth.getUser();
+      const { data, error } = await withTimeout(supabase.auth.getUser(), "User session check");
+      if (error) throw error;
       return data.user ?? null;
     },
     staleTime: 60_000,
+    retry: 1,
   });
 }
 
@@ -21,14 +44,15 @@ export function useMyRoles() {
     queryKey: ["crm", "my-roles", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user!.id);
+      const { data, error } = await withTimeout(
+        supabase.from("user_roles").select("role").eq("user_id", user!.id),
+        "Role lookup",
+      );
       if (error) throw error;
       return (data ?? []).map((r) => r.role as AppRole);
     },
     staleTime: 60_000,
+    retry: 1,
   });
 }
 
@@ -43,14 +67,14 @@ export function useMyProfile() {
     queryKey: ["crm", "my-profile", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user!.id)
-        .maybeSingle();
+      const { data, error } = await withTimeout(
+        supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle(),
+        "Profile lookup",
+      );
       if (error) throw error;
       return data;
     },
     staleTime: 30_000,
+    retry: 1,
   });
 }
