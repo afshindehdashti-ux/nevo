@@ -5,7 +5,6 @@ import { Sparkles, Send, Loader2, X, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
@@ -176,7 +175,7 @@ export function AiAssistDrawer() {
             ) : null}
           </SheetHeader>
 
-          <ScrollArea className="flex-1" viewportRef={scrollRef}>
+          <div ref={scrollRef} className="flex-1 overflow-y-auto">
             <div className="flex flex-col gap-3 px-4 py-4">
               {messages.length === 0 && !busy ? (
                 <div className="rounded-md border border-dashed border-neutral-300 p-4 text-sm text-neutral-600">

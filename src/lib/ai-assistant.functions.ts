@@ -627,7 +627,7 @@ export const logAiAction = createServerFn({ method: "POST" })
       related_module: data.related_module ?? null,
       related_record_id: data.related_record_id ?? null,
       ai_summary: data.ai_summary ?? null,
-      metadata: data.metadata ?? {},
+      metadata: (data.metadata ?? {}) as never,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
