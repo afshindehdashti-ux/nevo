@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail, History, Archive, Copy } from "lucide-react";
+import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail, History, Archive, Copy, Download } from "lucide-react";
 import JSZip from "jszip";
 import { useServerFn } from "@tanstack/react-start";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
