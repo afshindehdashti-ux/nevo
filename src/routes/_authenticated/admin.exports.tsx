@@ -207,6 +207,13 @@ function ExportsHistoryPage() {
 
   return (
     <div className="p-6 space-y-4">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv,text/csv"
+        className="sr-only"
+        onChange={handleFilePicked}
+      />
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
