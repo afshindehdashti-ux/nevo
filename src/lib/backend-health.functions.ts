@@ -4,12 +4,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 /**
  * Returns a real-time snapshot of backend health: database latency, queue
  * depths (pgmq main + DLQ), cron job status, and email-delivery stats over
- * the last 24 hours. Admin only.
+ * the last 24 hours. Super admin only.
  */
 export const getBackendHealth = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    // AuthZ — super_admin only. Sensitive infra data.
     const { data: isAdmin } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
       _role: "super_admin",
@@ -23,7 +22,7 @@ export const getBackendHealth = createServerFn({ method: "GET" })
     const startedAt = Date.now();
     const serverTime = new Date().toISOString();
 
-    // --- Database latency (round-trip against a trivial query) ---
+    // --- Database latency ---
     let dbLatencyMs: number | null = null;
     let dbOk = false;
     let dbError: string | null = null;
@@ -40,43 +39,31 @@ export const getBackendHealth = createServerFn({ method: "GET" })
       dbError = e instanceof Error ? e.message : String(e);
     }
 
-    // --- Queue depths via pgmq introspection tables ---
-    type QueueRow = { queue: string; size: number };
-    const queues: QueueRow[] = [];
-    const queueNames = [
-      "q_auth_emails",
-      "q_transactional_emails",
-      "q_auth_emails_dlq",
-      "q_transactional_emails_dlq",
-    ];
-    for (const q of queueNames) {
-      const { count, error } = await (supabaseAdmin as any)
-        .schema("pgmq")
-        .from(q)
-        .select("msg_id", { count: "exact", head: true });
-      queues.push({
-        queue: q,
-        size: error ? 0 : count ?? 0,
-      });
-    }
-
-    // --- Cron job presence (process-email-queue) ---
-    let cronScheduled = false;
-    let cronError: string | null = null;
+    // --- Queues + cron via SECURITY DEFINER RPC ---
+    let queues = {
+      auth_emails: 0,
+      transactional_emails: 0,
+      auth_emails_dlq: 0,
+      transactional_emails_dlq: 0,
+    };
+    let cron: { scheduled: boolean; jobname?: string; schedule?: string; active?: boolean } = {
+      scheduled: false,
+    };
+    let metricsError: string | null = null;
     try {
-      const { data, error } = await (supabaseAdmin as any)
-        .schema("cron")
-        .from("job")
-        .select("jobname, schedule, active")
-        .eq("jobname", "process-email-queue")
-        .maybeSingle();
-      if (error) cronError = error.message;
-      cronScheduled = !!data;
+      const { data, error } = await (supabaseAdmin as any).rpc(
+        "get_backend_health_metrics",
+      );
+      if (error) metricsError = error.message;
+      else if (data) {
+        queues = { ...queues, ...(data.queues ?? {}) };
+        cron = { ...cron, ...(data.cron ?? {}) };
+      }
     } catch (e) {
-      cronError = e instanceof Error ? e.message : String(e);
+      metricsError = e instanceof Error ? e.message : String(e);
     }
 
-    // --- Email send state (throughput / rate-limit backoff) ---
+    // --- Email throughput config ---
     const { data: sendState } = await supabaseAdmin
       .from("email_send_state")
       .select("*")
@@ -87,12 +74,13 @@ export const getBackendHealth = createServerFn({ method: "GET" })
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: logs, error: logsError } = await supabaseAdmin
       .from("email_send_log")
-      .select("message_id, status, created_at, template_name, recipient_email, error_message")
+      .select(
+        "message_id, status, created_at, template_name, recipient_email, error_message",
+      )
       .gte("created_at", since)
       .order("created_at", { ascending: false })
       .limit(2000);
 
-    // dedupe by message_id — latest row wins
     const latestByMsg = new Map<
       string,
       {
@@ -122,6 +110,7 @@ export const getBackendHealth = createServerFn({ method: "GET" })
       dlq: 0,
       suppressed: 0,
       pending: 0,
+      bounced: 0,
       other: 0,
     };
     const recentFailures: Array<{
@@ -138,26 +127,26 @@ export const getBackendHealth = createServerFn({ method: "GET" })
       else if (s === "dlq") emailStats.dlq++;
       else if (s === "suppressed") emailStats.suppressed++;
       else if (s === "pending") emailStats.pending++;
+      else if (s === "bounced") emailStats.bounced++;
       else emailStats.other++;
-      if (s === "dlq" || s === "failed" || s === "bounced" || s === "complained") {
+      if (["dlq", "failed", "bounced", "complained"].includes(s)) {
         if (recentFailures.length < 25) recentFailures.push(r);
       }
     }
 
+    // --- API self-check (this handler executed) ---
+    const api = {
+      ok: true,
+      elapsedMs: Date.now() - startedAt,
+      serverTime,
+    };
+
     return {
       generatedAt: serverTime,
-      serverElapsedMs: Date.now() - startedAt,
-      database: {
-        ok: dbOk,
-        latencyMs: dbLatencyMs,
-        error: dbError,
-      },
+      api,
+      database: { ok: dbOk, latencyMs: dbLatencyMs, error: dbError },
       queues,
-      cron: {
-        scheduled: cronScheduled,
-        jobName: "process-email-queue",
-        error: cronError,
-      },
+      cron,
       email: {
         stats: emailStats,
         state: sendState
@@ -170,5 +159,6 @@ export const getBackendHealth = createServerFn({ method: "GET" })
         recentFailures,
         logsError: logsError?.message ?? null,
       },
+      metricsError,
     };
   });
