@@ -2893,6 +2893,7 @@ export type Database = {
           invoice: number
         }[]
       }
+      get_backend_health_metrics: { Args: never; Returns: Json }
       has_admin_role: { Args: { required_role: string }; Returns: boolean }
       has_any_role: {
         Args: {
