@@ -338,10 +338,13 @@ function InvoiceDetailPage() {
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [purgeDistinctUsers, purgeActorMap]);
 
-  // Version-ID search only filters the current page (metadata is JSON, not indexed
-  // for text search server-side). Everything else is filtered server-side.
+  // Version-ID search and file-size filters are applied client-side to the
+  // current page (metadata is JSON and not indexed server-side). Everything
+  // else is filtered server-side.
   const filteredPurgeLogs = useMemo(() => {
     const idQ = purgeVersionQuery.trim().toLowerCase();
+    const minBytes = mbToBytes(purgeMinBytes);
+    const maxBytes = mbToBytes(purgeMaxBytes);
     let rows = idQ
       ? purgeLogs.filter((log) => {
           const meta = (log.metadata ?? {}) as { version_ids?: string[] };
@@ -349,6 +352,14 @@ function InvoiceDetailPage() {
           return ids.some((v) => v.toLowerCase().includes(idQ));
         })
       : purgeLogs;
+    if (minBytes != null || maxBytes != null) {
+      rows = rows.filter((log) => {
+        const total = ((log.metadata ?? {}) as { total_bytes?: number }).total_bytes ?? 0;
+        if (minBytes != null && total < minBytes) return false;
+        if (maxBytes != null && total > maxBytes) return false;
+        return true;
+      });
+    }
     if (purgeSort.column === "user") {
       rows = [...rows].sort((a, b) => {
         const nameA = a.user_id ? purgeActorMap[a.user_id] ?? "Unknown user" : "System";
@@ -362,7 +373,7 @@ function InvoiceDetailPage() {
       });
     }
     return rows;
-  }, [purgeLogs, purgeVersionQuery, purgeSort, purgeActorMap]);
+  }, [purgeLogs, purgeVersionQuery, purgeMinBytes, purgeMaxBytes, purgeSort, purgeActorMap]);
   const purgeFiltersActive =
     purgeUserFilter !== "all" || purgeFromDate !== "" || purgeToDate !== "" || purgeVersionQuery.trim() !== "";
   const resetPurgeFilters = () => {
