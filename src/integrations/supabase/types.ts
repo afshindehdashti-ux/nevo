@@ -270,6 +270,9 @@ export type Database = {
           legal_name: string
           logo_url: string | null
           phone: string | null
+          security_new_country_dedup_minutes: number
+          security_signin_failure_threshold: number
+          security_signin_failure_window_minutes: number
           team_members: Json
           trade_license: string | null
           updated_at: string
@@ -297,6 +300,9 @@ export type Database = {
           legal_name: string
           logo_url?: string | null
           phone?: string | null
+          security_new_country_dedup_minutes?: number
+          security_signin_failure_threshold?: number
+          security_signin_failure_window_minutes?: number
           team_members?: Json
           trade_license?: string | null
           updated_at?: string
@@ -324,6 +330,9 @@ export type Database = {
           legal_name?: string
           logo_url?: string | null
           phone?: string | null
+          security_new_country_dedup_minutes?: number
+          security_signin_failure_threshold?: number
+          security_signin_failure_window_minutes?: number
           team_members?: Json
           trade_license?: string | null
           updated_at?: string
@@ -2918,6 +2927,14 @@ export type Database = {
         }[]
       }
       get_backend_health_metrics: { Args: never; Returns: Json }
+      get_security_alert_settings: {
+        Args: never
+        Returns: {
+          new_country_dedup_minutes: number
+          signin_failure_threshold: number
+          signin_failure_window_minutes: number
+        }[]
+      }
       has_admin_role: { Args: { required_role: string }; Returns: boolean }
       has_any_role: {
         Args: {
