@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2, Save, X, Bookmark } from "lucide-react";
+import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2, Save, X, Bookmark, FileSpreadsheet } from "lucide-react";
 
 import { listCsvExportAudit } from "@/lib/invoice-purge-audit.functions";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
@@ -14,6 +14,8 @@ import { useMyRoles } from "@/lib/crm-hooks";
 import type { AppRole } from "@/lib/crm-hooks";
 import { verifyCsvText, type VerifyResult } from "@/lib/purge-csv-preamble";
 import { detectShaDrift } from "@/lib/csv-export-audit-metadata";
+import { buildComplianceReportCsv } from "@/lib/compliance-report";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const PREVIEW_ROW_LIMIT = 10;
 
@@ -127,6 +129,17 @@ function ExportsHistoryPage() {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const pendingRowRef = useRef<CsvExportAuditRecord | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // --- Selection for compliance report ---
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   // --- Payload preview (loaded from a user-picked file inside the dialog) ---
   const previewInputRef = useRef<HTMLInputElement | null>(null);
@@ -262,6 +275,45 @@ function ExportsHistoryPage() {
     for (const a of actors) m[a.user_id] = a.full_name ?? "Unknown user";
     return m;
   }, [actors]);
+
+  const allVisibleSelected =
+    rows.length > 0 && rows.every((r) => selectedIds.has(r.id));
+  function toggleAllVisible() {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allVisibleSelected) {
+        for (const r of rows) next.delete(r.id);
+      } else {
+        for (const r of rows) next.add(r.id);
+      }
+      return next;
+    });
+  }
+
+  function downloadComplianceReport() {
+    const selected = rows.filter((r) => selectedIds.has(r.id));
+    if (selected.length === 0) {
+      toast.error("Select at least one export to include in the report.");
+      return;
+    }
+    const csv = buildComplianceReportCsv(selected, {
+      generatedAtIso: new Date().toISOString(),
+      actorMap,
+    });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `csv-export-compliance-report-${stamp}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    toast.success(
+      `Compliance report ready · ${selected.length} export${selected.length === 1 ? "" : "s"}`,
+    );
+  }
 
   function update<K extends keyof z.infer<typeof searchSchema>>(key: K, value: string) {
     void navigate({ search: (prev: z.infer<typeof searchSchema>) => ({ ...prev, [key]: value }) });
@@ -538,12 +590,42 @@ function ExportsHistoryPage() {
               <RefreshCw className={`h-3 w-3 mr-1 ${query.isFetching ? "animate-spin" : ""}`} />
               Refresh
             </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-7 px-2"
+              onClick={downloadComplianceReport}
+              disabled={selectedIds.size === 0}
+              title="Download a CSV summarizing embedded vs recorded SHA-256 and timestamps for the selected exports"
+            >
+              <FileSpreadsheet className="h-3 w-3 mr-1" />
+              Compliance report ({selectedIds.size})
+            </Button>
+            {selectedIds.size > 0 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2"
+                onClick={() => setSelectedIds(new Set())}
+              >
+                Clear selection
+              </Button>
+            )}
           </div>
 
           <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[1%]">
+                    <Checkbox
+                      checked={allVisibleSelected}
+                      onCheckedChange={toggleAllVisible}
+                      aria-label="Select all visible exports"
+                    />
+                  </TableHead>
                   <TableHead>When</TableHead>
                   <TableHead>User</TableHead>
                   <TableHead>Scope</TableHead>
@@ -558,20 +640,27 @@ function ExportsHistoryPage() {
                 {query.isLoading ? (
                   Array.from({ length: 6 }).map((_, i) => (
                     <TableRow key={`sk-${i}`}>
-                      {Array.from({ length: 8 }).map((_, j) => (
+                      {Array.from({ length: 9 }).map((_, j) => (
                         <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : rows.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">
+                    <TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-8">
                       No CSV exports match these filters.
                     </TableCell>
                   </TableRow>
                 ) : (
                   rows.map((r) => (
-                    <TableRow key={r.id}>
+                    <TableRow key={r.id} data-state={selectedIds.has(r.id) ? "selected" : undefined}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.has(r.id)}
+                          onCheckedChange={() => toggleSelected(r.id)}
+                          aria-label={`Select export ${r.filename}`}
+                        />
+                      </TableCell>
                       <TableCell className="whitespace-nowrap text-xs">
                         {format(new Date(r.created_at), "yyyy-MM-dd HH:mm:ss")}
                       </TableCell>
