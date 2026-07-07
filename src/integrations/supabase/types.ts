@@ -1531,7 +1531,16 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          gmail_access_token: string | null
+          gmail_authorized_email: string | null
+          gmail_client_id: string | null
+          gmail_client_secret: string | null
           gmail_email: string | null
+          gmail_oauth_state: string | null
+          gmail_redirect_uri: string | null
+          gmail_refresh_token: string | null
+          gmail_scope: string | null
+          gmail_token_expires_at: string | null
           id: string
           imap_host: string | null
           imap_password: string | null
@@ -1550,7 +1559,16 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
+          gmail_access_token?: string | null
+          gmail_authorized_email?: string | null
+          gmail_client_id?: string | null
+          gmail_client_secret?: string | null
           gmail_email?: string | null
+          gmail_oauth_state?: string | null
+          gmail_redirect_uri?: string | null
+          gmail_refresh_token?: string | null
+          gmail_scope?: string | null
+          gmail_token_expires_at?: string | null
           id?: string
           imap_host?: string | null
           imap_password?: string | null
@@ -1569,7 +1587,16 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
+          gmail_access_token?: string | null
+          gmail_authorized_email?: string | null
+          gmail_client_id?: string | null
+          gmail_client_secret?: string | null
           gmail_email?: string | null
+          gmail_oauth_state?: string | null
+          gmail_redirect_uri?: string | null
+          gmail_refresh_token?: string | null
+          gmail_scope?: string | null
+          gmail_token_expires_at?: string | null
           id?: string
           imap_host?: string | null
           imap_password?: string | null
