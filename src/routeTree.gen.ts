@@ -93,6 +93,7 @@ import { Route as AuthenticatedAdminCommissionInvoicesRouteImport } from './rout
 import { Route as AuthenticatedAdminChangePasswordRouteImport } from './routes/_authenticated/admin.change-password'
 import { Route as AuthenticatedAdminBackendHealthRouteImport } from './routes/_authenticated/admin.backend-health'
 import { Route as AuthenticatedAdminApprovalsRouteImport } from './routes/_authenticated/admin.approvals'
+import { Route as AuthenticatedAdminAlertsRouteImport } from './routes/_authenticated/admin.alerts'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
 import { Route as LangSolutionsSandwichPanelsRouteImport } from './routes/$lang.solutions.sandwich-panels'
 import { Route as LangSolutionsRawMaterialsRouteImport } from './routes/$lang.solutions.raw-materials'
@@ -575,6 +576,12 @@ const AuthenticatedAdminApprovalsRoute =
     path: '/approvals',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAlertsRoute =
+  AuthenticatedAdminAlertsRouteImport.update({
+    id: '/alerts',
+    path: '/alerts',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminActivityRoute =
   AuthenticatedAdminActivityRouteImport.update({
     id: '/activity',
@@ -790,6 +797,7 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/admin/alerts': typeof AuthenticatedAdminAlertsRoute
   '/admin/approvals': typeof AuthenticatedAdminApprovalsRouteWithChildren
   '/admin/backend-health': typeof AuthenticatedAdminBackendHealthRoute
   '/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
@@ -901,6 +909,7 @@ export interface FileRoutesByTo {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/admin/alerts': typeof AuthenticatedAdminAlertsRoute
   '/admin/approvals': typeof AuthenticatedAdminApprovalsRouteWithChildren
   '/admin/backend-health': typeof AuthenticatedAdminBackendHealthRoute
   '/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
@@ -1015,6 +1024,7 @@ export interface FileRoutesById {
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/_authenticated/admin/alerts': typeof AuthenticatedAdminAlertsRoute
   '/_authenticated/admin/approvals': typeof AuthenticatedAdminApprovalsRouteWithChildren
   '/_authenticated/admin/backend-health': typeof AuthenticatedAdminBackendHealthRoute
   '/_authenticated/admin/change-password': typeof AuthenticatedAdminChangePasswordRoute
@@ -1130,6 +1140,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
     | '/admin/activity'
+    | '/admin/alerts'
     | '/admin/approvals'
     | '/admin/backend-health'
     | '/admin/change-password'
@@ -1241,6 +1252,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
     | '/admin/activity'
+    | '/admin/alerts'
     | '/admin/approvals'
     | '/admin/backend-health'
     | '/admin/change-password'
@@ -1354,6 +1366,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
     | '/_authenticated/admin/activity'
+    | '/_authenticated/admin/alerts'
     | '/_authenticated/admin/approvals'
     | '/_authenticated/admin/backend-health'
     | '/_authenticated/admin/change-password'
@@ -2039,6 +2052,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminApprovalsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/alerts': {
+      id: '/_authenticated/admin/alerts'
+      path: '/alerts'
+      fullPath: '/admin/alerts'
+      preLoaderRoute: typeof AuthenticatedAdminAlertsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/activity': {
       id: '/_authenticated/admin/activity'
       path: '/activity'
@@ -2392,6 +2412,7 @@ const AuthenticatedAdminUsersRouteWithChildren =
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
+  AuthenticatedAdminAlertsRoute: typeof AuthenticatedAdminAlertsRoute
   AuthenticatedAdminApprovalsRoute: typeof AuthenticatedAdminApprovalsRouteWithChildren
   AuthenticatedAdminBackendHealthRoute: typeof AuthenticatedAdminBackendHealthRoute
   AuthenticatedAdminChangePasswordRoute: typeof AuthenticatedAdminChangePasswordRoute
@@ -2430,6 +2451,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
+  AuthenticatedAdminAlertsRoute: AuthenticatedAdminAlertsRoute,
   AuthenticatedAdminApprovalsRoute:
     AuthenticatedAdminApprovalsRouteWithChildren,
   AuthenticatedAdminBackendHealthRoute: AuthenticatedAdminBackendHealthRoute,
