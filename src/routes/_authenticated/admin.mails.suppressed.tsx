@@ -35,7 +35,7 @@ function SuppressedPage() {
     }
   }
 
-  const rows = (query.data?.rows ?? []) as Array<{ email: string; reason: string | null; source: string | null; created_at: string }>;
+  const rows = (query.data?.rows ?? []) as unknown as Array<{ email: string; reason: string | null; source: string | null; created_at: string }>;
 
   return (
     <div className="space-y-4">

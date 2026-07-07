@@ -36,13 +36,13 @@ export const Route = createFileRoute("/_authenticated/admin/mails/")({
 });
 
 type Row = {
-  id: number;
+  id: string | number;
   message_id: string | null;
   template_name: string | null;
   recipient_email: string | null;
   status: string | null;
   error_message: string | null;
-  metadata: Record<string, unknown> | null;
+  metadata: unknown;
   created_at: string;
 };
 
@@ -105,7 +105,7 @@ function MailLogDashboard() {
   });
 
   const data = query.data;
-  const rows = (data?.rows ?? []) as Row[];
+  const rows = (data?.rows ?? []) as unknown as Row[];
   const stats = data?.stats ?? { total: 0, sent: 0, failed: 0, suppressed: 0, pending: 0 };
   const templates = data?.templates ?? [];
 
