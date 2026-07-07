@@ -12,6 +12,19 @@ function generateToken(): string {
   return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+/** Keep only JSON-scalar fields so the payload is safely serializable. */
+function flattenScalar(input: Record<string, unknown>): Record<string, string | number | boolean | null> {
+  const out: Record<string, string | number | boolean | null> = {};
+  for (const [k, v] of Object.entries(input)) {
+    if (v === null || typeof v === "string" || typeof v === "number" || typeof v === "boolean") {
+      out[k] = v;
+    } else {
+      out[k] = JSON.stringify(v);
+    }
+  }
+  return out;
+}
+
 /**
  * Preview data used for auth email templates when rendering internally.
  * Mirrors the samples used by the Lovable auth email preview route so
