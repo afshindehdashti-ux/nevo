@@ -924,11 +924,11 @@ function InvoiceDetailPage() {
       filename,
       sha256,
       rowCount: source.length,
-      scope: scopeLabel,
+      scope: meta.scope,
       exportedAt: new Date().toISOString(),
       byteSize: bytes.byteLength,
     });
-    toast.success(`Exported ${source.length} ${scopeLabel} audit entr${source.length === 1 ? "y" : "ies"}`, {
+    toast.success(`Exported ${source.length} ${meta.scope} audit entr${source.length === 1 ? "y" : "ies"}`, {
       description: sha256 ? `SHA-256: ${sha256.slice(0, 16)}…` : undefined,
     });
   }
