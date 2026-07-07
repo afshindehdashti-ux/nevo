@@ -119,24 +119,87 @@ export async function chatComplete(params: {
   return { text, usage: json.usage };
 }
 
-/** Extract text from an uploaded file. Phase 1 supports text-based files only. */
+/** Extract text from an uploaded file. Supports plain text, PDF, DOCX, XLSX, CSV. */
 export async function extractText(
   filename: string,
   contentType: string | null,
   bytes: ArrayBuffer,
 ): Promise<{ text: string; warning?: string }> {
   const lower = filename.toLowerCase();
+  const ct = (contentType ?? "").toLowerCase();
+
   const isPlain =
-    (contentType && /^text\//.test(contentType)) ||
+    /^text\//.test(ct) ||
+    ct === "application/json" ||
     /\.(txt|md|markdown|csv|tsv|json|log|html?|xml|yaml|yml)$/i.test(lower);
   if (isPlain) {
-    const text = new TextDecoder("utf-8", { fatal: false }).decode(bytes);
-    return { text };
+    return { text: new TextDecoder("utf-8", { fatal: false }).decode(bytes) };
   }
-  // Binary formats (PDF/DOCX/XLSX/images) are not yet parsed on the Worker runtime.
+
+  const isPdf = ct === "application/pdf" || /\.pdf$/i.test(lower);
+  if (isPdf) {
+    try {
+      const { extractText: pdfExtract, getDocumentProxy } = await import("unpdf");
+      const pdf = await getDocumentProxy(new Uint8Array(bytes));
+      const { text } = await pdfExtract(pdf, { mergePages: true });
+      const joined = Array.isArray(text) ? text.join("\n\n") : text;
+      if (!joined || !joined.trim()) {
+        return { text: "", warning: "PDF contained no extractable text (scanned image?)." };
+      }
+      return { text: joined };
+    } catch (err) {
+      return {
+        text: "",
+        warning: `Failed to parse PDF: ${err instanceof Error ? err.message : "unknown error"}`,
+      };
+    }
+  }
+
+  const isDocx =
+    ct === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+    /\.docx$/i.test(lower);
+  if (isDocx) {
+    try {
+      const mammoth = await import("mammoth");
+      const { value } = await mammoth.extractRawText({ buffer: Buffer.from(bytes) });
+      if (!value.trim()) return { text: "", warning: "DOCX contained no extractable text." };
+      return { text: value };
+    } catch (err) {
+      return {
+        text: "",
+        warning: `Failed to parse DOCX: ${err instanceof Error ? err.message : "unknown error"}`,
+      };
+    }
+  }
+
+  const isXlsx =
+    ct === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    ct === "application/vnd.ms-excel" ||
+    /\.(xlsx|xls)$/i.test(lower);
+  if (isXlsx) {
+    try {
+      const XLSX = await import("xlsx");
+      const wb = XLSX.read(new Uint8Array(bytes), { type: "array" });
+      const parts: string[] = [];
+      for (const name of wb.SheetNames) {
+        const sheet = wb.Sheets[name];
+        const csv = XLSX.utils.sheet_to_csv(sheet);
+        if (csv.trim()) parts.push(`# Sheet: ${name}\n${csv}`);
+      }
+      const joined = parts.join("\n\n");
+      if (!joined.trim()) return { text: "", warning: "Spreadsheet contained no data." };
+      return { text: joined };
+    } catch (err) {
+      return {
+        text: "",
+        warning: `Failed to parse spreadsheet: ${err instanceof Error ? err.message : "unknown error"}`,
+      };
+    }
+  }
+
   return {
     text: "",
-    warning: `Automatic text extraction is not yet available for ${filename}. The file is stored, but its contents will not be searchable until a follow-up ingestion adds parsing for this format.`,
+    warning: `Unsupported file type for ${filename}. Supported: TXT, MD, CSV, JSON, PDF, DOCX, XLSX.`,
   };
 }
 
