@@ -1,75 +1,53 @@
-# Mail Hub at `/admin/mails`
+# IMAP Inbox for /admin/mails/inbox
 
-A super-admin-only mail center inside the existing admin shell, split into three tabs.
+## Credentials
 
-## 1. Log Dashboard (`/admin/mails` — default tab)
+Store as backend secrets (not in DB, not in code):
+- `IMAP_HOST` (e.g. `imap.gmail.com`, `imap.hostinger.com`)
+- `IMAP_PORT` (e.g. `993`)
+- `IMAP_USER` (full email address)
+- `IMAP_PASSWORD` (app password / mailbox password)
+- `IMAP_TLS` (`true`/`false`, default `true`)
 
-Read-only monitoring of every email your app sends (auth + app emails). Data source: existing `email_send_log` table, deduped by `message_id`.
+Requested via the secret prompt after you approve this plan — I don't hardcode or ask for them in chat.
 
-Includes all six required dashboard features:
-- Time range: Last 24h / 7d / 30d + custom picker (default 7d)
-- Template filter (multi-select of all distinct `template_name`)
-- Status filter (All / Sent / Failed / Suppressed) with color badges
-- Summary stat cards: total unique / sent / failed / suppressed
-- Sortable, paginated table (50/page): Template, Recipient, Status, Timestamp, Error
-- Row click → detail drawer with full metadata + error trace
+## Backend
 
-Extras:
-- Suppressed emails panel (from `suppressed_emails`) with reason + date
-- "Resend" button on failed rows (re-queues via existing send route)
+New file `src/lib/imap-inbox.functions.ts` — server functions guarded by `requireSupabaseAuth` + `has_role('super_admin')`:
 
-## 2. Compose & Send (`/admin/mails/compose`)
+- `listImapMessages({ mailbox?, limit?, offset?, search? })` — connects, opens mailbox (default `INBOX`), returns latest N envelopes: `uid, from, to, subject, date, snippet, flags, hasAttachments`.
+- `getImapMessage({ uid, mailbox? })` — fetches full message: headers, text/html body, attachment metadata.
+- `markImapMessage({ uid, seen?, flagged?, mailbox? })` — flag / mark read.
+- `deleteImapMessage({ uid, mailbox? })` — move to Trash.
+- `listImapMailboxes()` — list folders (INBOX, Sent, Drafts, Trash, custom).
 
-Admin composer to send app emails to any customer/lead/contact/partner.
+Library: `imapflow` (modern, promise-based, uses Node `net`/`tls` which are supported under nodejs_compat). Each call opens a short-lived connection and closes it — no persistent pool (Workers are stateless).
 
-- Recipient picker: search across `customers`, `contacts`, `leads`, `partners` (or free-form email)
-- Template picker: choose any registered React Email template OR "Custom message"
-- Template data fields render dynamically from the template's `previewData` shape
-- Custom message mode: subject + rich text body (uses a generic `admin-broadcast` template we'll add)
-- Preview pane (calls existing `/lovable/email/transactional/preview`)
-- Send → POSTs to `/lovable/email/transactional/send` with idempotency key `admin-manual-<uuid>`
-- One recipient per send (Lovable rule: no bulk). For multi-recipient, sends sequentially with progress + logs each in `email_send_log`
+Reply / send: reuse existing `/lovable/email/transactional/send` pipeline. Optional: append sent copy to IMAP `Sent` folder via `imapflow.append()`.
 
-## 3. Inbox (`/admin/mails/inbox`)
+## Frontend
 
-**Important caveat:** Lovable's built-in email system is send-only — it does not receive mail. To read incoming email to `@nevoindustrial.com` addresses, we need one of:
+Rewrite `src/routes/_authenticated/admin.mails.inbox.tsx`:
 
-- **Option A (recommended): Gmail connector** — connects YOUR business Gmail (e.g. info@nevoindustrial.com if it's a Google Workspace mailbox) via the built-in Google Mail connector. Full read/reply/label support through the Lovable gateway. Works only if that mailbox is on Google Workspace.
-- **Option B: IMAP integration** — custom code + credentials for a non-Gmail mailbox. More work, less reliable.
-- **Option C: skip inbox for now** — ship dashboard + compose, add inbox later.
+- Left pane: mailbox folder list + message list (subject, from, date, unread dot).
+- Right pane: selected message viewer (sanitized HTML via DOMPurify, or plain text fallback), attachments list, action bar (Reply, Mark unread, Delete).
+- Reply drawer: prefilled To/Subject, composer, sends via existing transactional endpoint.
+- Search box (server-side IMAP search on subject/from).
+- Pagination / "Load more".
+- Loading + empty + error states. If secrets missing, show a "Configure IMAP" empty state.
 
-Assuming **Option A**: I'll wire the Gmail connector and build:
-- Thread list (INBOX label, unread first, search, pagination)
-- Thread reader with full message HTML
-- Reply / reply-all / forward (uses `gmail.send`)
-- Mark read / archive / trash (uses `gmail.modify`)
-- Label sidebar
+Data fetching: TanStack Query with `useSuspenseQuery`, keyed by mailbox + page + search.
 
-If your business mailbox isn't Google Workspace, tell me and we'll do B or C.
+## Runtime caveats
 
-## Access control
+- IMAP over raw TCP from the Worker runtime is supported but not battle-tested for every provider; if a provider blocks non-interactive IMAP (Gmail requires an App Password + IMAP enabled), the connection will fail with a clear error surfaced in the UI.
+- Large mailboxes: we only fetch envelopes for the current page, never the full mailbox.
+- No push/IDLE — inbox refreshes on manual reload or a 60s polling interval.
 
-- All routes under `_authenticated/admin/mails*`
-- Guarded by existing `AdminRouteGuard` requiring `super_admin` role
-- Compose + Inbox actions also re-check role server-side before hitting Gmail/send routes
+## Files
 
-## Technical details
-
-Files to add:
-- `src/routes/_authenticated/admin.mails.tsx` — layout with tabs + Outlet
-- `src/routes/_authenticated/admin.mails.index.tsx` — log dashboard
-- `src/routes/_authenticated/admin.mails.compose.tsx` — composer
-- `src/routes/_authenticated/admin.mails.inbox.tsx` — Gmail inbox list
-- `src/routes/_authenticated/admin.mails.inbox.$threadId.tsx` — thread reader
-- `src/lib/mail-hub.functions.ts` — `listEmailLogs`, `getEmailLogDetail`, `listSuppressed`, `resendEmail`, `searchRecipients`, `listGmailThreads`, `getGmailThread`, `sendGmailReply`, `modifyGmailMessage` (all `requireSupabaseAuth` + `has_role('super_admin')` check)
-- `src/lib/email-templates/admin-broadcast.tsx` — generic admin-authored email template
-- Sidebar link added to `AdminSidebar` for "Mail Hub"
-
-No new DB tables needed — reuses `email_send_log`, `suppressed_emails`, `customers`, `contacts`, `leads`, `partners`.
-
-If you pick Option A for inbox, I'll trigger the Gmail connector link during implementation.
-
-## Confirm
-
-1. Inbox option: **A** (Gmail connector), **B** (IMAP — tell me the mailbox provider), or **C** (skip)?
-2. Which mailbox address should the inbox connect to?
+- add `src/lib/imap-inbox.functions.ts`
+- add `src/lib/imap-client.server.ts` (imapflow wrapper)
+- edit `src/routes/_authenticated/admin.mails.inbox.tsx`
+- add `imapflow`, `dompurify`, `isomorphic-dompurify` via `bun add`
+- request 5 secrets above
