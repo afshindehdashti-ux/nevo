@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { sendOrderConfirmation } from "@/lib/orders.functions";
 import { MasterListShell } from "@/components/crm/MasterListShell";
+import { GuideMeButton } from "@/components/ai/GuideMeButton";
 
 import { useCanEditOrders } from "@/lib/crm-permissions";
 import {
