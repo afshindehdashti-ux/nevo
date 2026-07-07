@@ -10,7 +10,7 @@ export type AlertRow = {
   recipient_email: string | null;
   error_message: string | null;
   created_at: string;
-  metadata: Record<string, unknown> | null;
+  metadata: Record<string, any> | null;
 };
 
 export type AlertsResponse = {
@@ -156,7 +156,7 @@ export type AlertDetail = {
     status: string;
     error_message: string | null;
     created_at: string;
-    metadata: Record<string, unknown> | null;
+    metadata: Record<string, any> | null;
   }>;
   latest: AlertRow | null;
 };
@@ -189,7 +189,7 @@ export const getAlertDetail = createServerFn({ method: "POST" })
       status: r.status as string,
       error_message: r.error_message as string | null,
       created_at: r.created_at as string,
-      metadata: r.metadata as Record<string, unknown> | null,
+      metadata: r.metadata as Record<string, any> | null,
     }));
 
     const last = rows && rows.length > 0 ? rows[rows.length - 1] : null;
@@ -201,7 +201,7 @@ export const getAlertDetail = createServerFn({ method: "POST" })
           recipient_email: last.recipient_email as string | null,
           error_message: last.error_message as string | null,
           created_at: last.created_at as string,
-          metadata: last.metadata as Record<string, unknown> | null,
+          metadata: last.metadata as Record<string, any> | null,
         }
       : null;
 
