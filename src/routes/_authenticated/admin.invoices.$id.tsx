@@ -34,7 +34,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail, History, Archive, Copy, Download } from "lucide-react";
+import { ArrowLeft, ArrowUpDown, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail, History, Archive, Copy, Download } from "lucide-react";
+import { cn } from "@/lib/utils";
 import JSZip from "jszip";
 import { useServerFn } from "@tanstack/react-start";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
@@ -67,6 +68,7 @@ const invoiceDetailSearchSchema = z.object({
   purgeVersion: fallback(z.string(), "").default(""),
   purgePage: fallback(z.number().int(), 0).default(0),
   purgeSize: fallback(z.number().int(), 25).default(25),
+  purgeSort: fallback(z.string(), "created_at_desc").default("created_at_desc"),
 });
 
 type InvoiceDetailSearch = z.infer<typeof invoiceDetailSearchSchema>;
@@ -192,6 +194,32 @@ function InvoiceDetailPage() {
   const purgeVersionQuery = search.purgeVersion;
   const purgePage = search.purgePage;
   const purgePageSize = search.purgeSize;
+  const purgeSort = useMemo(() => {
+    const [column, direction] = search.purgeSort.split("_");
+    return {
+      column: column === "user" ? ("user" as const) : ("created_at" as const),
+      direction: direction === "asc" ? ("asc" as const) : ("desc" as const),
+    };
+  }, [search.purgeSort]);
+  const setPurgeSort = (column: "created_at" | "user", direction: "asc" | "desc") =>
+    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeSort: `${column}_${direction}`, purgePage: 0 }) });
+  function SortHeader({ column, label, className }: { column: "created_at" | "user"; label: string; className?: string }) {
+    const active = purgeSort.column === column;
+    const direction = active
+      ? purgeSort.direction === "asc" ? "desc" : "asc"
+      : column === "created_at" ? "desc" : "asc";
+    return (
+      <TableHead
+        className={cn("cursor-pointer select-none", className)}
+        onClick={() => setPurgeSort(column, direction)}
+      >
+        <span className="flex items-center gap-1">
+          {label}
+          <ArrowUpDown className={cn("h-3 w-3", active ? "text-foreground" : "text-muted-foreground")} />
+        </span>
+      </TableHead>
+    );
+  }
 
   const setPurgeUserFilter = (value: string) =>
     navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeUser: value, purgePage: 0 }) });
@@ -209,7 +237,7 @@ function InvoiceDetailPage() {
 
 
   const purgeLogsQuery = useQuery({
-    queryKey: ["invoice-purge-logs", id, purgeUserFilter, purgeFromDate, purgeToDate, purgePage, purgePageSize],
+    queryKey: ["invoice-purge-logs", id, purgeUserFilter, purgeFromDate, purgeToDate, purgePage, purgePageSize, purgeSort],
     queryFn: async () => {
       const from = purgePage * purgePageSize;
       const to = from + purgePageSize - 1;
@@ -226,8 +254,9 @@ function InvoiceDetailPage() {
       }
       if (purgeFromDate) query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
       if (purgeToDate) query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
+      const sortColumn = purgeSort.column === "user" ? "user_id" : "created_at";
       const { data, error, count } = await query
-        .order("created_at", { ascending: false })
+        .order(sortColumn, { ascending: purgeSort.direction === "asc" })
         .range(from, to);
       if (error) throw error;
       return { rows: (data ?? []) as PurgeLogRow[], total: count ?? 0 };
@@ -299,13 +328,27 @@ function InvoiceDetailPage() {
   // for text search server-side). Everything else is filtered server-side.
   const filteredPurgeLogs = useMemo(() => {
     const idQ = purgeVersionQuery.trim().toLowerCase();
-    if (!idQ) return purgeLogs;
-    return purgeLogs.filter((log) => {
-      const meta = (log.metadata ?? {}) as { version_ids?: string[] };
-      const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
-      return ids.some((v) => v.toLowerCase().includes(idQ));
-    });
-  }, [purgeLogs, purgeVersionQuery]);
+    let rows = idQ
+      ? purgeLogs.filter((log) => {
+          const meta = (log.metadata ?? {}) as { version_ids?: string[] };
+          const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
+          return ids.some((v) => v.toLowerCase().includes(idQ));
+        })
+      : purgeLogs;
+    if (purgeSort.column === "user") {
+      rows = [...rows].sort((a, b) => {
+        const nameA = a.user_id ? purgeActorMap[a.user_id] ?? "Unknown user" : "System";
+        const nameB = b.user_id ? purgeActorMap[b.user_id] ?? "Unknown user" : "System";
+        return purgeSort.direction === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+      });
+    } else if (purgeSort.column === "created_at") {
+      rows = [...rows].sort((a, b) => {
+        const cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        return purgeSort.direction === "asc" ? cmp : -cmp;
+      });
+    }
+    return rows;
+  }, [purgeLogs, purgeVersionQuery, purgeSort, purgeActorMap]);
   const purgeFiltersActive =
     purgeUserFilter !== "all" || purgeFromDate !== "" || purgeToDate !== "" || purgeVersionQuery.trim() !== "";
   const resetPurgeFilters = () => {
@@ -710,7 +753,10 @@ function InvoiceDetailPage() {
         else if (purgeUserFilter !== "all") query = query.eq("user_id", purgeUserFilter);
         if (purgeFromDate) query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
         if (purgeToDate) query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
-        const { data, error } = await query.order("created_at", { ascending: false }).limit(10000);
+        const sortColumn = purgeSort.column === "user" ? "user_id" : "created_at";
+        const { data, error } = await query
+          .order(sortColumn, { ascending: purgeSort.direction === "asc" })
+          .limit(10000);
         if (error) throw error;
         source = (data ?? []) as PurgeLogRow[];
         // Apply client-side version-id filter (JSON metadata; not queryable).
@@ -722,6 +768,19 @@ function InvoiceDetailPage() {
             return ids.some((v) => v.toLowerCase().includes(idQ));
           });
         }
+      }
+      // Apply the same audit-log sort to the exported rows.
+      if (purgeSort.column === "user") {
+        source = [...source].sort((a, b) => {
+          const nameA = a.user_id ? purgeActorMap[a.user_id] ?? "Unknown user" : "System";
+          const nameB = b.user_id ? purgeActorMap[b.user_id] ?? "Unknown user" : "System";
+          return purgeSort.direction === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+        });
+      } else if (purgeSort.column === "created_at") {
+        source = [...source].sort((a, b) => {
+          const cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          return purgeSort.direction === "asc" ? cmp : -cmp;
+        });
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to load audit entries for export");
@@ -1874,8 +1933,8 @@ function InvoiceDetailPage() {
                               aria-label="Select all filtered rows"
                             />
                           </TableHead>
-                          <TableHead>When</TableHead>
-                          <TableHead>User</TableHead>
+                          <SortHeader column="created_at" label="When" />
+                          <SortHeader column="user" label="User" />
                           <TableHead className="text-right">Removed</TableHead>
                           <TableHead className="text-right">Kept</TableHead>
                           <TableHead>Version IDs</TableHead>
