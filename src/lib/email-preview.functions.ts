@@ -2,6 +2,16 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+const SITE_NAME = "nevo-industrial-hub";
+const SENDER_DOMAIN = "notify.nevoindustrial.com";
+const FROM_DOMAIN = "notify.nevoindustrial.com";
+
+function generateToken(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 /**
  * Preview data used for auth email templates when rendering internally.
  * Mirrors the samples used by the Lovable auth email preview route so
