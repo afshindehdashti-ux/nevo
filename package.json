@@ -95,6 +95,7 @@
     "isomorphic-dompurify": "^3.18.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.575.0",
     "mailparser": "^3.9.14",
     "mammoth": "^1.12.0",
