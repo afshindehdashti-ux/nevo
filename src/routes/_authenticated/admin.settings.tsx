@@ -44,6 +44,7 @@ function SettingsPage() {
         <TabsList>
           <TabsTrigger value="company">Company Profile</TabsTrigger>
           <TabsTrigger value="documents">Document Defaults</TabsTrigger>
+          <TabsTrigger value="security">Security Alerts</TabsTrigger>
           <TabsTrigger value="team">Team</TabsTrigger>
         </TabsList>
         <TabsContent value="company">
@@ -51,6 +52,9 @@ function SettingsPage() {
         </TabsContent>
         <TabsContent value="documents">
           <DocumentForm canEdit={isSuperAdmin} />
+        </TabsContent>
+        <TabsContent value="security">
+          <SecurityAlertsForm canEdit={isSuperAdmin} />
         </TabsContent>
         <TabsContent value="team">
           <TeamPanel />
