@@ -121,8 +121,7 @@ function ExportsHistoryPage() {
 
   function clearAll() {
     void navigate({
-      search: () =>
-        ({ q: "", scope: "all", user: "all", from: "", to: "" }) as never,
+      search: () => ({ q: "", scope: "all", user: "all", from: "", to: "" }),
     });
   }
 
