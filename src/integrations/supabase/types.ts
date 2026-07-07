@@ -1527,6 +1527,66 @@ export type Database = {
           },
         ]
       }
+      mailbox_connections: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          gmail_email: string | null
+          id: string
+          imap_host: string | null
+          imap_password: string | null
+          imap_port: number | null
+          imap_tls: boolean
+          imap_username: string | null
+          is_active: boolean
+          last_test_at: string | null
+          last_test_error: string | null
+          last_test_ok: boolean | null
+          notes: string | null
+          provider: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          gmail_email?: string | null
+          id?: string
+          imap_host?: string | null
+          imap_password?: string | null
+          imap_port?: number | null
+          imap_tls?: boolean
+          imap_username?: string | null
+          is_active?: boolean
+          last_test_at?: string | null
+          last_test_error?: string | null
+          last_test_ok?: boolean | null
+          notes?: string | null
+          provider: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          gmail_email?: string | null
+          id?: string
+          imap_host?: string | null
+          imap_password?: string | null
+          imap_port?: number | null
+          imap_tls?: boolean
+          imap_username?: string | null
+          is_active?: boolean
+          last_test_at?: string | null
+          last_test_error?: string | null
+          last_test_ok?: boolean | null
+          notes?: string | null
+          provider?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       opportunities: {
         Row: {
           actual_close_date: string | null

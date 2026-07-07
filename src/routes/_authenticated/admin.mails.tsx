@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Mail, Send, Inbox, ShieldOff } from "lucide-react";
+import { Mail, Send, Inbox, ShieldOff, Settings } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/mails")({
   head: () => ({
@@ -17,6 +17,7 @@ const TABS = [
   { to: "/admin/mails/compose", label: "Compose", icon: Send, exact: false },
   { to: "/admin/mails/inbox", label: "Inbox", icon: Inbox, exact: false },
   { to: "/admin/mails/suppressed", label: "Suppressed", icon: ShieldOff, exact: false },
+  { to: "/admin/mails/settings", label: "Settings", icon: Settings, exact: false },
 ] as const;
 
 function MailHubLayout() {
