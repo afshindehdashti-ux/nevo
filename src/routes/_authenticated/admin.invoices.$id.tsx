@@ -169,15 +169,29 @@ function InvoiceDetailPage() {
     }
   }
 
-  function downloadCurrentPdf() {
-    if (!pdfPreview) return;
+  async function downloadCurrentPdf() {
+    if (!pdfPreview || !invoice) return;
     const a = document.createElement("a");
     a.href = pdfPreview.url;
     a.download = pdfPreview.filename;
     document.body.appendChild(a);
     a.click();
     a.remove();
+    // Record this download as a stored version (best-effort, don't block UX).
+    try {
+      await recordInvoicePdfVersion({
+        invoiceId: invoice.id,
+        docType: invoice.type,
+        blob: pdfPreview.blob,
+        filename: pdfPreview.filename,
+        source: "download",
+      });
+      refetchPdfVersions();
+    } catch (e) {
+      console.warn("Failed to archive PDF version", e);
+    }
   }
+
 
   // -------- Email to customer --------
   const emailFn = useServerFn(emailInvoicePdf);
