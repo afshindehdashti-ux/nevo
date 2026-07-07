@@ -173,6 +173,86 @@ function InvoiceDetailPage() {
   const [pdfToDate, setPdfToDate] = useState("");
   const [pdfNote, setPdfNote] = useState("");
 
+  // -------- PDF retention policy --------
+  const { data: retentionSetting, refetch: refetchRetention } = useQuery({
+    queryKey: ["pdf-retention-setting"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("company_settings")
+        .select("id, pdf_version_retention_count")
+        .eq("is_active", true)
+        .order("updated_at", { ascending: false, nullsFirst: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const [retentionInput, setRetentionInput] = useState<string>("20");
+  const [savingRetention, setSavingRetention] = useState(false);
+  const [purging, setPurging] = useState(false);
+  useEffect(() => {
+    if (retentionSetting?.pdf_version_retention_count != null) {
+      setRetentionInput(String(retentionSetting.pdf_version_retention_count));
+    }
+  }, [retentionSetting?.pdf_version_retention_count]);
+  const retentionCount = Math.max(1, Math.min(500, parseInt(retentionInput || "20", 10) || 20));
+  const overRetentionCount = Math.max(0, pdfVersions.length - retentionCount);
+
+  async function autoPruneIfNeeded() {
+    if (!retentionSetting?.pdf_version_retention_count) return;
+    try {
+      const removed = await purgeOlderInvoicePdfVersions(
+        id,
+        retentionSetting.pdf_version_retention_count,
+      );
+      if (removed > 0) refetchPdfVersions();
+    } catch (e) {
+      console.warn("auto-prune failed", e);
+    }
+  }
+
+  async function saveRetentionSetting() {
+    if (!retentionSetting?.id) {
+      toast.error("Company settings not initialised");
+      return;
+    }
+    setSavingRetention(true);
+    try {
+      const { error } = await supabase
+        .from("company_settings")
+        .update({ pdf_version_retention_count: retentionCount })
+        .eq("id", retentionSetting.id);
+      if (error) throw error;
+      toast.success(`Retention set to ${retentionCount} versions`);
+      refetchRetention();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save setting");
+    } finally {
+      setSavingRetention(false);
+    }
+  }
+
+  async function purgeOlderNow() {
+    if (overRetentionCount === 0) {
+      toast.info("Nothing to purge");
+      return;
+    }
+    if (!window.confirm(`Delete ${overRetentionCount} older PDF version(s)? This cannot be undone.`)) {
+      return;
+    }
+    setPurging(true);
+    try {
+      const removed = await purgeOlderInvoicePdfVersions(id, retentionCount);
+      toast.success(`Purged ${removed} version(s)`);
+      refetchPdfVersions();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Purge failed");
+    } finally {
+      setPurging(false);
+    }
+  }
+
   useEffect(() => {
     return () => {
       if (pdfPreview) URL.revokeObjectURL(pdfPreview.url);
