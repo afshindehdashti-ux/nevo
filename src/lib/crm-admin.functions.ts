@@ -111,6 +111,24 @@ export const inviteTeamMember = createServerFn({ method: "POST" })
       metadata: { email: data.email, role: data.role },
     });
 
+    // Look up the inviter's display name for the welcome email
+    let invitedBy: string | null = null;
+    const { data: inviter } = await supabaseAdmin
+      .from("profiles")
+      .select("full_name")
+      .eq("id", context.userId)
+      .maybeSingle();
+    invitedBy = inviter?.full_name ?? null;
+
+    // Fire-and-forget welcome email (does not block the invite response)
+    await sendWelcomeEmail({
+      recipientEmail: data.email,
+      fullName: data.fullName,
+      role: data.role,
+      invitedBy,
+      userId,
+    });
+
     return { ok: true, userId };
   });
 
