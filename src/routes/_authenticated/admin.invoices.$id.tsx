@@ -241,6 +241,29 @@ function InvoiceDetailPage() {
   const [savingRetention, setSavingRetention] = useState(false);
   const [purging, setPurging] = useState(false);
   const [purgeOpen, setPurgeOpen] = useState(false);
+  type RemovedPdfSnapshot = {
+    id: string;
+    filename: string;
+    byte_size: number | null;
+    source: string;
+    doc_type: string;
+    created_at: string;
+    blobUrl: string;
+  };
+  const [removedOpen, setRemovedOpen] = useState(false);
+  const [removedItems, setRemovedItems] = useState<RemovedPdfSnapshot[]>([]);
+  const closeRemovedModal = () => {
+    setRemovedOpen(false);
+    // Revoke blob URLs to free memory
+    setTimeout(() => {
+      setRemovedItems((prev) => {
+        prev.forEach((r) => {
+          try { URL.revokeObjectURL(r.blobUrl); } catch { /* noop */ }
+        });
+        return [];
+      });
+    }, 300);
+  };
   useEffect(() => {
     if (retentionSetting?.pdf_version_retention_count != null) {
       setRetentionInput(String(retentionSetting.pdf_version_retention_count));
