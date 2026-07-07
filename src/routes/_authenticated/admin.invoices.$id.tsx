@@ -785,7 +785,6 @@ function InvoiceDetailPage() {
     versionQuery?: string;
     minBytes?: string;
     maxBytes?: string;
-    selectedIds?: string[];
   };
 
   async function exportPurgeAuditCsv(rows?: PurgeLogRow[], meta: PurgeExportMeta = { scope: "filtered" }) {
