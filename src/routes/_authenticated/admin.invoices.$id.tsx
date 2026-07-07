@@ -326,13 +326,40 @@ function InvoiceDetailPage() {
     setPurgeOpen(true);
   }
 
+  function scrollToPurgeLog(logId?: string) {
+    const target = logId
+      ? document.getElementById(`purge-log-${logId}`)
+      : document.getElementById("purge-audit-log");
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (logId) {
+      target.classList.add("ring-2", "ring-primary");
+      setTimeout(() => target.classList.remove("ring-2", "ring-primary"), 2000);
+    }
+  }
+
   async function confirmPurge() {
     setPurging(true);
     try {
       const removed = await purgeOlderInvoicePdfVersions(id, effectiveRetention);
-      toast.success(`Purged ${removed} version(s)`);
       refetchPdfVersions();
-      refetchPurgeLogs();
+      const { data: latestLog } = await supabase
+        .from("activity_logs")
+        .select("id")
+        .eq("action", "purge_pdf_versions")
+        .eq("entity_type", "invoice")
+        .eq("entity_id", id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      await refetchPurgeLogs();
+      toast.success(`Purged ${removed} PDF version${removed === 1 ? "" : "s"}`, {
+        description: "A new entry has been added to the purge audit log.",
+        action: {
+          label: "View log entry",
+          onClick: () => scrollToPurgeLog(latestLog?.id),
+        },
+      });
       setPurgeOpen(false);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Purge failed");
@@ -340,6 +367,7 @@ function InvoiceDetailPage() {
       setPurging(false);
     }
   }
+
 
   function exportPurgeListCsv() {
     const rows = toPurgeVersions;
@@ -1259,7 +1287,7 @@ function InvoiceDetailPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card id="purge-audit-log">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <History className="h-4 w-4" />
@@ -1295,7 +1323,7 @@ function InvoiceDetailPage() {
                         : "System";
                       const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
                       return (
-                        <TableRow key={log.id}>
+                        <TableRow key={log.id} id={`purge-log-${log.id}`} className="transition-shadow">
                           <TableCell className="whitespace-nowrap text-sm">
                             {new Date(log.created_at).toLocaleString()}
                           </TableCell>
