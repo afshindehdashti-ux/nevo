@@ -18,7 +18,7 @@ export type ServerVerifyResponse = {
     id: string;
     filename: string;
     sha256: string;
-    exported_at: string | null;
+    created_at: string;
   };
 };
 
@@ -37,7 +37,7 @@ export const verifyCsvExportOnServer = createServerFn({ method: "POST" })
       "has_any_role",
       {
         _user_id: context.userId,
-        _roles: ALLOWED_ROLES as unknown as string[],
+        _roles: ALLOWED_ROLES,
       },
     );
     if (roleErr) throw new Error(roleErr.message);
@@ -45,7 +45,7 @@ export const verifyCsvExportOnServer = createServerFn({ method: "POST" })
 
     const { data: row, error } = await context.supabase
       .from("csv_export_audit")
-      .select("id, filename, sha256, exported_at")
+      .select("id, filename, sha256, created_at")
       .eq("id", data.audit_id)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -61,7 +61,7 @@ export const verifyCsvExportOnServer = createServerFn({ method: "POST" })
         id: row.id,
         filename: row.filename,
         sha256: row.sha256,
-        exported_at: row.exported_at ?? null,
+        created_at: row.created_at,
       },
     };
   });
