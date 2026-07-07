@@ -203,6 +203,23 @@ function InvoiceDetailPage() {
   }, [search.purgeSort]);
   const setPurgeSort = (column: "created_at" | "user", direction: "asc" | "desc") =>
     navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeSort: `${column}_${direction}`, purgePage: 0 }) });
+  function SortHeader({ column, label, className }: { column: "created_at" | "user"; label: string; className?: string }) {
+    const active = purgeSort.column === column;
+    const direction = active
+      ? purgeSort.direction === "asc" ? "desc" : "asc"
+      : column === "created_at" ? "desc" : "asc";
+    return (
+      <TableHead
+        className={cn("cursor-pointer select-none", className)}
+        onClick={() => setPurgeSort(column, direction)}
+      >
+        <span className="flex items-center gap-1">
+          {label}
+          <ArrowUpDown className={cn("h-3 w-3", active ? "text-foreground" : "text-muted-foreground")} />
+        </span>
+      </TableHead>
+    );
+  }
 
   const setPurgeUserFilter = (value: string) =>
     navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeUser: value, purgePage: 0 }) });
