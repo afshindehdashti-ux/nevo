@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/admin/opportunities")({
 });
 
 function OpportunitiesList() {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["opportunities-list"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -54,11 +54,12 @@ function OpportunitiesList() {
       </header>
 
       {error ? (
-        <Card className="border-destructive/40 bg-destructive/5">
-          <CardContent className="p-4 text-sm text-destructive">
-            Failed to load opportunities. {(error as Error).message}
-          </CardContent>
-        </Card>
+        <ListErrorState
+          resource="opportunities"
+          error={error}
+          onRetry={() => refetch()}
+          isRetrying={isFetching}
+        />
       ) : isLoading ? (
         <div className="space-y-2">
           <Skeleton className="h-12 w-full" />
