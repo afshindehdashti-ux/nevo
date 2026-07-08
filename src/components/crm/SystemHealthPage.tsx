@@ -356,7 +356,17 @@ export function SystemHealthPage() {
     setChecks((prev) =>
       prev.map((c) =>
         inScope(c.id)
-          ? { ...c, status: "idle", details: undefined, suggestedFix: undefined }
+          ? {
+              ...c,
+              status: "idle",
+              details: undefined,
+              suggestedFix: undefined,
+              errorCode: undefined,
+              errorMessage: undefined,
+              errorHint: undefined,
+              query: undefined,
+              endpoints: undefined,
+            }
           : c,
       ),
     );
@@ -367,10 +377,38 @@ export function SystemHealthPage() {
       setChecks((prev) => prev.map((c) => (c.id === id ? { ...c, status: "running" } : c)));
     };
     // Scoped writer: only writes the result if this check is in the current pass.
-    const update = (id: string, patch: Partial<CheckResult>) => {
+    // On fail/warn, auto-attach query + endpoints from CHECK_META so every
+    // failure card carries actionable context. Pass the caught error as the
+    // third arg to also surface Postgres/PostgREST code/message/hint.
+    const update = (
+      id: string,
+      patch: Partial<CheckResult>,
+      err?: unknown,
+    ) => {
       if (!inScope(id)) return;
-      writeCheck(id, patch);
+      const enriched: Partial<CheckResult> = { ...patch };
+      const isFailure = patch.status === "fail" || patch.status === "warn";
+      if (isFailure) {
+        const meta = CHECK_META[id];
+        if (meta && enriched.query === undefined) enriched.query = meta.query;
+        if (meta && enriched.endpoints === undefined) enriched.endpoints = meta.endpoints;
+        if (err !== undefined) {
+          const { errorCode, errorMessage, errorHint } = extractErr(err);
+          if (enriched.errorCode === undefined) enriched.errorCode = errorCode;
+          if (enriched.errorMessage === undefined) enriched.errorMessage = errorMessage;
+          if (enriched.errorHint === undefined) enriched.errorHint = errorHint;
+        }
+      } else if (patch.status === "pass") {
+        // Clear any stale error metadata from a previous run.
+        enriched.errorCode = undefined;
+        enriched.errorMessage = undefined;
+        enriched.errorHint = undefined;
+        enriched.query = undefined;
+        enriched.endpoints = undefined;
+      }
+      writeCheck(id, enriched);
     };
+
 
     const createdIds: {
       customer?: string;
