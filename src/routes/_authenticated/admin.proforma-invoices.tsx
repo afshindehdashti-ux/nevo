@@ -53,9 +53,14 @@ function paymentStatusVariant(s: string | null | undefined) {
   }
 }
 
+type SortKey = "created_at" | "balance_due" | "grand_total";
+type SortDir = "asc" | "desc";
+
 function ProformaInvoicesList() {
   const [search, setSearch] = useState("");
   const [paymentFilter, setPaymentFilter] = useState<PaymentStatus | "all">("all");
+  const [sortKey, setSortKey] = useState<SortKey>("created_at");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [exporting, setExporting] = useState(false);
 
@@ -75,9 +80,18 @@ function ProformaInvoicesList() {
     },
   });
 
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir(key === "created_at" ? "desc" : "desc");
+    }
+  };
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return rows.filter((r) => {
+    const list = rows.filter((r) => {
       if (paymentFilter !== "all" && r.payment_status !== paymentFilter) return false;
       if (!q) return true;
       const cName = (r.customers as { name?: string } | null)?.name || "";
@@ -86,7 +100,28 @@ function ProformaInvoicesList() {
         cName.toLowerCase().includes(q)
       );
     });
-  }, [rows, search, paymentFilter]);
+    const sign = sortDir === "asc" ? 1 : -1;
+    return [...list].sort((a, b) => {
+      if (sortKey === "created_at") {
+        return (
+          sign *
+          (new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+        );
+      }
+      const av = Number(a[sortKey]) || 0;
+      const bv = Number(b[sortKey]) || 0;
+      return sign * (av - bv);
+    });
+  }, [rows, search, paymentFilter, sortKey, sortDir]);
+
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { all: rows.length, Unpaid: 0, "Partially Paid": 0, Paid: 0, Overdue: 0 };
+    for (const r of rows) {
+      const s = r.payment_status || "Unpaid";
+      c[s] = (c[s] || 0) + 1;
+    }
+    return c;
+  }, [rows]);
 
   const filteredIds = useMemo(() => filtered.map((r) => r.id), [filtered]);
   const allSelected = filteredIds.length > 0 && filteredIds.every((id) => selected.has(id));
