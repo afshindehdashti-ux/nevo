@@ -282,6 +282,6 @@ export const Route = createFileRoute("/api/public/client-log")({
           );
         }
       },
-    },
+    }, corsHeaders()),
   },
 });
