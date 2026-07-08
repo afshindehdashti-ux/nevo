@@ -203,6 +203,14 @@ export function ErpFinanceDiagnostic() {
               )}
               Run Proforma PDF e2e
             </Button>
+            <Button variant="outline" onClick={onRunIsolated} disabled={isoLoading}>
+              {isoLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FlaskConical className="mr-2 h-4 w-4" />
+              )}
+              Run Isolated Proforma e2e
+            </Button>
           </div>
 
           {qa && (
