@@ -1,0 +1,46 @@
+name: Verify CSV Export Tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  verify-csv-export:
+    name: Run verify-csv-export test suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Detect SHA-verify related changes
+        id: detect
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo "$CHANGED"
+          if echo "$CHANGED" | grep -E '(verify-csv-export|VerifyOpenButton|BlockedVerificationDialog|admin\.exports)' > /dev/null; then
+            echo "sha_verify_changed=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::SHA-verify behavior files changed — tests are required to pass."
+          else
+            echo "sha_verify_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run verify-csv-export test suite
+        run: bunx vitest run src/lib/__tests__/verify-csv-export.test.ts src/lib/__tests__/verify-csv-export-server.test.ts --reporter=verbose
+
+      - name: Enforce block on SHA-verify changes
+        if: github.event_name == 'pull_request' && steps.detect.outputs.sha_verify_changed == 'true'
+        run: echo "SHA-verify behavior changes detected and tests passed — merge allowed."
