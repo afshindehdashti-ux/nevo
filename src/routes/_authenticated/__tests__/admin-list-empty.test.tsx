@@ -5,8 +5,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 
 // Empty-state tests: when the Supabase query resolves with zero rows, each
-// admin list page MUST render the friendly ListEmptyState card (title +
-// description) and NOT the raw table.
+// admin list page MUST render the shared ListEmptyState card (role=status,
+// icon, title, description, and telemetry) and NOT the raw table or the
+// error card.
+
+const logClientEvent = vi.fn();
+const reportClientError = vi.fn();
+vi.mock("@/lib/client-monitor", () => ({
+  logClientEvent: (...args: unknown[]) => logClientEvent(...args),
+  reportClientError: (...args: unknown[]) => reportClientError(...args),
+}));
 
 function makeBuilder(_table: string) {
   const chain: any = {
@@ -46,26 +54,93 @@ async function renderRoute(routePath: string) {
   );
 }
 
-beforeEach(() => vi.resetModules());
+beforeEach(() => {
+  vi.resetModules();
+  logClientEvent.mockReset();
+  reportClientError.mockReset();
+});
 afterEach(() => cleanup());
 
-const cases: Array<[string, string, string]> = [
-  ["opportunities",       "@/routes/_authenticated/admin.opportunities",       "No opportunities yet"],
-  ["commission-invoices", "@/routes/_authenticated/admin.commission-invoices", "No commissions yet"],
-  ["purchase-orders",     "@/routes/_authenticated/admin.purchase-orders",     "No purchase orders yet"],
+const cases: Array<{
+  label: string;
+  routePath: string;
+  title: string;
+  descriptionRegex: RegExp;
+  resource: string;
+}> = [
+  {
+    label: "opportunities",
+    routePath: "@/routes/_authenticated/admin.opportunities",
+    title: "No opportunities yet",
+    descriptionRegex: /will show up here/i,
+    resource: "opportunities",
+  },
+  {
+    label: "commission-invoices",
+    routePath: "@/routes/_authenticated/admin.commission-invoices",
+    title: "No commissions yet",
+    descriptionRegex: /will appear here/i,
+    resource: "commission_invoices",
+  },
+  {
+    label: "purchase-orders",
+    routePath: "@/routes/_authenticated/admin.purchase-orders",
+    title: "No purchase orders yet",
+    descriptionRegex: /show up here/i,
+    resource: "purchase_orders",
+  },
 ];
 
-describe.each(cases)("admin.%s — empty state", (_label, routePath, title) => {
-  it(`shows the ${title} card and no table when the query returns []`, async () => {
-    await renderRoute(routePath);
+describe.each(cases)(
+  "admin.$label — empty state",
+  ({ routePath, title, descriptionRegex, resource }) => {
+    it("renders the ListEmptyState card with icon, title, and description", async () => {
+      await renderRoute(routePath);
 
-    await waitFor(() => {
-      expect(screen.getByRole("heading", { name: title })).toBeTruthy();
+      const heading = await waitFor(() =>
+        screen.getByRole("heading", { name: title }),
+      );
+      expect(heading).toBeTruthy();
+
+      // The empty state card is exposed as role=status for a11y.
+      const statusCard = screen.getByRole("status");
+      expect(statusCard).toBeTruthy();
+      expect(statusCard.textContent).toMatch(descriptionRegex);
+
+      // A decorative icon (aria-hidden svg) sits above the title.
+      expect(statusCard.querySelector("svg[aria-hidden='true']")).not.toBeNull();
     });
 
-    // Table should not render at all in the empty state.
-    expect(document.querySelector("table")).toBeNull();
-    // Description text is present (not just the title).
-    expect(document.body.textContent).toMatch(/(show up|appear) here/i);
-  });
-});
+    it("does not render the data table or the error card", async () => {
+      await renderRoute(routePath);
+      await waitFor(() =>
+        screen.getByRole("heading", { name: title }),
+      );
+
+      expect(document.querySelector("table")).toBeNull();
+      // ListErrorState uses role=alert; must be absent in the empty state.
+      expect(screen.queryByRole("alert")).toBeNull();
+      // Retry button belongs to the error card.
+      expect(screen.queryByRole("button", { name: /retry/i })).toBeNull();
+    });
+
+    it(`emits admin_list_empty_shown for ${resource} once`, async () => {
+      await renderRoute(routePath);
+      await waitFor(() =>
+        screen.getByRole("heading", { name: title }),
+      );
+
+      const emptyCalls = logClientEvent.mock.calls.filter(
+        ([name]) => name === "admin_list_empty_shown",
+      );
+      expect(emptyCalls).toHaveLength(1);
+      expect(emptyCalls[0][1]).toMatchObject({
+        surface: "admin_list",
+        resource,
+        reason: "no_records",
+      });
+      // Should not be reported as a query failure.
+      expect(reportClientError).not.toHaveBeenCalled();
+    });
+  },
+);
