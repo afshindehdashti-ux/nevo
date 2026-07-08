@@ -420,16 +420,25 @@ export function SystemHealthPage() {
       }
 
 
-      // 8. Proforma Invoice — end-to-end: header + item + recompute check.
+      // 8. Proforma Invoice — end-to-end: header + item + recompute check +
+      // new-column persistence (terms_conditions/bank_details/approved_by),
+      // payment_status transitions (Unpaid → Partially Paid → Paid),
+      // and cleanup/isolation (item cascade + row delete).
       try {
         if (!createdIds.customer) throw new Error("Customer test row missing; skipping proforma.");
-        // Scenario: qty 100 × 18 = 1800 subtotal, 5% VAT = 90, grand total 1890.
+        const { data: authData } = await supabase.auth.getUser();
+        const currentUserId = authData.user?.id;
+        if (!currentUserId) throw new Error("No authenticated user for approval test");
+
         const quantity = 100;
         const unitPrice = 18;
         const vatRate = 5;
         const expectedSubtotal = quantity * unitPrice; // 1800
         const expectedVat = (expectedSubtotal * vatRate) / 100; // 90
         const expectedGrand = expectedSubtotal + expectedVat; // 1890
+
+        const termsText = `${testName}-terms: warranty 12 months, jurisdiction UAE.`;
+        const bankText = `${testName}-bank: HSBC · IBAN AE99 0000 · SWIFT HSBCAEAD`;
 
         const { data: piIns, error: piErr } = await supabase
           .from("proforma_invoices")
@@ -439,14 +448,33 @@ export function SystemHealthPage() {
             currency: "AED",
             vat_rate: vatRate,
             payment_terms: "Net 30",
+            terms_conditions: termsText,
+            bank_details: bankText,
           } as never)
-          .select("id")
+          .select("id, terms_conditions, bank_details, approved_by, payment_status")
           .single();
         if (piErr) throw piErr;
-        createdIds.proforma = (piIns as { id: string }).id;
+        const created = piIns as {
+          id: string;
+          terms_conditions: string | null;
+          bank_details: string | null;
+          approved_by: string | null;
+          payment_status: string | null;
+        };
+        createdIds.proforma = created.id;
+
+        // New-column persistence on create
+        if (created.terms_conditions !== termsText)
+          throw new Error(`terms_conditions not persisted (got ${JSON.stringify(created.terms_conditions)})`);
+        if (created.bank_details !== bankText)
+          throw new Error(`bank_details not persisted (got ${JSON.stringify(created.bank_details)})`);
+        if (created.approved_by !== null)
+          throw new Error(`approved_by should be null on create (got ${created.approved_by})`);
+        if (created.payment_status !== "Unpaid")
+          throw new Error(`initial payment_status ${created.payment_status} ≠ Unpaid`);
 
         // Insert item — the trigger recomputes header totals.
-        const { error: itemErr } = await supabase
+        const { data: itemIns, error: itemErr } = await supabase
           .from("proforma_invoice_items")
           .insert({
             proforma_invoice_id: createdIds.proforma,
@@ -454,40 +482,134 @@ export function SystemHealthPage() {
             quantity,
             unit_price: unitPrice,
             tax_rate: vatRate,
-          } as never);
-        if (itemErr) throw itemErr;
-
-        // Verify header was recomputed correctly.
-        const { data: piRow, error: readErr } = await supabase
-          .from("proforma_invoices")
-          .select("subtotal,vat_amount,grand_total,balance_due,payment_status")
-          .eq("id", createdIds.proforma)
+          } as never)
+          .select("id")
           .single();
-        if (readErr) throw readErr;
-        const row = piRow as {
-          subtotal: number;
-          vat_amount: number;
-          grand_total: number;
-          balance_due: number;
-          payment_status: string;
-        };
+        if (itemErr) throw itemErr;
+        const itemId = (itemIns as { id: string }).id;
+
         const near = (a: number, b: number) => Math.abs(Number(a) - b) < 0.01;
+        const readHeader = async () => {
+          const { data, error } = await supabase
+            .from("proforma_invoices")
+            .select(
+              "subtotal, vat_amount, grand_total, balance_due, amount_paid, payment_status, terms_conditions, bank_details, approved_by",
+            )
+            .eq("id", createdIds.proforma!)
+            .single();
+          if (error) throw error;
+          return data as {
+            subtotal: number;
+            vat_amount: number;
+            grand_total: number;
+            balance_due: number;
+            amount_paid: number;
+            payment_status: string;
+            terms_conditions: string | null;
+            bank_details: string | null;
+            approved_by: string | null;
+          };
+        };
+
+        // After item insert: totals + Unpaid + new columns still intact.
+        let row = await readHeader();
         if (!near(row.subtotal, expectedSubtotal)) throw new Error(`subtotal ${row.subtotal} ≠ ${expectedSubtotal}`);
         if (!near(row.vat_amount, expectedVat)) throw new Error(`vat_amount ${row.vat_amount} ≠ ${expectedVat}`);
         if (!near(row.grand_total, expectedGrand)) throw new Error(`grand_total ${row.grand_total} ≠ ${expectedGrand}`);
         if (!near(row.balance_due, expectedGrand)) throw new Error(`balance_due ${row.balance_due} ≠ ${expectedGrand}`);
         if (row.payment_status !== "Unpaid") throw new Error(`payment_status ${row.payment_status} ≠ Unpaid`);
+        if (row.terms_conditions !== termsText)
+          throw new Error(`terms_conditions drifted after item insert`);
+        if (row.bank_details !== bankText)
+          throw new Error(`bank_details drifted after item insert`);
+
+        // Approve — approved_by persists.
+        const { error: apprErr } = await supabase
+          .from("proforma_invoices")
+          .update({ approved_by: currentUserId })
+          .eq("id", createdIds.proforma!);
+        if (apprErr) throw apprErr;
+        row = await readHeader();
+        if (row.approved_by !== currentUserId)
+          throw new Error(`approved_by ${row.approved_by} ≠ ${currentUserId}`);
+
+        // Partial payment → Partially Paid.
+        const partial = 500;
+        const { error: p1Err } = await supabase
+          .from("proforma_invoices")
+          .update({ amount_paid: partial })
+          .eq("id", createdIds.proforma!);
+        if (p1Err) throw p1Err;
+        row = await readHeader();
+        if (!near(row.balance_due, expectedGrand - partial))
+          throw new Error(`balance_due after partial ${row.balance_due} ≠ ${expectedGrand - partial}`);
+        if (row.payment_status !== "Partially Paid")
+          throw new Error(`payment_status after partial ${row.payment_status} ≠ Partially Paid`);
+
+        // Full payment → Paid.
+        const { error: p2Err } = await supabase
+          .from("proforma_invoices")
+          .update({ amount_paid: expectedGrand })
+          .eq("id", createdIds.proforma!);
+        if (p2Err) throw p2Err;
+        row = await readHeader();
+        if (!near(row.balance_due, 0))
+          throw new Error(`balance_due after full payment ${row.balance_due} ≠ 0`);
+        if (row.payment_status !== "Paid")
+          throw new Error(`payment_status after full payment ${row.payment_status} ≠ Paid`);
+
+        // Isolation: deleting the line item recomputes totals to zero, keeps the header.
+        const { error: delItemErr } = await supabase
+          .from("proforma_invoice_items")
+          .delete()
+          .eq("id", itemId);
+        if (delItemErr) throw delItemErr;
+        row = await readHeader();
+        if (!near(row.subtotal, 0) || !near(row.grand_total, 0) || !near(row.vat_amount, 0))
+          throw new Error(
+            `totals not reset after item delete (subtotal=${row.subtotal}, vat=${row.vat_amount}, grand=${row.grand_total})`,
+          );
+
+        // Cleanup: delete header, verify it is gone and orphan items do not exist.
+        const { error: delHdrErr } = await supabase
+          .from("proforma_invoices")
+          .delete()
+          .eq("id", createdIds.proforma!);
+        if (delHdrErr) throw delHdrErr;
+        const { data: gone } = await supabase
+          .from("proforma_invoices")
+          .select("id")
+          .eq("id", createdIds.proforma!)
+          .maybeSingle();
+        if (gone) throw new Error("proforma row still present after delete");
+        const { count: orphanCount, error: orphErr } = await supabase
+          .from("proforma_invoice_items")
+          .select("id", { head: true, count: "exact" })
+          .eq("proforma_invoice_id", createdIds.proforma!);
+        if (orphErr) throw orphErr;
+        if ((orphanCount ?? 0) !== 0)
+          throw new Error(`orphan proforma_invoice_items rows: ${orphanCount}`);
+
+        // Header has been cleaned up in-test; do not re-delete in finally.
+        createdIds.proforma = undefined;
+
         update("proforma", {
           status: "pass",
-          details: `Created PI ${testName}-PI: subtotal=${expectedSubtotal}, VAT(${vatRate}%)=${expectedVat}, grand_total=${expectedGrand}, status=${row.payment_status}. Item cascaded via trigger.`,
+          details:
+            `PI ${testName}-PI: totals subtotal=${expectedSubtotal}, VAT(${vatRate}%)=${expectedVat}, grand_total=${expectedGrand}. ` +
+            `Persisted terms_conditions/bank_details/approved_by. ` +
+            `payment_status Unpaid → Partially Paid → Paid verified. ` +
+            `Item cascade + row cleanup isolated (no orphans).`,
         });
       } catch (e) {
         update("proforma", {
           status: "fail",
           details: (e as Error).message,
-          suggestedFix: "Verify proforma_invoices has vat_amount/grand_total/balance_due/payment_status columns and that recalc_proforma_totals trigger is installed.",
+          suggestedFix:
+            "Verify proforma_invoices has vat_amount/grand_total/balance_due/payment_status/terms_conditions/bank_details/approved_by columns, that recalc_proforma_totals + proforma_sync_mirrors triggers are installed, and that DELETE on the parent removes proforma_invoice_items (or that items are pre-cleaned).",
         });
       }
+
 
 
       // 9. Commercial Invoice
