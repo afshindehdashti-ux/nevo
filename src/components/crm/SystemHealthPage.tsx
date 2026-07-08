@@ -87,6 +87,10 @@ const INITIAL_CHECKS: CheckResult[] = [
   { id: "ai", title: "15. AI Assistant Health", status: "idle" },
   { id: "role", title: "16. Role Permission Health", status: "idle" },
   { id: "rls", title: "17. Supabase RLS Health", status: "idle" },
+  { id: "auth_session", title: "18. Auth Session & JWT Validity", status: "idle" },
+  { id: "rls_enforced", title: "19. RLS Enforcement (user_roles owner-only)", status: "idle" },
+  { id: "crm_connectivity", title: "20. CRM Connectivity (leads/opps/contacts/tasks)", status: "idle" },
+  { id: "realtime", title: "21. Realtime Channel Connectivity", status: "idle" },
 ];
 
 const REQUIRED_TABLES = [
