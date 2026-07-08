@@ -106,9 +106,13 @@ async def check_page(page, route: str, expected_text: str) -> tuple[bool, str]:
 
 async def main() -> int:
     cleanup = "--cleanup" in sys.argv
+    skip_seed = os.environ.get("SMOKE_SKIP_SEED") == "1"
     SCREENSHOTS.mkdir(parents=True, exist_ok=True)
 
-    run_sql(SEED_SQL)
+    if not skip_seed:
+        run_sql(SEED_SQL)
+    else:
+        print("[sql] skipped seed (SMOKE_SKIP_SEED=1)")
 
     results: list[tuple[str, bool, str]] = []
     try:
