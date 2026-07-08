@@ -3,10 +3,15 @@ import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { logClientEvent, reportClientError } from "@/lib/client-monitor";
+import type { AdminListResource } from "./list-telemetry";
 
 interface ListErrorStateProps {
-  /** Human-friendly label used in the headline, e.g. "opportunities". */
-  resource: string;
+  /**
+   * Registered telemetry slug for this list, e.g. `"opportunities"`. Also
+   * rendered in the "Failed to load {resource}" headline. Must be a
+   * member of `ADMIN_LIST_RESOURCES`.
+   */
+  resource: AdminListResource;
   /** Underlying error thrown by the query. */
   error: unknown;
   /** Retry handler — typically `() => refetch()` from useQuery. */
