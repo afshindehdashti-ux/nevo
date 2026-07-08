@@ -19,7 +19,7 @@ function OpportunitiesList() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("opportunities")
-        .select("id,name,stage,amount,currency,probability,expected_close_date,customer:customers(company_name),partner:partners(company_name),created_at")
+        .select("id,name,stage,amount,currency,probability,expected_close_date,customer:customers(name),partner:partners(company_name),created_at")
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;
@@ -74,7 +74,7 @@ function OpportunitiesList() {
               {(data ?? []).map((o: any) => (
                 <tr key={o.id} className="border-t border-border hover:bg-muted/20">
                   <td className="px-3 py-2 font-medium">{o.name}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{o.customer?.company_name ?? "—"}</td>
+                  <td className="px-3 py-2 text-muted-foreground">{o.customer?.name ?? "—"}</td>
                   <td className="px-3 py-2 text-muted-foreground">{o.partner?.company_name ?? "—"}</td>
                   <td className="px-3 py-2"><Badge variant="outline" className="capitalize">{o.stage}</Badge></td>
                   <td className="px-3 py-2 text-right tabular-nums">{formatMoney(Number(o.amount ?? 0), o.currency ?? "EUR")}</td>

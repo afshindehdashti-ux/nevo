@@ -20,7 +20,7 @@ function CommissionInvoicesList() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("partner_commissions")
-        .select("id,amount,currency,status,earned_at,paid_at,partner:partners(company_name),customer:customers(company_name),created_at")
+        .select("id,amount,currency,status,earned_at,paid_at,partner:partners(company_name),customer:customers(name),created_at")
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;
@@ -77,7 +77,7 @@ function CommissionInvoicesList() {
               {(data ?? []).map((c: any) => (
                 <tr key={c.id} className="border-t border-border hover:bg-muted/20">
                   <td className="px-3 py-2 font-medium">{c.partner?.company_name ?? "—"}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{c.customer?.company_name ?? "—"}</td>
+                  <td className="px-3 py-2 text-muted-foreground">{c.customer?.name ?? "—"}</td>
                   <td className="px-3 py-2"><Badge variant="outline" className="capitalize">{c.status ?? "pending"}</Badge></td>
                   <td className="px-3 py-2 text-right tabular-nums">{formatMoney(Number(c.amount ?? 0), c.currency ?? "EUR")}</td>
                   <td className="px-3 py-2 text-muted-foreground">{c.earned_at ? formatDate(c.earned_at) : "—"}</td>
