@@ -227,6 +227,149 @@ Rules:
    verify the payload's `resource` and `reason` match the checklist above.
 
 
+## Add a new admin list page
+
+Five steps. If you skip step 1, the `resource` prop in step 3 won't compile.
+If you skip step 5, `bun run check:admin-list-telemetry` will fail in CI.
+
+### 1. Register the telemetry slug
+
+Add a `snake_case` slug to `ADMIN_LIST_RESOURCES` in
+`src/components/admin/list-telemetry.ts`. This tuple is the single source
+of truth — the `AdminListResource` type derives from it and every prop
+(`AdminListPage.resource`, `ListEmptyState.resource`, `ListErrorState.resource`)
+narrows to that union.
+
+```ts
+// src/components/admin/list-telemetry.ts
+export const ADMIN_LIST_RESOURCES = [
+  "opportunities",
+  "commission_invoices",
+  "purchase_orders",
+  "shipments", // ← new
+] as const;
+```
+
+### 2. Create the route file
+
+File-based routing: `src/routes/_authenticated/admin.<slug-with-dashes>.tsx`.
+
+### 3. Copy-paste the page skeleton
+
+Uses `<AdminListPage>` — telemetry, skeleton, empty and error cards are all
+wired for you. Replace only what the comments call out.
+
+```tsx
+// src/routes/_authenticated/admin.shipments.tsx
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { Truck } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { AdminListPage } from "@/components/admin/AdminListPage";
+
+export const Route = createFileRoute("/_authenticated/admin/shipments")({
+  component: ShipmentsPage,
+});
+
+function ShipmentsPage() {
+  const { data, error, isLoading, isFetching, refetch } = useQuery({
+    queryKey: ["admin", "shipments"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("shipments")
+        .select("id, tracking_no, status, dispatched_at")
+        .order("dispatched_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  return (
+    <AdminListPage
+      // MUST match a slug in ADMIN_LIST_RESOURCES — this drives both
+      // `admin_list_empty_shown` (empty state) and `reportClientError`
+      // (error state) telemetry.
+      resource="shipments"
+      title="Shipments"
+      eyebrow="Operations"
+      subtitle="Outbound shipments in the fulfilment pipeline."
+      isLoading={isLoading}
+      error={error}
+      data={data}
+      refetch={refetch}
+      isFetching={isFetching}
+      // Omit both flags → reason="no_records" (level: info).
+      // Set `expectSeed`  → reason="seed_missing"  (level: warn) —
+      //   use in envs where data is expected (smoke tests).
+      // Set `filtersActive` → reason="filtered_out" (level: info) —
+      //   set when the user has narrowed the list with a filter.
+      // The two flags are mutually exclusive — the compiler enforces it.
+      empty={{
+        icon: Truck,
+        title: "No shipments yet",
+        // Keep the phrase "will show up here" or "will appear here".
+        description:
+          "Shipments will show up here as orders leave the warehouse.",
+      }}
+    >
+      {(rows) => (
+        <table className="w-full text-sm">
+          {/* … your table body … */}
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.id}>
+                <td>{r.tracking_no}</td>
+                <td>{r.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </AdminListPage>
+  );
+}
+```
+
+That single JSX block emits:
+
+| Situation                                | Event                        | Payload                                                             | Level |
+| ---------------------------------------- | ---------------------------- | ------------------------------------------------------------------- | ----- |
+| Query resolves with `[]`                 | `admin_list_empty_shown`     | `{ surface: "admin_list", resource: "shipments", reason: "no_records" }` | info  |
+| `[]` while `expectSeed` is set           | `admin_list_empty_shown`     | `{ …, reason: "seed_missing" }`                                     | warn  |
+| `[]` while `filtersActive` is set        | `admin_list_empty_shown`     | `{ …, reason: "filtered_out" }`                                     | info  |
+| Query throws                             | `reportClientError` + `admin_list_retry_clicked` on retry | `{ surface: "admin_list", resource: "shipments", kind: "supabase_query_failure" }` | error |
+| Non-array response (schema drift)        | Same as query throw          | Error message: "Unexpected response shape…"                         | error |
+
+### 4. Extend the contract test
+
+Add one row to `REGISTRY` in
+`src/routes/_authenticated/__tests__/admin-list-empty-telemetry.test.tsx`.
+The suite iterates the registry and auto-asserts slug + reason for the new
+page — no per-page test to write.
+
+```ts
+{
+  label: "admin.shipments",
+  routePath: "@/routes/_authenticated/admin.shipments",
+  emptyTitle: "No shipments yet",
+  expectedResource: "shipments",
+},
+```
+
+### 5. Verify locally
+
+```bash
+bun run check:admin-list-telemetry   # static guard
+bunx vitest run                      # contract + telemetry tests
+```
+
+Both must pass before CI. The static guard also runs in
+`.github/workflows/check-admin-list-telemetry.yml` and fails the build if a
+new page skips `resource`, uses an unregistered slug, uses an unapproved
+`reason`, or hand-rolls a raw `logClientEvent("admin_list_empty_shown", …)`
+outside `ListEmptyState.tsx`.
+
+
 
 ## Do / don't
 
