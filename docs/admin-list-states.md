@@ -154,6 +154,80 @@ The shared telemetry tests in `src/components/admin/__tests__/` cover
 `ListErrorState` and `ListEmptyState` behaviour once — no need to re-test
 per page.
 
+## `admin_list_empty_shown` telemetry checklist
+
+Every new list page MUST emit `admin_list_empty_shown` with the correct
+`resource` slug and `reason` — the dashboards group by both, and a typo
+silently drops the page from ops visibility. Walk this list before merging:
+
+### `resource` slug rules
+
+- **Present**: `resource` is set on **both** `ListErrorState` and
+  `ListEmptyState` (or passed once to `<AdminListPage>`). Missing on
+  `ListEmptyState` = telemetry never fires; missing on `ListErrorState` =
+  error stream can't be joined to the empty stream.
+- **Format**: `snake_case`, singular-or-plural matching the URL segment.
+  Allowed characters: `[a-z0-9_]+`.
+- **Matches the URL**: `resource` equals the last `/admin/<segment>` chunk
+  with `-` → `_`. Examples:
+  | Route                         | `resource` slug         |
+  |-------------------------------|-------------------------|
+  | `/admin/opportunities`        | `opportunities`         |
+  | `/admin/commission-invoices`  | `commission_invoices`   |
+  | `/admin/purchase-orders`      | `purchase_orders`       |
+- **Unique**: grep the repo — no other page uses the same slug. Two pages
+  sharing a slug collide in telemetry and the dedup ref cancels the second
+  event.
+- **Stable**: never rename after ship. Renaming breaks historical dashboards
+  and alert thresholds.
+
+### `reason` value rules
+
+Only these three values are allowed (`ListEmptyState` prop type enforces it):
+
+| `reason`        | When to use                                                                                | Telemetry level |
+|-----------------|--------------------------------------------------------------------------------------------|-----------------|
+| `no_records`    | Default. A fresh environment or genuinely empty table.                                     | `info`          |
+| `seed_missing`  | Env should have seeded rows but doesn't (smoke test failed, seed script skipped).          | `warn`          |
+| `filtered_out`  | User's active filters/search excluded every row — data exists, just none matches.          | `info`          |
+
+Rules:
+
+- **Default to `no_records`** — don't pass `reason` at all unless one of the
+  other two applies.
+- **`seed_missing`** is only correct when the caller can *prove* seeded data
+  should exist (e.g. `expectSeed` on `<AdminListPage>` in a smoke env). Never
+  hard-code it in the page.
+- **`filtered_out`** requires that at least one filter/search is currently
+  active. Don't emit it on the initial unfiltered load.
+- Copy must match the reason: `no_records` → "will show up here" phrasing;
+  `filtered_out` → mentions filters and how to clear them.
+
+### Verification steps for a new page
+
+1. **grep**: `rg "resource=\"<slug>\"" src/routes/_authenticated/` returns
+   both an `ListErrorState` and a `ListEmptyState` usage (or one
+   `<AdminListPage>`).
+2. **grep uniqueness**: `rg "resource=\"<slug>\"" src` — no other route file
+   claims the same slug.
+3. **Unit test** in `admin-list-empty.test.tsx` asserts:
+   ```ts
+   expect(logClientEvent).toHaveBeenCalledWith(
+     "admin_list_empty_shown",
+     { surface: "admin_list", resource: "<slug>", reason: "no_records" },
+     "info",
+   );
+   ```
+4. **Dedup**: assert `logClientEvent` was called exactly once even after a
+   re-render with the same props (covered by the shared telemetry test —
+   don't duplicate, but confirm your page relies on `ListEmptyState` and
+   doesn't emit the event itself).
+5. **Runtime spot-check** (once, after first deploy): open the page against
+   an empty table, filter DevTools console for `admin_list_empty_shown`, and
+   verify the payload's `resource` and `reason` match the checklist above.
+
+
+
 ## Do / don't
 
 - **Do** put the `resource` slug on both `ListErrorState` and
