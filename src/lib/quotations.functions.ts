@@ -170,6 +170,51 @@ export const createQuotationWithItems = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!inserted?.id) throw new Error("Could not create quotation");
 
+const CreateFullInput = z.object({
+  customer_id: z.string().uuid(),
+  issue_date: z.string(),
+  valid_until: z.string(),
+  currency: z.string().max(8).default("USD"),
+  vat_rate: z.number().min(0).max(100).default(0),
+  terms: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  items: z
+    .array(
+      z.object({
+        item_code: z.string().nullable().optional(),
+        hs_code: z.string().nullable().optional(),
+        description: z.string().min(1, "Description is required"),
+        quantity: z.number().min(0),
+        unit: z.string().nullable().optional(),
+        unit_price: z.number().min(0),
+        discount_pct: z.number().min(0).max(100).default(0),
+      }),
+    )
+    .min(1, "At least one line item is required"),
+});
+
+export const createQuotationWithItems = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CreateFullInput.parse(v))
+  .handler(async ({ context, data }) => {
+    const { data: inserted, error } = await context.supabase
+      .from("quotations")
+      .insert({
+        customer_id: data.customer_id,
+        issue_date: data.issue_date,
+        valid_until: data.valid_until,
+        currency: data.currency,
+        vat_rate: data.vat_rate,
+        terms: data.terms ?? null,
+        notes: data.notes ?? null,
+        created_by: context.userId,
+        status: "draft",
+      })
+      .select("id")
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!inserted?.id) throw new Error("Could not create quotation");
+
     const rows = data.items.map((it, idx) => {
       const line_total =
         Math.round(
@@ -178,6 +223,8 @@ export const createQuotationWithItems = createServerFn({ method: "POST" })
       return {
         quotation_id: inserted.id,
         position: idx + 1,
+        item_code: it.item_code ?? null,
+        hs_code: it.hs_code ?? null,
         description: it.description,
         quantity: it.quantity,
         unit: it.unit ?? "unit",
@@ -188,9 +235,21 @@ export const createQuotationWithItems = createServerFn({ method: "POST" })
     });
     const { error: itemsErr } = await context.supabase.from("quotation_items").insert(rows);
     if (itemsErr) {
-      // best-effort compensating delete; trigger recalc keeps totals consistent
       await context.supabase.from("quotations").delete().eq("id", inserted.id);
       throw new Error(itemsErr.message);
+    }
+
+    // Audit trail
+    try {
+      await context.supabase.from("activity_logs").insert({
+        user_id: context.userId,
+        action: "create",
+        entity_type: "quotation",
+        entity_id: inserted.id,
+        metadata: { items: rows.length, currency: data.currency },
+      });
+    } catch (err) {
+      console.warn("createQuotationWithItems activity log failed", err);
     }
     return { id: inserted.id };
   });
@@ -200,6 +259,8 @@ const ItemInput = z.object({
   id: z.string().uuid().optional(),
   quotation_id: z.string().uuid(),
   position: z.number().int().default(1),
+  item_code: z.string().nullable().optional(),
+  hs_code: z.string().nullable().optional(),
   description: z.string().min(1),
   quantity: z.number().default(1),
   unit: z.string().nullable().optional(),
@@ -224,6 +285,25 @@ export const upsertQuotationItem = createServerFn({ method: "POST" })
     }
     const { error } = await context.supabase.from("quotation_items").insert(payload);
     if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const duplicateQuotationItem = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => IdInput.parse(v))
+  .handler(async ({ context, data }) => {
+    const { data: row, error } = await context.supabase
+      .from("quotation_items")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) throw new Error("Item not found");
+    const { id: _id, created_at: _c, ...rest } = row as Record<string, unknown>;
+    const { error: insErr } = await context.supabase
+      .from("quotation_items")
+      .insert({ ...rest, position: (rest.position as number ?? 0) + 1 });
+    if (insErr) throw new Error(insErr.message);
     return { ok: true };
   });
 
