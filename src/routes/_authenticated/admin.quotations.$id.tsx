@@ -56,6 +56,7 @@ function QuotationEditor() {
   const upsertFn = useServerFn(upsertQuotation);
   const upsertItemFn = useServerFn(upsertQuotationItem);
   const deleteItemFn = useServerFn(deleteQuotationItem);
+  const duplicateItemFn = useServerFn(duplicateQuotationItem);
   const statusFn = useServerFn(setQuotationStatus);
   const deleteFn = useServerFn(deleteQuotation);
   const convertFn = useServerFn(convertQuotationToProforma);
