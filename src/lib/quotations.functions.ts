@@ -37,7 +37,7 @@ export const listQuotations = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("quotations")
       .select(
-        "id, quotation_number, status, issue_date, valid_until, currency, total, customer_id, customers(name), created_at",
+        "id, quotation_number, status, issue_date, valid_until, currency, subtotal, vat_amount, total, customer_id, customers(name, company_name, email), created_at, sent_at, converted_invoice_id, quotation_items(count)",
       )
       .order("created_at", { ascending: false })
       .limit(500);
