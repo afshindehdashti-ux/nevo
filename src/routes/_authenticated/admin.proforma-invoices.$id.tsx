@@ -399,6 +399,83 @@ function ProformaInvoiceDetail() {
             </CardContent>
           </Card>
 
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Wallet className="h-4 w-4" /> Payment capture
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-3">
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded border p-2">
+                  <p className="text-muted-foreground">Paid</p>
+                  <p className="font-semibold">{formatMoney(pi.amount_paid, pi.currency)}</p>
+                </div>
+                <div className="rounded border p-2">
+                  <p className="text-muted-foreground">Balance</p>
+                  <p className="font-semibold">{formatMoney(pi.balance_due, pi.currency)}</p>
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="pay_mode" className="text-xs">Mode</Label>
+                <select
+                  id="pay_mode"
+                  className="w-full border rounded h-9 px-2 bg-background text-sm"
+                  value={paymentMode}
+                  onChange={(e) => setPaymentMode(e.target.value as "add" | "set")}
+                >
+                  <option value="add">Add payment</option>
+                  <option value="set">Set total paid</option>
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="pay_amount" className="text-xs">
+                  Amount ({pi.currency})
+                </Label>
+                <Input
+                  id="pay_amount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={paymentAmount}
+                  onChange={(e) => setPaymentAmount(e.target.value)}
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => recordPayment.mutate()}
+                  disabled={recordPayment.isPending || !paymentAmount}
+                >
+                  {recordPayment.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                  ) : (
+                    <Wallet className="h-4 w-4 mr-1" />
+                  )}
+                  Record
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setPaymentMode("set");
+                    setPaymentAmount(String(Number(pi.grand_total ?? 0)));
+                  }}
+                  disabled={recordPayment.isPending}
+                >
+                  Mark paid
+                </Button>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Balance and payment status update automatically.
+              </p>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Approval</CardTitle>
