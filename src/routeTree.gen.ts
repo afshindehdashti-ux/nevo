@@ -73,6 +73,7 @@ import { Route as AuthenticatedAdminSecurityAuditRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminSecurityAlertsRouteImport } from './routes/_authenticated/admin.security-alerts'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminQuotationsRouteImport } from './routes/_authenticated/admin.quotations'
+import { Route as AuthenticatedAdminQaCenterRouteImport } from './routes/_authenticated/admin.qa-center'
 import { Route as AuthenticatedAdminPurchaseOrdersRouteImport } from './routes/_authenticated/admin.purchase-orders'
 import { Route as AuthenticatedAdminProformaInvoicesRouteImport } from './routes/_authenticated/admin.proforma-invoices'
 import { Route as AuthenticatedAdminProductsRouteImport } from './routes/_authenticated/admin.products'
@@ -464,6 +465,12 @@ const AuthenticatedAdminQuotationsRoute =
   AuthenticatedAdminQuotationsRouteImport.update({
     id: '/quotations',
     path: '/quotations',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminQaCenterRoute =
+  AuthenticatedAdminQaCenterRouteImport.update({
+    id: '/qa-center',
+    path: '/qa-center',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminPurchaseOrdersRoute =
@@ -877,6 +884,7 @@ export interface FileRoutesByFullPath {
   '/admin/products': typeof AuthenticatedAdminProductsRoute
   '/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
   '/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
+  '/admin/qa-center': typeof AuthenticatedAdminQaCenterRoute
   '/admin/quotations': typeof AuthenticatedAdminQuotationsRouteWithChildren
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/security-alerts': typeof AuthenticatedAdminSecurityAlertsRoute
@@ -996,6 +1004,7 @@ export interface FileRoutesByTo {
   '/admin/products': typeof AuthenticatedAdminProductsRoute
   '/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
   '/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
+  '/admin/qa-center': typeof AuthenticatedAdminQaCenterRoute
   '/admin/quotations': typeof AuthenticatedAdminQuotationsRouteWithChildren
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/security-alerts': typeof AuthenticatedAdminSecurityAlertsRoute
@@ -1120,6 +1129,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/products': typeof AuthenticatedAdminProductsRoute
   '/_authenticated/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
   '/_authenticated/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
+  '/_authenticated/admin/qa-center': typeof AuthenticatedAdminQaCenterRoute
   '/_authenticated/admin/quotations': typeof AuthenticatedAdminQuotationsRouteWithChildren
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/security-alerts': typeof AuthenticatedAdminSecurityAlertsRoute
@@ -1244,6 +1254,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/proforma-invoices'
     | '/admin/purchase-orders'
+    | '/admin/qa-center'
     | '/admin/quotations'
     | '/admin/reports'
     | '/admin/security-alerts'
@@ -1363,6 +1374,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/proforma-invoices'
     | '/admin/purchase-orders'
+    | '/admin/qa-center'
     | '/admin/quotations'
     | '/admin/reports'
     | '/admin/security-alerts'
@@ -1486,6 +1498,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/products'
     | '/_authenticated/admin/proforma-invoices'
     | '/_authenticated/admin/purchase-orders'
+    | '/_authenticated/admin/qa-center'
     | '/_authenticated/admin/quotations'
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/security-alerts'
@@ -2015,6 +2028,13 @@ declare module '@tanstack/react-router' {
       path: '/quotations'
       fullPath: '/admin/quotations'
       preLoaderRoute: typeof AuthenticatedAdminQuotationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/qa-center': {
+      id: '/_authenticated/admin/qa-center'
+      path: '/qa-center'
+      fullPath: '/admin/qa-center'
+      preLoaderRoute: typeof AuthenticatedAdminQaCenterRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/purchase-orders': {
@@ -2598,6 +2618,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminProductsRoute: typeof AuthenticatedAdminProductsRoute
   AuthenticatedAdminProformaInvoicesRoute: typeof AuthenticatedAdminProformaInvoicesRoute
   AuthenticatedAdminPurchaseOrdersRoute: typeof AuthenticatedAdminPurchaseOrdersRoute
+  AuthenticatedAdminQaCenterRoute: typeof AuthenticatedAdminQaCenterRoute
   AuthenticatedAdminQuotationsRoute: typeof AuthenticatedAdminQuotationsRouteWithChildren
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminSecurityAlertsRoute: typeof AuthenticatedAdminSecurityAlertsRoute
@@ -2648,6 +2669,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminProformaInvoicesRoute:
     AuthenticatedAdminProformaInvoicesRoute,
   AuthenticatedAdminPurchaseOrdersRoute: AuthenticatedAdminPurchaseOrdersRoute,
+  AuthenticatedAdminQaCenterRoute: AuthenticatedAdminQaCenterRoute,
   AuthenticatedAdminQuotationsRoute:
     AuthenticatedAdminQuotationsRouteWithChildren,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
