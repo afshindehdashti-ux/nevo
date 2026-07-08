@@ -37,8 +37,10 @@ import {
 } from "@/components/ui/table";
 import { CommunicationTimeline } from "@/components/crm/CommunicationTimeline";
 import { ApprovalPanel } from "@/components/crm/ApprovalPanel";
-import { Trash2, Plus, Send, Check, X, FileDown, ArrowRightCircle } from "lucide-react";
+import { Trash2, Plus, Send, Check, X, FileDown, ArrowRightCircle, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { QuotationEmailDialog } from "@/components/crm/QuotationEmailDialog";
+import { buildQuotationPdf, downloadQuotationPdf, loadSellerSettings, validateQuotationForPdf } from "@/lib/quotation-pdf";
 
 export const Route = createFileRoute("/_authenticated/admin/quotations/$id")({
   head: () => ({ meta: [{ title: "Quotation — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
