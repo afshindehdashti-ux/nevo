@@ -315,12 +315,17 @@ function QuotationEditor() {
               Open proforma
             </Button>
           )}
-          <Button
-            variant="outline"
-            onClick={() => window.open(`/admin/quotations/${id}/print`, "_blank")}
-          >
+          <Button variant="outline" onClick={handlePreviewPdf}>
             <FileDown className="h-4 w-4 mr-1" />
-            PDF
+            Preview PDF
+          </Button>
+          <Button variant="outline" onClick={handleDownloadPdf}>
+            <FileDown className="h-4 w-4 mr-1" />
+            Download PDF
+          </Button>
+          <Button variant="secondary" onClick={() => setEmailOpen(true)}>
+            <Mail className="h-4 w-4 mr-1" />
+            Email PDF
           </Button>
           <Button
             variant="ghost"
