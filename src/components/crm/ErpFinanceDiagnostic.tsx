@@ -2,11 +2,15 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { runErpQa, runErpFinanceTest } from "@/lib/erp-qa.functions";
+import {
+  assertLatestProformaPdf,
+  type PdfE2eReport,
+} from "@/lib/proforma-pdf-e2e";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2, XCircle, AlertTriangle, Loader2, Play, FlaskConical } from "lucide-react";
+import { CheckCircle2, XCircle, AlertTriangle, Loader2, Play, FlaskConical, FileCheck2 } from "lucide-react";
 
 type Check = {
   key: string;
