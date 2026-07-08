@@ -198,21 +198,9 @@ export function BlockedVerificationDialog({
                   size="sm"
                   variant="outline"
                   onClick={() => {
-                    const lines = [
-                      `Verification: ${isMalformed ? "MALFORMED" : "MISMATCH"}`,
-                      `Selected file: ${filename}`,
-                      `Audit filename: ${row.filename}`,
-                      `Payload marker present: ${hasMarker}`,
-                      `Embedded SHA-256: ${embeddedSha ?? "(missing)"}`,
-                      `Embedded timestamp: ${embeddedTs ?? "(missing)"}`,
-                      `Expected SHA-256: ${expected}`,
-                      `Computed SHA-256: ${computed ?? "(not computed)"}`,
-                      isMalformed ? `Issues: ${result.issues.join(", ")}` : "",
-                    ]
-                      .filter(Boolean)
-                      .join("\n");
+                    const text = buildVerificationReport(blocked);
                     void navigator.clipboard
-                      .writeText(lines)
+                      .writeText(text)
                       .then(() => toast.success("Verification report copied"))
                       .catch((err) =>
                         toast.error("Copy failed", {
@@ -220,6 +208,7 @@ export function BlockedVerificationDialog({
                         }),
                       );
                   }}
+
                 >
                   <Copy className="h-3.5 w-3.5" />
                   Copy verification report
