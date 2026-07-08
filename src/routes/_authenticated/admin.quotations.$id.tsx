@@ -213,11 +213,34 @@ function QuotationEditor() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const [emailOpen, setEmailOpen] = useState(false);
+
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading…</div>;
   if (!data) return <div className="p-6">Not found.</div>;
 
   const q = data.quotation;
   const canSend = q.status === "approved" || q.status === "draft";
+
+  const handleDownloadPdf = async () => {
+    const errs = validateQuotationForPdf(q as any, data.items as any);
+    if (errs.length) {
+      toast.error(errs.join(" · "));
+      return;
+    }
+    const seller = await loadSellerSettings();
+    downloadQuotationPdf(q as any, data.items as any, seller);
+  };
+
+  const handlePreviewPdf = async () => {
+    const errs = validateQuotationForPdf(q as any, data.items as any);
+    if (errs.length) {
+      toast.error(errs.join(" · "));
+      return;
+    }
+    const seller = await loadSellerSettings();
+    const { blob } = buildQuotationPdf(q as any, data.items as any, seller);
+    window.open(URL.createObjectURL(blob), "_blank");
+  };
 
   return (
     <div className="p-6 space-y-4 max-w-6xl">
