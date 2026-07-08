@@ -66,6 +66,6 @@ describe.each(cases)("admin.%s — empty state", (_label, routePath, title) => {
     // Table should not render at all in the empty state.
     expect(document.querySelector("table")).toBeNull();
     // Description text is present (not just the title).
-    expect(document.body.textContent).toMatch(/will (show up|appear)/i);
+    expect(document.body.textContent).toMatch(/(show up|appear) here/i);
   });
 });
