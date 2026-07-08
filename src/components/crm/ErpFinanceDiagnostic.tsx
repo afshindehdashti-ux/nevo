@@ -71,15 +71,37 @@ function StatusBadge({ status }: { status: "pass" | "fail" | "warn" }) {
   );
 }
 
+type IsoStep = {
+  key: string;
+  label: string;
+  status: "pass" | "fail" | "warn";
+  message: string;
+  details?: any;
+};
+type IsoReport = {
+  startedAt: string;
+  finishedAt: string;
+  runId: string;
+  marker: string;
+  passed: number;
+  failed: number;
+  warned: number;
+  total: number;
+  steps: IsoStep[];
+};
+
 export function ErpFinanceDiagnostic() {
   const runQa = useServerFn(runErpQa);
   const runTest = useServerFn(runErpFinanceTest);
+  const runIso = useServerFn(runProformaE2eIsolated);
   const [qa, setQa] = useState<QaReport | null>(null);
   const [test, setTest] = useState<FinanceReport | null>(null);
   const [pdfReport, setPdfReport] = useState<PdfE2eReport | null>(null);
+  const [iso, setIso] = useState<IsoReport | null>(null);
   const [qaLoading, setQaLoading] = useState(false);
   const [testLoading, setTestLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [isoLoading, setIsoLoading] = useState(false);
 
   async function onRunQa() {
     setQaLoading(true);
