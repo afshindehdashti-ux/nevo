@@ -59,6 +59,25 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        const { data: roleRow, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .in('role', ['super_admin', 'management', 'sales', 'operations', 'finance'])
+          .maybeSingle()
+
+        if (roleError) {
+          console.error('Failed to verify email sender role', {
+            error: roleError,
+            user_id: user.id,
+          })
+          return Response.json({ error: 'Unable to verify permissions' }, { status: 500 })
+        }
+
+        if (!roleRow) {
+          return Response.json({ error: 'Forbidden' }, { status: 403 })
+        }
+
         // Parse request body
         let templateName: string
         let recipientEmail: string
