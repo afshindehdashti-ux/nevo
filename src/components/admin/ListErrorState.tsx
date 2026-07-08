@@ -23,6 +23,28 @@ interface ListErrorStateProps {
 export function ListErrorState({ resource, error, onRetry, isRetrying }: ListErrorStateProps) {
   const message = error instanceof Error ? error.message : String(error ?? "Unknown error");
 
+  // Telemetry: log each distinct failure once per (resource + message) so a
+  // retry storm doesn't flood the sink. reportClientError captures the stack
+  // and routes through the same pipeline as uncaught errors.
+  const loggedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!error) return;
+    const key = `${resource}::${message}`;
+    if (loggedRef.current === key) return;
+    loggedRef.current = key;
+    reportClientError(error, {
+      surface: "admin_list",
+      resource,
+      kind: "supabase_query_failure",
+    });
+  }, [error, resource, message]);
+
+  const handleRetry = () => {
+    logClientEvent("admin_list_retry_clicked", { resource, message }, "info");
+    onRetry();
+  };
+
+
   return (
     <Card className="border-destructive/40 bg-destructive/5" role="alert" aria-live="polite">
       <CardContent className="p-4 flex flex-col sm:flex-row sm:items-start gap-3">
@@ -42,7 +64,7 @@ export function ListErrorState({ resource, error, onRetry, isRetrying }: ListErr
           type="button"
           size="sm"
           variant="outline"
-          onClick={onRetry}
+          onClick={handleRetry}
           disabled={isRetrying}
           className="shrink-0"
         >
