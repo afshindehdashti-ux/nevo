@@ -77,7 +77,7 @@ function PurchaseOrdersList() {
               {(data ?? []).map((o: any) => (
                 <tr key={o.id} className="border-t border-border hover:bg-muted/20">
                   <td className="px-3 py-2 font-medium">{o.order_number}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{o.customer?.company_name ?? "—"}</td>
+                  <td className="px-3 py-2 text-muted-foreground">{o.customer?.name ?? "—"}</td>
                   <td className="px-3 py-2"><Badge variant="outline" className="capitalize">{o.status}</Badge></td>
                   <td className="px-3 py-2 text-muted-foreground">{o.order_date ? formatDate(o.order_date) : "—"}</td>
                   <td className="px-3 py-2 text-muted-foreground">{o.requested_delivery ? formatDate(o.requested_delivery) : "—"}</td>
