@@ -1,102 +1,134 @@
 
-## What ships this turn
+# Smart Invoice Importer
 
-A protected internal AI Assistant with four surfaces, wired to Lovable AI Gateway with `openai/gpt-5-mini` via the Responses API for chat/structured checks and `openai/text-embedding-3-small` for RAG.
+Add a protected feature that lets NEVO staff upload old invoices (XLSX, XLS, CSV, DOCX, PDF, PNG, JPG, JPEG), extract the fields with AI, review + correct them, and create a **Draft** Proforma or Commercial Invoice in NEVO's existing format. Nothing on the public site changes; nothing is auto-sent or auto-approved.
 
-Non-goals (queued for follow-up turns): training center, quick-action mutations, AI settings page, saved answers, WhatsApp/email drafters.
-
----
-
-### 1. Chat page — `/admin/ai-assistant`
-
-- Sidebar of past sessions (create / rename / delete), main chat pane, right panel of cited sources for the last answer.
-- AI Elements composition (`Conversation`, `Message`, `MessageResponse`, `PromptInput`, `Shimmer`), streaming via `useChat` + `DefaultChatTransport`.
-- Model calls happen in `src/routes/api/ai/chat.ts` (server route). Reads `LOVABLE_API_KEY` inside the handler, uses `openai/gpt-5-mini`.
-- Every assistant reply persists to `ai_chat_messages` in `onFinish` with the citations it used.
-- Role gate: Super Admin / Management / Sales / Operations / Finance / Read Only — Read Only cannot upload docs or use invoice AI Check.
-
-### 2. Knowledge Base — `/admin/ai-assistant/knowledge-base`
-
-- Upload UI (PDF / DOCX / XLSX / CSV / TXT / images) → private Supabase Storage bucket `ai-knowledge`.
-- Server function `ingestKnowledgeDocument` extracts text (PDF via `unpdf`, DOCX via `mammoth`, XLSX/CSV via `xlsx`, images via note-only stub for Phase 1), chunks ~1000 chars with 150 overlap, embeds each chunk with `openai/text-embedding-3-small` (1536 dims), inserts into `ai_document_chunks`.
-- List/delete UI with filters: category, access level, linked entity, tag search.
-- Metadata form: title, category (enum), description, access level, linked customer / supplier / order / invoice (async selects), tags, status.
-- RLS: reads gated by `has_any_role` matching the row's `access_level`; ingest/delete for Management/Super Admin only.
-
-### 3. Floating "AI Assist" drawer — every backend page
-
-- Small button in root `_authenticated` layout (bottom-right). Opens a `Sheet` containing a scoped chat that posts to `/api/ai/chat` with an extra `context` payload: `{ module, route, record_id, record_summary }`.
-- The current route derives `module + record_id` from URL; a lightweight `getRecordSummary` server fn returns a safe summary (customer/supplier/order/invoice) scoped by RLS.
-- Drawer conversations are ephemeral by default (not stored) with an "Attach summary to record" button that inserts into `ai_actions_log` — actual mutations queued for later.
-
-### 4. Invoice AI Check
-
-- `AI Check` button on the invoice detail page (proforma / commercial / commission) for Management / Finance / Super Admin.
-- Calls `checkInvoiceIntegrity` server fn: pulls the invoice + items + customer/supplier via RLS, runs `generateText` with `Output.object` (strict json_schema, provider built with `structuredOutputs: true`) using `openai/gpt-5-mini`.
-- Returns a structured list: `{ severity, field, message, suggestion }[]`. Rendered as a dialog; no auto-mutation, "Apply suggestion" chips are display-only in Phase 1.
+This is a large feature. I'll ship it in **five reviewable phases**, each independently useful and safe to stop after. Everything lives under `/_authenticated/` and reuses existing tables (`customers`, `products`, `invoices`, `invoice_items`, `orders`) — the importer only adds staging tables and never mutates production records without an explicit "Create Draft" click.
 
 ---
 
-### Database (one migration)
+## Phase 1 — Foundations (schema, storage, RLS)
 
-New tables — all in `public`, RLS on, GRANTs included:
+**Tables** (new, all in `public`, all RLS-on, staff-only):
+- `invoice_import_jobs` — one row per upload; tracks `status` (`uploaded | processing | ready_for_review | draft_created | failed | cancelled`), `import_type`, `related_customer_id`, `related_order_id`, `created_invoice_id`, `overall_confidence`.
+- `invoice_import_files` — original uploaded file(s) metadata + storage path.
+- `invoice_import_extracted_data` — `raw_text`, `extracted_json`, `mapped_json`, `confidence_scores`, `validation_warnings` (1-to-1 with job).
+- `invoice_import_audit_log` — every action (upload, extract, edit, create-draft, cancel).
 
-- `ai_documents` — title, category (enum), description, file_url, file_type, byte_size, access_level (enum), related_customer_id, related_supplier_id, related_order_id, related_invoice_id, tags text[], uploaded_by, status, timestamps.
-- `ai_document_chunks` — document_id fk, chunk_index, chunk_text, page_number, metadata jsonb, `embedding vector(1536)`, HNSW index on `embedding vector_cosine_ops`.
-- `ai_chat_sessions` — user_id, title, related_module, related_record_id, timestamps.
-- `ai_chat_messages` — session_id fk, user_id, role (user/assistant/system), content, parts jsonb (UIMessage parts), sources jsonb, tokens_in/out, created_at.
-- `ai_actions_log` — user_id, action_type, related_module, related_record_id, ai_summary, metadata, created_at.
-- Enums: `ai_document_category`, `ai_document_access_level`, `ai_document_status`, `ai_chat_role`.
-- SQL fn `match_ai_chunks(query_embedding vector(1536), match_count int, allowed_levels text[], user_id uuid)` — SECURITY DEFINER, returns top-k chunks the caller is allowed to see, joins to document metadata for citations.
+**Storage bucket**: `invoice-imports` (private), path `{user_id}/{job_id}/{filename}`. Signed URLs only.
 
-RLS:
-- `ai_documents` / `ai_document_chunks`: SELECT where `has_any_role(uid, access_map[access_level])`; INSERT/DELETE for Management/Super Admin.
-- `ai_chat_sessions` / `ai_chat_messages`: owner-only (`auth.uid() = user_id`).
-- `ai_actions_log`: owner INSERT, staff SELECT.
+**Roles** (via existing `has_role` / `app_role`): allow `super_admin`, `management`, `sales`, `finance`; block `read_only` and `operations` (operations can VIEW jobs linked to their orders but not create).
 
-Existing `ai_assistant_conversations` table is untouched (may be from an earlier feature) — Phase 1 uses the new tables.
+**Grants + policies**: standard `authenticated` + `service_role` grants, plus role-scoped policies using `has_role`. No `anon`.
 
-### Storage
+Deliverable at end of phase 1: migration reviewed and applied, bucket created, no UI yet.
 
-- Create private bucket `ai-knowledge` via `supabase--storage_create_bucket`.
-- RLS on `storage.objects`: Management/Super Admin upload; readable by any authenticated user whose role matches the document's access level (looked up via the row's `file_url` path pattern).
+---
 
-### Secrets
+## Phase 2 — Upload + extraction pipeline (server)
 
-- `LOVABLE_API_KEY` already present. No user-provided secrets required.
+**Server functions** (`src/lib/invoice-import.functions.ts`, `.server.ts` helpers):
+- `createImportJob({ file, importType, relatedCustomerId?, relatedOrderId? })` — validates file type/size (≤20 MB), uploads to storage via signed upload, inserts `invoice_import_jobs` + `invoice_import_files`, returns `jobId`.
+- `runExtraction({ jobId })` — status → `processing`, dispatches per file type, writes result, status → `ready_for_review` or `failed`.
+- `getImportJob({ jobId })` — returns job + extracted + mapped JSON for the review UI.
+- `updateMappedData({ jobId, mapped })` — user edits during review.
+- `cancelImportJob({ jobId })`.
 
-### New / changed files
+All use `.middleware([requireSupabaseAuth])` and re-check role with `has_role` inside the handler.
 
-- Migration (via `supabase--migration`).
-- `src/lib/ai-gateway.server.ts` — provider helper (chat + structured + embeddings).
-- `src/lib/ai-assistant.functions.ts` — `listChatSessions`, `createChatSession`, `getChatSession`, `deleteChatSession`, `saveChatMessage`, `ingestKnowledgeDocument`, `listKnowledgeDocuments`, `deleteKnowledgeDocument`, `getRecordSummary`, `checkInvoiceIntegrity`, `logAiAction`.
-- `src/lib/ai-assistant.server.ts` — chunking, embedding, retrieval helpers (server-only).
-- `src/routes/api/ai/chat.ts` — streaming chat route (RAG retrieval + Responses API, cites sources).
-- `src/routes/_authenticated/admin.ai-assistant.tsx` — layout with sidebar + `<Outlet />`.
-- `src/routes/_authenticated/admin.ai-assistant.index.tsx` — chat surface.
-- `src/routes/_authenticated/admin.ai-assistant.knowledge-base.tsx` — upload + list.
-- `src/components/ai/AiAssistDrawer.tsx` — global drawer, mounted in `_authenticated` layout.
-- `src/components/ai/InvoiceAiCheckButton.tsx` — button + result dialog, wired into `admin.invoices.$id.tsx`.
-- `src/components/ai/` supporting UI (SourcesPanel, KnowledgeUpload, ChatSessionList).
-- Sidebar link added to `src/lib/crm-nav.ts` under Administration.
-- AI Elements install: `bun x ai-elements@latest add conversation message prompt-input shimmer tool`.
-- `bun add ai @ai-sdk/react @ai-sdk/openai-compatible unpdf mammoth xlsx`.
+**Extractors** (per file type, all server-side):
+- **XLSX/XLS/CSV** — `exceljs` / `papaparse`. Detect header key/value pairs, item table (by header row heuristics: `qty`, `unit price`, `description`), totals block.
+- **DOCX** — `mammoth` for text + `docx4js` tables (or plain XML fallback shipped in the docs skill).
+- **PDF (text)** — `pdf-parse`. If extracted text is thin (< 200 chars) or scanned, fall through to OCR.
+- **PDF (scanned) / PNG / JPG** — send the file (base64) to Lovable AI Gateway as an `image_url` block with a Gemini vision model (`google/gemini-2.5-flash` for cost, `google/gemini-2.5-pro` fallback). Prompt requests strict JSON matching our schema with per-field `confidence` (0–1).
 
-### Technical details
+**AI normalisation step** (all file types): feed the raw structured guess to `google/gemini-2.5-flash` with our target schema and Zod-validated output — normalises currency codes, dates, VAT %, line items. Assigns a `confidence` per field.
 
-- Chat route: build `openai/gpt-5-mini` via `createLovableAiGatewayProvider(key, runId, { structuredOutputs: true })`, retrieve top-8 chunks with `match_ai_chunks` using the query's embedding, inject as a `system` message with numbered citations, stream via `streamText.toUIMessageStreamResponse({ originalMessages, onFinish })`. On finish, persist assistant message + cited chunk ids + document titles in `ai_chat_messages.sources`.
-- Context drawer uses the same route with `context.system_addendum` merged into the system prompt (module + safe record summary).
-- Invoice AI Check uses `generateText` with `Output.object` schema `{ findings: Array<{ severity: 'info'|'warning'|'error', field: string, message: string, suggestion: string | null }> }`, wrapped in the `NoObjectGeneratedError.isInstance` fallback.
-- Embeddings called through the same gateway helper against `/v1/embeddings` — one request per batch of ≤ 96 chunks, respecting the 300k token cap.
-- All model calls read `process.env.LOVABLE_API_KEY` inside handlers; `attachSupabaseAuth` already registered in `src/start.ts` handles bearer forwarding for server fns.
-- `_authenticated` layout is integration-managed and untouched; the drawer is mounted via a small wrapper component imported by existing child routes that opt in (or from `__root.tsx` behind `useLocation` check for `_authenticated` prefix — final placement decided during implementation without altering the managed file).
+**Runtime note**: no `child_process`, no `sharp`, no native binaries — all extractors are pure JS or delegate to the AI Gateway. Fits Cloudflare Workers.
 
-### Verification before finishing
+Deliverable: unit tests hitting extractors with 1 fixture per file type; integration test that mocks the AI Gateway.
 
-- Migration applied, `bunx tsgo --noEmit` and `bun run build` clean.
-- Manual smoke: create a session, ask a question with no docs (fallback prompt), upload a small text file, re-ask and confirm citation appears, open the drawer on an invoice page and see AI reference the invoice number, click AI Check on an invoice and see structured findings.
-- Confirm anonymous users cannot reach `/admin/ai-assistant` (already gated by `_authenticated`) and that a Sales user cannot see a Finance-only doc.
+---
 
-### Rough size
+## Phase 3 — Review UI + validation
 
-~9 new files, 1 migration, 1 modified route (`admin.invoices.$id.tsx`), 1 modified nav file. Expect several hundred lines of route/handler code plus the ingest pipeline. Realistically this is at the edge of one turn — I'll commit table + chat + knowledge base + drawer + AI Check together and cut smaller polish (per-role AI Settings page, training center, quick-action confirm flow) into follow-ups you can approve next.
+**Route**: `src/routes/_authenticated/admin.invoice-imports.$jobId.tsx` (review) and `admin.invoice-imports.tsx` (history list — reuses the existing `ListErrorState` / `ListEmptyState` / skeleton pattern documented in `docs/admin-list-states.md`).
+
+**Modal component**: `<ImportFromFileModal />` in `src/components/invoice-import/` with:
+- Drag-and-drop + browse (accepts the 8 file types only, ≤20 MB).
+- Import-as picker: Proforma, Commercial, Customer + Invoice, Order + Invoice, Draft Only.
+- Optional "link to existing customer / order" search boxes.
+- Progress steps: Uploading → Reading → Extracting → Mapping → Checking totals → Ready.
+
+**Review page layout**:
+- Left: original file preview (image inline, PDF via `<iframe src=signedUrl>`, DOCX/XLSX show a "Download original" button + parsed text summary).
+- Right: form of extracted fields — every field editable, yellow background if `confidence < 0.8`, red if `< 0.6`, required badge on critical fields (customer, date, currency, ≥1 item, qty, unit price, grand total).
+- Bottom: item table (add/remove/edit rows).
+- Customer matcher: server fn `matchCustomer` searches by name/email/phone/VAT and returns exact / possible / none, with a "Create new" toggle.
+- Product matcher: similar via SKU/name.
+
+**Validation** (`src/lib/invoice-import-validate.ts`, shared client+server):
+- Math: `qty × unit_price = line_total`; `subtotal = Σ line_total`; `grand_total = subtotal − discount + vat`.
+- Warnings for currency/VAT/duplicate invoice number/missing bank/etc.
+- If imported total ≠ calculated, show side-by-side + choose imported / calculated / manual.
+- Blocks "Create Draft" until every critical field is present and non-critical warnings acknowledged.
+
+Buttons: **Re-run extraction**, **Save as Draft** (persists edits without creating invoice), **Create NEVO Invoice**, **Cancel**.
+
+---
+
+## Phase 4 — Wire into existing modules + PDF
+
+**Buttons — `Import From File`** placed next to existing "New …" buttons on:
+- Proforma Invoices list, Commercial Invoices list (both filtered variants of `admin.invoices`),
+- Customer profile (`admin.customers.$id.tsx` — Documents / Invoices tab),
+- Order page (`admin.orders.$id.tsx` — Related Documents),
+- AI Assistant → new sub-route `/_authenticated/admin.ai-assistant.document-check.tsx`.
+
+**Create Draft flow** (`createInvoiceFromImport` server fn):
+1. Validate mapped data server-side (re-runs the same rules).
+2. If `create_customer`, upsert into `customers`; if match, link.
+3. Upsert `products` for new items; link `invoice_items.product_id` where matched, otherwise leave as free-text line with description/price.
+4. Insert `invoices` with `status = 'draft'`, `type = 'proforma' | 'commercial'`, auto-numbered (`PI-NEVO-YYYY-#####` / `INV-NEVO-YYYY-#####` — allocator function in DB with advisory lock).
+5. Store the imported original number in `invoices.original_document_reference` (new nullable column, added in Phase 1 migration).
+6. Update job: `status='draft_created'`, `created_invoice_id`.
+7. Audit-log the creation.
+
+Nothing is auto-sent, auto-approved, or auto-paid.
+
+**PDF**: reuse the existing NEVO invoice PDF renderer (whatever `invoice_pdf_versions` currently uses). The importer produces a normal `invoices` row, so preview/download/convert-to-order all work through the existing pipeline. Company header/logo/footer come from `company_settings` (already populated with the NEVO details in the prompt).
+
+---
+
+## Phase 5 — AI Check + polish
+
+- **AI Check button** on the review page → server fn `aiCheckImport({ jobId })` sends the mapped JSON + validation warnings to the AI Gateway with a rubric prompt; returns markdown list of: missing fields, low-confidence fields, calc issues, possible duplicate customer, product-match issues, currency/VAT/payment-term warnings, and recommended corrections. Rendered in a right-side drawer.
+- Assistant slash commands: `/extract-invoice`, `/check-invoice`, `/missing-fields`, `/vat-check`, `/match-customer`, `/convert-to-nevo`, `/explain-warnings` — each maps to a server fn already built above.
+- **Import History** page finalised with statuses, filters, and row actions (View original, View extracted, Continue review, Create invoice, Delete, Re-run).
+- Telemetry: reuse `logClientEvent` / `reportClientError` — events `invoice_import_uploaded`, `_extracted`, `_review_opened`, `_draft_created`, `_failed`, `_ai_checked`.
+
+---
+
+## Out-of-scope for this feature (explicit)
+
+- Public-site changes: none.
+- Existing invoice records: untouched; the importer only inserts new drafts.
+- Emailing / approval / payment marking: unchanged, still manual.
+- Bulk import (multi-file at once): possible later; single-file per job for v1.
+- Non-English OCR quality: Gemini handles Arabic/EN reasonably; other scripts best-effort.
+
+## Technical section (for reviewers)
+
+- Stack: TanStack Start server functions (`createServerFn`, `requireSupabaseAuth`), never Supabase Edge Functions for app-internal work.
+- Secrets: `LOVABLE_API_KEY` (auto), no other API keys. Ensure via `ai_gateway--create` at start of Phase 2.
+- Packages: `exceljs`, `papaparse`, `mammoth`, `pdf-parse`, `zod` (already present). All Worker-compatible.
+- Files: server-only extractors live in `src/lib/invoice-import/*.server.ts`; server fns in `src/lib/invoice-import.functions.ts`; components in `src/components/invoice-import/`.
+- Follows the existing admin-list state contract from `docs/admin-list-states.md`.
+- Shared `classifyListState` used for the Import History table.
+
+## Confirmations before I start
+
+1. Ship in the 5 phases above, one migration+PR per phase, or roll it into fewer/more?
+2. AI model default: `google/gemini-2.5-flash` for cost, escalate to `google/gemini-2.5-pro` on low confidence — OK, or force one model?
+3. `original_document_reference` as a new nullable column on `invoices` — any objection to adding it in Phase 1?
+4. Operations role: read-only on jobs linked to their orders, no create — matches the prompt's "cannot create invoice unless permitted"?
