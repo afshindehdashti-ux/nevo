@@ -24,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/admin/purchase-orders")({
 });
 
 function PurchaseOrdersList() {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["purchase-orders"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -52,11 +52,12 @@ function PurchaseOrdersList() {
       </header>
 
       {error ? (
-        <Card className="border-destructive/40 bg-destructive/5">
-          <CardContent className="p-4 text-sm text-destructive">
-            Failed to load purchase orders. {(error as Error).message}
-          </CardContent>
-        </Card>
+        <ListErrorState
+          resource="purchase orders"
+          error={error}
+          onRetry={() => refetch()}
+          isRetrying={isFetching}
+        />
       ) : isLoading ? (
         <div className="space-y-2">
           <Skeleton className="h-12 w-full" />
