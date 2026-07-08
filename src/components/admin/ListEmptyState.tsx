@@ -2,7 +2,11 @@ import { useEffect, useRef, type ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { logClientEvent } from "@/lib/client-monitor";
-import type { AdminListEmptyReason, AdminListResource } from "./list-telemetry";
+import {
+  emitAdminListEmptyShown,
+  type AdminListEmptyReason,
+  type AdminListResource,
+} from "./list-telemetry";
 
 interface ListEmptyStateProps {
   /** Icon rendered above the title (lucide-react component). */
@@ -47,10 +51,9 @@ export function ListEmptyState({
     const key = `${resource}::${reason}`;
     if (loggedRef.current === key) return;
     loggedRef.current = key;
-    logClientEvent(
-      "admin_list_empty_shown",
+    emitAdminListEmptyShown(
       { surface: "admin_list", resource, reason },
-      reason === "seed_missing" ? "warn" : "info",
+      logClientEvent,
     );
   }, [resource, reason]);
 

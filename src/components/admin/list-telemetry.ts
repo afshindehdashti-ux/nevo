@@ -62,3 +62,125 @@ export function isAdminListEmptyReason(
     (ADMIN_LIST_EMPTY_REASONS as readonly string[]).includes(value)
   );
 }
+
+/* ------------------------------------------------------------------ *
+ * Runtime validation wrapper for admin_list_empty_shown              *
+ * ------------------------------------------------------------------ *
+ * TypeScript blocks bad values at compile time, but the event also
+ * has non-typed callers (Storybook, ad-hoc scripts, tests that build
+ * the payload as `unknown`). This wrapper is the LAST line of defence:
+ * it inspects the payload, drops anything with an unknown `resource`
+ * or `reason`, and emits a `warn`-level diagnostic instead so drift is
+ * visible without polluting analytics with garbage rows.
+ */
+
+export type AdminListEmptyPayload = {
+  surface: "admin_list";
+  resource: AdminListResource;
+  reason: AdminListEmptyReason;
+};
+
+export type EmitAdminListEmptyResult =
+  | { ok: true; payload: AdminListEmptyPayload; level: "info" | "warn" }
+  | {
+      ok: false;
+      reason: "invalid_resource" | "invalid_reason" | "invalid_surface";
+      offending: unknown;
+    };
+
+/**
+ * Signature of the underlying transport. `client-monitor.logClientEvent`
+ * matches this shape; tests pass a spy.
+ */
+export type ClientEventLogger = (
+  event: string,
+  payload: Record<string, unknown>,
+  level?: "info" | "warn" | "error",
+) => void;
+
+/**
+ * Validate a candidate `admin_list_empty_shown` payload and, if it
+ * passes, forward it to `logger`. Rejects with a structured result and
+ * emits a `admin_list_empty_shown__rejected` diagnostic (level `warn`)
+ * instead of the real event when validation fails.
+ *
+ * Returns the outcome so callers (and tests) can assert on it. The
+ * return value is intentionally never thrown — telemetry MUST NOT crash
+ * the UI.
+ */
+export function emitAdminListEmptyShown(
+  candidate: unknown,
+  logger: ClientEventLogger,
+): EmitAdminListEmptyResult {
+  const obj =
+    candidate && typeof candidate === "object"
+      ? (candidate as Record<string, unknown>)
+      : {};
+
+  if (obj.surface !== "admin_list") {
+    const result = {
+      ok: false as const,
+      reason: "invalid_surface" as const,
+      offending: obj.surface,
+    };
+    safeLog(logger, "admin_list_empty_shown__rejected", {
+      reason: result.reason,
+      offending: obj.surface,
+      allowed_surface: "admin_list",
+    });
+    return result;
+  }
+
+  if (!isAdminListResource(obj.resource)) {
+    const result = {
+      ok: false as const,
+      reason: "invalid_resource" as const,
+      offending: obj.resource,
+    };
+    safeLog(logger, "admin_list_empty_shown__rejected", {
+      reason: result.reason,
+      offending: obj.resource,
+      allowed: [...ADMIN_LIST_RESOURCES],
+    });
+    return result;
+  }
+
+  if (!isAdminListEmptyReason(obj.reason)) {
+    const result = {
+      ok: false as const,
+      reason: "invalid_reason" as const,
+      offending: obj.reason,
+    };
+    safeLog(logger, "admin_list_empty_shown__rejected", {
+      reason: result.reason,
+      offending: obj.reason,
+      resource: obj.resource,
+      allowed: [...ADMIN_LIST_EMPTY_REASONS],
+    });
+    return result;
+  }
+
+  const payload: AdminListEmptyPayload = {
+    surface: "admin_list",
+    resource: obj.resource,
+    reason: obj.reason,
+  };
+  const level: "info" | "warn" = payload.reason === "seed_missing" ? "warn" : "info";
+  safeLog(logger, "admin_list_empty_shown", payload, level);
+  return { ok: true, payload, level };
+}
+
+/** Swallow transport errors — telemetry must never break the page. */
+function safeLog(
+  logger: ClientEventLogger,
+  event: string,
+  payload: Record<string, unknown>,
+  level: "info" | "warn" | "error" = "warn",
+) {
+  try {
+    logger(event, payload, level);
+  } catch {
+    /* intentionally silent */
+  }
+}
+
