@@ -265,6 +265,73 @@ export function ErpFinanceDiagnostic() {
         </Card>
       )}
 
+      {pdfReport && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileCheck2 className="h-5 w-5" />
+              Proforma PDF e2e — {pdfReport.proformaNumber ?? pdfReport.proformaId.slice(0, 8)}
+              <StatusBadge status={pdfReport.pass ? "pass" : "fail"} />
+            </CardTitle>
+            <CardDescription>
+              Real PDF generated ({pdfReport.pageCount} page{pdfReport.pageCount === 1 ? "" : "s"},{" "}
+              {(pdfReport.fileSize / 1024).toFixed(1)} KB) and text-extracted with pdfjs. Asserts
+              that VAT rate%, VAT amount, grand total, and the payment status stamp are all
+              present.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid gap-2 text-xs md:grid-cols-4">
+              <div className="rounded border p-2">
+                <div className="text-muted-foreground">VAT rate</div>
+                <div className="font-medium">{pdfReport.vatRate}%</div>
+              </div>
+              <div className="rounded border p-2">
+                <div className="text-muted-foreground">VAT amount</div>
+                <div className="font-medium">
+                  {pdfReport.currency} {pdfReport.vatAmount.toFixed(2)}
+                </div>
+              </div>
+              <div className="rounded border p-2">
+                <div className="text-muted-foreground">Grand total</div>
+                <div className="font-medium">
+                  {pdfReport.currency} {pdfReport.grandTotal.toFixed(2)}
+                </div>
+              </div>
+              <div className="rounded border p-2">
+                <div className="text-muted-foreground">Payment status</div>
+                <div className="font-medium">{pdfReport.paymentStatus}</div>
+              </div>
+            </div>
+            <ul className="space-y-1">
+              {pdfReport.assertions.map((a) => (
+                <li
+                  key={a.key}
+                  className="flex items-center justify-between gap-3 rounded-md border p-2 text-sm"
+                >
+                  <div>
+                    <div className="font-medium">{a.label}</div>
+                    <div className="text-xs text-muted-foreground">
+                      Expected in PDF: <code>{a.expected}</code>
+                    </div>
+                  </div>
+                  <StatusBadge status={a.found ? "pass" : "fail"} />
+                </li>
+              ))}
+            </ul>
+            <details>
+              <summary className="cursor-pointer text-xs text-muted-foreground">
+                PDF text preview
+              </summary>
+              <pre className="mt-1 max-h-48 overflow-auto rounded bg-muted p-2 text-xs whitespace-pre-wrap">
+                {pdfReport.textPreview}
+              </pre>
+            </details>
+          </CardContent>
+        </Card>
+      )}
+
+
       {qa && (failedChecks.length > 0 || warnChecks.length > 0) && (
         <Card>
           <CardHeader>
