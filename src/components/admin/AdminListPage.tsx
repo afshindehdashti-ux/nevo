@@ -83,23 +83,30 @@ export type AdminListPageProps<T> = AdminListPageBaseProps<T> &
  * consistent `admin_list_empty_shown` / `reportClientError` events for
  * free — nothing to remember at the call site.
  */
-export function AdminListPage<T>({
-  resource,
-  title,
-  subtitle,
-  eyebrow,
-  isLoading,
-  error,
-  data,
-  refetch,
-  isFetching,
-  expectSeed,
-  empty,
-  children,
-  skeletonRows = 3,
-  toolbar,
-}: AdminListPageProps<T>) {
-  const view = classifyListState<T>({ isLoading, error, data, expectSeed });
+export function AdminListPage<T>(props: AdminListPageProps<T>) {
+  const {
+    resource,
+    title,
+    subtitle,
+    eyebrow,
+    isLoading,
+    error,
+    data,
+    refetch,
+    isFetching,
+    empty,
+    children,
+    skeletonRows = 3,
+    toolbar,
+  } = props;
+
+  // Re-narrow the discriminated union for classifyListState — passing
+  // `props` directly loses the mutual-exclusivity refinement.
+  const view = props.expectSeed
+    ? classifyListState<T>({ isLoading, error, data, expectSeed: true })
+    : props.filtersActive
+      ? classifyListState<T>({ isLoading, error, data, filtersActive: true })
+      : classifyListState<T>({ isLoading, error, data });
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-[1400px] mx-auto">
