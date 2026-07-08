@@ -12,6 +12,8 @@ const EXTRA_RULES: Rule[] = [
   { match: (p) => p === "/admin/session", requiresSuperAdmin: true },
   { match: (p) => p.startsWith("/admin/users"), requiresSuperAdmin: true },
   { match: (p) => p === "/admin/document-access", requiresSuperAdmin: true },
+  // System Health & QA Center: super_admin (implicit) + management only
+  { match: (p) => p === "/admin/qa-center", allowedRoles: ["management"] },
 ];
 
 function matchNavItem(pathname: string): CrmNavItem | null {
