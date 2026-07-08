@@ -68,11 +68,11 @@ function OpportunitiesList() {
           <Skeleton className="h-12 w-full" />
         </div>
       ) : (data ?? []).length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center text-sm text-muted-foreground">
-            No opportunities yet.
-          </CardContent>
-        </Card>
+        <ListEmptyState
+          icon={Target}
+          title="No opportunities yet"
+          description="Deals you create — either manually or from a qualified lead — will show up here with stage, value, and expected close date."
+        />
       ) : (
         <div className="border border-border rounded-md overflow-hidden bg-background">
           <table className="w-full text-sm">
