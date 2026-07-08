@@ -36,6 +36,8 @@
     "test": "vitest run",
     "test:visual": "node scripts/visual/header-logo.mjs",
     "test:visual:update": "node scripts/visual/header-logo.mjs --update",
+    "test:visual:admin-list": "python3 scripts/visual/admin-list-layout.py",
+    "test:visual:admin-list:update": "python3 scripts/visual/admin-list-layout.py --update",
     "test:e2e:logo-fallback": "node scripts/e2e/header-logo-fallback.mjs",
     "test:e2e:homepage-contact": "python3 scripts/e2e/homepage_contact_submit.py",
     "test:e2e:logo-sequencing": "node scripts/e2e/header-logo-sequencing.mjs",
