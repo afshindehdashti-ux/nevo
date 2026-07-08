@@ -531,12 +531,12 @@ export const emailQuotation = createServerFn({ method: "POST" })
     // never silently fails at build time.
     const { data: settings } = await context.supabase
       .from("company_settings")
-      .select("company_name, email")
+      .select("legal_name, email")
       .eq("is_active", true)
       .order("updated_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    const fromName = settings?.company_name || "NEVO Industrial";
+    const fromName = settings?.legal_name || "NEVO Industrial";
     const fromEmail = settings?.email || "onboarding@resend.dev";
     const from = `${fromName} <${fromEmail}>`;
 
