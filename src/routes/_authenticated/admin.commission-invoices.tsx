@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GuideMeButton } from "@/components/ai/GuideMeButton";
+import { ListErrorState } from "@/components/admin/ListErrorState";
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import { buildSelect } from "@/lib/supabase-select";
 
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/admin/commission-invoices"
 });
 
 function CommissionInvoicesList() {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["partner-commissions"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -54,11 +55,12 @@ function CommissionInvoicesList() {
       </header>
 
       {error ? (
-        <Card className="border-destructive/40 bg-destructive/5">
-          <CardContent className="p-4 text-sm text-destructive">
-            Failed to load commissions. {(error as Error).message}
-          </CardContent>
-        </Card>
+        <ListErrorState
+          resource="commissions"
+          error={error}
+          onRetry={() => refetch()}
+          isRetrying={isFetching}
+        />
       ) : isLoading ? (
         <div className="space-y-2">
           <Skeleton className="h-12 w-full" />
