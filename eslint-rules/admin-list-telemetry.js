@@ -261,10 +261,96 @@ const noRawEmptyEvent = {
   },
 };
 
+/**
+ * A JSX attribute is "truthy" (i.e. actually enables the flag) when it is
+ * present with no value (shorthand `<X flag />`), `={true}`, or a
+ * non-empty string literal. Explicit `={false}` and dynamic expressions
+ * we can't statically prove are treated as "not conclusively enabled".
+ */
+function jsxAttrIsTruthy(attr) {
+  if (!attr) return false;
+  if (!attr.value) return true; // <X flag />
+  if (attr.value.type === "Literal") return Boolean(attr.value.value);
+  if (attr.value.type === "JSXExpressionContainer") {
+    const expr = attr.value.expression;
+    if (expr.type === "Literal") return Boolean(expr.value);
+    return false;
+  }
+  return false;
+}
+
+/** ObjectExpression property counts as truthy only for `true` or a non-empty string literal. */
+function objectPropIsTruthy(prop) {
+  if (!prop || !prop.value) return false;
+  const v = prop.value;
+  if (v.type === "Literal") return Boolean(v.value);
+  return false;
+}
+
+const noConflictingEmptyFlags = {
+  meta: {
+    type: "problem",
+    docs: {
+      description:
+        "`filtersActive` and `expectSeed` are mutually exclusive — they map to conflicting admin_list_empty_shown reasons (filtered_out vs seed_missing).",
+    },
+    schema: [],
+    messages: {
+      jsxConflict:
+        '<{{component}}> sets both `filtersActive` and `expectSeed`. They map to conflicting admin_list_empty_shown reasons (filtered_out vs seed_missing). Pick one, or omit both to emit reason="no_records".',
+      objectConflict:
+        '<AdminListPage empty={{ filtersActive, expectSeed }}> sets both flags. They map to conflicting admin_list_empty_shown reasons (filtered_out vs seed_missing). Pick one, or omit both to emit reason="no_records".',
+    },
+  },
+  create(context) {
+    return {
+      // Case 1: direct JSX props on <ListEmptyState>.
+      JSXOpeningElement(node) {
+        if (node.name.type !== "JSXIdentifier") return;
+        if (node.name.name !== "ListEmptyState") return;
+        const filters = findAttr(node, "filtersActive");
+        const seed = findAttr(node, "expectSeed");
+        if (jsxAttrIsTruthy(filters) && jsxAttrIsTruthy(seed)) {
+          context.report({
+            node,
+            messageId: "jsxConflict",
+            data: { component: "ListEmptyState" },
+          });
+        }
+      },
+      // Case 2: object-literal `empty={{ filtersActive, expectSeed }}` on
+      // <AdminListPage> (the shared wrapper forwards them to ListEmptyState).
+      JSXAttribute(node) {
+        if (!node.name || node.name.name !== "empty") return;
+        const parent = node.parent;
+        if (
+          !parent ||
+          parent.type !== "JSXOpeningElement" ||
+          parent.name.type !== "JSXIdentifier" ||
+          parent.name.name !== "AdminListPage"
+        ) {
+          return;
+        }
+        const value = node.value;
+        if (!value || value.type !== "JSXExpressionContainer") return;
+        const obj = value.expression;
+        if (!obj || obj.type !== "ObjectExpression") return;
+        const filters = findProp(obj, "filtersActive");
+        const seed = findProp(obj, "expectSeed");
+        if (objectPropIsTruthy(filters) && objectPropIsTruthy(seed)) {
+          context.report({ node, messageId: "objectConflict" });
+        }
+      },
+    };
+  },
+};
+
 export default {
   rules: {
     "valid-resource-prop": validResourceProp,
     "valid-empty-reason": validEmptyReason,
     "no-raw-empty-event": noRawEmptyEvent,
+    "no-conflicting-empty-flags": noConflictingEmptyFlags,
   },
 };
+
