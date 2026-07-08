@@ -268,13 +268,19 @@ function ProformaInvoicesList() {
               </TableHead>
               <TableHead>Proforma #</TableHead>
               <TableHead>Customer</TableHead>
-              <TableHead>Issued</TableHead>
+              <TableHead>
+                <SortButton label="Issued" active={sortKey === "created_at"} dir={sortDir} onClick={() => toggleSort("created_at")} />
+              </TableHead>
               <TableHead>Valid until</TableHead>
               <TableHead>Approved</TableHead>
               <TableHead>Payment</TableHead>
               <TableHead className="text-right">VAT</TableHead>
-              <TableHead className="text-right">Grand total</TableHead>
-              <TableHead className="text-right">Balance</TableHead>
+              <TableHead className="text-right">
+                <SortButton label="Grand total" active={sortKey === "grand_total"} dir={sortDir} onClick={() => toggleSort("grand_total")} align="right" />
+              </TableHead>
+              <TableHead className="text-right">
+                <SortButton label="Balance" active={sortKey === "balance_due"} dir={sortDir} onClick={() => toggleSort("balance_due")} align="right" />
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
