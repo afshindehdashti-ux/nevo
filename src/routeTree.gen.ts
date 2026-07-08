@@ -63,6 +63,7 @@ import { Route as ApiPublicApprovalNotifyRouteImport } from './routes/api/public
 import { Route as ApiAdminCsvExportAuditRouteImport } from './routes/api/admin/csv-export-audit'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTasksRouteImport } from './routes/_authenticated/admin.tasks'
+import { Route as AuthenticatedAdminSystemHealthRouteImport } from './routes/_authenticated/admin.system-health'
 import { Route as AuthenticatedAdminSuppliersRouteImport } from './routes/_authenticated/admin.suppliers'
 import { Route as AuthenticatedAdminSolutionsSeoRouteImport } from './routes/_authenticated/admin.solutions-seo'
 import { Route as AuthenticatedAdminShipmentsRouteImport } from './routes/_authenticated/admin.shipments'
@@ -72,6 +73,7 @@ import { Route as AuthenticatedAdminSecurityAuditRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminSecurityAlertsRouteImport } from './routes/_authenticated/admin.security-alerts'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminQuotationsRouteImport } from './routes/_authenticated/admin.quotations'
+import { Route as AuthenticatedAdminQaCenterRouteImport } from './routes/_authenticated/admin.qa-center'
 import { Route as AuthenticatedAdminPurchaseOrdersRouteImport } from './routes/_authenticated/admin.purchase-orders'
 import { Route as AuthenticatedAdminProformaInvoicesRouteImport } from './routes/_authenticated/admin.proforma-invoices'
 import { Route as AuthenticatedAdminProductsRouteImport } from './routes/_authenticated/admin.products'
@@ -405,6 +407,12 @@ const AuthenticatedAdminTasksRoute = AuthenticatedAdminTasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminSystemHealthRoute =
+  AuthenticatedAdminSystemHealthRouteImport.update({
+    id: '/system-health',
+    path: '/system-health',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminSuppliersRoute =
   AuthenticatedAdminSuppliersRouteImport.update({
     id: '/suppliers',
@@ -457,6 +465,12 @@ const AuthenticatedAdminQuotationsRoute =
   AuthenticatedAdminQuotationsRouteImport.update({
     id: '/quotations',
     path: '/quotations',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminQaCenterRoute =
+  AuthenticatedAdminQaCenterRouteImport.update({
+    id: '/qa-center',
+    path: '/qa-center',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminPurchaseOrdersRoute =
@@ -870,6 +884,7 @@ export interface FileRoutesByFullPath {
   '/admin/products': typeof AuthenticatedAdminProductsRoute
   '/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
   '/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
+  '/admin/qa-center': typeof AuthenticatedAdminQaCenterRoute
   '/admin/quotations': typeof AuthenticatedAdminQuotationsRouteWithChildren
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/security-alerts': typeof AuthenticatedAdminSecurityAlertsRoute
@@ -879,6 +894,7 @@ export interface FileRoutesByFullPath {
   '/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
+  '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/api/admin/csv-export-audit': typeof ApiAdminCsvExportAuditRoute
@@ -988,6 +1004,7 @@ export interface FileRoutesByTo {
   '/admin/products': typeof AuthenticatedAdminProductsRoute
   '/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
   '/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
+  '/admin/qa-center': typeof AuthenticatedAdminQaCenterRoute
   '/admin/quotations': typeof AuthenticatedAdminQuotationsRouteWithChildren
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/security-alerts': typeof AuthenticatedAdminSecurityAlertsRoute
@@ -997,6 +1014,7 @@ export interface FileRoutesByTo {
   '/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
+  '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/api/admin/csv-export-audit': typeof ApiAdminCsvExportAuditRoute
@@ -1111,6 +1129,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/products': typeof AuthenticatedAdminProductsRoute
   '/_authenticated/admin/proforma-invoices': typeof AuthenticatedAdminProformaInvoicesRoute
   '/_authenticated/admin/purchase-orders': typeof AuthenticatedAdminPurchaseOrdersRoute
+  '/_authenticated/admin/qa-center': typeof AuthenticatedAdminQaCenterRoute
   '/_authenticated/admin/quotations': typeof AuthenticatedAdminQuotationsRouteWithChildren
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/security-alerts': typeof AuthenticatedAdminSecurityAlertsRoute
@@ -1120,6 +1139,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
   '/_authenticated/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/_authenticated/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
+  '/_authenticated/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/_authenticated/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/api/admin/csv-export-audit': typeof ApiAdminCsvExportAuditRoute
@@ -1234,6 +1254,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/proforma-invoices'
     | '/admin/purchase-orders'
+    | '/admin/qa-center'
     | '/admin/quotations'
     | '/admin/reports'
     | '/admin/security-alerts'
@@ -1243,6 +1264,7 @@ export interface FileRouteTypes {
     | '/admin/shipments'
     | '/admin/solutions-seo'
     | '/admin/suppliers'
+    | '/admin/system-health'
     | '/admin/tasks'
     | '/admin/users'
     | '/api/admin/csv-export-audit'
@@ -1352,6 +1374,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/proforma-invoices'
     | '/admin/purchase-orders'
+    | '/admin/qa-center'
     | '/admin/quotations'
     | '/admin/reports'
     | '/admin/security-alerts'
@@ -1361,6 +1384,7 @@ export interface FileRouteTypes {
     | '/admin/shipments'
     | '/admin/solutions-seo'
     | '/admin/suppliers'
+    | '/admin/system-health'
     | '/admin/tasks'
     | '/admin/users'
     | '/api/admin/csv-export-audit'
@@ -1474,6 +1498,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/products'
     | '/_authenticated/admin/proforma-invoices'
     | '/_authenticated/admin/purchase-orders'
+    | '/_authenticated/admin/qa-center'
     | '/_authenticated/admin/quotations'
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/security-alerts'
@@ -1483,6 +1508,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/shipments'
     | '/_authenticated/admin/solutions-seo'
     | '/_authenticated/admin/suppliers'
+    | '/_authenticated/admin/system-health'
     | '/_authenticated/admin/tasks'
     | '/_authenticated/admin/users'
     | '/api/admin/csv-export-audit'
@@ -1934,6 +1960,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTasksRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/system-health': {
+      id: '/_authenticated/admin/system-health'
+      path: '/system-health'
+      fullPath: '/admin/system-health'
+      preLoaderRoute: typeof AuthenticatedAdminSystemHealthRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/suppliers': {
       id: '/_authenticated/admin/suppliers'
       path: '/suppliers'
@@ -1995,6 +2028,13 @@ declare module '@tanstack/react-router' {
       path: '/quotations'
       fullPath: '/admin/quotations'
       preLoaderRoute: typeof AuthenticatedAdminQuotationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/qa-center': {
+      id: '/_authenticated/admin/qa-center'
+      path: '/qa-center'
+      fullPath: '/admin/qa-center'
+      preLoaderRoute: typeof AuthenticatedAdminQaCenterRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/purchase-orders': {
@@ -2578,6 +2618,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminProductsRoute: typeof AuthenticatedAdminProductsRoute
   AuthenticatedAdminProformaInvoicesRoute: typeof AuthenticatedAdminProformaInvoicesRoute
   AuthenticatedAdminPurchaseOrdersRoute: typeof AuthenticatedAdminPurchaseOrdersRoute
+  AuthenticatedAdminQaCenterRoute: typeof AuthenticatedAdminQaCenterRoute
   AuthenticatedAdminQuotationsRoute: typeof AuthenticatedAdminQuotationsRouteWithChildren
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminSecurityAlertsRoute: typeof AuthenticatedAdminSecurityAlertsRoute
@@ -2587,6 +2628,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminShipmentsRoute: typeof AuthenticatedAdminShipmentsRouteWithChildren
   AuthenticatedAdminSolutionsSeoRoute: typeof AuthenticatedAdminSolutionsSeoRoute
   AuthenticatedAdminSuppliersRoute: typeof AuthenticatedAdminSuppliersRoute
+  AuthenticatedAdminSystemHealthRoute: typeof AuthenticatedAdminSystemHealthRoute
   AuthenticatedAdminTasksRoute: typeof AuthenticatedAdminTasksRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -2627,6 +2669,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminProformaInvoicesRoute:
     AuthenticatedAdminProformaInvoicesRoute,
   AuthenticatedAdminPurchaseOrdersRoute: AuthenticatedAdminPurchaseOrdersRoute,
+  AuthenticatedAdminQaCenterRoute: AuthenticatedAdminQaCenterRoute,
   AuthenticatedAdminQuotationsRoute:
     AuthenticatedAdminQuotationsRouteWithChildren,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
@@ -2638,6 +2681,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
     AuthenticatedAdminShipmentsRouteWithChildren,
   AuthenticatedAdminSolutionsSeoRoute: AuthenticatedAdminSolutionsSeoRoute,
   AuthenticatedAdminSuppliersRoute: AuthenticatedAdminSuppliersRoute,
+  AuthenticatedAdminSystemHealthRoute: AuthenticatedAdminSystemHealthRoute,
   AuthenticatedAdminTasksRoute: AuthenticatedAdminTasksRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRouteWithChildren,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
