@@ -501,112 +501,112 @@ function QuotationEditor() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-24">Item code</TableHead>
+              <TableHead className="w-24">HS code</TableHead>
               <TableHead>Description</TableHead>
               <TableHead className="w-24">Qty</TableHead>
               <TableHead className="w-20">Unit</TableHead>
               <TableHead className="w-32">Unit price</TableHead>
               <TableHead className="w-24">Discount %</TableHead>
               <TableHead className="w-32 text-right">Total</TableHead>
-              <TableHead className="w-10" />
+              <TableHead className="w-20" />
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.items.map((it) => (
-              <TableRow key={it.id}>
-                <TableCell>
-                  <Input
-                    defaultValue={it.description}
-                    onBlur={(e) =>
-                      updateItem.mutate({
-                        id: it.id,
-                        description: e.target.value,
-                        quantity: Number(it.quantity),
-                        unit_price: Number(it.unit_price),
-                        discount_pct: Number(it.discount_pct),
-                        position: it.position,
-                      })
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    type="number"
-                    defaultValue={Number(it.quantity)}
-                    onBlur={(e) =>
-                      updateItem.mutate({
-                        id: it.id,
-                        description: it.description,
-                        quantity: Number(e.target.value),
-                        unit_price: Number(it.unit_price),
-                        discount_pct: Number(it.discount_pct),
-                        position: it.position,
-                      })
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    defaultValue={it.unit ?? ""}
-                    onBlur={(e) =>
-                      updateItem.mutate({
-                        id: it.id,
-                        description: it.description,
-                        quantity: Number(it.quantity),
-                        unit_price: Number(it.unit_price),
-                        discount_pct: Number(it.discount_pct),
-                        position: it.position,
-                      })
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    type="number"
-                    defaultValue={Number(it.unit_price)}
-                    onBlur={(e) =>
-                      updateItem.mutate({
-                        id: it.id,
-                        description: it.description,
-                        quantity: Number(it.quantity),
-                        unit_price: Number(e.target.value),
-                        discount_pct: Number(it.discount_pct),
-                        position: it.position,
-                      })
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    type="number"
-                    defaultValue={Number(it.discount_pct)}
-                    onBlur={(e) =>
-                      updateItem.mutate({
-                        id: it.id,
-                        description: it.description,
-                        quantity: Number(it.quantity),
-                        unit_price: Number(it.unit_price),
-                        discount_pct: Number(e.target.value),
-                        position: it.position,
-                      })
-                    }
-                  />
-                </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {q.currency} {Number(it.line_total).toLocaleString()}
-                </TableCell>
-                <TableCell>
-                  <button
-                    onClick={() => delItem.mutate(it.id)}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {data.items.map((it: any) => {
+              const liveTotal =
+                Number(it.quantity ?? 0) *
+                Number(it.unit_price ?? 0) *
+                (1 - (Number(it.discount_pct ?? 0)) / 100);
+              const base = {
+                id: it.id,
+                description: it.description,
+                quantity: Number(it.quantity),
+                unit_price: Number(it.unit_price),
+                discount_pct: Number(it.discount_pct),
+                position: it.position,
+                unit: it.unit ?? null,
+                item_code: it.item_code ?? null,
+                hs_code: it.hs_code ?? null,
+              };
+              return (
+                <TableRow key={it.id}>
+                  <TableCell>
+                    <Input
+                      defaultValue={it.item_code ?? ""}
+                      onBlur={(e) => updateItem.mutate({ ...base, item_code: e.target.value || null })}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      defaultValue={it.hs_code ?? ""}
+                      onBlur={(e) => updateItem.mutate({ ...base, hs_code: e.target.value || null })}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      defaultValue={it.description}
+                      onBlur={(e) => updateItem.mutate({ ...base, description: e.target.value })}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      defaultValue={Number(it.quantity)}
+                      onBlur={(e) => updateItem.mutate({ ...base, quantity: Number(e.target.value) })}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      defaultValue={it.unit ?? ""}
+                      onBlur={(e) => updateItem.mutate({ ...base, unit: e.target.value || null })}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      defaultValue={Number(it.unit_price)}
+                      onBlur={(e) => updateItem.mutate({ ...base, unit_price: Number(e.target.value) })}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      defaultValue={Number(it.discount_pct)}
+                      onBlur={(e) => updateItem.mutate({ ...base, discount_pct: Number(e.target.value) })}
+                    />
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {q.currency}{" "}
+                    {liveTotal.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => dupItem.mutate(it.id)}
+                        className="text-muted-foreground hover:text-foreground"
+                        title="Duplicate row"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => delItem.mutate(it.id)}
+                        className="text-muted-foreground hover:text-destructive"
+                        title="Delete row"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
             {data.items.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-6 text-sm">
+                <TableCell colSpan={9} className="text-center text-muted-foreground py-6 text-sm">
                   No line items yet.
                 </TableCell>
               </TableRow>
@@ -614,6 +614,7 @@ function QuotationEditor() {
           </TableBody>
         </Table>
       </Card>
+      </fieldset>
 
       {(() => {
         const maxDisc = data.items.reduce(
