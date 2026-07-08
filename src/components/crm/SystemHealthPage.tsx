@@ -917,7 +917,11 @@ export function SystemHealthPage() {
     pass: checks.filter((c) => c.status === "pass").length,
     warn: checks.filter((c) => c.status === "warn").length,
     fail: checks.filter((c) => c.status === "fail").length,
+    running: checks.filter((c) => c.status === "running").length,
   };
+  const failingIds = checks
+    .filter((c) => c.status === "fail" || c.status === "warn")
+    .map((c) => c.id);
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -936,14 +940,35 @@ export function SystemHealthPage() {
               <span className="text-emerald-600">{summary.pass} pass</span> ·{" "}
               <span className="text-amber-600">{summary.warn} warn</span> ·{" "}
               <span className="text-rose-600">{summary.fail} fail</span>
+              {running && summary.running > 0 && (
+                <>
+                  {" · "}
+                  <span className="text-blue-600">{summary.running} running…</span>
+                </>
+              )}
             </p>
           )}
         </div>
-        <Button onClick={runAll} disabled={running} className="gap-2">
-          {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-          Run Full Backend Test
-        </Button>
+        <div className="flex items-center gap-2">
+          {failingIds.length > 0 && (
+            <Button
+              variant="outline"
+              onClick={() => runAll(new Set(failingIds))}
+              disabled={running}
+              className="gap-2"
+              title="Re-run only the checks that failed or warned"
+            >
+              <RefreshCw className={`h-4 w-4 ${running ? "animate-spin" : ""}`} />
+              Retry failing ({failingIds.length})
+            </Button>
+          )}
+          <Button onClick={() => runAll()} disabled={running} className="gap-2">
+            {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+            Run Full Backend Test
+          </Button>
+        </div>
       </div>
+
 
       <Alert>
         <ShieldCheck className="h-4 w-4" />
