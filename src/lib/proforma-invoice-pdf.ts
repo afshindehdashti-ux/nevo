@@ -116,8 +116,6 @@ export async function fetchProformaForPdf(proformaId: string) {
          subtotal, discount_amount, vat_rate, vat_amount, grand_total,
          amount_paid, balance_due, payment_status, payment_terms, delivery_terms,
          incoterms, terms_conditions, bank_details, prepared_by, approved_by,
-         approver:profiles!proforma_invoices_approved_by_fkey(full_name),
-         preparer:profiles!proforma_invoices_prepared_by_fkey(full_name),
          customers(name, address, city, country, vat_number, email)`,
       )
       .eq("id", proformaId)
@@ -132,8 +130,25 @@ export async function fetchProformaForPdf(proformaId: string) {
   ]);
   if (pRes.error) throw pRes.error;
   if (itemsRes.error) throw itemsRes.error;
-  const pi = pRes.data as unknown as ProformaRow | null;
-  if (!pi) throw new Error("Proforma invoice not found");
+  const raw = pRes.data as unknown as ProformaRow | null;
+  if (!raw) throw new Error("Proforma invoice not found");
+
+  // Resolve approver / preparer names (no FK to profiles, so join manually).
+  const ids = [raw.approved_by, raw.prepared_by].filter(
+    (v): v is string => typeof v === "string" && v.length > 0,
+  );
+  let approver: { full_name: string | null } | null = null;
+  let preparer: { full_name: string | null } | null = null;
+  if (ids.length > 0) {
+    const { data: profs } = await supabase
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", ids);
+    const byId = new Map((profs ?? []).map((p) => [p.id, p.full_name] as const));
+    if (raw.approved_by) approver = { full_name: byId.get(raw.approved_by) ?? null };
+    if (raw.prepared_by) preparer = { full_name: byId.get(raw.prepared_by) ?? null };
+  }
+  const pi: ProformaRow = { ...raw, approver, preparer };
   return { pi, items: (itemsRes.data ?? []) as ItemRow[] };
 }
 
