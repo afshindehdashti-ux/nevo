@@ -227,7 +227,180 @@ Rules:
    verify the payload's `resource` and `reason` match the checklist above.
 
 
+## Allowed registries (single source of truth)
+
+Both TypeScript types and every automated check (ESLint plugin, CI grep,
+runtime validation wrapper) derive their allowed values from
+[`src/components/admin/list-telemetry.ts`](../src/components/admin/list-telemetry.ts).
+Do not hard-code these strings anywhere else — always import the union
+type or extend the tuple in that file first.
+
+### `ADMIN_LIST_RESOURCES`
+
+| Slug                  | URL segment                    |
+|-----------------------|--------------------------------|
+| `opportunities`       | `/admin/opportunities`         |
+| `commission_invoices` | `/admin/commission-invoices`   |
+| `purchase_orders`     | `/admin/purchase-orders`       |
+
+### `ADMIN_LIST_EMPTY_REASONS`
+
+| Reason         | Telemetry level | When to use                                                    |
+|----------------|-----------------|----------------------------------------------------------------|
+| `no_records`   | `info`          | Default. Table is genuinely empty (or `reason` prop omitted).  |
+| `seed_missing` | `warn`          | Env was expected to have seeded data but doesn't.              |
+| `filtered_out` | `info`          | Rows exist; the user's active filters exclude all of them.     |
+
+To add a new resource, append to `ADMIN_LIST_RESOURCES` (never rename or
+reorder existing entries — dashboards key off them). Reasons are frozen;
+adding a new one requires updating the wrapper, the ESLint rule, the CI
+grep script, and the dashboards in tandem.
+
+
+## Enforcement — how the guardrails compose
+
+Four layers catch drift, in this order:
+
+1. **TypeScript** — `AdminListResource` / `AdminListEmptyReason` unions on
+   `AdminListPage`, `ListEmptyState`, and `ListErrorState` props. A typo
+   fails `bun run typecheck`.
+2. **ESLint plugin** — [`eslint-rules/admin-list-telemetry.js`](../eslint-rules/admin-list-telemetry.js)
+   catches non-typed callers, dynamic props, and mutually exclusive
+   flags. Rules:
+   - `admin-list-telemetry/valid-resource-prop`
+   - `admin-list-telemetry/valid-empty-reason` — `--fix` rewrites near
+     typos to the nearest approved value (Levenshtein ≤ 3); ambiguous or
+     far-off values fail hard.
+   - `admin-list-telemetry/no-raw-empty-event`
+   - `admin-list-telemetry/no-conflicting-empty-flags`
+3. **CI grep** — `scripts/check-admin-list-telemetry.mjs` prints a
+   per-file drift report with categories, offending lines, and the
+   current allowed values. Runs in
+   `.github/workflows/check-admin-list-telemetry.yml`.
+4. **Runtime wrapper** — `emitAdminListEmptyShown()` in
+   `list-telemetry.ts` validates the payload one last time before the
+   transport, drops unknown values, and emits an
+   `admin_list_empty_shown__rejected` diagnostic so drift is visible in
+   telemetry instead of polluting real events.
+
+
+## Copy-paste examples that satisfy every rule
+
+Every snippet below has been verified against the ESLint plugin. Copy
+verbatim, then swap in your slug and copy strings.
+
+### 1. Default empty state (via `<AdminListPage>`)
+
+```tsx
+<AdminListPage
+  resource="opportunities"           // must be in ADMIN_LIST_RESOURCES
+  title="Opportunities"
+  isLoading={isLoading}
+  error={error}
+  data={data}
+  refetch={refetch}
+  isFetching={isFetching}
+  empty={{
+    icon: Target,
+    title: "No opportunities yet",
+    description: "New opportunities will show up here as your team creates them.",
+    // reason omitted → defaults to "no_records" (info)
+  }}
+>
+  {(rows) => <OpportunitiesTable rows={rows} />}
+</AdminListPage>
+```
+
+### 2. Filtered-out empty state
+
+```tsx
+<AdminListPage
+  resource="commission_invoices"
+  title="Commission Invoices"
+  isLoading={isLoading}
+  error={error}
+  data={data}
+  refetch={refetch}
+  isFetching={isFetching}
+  empty={{
+    icon: Percent,
+    title: "No invoices match your filters",
+    description: "Clear filters to see invoices that will show up here.",
+    filtersActive: activeFilterCount > 0,   // → reason="filtered_out"
+    // NEVER also set expectSeed — no-conflicting-empty-flags will fail.
+  }}
+>
+  {(rows) => <CommissionInvoicesTable rows={rows} />}
+</AdminListPage>
+```
+
+### 3. Seed-missing (smoke-test env only)
+
+```tsx
+<AdminListPage
+  resource="purchase_orders"
+  title="Purchase Orders"
+  isLoading={isLoading}
+  error={error}
+  data={data}
+  refetch={refetch}
+  isFetching={isFetching}
+  empty={{
+    icon: ClipboardList,
+    title: "No purchase orders yet",
+    description: "Purchase orders will show up here after import runs.",
+    expectSeed: import.meta.env.VITE_EXPECT_SEED === "true", // → reason="seed_missing" (warn)
+  }}
+>
+  {(rows) => <PurchaseOrdersTable rows={rows} />}
+</AdminListPage>
+```
+
+### 4. Direct `<ListEmptyState>` (only when the shell can't express the layout)
+
+```tsx
+<ListEmptyState
+  resource="opportunities"           // required, must be in registry
+  reason="filtered_out"              // optional, must be in registry
+  icon={Target}
+  title="No opportunities match your filters"
+  description="Clear filters to see opportunities that will show up here."
+/>
+```
+
+### 5. Common mistakes the rules catch
+
+```tsx
+// ❌ valid-resource-prop: missing slug
+<AdminListPage title="Shipments" />
+
+// ❌ valid-resource-prop: slug not in ADMIN_LIST_RESOURCES
+<ListEmptyState resource="shipmnts" ... />
+
+// ❌ valid-empty-reason: typo — auto-fixed by --fix to "no_records"
+<ListEmptyState resource="opportunities" reason="no_record" ... />
+
+// ❌ valid-empty-reason: too far from any allowed value — hard error
+<ListEmptyState resource="opportunities" reason="brand_new_reason" ... />
+
+// ❌ no-conflicting-empty-flags: mutually exclusive
+<ListEmptyState resource="opportunities" filtersActive expectSeed ... />
+
+// ❌ no-raw-empty-event: forbidden outside ListEmptyState.tsx
+logClientEvent("admin_list_empty_shown", { ... });
+```
+
+Run locally before pushing:
+
+```bash
+bun run lint                          # ESLint plugin (all four rules)
+bun run check:admin-list-telemetry    # CI grep with per-file drift report
+bunx vitest run                       # runtime wrapper + component tests
+```
+
+
 ## Add a new admin list page
+
 
 Five steps. If you skip step 1, the `resource` prop in step 3 won't compile.
 If you skip step 5, `bun run check:admin-list-telemetry` will fail in CI.
