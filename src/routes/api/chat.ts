@@ -1,4 +1,5 @@
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { withMethodGuards } from "@/lib/api-http";
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 
@@ -45,7 +46,7 @@ function totalChars(messages: UIMessage[]): number {
 
 export const Route = createFileRoute("/api/chat")({
   server: {
-    handlers: {
+    handlers: withMethodGuards({
       POST: async ({ request }) => {
         const body = (await request.json()) as { messages?: unknown };
         if (!Array.isArray(body.messages)) {
@@ -83,6 +84,6 @@ export const Route = createFileRoute("/api/chat")({
           originalMessages: messages,
         });
       },
-    },
+    }),
   },
 });

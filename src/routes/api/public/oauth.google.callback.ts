@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { withMethodGuards } from "@/lib/api-http";
 
 // Google OAuth 2.0 callback for the Mailbox Gmail flow.
 // Public route: the state nonce (created and stored by an authenticated
@@ -16,7 +17,7 @@ function redirectBack(origin: string, status: "ok" | "error", reason?: string) {
 
 export const Route = createFileRoute("/api/public/oauth/google/callback")({
   server: {
-    handlers: {
+    handlers: withMethodGuards({
       GET: async ({ request }) => {
         const url = new URL(request.url);
         const origin = url.origin;
@@ -105,6 +106,6 @@ export const Route = createFileRoute("/api/public/oauth/google/callback")({
           return redirectBack(origin, "error", e?.message ?? "callback_failed");
         }
       },
-    },
+    }),
   },
 });
