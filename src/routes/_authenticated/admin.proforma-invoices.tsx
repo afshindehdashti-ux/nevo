@@ -197,12 +197,27 @@ function ProformaInvoicesList() {
       headerExtra={<GuideMeButton sectionId="proforma-invoice" />}
     >
       <div className="p-3 border-b flex gap-2 items-center flex-wrap">
+        <div className="flex gap-1 flex-wrap">
+          {(["all", "Unpaid", "Partially Paid", "Paid", "Overdue"] as const).map((k) => (
+            <Button
+              key={k}
+              size="sm"
+              variant={paymentFilter === k ? "default" : "outline"}
+              className="h-7 px-2 text-xs"
+              onClick={() => setPaymentFilter(k as PaymentStatus | "all")}
+            >
+              {k === "all" ? "All" : k}
+              <span className="ml-1.5 text-[10px] opacity-70">{counts[k] ?? 0}</span>
+            </Button>
+          ))}
+        </div>
+        <div className="h-5 w-px bg-border mx-1" />
         <Label className="text-xs text-muted-foreground">Payment</Label>
         <Select
           value={paymentFilter}
           onValueChange={(v) => setPaymentFilter(v as PaymentStatus | "all")}
         >
-          <SelectTrigger className="w-52 h-8">
+          <SelectTrigger className="w-44 h-8">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
