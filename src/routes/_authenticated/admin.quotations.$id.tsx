@@ -177,6 +177,11 @@ function QuotationEditor() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["quotation", id] }),
   });
 
+  const dupItem = useMutation({
+    mutationFn: (itemId: string) => duplicateItemFn({ data: { id: itemId } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["quotation", id] }),
+  });
+
   const changeStatus = useMutation({
     mutationFn: (status:
       | "draft"
