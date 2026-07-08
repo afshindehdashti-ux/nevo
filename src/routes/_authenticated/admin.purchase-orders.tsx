@@ -28,7 +28,7 @@ function PurchaseOrdersList() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("orders")
-        .select("id,order_number,status,order_date,requested_delivery,currency,total,customer:customers(name)")
+        .select(ORDERS_SELECT)
         .order("order_date", { ascending: false })
         .limit(200);
       if (error) throw error;
