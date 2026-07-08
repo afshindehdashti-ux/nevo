@@ -35,11 +35,11 @@ export function AdminRouteGuard({ children }: { children: ReactNode }) {
     return () => window.clearTimeout(t);
   }, [stillChecking]);
 
-  // Not signed in → send to /auth
+  // Not signed in → send to the CRM sign-in route.
   useEffect(() => {
     if (!userQ.isLoading && !userQ.error && !userQ.data) {
-      dlog("no user, redirecting to /auth");
-      window.location.replace("/auth");
+      dlog("no user, redirecting to /admin/login");
+      window.location.replace("/admin/login");
     }
   }, [userQ.isLoading, userQ.error, userQ.data]);
 
@@ -148,7 +148,7 @@ function AccessDenied({
               variant="outline"
               onClick={async () => {
                 await supabase.auth.signOut();
-                window.location.replace("/auth");
+                window.location.replace("/admin/login");
               }}
             >
               Sign out
