@@ -151,6 +151,20 @@ export function ErpFinanceDiagnostic() {
     }
   }
 
+  async function onRunIsolated() {
+    setIsoLoading(true);
+    try {
+      const r = (await runIso()) as IsoReport;
+      setIso(r);
+      if (r.failed > 0) toast.error(`Isolated proforma e2e: ${r.failed} failing steps`);
+      else toast.success(`Isolated proforma e2e passed (run ${r.runId.slice(0, 8)})`);
+    } catch (e) {
+      toast.error(`Isolated proforma e2e failed: ${(e as Error).message}`);
+    } finally {
+      setIsoLoading(false);
+    }
+  }
+
   const failedChecks = qa?.results.filter((r) => r.status === "fail") ?? [];
   const warnChecks = qa?.results.filter((r) => r.status === "warn") ?? [];
 
