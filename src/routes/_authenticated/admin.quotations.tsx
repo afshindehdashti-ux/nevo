@@ -117,11 +117,18 @@ function QuotationsPage() {
                     {r.currency} {Number(r.total ?? 0).toLocaleString()}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button asChild variant="ghost" size="sm">
-                      <Link to="/admin/quotations/$id" params={{ id: r.id }}>
-                        Open
-                      </Link>
-                    </Button>
+                    <div className="flex justify-end gap-1">
+                      <Button asChild variant="ghost" size="sm">
+                        <Link to="/admin/quotations/$id" params={{ id: r.id }}>
+                          Open
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" size="sm">
+                        <Link to="/admin/quotations/$id" params={{ id: r.id }}>
+                          Edit
+                        </Link>
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               );
