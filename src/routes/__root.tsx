@@ -248,14 +248,18 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+  const pathname = router.state.location.pathname;
+  const isBackend = /^\/(admin|crm|backoffice)(\/|$)/.test(pathname);
 
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
-        <AIAssistantLauncher />
-        <StickyMobileCTA />
+        {/* Public marketing CTAs — hidden on all admin/CRM/backoffice routes. */}
+        {!isBackend && <AIAssistantLauncher />}
+        {!isBackend && <StickyMobileCTA />}
         <CookieConsent />
         <Analytics />
         <ClientMonitor />
@@ -265,3 +269,4 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+

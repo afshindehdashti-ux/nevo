@@ -346,38 +346,75 @@ export function SystemHealthPage() {
         update("quotation", { status: "fail", details: (e as Error).message });
       }
 
-      // 8. Proforma Invoice
+      // 8. Proforma Invoice — end-to-end: header + item + recompute check.
       try {
         if (!createdIds.customer) throw new Error("Customer test row missing; skipping proforma.");
-        const subtotal = 1000;
-        const vatRate = 0.2;
-        const vatAmount = subtotal * vatRate;
-        const grandTotal = subtotal + vatAmount;
+        // Scenario: qty 100 × 18 = 1800 subtotal, 5% VAT = 90, grand total 1890.
+        const quantity = 100;
+        const unitPrice = 18;
+        const vatRate = 5;
+        const expectedSubtotal = quantity * unitPrice; // 1800
+        const expectedVat = (expectedSubtotal * vatRate) / 100; // 90
+        const expectedGrand = expectedSubtotal + expectedVat; // 1890
+
         const { data: piIns, error: piErr } = await supabase
           .from("proforma_invoices")
           .insert({
             customer_id: createdIds.customer,
             proforma_number: `${testName}-PI`,
-            subtotal,
-            vat_amount: vatAmount,
-            total: grandTotal,
+            currency: "AED",
+            vat_rate: vatRate,
+            payment_terms: "Net 30",
           } as never)
           .select("id")
           .single();
         if (piErr) throw piErr;
         createdIds.proforma = (piIns as { id: string }).id;
-        if (Math.abs(grandTotal - 1200) > 0.01) throw new Error("Totals calc mismatch");
+
+        // Insert item — the trigger recomputes header totals.
+        const { error: itemErr } = await supabase
+          .from("proforma_invoice_items")
+          .insert({
+            proforma_invoice_id: createdIds.proforma,
+            description: `${testName}-item`,
+            quantity,
+            unit_price: unitPrice,
+            tax_rate: vatRate,
+          } as never);
+        if (itemErr) throw itemErr;
+
+        // Verify header was recomputed correctly.
+        const { data: piRow, error: readErr } = await supabase
+          .from("proforma_invoices")
+          .select("subtotal,vat_amount,grand_total,balance_due,payment_status")
+          .eq("id", createdIds.proforma)
+          .single();
+        if (readErr) throw readErr;
+        const row = piRow as {
+          subtotal: number;
+          vat_amount: number;
+          grand_total: number;
+          balance_due: number;
+          payment_status: string;
+        };
+        const near = (a: number, b: number) => Math.abs(Number(a) - b) < 0.01;
+        if (!near(row.subtotal, expectedSubtotal)) throw new Error(`subtotal ${row.subtotal} ≠ ${expectedSubtotal}`);
+        if (!near(row.vat_amount, expectedVat)) throw new Error(`vat_amount ${row.vat_amount} ≠ ${expectedVat}`);
+        if (!near(row.grand_total, expectedGrand)) throw new Error(`grand_total ${row.grand_total} ≠ ${expectedGrand}`);
+        if (!near(row.balance_due, expectedGrand)) throw new Error(`balance_due ${row.balance_due} ≠ ${expectedGrand}`);
+        if (row.payment_status !== "Unpaid") throw new Error(`payment_status ${row.payment_status} ≠ Unpaid`);
         update("proforma", {
           status: "pass",
-          details: `Created proforma with subtotal=1000, VAT=200, total=1200.`,
+          details: `Created PI ${testName}-PI: subtotal=${expectedSubtotal}, VAT(${vatRate}%)=${expectedVat}, grand_total=${expectedGrand}, status=${row.payment_status}. Item cascaded via trigger.`,
         });
       } catch (e) {
         update("proforma", {
-          status: "warn",
+          status: "fail",
           details: (e as Error).message,
-          suggestedFix: "Confirm required columns on proforma_invoices match generator inputs.",
+          suggestedFix: "Verify proforma_invoices has vat_amount/grand_total/balance_due/payment_status columns and that recalc_proforma_totals trigger is installed.",
         });
       }
+
 
       // 9. Commercial Invoice
       try {
