@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
+import { ImportWizard } from "@/components/import/ImportWizard";
+import { SUPPORTED_IMPORT_TYPES } from "@/lib/import-schemas";
 
 type ImportJob = Database["public"]["Tables"]["import_jobs"]["Row"];
 type JobStatus = Database["public"]["Enums"]["import_job_status"];
