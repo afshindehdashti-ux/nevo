@@ -214,6 +214,12 @@ const validEmptyReason = {
     },
   },
   create(context) {
+    const filename = context.filename || context.getFilename();
+    // Same rationale as valid-resource-prop: AdminListPage.tsx forwards
+    // an already-typed reason prop, no literal lives here.
+    if (/[\\/]components[\\/]admin[\\/]AdminListPage\.tsx?$/.test(filename)) {
+      return {};
+    }
     const approved = [...REASON_SET];
     return {
       JSXOpeningElement(node) {
