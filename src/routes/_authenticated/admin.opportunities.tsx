@@ -19,7 +19,7 @@ function OpportunitiesList() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("opportunities")
-        .select("id,name,stage,amount,currency,probability,expected_close_date,customer:customers(company_name),partner:partners(company_name),created_at")
+        .select("id,name,stage,amount,currency,probability,expected_close_date,customer:customers(name),partner:partners(company_name),created_at")
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;
