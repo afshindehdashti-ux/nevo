@@ -1159,11 +1159,27 @@ export function SystemHealthPage() {
 
       <div className="grid gap-3">
         {checks.map((c) => {
-          const hasBody = !!(c.details || c.suggestedFix);
           const isFailing = c.status === "fail" || c.status === "warn";
+          const hasBody = !!(
+            c.details ||
+            c.suggestedFix ||
+            c.errorMessage ||
+            c.errorCode ||
+            c.errorHint ||
+            (isFailing && (c.query || (c.endpoints && c.endpoints.length)))
+          );
           const isOpen = expanded[c.id] ?? (isFailing && hasBody);
           return (
-            <Card key={c.id}>
+            <Card
+              key={c.id}
+              className={
+                c.status === "fail"
+                  ? "border-rose-500/40"
+                  : c.status === "warn"
+                    ? "border-amber-500/40"
+                    : undefined
+              }
+            >
               <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-3">
                 <div className="min-w-0">
                   <CardTitle className="text-base flex items-center gap-2">
@@ -1213,6 +1229,63 @@ export function SystemHealthPage() {
                       {c.details}
                     </p>
                   )}
+
+                  {(c.errorCode || c.errorMessage || c.errorHint) && (
+                    <div className="rounded-md border border-rose-500/30 bg-rose-500/5 p-3 space-y-1.5">
+                      <p className="text-xs font-medium text-rose-600 dark:text-rose-400 uppercase tracking-wide">
+                        Error
+                      </p>
+                      {c.errorCode && (
+                        <p className="text-xs">
+                          <span className="font-medium text-foreground">Code: </span>
+                          <code className="font-mono text-rose-600 dark:text-rose-400">
+                            {c.errorCode}
+                          </code>
+                        </p>
+                      )}
+                      {c.errorMessage && (
+                        <pre className="text-xs font-mono whitespace-pre-wrap break-words text-foreground/90 leading-relaxed">
+                          {c.errorMessage}
+                        </pre>
+                      )}
+                      {c.errorHint && (
+                        <p className="text-xs text-muted-foreground">
+                          <span className="font-medium text-foreground">Hint: </span>
+                          {c.errorHint}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {isFailing && c.query && (
+                    <div className="rounded-md border border-border/60 bg-muted/40 p-3 space-y-1.5">
+                      <p className="text-xs font-medium text-foreground uppercase tracking-wide">
+                        Failing query
+                      </p>
+                      <pre className="text-xs font-mono whitespace-pre-wrap break-words text-muted-foreground leading-relaxed">
+                        {c.query}
+                      </pre>
+                    </div>
+                  )}
+
+                  {isFailing && c.endpoints && c.endpoints.length > 0 && (
+                    <div className="rounded-md border border-border/60 bg-muted/40 p-3 space-y-2">
+                      <p className="text-xs font-medium text-foreground uppercase tracking-wide">
+                        Affected endpoints
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {c.endpoints.map((ep) => (
+                          <code
+                            key={ep}
+                            className="text-[11px] font-mono px-1.5 py-0.5 rounded border border-border/60 bg-background text-foreground/80"
+                          >
+                            {ep}
+                          </code>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {c.suggestedFix && (
                     <div className="rounded-md border border-border/60 bg-muted/40 p-3 space-y-2">
                       <p className="text-sm text-muted-foreground">
@@ -1231,7 +1304,7 @@ export function SystemHealthPage() {
                           </>
                         ) : (
                           <>
-                            <Copy className="h-3.5 w-3.5" /> Copy suggested fix
+                            <Copy className="h-3.5 w-3.5" /> Copy failure report
                           </>
                         )}
                       </Button>
@@ -1239,6 +1312,9 @@ export function SystemHealthPage() {
                   )}
                 </CardContent>
               )}
+            </Card>
+          );
+        })}
             </Card>
           );
         })}
