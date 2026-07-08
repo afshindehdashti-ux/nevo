@@ -87,6 +87,10 @@ const INITIAL_CHECKS: CheckResult[] = [
   { id: "ai", title: "15. AI Assistant Health", status: "idle" },
   { id: "role", title: "16. Role Permission Health", status: "idle" },
   { id: "rls", title: "17. Supabase RLS Health", status: "idle" },
+  { id: "auth_session", title: "18. Auth Session & JWT Validity", status: "idle" },
+  { id: "rls_enforced", title: "19. RLS Enforcement (user_roles owner-only)", status: "idle" },
+  { id: "crm_connectivity", title: "20. CRM Connectivity (leads/opps/contacts/tasks)", status: "idle" },
+  { id: "realtime", title: "21. Realtime Channel Connectivity", status: "idle" },
 ];
 
 const REQUIRED_TABLES = [
@@ -528,6 +532,133 @@ export function SystemHealthPage() {
           details: (e as Error).message,
           suggestedFix: "Ensure public.has_role(uuid, app_role) exists and is SECURITY DEFINER.",
         });
+      }
+
+      // 18. Auth Session & JWT expiry
+      try {
+        const { data: sess, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        const s = sess.session;
+        if (!s) throw new Error("No active session");
+        const expiresAt = (s.expires_at ?? 0) * 1000;
+        const minutesLeft = Math.round((expiresAt - Date.now()) / 60000);
+        if (minutesLeft <= 0) {
+          update("auth_session", {
+            status: "fail",
+            details: `JWT expired ${Math.abs(minutesLeft)}m ago.`,
+            suggestedFix: "Sign out and back in to refresh the session.",
+          });
+        } else if (minutesLeft < 5) {
+          update("auth_session", {
+            status: "warn",
+            details: `JWT expires in ${minutesLeft}m; token refresh will run automatically.`,
+          });
+        } else {
+          update("auth_session", {
+            status: "pass",
+            details: `JWT valid for another ${minutesLeft}m (expires ${format(expiresAt, "yyyy-MM-dd HH:mm")}).`,
+          });
+        }
+      } catch (e) {
+        update("auth_session", {
+          status: "fail",
+          details: (e as Error).message,
+          suggestedFix: "Re-authenticate at /admin/login.",
+        });
+      }
+
+      // 19. RLS Enforcement — user_roles must be readable only for own rows
+      try {
+        const { data: me } = await supabase.auth.getUser();
+        const uid = me.user?.id;
+        if (!uid) throw new Error("No user id available");
+        const { data: rows, error } = await supabase
+          .from("user_roles")
+          .select("user_id");
+        if (error) throw error;
+        const foreign = (rows ?? []).filter((r) => r.user_id !== uid);
+        if (foreign.length > 0) {
+          update("rls_enforced", {
+            status: "fail",
+            details: `user_roles returned ${foreign.length} rows belonging to other users — RLS is not scoping to auth.uid().`,
+            suggestedFix: "Review SELECT policy on public.user_roles; it must use auth.uid() = user_id.",
+          });
+        } else {
+          update("rls_enforced", {
+            status: "pass",
+            details: `user_roles returned ${rows?.length ?? 0} own row(s); no cross-user leakage detected.`,
+          });
+        }
+      } catch (e) {
+        update("rls_enforced", {
+          status: "warn",
+          details: (e as Error).message,
+          suggestedFix: "Ensure public.user_roles has SELECT policy scoped to auth.uid().",
+        });
+      }
+
+      // 20. CRM Connectivity — probe core CRM tables
+      try {
+        const tables = ["leads", "opportunities", "contacts", "tasks"] as const;
+        const results: string[] = [];
+        const failures: string[] = [];
+        for (const t of tables) {
+          const { count, error } = await supabase
+            .from(t)
+            .select("*", { head: true, count: "exact" });
+          if (error) failures.push(`${t} (${error.message})`);
+          else results.push(`${t}=${count ?? 0}`);
+        }
+        if (failures.length === 0) {
+          update("crm_connectivity", {
+            status: "pass",
+            details: `Reachable: ${results.join(", ")}.`,
+          });
+        } else if (failures.length < tables.length) {
+          update("crm_connectivity", {
+            status: "warn",
+            details: `OK: ${results.join(", ")}. Failed: ${failures.join(", ")}.`,
+            suggestedFix: "Check RLS SELECT policies and Data API GRANTs on failing tables.",
+          });
+        } else {
+          update("crm_connectivity", {
+            status: "fail",
+            details: `All CRM tables unreachable: ${failures.join(", ")}.`,
+            suggestedFix: "Verify authentication and RLS policies for CRM tables.",
+          });
+        }
+      } catch (e) {
+        update("crm_connectivity", { status: "fail", details: (e as Error).message });
+      }
+
+      // 21. Realtime channel connectivity
+      try {
+        const channelName = `health-check-${Date.now()}`;
+        const status = await new Promise<string>((resolve) => {
+          const ch = supabase.channel(channelName);
+          const timeout = window.setTimeout(() => {
+            supabase.removeChannel(ch);
+            resolve("TIMEOUT");
+          }, 4000);
+          ch.subscribe((s) => {
+            if (s === "SUBSCRIBED" || s === "CHANNEL_ERROR" || s === "TIMED_OUT" || s === "CLOSED") {
+              window.clearTimeout(timeout);
+              supabase.removeChannel(ch);
+              resolve(s);
+            }
+          });
+        });
+        if (status === "SUBSCRIBED") {
+          update("realtime", { status: "pass", details: "Realtime channel subscribed successfully." });
+        } else {
+          update("realtime", {
+            status: "warn",
+            details: `Realtime status: ${status}`,
+            suggestedFix: "Realtime is optional; verify Realtime is enabled in the backend if needed.",
+          });
+        }
+      } catch (e) {
+        update("realtime", { status: "warn", details: (e as Error).message });
       }
     } finally {
       // Cleanup test records
