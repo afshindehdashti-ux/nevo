@@ -83,12 +83,87 @@ export const upsertQuotation = createServerFn({ method: "POST" })
     }
     const { data: inserted, error } = await context.supabase
       .from("quotations")
-      .insert(data)
+      .insert({ ...data, created_by: context.userId })
       .select("id")
       .maybeSingle();
     if (error) throw new Error(error.message);
     return { id: inserted?.id };
   });
+
+/**
+ * Create a quotation with a required customer, valid_until, and at least
+ * one line item — atomic-ish (item insert on failure rolls back the header).
+ * This is the ONLY sanctioned "New quotation" entry point; the button in
+ * the list must not create empty drafts anymore.
+ */
+const CreateFullInput = z.object({
+  customer_id: z.string().uuid(),
+  issue_date: z.string(),
+  valid_until: z.string(),
+  currency: z.string().max(8).default("USD"),
+  vat_rate: z.number().min(0).max(100).default(0),
+  terms: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  items: z
+    .array(
+      z.object({
+        description: z.string().min(1, "Description is required"),
+        quantity: z.number().min(0),
+        unit: z.string().nullable().optional(),
+        unit_price: z.number().min(0),
+        discount_pct: z.number().min(0).max(100).default(0),
+      }),
+    )
+    .min(1, "At least one line item is required"),
+});
+
+export const createQuotationWithItems = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CreateFullInput.parse(v))
+  .handler(async ({ context, data }) => {
+    const { data: inserted, error } = await context.supabase
+      .from("quotations")
+      .insert({
+        customer_id: data.customer_id,
+        issue_date: data.issue_date,
+        valid_until: data.valid_until,
+        currency: data.currency,
+        vat_rate: data.vat_rate,
+        terms: data.terms ?? null,
+        notes: data.notes ?? null,
+        created_by: context.userId,
+        status: "draft",
+      })
+      .select("id")
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!inserted?.id) throw new Error("Could not create quotation");
+
+    const rows = data.items.map((it, idx) => {
+      const line_total =
+        Math.round(
+          it.quantity * it.unit_price * (1 - (it.discount_pct ?? 0) / 100) * 100,
+        ) / 100;
+      return {
+        quotation_id: inserted.id,
+        position: idx + 1,
+        description: it.description,
+        quantity: it.quantity,
+        unit: it.unit ?? "unit",
+        unit_price: it.unit_price,
+        discount_pct: it.discount_pct ?? 0,
+        line_total,
+      };
+    });
+    const { error: itemsErr } = await context.supabase.from("quotation_items").insert(rows);
+    if (itemsErr) {
+      // best-effort compensating delete; trigger recalc keeps totals consistent
+      await context.supabase.from("quotations").delete().eq("id", inserted.id);
+      throw new Error(itemsErr.message);
+    }
+    return { id: inserted.id };
+  });
+
 
 const ItemInput = z.object({
   id: z.string().uuid().optional(),
