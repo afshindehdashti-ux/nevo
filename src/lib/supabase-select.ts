@@ -32,6 +32,14 @@ export interface EmbedSpec<T extends TableName = TableName> {
   columns: readonly ColumnOf<T>[];
 }
 
+/**
+ * Discriminated union across every public table so a heterogeneous embeds
+ * array (e.g. `[customers, partners]`) type-checks each item's `columns`
+ * against its own `table`. A single generic `EmbedSpec<T>[]` collapses `T`
+ * across the array, which makes `columns` resolve to `never`.
+ */
+export type AnyEmbedSpec = { [K in TableName]: EmbedSpec<K> }[TableName];
+
 export function embed<T extends TableName>(spec: EmbedSpec<T>): string {
   if (spec.columns.length === 0) {
     throw new Error(`embed(${spec.table}): at least one column is required`);
@@ -43,11 +51,12 @@ export function embed<T extends TableName>(spec: EmbedSpec<T>): string {
 export function buildSelect<T extends TableName>(
   table: T,
   columns: readonly ColumnOf<T>[],
-  embeds: readonly EmbedSpec<TableName>[] = [],
+  embeds: readonly AnyEmbedSpec[] = [],
 ): string {
   if (columns.length === 0 && embeds.length === 0) {
     throw new Error(`buildSelect(${table}): select must project at least one column`);
   }
   return [...columns, ...embeds.map((e) => embed(e))].join(",");
 }
+
 
