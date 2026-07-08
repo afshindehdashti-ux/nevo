@@ -46,6 +46,7 @@ import JSZip from "jszip";
 import { useServerFn } from "@tanstack/react-start";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
 import { emailInvoicePdf } from "@/lib/invoices.functions";
+import { convertProformaToCommercial } from "@/lib/quotations.functions";
 import {
   recordInvoicePdfVersion,
   signInvoicePdfUrl,
@@ -1597,6 +1598,26 @@ function InvoiceDetailPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
+  const convertProformaFn = useServerFn(convertProformaToCommercial);
+  const convertToCommercial = useMutation({
+    mutationFn: async () => {
+      return convertProformaFn({ data: { id } });
+    },
+    onSuccess: (res) => {
+      if (res?.already) {
+        toast.info("Commercial invoice already exists");
+      } else {
+        toast.success("Commercial invoice created");
+      }
+      if (res?.invoice_id) {
+        qc.invalidateQueries({ queryKey: ["invoices"] });
+        navigate({ to: "/admin/invoices/$id", params: { id: res.invoice_id } });
+      }
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Convert failed"),
+  });
+
+
   const addPayment = useMutation({
     mutationFn: async () => {
       if (!invoice) return;
@@ -1755,6 +1776,15 @@ function InvoiceDetailPage() {
             {canPay && invoice.type === "commercial" && Number(invoice.balance) > 0 && (
               <Button size="sm" onClick={() => setPayOpen(true)}>
                 <Wallet className="h-4 w-4 mr-1" /> Record payment
+              </Button>
+            )}
+            {canEdit && invoice.type === "proforma" && (
+              <Button
+                size="sm"
+                onClick={() => convertToCommercial.mutate()}
+                disabled={convertToCommercial.isPending}
+              >
+                {convertToCommercial.isPending ? "Converting…" : "Convert to commercial invoice"}
               </Button>
             )}
           </div>
