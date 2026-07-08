@@ -1,7 +1,8 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listQuotations, upsertQuotation } from "@/lib/quotations.functions";
+import { useState } from "react";
+import { listQuotations } from "@/lib/quotations.functions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { Plus, FileText } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { NewQuotationDialog } from "@/components/crm/NewQuotationDialog";
 
 export const Route = createFileRoute("/_authenticated/admin/quotations")({
   head: () => ({ meta: [{ title: "Quotations — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
@@ -35,21 +37,11 @@ const statusColor: Record<string, "default" | "secondary" | "destructive" | "out
 
 function QuotationsPage() {
   const listFn = useServerFn(listQuotations);
-  const upsertFn = useServerFn(upsertQuotation);
-  const qc = useQueryClient();
-  const navigate = useNavigate();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: rows = [], isLoading } = useQuery({
     queryKey: ["quotations"],
     queryFn: () => listFn(),
-  });
-
-  const create = useMutation({
-    mutationFn: () => upsertFn({ data: { status: "draft" } }),
-    onSuccess: (r) => {
-      qc.invalidateQueries({ queryKey: ["quotations"] });
-      if (r?.id) navigate({ to: "/admin/quotations/$id", params: { id: r.id } });
-    },
   });
 
   return (
@@ -62,11 +54,14 @@ function QuotationsPage() {
             proforma or commercial invoices.
           </p>
         </div>
-        <Button onClick={() => create.mutate()} disabled={create.isPending}>
+        <Button onClick={() => setDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           New quotation
         </Button>
       </div>
+
+      <NewQuotationDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+
 
       <Card>
         <Table>

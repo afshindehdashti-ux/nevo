@@ -341,14 +341,84 @@ export function SystemHealthPage() {
         });
       }
 
-      // 7. Quotation Generator — read schema availability
+      // 7. Quotation Generator — end-to-end: header + item + trigger recompute.
+      let quotationId: string | undefined;
       try {
-        const { error } = await supabase.from("quotations").select("id", { head: true, count: "exact" });
-        if (error) throw error;
-        update("quotation", { status: "pass", details: "Quotations table reachable." });
+        if (!createdIds.customer) throw new Error("Customer test row missing; skipping quotation.");
+        const qty = 3;
+        const unitPrice = 250;
+        const vatRate = 5;
+        const expectedSubtotal = qty * unitPrice; // 750
+        const expectedVat = (expectedSubtotal * vatRate) / 100; // 37.5
+        const expectedTotal = expectedSubtotal + expectedVat; // 787.5
+
+        const { data: qIns, error: qErr } = await supabase
+          .from("quotations")
+          .insert({
+            customer_id: createdIds.customer,
+            issue_date: new Date().toISOString().slice(0, 10),
+            valid_until: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+            currency: "USD",
+            vat_rate: vatRate,
+            status: "draft",
+          })
+          .select("id")
+          .single();
+        if (qErr) throw qErr;
+        quotationId = qIns.id;
+
+        const { error: itErr } = await supabase.from("quotation_items").insert({
+          quotation_id: quotationId,
+          position: 1,
+          description: `${testName}-line`,
+          quantity: qty,
+          unit: "unit",
+          unit_price: unitPrice,
+          discount_pct: 0,
+        });
+        if (itErr) throw itErr;
+
+        const { data: qRow, error: readErr } = await supabase
+          .from("quotations")
+          .select("subtotal,vat_amount,total,customer_id,valid_until,quotation_number")
+          .eq("id", quotationId)
+          .single();
+        if (readErr) throw readErr;
+        const row = qRow as {
+          subtotal: number;
+          vat_amount: number;
+          total: number;
+          customer_id: string | null;
+          valid_until: string | null;
+          quotation_number: string | null;
+        };
+        const near = (a: number, b: number) => Math.abs(Number(a) - b) < 0.01;
+        if (!row.customer_id) throw new Error("customer_id was not persisted");
+        if (!row.valid_until) throw new Error("valid_until was not persisted");
+        if (!row.quotation_number) throw new Error("quotation_number was not auto-assigned");
+        if (!near(row.subtotal, expectedSubtotal))
+          throw new Error(`subtotal ${row.subtotal} ≠ ${expectedSubtotal}`);
+        if (!near(row.vat_amount, expectedVat))
+          throw new Error(`vat_amount ${row.vat_amount} ≠ ${expectedVat}`);
+        if (!near(row.total, expectedTotal))
+          throw new Error(`total ${row.total} ≠ ${expectedTotal}`);
+        update("quotation", {
+          status: "pass",
+          details: `Created ${row.quotation_number}: customer OK, valid_until OK, subtotal=${expectedSubtotal}, VAT(${vatRate}%)=${expectedVat}, total=${expectedTotal}. Trigger recompute verified.`,
+        });
       } catch (e) {
-        update("quotation", { status: "fail", details: (e as Error).message });
+        update("quotation", {
+          status: "fail",
+          details: (e as Error).message,
+          suggestedFix: "Verify quotations schema (customer_id, valid_until, subtotal/total) and that trg_qitems_recalc + trg_quotations_number are installed.",
+        });
+      } finally {
+        if (quotationId) {
+          await supabase.from("quotation_items").delete().eq("quotation_id", quotationId);
+          await supabase.from("quotations").delete().eq("id", quotationId);
+        }
       }
+
 
       // 8. Proforma Invoice — end-to-end: header + item + recompute check.
       try {
