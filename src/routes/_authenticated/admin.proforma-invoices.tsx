@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FileDown, Loader2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, FileDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { generateProformaInvoicePdf } from "@/lib/proforma-invoice-pdf";
@@ -53,9 +53,14 @@ function paymentStatusVariant(s: string | null | undefined) {
   }
 }
 
+type SortKey = "created_at" | "balance_due" | "grand_total";
+type SortDir = "asc" | "desc";
+
 function ProformaInvoicesList() {
   const [search, setSearch] = useState("");
   const [paymentFilter, setPaymentFilter] = useState<PaymentStatus | "all">("all");
+  const [sortKey, setSortKey] = useState<SortKey>("created_at");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [exporting, setExporting] = useState(false);
 
@@ -75,9 +80,18 @@ function ProformaInvoicesList() {
     },
   });
 
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir(key === "created_at" ? "desc" : "desc");
+    }
+  };
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return rows.filter((r) => {
+    const list = rows.filter((r) => {
       if (paymentFilter !== "all" && r.payment_status !== paymentFilter) return false;
       if (!q) return true;
       const cName = (r.customers as { name?: string } | null)?.name || "";
@@ -86,7 +100,28 @@ function ProformaInvoicesList() {
         cName.toLowerCase().includes(q)
       );
     });
-  }, [rows, search, paymentFilter]);
+    const sign = sortDir === "asc" ? 1 : -1;
+    return [...list].sort((a, b) => {
+      if (sortKey === "created_at") {
+        return (
+          sign *
+          (new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+        );
+      }
+      const av = Number(a[sortKey]) || 0;
+      const bv = Number(b[sortKey]) || 0;
+      return sign * (av - bv);
+    });
+  }, [rows, search, paymentFilter, sortKey, sortDir]);
+
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { all: rows.length, Unpaid: 0, "Partially Paid": 0, Paid: 0, Overdue: 0 };
+    for (const r of rows) {
+      const s = r.payment_status || "Unpaid";
+      c[s] = (c[s] || 0) + 1;
+    }
+    return c;
+  }, [rows]);
 
   const filteredIds = useMemo(() => filtered.map((r) => r.id), [filtered]);
   const allSelected = filteredIds.length > 0 && filteredIds.every((id) => selected.has(id));
@@ -162,12 +197,27 @@ function ProformaInvoicesList() {
       headerExtra={<GuideMeButton sectionId="proforma-invoice" />}
     >
       <div className="p-3 border-b flex gap-2 items-center flex-wrap">
+        <div className="flex gap-1 flex-wrap">
+          {(["all", "Unpaid", "Partially Paid", "Paid", "Overdue"] as const).map((k) => (
+            <Button
+              key={k}
+              size="sm"
+              variant={paymentFilter === k ? "default" : "outline"}
+              className="h-7 px-2 text-xs"
+              onClick={() => setPaymentFilter(k as PaymentStatus | "all")}
+            >
+              {k === "all" ? "All" : k}
+              <span className="ml-1.5 text-[10px] opacity-70">{counts[k] ?? 0}</span>
+            </Button>
+          ))}
+        </div>
+        <div className="h-5 w-px bg-border mx-1" />
         <Label className="text-xs text-muted-foreground">Payment</Label>
         <Select
           value={paymentFilter}
           onValueChange={(v) => setPaymentFilter(v as PaymentStatus | "all")}
         >
-          <SelectTrigger className="w-52 h-8">
+          <SelectTrigger className="w-44 h-8">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -218,13 +268,19 @@ function ProformaInvoicesList() {
               </TableHead>
               <TableHead>Proforma #</TableHead>
               <TableHead>Customer</TableHead>
-              <TableHead>Issued</TableHead>
+              <TableHead>
+                <SortButton label="Issued" active={sortKey === "created_at"} dir={sortDir} onClick={() => toggleSort("created_at")} />
+              </TableHead>
               <TableHead>Valid until</TableHead>
               <TableHead>Approved</TableHead>
               <TableHead>Payment</TableHead>
               <TableHead className="text-right">VAT</TableHead>
-              <TableHead className="text-right">Grand total</TableHead>
-              <TableHead className="text-right">Balance</TableHead>
+              <TableHead className="text-right">
+                <SortButton label="Grand total" active={sortKey === "grand_total"} dir={sortDir} onClick={() => toggleSort("grand_total")} align="right" />
+              </TableHead>
+              <TableHead className="text-right">
+                <SortButton label="Balance" active={sortKey === "balance_due"} dir={sortDir} onClick={() => toggleSort("balance_due")} align="right" />
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -292,5 +348,33 @@ function ProformaInvoicesList() {
         </Table>
       </div>
     </MasterListShell>
+  );
+}
+
+function SortButton({
+  label,
+  active,
+  dir,
+  onClick,
+  align,
+}: {
+  label: string;
+  active: boolean;
+  dir: "asc" | "desc";
+  onClick: () => void;
+  align?: "right";
+}) {
+  const Icon = !active ? ArrowUpDown : dir === "asc" ? ArrowUp : ArrowDown;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center gap-1 hover:text-foreground ${
+        active ? "text-foreground" : "text-muted-foreground"
+      } ${align === "right" ? "justify-end w-full" : ""}`}
+    >
+      {label}
+      <Icon className="h-3 w-3" />
+    </button>
   );
 }
