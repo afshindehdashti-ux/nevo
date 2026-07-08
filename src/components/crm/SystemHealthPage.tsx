@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useMyRoles, type AppRole } from "@/lib/crm-hooks";
 import { AccessDenied } from "@/components/crm/AccessDenied";
+import { ErpFinanceDiagnostic } from "@/components/crm/ErpFinanceDiagnostic";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -1360,6 +1361,7 @@ export function SystemHealthPage() {
         })}
       </div>
 
+      <ErpFinanceDiagnostic />
     </div>
   );
 }
