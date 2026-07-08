@@ -257,10 +257,21 @@ export const duplicateQuotationItem = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Item not found");
-    const { id: _id, created_at: _c, ...rest } = row as Record<string, unknown>;
     const { error: insErr } = await context.supabase
       .from("quotation_items")
-      .insert({ ...rest, position: (rest.position as number ?? 0) + 1 });
+      .insert({
+        quotation_id: row.quotation_id,
+        description: row.description,
+        item_code: row.item_code ?? null,
+        hs_code: row.hs_code ?? null,
+        quantity: row.quantity,
+        unit: row.unit,
+        unit_price: row.unit_price,
+        discount_pct: row.discount_pct,
+        line_total: row.line_total,
+        position: (row.position ?? 0) + 1,
+        product_id: row.product_id ?? null,
+      });
     if (insErr) throw new Error(insErr.message);
     return { ok: true };
   });
