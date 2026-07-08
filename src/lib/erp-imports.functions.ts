@@ -76,7 +76,7 @@ export const runImport = createServerFn({ method: "POST" })
           const name = str(r.company_name) ?? str(r.name);
           if (!name) throw new Error("company_name/name required");
           if (!data.dry_run) {
-            const { error } = await context.supabase.from("customers").insert({
+            const { error } = await (context.supabase.from("customers") as any).insert({
               company_name: name,
               name,
               email: str(r.email),
@@ -90,7 +90,7 @@ export const runImport = createServerFn({ method: "POST" })
           const name = str(r.name) ?? str(r.company_name);
           if (!name) throw new Error("name required");
           if (!data.dry_run) {
-            const { error } = await context.supabase.from("suppliers").insert({
+            const { error } = await (context.supabase.from("suppliers") as any).insert({
               name,
               email: str(r.email),
               phone: str(r.phone),
@@ -103,7 +103,7 @@ export const runImport = createServerFn({ method: "POST" })
           if (!name || !sku) throw new Error("name and sku required");
           const price = num(r.unit_price) ?? 0;
           if (!data.dry_run) {
-            const { error } = await context.supabase.from("products").insert({
+            const { error } = await (context.supabase.from("products") as any).insert({
               name,
               sku,
               unit_price: price,
@@ -142,7 +142,7 @@ export const runImport = createServerFn({ method: "POST" })
               .select("id")
               .single();
             if (error) throw new Error(error.message);
-            await context.supabase.from("finance_document_items").insert({
+            await (context.supabase.from("finance_document_items") as any).insert({
               document_id: doc.id,
               description,
               quantity: qty,
