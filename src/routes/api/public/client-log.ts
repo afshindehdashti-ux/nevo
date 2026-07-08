@@ -59,7 +59,7 @@ function corsHeaders(): HeadersInit {
 
 export const Route = createFileRoute("/api/public/client-log")({
   server: {
-    handlers: {
+    handlers: withMethodGuards({
       OPTIONS: async () => new Response(null, { status: 204, headers: corsHeaders() }),
       POST: async ({ request }) => {
         try {
