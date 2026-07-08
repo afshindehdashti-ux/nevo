@@ -5,6 +5,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate, formatMoney } from "@/lib/crm-money";
+import { buildSelect, embed } from "@/lib/supabase-select";
+
+// Type-checked against Database types — `customers.company_name` would fail
+// tsc here instead of at runtime with a "column does not exist" error.
+const OPPORTUNITIES_SELECT = buildSelect(
+  "opportunities",
+  ["id", "name", "stage", "amount", "currency", "probability", "expected_close_date", "created_at"],
+  [
+    embed({ as: "customer", table: "customers", columns: ["name"] }),
+    embed({ as: "partner", table: "partners", columns: ["company_name"] }),
+  ],
+);
+
 
 export const Route = createFileRoute("/_authenticated/admin/opportunities")({
   head: () => ({
