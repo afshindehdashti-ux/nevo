@@ -226,6 +226,7 @@ function QuotationEditor() {
   if (!data) return <div className="p-6">Not found.</div>;
 
   const q = data.quotation;
+  const isDraft = q.status === "draft";
   const canSend = q.status === "approved" || q.status === "draft";
 
   const handleDownloadPdf = async () => {
