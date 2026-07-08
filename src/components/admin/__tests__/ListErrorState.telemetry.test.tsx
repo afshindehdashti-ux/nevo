@@ -63,14 +63,14 @@ describe("ListErrorState telemetry", () => {
     expect(onRetry).toHaveBeenCalledTimes(1);
     expect(logClientEvent).toHaveBeenCalledWith(
       "admin_list_retry_clicked",
-      { resource: "commissions", message: "network" },
+      { resource: "commission_invoices", message: "network" },
       "info",
     );
   });
 
   it("does not emit telemetry when there is no error", () => {
     // Guard: passing undefined error should short-circuit both hooks.
-    render(<ListErrorState resource="purchase orders" error={undefined} onRetry={() => {}} />);
+    render(<ListErrorState resource="purchase_orders" error={undefined} onRetry={() => {}} />);
     expect(reportClientError).not.toHaveBeenCalled();
   });
 });
