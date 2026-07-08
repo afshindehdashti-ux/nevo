@@ -433,7 +433,7 @@ export function SystemHealthPage() {
           status: "fail",
           details: (e as Error).message,
           suggestedFix: "Sign in again at /admin/login.",
-        });
+        }, e);
       }
 
       mark("db");
@@ -457,7 +457,7 @@ export function SystemHealthPage() {
           });
         }
       } catch (e) {
-        update("db", { status: "fail", details: (e as Error).message });
+        update("db", { status: "fail", details: (e as Error).message }, e);
       }
 
       mark("crm");
@@ -467,7 +467,7 @@ export function SystemHealthPage() {
         if (error) throw error;
         update("crm", { status: "pass", details: "Core CRM tables responded." });
       } catch (e) {
-        update("crm", { status: "fail", details: (e as Error).message });
+        update("crm", { status: "fail", details: (e as Error).message }, e);
       }
 
       mark("customer_crud");
@@ -492,7 +492,7 @@ export function SystemHealthPage() {
           status: "fail",
           details: (e as Error).message,
           suggestedFix: "Check RLS write policies on public.customers for your role.",
-        });
+        }, e);
       }
 
       mark("supplier_crud");
@@ -511,7 +511,7 @@ export function SystemHealthPage() {
           status: "fail",
           details: (e as Error).message,
           suggestedFix: "Check RLS write policies on public.suppliers.",
-        });
+        }, e);
       }
 
       mark("product_crud");
@@ -530,7 +530,7 @@ export function SystemHealthPage() {
           status: "fail",
           details: (e as Error).message,
           suggestedFix: "Check RLS write policies on public.products.",
-        });
+        }, e);
       }
 
       mark("quotation");
@@ -604,7 +604,7 @@ export function SystemHealthPage() {
           status: "fail",
           details: (e as Error).message,
           suggestedFix: "Verify quotations schema (customer_id, valid_until, subtotal/total) and that trg_qitems_recalc + trg_quotations_number are installed.",
-        });
+        }, e);
       } finally {
         if (quotationId) {
           await supabase.from("quotation_items").delete().eq("quotation_id", quotationId);
@@ -801,7 +801,7 @@ export function SystemHealthPage() {
           details: (e as Error).message,
           suggestedFix:
             "Verify proforma_invoices has vat_amount/grand_total/balance_due/payment_status/terms_conditions/bank_details/approved_by columns, that recalc_proforma_totals + proforma_sync_mirrors triggers are installed, and that DELETE on the parent removes proforma_invoice_items (or that items are pre-cleaned).",
-        });
+        }, e);
       }
 
 
@@ -813,7 +813,7 @@ export function SystemHealthPage() {
         if (error) throw error;
         update("commercial", { status: "pass", details: "Invoices table reachable." });
       } catch (e) {
-        update("commercial", { status: "fail", details: (e as Error).message });
+        update("commercial", { status: "fail", details: (e as Error).message }, e);
       }
 
       mark("commission");
@@ -825,7 +825,7 @@ export function SystemHealthPage() {
         if (error) throw error;
         update("commission", { status: "pass", details: "partner_commissions reachable." });
       } catch (e) {
-        update("commission", { status: "fail", details: (e as Error).message });
+        update("commission", { status: "fail", details: (e as Error).message }, e);
       }
 
       mark("purchase_order");
@@ -844,7 +844,7 @@ export function SystemHealthPage() {
           status: "warn",
           details: (e as Error).message,
           suggestedFix: "Add a dedicated purchase_orders table if needed.",
-        });
+        }, e);
       }
 
       mark("pdf");
@@ -856,7 +856,7 @@ export function SystemHealthPage() {
           details: "PDF print route registered at /admin/quotations/:id/print.",
         });
       } catch (e) {
-        update("pdf", { status: "warn", details: (e as Error).message });
+        update("pdf", { status: "warn", details: (e as Error).message }, e);
       }
 
       mark("files");
@@ -870,7 +870,7 @@ export function SystemHealthPage() {
           status: "warn",
           details: (e as Error).message,
           suggestedFix: "Ensure the documents storage bucket and RLS policies exist.",
-        });
+        }, e);
       }
 
       mark("doc_import");
@@ -882,7 +882,7 @@ export function SystemHealthPage() {
         if (error) throw error;
         update("doc_import", { status: "pass", details: "import_jobs reachable." });
       } catch (e) {
-        update("doc_import", { status: "warn", details: (e as Error).message });
+        update("doc_import", { status: "warn", details: (e as Error).message }, e);
       }
 
       mark("ai");
@@ -894,7 +894,7 @@ export function SystemHealthPage() {
         if (error) throw error;
         update("ai", { status: "pass", details: "AI Assistant tables reachable." });
       } catch (e) {
-        update("ai", { status: "warn", details: (e as Error).message });
+        update("ai", { status: "warn", details: (e as Error).message }, e);
       }
 
       mark("role");
@@ -906,7 +906,7 @@ export function SystemHealthPage() {
           details: `Current roles: ${roleList}. Allowed on this page: ${ALLOWED_ROLES.join(", ")}.`,
         });
       } catch (e) {
-        update("role", { status: "fail", details: (e as Error).message });
+        update("role", { status: "fail", details: (e as Error).message }, e);
       }
 
       mark("rls");
@@ -926,7 +926,7 @@ export function SystemHealthPage() {
           status: "warn",
           details: (e as Error).message,
           suggestedFix: "Ensure public.has_role(uuid, app_role) exists and is SECURITY DEFINER.",
-        });
+        }, e);
       }
 
       mark("auth_session");
@@ -960,7 +960,7 @@ export function SystemHealthPage() {
           status: "fail",
           details: (e as Error).message,
           suggestedFix: "Re-authenticate at /admin/login.",
-        });
+        }, e);
       }
 
       mark("rls_enforced");
@@ -991,7 +991,7 @@ export function SystemHealthPage() {
           status: "warn",
           details: (e as Error).message,
           suggestedFix: "Ensure public.user_roles has SELECT policy scoped to auth.uid().",
-        });
+        }, e);
       }
 
       mark("crm_connectivity");
@@ -1026,7 +1026,7 @@ export function SystemHealthPage() {
           });
         }
       } catch (e) {
-        update("crm_connectivity", { status: "fail", details: (e as Error).message });
+        update("crm_connectivity", { status: "fail", details: (e as Error).message }, e);
       }
 
       mark("realtime");
@@ -1057,7 +1057,7 @@ export function SystemHealthPage() {
           });
         }
       } catch (e) {
-        update("realtime", { status: "warn", details: (e as Error).message });
+        update("realtime", { status: "warn", details: (e as Error).message }, e);
       }
     } finally {
       // Cleanup test records
