@@ -348,6 +348,17 @@ function QuotationEditor() {
         </div>
       </div>
 
+      {!isDraft && (
+        <div className="flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-900 dark:text-amber-200">
+          <Lock className="h-4 w-4 mt-0.5 shrink-0" />
+          <span>
+            This quotation is <b>{q.status}</b> and locked. Create a revision or return it to
+            draft to edit the header, line items, or terms.
+          </span>
+        </div>
+      )}
+
+      <fieldset disabled={!isDraft} className="contents">
       <div className="grid md:grid-cols-3 gap-4">
         <Card className="p-4 md:col-span-2 space-y-3">
           <h3 className="text-sm font-semibold">Header</h3>
@@ -361,7 +372,7 @@ function QuotationEditor() {
                 <SelectTrigger><SelectValue placeholder="Select customer" /></SelectTrigger>
                 <SelectContent>
                   {customers.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    <SelectItem key={c.id} value={c.id}>{c.company_name || c.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
