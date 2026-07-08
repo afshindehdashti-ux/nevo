@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useMyRoles, type AppRole } from "@/lib/crm-hooks";
 import { AccessDenied } from "@/components/crm/AccessDenied";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,11 +16,47 @@ import {
   ShieldCheck,
   Database as DbIcon,
   Play,
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  Check,
 } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 
 const ALLOWED_ROLES: AppRole[] = ["super_admin", "management"];
 const TEST_PREFIX = "TEST-NEVO-QA-";
+const STORAGE_CHECKS_KEY = "nevo:system-health:checks";
+const STORAGE_LAST_RUN_KEY = "nevo:system-health:last-run";
+
+function loadPersisted(): CheckResult[] | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_CHECKS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as CheckResult[];
+    if (!Array.isArray(parsed)) return null;
+    // Merge with INITIAL_CHECKS so newly added checks appear.
+    return INITIAL_CHECKS.map((base) => {
+      const prev = parsed.find((p) => p.id === base.id);
+      return prev
+        ? { ...base, ...prev, status: prev.status === "running" ? "idle" : prev.status }
+        : base;
+    });
+  } catch {
+    return null;
+  }
+}
+
+function loadLastRunAt(): number | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_LAST_RUN_KEY);
+    const n = raw ? Number(raw) : NaN;
+    return Number.isFinite(n) ? n : null;
+  } catch {
+    return null;
+  }
+}
 
 type CheckStatus = "idle" | "running" | "pass" | "warn" | "fail";
 
@@ -108,9 +145,56 @@ function StatusBadge({ status }: { status: CheckStatus }) {
 
 export function SystemHealthPage() {
   const { data: roles, isLoading: rolesLoading } = useMyRoles();
-  const [checks, setChecks] = useState<CheckResult[]>(INITIAL_CHECKS);
+  const [checks, setChecks] = useState<CheckResult[]>(() => loadPersisted() ?? INITIAL_CHECKS);
   const [running, setRunning] = useState(false);
-  const [lastRunAt, setLastRunAt] = useState<number | null>(null);
+  const [lastRunAt, setLastRunAt] = useState<number | null>(() => loadLastRunAt());
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Persist check results + last run so timestamps survive refresh.
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_CHECKS_KEY, JSON.stringify(checks));
+    } catch {
+      /* storage unavailable */
+    }
+  }, [checks]);
+  useEffect(() => {
+    try {
+      if (lastRunAt) localStorage.setItem(STORAGE_LAST_RUN_KEY, String(lastRunAt));
+    } catch {
+      /* storage unavailable */
+    }
+  }, [lastRunAt]);
+
+  // Auto-expand any check that ends in warn/fail after a run.
+  useEffect(() => {
+    if (running) return;
+    setExpanded((prev) => {
+      const next = { ...prev };
+      for (const c of checks) {
+        if ((c.status === "fail" || c.status === "warn") && next[c.id] === undefined) {
+          next[c.id] = true;
+        }
+      }
+      return next;
+    });
+  }, [running, checks]);
+
+  const toggle = (id: string) => setExpanded((p) => ({ ...p, [id]: !p[id] }));
+
+  const copyFix = async (c: CheckResult) => {
+    if (!c.suggestedFix) return;
+    const payload = `[${c.title}] ${c.status.toUpperCase()}\nDetails: ${c.details ?? "-"}\nSuggested fix: ${c.suggestedFix}`;
+    try {
+      await navigator.clipboard.writeText(payload);
+      setCopiedId(c.id);
+      toast.success("Suggested fix copied to clipboard");
+      window.setTimeout(() => setCopiedId((cur) => (cur === c.id ? null : cur)), 1500);
+    } catch {
+      toast.error("Could not copy — clipboard unavailable");
+    }
+  };
 
   if (rolesLoading) {
     return (
@@ -469,41 +553,92 @@ export function SystemHealthPage() {
       </Alert>
 
       <div className="grid gap-3">
-        {checks.map((c) => (
-          <Card key={c.id}>
-            <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-3">
-              <div>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <DbIcon className="h-4 w-4 text-muted-foreground" />
-                  {c.title}
-                </CardTitle>
-                {c.lastTested && (
+        {checks.map((c) => {
+          const hasBody = !!(c.details || c.suggestedFix);
+          const isFailing = c.status === "fail" || c.status === "warn";
+          const isOpen = expanded[c.id] ?? (isFailing && hasBody);
+          return (
+            <Card key={c.id}>
+              <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-3">
+                <div className="min-w-0">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <DbIcon className="h-4 w-4 text-muted-foreground" />
+                    {c.title}
+                  </CardTitle>
                   <CardDescription className="text-xs mt-1">
-                    Last tested {formatDistanceToNow(c.lastTested, { addSuffix: true })}
+                    {c.lastTested ? (
+                      <>
+                        Last tested{" "}
+                        <span title={format(c.lastTested, "yyyy-MM-dd HH:mm:ss")}>
+                          {formatDistanceToNow(c.lastTested, { addSuffix: true })}
+                        </span>{" "}
+                        · {format(c.lastTested, "yyyy-MM-dd HH:mm")}
+                      </>
+                    ) : (
+                      "Never tested"
+                    )}
                   </CardDescription>
-                )}
-              </div>
-              <StatusBadge status={c.status} />
-            </CardHeader>
-            {(c.details || c.suggestedFix) && (
-              <CardContent className="pt-0 space-y-2">
-                {c.details && (
-                  <p className="text-sm text-muted-foreground">
-                    <span className="font-medium text-foreground">Details: </span>
-                    {c.details}
-                  </p>
-                )}
-                {c.suggestedFix && (
-                  <p className="text-sm text-muted-foreground">
-                    <span className="font-medium text-foreground">Suggested fix: </span>
-                    {c.suggestedFix}
-                  </p>
-                )}
-              </CardContent>
-            )}
-          </Card>
-        ))}
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <StatusBadge status={c.status} />
+                  {hasBody && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-muted-foreground"
+                      onClick={() => toggle(c.id)}
+                      aria-expanded={isOpen}
+                      aria-controls={`check-body-${c.id}`}
+                    >
+                      {isOpen ? (
+                        <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
+                      )}
+                      <span className="ml-1 text-xs">{isOpen ? "Hide" : "Details"}</span>
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              {hasBody && isOpen && (
+                <CardContent id={`check-body-${c.id}`} className="pt-0 space-y-3">
+                  {c.details && (
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium text-foreground">Details: </span>
+                      {c.details}
+                    </p>
+                  )}
+                  {c.suggestedFix && (
+                    <div className="rounded-md border border-border/60 bg-muted/40 p-3 space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        <span className="font-medium text-foreground">Suggested fix: </span>
+                        {c.suggestedFix}
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 gap-1.5"
+                        onClick={() => copyFix(c)}
+                      >
+                        {copiedId === c.id ? (
+                          <>
+                            <Check className="h-3.5 w-3.5" /> Copied
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-3.5 w-3.5" /> Copy suggested fix
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              )}
+            </Card>
+          );
+        })}
       </div>
+
     </div>
   );
 }
