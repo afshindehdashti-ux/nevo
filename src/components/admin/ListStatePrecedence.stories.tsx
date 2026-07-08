@@ -11,7 +11,7 @@ interface PrecedenceDemoProps {
   /** Which of the four states to render — matches the branch order in the real pages. */
   state: StateKind;
   /** Resource slug used for telemetry — matches admin-list-states.md contract. */
-  resource: string;
+  resource: AdminListResource;
 }
 
 /**
