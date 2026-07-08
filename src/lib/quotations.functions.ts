@@ -127,48 +127,6 @@ export const upsertQuotation = createServerFn({ method: "POST" })
  * This is the ONLY sanctioned "New quotation" entry point; the button in
  * the list must not create empty drafts anymore.
  */
-const CreateFullInput = z.object({
-  customer_id: z.string().uuid(),
-  issue_date: z.string(),
-  valid_until: z.string(),
-  currency: z.string().max(8).default("USD"),
-  vat_rate: z.number().min(0).max(100).default(0),
-  terms: z.string().nullable().optional(),
-  notes: z.string().nullable().optional(),
-  items: z
-    .array(
-      z.object({
-        description: z.string().min(1, "Description is required"),
-        quantity: z.number().min(0),
-        unit: z.string().nullable().optional(),
-        unit_price: z.number().min(0),
-        discount_pct: z.number().min(0).max(100).default(0),
-      }),
-    )
-    .min(1, "At least one line item is required"),
-});
-
-export const createQuotationWithItems = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((v) => CreateFullInput.parse(v))
-  .handler(async ({ context, data }) => {
-    const { data: inserted, error } = await context.supabase
-      .from("quotations")
-      .insert({
-        customer_id: data.customer_id,
-        issue_date: data.issue_date,
-        valid_until: data.valid_until,
-        currency: data.currency,
-        vat_rate: data.vat_rate,
-        terms: data.terms ?? null,
-        notes: data.notes ?? null,
-        created_by: context.userId,
-        status: "draft",
-      })
-      .select("id")
-      .maybeSingle();
-    if (error) throw new Error(error.message);
-    if (!inserted?.id) throw new Error("Could not create quotation");
 
 const CreateFullInput = z.object({
   customer_id: z.string().uuid(),
