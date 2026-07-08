@@ -133,11 +133,7 @@ function ExportsHistoryPage() {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const pendingRowRef = useRef<CsvExportAuditRecord | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [blocked, setBlocked] = useState<{
-    filename: string;
-    row: CsvExportAuditRecord;
-    result: VerifyResult;
-  } | null>(null);
+  const [blocked, setBlocked] = useState<BlockedVerification | null>(null);
 
   // --- Selection for compliance report ---
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
