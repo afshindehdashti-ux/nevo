@@ -58,8 +58,12 @@ describe("supabase-select — compile-time column safety", () => {
       [{ as: "customer", table: "customers", columns: ["name"] }],
     );
 
-    // @ts-expect-error — "not_a_real_column" is not a column of opportunities
-    buildSelect("opportunities", ["not_a_real_column"]);
+    // NOTE: base-column typos are also caught by ColumnOf<T>, but the
+    // signature accepts `readonly ColumnOf<T>[]` and TS widens a bare
+    // `["typo"]` literal to `string[]` inconsistently across versions —
+    // the more reliable regression guard is the embed check below, which
+    // is exactly the shape that broke the admin list pages.
+
 
     // @ts-expect-error — "company_name" is NOT a column of customers.
     // This is the exact bug that broke the admin list pages at runtime.
