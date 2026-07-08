@@ -2781,7 +2781,9 @@ export type Database = {
           created_at: string
           description: string
           discount: number
+          discount_amount: number
           id: string
+          item_code: string | null
           line_total: number
           product_id: string | null
           proforma_invoice_id: string
@@ -2796,7 +2798,9 @@ export type Database = {
           created_at?: string
           description: string
           discount?: number
+          discount_amount?: number
           id?: string
+          item_code?: string | null
           line_total?: number
           product_id?: string | null
           proforma_invoice_id: string
@@ -2811,7 +2815,9 @@ export type Database = {
           created_at?: string
           description?: string
           discount?: number
+          discount_amount?: number
           id?: string
+          item_code?: string | null
           line_total?: number
           product_id?: string | null
           proforma_invoice_id?: string
@@ -2841,67 +2847,100 @@ export type Database = {
       }
       proforma_invoices: {
         Row: {
+          amount_paid: number
           approved_by: string | null
+          balance_due: number
+          bank_details: string | null
           created_at: string
           created_by: string | null
           currency: string
           customer_id: string
           delivery_terms: string | null
+          discount_amount: number
           discount_total: number
+          grand_total: number
           id: string
+          incoterms: string | null
           notes: string | null
           opportunity_id: string | null
           order_id: string | null
+          payment_status: string
           payment_terms: string | null
+          prepared_by: string | null
           proforma_number: string | null
           status: string
           subtotal: number
           tax_total: number
+          terms_conditions: string | null
           total: number
           updated_at: string
           valid_until: string | null
+          vat_amount: number
+          vat_rate: number
         }
         Insert: {
+          amount_paid?: number
           approved_by?: string | null
+          balance_due?: number
+          bank_details?: string | null
           created_at?: string
           created_by?: string | null
           currency?: string
           customer_id: string
           delivery_terms?: string | null
+          discount_amount?: number
           discount_total?: number
+          grand_total?: number
           id?: string
+          incoterms?: string | null
           notes?: string | null
           opportunity_id?: string | null
           order_id?: string | null
+          payment_status?: string
           payment_terms?: string | null
+          prepared_by?: string | null
           proforma_number?: string | null
           status?: string
           subtotal?: number
           tax_total?: number
+          terms_conditions?: string | null
           total?: number
           updated_at?: string
           valid_until?: string | null
+          vat_amount?: number
+          vat_rate?: number
         }
         Update: {
+          amount_paid?: number
           approved_by?: string | null
+          balance_due?: number
+          bank_details?: string | null
           created_at?: string
           created_by?: string | null
           currency?: string
           customer_id?: string
           delivery_terms?: string | null
+          discount_amount?: number
           discount_total?: number
+          grand_total?: number
           id?: string
+          incoterms?: string | null
           notes?: string | null
           opportunity_id?: string | null
           order_id?: string | null
+          payment_status?: string
           payment_terms?: string | null
+          prepared_by?: string | null
           proforma_number?: string | null
           status?: string
           subtotal?: number
           tax_total?: number
+          terms_conditions?: string | null
           total?: number
           updated_at?: string
           valid_until?: string | null
+          vat_amount?: number
+          vat_rate?: number
         }
         Relationships: [
           {
