@@ -63,18 +63,18 @@ export const listFinanceDocuments = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: { document_type?: string; status?: string; limit?: number } | undefined) => v ?? {})
   .handler(async ({ data, context }) => {
-    let q = context.supabase
+    let q: any = context.supabase
       .from("finance_documents")
       .select(
         "id, document_type, document_number, status, issue_date, valid_until, due_date, currency, subtotal, discount_total, tax_total, shipping_total, grand_total, amount_paid, balance, customer_id, supplier_id, partner_id, source_document_id, created_at, updated_at, customers(company_name, name, email), suppliers(name, email), finance_document_items(count)"
       )
       .order("created_at", { ascending: false })
       .limit(data.limit ?? 200);
-    if (data.document_type) q = q.eq("document_type", data.document_type as never);
-    if (data.status) q = q.eq("status", data.status as never);
+    if (data.document_type) q = q.eq("document_type", data.document_type);
+    if (data.status) q = q.eq("status", data.status);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
-    return (rows ?? []) as unknown as Array<Record<string, unknown>>;
+    return (rows ?? []) as any[];
   });
 
 export const getFinanceDocument = createServerFn({ method: "GET" })
@@ -109,15 +109,14 @@ export const upsertFinanceDocument = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await ensureCounterparty(data);
     const { items, id, ...header } = data;
-    const payload = { ...header, updated_by: context.userId } as Record<string, unknown>;
+    const payload: any = { ...header, updated_by: context.userId };
     let docId = id;
     if (id) {
-      const { error } = await context.supabase.from("finance_documents").update(payload).eq("id", id);
+      const { error } = await (context.supabase.from("finance_documents") as any).update(payload).eq("id", id);
       if (error) throw new Error(error.message);
     } else {
       payload.created_by = context.userId;
-      const { data: ins, error } = await context.supabase
-        .from("finance_documents")
+      const { data: ins, error } = await (context.supabase.from("finance_documents") as any)
         .insert(payload)
         .select("id")
         .single();
@@ -126,7 +125,6 @@ export const upsertFinanceDocument = createServerFn({ method: "POST" })
     }
 
     if (items) {
-      // Replace items in a simple, deterministic way
       const { error: delErr } = await context.supabase
         .from("finance_document_items")
         .delete()
@@ -134,7 +132,7 @@ export const upsertFinanceDocument = createServerFn({ method: "POST" })
       if (delErr) throw new Error(delErr.message);
       if (items.length) {
         const rows = items.map((it, idx) => ({
-          document_id: docId,
+          document_id: docId!,
           product_id: it.product_id ?? null,
           item_code: it.item_code ?? null,
           description: it.description,
@@ -147,7 +145,7 @@ export const upsertFinanceDocument = createServerFn({ method: "POST" })
           tax_percent: it.tax_percent ?? 0,
           sort_order: it.sort_order ?? idx,
         }));
-        const { error: insErr } = await context.supabase.from("finance_document_items").insert(rows);
+        const { error: insErr } = await (context.supabase.from("finance_document_items") as any).insert(rows);
         if (insErr) throw new Error(insErr.message);
       }
     }
