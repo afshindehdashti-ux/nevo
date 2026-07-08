@@ -1,3 +1,4 @@
+import { withMethodGuards } from "@/lib/api-http";
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 
@@ -19,7 +20,7 @@ const CORS = {
 
 export const Route = createFileRoute('/api/public/contact-submit')({
   server: {
-    handlers: {
+    handlers: withMethodGuards({
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
       POST: async ({ request }) => {
         let body: unknown
@@ -96,6 +97,6 @@ export const Route = createFileRoute('/api/public/contact-submit')({
           { status: 200, headers: CORS },
         )
       },
-    },
+    }),
   },
 })

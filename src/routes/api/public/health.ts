@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { withMethodGuards } from "@/lib/api-http";
 
 // Lightweight uptime probe. Public, unauthenticated, no PII.
 // Used by external uptime monitors (Better Stack, UptimeRobot, etc.)
 // and post-publish smoke checks.
 export const Route = createFileRoute("/api/public/health")({
   server: {
-    handlers: {
+    handlers: withMethodGuards({
       GET: async () => {
         return new Response(
           JSON.stringify({
@@ -27,6 +28,6 @@ export const Route = createFileRoute("/api/public/health")({
           status: 200,
           headers: { "cache-control": "no-store, max-age=0" },
         }),
-    },
+    }),
   },
 });

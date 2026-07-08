@@ -1,3 +1,4 @@
+import { withMethodGuards } from "@/lib/api-http";
 // Backend alert endpoint — receives DLQ notifications from the database
 // trigger `notify_email_dlq` on public.email_send_log and enqueues a branded
 // alert email to the operations mailbox. Bearer-protected with the same
@@ -8,7 +9,7 @@ const ALERT_TEMPLATE = 'email-dlq-alert'
 
 export const Route = createFileRoute('/api/public/alerts/email-dlq')({
   server: {
-    handlers: {
+    handlers: withMethodGuards({
       POST: async ({ request }) => {
         const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
         if (!serviceKey) {
@@ -108,6 +109,6 @@ export const Route = createFileRoute('/api/public/alerts/email-dlq')({
 
         return Response.json({ ok: true, messageId: result.messageId, sms })
       },
-    },
+    }),
   },
 })

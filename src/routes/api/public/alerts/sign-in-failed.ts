@@ -1,3 +1,4 @@
+import { withMethodGuards } from "@/lib/api-http";
 // Public endpoint called by the sign-in page when supabase.auth.signInWithPassword
 // returns an error. Records a `sign_in_failed` row in activity_logs and, when
 // a threshold of failures for the same email in a rolling window is crossed,
@@ -19,7 +20,7 @@ function normalizeEmail(v: unknown): string | null {
 
 export const Route = createFileRoute('/api/public/alerts/sign-in-failed')({
   server: {
-    handlers: {
+    handlers: withMethodGuards({
       POST: async ({ request }) => {
         const url = process.env.SUPABASE_URL ?? import.meta.env.VITE_SUPABASE_URL
         const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -141,6 +142,6 @@ export const Route = createFileRoute('/api/public/alerts/sign-in-failed')({
 
         return Response.json({ ok: true, logged: true, failures, alert })
       },
-    },
+    }),
   },
 })

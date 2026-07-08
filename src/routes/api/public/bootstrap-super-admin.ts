@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { withMethodGuards } from "@/lib/api-http";
 import { z } from "zod";
 
 /**
@@ -16,7 +17,7 @@ const schema = z.object({
 
 export const Route = createFileRoute("/api/public/bootstrap-super-admin")({
   server: {
-    handlers: {
+    handlers: withMethodGuards({
       POST: async ({ request }) => {
         let body: unknown;
         try {
@@ -97,6 +98,6 @@ export const Route = createFileRoute("/api/public/bootstrap-super-admin")({
 
         return Response.json({ ok: true, userId, email });
       },
-    },
+    }),
   },
 });

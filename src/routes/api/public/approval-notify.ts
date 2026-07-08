@@ -1,3 +1,4 @@
+import { withMethodGuards } from "@/lib/api-http";
 import * as React from 'react'
 import { render } from '@react-email/render'
 import { createClient } from '@supabase/supabase-js'
@@ -202,7 +203,7 @@ async function enqueueForRecipient(
 
 export const Route = createFileRoute('/api/public/approval-notify')({
   server: {
-    handlers: {
+    handlers: withMethodGuards({
       POST: async ({ request }) => {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
         const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -356,6 +357,6 @@ export const Route = createFileRoute('/api/public/approval-notify')({
 
         return Response.json({ ok: true, queued, skipped })
       },
-    },
+    }),
   },
 })

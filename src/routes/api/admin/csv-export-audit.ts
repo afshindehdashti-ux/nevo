@@ -20,6 +20,7 @@
  */
 
 import { createFileRoute } from "@tanstack/react-router";
+import { withMethodGuards } from "@/lib/api-http";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
@@ -45,7 +46,7 @@ function jsonError(status: number, message: string, extra?: Record<string, unkno
 
 export const Route = createFileRoute("/api/admin/csv-export-audit")({
   server: {
-    handlers: {
+    handlers: withMethodGuards({
       GET: async ({ request }) => {
         const auth = request.headers.get("authorization") ?? "";
         const token = auth.toLowerCase().startsWith("bearer ")
@@ -135,6 +136,6 @@ export const Route = createFileRoute("/api/admin/csv-export-audit")({
           },
         );
       },
-    },
+    }),
   },
 });
