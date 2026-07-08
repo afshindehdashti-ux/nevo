@@ -21,6 +21,7 @@ import {
   Copy,
   Check,
   RefreshCw,
+  Download,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 
@@ -337,6 +338,38 @@ export function SystemHealthPage() {
       window.setTimeout(() => setCopiedId((cur) => (cur === c.id ? null : cur)), 1500);
     } catch {
       toast.error("Could not copy — clipboard unavailable");
+    }
+  };
+
+  const exportReport = async () => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const payload = {
+        reportType: "system-health",
+        exportedAt: new Date().toISOString(),
+        exportedBy: userData.user?.email ?? userData.user?.id ?? "unknown",
+        sourceUrl: typeof window !== "undefined" ? window.location.href : null,
+        lastRunAt: lastRunAt ? new Date(lastRunAt).toISOString() : null,
+        generatedAtDisplay: lastRunAt ? format(lastRunAt, "yyyy-MM-dd HH:mm:ss") : null,
+        summary,
+        checks: checks.map((c) => ({
+          ...c,
+          lastTested: c.lastTested ? new Date(c.lastTested).toISOString() : null,
+        })),
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const ts = format(Date.now(), "yyyy-MM-dd-HHmmss");
+      a.href = url;
+      a.download = `nevo-system-health-report-${ts}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Report exported");
+    } catch {
+      toast.error("Could not export report");
     }
   };
 
@@ -1140,6 +1173,16 @@ export function SystemHealthPage() {
               Retry failing ({failingIds.length})
             </Button>
           )}
+          <Button
+            variant="outline"
+            onClick={exportReport}
+            disabled={running}
+            className="gap-2"
+            title="Download latest System Health results as JSON"
+          >
+            <Download className="h-4 w-4" />
+            Export report
+          </Button>
           <Button onClick={() => runAll()} disabled={running} className="gap-2">
             {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
             Run Full Backend Test
