@@ -20,7 +20,47 @@ Rules:
 - Non-array responses are treated as errors (see `classifyListState`) so
   schema drift trips error telemetry instead of an unexplained empty card.
 
-## Canonical page skeleton
+## Preferred: `<AdminListPage>` template
+
+For new pages, use the shared shell at
+`src/components/admin/AdminListPage.tsx`. It wires `classifyListState` and
+both telemetry streams (`admin_list_empty_shown`, `reportClientError`)
+automatically, so you can't accidentally forget one:
+
+```tsx
+const { data, isLoading, error, refetch, isFetching } = useQuery({ ... });
+
+return (
+  <AdminListPage<Opportunity>
+    resource="opportunities"
+    eyebrow="CRM"
+    title="Opportunities"
+    subtitle="Pipeline of open and closed deals across NEVO Industrial."
+    isLoading={isLoading}
+    error={error}
+    data={data}
+    refetch={refetch}
+    isFetching={isFetching}
+    empty={{
+      icon: Target,
+      title: "No opportunities yet",
+      description: "New opportunities will show up here as your team creates them.",
+    }}
+  >
+    {(rows) => <OpportunitiesTable rows={rows} />}
+  </AdminListPage>
+);
+```
+
+The shell enforces the precedence chain, the a11y attributes on the skeleton,
+and the `resource` slug on both telemetry streams. Non-array responses are
+routed through `ListErrorState` via `classifyListState`, so schema drift
+never renders as an unexplained empty card.
+
+Only fall back to the manual skeleton below when you need a layout the shell
+can't express (e.g. tabs that own their own state region).
+
+## Canonical page skeleton (manual)
 
 ```tsx
 const { data, isLoading, error, refetch, isFetching } = useQuery({ ... });
