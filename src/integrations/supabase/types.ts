@@ -2450,12 +2450,21 @@ export type Database = {
       partner_commissions: {
         Row: {
           amount: number
+          calc_base_amount: number | null
+          calc_qty: number | null
+          calc_rate: number | null
+          calc_type: Database["public"]["Enums"]["commission_calc_type"]
+          calc_unit: string | null
+          commission_number: string | null
           created_at: string
           created_by: string | null
           currency: string
           customer_id: string | null
+          description: string | null
+          due_date: string | null
           earned_at: string
           id: string
+          invoice_date: string
           invoice_id: string | null
           notes: string | null
           order_id: string | null
@@ -2467,12 +2476,21 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          calc_base_amount?: number | null
+          calc_qty?: number | null
+          calc_rate?: number | null
+          calc_type?: Database["public"]["Enums"]["commission_calc_type"]
+          calc_unit?: string | null
+          commission_number?: string | null
           created_at?: string
           created_by?: string | null
           currency?: string
           customer_id?: string | null
+          description?: string | null
+          due_date?: string | null
           earned_at?: string
           id?: string
+          invoice_date?: string
           invoice_id?: string | null
           notes?: string | null
           order_id?: string | null
@@ -2484,12 +2502,21 @@ export type Database = {
         }
         Update: {
           amount?: number
+          calc_base_amount?: number | null
+          calc_qty?: number | null
+          calc_rate?: number | null
+          calc_type?: Database["public"]["Enums"]["commission_calc_type"]
+          calc_unit?: string | null
+          commission_number?: string | null
           created_at?: string
           created_by?: string | null
           currency?: string
           customer_id?: string | null
+          description?: string | null
+          due_date?: string | null
           earned_at?: string
           id?: string
+          invoice_date?: string
           invoice_id?: string | null
           notes?: string | null
           order_id?: string | null
@@ -3734,10 +3761,12 @@ export type Database = {
         }
         Returns: number
       }
+      next_commission_number: { Args: never; Returns: string }
       next_invoice_number: {
         Args: { _type: Database["public"]["Enums"]["invoice_type"] }
         Returns: string
       }
+      next_po_number: { Args: never; Returns: string }
       next_quotation_number: { Args: never; Returns: string }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
@@ -3781,6 +3810,12 @@ export type Database = {
         | "operations"
         | "finance"
         | "read_only"
+      commission_calc_type:
+        | "percentage"
+        | "fixed"
+        | "per_ton"
+        | "per_container"
+        | "per_project"
       communication_direction: "inbound" | "outbound" | "internal"
       communication_kind:
         | "note"
@@ -4041,6 +4076,13 @@ export const Constants = {
         "operations",
         "finance",
         "read_only",
+      ],
+      commission_calc_type: [
+        "percentage",
+        "fixed",
+        "per_ton",
+        "per_container",
+        "per_project",
       ],
       communication_direction: ["inbound", "outbound", "internal"],
       communication_kind: [
