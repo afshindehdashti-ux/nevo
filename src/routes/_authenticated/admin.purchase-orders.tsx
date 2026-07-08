@@ -70,6 +70,7 @@ function PurchaseOrdersList() {
           icon={ClipboardList}
           title="No purchase orders yet"
           description="Confirmed customer purchase orders show up here as they enter the operations pipeline. Convert a quotation to create the first one."
+          resource="purchase_orders"
         />
       ) : (
         <div className="border border-border rounded-md overflow-hidden bg-background">

@@ -73,6 +73,7 @@ function CommissionInvoicesList() {
           icon={Percent}
           title="No commissions yet"
           description="Commissions accrue automatically when partner-linked customer orders are confirmed and invoiced. New entries will appear here for review and payout."
+          resource="commission_invoices"
         />
       ) : (
         <div className="border border-border rounded-md overflow-hidden bg-background">
