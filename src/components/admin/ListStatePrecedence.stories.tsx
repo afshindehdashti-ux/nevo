@@ -4,6 +4,7 @@ import { Target } from "lucide-react";
 import { ListErrorState } from "./ListErrorState";
 import { ListEmptyState } from "./ListEmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { AdminListResource } from "./list-telemetry";
 
 type StateKind = "error" | "loading" | "empty" | "ready";
 
