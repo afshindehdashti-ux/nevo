@@ -563,10 +563,12 @@ export const runErpFinanceTest = createServerFn({ method: "POST" })
       try {
         const { error } = await supabase.from("document_files").insert({
           document_id: docId,
-          file_path: `qa/${docId}.pdf`,
-          file_type: "application/pdf",
-          size_bytes: pdfBytes,
-          kind: "test",
+          kind: "pdf",
+          storage_bucket: "documents",
+          storage_path: `qa/${docId}.pdf`,
+          content_type: "application/pdf",
+          file_size: pdfBytes,
+          generated_by: context.userId,
         });
         if (error) throw new Error(error.message);
         step({ key: "files", label: "Save PDF link to document_files", status: "pass", message: "Row inserted" });
