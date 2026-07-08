@@ -54,15 +54,14 @@ export const runImport = createServerFn({ method: "POST" })
     const rows = data.rows.map((r) => mapRow(r, data.column_mapping));
 
     // Create import audit row
-    const { data: job, error: jobErr } = await context.supabase
-      .from("imports")
+    const { data: job, error: jobErr } = await (context.supabase.from("imports") as any)
       .insert({
         import_type: data.import_type,
         source: data.source,
         raw_row_count: rows.length,
         status: data.dry_run ? "dry_run" : "processing",
         column_mapping: data.column_mapping ?? {},
-        preview_data: rows.slice(0, 5),
+        preview_data: rows.slice(0, 5) as any,
         created_by: context.userId,
       })
       .select("id")
@@ -130,10 +129,9 @@ export const runImport = createServerFn({ method: "POST" })
                 .maybeSingle();
               customer_id = c?.id ?? null;
             }
-            const { data: doc, error } = await context.supabase
-              .from("finance_documents")
+            const { data: doc, error } = await (context.supabase.from("finance_documents") as any)
               .insert({
-                document_type: doc_type as never,
+                document_type: doc_type,
                 customer_id,
                 currency: str(r.currency) ?? "USD",
                 created_by: context.userId,
@@ -156,13 +154,12 @@ export const runImport = createServerFn({ method: "POST" })
       }
     }
 
-    await context.supabase
-      .from("imports")
+    await (context.supabase.from("imports") as any)
       .update({
         status: data.dry_run ? "dry_run_complete" : errors.length ? "completed_with_errors" : "completed",
         processed_count: processed,
         error_count: errors.length,
-        errors,
+        errors: errors as any,
         completed_at: new Date().toISOString(),
       })
       .eq("id", job.id);

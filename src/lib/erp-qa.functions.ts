@@ -12,7 +12,7 @@ type CheckResult = {
   label: string;
   passed: boolean;
   message: string;
-  details?: unknown;
+  details?: any;
 };
 
 export const runErpQa = createServerFn({ method: "POST" })
