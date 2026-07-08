@@ -113,9 +113,56 @@ function StatusBadge({ status }: { status: CheckStatus }) {
 
 export function SystemHealthPage() {
   const { data: roles, isLoading: rolesLoading } = useMyRoles();
-  const [checks, setChecks] = useState<CheckResult[]>(INITIAL_CHECKS);
+  const [checks, setChecks] = useState<CheckResult[]>(() => loadPersisted() ?? INITIAL_CHECKS);
   const [running, setRunning] = useState(false);
-  const [lastRunAt, setLastRunAt] = useState<number | null>(null);
+  const [lastRunAt, setLastRunAt] = useState<number | null>(() => loadLastRunAt());
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Persist check results + last run so timestamps survive refresh.
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_CHECKS_KEY, JSON.stringify(checks));
+    } catch {
+      /* storage unavailable */
+    }
+  }, [checks]);
+  useEffect(() => {
+    try {
+      if (lastRunAt) localStorage.setItem(STORAGE_LAST_RUN_KEY, String(lastRunAt));
+    } catch {
+      /* storage unavailable */
+    }
+  }, [lastRunAt]);
+
+  // Auto-expand any check that ends in warn/fail after a run.
+  useEffect(() => {
+    if (running) return;
+    setExpanded((prev) => {
+      const next = { ...prev };
+      for (const c of checks) {
+        if ((c.status === "fail" || c.status === "warn") && next[c.id] === undefined) {
+          next[c.id] = true;
+        }
+      }
+      return next;
+    });
+  }, [running, checks]);
+
+  const toggle = (id: string) => setExpanded((p) => ({ ...p, [id]: !p[id] }));
+
+  const copyFix = async (c: CheckResult) => {
+    if (!c.suggestedFix) return;
+    const payload = `[${c.title}] ${c.status.toUpperCase()}\nDetails: ${c.details ?? "-"}\nSuggested fix: ${c.suggestedFix}`;
+    try {
+      await navigator.clipboard.writeText(payload);
+      setCopiedId(c.id);
+      toast.success("Suggested fix copied to clipboard");
+      window.setTimeout(() => setCopiedId((cur) => (cur === c.id ? null : cur)), 1500);
+    } catch {
+      toast.error("Could not copy — clipboard unavailable");
+    }
+  };
 
   if (rolesLoading) {
     return (
