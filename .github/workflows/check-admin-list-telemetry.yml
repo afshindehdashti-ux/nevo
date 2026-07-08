@@ -1,0 +1,24 @@
+name: check-admin-list-telemetry
+
+on:
+  pull_request:
+    paths:
+      - "src/**/*.ts"
+      - "src/**/*.tsx"
+      - "scripts/check-admin-list-telemetry.mjs"
+      - ".github/workflows/check-admin-list-telemetry.yml"
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      # No dependencies — the script uses only Node stdlib so we skip
+      # `bun install` to keep this guard cheap and fast.
+      - name: Enforce admin_list_empty_shown contract
+        run: node scripts/check-admin-list-telemetry.mjs
