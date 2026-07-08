@@ -160,6 +160,36 @@ function ProformaInvoiceDetail() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Approve failed"),
   });
 
+  // Payment capture
+  const [paymentAmount, setPaymentAmount] = useState<string>("");
+  const [paymentMode, setPaymentMode] = useState<"add" | "set">("add");
+
+  const recordPayment = useMutation({
+    mutationFn: async () => {
+      if (!pi) throw new Error("Not loaded");
+      const amt = Number(paymentAmount);
+      if (!Number.isFinite(amt) || amt < 0) throw new Error("Enter a valid amount");
+      const nextPaid =
+        paymentMode === "add" ? Number(pi.amount_paid ?? 0) + amt : amt;
+      if (nextPaid < 0) throw new Error("Amount paid cannot be negative");
+      if (nextPaid > Number(pi.grand_total ?? 0) + 0.009) {
+        throw new Error("Amount paid cannot exceed grand total");
+      }
+      const { error } = await supabase
+        .from("proforma_invoices")
+        .update({ amount_paid: nextPaid })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Payment recorded");
+      setPaymentAmount("");
+      qc.invalidateQueries({ queryKey: ["proforma_invoice", id] });
+      qc.invalidateQueries({ queryKey: ["proforma_invoices", "list"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Payment failed"),
+  });
+
   const [downloading, setDownloading] = useState(false);
   const download = async () => {
     setDownloading(true);
