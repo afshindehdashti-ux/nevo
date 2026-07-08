@@ -399,7 +399,6 @@ function ProformaInvoiceDetail() {
             </CardContent>
           </Card>
 
-          </Card>
 
           <Card>
             <CardHeader>
