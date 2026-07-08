@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GuideMeButton } from "@/components/ai/GuideMeButton";
+import { ListErrorState } from "@/components/admin/ListErrorState";
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import { buildSelect } from "@/lib/supabase-select";
 
