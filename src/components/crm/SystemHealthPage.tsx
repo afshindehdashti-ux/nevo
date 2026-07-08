@@ -1315,9 +1315,6 @@ export function SystemHealthPage() {
             </Card>
           );
         })}
-            </Card>
-          );
-        })}
       </div>
 
     </div>
