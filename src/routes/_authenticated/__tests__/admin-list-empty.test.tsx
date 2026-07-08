@@ -56,7 +56,7 @@ const cases: Array<[string, string, string]> = [
 ];
 
 describe.each(cases)("admin.%s — empty state", (_label, routePath, title) => {
-  it(`shows ${title!r =} card and no table when the query returns []`, async () => {
+  it(`shows the ${title} card and no table when the query returns []`, async () => {
     await renderRoute(routePath);
 
     await waitFor(() => {
