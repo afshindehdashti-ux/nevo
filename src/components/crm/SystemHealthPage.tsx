@@ -216,7 +216,7 @@ export function SystemHealthPage() {
     );
   }
 
-  const update = (id: string, patch: Partial<CheckResult>) =>
+  const writeCheck = (id: string, patch: Partial<CheckResult>) =>
     setChecks((prev) =>
       prev.map((c) => (c.id === id ? { ...c, ...patch, lastTested: Date.now() } : c)),
     );
@@ -234,15 +234,15 @@ export function SystemHealthPage() {
       ),
     );
 
-    // Per-check helpers — flip to "running" right before the block runs,
-    // and only write the result if this check is in scope for the current pass.
+    // Per-check progress — flip to "running" right before the block runs.
     const mark = (id: string) => {
       if (!inScope(id)) return;
       setChecks((prev) => prev.map((c) => (c.id === id ? { ...c, status: "running" } : c)));
     };
-    const write = (id: string, patch: Partial<CheckResult>) => {
+    // Scoped writer: only writes the result if this check is in the current pass.
+    const update = (id: string, patch: Partial<CheckResult>) => {
       if (!inScope(id)) return;
-      update(id, patch);
+      writeCheck(id, patch);
     };
 
     const createdIds: {
