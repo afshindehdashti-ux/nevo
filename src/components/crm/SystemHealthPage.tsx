@@ -68,6 +68,16 @@ type CheckResult = {
   details?: string;
   suggestedFix?: string;
   lastTested?: number;
+  /** Postgres / PostgREST error code (e.g. "42501", "PGRST116"). */
+  errorCode?: string;
+  /** Raw error message from Supabase / thrown Error. */
+  errorMessage?: string;
+  /** Optional hint returned by Postgres/PostgREST. */
+  errorHint?: string;
+  /** The SQL / PostgREST call the check was running when it failed. */
+  query?: string;
+  /** CRM tables, RPCs, or routes this check touched. */
+  endpoints?: string[];
 };
 
 const INITIAL_CHECKS: CheckResult[] = [
@@ -93,6 +103,123 @@ const INITIAL_CHECKS: CheckResult[] = [
   { id: "crm_connectivity", title: "20. CRM Connectivity (leads/opps/contacts/tasks)", status: "idle" },
   { id: "realtime", title: "21. Realtime Channel Connectivity", status: "idle" },
 ];
+
+/**
+ * Static metadata per check: the query / RPC / route each check exercises and
+ * the CRM endpoints (tables, RPCs, routes) it touches. Merged into failure
+ * cards so operators can see exactly what broke without re-reading the code.
+ */
+const CHECK_META: Record<string, { query?: string; endpoints?: string[] }> = {
+  auth: { query: "supabase.auth.getUser()", endpoints: ["auth.users"] },
+  db: {
+    query: `select count(*) from public.<table> -- for each REQUIRED_TABLES entry`,
+    endpoints: [
+      "profiles", "customers", "suppliers", "products", "orders", "quotations",
+      "proforma_invoices", "invoices", "partner_commissions", "payments",
+      "documents", "activity_logs", "company_settings", "document_settings",
+      "import_jobs",
+    ],
+  },
+  crm: { query: "select count(*) from public.profiles", endpoints: ["profiles"] },
+  customer_crud: {
+    query: "insert into public.customers ...; update public.customers set name=$1 where id=$2",
+    endpoints: ["customers", "RLS: Staff manage customers"],
+  },
+  supplier_crud: {
+    query: "insert into public.suppliers (name) values ($1)",
+    endpoints: ["suppliers", "RLS: Staff manage suppliers"],
+  },
+  product_crud: {
+    query: "insert into public.products (name) values ($1)",
+    endpoints: ["products", "RLS: Staff manage products"],
+  },
+  quotation: {
+    query:
+      "insert into public.quotations ...; insert into public.quotation_items ...; select subtotal,vat_amount,total,customer_id,valid_until,quotation_number from public.quotations where id=$1",
+    endpoints: [
+      "quotations", "quotation_items",
+      "trigger: trg_quotations_number", "trigger: trg_qitems_recalc",
+      "route: /admin/quotations/:id",
+    ],
+  },
+  proforma: {
+    query:
+      "insert into public.proforma_invoices ...; insert into public.proforma_invoice_items ...; update public.proforma_invoices set amount_paid=$1; delete from public.proforma_invoice_items where id=$1; delete from public.proforma_invoices where id=$1",
+    endpoints: [
+      "proforma_invoices", "proforma_invoice_items",
+      "trigger: recalc_proforma_totals", "trigger: proforma_invoices_sync_mirrors",
+      "route: /admin/proforma-invoices/:id",
+    ],
+  },
+  commercial: {
+    query: "select count(*) from public.invoices",
+    endpoints: ["invoices", "route: /admin/invoices"],
+  },
+  commission: {
+    query: "select count(*) from public.partner_commissions",
+    endpoints: ["partner_commissions", "route: /admin/partners"],
+  },
+  purchase_order: {
+    query: "select count(*) from public.orders",
+    endpoints: ["orders", "route: /admin/orders"],
+  },
+  pdf: {
+    query: "n/a (client-side jsPDF builders)",
+    endpoints: [
+      "src/lib/quotation-pdf.ts", "src/lib/proforma-invoice-pdf.ts", "src/lib/invoice-pdf.ts",
+      "route: /admin/quotations/:id/print",
+    ],
+  },
+  files: {
+    query: "select count(*) from public.documents",
+    endpoints: ["documents", "storage.buckets (documents)"],
+  },
+  doc_import: {
+    query: "select count(*) from public.import_jobs",
+    endpoints: ["import_jobs", "route: /admin/imports"],
+  },
+  ai: {
+    query: "select count(*) from public.ai_assistant_conversations",
+    endpoints: ["ai_assistant_conversations", "ai_chat_messages", "ai_documents"],
+  },
+  role: { query: "n/a (client role membership check)", endpoints: ["user_roles"] },
+  rls: {
+    query: "select public.has_role(auth.uid(), 'super_admin'::app_role)",
+    endpoints: ["rpc: has_role", "user_roles"],
+  },
+  auth_session: { query: "supabase.auth.getSession()", endpoints: ["auth.sessions"] },
+  rls_enforced: {
+    query: "select user_id from public.user_roles",
+    endpoints: ["user_roles", "policy: user_roles SELECT scoped to auth.uid()"],
+  },
+  crm_connectivity: {
+    query: "select count(*) from public.<table> -- leads, opportunities, contacts, tasks",
+    endpoints: ["leads", "opportunities", "contacts", "tasks"],
+  },
+  realtime: {
+    query: "supabase.channel('health-check-*').subscribe()",
+    endpoints: ["realtime (websocket)"],
+  },
+};
+
+/** Extract PostgrestError-style fields off a thrown value. */
+function extractErr(e: unknown): {
+  errorCode?: string;
+  errorMessage?: string;
+  errorHint?: string;
+} {
+  if (!e || typeof e !== "object") {
+    return { errorMessage: typeof e === "string" ? e : String(e) };
+  }
+  const anyE = e as {
+    code?: string; status?: number; message?: string; hint?: string; details?: string;
+    error_description?: string;
+  };
+  const code = anyE.code || (anyE.status ? `HTTP ${anyE.status}` : undefined);
+  const message = anyE.message || anyE.error_description || anyE.details || String(e);
+  const hint = anyE.hint || undefined;
+  return { errorCode: code, errorMessage: message, errorHint: hint };
+}
 
 const REQUIRED_TABLES = [
   "profiles",
@@ -189,17 +316,30 @@ export function SystemHealthPage() {
   const toggle = (id: string) => setExpanded((p) => ({ ...p, [id]: !p[id] }));
 
   const copyFix = async (c: CheckResult) => {
-    if (!c.suggestedFix) return;
-    const payload = `[${c.title}] ${c.status.toUpperCase()}\nDetails: ${c.details ?? "-"}\nSuggested fix: ${c.suggestedFix}`;
+    const lines = [
+      `[${c.title}] ${c.status.toUpperCase()}`,
+      c.details ? `Details: ${c.details}` : null,
+      c.errorCode ? `Error code: ${c.errorCode}` : null,
+      c.errorMessage ? `Error message: ${c.errorMessage}` : null,
+      c.errorHint ? `Hint: ${c.errorHint}` : null,
+      c.query ? `Failing query:\n${c.query}` : null,
+      c.endpoints && c.endpoints.length
+        ? `Affected endpoints: ${c.endpoints.join(", ")}`
+        : null,
+      c.suggestedFix ? `Suggested fix: ${c.suggestedFix}` : null,
+    ].filter(Boolean);
+    const payload = lines.join("\n");
+    if (!payload) return;
     try {
       await navigator.clipboard.writeText(payload);
       setCopiedId(c.id);
-      toast.success("Suggested fix copied to clipboard");
+      toast.success("Failure report copied to clipboard");
       window.setTimeout(() => setCopiedId((cur) => (cur === c.id ? null : cur)), 1500);
     } catch {
       toast.error("Could not copy — clipboard unavailable");
     }
   };
+
 
   if (rolesLoading) {
     return (
@@ -229,7 +369,17 @@ export function SystemHealthPage() {
     setChecks((prev) =>
       prev.map((c) =>
         inScope(c.id)
-          ? { ...c, status: "idle", details: undefined, suggestedFix: undefined }
+          ? {
+              ...c,
+              status: "idle",
+              details: undefined,
+              suggestedFix: undefined,
+              errorCode: undefined,
+              errorMessage: undefined,
+              errorHint: undefined,
+              query: undefined,
+              endpoints: undefined,
+            }
           : c,
       ),
     );
@@ -240,10 +390,38 @@ export function SystemHealthPage() {
       setChecks((prev) => prev.map((c) => (c.id === id ? { ...c, status: "running" } : c)));
     };
     // Scoped writer: only writes the result if this check is in the current pass.
-    const update = (id: string, patch: Partial<CheckResult>) => {
+    // On fail/warn, auto-attach query + endpoints from CHECK_META so every
+    // failure card carries actionable context. Pass the caught error as the
+    // third arg to also surface Postgres/PostgREST code/message/hint.
+    const update = (
+      id: string,
+      patch: Partial<CheckResult>,
+      err?: unknown,
+    ) => {
       if (!inScope(id)) return;
-      writeCheck(id, patch);
+      const enriched: Partial<CheckResult> = { ...patch };
+      const isFailure = patch.status === "fail" || patch.status === "warn";
+      if (isFailure) {
+        const meta = CHECK_META[id];
+        if (meta && enriched.query === undefined) enriched.query = meta.query;
+        if (meta && enriched.endpoints === undefined) enriched.endpoints = meta.endpoints;
+        if (err !== undefined) {
+          const { errorCode, errorMessage, errorHint } = extractErr(err);
+          if (enriched.errorCode === undefined) enriched.errorCode = errorCode;
+          if (enriched.errorMessage === undefined) enriched.errorMessage = errorMessage;
+          if (enriched.errorHint === undefined) enriched.errorHint = errorHint;
+        }
+      } else if (patch.status === "pass") {
+        // Clear any stale error metadata from a previous run.
+        enriched.errorCode = undefined;
+        enriched.errorMessage = undefined;
+        enriched.errorHint = undefined;
+        enriched.query = undefined;
+        enriched.endpoints = undefined;
+      }
+      writeCheck(id, enriched);
     };
+
 
     const createdIds: {
       customer?: string;
@@ -268,7 +446,7 @@ export function SystemHealthPage() {
           status: "fail",
           details: (e as Error).message,
           suggestedFix: "Sign in again at /admin/login.",
-        });
+        }, e);
       }
 
       mark("db");
@@ -292,7 +470,7 @@ export function SystemHealthPage() {
           });
         }
       } catch (e) {
-        update("db", { status: "fail", details: (e as Error).message });
+        update("db", { status: "fail", details: (e as Error).message }, e);
       }
 
       mark("crm");
@@ -302,7 +480,7 @@ export function SystemHealthPage() {
         if (error) throw error;
         update("crm", { status: "pass", details: "Core CRM tables responded." });
       } catch (e) {
-        update("crm", { status: "fail", details: (e as Error).message });
+        update("crm", { status: "fail", details: (e as Error).message }, e);
       }
 
       mark("customer_crud");
@@ -327,7 +505,7 @@ export function SystemHealthPage() {
           status: "fail",
           details: (e as Error).message,
           suggestedFix: "Check RLS write policies on public.customers for your role.",
-        });
+        }, e);
       }
 
       mark("supplier_crud");
@@ -346,7 +524,7 @@ export function SystemHealthPage() {
           status: "fail",
           details: (e as Error).message,
           suggestedFix: "Check RLS write policies on public.suppliers.",
-        });
+        }, e);
       }
 
       mark("product_crud");
@@ -365,7 +543,7 @@ export function SystemHealthPage() {
           status: "fail",
           details: (e as Error).message,
           suggestedFix: "Check RLS write policies on public.products.",
-        });
+        }, e);
       }
 
       mark("quotation");
@@ -439,7 +617,7 @@ export function SystemHealthPage() {
           status: "fail",
           details: (e as Error).message,
           suggestedFix: "Verify quotations schema (customer_id, valid_until, subtotal/total) and that trg_qitems_recalc + trg_quotations_number are installed.",
-        });
+        }, e);
       } finally {
         if (quotationId) {
           await supabase.from("quotation_items").delete().eq("quotation_id", quotationId);
@@ -636,7 +814,7 @@ export function SystemHealthPage() {
           details: (e as Error).message,
           suggestedFix:
             "Verify proforma_invoices has vat_amount/grand_total/balance_due/payment_status/terms_conditions/bank_details/approved_by columns, that recalc_proforma_totals + proforma_sync_mirrors triggers are installed, and that DELETE on the parent removes proforma_invoice_items (or that items are pre-cleaned).",
-        });
+        }, e);
       }
 
 
@@ -648,7 +826,7 @@ export function SystemHealthPage() {
         if (error) throw error;
         update("commercial", { status: "pass", details: "Invoices table reachable." });
       } catch (e) {
-        update("commercial", { status: "fail", details: (e as Error).message });
+        update("commercial", { status: "fail", details: (e as Error).message }, e);
       }
 
       mark("commission");
@@ -660,7 +838,7 @@ export function SystemHealthPage() {
         if (error) throw error;
         update("commission", { status: "pass", details: "partner_commissions reachable." });
       } catch (e) {
-        update("commission", { status: "fail", details: (e as Error).message });
+        update("commission", { status: "fail", details: (e as Error).message }, e);
       }
 
       mark("purchase_order");
@@ -679,7 +857,7 @@ export function SystemHealthPage() {
           status: "warn",
           details: (e as Error).message,
           suggestedFix: "Add a dedicated purchase_orders table if needed.",
-        });
+        }, e);
       }
 
       mark("pdf");
@@ -691,7 +869,7 @@ export function SystemHealthPage() {
           details: "PDF print route registered at /admin/quotations/:id/print.",
         });
       } catch (e) {
-        update("pdf", { status: "warn", details: (e as Error).message });
+        update("pdf", { status: "warn", details: (e as Error).message }, e);
       }
 
       mark("files");
@@ -705,7 +883,7 @@ export function SystemHealthPage() {
           status: "warn",
           details: (e as Error).message,
           suggestedFix: "Ensure the documents storage bucket and RLS policies exist.",
-        });
+        }, e);
       }
 
       mark("doc_import");
@@ -717,7 +895,7 @@ export function SystemHealthPage() {
         if (error) throw error;
         update("doc_import", { status: "pass", details: "import_jobs reachable." });
       } catch (e) {
-        update("doc_import", { status: "warn", details: (e as Error).message });
+        update("doc_import", { status: "warn", details: (e as Error).message }, e);
       }
 
       mark("ai");
@@ -729,7 +907,7 @@ export function SystemHealthPage() {
         if (error) throw error;
         update("ai", { status: "pass", details: "AI Assistant tables reachable." });
       } catch (e) {
-        update("ai", { status: "warn", details: (e as Error).message });
+        update("ai", { status: "warn", details: (e as Error).message }, e);
       }
 
       mark("role");
@@ -741,7 +919,7 @@ export function SystemHealthPage() {
           details: `Current roles: ${roleList}. Allowed on this page: ${ALLOWED_ROLES.join(", ")}.`,
         });
       } catch (e) {
-        update("role", { status: "fail", details: (e as Error).message });
+        update("role", { status: "fail", details: (e as Error).message }, e);
       }
 
       mark("rls");
@@ -761,7 +939,7 @@ export function SystemHealthPage() {
           status: "warn",
           details: (e as Error).message,
           suggestedFix: "Ensure public.has_role(uuid, app_role) exists and is SECURITY DEFINER.",
-        });
+        }, e);
       }
 
       mark("auth_session");
@@ -795,7 +973,7 @@ export function SystemHealthPage() {
           status: "fail",
           details: (e as Error).message,
           suggestedFix: "Re-authenticate at /admin/login.",
-        });
+        }, e);
       }
 
       mark("rls_enforced");
@@ -826,7 +1004,7 @@ export function SystemHealthPage() {
           status: "warn",
           details: (e as Error).message,
           suggestedFix: "Ensure public.user_roles has SELECT policy scoped to auth.uid().",
-        });
+        }, e);
       }
 
       mark("crm_connectivity");
@@ -861,7 +1039,7 @@ export function SystemHealthPage() {
           });
         }
       } catch (e) {
-        update("crm_connectivity", { status: "fail", details: (e as Error).message });
+        update("crm_connectivity", { status: "fail", details: (e as Error).message }, e);
       }
 
       mark("realtime");
@@ -892,7 +1070,7 @@ export function SystemHealthPage() {
           });
         }
       } catch (e) {
-        update("realtime", { status: "warn", details: (e as Error).message });
+        update("realtime", { status: "warn", details: (e as Error).message }, e);
       }
     } finally {
       // Cleanup test records
@@ -981,11 +1159,27 @@ export function SystemHealthPage() {
 
       <div className="grid gap-3">
         {checks.map((c) => {
-          const hasBody = !!(c.details || c.suggestedFix);
           const isFailing = c.status === "fail" || c.status === "warn";
+          const hasBody = !!(
+            c.details ||
+            c.suggestedFix ||
+            c.errorMessage ||
+            c.errorCode ||
+            c.errorHint ||
+            (isFailing && (c.query || (c.endpoints && c.endpoints.length)))
+          );
           const isOpen = expanded[c.id] ?? (isFailing && hasBody);
           return (
-            <Card key={c.id}>
+            <Card
+              key={c.id}
+              className={
+                c.status === "fail"
+                  ? "border-rose-500/40"
+                  : c.status === "warn"
+                    ? "border-amber-500/40"
+                    : undefined
+              }
+            >
               <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-3">
                 <div className="min-w-0">
                   <CardTitle className="text-base flex items-center gap-2">
@@ -1035,6 +1229,63 @@ export function SystemHealthPage() {
                       {c.details}
                     </p>
                   )}
+
+                  {(c.errorCode || c.errorMessage || c.errorHint) && (
+                    <div className="rounded-md border border-rose-500/30 bg-rose-500/5 p-3 space-y-1.5">
+                      <p className="text-xs font-medium text-rose-600 dark:text-rose-400 uppercase tracking-wide">
+                        Error
+                      </p>
+                      {c.errorCode && (
+                        <p className="text-xs">
+                          <span className="font-medium text-foreground">Code: </span>
+                          <code className="font-mono text-rose-600 dark:text-rose-400">
+                            {c.errorCode}
+                          </code>
+                        </p>
+                      )}
+                      {c.errorMessage && (
+                        <pre className="text-xs font-mono whitespace-pre-wrap break-words text-foreground/90 leading-relaxed">
+                          {c.errorMessage}
+                        </pre>
+                      )}
+                      {c.errorHint && (
+                        <p className="text-xs text-muted-foreground">
+                          <span className="font-medium text-foreground">Hint: </span>
+                          {c.errorHint}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {isFailing && c.query && (
+                    <div className="rounded-md border border-border/60 bg-muted/40 p-3 space-y-1.5">
+                      <p className="text-xs font-medium text-foreground uppercase tracking-wide">
+                        Failing query
+                      </p>
+                      <pre className="text-xs font-mono whitespace-pre-wrap break-words text-muted-foreground leading-relaxed">
+                        {c.query}
+                      </pre>
+                    </div>
+                  )}
+
+                  {isFailing && c.endpoints && c.endpoints.length > 0 && (
+                    <div className="rounded-md border border-border/60 bg-muted/40 p-3 space-y-2">
+                      <p className="text-xs font-medium text-foreground uppercase tracking-wide">
+                        Affected endpoints
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {c.endpoints.map((ep) => (
+                          <code
+                            key={ep}
+                            className="text-[11px] font-mono px-1.5 py-0.5 rounded border border-border/60 bg-background text-foreground/80"
+                          >
+                            {ep}
+                          </code>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {c.suggestedFix && (
                     <div className="rounded-md border border-border/60 bg-muted/40 p-3 space-y-2">
                       <p className="text-sm text-muted-foreground">
@@ -1053,7 +1304,7 @@ export function SystemHealthPage() {
                           </>
                         ) : (
                           <>
-                            <Copy className="h-3.5 w-3.5" /> Copy suggested fix
+                            <Copy className="h-3.5 w-3.5" /> Copy failure report
                           </>
                         )}
                       </Button>
