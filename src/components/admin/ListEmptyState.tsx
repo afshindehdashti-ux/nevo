@@ -2,7 +2,11 @@ import { useEffect, useRef, type ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { logClientEvent } from "@/lib/client-monitor";
-import type { AdminListEmptyReason, AdminListResource } from "./list-telemetry";
+import {
+  emitAdminListEmptyShown,
+  type AdminListEmptyReason,
+  type AdminListResource,
+} from "./list-telemetry";
 
 interface ListEmptyStateProps {
   /** Icon rendered above the title (lucide-react component). */
