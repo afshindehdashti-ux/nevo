@@ -62,7 +62,7 @@ function CommissionInvoicesList() {
           isRetrying={isFetching}
         />
       ) : isLoading ? (
-        <div className="space-y-2">
+        <div data-testid="list-skeleton" aria-busy="true" aria-live="polite" className="space-y-2">
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-12 w-full" />
