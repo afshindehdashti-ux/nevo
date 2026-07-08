@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Copy,
   Check,
+  RefreshCw,
   Download,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
