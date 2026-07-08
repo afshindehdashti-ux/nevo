@@ -317,8 +317,9 @@ export const convertQuotationToProforma = createServerFn({ method: "POST" })
         vat_amount: Number(q.vat_amount ?? 0),
         total: Number(q.total ?? 0),
         notes: q.notes ?? null,
+        payment_terms: q.terms ?? null,
       })
-      .select("id")
+      .select("id, invoice_number")
       .maybeSingle();
     if (invErr) throw new Error(invErr.message);
     if (!inv?.id) throw new Error("Could not create proforma invoice");
@@ -353,6 +354,141 @@ export const convertQuotationToProforma = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (linkErr) throw new Error(linkErr.message);
 
+    // Audit trail — best-effort.
+    try {
+      await context.supabase.from("activity_logs").insert({
+        user_id: context.userId,
+        action: "convert",
+        entity_type: "quotation_to_proforma",
+        entity_id: data.id,
+        metadata: {
+          quotation_id: data.id,
+          proforma_invoice_id: inv.id,
+          proforma_number: inv.invoice_number,
+          items: (items ?? []).length,
+          total: Number(q.total ?? 0),
+          currency: q.currency,
+        },
+      });
+    } catch (err) {
+      console.warn("convertQuotationToProforma activity log failed", err);
+    }
+
     return { invoice_id: inv.id, already: false };
   });
+
+/**
+ * Convert a proforma invoice into a commercial (final) invoice.
+ * Copies customer, currency, payment terms, notes, and all line items.
+ * Links the new commercial invoice back to the source via
+ * `invoices.proforma_invoice_id`.
+ */
+export const convertProformaToCommercial = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        due_date: z.string().nullable().optional(),
+      })
+      .parse(v),
+  )
+  .handler(async ({ context, data }) => {
+    const [{ data: pi, error: piErr }, { data: items, error: iErr }] = await Promise.all([
+      context.supabase
+        .from("invoices")
+        .select(
+          "id, type, customer_id, currency, subtotal, vat_amount, total, notes, payment_terms, invoice_number",
+        )
+        .eq("id", data.id)
+        .maybeSingle(),
+      context.supabase
+        .from("invoice_items")
+        .select(
+          "description, quantity, unit, unit_price, discount_pct, vat_pct, line_total, position, product_id",
+        )
+        .eq("invoice_id", data.id)
+        .order("position"),
+    ]);
+    if (piErr) throw new Error(piErr.message);
+    if (iErr) throw new Error(iErr.message);
+    if (!pi) throw new Error("Proforma invoice not found");
+    if (pi.type !== "proforma") throw new Error("Source invoice is not a proforma");
+    if (!pi.customer_id) throw new Error("Proforma has no customer");
+
+    // Idempotency: reuse an existing commercial invoice already derived from
+    // this proforma.
+    const { data: existing } = await context.supabase
+      .from("invoices")
+      .select("id")
+      .eq("proforma_invoice_id", pi.id)
+      .eq("type", "commercial")
+      .maybeSingle();
+    if (existing?.id) {
+      return { invoice_id: existing.id, already: true };
+    }
+
+    const { data: inv, error: invErr } = await context.supabase
+      .from("invoices")
+      .insert({
+        type: "commercial",
+        status: "draft",
+        customer_id: pi.customer_id,
+        currency: pi.currency,
+        issue_date: new Date().toISOString().slice(0, 10),
+        due_date: data.due_date ?? null,
+        subtotal: Number(pi.subtotal ?? 0),
+        vat_amount: Number(pi.vat_amount ?? 0),
+        total: Number(pi.total ?? 0),
+        notes: pi.notes ?? null,
+        payment_terms: pi.payment_terms ?? null,
+        proforma_invoice_id: pi.id,
+      })
+      .select("id, invoice_number")
+      .maybeSingle();
+    if (invErr) throw new Error(invErr.message);
+    if (!inv?.id) throw new Error("Could not create commercial invoice");
+
+    if ((items ?? []).length > 0) {
+      const rows = (items ?? []).map((it) => ({
+        invoice_id: inv.id,
+        description: it.description,
+        quantity: Number(it.quantity ?? 0),
+        unit: it.unit ?? "unit",
+        unit_price: Number(it.unit_price ?? 0),
+        discount_pct: Number(it.discount_pct ?? 0),
+        vat_pct: Number(it.vat_pct ?? 0),
+        line_total: Number(it.line_total ?? 0),
+        position: it.position,
+        product_id: it.product_id ?? null,
+      }));
+      const { error: itemsErr } = await context.supabase
+        .from("invoice_items")
+        .insert(rows);
+      if (itemsErr) throw new Error(itemsErr.message);
+    }
+
+    try {
+      await context.supabase.from("activity_logs").insert({
+        user_id: context.userId,
+        action: "convert",
+        entity_type: "proforma_to_invoice",
+        entity_id: pi.id,
+        metadata: {
+          proforma_invoice_id: pi.id,
+          proforma_number: pi.invoice_number,
+          commercial_invoice_id: inv.id,
+          commercial_number: inv.invoice_number,
+          items: (items ?? []).length,
+          total: Number(pi.total ?? 0),
+          currency: pi.currency,
+        },
+      });
+    } catch (err) {
+      console.warn("convertProformaToCommercial activity log failed", err);
+    }
+
+    return { invoice_id: inv.id, already: false };
+  });
+
 
