@@ -256,8 +256,14 @@ File-based routing: `src/routes/_authenticated/admin.<slug-with-dashes>.tsx`.
 
 ### 3. Copy-paste the page skeleton
 
-Uses `<AdminListPage>` — telemetry, skeleton, empty and error cards are all
-wired for you. Replace only what the comments call out.
+The canonical, always-current template lives at
+[`templates/admin-list-page.template.tsx`](../templates/admin-list-page.template.tsx).
+Copy that file to `src/routes/_authenticated/admin.<slug>.tsx` and replace
+every `__REPLACE__` marker — the `resource`, `empty`, `filtersActive`, and
+`expectSeed` wiring for `admin_list_empty_shown` is already correct and
+must not be changed.
+
+The same skeleton, inlined for reference:
 
 ```tsx
 // src/routes/_authenticated/admin.shipments.tsx
