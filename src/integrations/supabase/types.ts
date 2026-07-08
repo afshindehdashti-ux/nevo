@@ -1195,6 +1195,56 @@ export type Database = {
           },
         ]
       }
+      document_files: {
+        Row: {
+          content_type: string | null
+          created_at: string
+          document_id: string
+          file_size: number | null
+          generated_by: string | null
+          id: string
+          is_current: boolean
+          kind: string
+          storage_bucket: string
+          storage_path: string
+          version: number
+        }
+        Insert: {
+          content_type?: string | null
+          created_at?: string
+          document_id: string
+          file_size?: number | null
+          generated_by?: string | null
+          id?: string
+          is_current?: boolean
+          kind?: string
+          storage_bucket?: string
+          storage_path: string
+          version?: number
+        }
+        Update: {
+          content_type?: string | null
+          created_at?: string
+          document_id?: string
+          file_size?: number | null
+          generated_by?: string | null
+          id?: string
+          is_current?: boolean
+          kind?: string
+          storage_bucket?: string
+          storage_path?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_files_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "finance_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_settings: {
         Row: {
           commission_prefix: string
@@ -1339,6 +1389,85 @@ export type Database = {
         }
         Relationships: []
       }
+      email_log: {
+        Row: {
+          attachment_paths: string[] | null
+          body: string | null
+          cc_emails: string[] | null
+          created_at: string
+          customer_id: string | null
+          document_id: string | null
+          error: string | null
+          id: string
+          provider: string | null
+          provider_message_id: string | null
+          sent_at: string | null
+          sent_by: string | null
+          status: string
+          subject: string
+          supplier_id: string | null
+          to_email: string
+        }
+        Insert: {
+          attachment_paths?: string[] | null
+          body?: string | null
+          cc_emails?: string[] | null
+          created_at?: string
+          customer_id?: string | null
+          document_id?: string | null
+          error?: string | null
+          id?: string
+          provider?: string | null
+          provider_message_id?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          status?: string
+          subject: string
+          supplier_id?: string | null
+          to_email: string
+        }
+        Update: {
+          attachment_paths?: string[] | null
+          body?: string | null
+          cc_emails?: string[] | null
+          created_at?: string
+          customer_id?: string | null
+          document_id?: string | null
+          error?: string | null
+          id?: string
+          provider?: string | null
+          provider_message_id?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          status?: string
+          subject?: string
+          supplier_id?: string | null
+          to_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_log_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_log_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "finance_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_log_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -1425,6 +1554,218 @@ export type Database = {
           used_at?: string | null
         }
         Relationships: []
+      }
+      finance_document_items: {
+        Row: {
+          created_at: string
+          description: string
+          discount_amount: number
+          discount_percent: number
+          document_id: string
+          hs_code: string | null
+          id: string
+          item_code: string | null
+          line_total: number
+          metadata: Json
+          product_id: string | null
+          quantity: number
+          sort_order: number
+          tax_amount: number
+          tax_percent: number
+          unit: string | null
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          discount_amount?: number
+          discount_percent?: number
+          document_id: string
+          hs_code?: string | null
+          id?: string
+          item_code?: string | null
+          line_total?: number
+          metadata?: Json
+          product_id?: string | null
+          quantity?: number
+          sort_order?: number
+          tax_amount?: number
+          tax_percent?: number
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          discount_amount?: number
+          discount_percent?: number
+          document_id?: string
+          hs_code?: string | null
+          id?: string
+          item_code?: string | null
+          line_total?: number
+          metadata?: Json
+          product_id?: string | null
+          quantity?: number
+          sort_order?: number
+          tax_amount?: number
+          tax_percent?: number
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_document_items_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "finance_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_document_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      finance_documents: {
+        Row: {
+          amount_paid: number
+          balance: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string | null
+          delivery_terms: string | null
+          discount_total: number
+          document_number: string | null
+          document_type: Database["public"]["Enums"]["finance_document_type"]
+          due_date: string | null
+          grand_total: number
+          id: string
+          incoterms: string | null
+          internal_notes: string | null
+          issue_date: string
+          legacy_id: string | null
+          legacy_table: string | null
+          metadata: Json
+          notes: string | null
+          partner_id: string | null
+          payment_terms: string | null
+          revision: number
+          shipping_total: number
+          source_document_id: string | null
+          status: Database["public"]["Enums"]["finance_document_status"]
+          subtotal: number
+          supplier_id: string | null
+          tax_total: number
+          updated_at: string
+          updated_by: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          amount_paid?: number
+          balance?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          delivery_terms?: string | null
+          discount_total?: number
+          document_number?: string | null
+          document_type: Database["public"]["Enums"]["finance_document_type"]
+          due_date?: string | null
+          grand_total?: number
+          id?: string
+          incoterms?: string | null
+          internal_notes?: string | null
+          issue_date?: string
+          legacy_id?: string | null
+          legacy_table?: string | null
+          metadata?: Json
+          notes?: string | null
+          partner_id?: string | null
+          payment_terms?: string | null
+          revision?: number
+          shipping_total?: number
+          source_document_id?: string | null
+          status?: Database["public"]["Enums"]["finance_document_status"]
+          subtotal?: number
+          supplier_id?: string | null
+          tax_total?: number
+          updated_at?: string
+          updated_by?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          balance?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          delivery_terms?: string | null
+          discount_total?: number
+          document_number?: string | null
+          document_type?: Database["public"]["Enums"]["finance_document_type"]
+          due_date?: string | null
+          grand_total?: number
+          id?: string
+          incoterms?: string | null
+          internal_notes?: string | null
+          issue_date?: string
+          legacy_id?: string | null
+          legacy_table?: string | null
+          metadata?: Json
+          notes?: string | null
+          partner_id?: string | null
+          payment_terms?: string | null
+          revision?: number
+          shipping_total?: number
+          source_document_id?: string | null
+          status?: Database["public"]["Enums"]["finance_document_status"]
+          subtotal?: number
+          supplier_id?: string | null
+          tax_total?: number
+          updated_at?: string
+          updated_by?: string | null
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_documents_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_documents_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_documents_source_document_id_fkey"
+            columns: ["source_document_id"]
+            isOneToOne: false
+            referencedRelation: "finance_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_documents_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       header_logo_events: {
         Row: {
@@ -1601,6 +1942,152 @@ export type Database = {
           total_rows?: number
         }
         Relationships: []
+      }
+      imports: {
+        Row: {
+          column_mapping: Json
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          error_count: number
+          errors: Json | null
+          file_path: string | null
+          id: string
+          import_type: string
+          preview_data: Json | null
+          processed_count: number
+          raw_row_count: number | null
+          source: string
+          status: string
+        }
+        Insert: {
+          column_mapping?: Json
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          error_count?: number
+          errors?: Json | null
+          file_path?: string | null
+          id?: string
+          import_type: string
+          preview_data?: Json | null
+          processed_count?: number
+          raw_row_count?: number | null
+          source: string
+          status?: string
+        }
+        Update: {
+          column_mapping?: Json
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          error_count?: number
+          errors?: Json | null
+          file_path?: string | null
+          id?: string
+          import_type?: string
+          preview_data?: Json | null
+          processed_count?: number
+          raw_row_count?: number | null
+          source?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      inventory_items: {
+        Row: {
+          created_at: string
+          id: string
+          last_movement_at: string | null
+          product_id: string
+          quantity_on_hand: number
+          quantity_reserved: number
+          reorder_level: number
+          unit: string | null
+          updated_at: string
+          warehouse: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_movement_at?: string | null
+          product_id: string
+          quantity_on_hand?: number
+          quantity_reserved?: number
+          reorder_level?: number
+          unit?: string | null
+          updated_at?: string
+          warehouse?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_movement_at?: string | null
+          product_id?: string
+          quantity_on_hand?: number
+          quantity_reserved?: number
+          reorder_level?: number
+          unit?: string | null
+          updated_at?: string
+          warehouse?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_movements: {
+        Row: {
+          created_at: string
+          id: string
+          inventory_item_id: string
+          movement_type: string
+          performed_by: string | null
+          quantity: number
+          reference_document_id: string | null
+          reference_note: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inventory_item_id: string
+          movement_type: string
+          performed_by?: string | null
+          quantity: number
+          reference_document_id?: string | null
+          reference_note?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inventory_item_id?: string
+          movement_type?: string
+          performed_by?: string | null
+          quantity?: number
+          reference_document_id?: string | null
+          reference_note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_movements_reference_document_id_fkey"
+            columns: ["reference_document_id"]
+            isOneToOne: false
+            referencedRelation: "finance_documents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invoice_import_audit_log: {
         Row: {
@@ -2193,6 +2680,39 @@ export type Database = {
           provider?: string
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      number_sequences: {
+        Row: {
+          created_at: string
+          doc_type: Database["public"]["Enums"]["finance_document_type"]
+          id: string
+          last_value: number
+          padding: number
+          prefix: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          doc_type: Database["public"]["Enums"]["finance_document_type"]
+          id?: string
+          last_value?: number
+          padding?: number
+          prefix: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          doc_type?: Database["public"]["Enums"]["finance_document_type"]
+          id?: string
+          last_value?: number
+          padding?: number
+          prefix?: string
+          updated_at?: string
+          year?: number
         }
         Relationships: []
       }
@@ -3801,6 +4321,12 @@ export type Database = {
         Returns: number
       }
       next_commission_number: { Args: never; Returns: string }
+      next_document_number: {
+        Args: {
+          _doc_type: Database["public"]["Enums"]["finance_document_type"]
+        }
+        Returns: string
+      }
       next_invoice_number: {
         Args: { _type: Database["public"]["Enums"]["invoice_type"] }
         Returns: string
@@ -3872,6 +4398,24 @@ export type Database = {
         | "coa"
         | "contract"
         | "other"
+      finance_document_status:
+        | "draft"
+        | "pending_approval"
+        | "approved"
+        | "issued"
+        | "sent"
+        | "partially_paid"
+        | "paid"
+        | "overdue"
+        | "converted"
+        | "cancelled"
+        | "void"
+      finance_document_type:
+        | "quotation"
+        | "proforma_invoice"
+        | "commercial_invoice"
+        | "purchase_order"
+        | "commission_invoice"
       import_job_status:
         | "draft"
         | "validating"
@@ -4141,6 +4685,26 @@ export const Constants = {
         "coa",
         "contract",
         "other",
+      ],
+      finance_document_status: [
+        "draft",
+        "pending_approval",
+        "approved",
+        "issued",
+        "sent",
+        "partially_paid",
+        "paid",
+        "overdue",
+        "converted",
+        "cancelled",
+        "void",
+      ],
+      finance_document_type: [
+        "quotation",
+        "proforma_invoice",
+        "commercial_invoice",
+        "purchase_order",
+        "commission_invoice",
       ],
       import_job_status: [
         "draft",
