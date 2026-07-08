@@ -38,6 +38,7 @@
     "test:visual:update": "node scripts/visual/header-logo.mjs --update",
     "test:visual:admin-list": "python3 scripts/visual/admin-list-layout.py",
     "test:visual:admin-list:update": "python3 scripts/visual/admin-list-layout.py --update",
+    "check:admin-list-telemetry": "node scripts/check-admin-list-telemetry.mjs",
     "test:e2e:logo-fallback": "node scripts/e2e/header-logo-fallback.mjs",
     "test:e2e:homepage-contact": "python3 scripts/e2e/homepage_contact_submit.py",
     "test:e2e:logo-sequencing": "node scripts/e2e/header-logo-sequencing.mjs",
