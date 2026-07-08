@@ -84,6 +84,6 @@ export const Route = createFileRoute("/api/chat")({
           originalMessages: messages,
         });
       },
-    },
+    }),
   },
 });
