@@ -56,9 +56,29 @@ const telemetrySource = readFileSync(TELEMETRY_FILE, "utf8");
 const APPROVED_RESOURCES = new Set(parseConstTuple(telemetrySource, "ADMIN_LIST_RESOURCES"));
 const APPROVED_REASONS = new Set(parseConstTuple(telemetrySource, "ADMIN_LIST_EMPTY_REASONS"));
 
+/**
+ * Violation categories drive the per-file grouped drift report at the end.
+ * Keep these stable — CI log parsers key off them.
+ */
+const CATEGORIES = {
+  RAW_EMIT: "raw-emit",
+  MISSING_RESOURCE: "missing-resource",
+  INVALID_RESOURCE: "invalid-resource",
+  DYNAMIC_RESOURCE: "dynamic-resource",
+  INVALID_REASON: "invalid-reason",
+};
+
+const CATEGORY_LABEL = {
+  [CATEGORIES.RAW_EMIT]: "Raw admin_list_empty_shown emission",
+  [CATEGORIES.MISSING_RESOURCE]: "Missing `resource` prop",
+  [CATEGORIES.INVALID_RESOURCE]: "Invalid `resource` slug",
+  [CATEGORIES.DYNAMIC_RESOURCE]: "Dynamic `resource` prop (needs annotation)",
+  [CATEGORIES.INVALID_REASON]: "Invalid `reason` value",
+};
+
 const violations = [];
-function fail(file, line, message) {
-  violations.push({ file, line, message });
+function fail(file, line, category, message) {
+  violations.push({ file, line, category, message });
 }
 
 function lineOf(text, index) {
@@ -95,7 +115,8 @@ for (const rel of files) {
       fail(
         rel,
         lineOf(src, m.index),
-        `Raw admin_list_empty_shown emission outside ${EMPTY_STATE_FILE}. Route it through <ListEmptyState resource="…" /> so slug + reason validation runs.`,
+        CATEGORIES.RAW_EMIT,
+        `Direct logClientEvent("admin_list_empty_shown", …) call. Route it through <ListEmptyState resource="…" /> so slug + reason validation runs.`,
       );
     }
   }
@@ -104,10 +125,6 @@ for (const rel of files) {
   const tagRe = /<(ListEmptyState|AdminListPage)\b([^>]*?)(\/?)>/gs;
   for (const m of src.matchAll(tagRe)) {
     const [full, tag, attrs] = m;
-    // AdminListPage.tsx itself defines the shared implementation and calls
-    // <ListEmptyState … resource={resource} … />; the type system already
-    // enforces the union there, and the runtime hop makes literal parsing
-    // impossible. Skip.
     if (rel === "src/components/admin/AdminListPage.tsx") continue;
 
     const openTag = attrs;
@@ -119,7 +136,8 @@ for (const rel of files) {
       fail(
         rel,
         line,
-        `<${tag}> is missing the required \`resource\` prop. Add one from ADMIN_LIST_RESOURCES so admin_list_empty_shown fires.`,
+        CATEGORIES.MISSING_RESOURCE,
+        `<${tag}> has no \`resource\` prop.`,
       );
       continue;
     }
@@ -128,44 +146,111 @@ for (const rel of files) {
         fail(
           rel,
           line,
-          `<${tag} resource="${resource.value}"> is not in ADMIN_LIST_RESOURCES. Approved: ${[...APPROVED_RESOURCES].join(", ")}.`,
+          CATEGORIES.INVALID_RESOURCE,
+          `<${tag} resource="${resource.value}"> — slug not in ADMIN_LIST_RESOURCES.`,
         );
       }
-    } else {
-      // Dynamic resource — allow only when the file annotates why. Look
-      // for `// admin-list-telemetry: dynamic-resource` on the same tag.
-      if (!full.includes("admin-list-telemetry: dynamic-resource")) {
-        fail(
-          rel,
-          line,
-          `<${tag} resource={${resource.value}}> uses a non-literal slug. Either inline a literal from ADMIN_LIST_RESOURCES or add \`{/* admin-list-telemetry: dynamic-resource */}\` on the same tag to acknowledge the risk.`,
-        );
-      }
+    } else if (!full.includes("admin-list-telemetry: dynamic-resource")) {
+      fail(
+        rel,
+        line,
+        CATEGORIES.DYNAMIC_RESOURCE,
+        `<${tag} resource={${resource.value}}> — non-literal slug without the \`admin-list-telemetry: dynamic-resource\` annotation.`,
+      );
     }
 
     if (reason && reason.kind === "literal" && !APPROVED_REASONS.has(reason.value)) {
       fail(
         rel,
         line,
-        `<${tag} reason="${reason.value}"> is not in ADMIN_LIST_EMPTY_REASONS. Approved: ${[...APPROVED_REASONS].join(", ")}.`,
+        CATEGORIES.INVALID_REASON,
+        `<${tag} reason="${reason.value}"> — reason not in ADMIN_LIST_EMPTY_REASONS.`,
       );
     }
   }
 }
 
+const RESOURCE_LIST = [...APPROVED_RESOURCES].sort();
+const REASON_LIST = [...APPROVED_REASONS].sort();
+
 if (violations.length > 0) {
-  console.error(
-    `\n✗ admin-list telemetry check failed with ${violations.length} violation(s):\n`,
-  );
+  const byFile = new Map();
   for (const v of violations) {
-    console.error(`  ${v.file}:${v.line}  ${v.message}`);
+    if (!byFile.has(v.file)) byFile.set(v.file, []);
+    byFile.get(v.file).push(v);
   }
+
+  const totalFiles = byFile.size;
+  const byCategoryCount = violations.reduce((acc, v) => {
+    acc[v.category] = (acc[v.category] || 0) + 1;
+    return acc;
+  }, {});
+
+  console.error("");
+  console.error("═══════════════════════════════════════════════════════════════");
+  console.error(" admin-list telemetry drift detected");
+  console.error("═══════════════════════════════════════════════════════════════");
   console.error(
-    `\nSee docs/admin-list-states.md → "admin_list_empty_shown checklist".`,
+    ` ${violations.length} violation(s) across ${totalFiles} file(s)`,
   );
+  console.error("");
+  console.error(" Breakdown by category:");
+  for (const [cat, label] of Object.entries(CATEGORY_LABEL)) {
+    const n = byCategoryCount[cat] || 0;
+    if (n > 0) console.error(`   • ${label.padEnd(48)} ${n}`);
+  }
+  console.error("");
+  console.error(" Approved resource slugs (ADMIN_LIST_RESOURCES):");
+  for (const r of RESOURCE_LIST) console.error(`   - ${r}`);
+  console.error("");
+  console.error(" Approved empty reasons (ADMIN_LIST_EMPTY_REASONS):");
+  for (const r of REASON_LIST) console.error(`   - ${r}`);
+  console.error("");
+  console.error("───────────────────────────────────────────────────────────────");
+  console.error(" Per-file drift report");
+  console.error("───────────────────────────────────────────────────────────────");
+
+  const sortedFiles = [...byFile.keys()].sort();
+  for (const file of sortedFiles) {
+    const items = byFile.get(file).sort((a, b) => a.line - b.line);
+    console.error("");
+    console.error(`▸ ${file}  (${items.length} violation${items.length === 1 ? "" : "s"})`);
+    for (const v of items) {
+      console.error(`    line ${v.line}  [${v.category}]  ${v.message}`);
+    }
+  }
+
+  console.error("");
+  console.error("───────────────────────────────────────────────────────────────");
+  console.error(" How to fix");
+  console.error("───────────────────────────────────────────────────────────────");
+  console.error(" • missing-resource / invalid-resource:");
+  console.error("     Pass one of the approved slugs above. To add a new one,");
+  console.error("     append it to ADMIN_LIST_RESOURCES in");
+  console.error("     src/components/admin/list-telemetry.ts first.");
+  console.error(" • invalid-reason:");
+  console.error("     Use one of the approved reasons above (or omit the prop");
+  console.error("     to default to \"no_records\").");
+  console.error(" • dynamic-resource:");
+  console.error("     Prefer a string literal. If the value is genuinely");
+  console.error("     computed, add {/* admin-list-telemetry: dynamic-resource */}");
+  console.error("     on the same tag to acknowledge the risk.");
+  console.error(" • raw-emit:");
+  console.error("     Render <ListEmptyState resource=\"…\" /> instead of calling");
+  console.error("     logClientEvent(\"admin_list_empty_shown\", …) directly.");
+  console.error("");
+  console.error(" See docs/admin-list-states.md → \"admin_list_empty_shown checklist\".");
+  console.error("");
   process.exit(1);
 }
 
 console.log(
-  `✓ admin-list telemetry: ${files.length} files scanned, ${APPROVED_RESOURCES.size} approved resources, ${APPROVED_REASONS.size} approved reasons — no violations.`,
+  `✓ admin-list telemetry: ${files.length} files scanned — no drift.`,
 );
+console.log(
+  `  Approved resources (${RESOURCE_LIST.length}): ${RESOURCE_LIST.join(", ")}`,
+);
+console.log(
+  `  Approved reasons   (${REASON_LIST.length}): ${REASON_LIST.join(", ")}`,
+);
+
