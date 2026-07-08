@@ -102,12 +102,16 @@ function ImportDataPage() {
             </CardHeader>
             <CardContent className="text-sm">
               <ul className="space-y-1.5">
-                {items.map((t) => (
-                  <li key={t.value} className="flex items-center gap-2">
-                    <FileSpreadsheet className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span>{t.label}</span>
-                  </li>
-                ))}
+                {items.map((t) => {
+                  const supported = SUPPORTED_IMPORT_TYPES.includes(t.value);
+                  return (
+                    <li key={t.value} className="flex items-center gap-2">
+                      <FileSpreadsheet className={`h-3.5 w-3.5 ${supported ? "text-emerald-600" : "text-muted-foreground"}`} />
+                      <span>{t.label}</span>
+                      {supported && <Badge variant="outline" className="ml-auto text-[10px] py-0 px-1.5">Ready</Badge>}
+                    </li>
+                  );
+                })}
               </ul>
             </CardContent>
           </Card>
