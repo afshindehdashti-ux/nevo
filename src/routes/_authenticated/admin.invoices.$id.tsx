@@ -1758,6 +1758,15 @@ function InvoiceDetailPage() {
                 <Wallet className="h-4 w-4 mr-1" /> Record payment
               </Button>
             )}
+            {canEdit && invoice.type === "proforma" && (
+              <Button
+                size="sm"
+                onClick={() => convertToCommercial.mutate()}
+                disabled={convertToCommercial.isPending}
+              >
+                {convertToCommercial.isPending ? "Converting…" : "Convert to commercial invoice"}
+              </Button>
+            )}
           </div>
         </div>
       </div>
