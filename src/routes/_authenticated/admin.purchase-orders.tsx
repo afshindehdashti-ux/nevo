@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { ClipboardList } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GuideMeButton } from "@/components/ai/GuideMeButton";
 import { ListErrorState } from "@/components/admin/ListErrorState";
+import { ListEmptyState } from "@/components/admin/ListEmptyState";
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import { buildSelect } from "@/lib/supabase-select";
 
