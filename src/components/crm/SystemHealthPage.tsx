@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useMyRoles, type AppRole } from "@/lib/crm-hooks";
 import { AccessDenied } from "@/components/crm/AccessDenied";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,8 +16,12 @@ import {
   ShieldCheck,
   Database as DbIcon,
   Play,
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  Check,
 } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 
 const ALLOWED_ROLES: AppRole[] = ["super_admin", "management"];
 const TEST_PREFIX = "TEST-NEVO-QA-";
