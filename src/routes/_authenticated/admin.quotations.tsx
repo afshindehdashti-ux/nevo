@@ -69,6 +69,7 @@ function QuotationsPage() {
             <TableRow>
               <TableHead>Number</TableHead>
               <TableHead>Customer</TableHead>
+              <TableHead className="w-16 text-right">Items</TableHead>
               <TableHead>Issue</TableHead>
               <TableHead>Valid until</TableHead>
               <TableHead>Status</TableHead>
@@ -79,44 +80,52 @@ function QuotationsPage() {
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                   Loading…
                 </TableCell>
               </TableRow>
             )}
             {!isLoading && rows.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-12">
+                <TableCell colSpan={8} className="text-center text-muted-foreground py-12">
                   <FileText className="h-8 w-8 mx-auto mb-2 opacity-40" />
                   No quotations yet. Click <b>New quotation</b> to create one.
                 </TableCell>
               </TableRow>
             )}
-            {rows.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell className="font-mono text-xs">
-                  {r.quotation_number ?? "—"}
-                </TableCell>
-                <TableCell>{r.customers?.name ?? "—"}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">
-                  {r.issue_date ? formatDistanceToNow(new Date(r.issue_date), { addSuffix: true }) : "—"}
-                </TableCell>
-                <TableCell className="text-xs">{r.valid_until ?? "—"}</TableCell>
-                <TableCell>
-                  <Badge variant={statusColor[r.status] ?? "outline"}>{r.status}</Badge>
-                </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {r.currency} {Number(r.total ?? 0).toLocaleString()}
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button asChild variant="ghost" size="sm">
-                    <Link to="/admin/quotations/$id" params={{ id: r.id }}>
-                      Open
-                    </Link>
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {rows.map((r: any) => {
+              const customerName =
+                r.customers?.company_name || r.customers?.name || (r.customer_id ? "(unnamed)" : "—");
+              const itemsCount = Array.isArray(r.quotation_items)
+                ? Number(r.quotation_items[0]?.count ?? 0)
+                : 0;
+              return (
+                <TableRow key={r.id}>
+                  <TableCell className="font-mono text-xs">{r.quotation_number ?? "—"}</TableCell>
+                  <TableCell>{customerName}</TableCell>
+                  <TableCell className="text-right tabular-nums text-xs">{itemsCount}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {r.issue_date
+                      ? formatDistanceToNow(new Date(r.issue_date), { addSuffix: true })
+                      : "—"}
+                  </TableCell>
+                  <TableCell className="text-xs">{r.valid_until ?? "—"}</TableCell>
+                  <TableCell>
+                    <Badge variant={statusColor[r.status] ?? "outline"}>{r.status}</Badge>
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {r.currency} {Number(r.total ?? 0).toLocaleString()}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button asChild variant="ghost" size="sm">
+                      <Link to="/admin/quotations/$id" params={{ id: r.id }}>
+                        Open
+                      </Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </Card>

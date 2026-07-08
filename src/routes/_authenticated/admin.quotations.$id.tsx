@@ -37,8 +37,10 @@ import {
 } from "@/components/ui/table";
 import { CommunicationTimeline } from "@/components/crm/CommunicationTimeline";
 import { ApprovalPanel } from "@/components/crm/ApprovalPanel";
-import { Trash2, Plus, Send, Check, X, FileDown, ArrowRightCircle } from "lucide-react";
+import { Trash2, Plus, Send, Check, X, FileDown, ArrowRightCircle, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { QuotationEmailDialog } from "@/components/crm/QuotationEmailDialog";
+import { buildQuotationPdf, downloadQuotationPdf, loadSellerSettings, validateQuotationForPdf } from "@/lib/quotation-pdf";
 
 export const Route = createFileRoute("/_authenticated/admin/quotations/$id")({
   head: () => ({ meta: [{ title: "Quotation — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
@@ -211,11 +213,34 @@ function QuotationEditor() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const [emailOpen, setEmailOpen] = useState(false);
+
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading…</div>;
   if (!data) return <div className="p-6">Not found.</div>;
 
   const q = data.quotation;
   const canSend = q.status === "approved" || q.status === "draft";
+
+  const handleDownloadPdf = async () => {
+    const errs = validateQuotationForPdf(q as any, data.items as any);
+    if (errs.length) {
+      toast.error(errs.join(" · "));
+      return;
+    }
+    const seller = await loadSellerSettings();
+    downloadQuotationPdf(q as any, data.items as any, seller);
+  };
+
+  const handlePreviewPdf = async () => {
+    const errs = validateQuotationForPdf(q as any, data.items as any);
+    if (errs.length) {
+      toast.error(errs.join(" · "));
+      return;
+    }
+    const seller = await loadSellerSettings();
+    const { blob } = buildQuotationPdf(q as any, data.items as any, seller);
+    window.open(URL.createObjectURL(blob), "_blank");
+  };
 
   return (
     <div className="p-6 space-y-4 max-w-6xl">
@@ -290,12 +315,17 @@ function QuotationEditor() {
               Open proforma
             </Button>
           )}
-          <Button
-            variant="outline"
-            onClick={() => window.open(`/admin/quotations/${id}/print`, "_blank")}
-          >
+          <Button variant="outline" onClick={handlePreviewPdf}>
             <FileDown className="h-4 w-4 mr-1" />
-            PDF
+            Preview PDF
+          </Button>
+          <Button variant="outline" onClick={handleDownloadPdf}>
+            <FileDown className="h-4 w-4 mr-1" />
+            Download PDF
+          </Button>
+          <Button variant="secondary" onClick={() => setEmailOpen(true)}>
+            <Mail className="h-4 w-4 mr-1" />
+            Email PDF
           </Button>
           <Button
             variant="ghost"
@@ -587,6 +617,17 @@ function QuotationEditor() {
       })()}
 
       <CommunicationTimeline entityType="quotation" entityId={id} />
+
+      <QuotationEmailDialog
+        open={emailOpen}
+        onOpenChange={setEmailOpen}
+        quotation={q}
+        items={data.items}
+        onSent={() => {
+          qc.invalidateQueries({ queryKey: ["quotation", id] });
+          qc.invalidateQueries({ queryKey: ["quotations"] });
+        }}
+      />
     </div>
   );
 }

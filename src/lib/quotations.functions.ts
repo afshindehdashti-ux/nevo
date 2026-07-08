@@ -37,7 +37,7 @@ export const listQuotations = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("quotations")
       .select(
-        "id, quotation_number, status, issue_date, valid_until, currency, total, customer_id, customers(name), created_at",
+        "id, quotation_number, status, issue_date, valid_until, currency, subtotal, vat_amount, total, customer_id, customers(name, company_name, email), created_at, sent_at, converted_invoice_id, quotation_items(count)",
       )
       .order("created_at", { ascending: false })
       .limit(500);
@@ -490,5 +490,129 @@ export const convertProformaToCommercial = createServerFn({ method: "POST" })
 
     return { invoice_id: inv.id, already: false };
   });
+
+/**
+ * Email a quotation PDF to a recipient via Resend (through the Lovable
+ * connector gateway). The PDF is generated on the client and passed as
+ * base64. On success the quotation is bumped to `sent` when currently
+ * `draft` or `approved`, and an activity log row is written.
+ */
+const EmailInput = z.object({
+  id: z.string().uuid(),
+  to: z.string().email(),
+  cc: z.array(z.string().email()).optional(),
+  subject: z.string().min(1).max(300),
+  message: z.string().max(20_000).optional().default(""),
+  pdf_base64: z.string().min(100),
+  pdf_filename: z.string().min(1).max(200),
+});
+
+export const emailQuotation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => EmailInput.parse(v))
+  .handler(async ({ context, data }) => {
+    const lovableKey = process.env.LOVABLE_API_KEY;
+    const resendKey = process.env.RESEND_API_KEY;
+    if (!lovableKey || !resendKey) {
+      throw new Error("Email provider is not configured. Contact an administrator.");
+    }
+
+    // Load quotation for reference-number in the activity log and status bump.
+    const { data: q, error: qErr } = await context.supabase
+      .from("quotations")
+      .select("id, quotation_number, status, currency, total, customer_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (qErr) throw new Error(qErr.message);
+    if (!q) throw new Error("Quotation not found");
+
+    // Pull sender identity from company settings; fall back to a Resend
+    // sandbox address (only deliverable to the account owner) so the call
+    // never silently fails at build time.
+    const { data: settings } = await context.supabase
+      .from("company_settings")
+      .select("legal_name, email")
+      .eq("is_active", true)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const fromName = settings?.legal_name || "NEVO Industrial";
+    const fromEmail = settings?.email || "onboarding@resend.dev";
+    const from = `${fromName} <${fromEmail}>`;
+
+    const html = [
+      `<div style="font-family:Arial,sans-serif;font-size:14px;color:#111;line-height:1.55">`,
+      data.message
+        ? data.message
+            .split("\n")
+            .map((l) => `<p style="margin:0 0 10px">${l.replace(/</g, "&lt;")}</p>`)
+            .join("")
+        : `<p>Please find attached quotation <b>${q.quotation_number ?? ""}</b>.</p>`,
+      `<p style="margin-top:24px;color:#666;font-size:12px">${fromName}</p>`,
+      `</div>`,
+    ].join("");
+
+    const res = await fetch("https://connector-gateway.lovable.dev/resend/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${lovableKey}`,
+        "X-Connection-Api-Key": resendKey,
+      },
+      body: JSON.stringify({
+        from,
+        to: [data.to],
+        cc: data.cc && data.cc.length ? data.cc : undefined,
+        subject: data.subject,
+        html,
+        attachments: [
+          {
+            filename: data.pdf_filename,
+            content: data.pdf_base64,
+          },
+        ],
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      console.error(`Resend send failed [${res.status}]: ${body}`);
+      throw new Error(`Email provider rejected the send (${res.status}). ${body.slice(0, 300)}`);
+    }
+    const responseJson = (await res.json().catch(() => ({}))) as { id?: string };
+
+    // Bump status to `sent` on first send from draft/approved.
+    if (q.status === "draft" || q.status === "approved") {
+      await context.supabase
+        .from("quotations")
+        .update({ status: "sent", sent_at: new Date().toISOString() })
+        .eq("id", q.id);
+    }
+
+    // Audit log — best effort.
+    try {
+      await context.supabase.from("activity_logs").insert({
+        user_id: context.userId,
+        action: "email_sent",
+        entity_type: "quotation",
+        entity_id: q.id,
+        metadata: {
+          quotation_number: q.quotation_number,
+          to: data.to,
+          cc: data.cc ?? [],
+          subject: data.subject,
+          resend_id: responseJson.id ?? null,
+          filename: data.pdf_filename,
+          total: Number(q.total ?? 0),
+          currency: q.currency,
+        },
+      });
+    } catch (err) {
+      console.warn("emailQuotation activity log failed", err);
+    }
+
+    return { ok: true, resend_id: responseJson.id ?? null };
+  });
+
 
 
