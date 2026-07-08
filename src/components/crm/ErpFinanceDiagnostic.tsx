@@ -159,6 +159,14 @@ export function ErpFinanceDiagnostic() {
               )}
               Run ERP Finance Test
             </Button>
+            <Button variant="outline" onClick={onRunPdfE2e} disabled={pdfLoading}>
+              {pdfLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FileCheck2 className="mr-2 h-4 w-4" />
+              )}
+              Run Proforma PDF e2e
+            </Button>
           </div>
 
           {qa && (
