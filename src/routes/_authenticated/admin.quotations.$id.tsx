@@ -162,6 +162,9 @@ function QuotationEditor() {
       unit_price: number;
       discount_pct: number;
       position: number;
+      unit?: string | null;
+      item_code?: string | null;
+      hs_code?: string | null;
     }) =>
       upsertItemFn({
         data: {
