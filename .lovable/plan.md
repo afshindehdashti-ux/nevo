@@ -1,68 +1,94 @@
-# Finance backend rewrite
+# Phase 1 — Quotation Full Loop
 
-You chose "full rewrite to your spec." Before I run migrations, I need you to sign off on this plan — the changes are destructive and will break several working modules until every dependency is updated. Everything below matches the field names / table names in your brief.
+Scope confirmed: existing tables (`quotations`, `quotation_items`, `customers`, `products`), Resend for email. Proforma, Commercial Invoice, and PO come in later phases.
 
-## Impact summary (please read)
+## What I found in the current app
 
-Modules that currently depend on the existing `invoices` (with `type='proforma'|'commercial'`) and `customers.name` shape and will need code changes or will temporarily break:
+- `/admin/quotations` list query is correct — it shows exactly what's in DB. There is **one** quotation row (`QTN-NEVO-2026-0010`) with no customer, no items, `subtotal=0`, `total=0`. So "blank customer, USD 0" is real data, not a UI bug.
+- Root cause: `NewQuotationDialog` (or older flow) inserts empty draft rows. Fix: gate creation through `createQuotationWithItems` only — no empty drafts.
+- Numbering trigger, VAT recalc trigger, discount-approval trigger, and `quotation_number_seq` already exist and work.
+- No PDF generator, no import, no email, no "Send to customer" action wired up.
 
-- `orders → invoice` generation (`src/lib/orders.functions.ts`, order detail actions)
-- `payments` (`src/routes/_authenticated/admin.payments.tsx`, `payments` table FK to invoices)
-- `partner_commissions` (`invoice_id` FK, `auto_request_commission_approval`)
-- `approvals` (`auto_request_invoice_approval` trigger, `decide_approval_request` switch on `entity_type in ('proforma','invoice')`)
-- `invoice_import_jobs`, `invoice_pdf_versions`, `ai_documents.related_invoice_id`
-- `quotations.converted_invoice_id`, quotation → invoice conversion
-- AI features: `InvoiceAiCheckButton`, `ai-summary.functions.ts` for invoices
-- CRM sidebar, guide content, telemetry (`ADMIN_LIST_RESOURCES` includes `invoices`, `proforma_invoices`, etc.)
-- PDF: `src/lib/invoice-pdf.ts` (all field names change)
-- Customer-facing portal (`customer-portal.functions.ts`) — reads invoices for `is_customer_user`
-- Every place that reads `customers.name`, `customers.address`, `invoices.vat_amount`, `invoice_items.vat_pct/discount_pct`
+## Deliverables (this phase)
 
-Existing production data (all rows in `invoices`, `invoice_items`, `customers.name`, etc.) must be migrated. If we don't, the app loses history.
+### 1. Kill empty drafts
+- Remove/replace the "New quotation" path that inserts blank rows.
+- One-shot dialog: pick customer, dates, currency, add ≥1 line → server validates → insert header + items in one call (`createQuotationWithItems`, already exists).
+- Cleanup: delete the existing empty `QTN-NEVO-2026-0010` (or leave it; user's call — I'll leave it and let them delete).
 
-## Migration strategy
+### 2. Fix the list page
+- Show `customers.company_name` (fallback to `name`) so it's never blank when a customer exists.
+- Add columns: PDF badge (generated / not), items count.
+- Row actions: Open, Duplicate, Delete draft, Convert to proforma (if `approved`/`accepted`).
 
-1. **Additive column adds first**, no drops. Keep old columns as aliases so the app doesn't break mid-deploy.
-   - `customers`: add `company_name` (copy from `name`), `billing_address` (copy from `address`). Keep `name`/`address` as generated columns mirroring the new ones, so legacy code keeps working.
-2. **Create the two new tables** exactly per your spec:
-   - `proforma_invoices` + `proforma_invoice_items`
-   - Their sequences and numbering triggers (`PRO-YYYY-0001`, `INV-YYYY-0001`, sequential, atomic via `nextval`).
-3. **Backfill**: `insert into proforma_invoices ... from invoices where type = 'proforma'`, same for items. Preserve ids so `converted_invoice_id`-style links keep working.
-4. **Reshape `invoices`** per your spec: add `proforma_invoice_id`, `payment_status`, `discount_total`, `tax_total`, `paid_amount`, `balance`, `payment_terms`, `approved_by`. Drop `type` (only commercial remains). Rename `vat_amount → tax_total`, `amount_paid → paid_amount`. Backfill numeric fields from items.
-5. **Reshape `invoice_items`** per your spec: add `discount`, `tax_rate`, `sort_order`, `line_total`. Rename `discount_pct → discount`, `vat_pct → tax_rate`, `position → sort_order`.
-6. **RLS**: rewrite policies to your matrix — `super_admin`, `management`, `finance` full; `sales` create-only for quotations/proformas, cannot mark paid; customers see own approved/sent only. `has_role`/`has_any_role` already exist.
-7. **Total-calc trigger**: replace `recalc_invoice_totals` with a trigger that runs your formula (`line_subtotal / line_discount_amount / line_taxable / line_tax / line_total → sums → payments → balance → payment_status`). Same for a new `recalc_proforma_totals`.
-8. **Activity logs**: add triggers on `proforma_invoices` and `invoices` for created/updated/approved/sent/converted/paid; add a helper `log_finance_event(...)`.
-9. **Convert-proforma-to-invoice**: `convert_proforma_to_invoice(_proforma_id)` SECURITY DEFINER RPC that copies fields/items, sets `invoice.proforma_invoice_id`, sets proforma `status = 'converted_to_invoice'`, logs activity.
+### 3. Spreadsheet-like line-item editor on `/admin/quotations/$id`
+- Editable grid: description, HS code, qty, unit, unit price, discount %, VAT %, line total (computed).
+- Add / delete / duplicate / reorder rows.
+- Live subtotal / discount / VAT / grand total.
+- Save persists via existing `upsertQuotationItem` / `deleteQuotationItem`; trigger recomputes header totals.
 
-## App code changes
+### 4. Import Center (Quotations only in this phase)
+- New route `/admin/quotations/import`.
+- Accept CSV + XLSX (SheetJS `xlsx` — already usable, will `bun add xlsx` if missing).
+- Column mapper: file header → canonical field (description, hs_code, qty, unit, unit_price, discount_pct, currency).
+- Preview table with per-row validation (missing qty, non-numeric price, etc.).
+- On confirm: pick/create customer, set dates/currency, insert quotation + all valid items in one server fn.
+- Central "Import Center" page can be a follow-up; this phase surfaces the button from `/admin/quotations`.
 
-- Rewrite `src/lib/invoice-pdf.ts` to read the new field names (`company_name`, `billing_address`, `discount_total`, `tax_total`, `paid_amount`, `balance`, `payment_terms`, `delivery_terms`, `valid_until`).
-- Rewrite `src/lib/invoices.functions.ts` and add `src/lib/proforma-invoices.functions.ts`.
-- **New UI (unavoidable)**: `/admin/invoices/new` and `/admin/proforma-invoices/new` with customer picker (searches `customers`), line-item editor with live totals, validation per your list (rules 4 and 5), submit. Your rule "Do not add new UI" is incompatible with your rules 6 and 7 which explicitly require these flows — I'm interpreting the ban as "no unrequested UI." Confirm.
-- Update `admin.invoices.$id.tsx` and `admin.proforma-invoices.$id.tsx` detail pages to read new fields and expose Approve / Mark sent / Convert to invoice / Add payment / Download PDF actions.
-- Update every query that reads invoices to project `customers ( company_name, email, phone, billing_address, country )`.
-- Update orders → invoice generation, payments page, commissions, approvals switch to use new tables/fields.
-- Update `ADMIN_LIST_RESOURCES` and telemetry.
-- Update `src/integrations/supabase/types.ts` regenerates after migration approval.
+### 5. NEVO-branded PDF
+- New `src/lib/quotation-pdf.ts` using `jspdf` + `jspdf-autotable` (matches existing invoice-pdf.ts stack).
+- Sections: NEVO logo/header, doc number + status, issue date + valid-until, seller (from `company_settings`), bill-to (customer), items table (desc, HS, qty, unit, unit price, discount, line total), totals block (subtotal / discount / VAT / grand total), incoterms / payment terms / delivery terms / notes, bank details, signature block, footer.
+- "Preview PDF" and "Download PDF" buttons on the edit page.
+- Refuse to generate when required fields missing (customer, ≥1 item, quantities>0, unit prices set) — clear error listing what's missing.
 
-## Test data + acceptance run
+### 6. Email PDF via Resend
+- Connect Resend via `standard_connectors--connect` (I'll do it in the same turn; user confirms in UI).
+- New server fn `emailQuotation({id, to, subject, message})`:
+  1. Load quotation + items + customer.
+  2. Generate PDF server-side (same generator, running under Node buffer).
+  3. POST to Resend gateway with PDF as base64 attachment.
+  4. Log to `activity_logs` with `action='email_sent'`, entity_type='quotation'.
+  5. Bump status to `sent` if currently `draft`/`approved`.
+- Dialog on edit page: prefilled to customer email, editable subject/body, "Send" button.
 
-After deploy I'll:
+### 7. Convert (already partially built)
+- `convertQuotationToProforma` server fn already exists and works. Just surface it as a button on the edit page (only when status is `approved` or `accepted`). Toast + redirect to new proforma.
 
-1. Insert `NEVO Test Customer LLC` into `customers`.
-2. Drive Playwright: create proforma with 2 items → verify list + detail + PDF → convert to invoice → verify new invoice → add payment → verify `balance` and `payment_status`.
-3. Screenshot each step and attach.
-4. Run `bun run lint`, `bunx vitest run`, and the admin-list telemetry check.
+### 8. Validation guard rails
+- Server-side: `createQuotationWithItems` already requires customer + ≥1 item.
+- Add: quantity>0 and unit_price≥0 (currently allows 0/0).
+- Client-side: form uses same zod schema shared from `import-schemas.ts` extension.
 
-## Estimated blast radius
+### 9. System Health check for quotation
+- Add QA test in `SystemHealthPage`: create draft → add item → generate PDF (in-memory, don't persist) → convert to proforma → cleanup. PASS/FAIL/WARNING.
 
-~15–20 files edited, 1 large migration, 2 new routes, 1 new server-function module, PDF generator rewrite. Realistic first-cut ETA is several hours of work; there **will** be follow-up fixes as I find modules still reading the old shape.
+## Out of scope (later phases)
+- Proforma / Commercial Invoice / Purchase Order UI rebuild.
+- Central Import Center dashboard.
+- Revision system (`Rev. 0`, `Rev. 1`).
+- Role-based permission granularity beyond current `has_staff_role`.
+- Payment status tracking on quotations (they don't have payments).
+- Email templates management UI.
 
-## Confirm before I start
+## Technical notes
 
-1. **Proceed with destructive rename+backfill of `customers.name → company_name` and `customers.address → billing_address`?** (I'll keep `name`/`address` as generated aliases so nothing else breaks.)
-2. **Confirm the two new create routes are OK** despite "no new UI." They're required by your rules 6 and 7.
-3. **OK to run this in one big migration**, or split into 4 (schema add → backfill → app code → drop old columns much later)? I recommend the 4-step split; safer to roll back.
+- Files touched:
+  - `src/routes/_authenticated/admin.quotations.tsx` (list improvements)
+  - `src/routes/_authenticated/admin.quotations.$id.tsx` (editor + PDF/email/convert buttons)
+  - `src/routes/_authenticated/admin.quotations.import.tsx` (new)
+  - `src/components/crm/NewQuotationDialog.tsx` (require line items)
+  - `src/lib/quotations.functions.ts` (add `emailQuotation`, `importQuotation`)
+  - `src/lib/quotation-pdf.ts` (new)
+  - `src/components/crm/SystemHealthPage.tsx` (add quotation e2e test)
+- New deps: `xlsx` (if not present), reuse `jspdf`, `jspdf-autotable`.
+- No DB migration required — existing schema is sufficient for quotations. `hs_code` column already exists on `quotation_items` (verified via schema).
+- Resend requires the user to link the connector via the popup — I'll trigger it and continue once connected.
 
-Reply "go" (single migration) or "split" (4 steps) or edits, and I'll start.
+## Estimated turns
+
+Given size, I'll deliver in **3 sub-turns after approval**:
+1. List + editor + validation + kill-empty-drafts + delete existing blank row helper.
+2. PDF generator + import wizard.
+3. Resend wiring + email dialog + convert button + system-health check.
+
+Approve to start with sub-turn 1.
