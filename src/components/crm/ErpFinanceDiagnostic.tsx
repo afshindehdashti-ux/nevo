@@ -375,6 +375,53 @@ export function ErpFinanceDiagnostic() {
         </Card>
       )}
 
+      {iso && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FlaskConical className="h-5 w-5" />
+              Isolated Proforma e2e
+              <StatusBadge status={iso.failed === 0 ? "pass" : "fail"} />
+            </CardTitle>
+            <CardDescription>
+              Run <code>{iso.runId.slice(0, 8)}</code> · marker <code>{iso.marker}</code> ·
+              creates unique customer + proforma + items, always cleans up, then verifies zero
+              orphaned <code>proforma_invoice_items</code> remain.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex flex-wrap gap-4 text-sm">
+              <span className="text-emerald-600 font-medium">{iso.passed} PASS</span>
+              <span className="text-amber-500 font-medium">{iso.warned} WARN</span>
+              <span className="text-red-600 font-medium">{iso.failed} FAIL</span>
+            </div>
+            <ol className="space-y-2">
+              {iso.steps.map((s, i) => (
+                <li key={s.key} className="flex items-start gap-3 rounded-md border p-3">
+                  <span className="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-muted text-center text-xs leading-5">
+                    {i + 1}
+                  </span>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-medium text-sm">{s.label}</div>
+                      <StatusBadge status={s.status} />
+                    </div>
+                    <div className="text-xs text-muted-foreground break-words">{s.message}</div>
+                    {s.details && (
+                      <pre className="mt-1 overflow-x-auto rounded bg-muted p-2 text-xs">
+                        {JSON.stringify(s.details, null, 2)}
+                      </pre>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
+
+
+
 
       {qa && (failedChecks.length > 0 || warnChecks.length > 0) && (
         <Card>
