@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ListErrorState } from "@/components/admin/ListErrorState";
+import { ListEmptyState } from "@/components/admin/ListEmptyState";
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import { buildSelect } from "@/lib/supabase-select";
 
@@ -67,11 +68,11 @@ function OpportunitiesList() {
           <Skeleton className="h-12 w-full" />
         </div>
       ) : (data ?? []).length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center text-sm text-muted-foreground">
-            No opportunities yet.
-          </CardContent>
-        </Card>
+        <ListEmptyState
+          icon={Target}
+          title="No opportunities yet"
+          description="Deals you create — either manually or from a qualified lead — will show up here with stage, value, and expected close date."
+        />
       ) : (
         <div className="border border-border rounded-md overflow-hidden bg-background">
           <table className="w-full text-sm">
