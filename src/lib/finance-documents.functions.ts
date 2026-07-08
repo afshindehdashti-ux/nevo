@@ -284,8 +284,8 @@ export const convertFinanceDocument = createServerFn({ method: "POST" })
         tax_percent: it.tax_percent ?? 0,
         sort_order: it.sort_order ?? 0,
       }));
-      const { error: itemsErr } = await context.supabase
-        .from("finance_document_items")
+      const { error: itemsErr } = await (context.supabase
+        .from("finance_document_items") as any)
         .insert(rows);
       if (itemsErr) throw new Error(itemsErr.message);
     }
