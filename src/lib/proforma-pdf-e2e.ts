@@ -39,9 +39,8 @@ export type PdfE2eReport = {
 async function extractPdfText(blob: Blob): Promise<{ text: string; pages: number }> {
   // Lazy import to keep pdfjs out of the main bundle.
   const pdfjs = await import("pdfjs-dist");
-  // Disable worker: extraction is short and worker setup varies by bundler.
-  // @ts-expect-error - GlobalWorkerOptions typing varies across pdfjs versions
-  if (pdfjs.GlobalWorkerOptions) pdfjs.GlobalWorkerOptions.workerSrc = "";
+  const pdfjsAny = pdfjs as unknown as { GlobalWorkerOptions?: { workerSrc: string } };
+  if (pdfjsAny.GlobalWorkerOptions) pdfjsAny.GlobalWorkerOptions.workerSrc = "";
 
   const buf = await blob.arrayBuffer();
   const doc = await pdfjs.getDocument({
