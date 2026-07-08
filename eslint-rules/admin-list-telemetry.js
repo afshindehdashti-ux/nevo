@@ -98,11 +98,20 @@ const validResourceProp = {
     },
   },
   create(context) {
+    const filename = context.filename || context.getFilename();
+    // AdminListPage.tsx is the shared wrapper that forwards `resource` /
+    // `reason` from typed props to <ListEmptyState> / <ListErrorState>.
+    // The types already enforce the union at every call site, and the
+    // literal never appears inside this file — skip.
+    if (/[\\/]components[\\/]admin[\\/]AdminListPage\.tsx?$/.test(filename)) {
+      return {};
+    }
     return {
       JSXOpeningElement(node) {
         if (node.name.type !== "JSXIdentifier") return;
         const name = node.name.name;
         if (!GUARDED_COMPONENTS.has(name)) return;
+
 
         const attr = findAttr(node, "resource");
         if (!attr) {
