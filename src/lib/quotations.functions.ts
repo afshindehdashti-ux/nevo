@@ -45,6 +45,37 @@ export const listQuotations = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
+/** Lightweight customer creator used from the "New quotation" dialog so
+ *  users never have to leave the flow to add a missing counterparty. */
+export const createCustomerLite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) =>
+    z
+      .object({
+        name: z.string().trim().min(1, "Customer name is required"),
+        email: z.string().email().nullable().optional(),
+        country: z.string().nullable().optional(),
+        currency: z.string().max(8).nullable().optional(),
+      })
+      .parse(v),
+  )
+  .handler(async ({ context, data }) => {
+    const { data: inserted, error } = await context.supabase
+      .from("customers")
+      .insert({
+        name: data.name,
+        company_name: data.name,
+        email: data.email ?? null,
+        country: data.country ?? null,
+        currency: data.currency ?? "USD",
+      })
+      .select("id, name, company_name")
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!inserted?.id) throw new Error("Could not create customer");
+    return inserted;
+  });
+
 export const getQuotation = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => IdInput.parse(v))
