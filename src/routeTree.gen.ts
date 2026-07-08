@@ -63,6 +63,7 @@ import { Route as ApiPublicApprovalNotifyRouteImport } from './routes/api/public
 import { Route as ApiAdminCsvExportAuditRouteImport } from './routes/api/admin/csv-export-audit'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTasksRouteImport } from './routes/_authenticated/admin.tasks'
+import { Route as AuthenticatedAdminSystemHealthRouteImport } from './routes/_authenticated/admin.system-health'
 import { Route as AuthenticatedAdminSuppliersRouteImport } from './routes/_authenticated/admin.suppliers'
 import { Route as AuthenticatedAdminSolutionsSeoRouteImport } from './routes/_authenticated/admin.solutions-seo'
 import { Route as AuthenticatedAdminShipmentsRouteImport } from './routes/_authenticated/admin.shipments'
@@ -405,6 +406,12 @@ const AuthenticatedAdminTasksRoute = AuthenticatedAdminTasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminSystemHealthRoute =
+  AuthenticatedAdminSystemHealthRouteImport.update({
+    id: '/system-health',
+    path: '/system-health',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminSuppliersRoute =
   AuthenticatedAdminSuppliersRouteImport.update({
     id: '/suppliers',
@@ -879,6 +886,7 @@ export interface FileRoutesByFullPath {
   '/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
+  '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/api/admin/csv-export-audit': typeof ApiAdminCsvExportAuditRoute
@@ -997,6 +1005,7 @@ export interface FileRoutesByTo {
   '/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
   '/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
+  '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/api/admin/csv-export-audit': typeof ApiAdminCsvExportAuditRoute
@@ -1120,6 +1129,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/shipments': typeof AuthenticatedAdminShipmentsRouteWithChildren
   '/_authenticated/admin/solutions-seo': typeof AuthenticatedAdminSolutionsSeoRoute
   '/_authenticated/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
+  '/_authenticated/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/_authenticated/admin/tasks': typeof AuthenticatedAdminTasksRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/api/admin/csv-export-audit': typeof ApiAdminCsvExportAuditRoute
@@ -1243,6 +1253,7 @@ export interface FileRouteTypes {
     | '/admin/shipments'
     | '/admin/solutions-seo'
     | '/admin/suppliers'
+    | '/admin/system-health'
     | '/admin/tasks'
     | '/admin/users'
     | '/api/admin/csv-export-audit'
@@ -1361,6 +1372,7 @@ export interface FileRouteTypes {
     | '/admin/shipments'
     | '/admin/solutions-seo'
     | '/admin/suppliers'
+    | '/admin/system-health'
     | '/admin/tasks'
     | '/admin/users'
     | '/api/admin/csv-export-audit'
@@ -1483,6 +1495,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/shipments'
     | '/_authenticated/admin/solutions-seo'
     | '/_authenticated/admin/suppliers'
+    | '/_authenticated/admin/system-health'
     | '/_authenticated/admin/tasks'
     | '/_authenticated/admin/users'
     | '/api/admin/csv-export-audit'
@@ -1932,6 +1945,13 @@ declare module '@tanstack/react-router' {
       path: '/tasks'
       fullPath: '/admin/tasks'
       preLoaderRoute: typeof AuthenticatedAdminTasksRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/system-health': {
+      id: '/_authenticated/admin/system-health'
+      path: '/system-health'
+      fullPath: '/admin/system-health'
+      preLoaderRoute: typeof AuthenticatedAdminSystemHealthRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/suppliers': {
@@ -2587,6 +2607,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminShipmentsRoute: typeof AuthenticatedAdminShipmentsRouteWithChildren
   AuthenticatedAdminSolutionsSeoRoute: typeof AuthenticatedAdminSolutionsSeoRoute
   AuthenticatedAdminSuppliersRoute: typeof AuthenticatedAdminSuppliersRoute
+  AuthenticatedAdminSystemHealthRoute: typeof AuthenticatedAdminSystemHealthRoute
   AuthenticatedAdminTasksRoute: typeof AuthenticatedAdminTasksRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -2638,6 +2659,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
     AuthenticatedAdminShipmentsRouteWithChildren,
   AuthenticatedAdminSolutionsSeoRoute: AuthenticatedAdminSolutionsSeoRoute,
   AuthenticatedAdminSuppliersRoute: AuthenticatedAdminSuppliersRoute,
+  AuthenticatedAdminSystemHealthRoute: AuthenticatedAdminSystemHealthRoute,
   AuthenticatedAdminTasksRoute: AuthenticatedAdminTasksRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRouteWithChildren,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
