@@ -83,7 +83,7 @@ export const getQuotation = createServerFn({ method: "GET" })
     const [{ data: quotation, error: qErr }, { data: items, error: iErr }] = await Promise.all([
       context.supabase
         .from("quotations")
-        .select("*, customers(id,name,email,city,country,currency)")
+        .select("*, customers(id,name,company_name,email,city,country,currency)")
         .eq("id", data.id)
         .maybeSingle(),
       context.supabase
