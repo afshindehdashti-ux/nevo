@@ -77,6 +77,8 @@ beforeEach(() => {
   mockRows = [];
   vi.resetModules();
 });
+afterEach(() => cleanup());
+
 
 describe("admin.opportunities — customer embed integration", () => {
   it("selects customer:customers(name) and renders customer.name in the table", async () => {
