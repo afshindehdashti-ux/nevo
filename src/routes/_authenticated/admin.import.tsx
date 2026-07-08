@@ -196,16 +196,14 @@ function ImportDataPage() {
         )}
       </section>
 
-      <Card className="border-amber-500/30 bg-amber-500/5">
+      <Card className="border-emerald-500/30 bg-emerald-500/5">
         <CardContent className="p-4 text-sm">
-          <p className="font-medium mb-1">Wizard coming next</p>
+          <p className="font-medium mb-1">Wizard live</p>
           <p className="text-muted-foreground">
-            The full upload → column mapping → validation → confirm-and-run flow is scheduled for the next
-            update. This page already lists every historical job and every supported import type, and the
-            database tables, RLS policies, and audit hooks are ready. See{" "}
-            <Link to="/admin" className="text-emerald-600 hover:underline">
-              Dashboard
-            </Link>{" "}
+            Upload → column mapping → validation → confirm-and-run is now available for the entity types
+            marked <span className="text-emerald-700 font-medium">Ready</span>. Additional entity types
+            will be enabled as their coercion rules are wired. See{" "}
+            <Link to="/admin" className="text-emerald-600 hover:underline">Dashboard</Link>{" "}
             for real-time counts.
           </p>
         </CardContent>
