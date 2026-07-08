@@ -43,6 +43,7 @@
     "test:e2e:homepage-contact": "python3 scripts/e2e/homepage_contact_submit.py",
     "test:e2e:logo-sequencing": "node scripts/e2e/header-logo-sequencing.mjs",
     "test:e2e:admin-access": "python3 scripts/e2e/admin-system-health-access.py",
+    "test:e2e:admin-qa-run": "python3 scripts/e2e/admin-qa-run-full-backend-test.py",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
