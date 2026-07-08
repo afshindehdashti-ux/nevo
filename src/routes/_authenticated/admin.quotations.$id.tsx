@@ -7,6 +7,7 @@ import {
   upsertQuotation,
   upsertQuotationItem,
   deleteQuotationItem,
+  duplicateQuotationItem,
   setQuotationStatus,
   deleteQuotation,
   convertQuotationToProforma,
