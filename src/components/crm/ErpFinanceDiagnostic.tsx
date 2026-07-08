@@ -76,8 +76,10 @@ export function ErpFinanceDiagnostic() {
   const runTest = useServerFn(runErpFinanceTest);
   const [qa, setQa] = useState<QaReport | null>(null);
   const [test, setTest] = useState<FinanceReport | null>(null);
+  const [pdfReport, setPdfReport] = useState<PdfE2eReport | null>(null);
   const [qaLoading, setQaLoading] = useState(false);
   const [testLoading, setTestLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   async function onRunQa() {
     setQaLoading(true);
