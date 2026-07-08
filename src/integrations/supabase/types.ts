@@ -751,7 +751,9 @@ export type Database = {
           address: string | null
           ai_summary: string | null
           ai_summary_at: string | null
+          billing_address: string | null
           city: string | null
+          company_name: string | null
           contact_person: string | null
           country: string | null
           created_at: string
@@ -774,7 +776,9 @@ export type Database = {
           address?: string | null
           ai_summary?: string | null
           ai_summary_at?: string | null
+          billing_address?: string | null
           city?: string | null
+          company_name?: string | null
           contact_person?: string | null
           country?: string | null
           created_at?: string
@@ -797,7 +801,9 @@ export type Database = {
           address?: string | null
           ai_summary?: string | null
           ai_summary_at?: string | null
+          billing_address?: string | null
           city?: string | null
+          company_name?: string | null
           contact_person?: string | null
           country?: string | null
           created_at?: string
@@ -1787,6 +1793,7 @@ export type Database = {
         Row: {
           created_at: string
           description: string
+          discount: number
           discount_pct: number
           id: string
           invoice_id: string
@@ -1794,6 +1801,8 @@ export type Database = {
           position: number
           product_id: string | null
           quantity: number
+          sort_order: number
+          tax_rate: number
           unit: string
           unit_price: number
           updated_at: string
@@ -1802,6 +1811,7 @@ export type Database = {
         Insert: {
           created_at?: string
           description: string
+          discount?: number
           discount_pct?: number
           id?: string
           invoice_id: string
@@ -1809,6 +1819,8 @@ export type Database = {
           position?: number
           product_id?: string | null
           quantity?: number
+          sort_order?: number
+          tax_rate?: number
           unit?: string
           unit_price?: number
           updated_at?: string
@@ -1817,6 +1829,7 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string
+          discount?: number
           discount_pct?: number
           id?: string
           invoice_id?: string
@@ -1824,6 +1837,8 @@ export type Database = {
           position?: number
           product_id?: string | null
           quantity?: number
+          sort_order?: number
+          tax_rate?: number
           unit?: string
           unit_price?: number
           updated_at?: string
@@ -1899,11 +1914,13 @@ export type Database = {
       invoices: {
         Row: {
           amount_paid: number
+          approved_by: string | null
           balance: number
           created_at: string
           created_by: string | null
           currency: string
           customer_id: string
+          discount_total: number
           due_date: string | null
           id: string
           invoice_number: string | null
@@ -1911,9 +1928,13 @@ export type Database = {
           notes: string | null
           order_id: string | null
           original_document_reference: string | null
+          payment_status: string | null
+          payment_terms: string | null
           pdf_version_retention_count: number | null
+          proforma_invoice_id: string | null
           status: Database["public"]["Enums"]["invoice_status"]
           subtotal: number
+          tax_total: number
           total: number
           type: Database["public"]["Enums"]["invoice_type"]
           updated_at: string
@@ -1922,11 +1943,13 @@ export type Database = {
         }
         Insert: {
           amount_paid?: number
+          approved_by?: string | null
           balance?: number
           created_at?: string
           created_by?: string | null
           currency?: string
           customer_id: string
+          discount_total?: number
           due_date?: string | null
           id?: string
           invoice_number?: string | null
@@ -1934,9 +1957,13 @@ export type Database = {
           notes?: string | null
           order_id?: string | null
           original_document_reference?: string | null
+          payment_status?: string | null
+          payment_terms?: string | null
           pdf_version_retention_count?: number | null
+          proforma_invoice_id?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
+          tax_total?: number
           total?: number
           type?: Database["public"]["Enums"]["invoice_type"]
           updated_at?: string
@@ -1945,11 +1972,13 @@ export type Database = {
         }
         Update: {
           amount_paid?: number
+          approved_by?: string | null
           balance?: number
           created_at?: string
           created_by?: string | null
           currency?: string
           customer_id?: string
+          discount_total?: number
           due_date?: string | null
           id?: string
           invoice_number?: string | null
@@ -1957,9 +1986,13 @@ export type Database = {
           notes?: string | null
           order_id?: string | null
           original_document_reference?: string | null
+          payment_status?: string | null
+          payment_terms?: string | null
           pdf_version_retention_count?: number | null
+          proforma_invoice_id?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
+          tax_total?: number
           total?: number
           type?: Database["public"]["Enums"]["invoice_type"]
           updated_at?: string
@@ -2716,6 +2749,157 @@ export type Database = {
         }
         Relationships: []
       }
+      proforma_invoice_items: {
+        Row: {
+          created_at: string
+          description: string
+          discount: number
+          id: string
+          line_total: number
+          product_id: string | null
+          proforma_invoice_id: string
+          quantity: number
+          sort_order: number
+          tax_rate: number
+          unit: string
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          discount?: number
+          id?: string
+          line_total?: number
+          product_id?: string | null
+          proforma_invoice_id: string
+          quantity?: number
+          sort_order?: number
+          tax_rate?: number
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          discount?: number
+          id?: string
+          line_total?: number
+          product_id?: string | null
+          proforma_invoice_id?: string
+          quantity?: number
+          sort_order?: number
+          tax_rate?: number
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proforma_invoice_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proforma_invoice_items_proforma_invoice_id_fkey"
+            columns: ["proforma_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "proforma_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proforma_invoices: {
+        Row: {
+          approved_by: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string
+          delivery_terms: string | null
+          discount_total: number
+          id: string
+          notes: string | null
+          opportunity_id: string | null
+          order_id: string | null
+          payment_terms: string | null
+          proforma_number: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          total: number
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id: string
+          delivery_terms?: string | null
+          discount_total?: number
+          id?: string
+          notes?: string | null
+          opportunity_id?: string | null
+          order_id?: string | null
+          payment_terms?: string | null
+          proforma_number?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          total?: number
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string
+          delivery_terms?: string | null
+          discount_total?: number
+          id?: string
+          notes?: string | null
+          opportunity_id?: string | null
+          order_id?: string | null
+          payment_terms?: string | null
+          proforma_number?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          total?: number
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proforma_invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proforma_invoices_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proforma_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_inquiries: {
         Row: {
           application: string | null
@@ -3420,6 +3604,10 @@ export type Database = {
         Returns: boolean
       }
       can_use_invoice_importer: { Args: { _user_id: string }; Returns: boolean }
+      convert_proforma_to_invoice: {
+        Args: { _proforma_id: string }
+        Returns: string
+      }
       decide_approval_request: {
         Args: { _decision: string; _id: string; _notes?: string }
         Returns: {

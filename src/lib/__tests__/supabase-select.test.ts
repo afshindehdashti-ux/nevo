@@ -65,11 +65,12 @@ describe("supabase-select — compile-time column safety", () => {
     // is exactly the shape that broke the admin list pages.
 
 
-    // "company_name" is NOT a column of customers. This is the exact bug
-    // that broke the admin list pages at runtime; it must fail typecheck.
+    // "not_a_real_column" is NOT a column of customers. This is the exact
+    // shape of bug that broke the admin list pages at runtime; it must fail
+    // typecheck.
     buildSelect("opportunities", ["id"], [
-      // @ts-expect-error — customers has no `company_name` column
-      { as: "customer", table: "customers", columns: ["company_name"] },
+      // @ts-expect-error — customers has no `not_a_real_column` column
+      { as: "customer", table: "customers", columns: ["not_a_real_column"] },
     ]);
 
     // @ts-expect-error — "not_a_table" is not a public table
