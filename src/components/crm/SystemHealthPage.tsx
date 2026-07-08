@@ -254,6 +254,7 @@ export function SystemHealthPage() {
     } = {};
 
     try {
+      mark("auth");
       // 1. Auth
       try {
         const { data, error } = await supabase.auth.getUser();
@@ -270,6 +271,7 @@ export function SystemHealthPage() {
         });
       }
 
+      mark("db");
       // 2. DB connectivity + required tables
       try {
         const missing: string[] = [];
@@ -293,6 +295,7 @@ export function SystemHealthPage() {
         update("db", { status: "fail", details: (e as Error).message });
       }
 
+      mark("crm");
       // 3. CRM Module Health — quick counts on core tables
       try {
         const { error } = await supabase.from("profiles").select("id", { head: true, count: "exact" });
@@ -302,6 +305,7 @@ export function SystemHealthPage() {
         update("crm", { status: "fail", details: (e as Error).message });
       }
 
+      mark("customer_crud");
       // 4. Customer CRUD
       const testName = `${TEST_PREFIX}${Date.now()}`;
       try {
@@ -326,6 +330,7 @@ export function SystemHealthPage() {
         });
       }
 
+      mark("supplier_crud");
       // 5. Supplier CRUD
       try {
         const { data: sIns, error: sErr } = await supabase
@@ -344,6 +349,7 @@ export function SystemHealthPage() {
         });
       }
 
+      mark("product_crud");
       // 6. Product CRUD
       try {
         const { data: pIns, error: pErr } = await supabase
@@ -362,6 +368,7 @@ export function SystemHealthPage() {
         });
       }
 
+      mark("quotation");
       // 7. Quotation Generator — end-to-end: header + item + trigger recompute.
       let quotationId: string | undefined;
       try {
@@ -441,6 +448,7 @@ export function SystemHealthPage() {
       }
 
 
+      mark("proforma");
       // 8. Proforma Invoice — end-to-end: header + item + recompute check +
       // new-column persistence (terms_conditions/bank_details/approved_by),
       // payment_status transitions (Unpaid → Partially Paid → Paid),
@@ -633,6 +641,7 @@ export function SystemHealthPage() {
 
 
 
+      mark("commercial");
       // 9. Commercial Invoice
       try {
         const { error } = await supabase.from("invoices").select("id", { head: true, count: "exact" });
@@ -642,6 +651,7 @@ export function SystemHealthPage() {
         update("commercial", { status: "fail", details: (e as Error).message });
       }
 
+      mark("commission");
       // 10. Commission Invoice
       try {
         const { error } = await supabase
@@ -653,6 +663,7 @@ export function SystemHealthPage() {
         update("commission", { status: "fail", details: (e as Error).message });
       }
 
+      mark("purchase_order");
       // 11. Purchase Order — table not confirmed in schema, warn if missing
       try {
         const { error } = await supabase
@@ -671,6 +682,7 @@ export function SystemHealthPage() {
         });
       }
 
+      mark("pdf");
       // 12. PDF Export — heuristic: check pdfmake or jsPDF loaded
       try {
         // Route exists that renders quotation print: /admin/quotations/$id/print
@@ -682,6 +694,7 @@ export function SystemHealthPage() {
         update("pdf", { status: "warn", details: (e as Error).message });
       }
 
+      mark("files");
       // 13. File Upload — check documents table
       try {
         const { error } = await supabase.from("documents").select("id", { head: true, count: "exact" });
@@ -695,6 +708,7 @@ export function SystemHealthPage() {
         });
       }
 
+      mark("doc_import");
       // 14. Smart Document Importer
       try {
         const { error } = await supabase
@@ -706,6 +720,7 @@ export function SystemHealthPage() {
         update("doc_import", { status: "warn", details: (e as Error).message });
       }
 
+      mark("ai");
       // 15. AI Assistant
       try {
         const { error } = await supabase
@@ -717,6 +732,7 @@ export function SystemHealthPage() {
         update("ai", { status: "warn", details: (e as Error).message });
       }
 
+      mark("role");
       // 16. Role Permission
       try {
         const roleList = (roles ?? []).join(", ") || "none";
@@ -728,6 +744,7 @@ export function SystemHealthPage() {
         update("role", { status: "fail", details: (e as Error).message });
       }
 
+      mark("rls");
       // 17. RLS Health — verify has_role RPC exists
       try {
         const { data, error } = await supabase.rpc("has_role", {
@@ -747,6 +764,7 @@ export function SystemHealthPage() {
         });
       }
 
+      mark("auth_session");
       // 18. Auth Session & JWT expiry
       try {
         const { data: sess, error } = await supabase.auth.getSession();
@@ -780,6 +798,7 @@ export function SystemHealthPage() {
         });
       }
 
+      mark("rls_enforced");
       // 19. RLS Enforcement — user_roles must be readable only for own rows
       try {
         const { data: me } = await supabase.auth.getUser();
@@ -810,6 +829,7 @@ export function SystemHealthPage() {
         });
       }
 
+      mark("crm_connectivity");
       // 20. CRM Connectivity — probe core CRM tables
       try {
         const tables = ["leads", "opportunities", "contacts", "tasks"] as const;
@@ -844,6 +864,7 @@ export function SystemHealthPage() {
         update("crm_connectivity", { status: "fail", details: (e as Error).message });
       }
 
+      mark("realtime");
       // 21. Realtime channel connectivity
       try {
         const channelName = `health-check-${Date.now()}`;
