@@ -243,7 +243,7 @@ export const runErpQa = createServerFn({ method: "POST" })
     // 7. PDF generator availability
     try {
       // Runtime probe: verify @react-pdf/renderer is importable server-side.
-      await import("@react-pdf/renderer");
+      await import(/* @vite-ignore */ "@react-pdf/renderer" as string);
       push({
         key: "infra:pdf_engine",
         category: "infra",
@@ -542,7 +542,7 @@ export const runErpFinanceTest = createServerFn({ method: "POST" })
         // Confirm the engine is importable. Actual rendering is exercised in a
         // later phase; here we validate availability without shipping a heavy
         // React tree through the QA path.
-        await import("@react-pdf/renderer");
+        await import(/* @vite-ignore */ "@react-pdf/renderer" as string);
         pdfBytes = 1;
         step({
           key: "pdf",
