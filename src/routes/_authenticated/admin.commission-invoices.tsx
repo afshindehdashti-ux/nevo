@@ -57,7 +57,7 @@ function CommissionInvoicesList() {
 
       {error ? (
         <ListErrorState
-          resource="commissions"
+          resource="commission_invoices"
           error={error}
           onRetry={() => refetch()}
           isRetrying={isFetching}

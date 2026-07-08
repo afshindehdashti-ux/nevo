@@ -4,6 +4,7 @@ import { Target } from "lucide-react";
 import { ListErrorState } from "./ListErrorState";
 import { ListEmptyState } from "./ListEmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { AdminListResource } from "./list-telemetry";
 
 type StateKind = "error" | "loading" | "empty" | "ready";
 
@@ -11,7 +12,7 @@ interface PrecedenceDemoProps {
   /** Which of the four states to render — matches the branch order in the real pages. */
   state: StateKind;
   /** Resource slug used for telemetry — matches admin-list-states.md contract. */
-  resource: string;
+  resource: AdminListResource;
 }
 
 /**

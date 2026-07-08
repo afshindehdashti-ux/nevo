@@ -4,10 +4,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ListErrorState } from "@/components/admin/ListErrorState";
 import { ListEmptyState } from "@/components/admin/ListEmptyState";
 import { classifyListState } from "@/components/admin/list-state";
+import type { AdminListResource } from "@/components/admin/list-telemetry";
 
-export interface AdminListPageProps<T> {
-  /** Snake_case slug — used by BOTH error and empty telemetry. Required. */
-  resource: string;
+/**
+ * Shared props for every AdminListPage variant. The `expectSeed` /
+ * `filtersActive` split lives on `AdminListPageProps` (below) as a
+ * discriminated union so the two flags can't be set at the same time.
+ */
+interface AdminListPageBaseProps<T> {
+  /**
+   * Registered telemetry slug — used by BOTH error and empty telemetry.
+   * Must be a member of `ADMIN_LIST_RESOURCES`; unknown slugs won't
+   * compile.
+   */
+  resource: AdminListResource;
   /** Human page title, e.g. "Opportunities". */
   title: string;
   /** One-line subtitle under the title. Optional. */
@@ -24,12 +34,6 @@ export interface AdminListPageProps<T> {
   refetch: () => void;
   /** From `useQuery` — disables Retry while a refetch is in flight. */
   isFetching?: boolean;
-
-  /**
-   * When true, an empty result is classified as `seed_missing` and telemetry
-   * escalates to `warn`. Use only in envs where records are expected to exist.
-   */
-  expectSeed?: boolean;
 
   /** Empty-state config (only these props — everything else is enforced). */
   empty: {
@@ -54,6 +58,19 @@ export interface AdminListPageProps<T> {
 }
 
 /**
+ * `expectSeed` and `filtersActive` describe *why* an empty result is
+ * expected in this environment and drive the emitted `reason`. They are
+ * mutually exclusive — set at most one. Invalid combinations (both true)
+ * fail to compile.
+ */
+export type AdminListPageProps<T> = AdminListPageBaseProps<T> &
+  (
+    | { expectSeed?: false; filtersActive?: false }
+    | { expectSeed: true; filtersActive?: never }
+    | { expectSeed?: never; filtersActive: true }
+  );
+
+/**
  * Canonical admin list page shell. Enforces the contract from
  * `docs/admin-list-states.md`:
  *
@@ -66,23 +83,30 @@ export interface AdminListPageProps<T> {
  * consistent `admin_list_empty_shown` / `reportClientError` events for
  * free — nothing to remember at the call site.
  */
-export function AdminListPage<T>({
-  resource,
-  title,
-  subtitle,
-  eyebrow,
-  isLoading,
-  error,
-  data,
-  refetch,
-  isFetching,
-  expectSeed,
-  empty,
-  children,
-  skeletonRows = 3,
-  toolbar,
-}: AdminListPageProps<T>) {
-  const view = classifyListState<T>({ isLoading, error, data, expectSeed });
+export function AdminListPage<T>(props: AdminListPageProps<T>) {
+  const {
+    resource,
+    title,
+    subtitle,
+    eyebrow,
+    isLoading,
+    error,
+    data,
+    refetch,
+    isFetching,
+    empty,
+    children,
+    skeletonRows = 3,
+    toolbar,
+  } = props;
+
+  // Re-narrow the discriminated union for classifyListState — passing
+  // `props` directly loses the mutual-exclusivity refinement.
+  const view = props.expectSeed
+    ? classifyListState<T>({ isLoading, error, data, expectSeed: true })
+    : props.filtersActive
+      ? classifyListState<T>({ isLoading, error, data, filtersActive: true })
+      : classifyListState<T>({ isLoading, error, data });
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-[1400px] mx-auto">

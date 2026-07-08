@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { logClientEvent } from "@/lib/client-monitor";
+import type { AdminListEmptyReason, AdminListResource } from "./list-telemetry";
 
 interface ListEmptyStateProps {
   /** Icon rendered above the title (lucide-react component). */
@@ -13,17 +14,17 @@ interface ListEmptyStateProps {
   /** Optional call-to-action button/link rendered below the description. */
   action?: ReactNode;
   /**
-   * Resource slug used for telemetry, e.g. "opportunities". When provided,
-   * an `admin_list_empty_shown` event is emitted once per resource+reason
-   * so we can distinguish a fresh environment from a broken seed.
+   * Registered telemetry slug for this list, e.g. `"opportunities"`. When
+   * provided, an `admin_list_empty_shown` event is emitted once per
+   * (resource + reason). Slugs must be added to `ADMIN_LIST_RESOURCES`
+   * first — an unregistered string will not compile.
    */
-  resource?: string;
+  resource?: AdminListResource;
   /**
-   * Why the list is empty. Defaults to "no_records". Use "seed_missing" when
-   * the caller can tell that the environment should have seeded data but
-   * doesn't (e.g. smoke tests reported failure).
+   * Why the list is empty. Defaults to `"no_records"`. Only the values in
+   * `ADMIN_LIST_EMPTY_REASONS` are accepted.
    */
-  reason?: "no_records" | "seed_missing" | "filtered_out";
+  reason?: AdminListEmptyReason;
 }
 
 /**

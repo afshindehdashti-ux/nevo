@@ -1,3 +1,5 @@
+import type { AdminListEmptyReason } from "./list-telemetry";
+
 /**
  * Shared classifier for admin list queries. Turns the raw
  * `{ data, error }` from React Query into a discriminated view state so
@@ -6,19 +8,25 @@
 export type ListViewState<T> =
   | { kind: "loading" }
   | { kind: "error"; error: unknown }
-  | { kind: "empty"; reason: "no_records" | "seed_missing" | "filtered_out" }
+  | { kind: "empty"; reason: AdminListEmptyReason }
   | { kind: "ready"; rows: T[] };
 
-export interface ClassifyOptions {
+/**
+ * Options for `classifyListState`. `expectSeed` and `filtersActive` are
+ * mutually exclusive: an env either expects seeded data (and getting `[]`
+ * is `seed_missing`) or the user narrowed the list with a filter (and
+ * getting `[]` is `filtered_out`) — not both at once. The union enforces
+ * this at compile time so callers can't request an ambiguous state.
+ */
+export type ClassifyOptions = {
   isLoading: boolean;
   error: unknown;
   data: unknown;
-  /**
-   * When true, an empty result is reported as `seed_missing` — used by smoke
-   * tests or environments where records are expected to already exist.
-   */
-  expectSeed?: boolean;
-}
+} & (
+  | { expectSeed?: false; filtersActive?: false }
+  | { expectSeed: true; filtersActive?: never }
+  | { expectSeed?: never; filtersActive: true }
+);
 
 /**
  * Normalises the (isLoading, error, data) triple that every admin list
@@ -26,12 +34,8 @@ export interface ClassifyOptions {
  * regression surfaces via `ListErrorState` telemetry instead of silently
  * rendering an empty table.
  */
-export function classifyListState<T>({
-  isLoading,
-  error,
-  data,
-  expectSeed,
-}: ClassifyOptions): ListViewState<T> {
+export function classifyListState<T>(opts: ClassifyOptions): ListViewState<T> {
+  const { isLoading, error, data } = opts;
   if (error) return { kind: "error", error };
   if (isLoading) return { kind: "loading" };
   if (data != null && !Array.isArray(data)) {
@@ -44,7 +48,12 @@ export function classifyListState<T>({
   }
   const rows = (data as T[] | null | undefined) ?? [];
   if (rows.length === 0) {
-    return { kind: "empty", reason: expectSeed ? "seed_missing" : "no_records" };
+    const reason: AdminListEmptyReason = opts.expectSeed
+      ? "seed_missing"
+      : opts.filtersActive
+        ? "filtered_out"
+        : "no_records";
+    return { kind: "empty", reason };
   }
   return { kind: "ready", rows };
 }
