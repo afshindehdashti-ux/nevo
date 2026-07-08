@@ -1,6 +1,8 @@
+import { useEffect, useRef } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { logClientEvent, reportClientError } from "@/lib/client-monitor";
 
 interface ListErrorStateProps {
   /** Human-friendly label used in the headline, e.g. "opportunities". */
