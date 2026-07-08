@@ -221,9 +221,29 @@ export function SystemHealthPage() {
       prev.map((c) => (c.id === id ? { ...c, ...patch, lastTested: Date.now() } : c)),
     );
 
-  async function runAll() {
+  async function runAll(retryIds?: Set<string>) {
     setRunning(true);
-    setChecks(INITIAL_CHECKS.map((c) => ({ ...c, status: "running" as CheckStatus })));
+    const inScope = (id: string) => !retryIds || retryIds.has(id);
+
+    // Reset only the checks that are actually being run this pass.
+    setChecks((prev) =>
+      prev.map((c) =>
+        inScope(c.id)
+          ? { ...c, status: "idle", details: undefined, suggestedFix: undefined }
+          : c,
+      ),
+    );
+
+    // Per-check helpers — flip to "running" right before the block runs,
+    // and only write the result if this check is in scope for the current pass.
+    const mark = (id: string) => {
+      if (!inScope(id)) return;
+      setChecks((prev) => prev.map((c) => (c.id === id ? { ...c, status: "running" } : c)));
+    };
+    const write = (id: string, patch: Partial<CheckResult>) => {
+      if (!inScope(id)) return;
+      update(id, patch);
+    };
 
     const createdIds: {
       customer?: string;
