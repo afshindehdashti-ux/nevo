@@ -628,3 +628,302 @@ export const runErpFinanceTest = createServerFn({ method: "POST" })
       steps,
     };
   });
+
+/**
+ * Isolated Proforma e2e — each run uses a unique marker so parallel/repeat
+ * runs never collide. Guarantees cleanup even on failure and then verifies
+ * no orphaned proforma_invoice_items remain (both by marker and by
+ * dangling FK to a deleted parent).
+ */
+export const runProformaE2eIsolated = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const supabase = context.supabase as any;
+    const startedAt = new Date().toISOString();
+    const runId =
+      globalThis.crypto?.randomUUID?.() ??
+      `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    const marker = `e2e:${runId}`;
+    const custName = `E2E Proforma ${runId}`;
+
+    const steps: Array<{
+      key: string;
+      label: string;
+      status: CheckStatus;
+      message: string;
+      details?: any;
+    }> = [];
+    const step = (s: (typeof steps)[number]) => steps.push(s);
+
+    let customerId: string | null = null;
+    let proformaId: string | null = null;
+    let itemsInsertedIds: string[] = [];
+
+    // --- Pre-cleanup: sweep any leftovers from earlier failed runs.
+    let preSweep = { proformas: 0, customers: 0 };
+    try {
+      const { data: leftovers } = await supabase
+        .from("proforma_invoices")
+        .select("id, customer_id")
+        .like("notes", "e2e:%");
+      const leftoverIds = (leftovers ?? []).map((r: any) => r.id);
+      const leftoverCustomerIds = (leftovers ?? [])
+        .map((r: any) => r.customer_id)
+        .filter(Boolean);
+      if (leftoverIds.length > 0) {
+        await supabase.from("proforma_invoices").delete().in("id", leftoverIds);
+      }
+      if (leftoverCustomerIds.length > 0) {
+        await supabase
+          .from("customers")
+          .delete()
+          .in("id", leftoverCustomerIds)
+          .like("company_name", "E2E Proforma %");
+      }
+      preSweep = {
+        proformas: leftoverIds.length,
+        customers: leftoverCustomerIds.length,
+      };
+      step({
+        key: "pre_sweep",
+        label: "Pre-run sweep of prior e2e leftovers",
+        status: "pass",
+        message: `Removed ${preSweep.proformas} proformas + ${preSweep.customers} customers`,
+        details: preSweep,
+      });
+    } catch (e) {
+      step({
+        key: "pre_sweep",
+        label: "Pre-run sweep of prior e2e leftovers",
+        status: "warn",
+        message: (e as Error).message,
+      });
+    }
+
+    try {
+      // 1. Unique customer
+      const { data: cust, error: cErr } = await supabase
+        .from("customers")
+        .insert({
+          company_name: custName,
+          name: custName,
+          email: `qa+${runId}@nevoindustrial.com`,
+          country: "AE",
+        })
+        .select("id")
+        .single();
+      if (cErr) throw new Error(`customer insert: ${cErr.message}`);
+      customerId = cust.id;
+      step({
+        key: "customer",
+        label: "Create isolated test customer",
+        status: "pass",
+        message: custName,
+        details: { customerId },
+      });
+
+      // 2. Draft proforma with marker in notes
+      const { data: pi, error: pErr } = await supabase
+        .from("proforma_invoices")
+        .insert({
+          customer_id: customerId,
+          currency: "USD",
+          status: "draft",
+          vat_rate: 5,
+          notes: marker,
+          created_by: context.userId,
+        })
+        .select("id, proforma_number")
+        .single();
+      if (pErr) throw new Error(`proforma insert: ${pErr.message}`);
+      proformaId = pi.id;
+      step({
+        key: "create_pi",
+        label: "Create isolated proforma",
+        status: "pass",
+        message: `id=${pi.id} number=${pi.proforma_number ?? "(draft)"} marker=${marker}`,
+        details: { proformaId, marker },
+      });
+
+      // 3. Insert items
+      const items = [
+        {
+          proforma_invoice_id: proformaId,
+          description: "E2E Item A",
+          quantity: 10,
+          unit: "pcs",
+          unit_price: 100,
+          tax_rate: 5,
+          sort_order: 0,
+        },
+        {
+          proforma_invoice_id: proformaId,
+          description: "E2E Item B",
+          quantity: 2,
+          unit: "pcs",
+          unit_price: 250,
+          tax_rate: 5,
+          sort_order: 1,
+        },
+      ];
+      const { data: inserted, error: iErr } = await supabase
+        .from("proforma_invoice_items")
+        .insert(items)
+        .select("id");
+      if (iErr) throw new Error(`items insert: ${iErr.message}`);
+      itemsInsertedIds = (inserted ?? []).map((r: any) => r.id);
+      step({
+        key: "items",
+        label: "Insert isolated line items",
+        status: itemsInsertedIds.length === items.length ? "pass" : "fail",
+        message: `${itemsInsertedIds.length}/${items.length} rows`,
+      });
+
+      // 4. Verify recomputed totals
+      const { data: reread } = await supabase
+        .from("proforma_invoices")
+        .select("subtotal, vat_amount, grand_total")
+        .eq("id", proformaId)
+        .maybeSingle();
+      const grand = Number(reread?.grand_total ?? 0);
+      step({
+        key: "totals",
+        label: "Trigger recomputed totals",
+        status: grand > 0 ? "pass" : "fail",
+        message: `subtotal=${reread?.subtotal} vat=${reread?.vat_amount} grand=${grand}`,
+      });
+    } catch (e) {
+      step({
+        key: "run",
+        label: "Isolated proforma workflow",
+        status: "fail",
+        message: (e as Error).message,
+      });
+    } finally {
+      // --- Guaranteed cleanup, even on partial failure.
+      // proforma_invoice_items CASCADEs on proforma delete, but we still
+      // delete items explicitly first in case the proforma delete fails.
+      let itemsDeleted = 0;
+      let proformaDeleted = 0;
+      let customerDeleted = 0;
+      try {
+        if (proformaId) {
+          const { data: delItems } = await supabase
+            .from("proforma_invoice_items")
+            .delete()
+            .eq("proforma_invoice_id", proformaId)
+            .select("id");
+          itemsDeleted = (delItems ?? []).length;
+          const { data: delPi } = await supabase
+            .from("proforma_invoices")
+            .delete()
+            .eq("id", proformaId)
+            .select("id");
+          proformaDeleted = (delPi ?? []).length;
+        }
+        if (customerId) {
+          const { data: delCust } = await supabase
+            .from("customers")
+            .delete()
+            .eq("id", customerId)
+            .select("id");
+          customerDeleted = (delCust ?? []).length;
+        }
+        step({
+          key: "cleanup",
+          label: "Guaranteed cleanup",
+          status: "pass",
+          message: `items=${itemsDeleted} proforma=${proformaDeleted} customer=${customerDeleted}`,
+        });
+      } catch (e) {
+        step({
+          key: "cleanup",
+          label: "Guaranteed cleanup",
+          status: "fail",
+          message: (e as Error).message,
+        });
+      }
+
+      // --- Post-cleanup verification: no orphans remain.
+      try {
+        // (a) By marker: any proforma with our marker still around?
+        const { data: markerLeft } = await supabase
+          .from("proforma_invoices")
+          .select("id")
+          .eq("notes", marker);
+        const markerCount = (markerLeft ?? []).length;
+
+        // (b) By id: this run's items still exist?
+        let runItemsLeft = 0;
+        if (itemsInsertedIds.length > 0) {
+          const { data: itemsLeft } = await supabase
+            .from("proforma_invoice_items")
+            .select("id")
+            .in("id", itemsInsertedIds);
+          runItemsLeft = (itemsLeft ?? []).length;
+        }
+
+        // (c) Global orphan sweep: items whose parent proforma is gone.
+        //     Fetch all item parent_ids, then check which still exist.
+        const { data: allItems } = await supabase
+          .from("proforma_invoice_items")
+          .select("id, proforma_invoice_id");
+        const parentIds = Array.from(
+          new Set(
+            (allItems ?? [])
+              .map((r: any) => r.proforma_invoice_id)
+              .filter(Boolean),
+          ),
+        ) as string[];
+        let orphanItems: any[] = [];
+        if (parentIds.length > 0) {
+          const { data: parents } = await supabase
+            .from("proforma_invoices")
+            .select("id")
+            .in("id", parentIds);
+          const alive = new Set((parents ?? []).map((r: any) => r.id));
+          orphanItems = (allItems ?? []).filter(
+            (r: any) => !alive.has(r.proforma_invoice_id),
+          );
+        }
+
+        const orphansFound =
+          markerCount > 0 || runItemsLeft > 0 || orphanItems.length > 0;
+        step({
+          key: "verify_no_orphans",
+          label: "No orphaned proforma_invoice_items remain",
+          status: orphansFound ? "fail" : "pass",
+          message: orphansFound
+            ? `marker_leftover=${markerCount} run_items_left=${runItemsLeft} dangling=${orphanItems.length}`
+            : "Clean: no marker leftovers, no dangling items",
+          details: {
+            marker_leftover: markerCount,
+            run_items_left: runItemsLeft,
+            dangling_sample: orphanItems.slice(0, 5),
+          },
+        });
+      } catch (e) {
+        step({
+          key: "verify_no_orphans",
+          label: "No orphaned proforma_invoice_items remain",
+          status: "warn",
+          message: (e as Error).message,
+        });
+      }
+    }
+
+    const passed = steps.filter((s) => s.status === "pass").length;
+    const failed = steps.filter((s) => s.status === "fail").length;
+    const warned = steps.filter((s) => s.status === "warn").length;
+    return {
+      startedAt,
+      finishedAt: new Date().toISOString(),
+      runId,
+      marker,
+      passed,
+      failed,
+      warned,
+      total: steps.length,
+      steps,
+    };
+  });

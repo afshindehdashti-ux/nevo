@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { runErpQa, runErpFinanceTest } from "@/lib/erp-qa.functions";
+import { runErpQa, runErpFinanceTest, runProformaE2eIsolated } from "@/lib/erp-qa.functions";
 import {
   assertLatestProformaPdf,
   type PdfE2eReport,
@@ -71,15 +71,37 @@ function StatusBadge({ status }: { status: "pass" | "fail" | "warn" }) {
   );
 }
 
+type IsoStep = {
+  key: string;
+  label: string;
+  status: "pass" | "fail" | "warn";
+  message: string;
+  details?: any;
+};
+type IsoReport = {
+  startedAt: string;
+  finishedAt: string;
+  runId: string;
+  marker: string;
+  passed: number;
+  failed: number;
+  warned: number;
+  total: number;
+  steps: IsoStep[];
+};
+
 export function ErpFinanceDiagnostic() {
   const runQa = useServerFn(runErpQa);
   const runTest = useServerFn(runErpFinanceTest);
+  const runIso = useServerFn(runProformaE2eIsolated);
   const [qa, setQa] = useState<QaReport | null>(null);
   const [test, setTest] = useState<FinanceReport | null>(null);
   const [pdfReport, setPdfReport] = useState<PdfE2eReport | null>(null);
+  const [iso, setIso] = useState<IsoReport | null>(null);
   const [qaLoading, setQaLoading] = useState(false);
   const [testLoading, setTestLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [isoLoading, setIsoLoading] = useState(false);
 
   async function onRunQa() {
     setQaLoading(true);
@@ -129,6 +151,20 @@ export function ErpFinanceDiagnostic() {
     }
   }
 
+  async function onRunIsolated() {
+    setIsoLoading(true);
+    try {
+      const r = (await runIso()) as IsoReport;
+      setIso(r);
+      if (r.failed > 0) toast.error(`Isolated proforma e2e: ${r.failed} failing steps`);
+      else toast.success(`Isolated proforma e2e passed (run ${r.runId.slice(0, 8)})`);
+    } catch (e) {
+      toast.error(`Isolated proforma e2e failed: ${(e as Error).message}`);
+    } finally {
+      setIsoLoading(false);
+    }
+  }
+
   const failedChecks = qa?.results.filter((r) => r.status === "fail") ?? [];
   const warnChecks = qa?.results.filter((r) => r.status === "warn") ?? [];
 
@@ -166,6 +202,14 @@ export function ErpFinanceDiagnostic() {
                 <FileCheck2 className="mr-2 h-4 w-4" />
               )}
               Run Proforma PDF e2e
+            </Button>
+            <Button variant="outline" onClick={onRunIsolated} disabled={isoLoading}>
+              {isoLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FlaskConical className="mr-2 h-4 w-4" />
+              )}
+              Run Isolated Proforma e2e
             </Button>
           </div>
 
@@ -330,6 +374,53 @@ export function ErpFinanceDiagnostic() {
           </CardContent>
         </Card>
       )}
+
+      {iso && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FlaskConical className="h-5 w-5" />
+              Isolated Proforma e2e
+              <StatusBadge status={iso.failed === 0 ? "pass" : "fail"} />
+            </CardTitle>
+            <CardDescription>
+              Run <code>{iso.runId.slice(0, 8)}</code> · marker <code>{iso.marker}</code> ·
+              creates unique customer + proforma + items, always cleans up, then verifies zero
+              orphaned <code>proforma_invoice_items</code> remain.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex flex-wrap gap-4 text-sm">
+              <span className="text-emerald-600 font-medium">{iso.passed} PASS</span>
+              <span className="text-amber-500 font-medium">{iso.warned} WARN</span>
+              <span className="text-red-600 font-medium">{iso.failed} FAIL</span>
+            </div>
+            <ol className="space-y-2">
+              {iso.steps.map((s, i) => (
+                <li key={s.key} className="flex items-start gap-3 rounded-md border p-3">
+                  <span className="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-muted text-center text-xs leading-5">
+                    {i + 1}
+                  </span>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-medium text-sm">{s.label}</div>
+                      <StatusBadge status={s.status} />
+                    </div>
+                    <div className="text-xs text-muted-foreground break-words">{s.message}</div>
+                    {s.details && (
+                      <pre className="mt-1 overflow-x-auto rounded bg-muted p-2 text-xs">
+                        {JSON.stringify(s.details, null, 2)}
+                      </pre>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
+
+
 
 
       {qa && (failedChecks.length > 0 || warnChecks.length > 0) && (
