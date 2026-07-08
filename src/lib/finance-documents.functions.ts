@@ -70,11 +70,11 @@ export const listFinanceDocuments = createServerFn({ method: "GET" })
       )
       .order("created_at", { ascending: false })
       .limit(data.limit ?? 200);
-    if (data.document_type) q = q.eq("document_type", data.document_type);
-    if (data.status) q = q.eq("status", data.status);
+    if (data.document_type) q = q.eq("document_type", data.document_type as never);
+    if (data.status) q = q.eq("status", data.status as never);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    return (rows ?? []) as unknown as Array<Record<string, unknown>>;
   });
 
 export const getFinanceDocument = createServerFn({ method: "GET" })
