@@ -72,6 +72,7 @@ function OpportunitiesList() {
           icon={Target}
           title="No opportunities yet"
           description="Deals you create — either manually or from a qualified lead — will show up here with stage, value, and expected close date."
+          resource="opportunities"
         />
       ) : (
         <div className="border border-border rounded-md overflow-hidden bg-background">
