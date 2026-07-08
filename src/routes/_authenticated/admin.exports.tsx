@@ -7,6 +7,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2, Save, X, Bookmark, FileSpreadsheet, AlertTriangle } from "lucide-react";
+import { VerifyOpenButton } from "@/components/exports/VerifyOpenButton";
+import { BlockedVerificationDialog, type BlockedVerification } from "@/components/exports/BlockedVerificationDialog";
 
 import { listCsvExportAudit } from "@/lib/invoice-purge-audit.functions";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
@@ -131,11 +133,7 @@ function ExportsHistoryPage() {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const pendingRowRef = useRef<CsvExportAuditRecord | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [blocked, setBlocked] = useState<{
-    filename: string;
-    row: CsvExportAuditRecord;
-    result: VerifyResult;
-  } | null>(null);
+  const [blocked, setBlocked] = useState<BlockedVerification | null>(null);
 
   // --- Selection for compliance report ---
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -749,28 +747,11 @@ function ExportsHistoryPage() {
                         >
                           <Copy className="h-3 w-3" />
                         </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 px-2"
+                        <VerifyOpenButton
+                          rowId={r.id}
+                          verifyingId={verifyingId}
                           onClick={() => triggerVerifyAndOpen(r)}
-                          disabled={verifyingId !== null}
-                          aria-busy={verifyingId === r.id}
-                          title="Pick the saved CSV to re-verify its SHA-256 before opening"
-                        >
-                          {verifyingId === r.id ? (
-                            <>
-                              <Loader2 className="h-3 w-3 animate-spin" />
-                              <span className="ml-1">Verifying…</span>
-                            </>
-                          ) : (
-                            <>
-                              <FileDown className="h-3 w-3" />
-                              <span className="ml-1">Verify &amp; open</span>
-                            </>
-                          )}
-                        </Button>
+                        />
                         <Button
                           type="button"
                           variant="ghost"
