@@ -25,6 +25,38 @@ import { format, formatDistanceToNow } from "date-fns";
 
 const ALLOWED_ROLES: AppRole[] = ["super_admin", "management"];
 const TEST_PREFIX = "TEST-NEVO-QA-";
+const STORAGE_CHECKS_KEY = "nevo:system-health:checks";
+const STORAGE_LAST_RUN_KEY = "nevo:system-health:last-run";
+
+function loadPersisted(): CheckResult[] | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_CHECKS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as CheckResult[];
+    if (!Array.isArray(parsed)) return null;
+    // Merge with INITIAL_CHECKS so newly added checks appear.
+    return INITIAL_CHECKS.map((base) => {
+      const prev = parsed.find((p) => p.id === base.id);
+      return prev
+        ? { ...base, ...prev, status: prev.status === "running" ? "idle" : prev.status }
+        : base;
+    });
+  } catch {
+    return null;
+  }
+}
+
+function loadLastRunAt(): number | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_LAST_RUN_KEY);
+    const n = raw ? Number(raw) : NaN;
+    return Number.isFinite(n) ? n : null;
+  } catch {
+    return null;
+  }
+}
 
 type CheckStatus = "idle" | "running" | "pass" | "warn" | "fail";
 
