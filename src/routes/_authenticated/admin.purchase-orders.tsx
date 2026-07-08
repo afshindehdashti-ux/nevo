@@ -66,11 +66,11 @@ function PurchaseOrdersList() {
           <Skeleton className="h-12 w-full" />
         </div>
       ) : (data ?? []).length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center text-sm text-muted-foreground">
-            No purchase orders yet.
-          </CardContent>
-        </Card>
+        <ListEmptyState
+          icon={ClipboardList}
+          title="No purchase orders yet"
+          description="Confirmed customer purchase orders show up here as they enter the operations pipeline. Convert a quotation to create the first one."
+        />
       ) : (
         <div className="border border-border rounded-md overflow-hidden bg-background">
           <table className="w-full text-sm">

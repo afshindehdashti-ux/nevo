@@ -69,11 +69,11 @@ function CommissionInvoicesList() {
           <Skeleton className="h-12 w-full" />
         </div>
       ) : (data ?? []).length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center text-sm text-muted-foreground">
-            No partner commissions yet.
-          </CardContent>
-        </Card>
+        <ListEmptyState
+          icon={Percent}
+          title="No commissions yet"
+          description="Commissions accrue automatically when partner-linked customer orders are confirmed and invoiced. New entries will appear here for review and payout."
+        />
       ) : (
         <div className="border border-border rounded-md overflow-hidden bg-background">
           <table className="w-full text-sm">
