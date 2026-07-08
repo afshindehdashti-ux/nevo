@@ -5,6 +5,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate, formatMoney } from "@/lib/crm-money";
+import { buildSelect } from "@/lib/supabase-select";
+
+// Type-checked against Database types — `customers.company_name` would fail
+// tsc here instead of at runtime with a "column does not exist" error.
+const OPPORTUNITIES_SELECT = buildSelect(
+  "opportunities",
+  ["id", "name", "stage", "amount", "currency", "probability", "expected_close_date", "created_at"],
+  [
+    { as: "customer", table: "customers", columns: ["name"] },
+    { as: "partner", table: "partners", columns: ["company_name"] },
+  ],
+);
+
+
 
 export const Route = createFileRoute("/_authenticated/admin/opportunities")({
   head: () => ({
@@ -19,7 +33,7 @@ function OpportunitiesList() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("opportunities")
-        .select("id,name,stage,amount,currency,probability,expected_close_date,customer:customers(name),partner:partners(company_name),created_at")
+        .select(OPPORTUNITIES_SELECT)
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;

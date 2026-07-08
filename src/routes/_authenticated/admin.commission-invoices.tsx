@@ -6,6 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GuideMeButton } from "@/components/ai/GuideMeButton";
 import { formatDate, formatMoney } from "@/lib/crm-money";
+import { buildSelect } from "@/lib/supabase-select";
+
+const COMMISSIONS_SELECT = buildSelect(
+  "partner_commissions",
+  ["id", "amount", "currency", "status", "earned_at", "paid_at", "created_at"],
+  [
+    { as: "partner", table: "partners", columns: ["company_name"] },
+    { as: "customer", table: "customers", columns: ["name"] },
+  ],
+);
+
 
 export const Route = createFileRoute("/_authenticated/admin/commission-invoices")({
   head: () => ({
@@ -20,7 +31,7 @@ function CommissionInvoicesList() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("partner_commissions")
-        .select("id,amount,currency,status,earned_at,paid_at,partner:partners(company_name),customer:customers(name),created_at")
+        .select(COMMISSIONS_SELECT)
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;

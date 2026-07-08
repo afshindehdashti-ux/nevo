@@ -6,6 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GuideMeButton } from "@/components/ai/GuideMeButton";
 import { formatDate, formatMoney } from "@/lib/crm-money";
+import { buildSelect } from "@/lib/supabase-select";
+
+const ORDERS_SELECT = buildSelect(
+  "orders",
+  ["id", "order_number", "status", "order_date", "requested_delivery", "currency", "total"],
+  [{ as: "customer", table: "customers", columns: ["name"] }],
+);
+
 
 export const Route = createFileRoute("/_authenticated/admin/purchase-orders")({
   head: () => ({
@@ -20,7 +28,7 @@ function PurchaseOrdersList() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("orders")
-        .select("id,order_number,status,order_date,requested_delivery,currency,total,customer:customers(name)")
+        .select(ORDERS_SELECT)
         .order("order_date", { ascending: false })
         .limit(200);
       if (error) throw error;
