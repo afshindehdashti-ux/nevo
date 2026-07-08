@@ -68,10 +68,10 @@ function QuotationEditor() {
     queryFn: () => getFn({ data: { id } }),
   });
 
-  const [customers, setCustomers] = useState<Array<{ id: string; name: string }>>([]);
+  const [customers, setCustomers] = useState<Array<{ id: string; name: string; company_name: string | null }>>([]);
   useEffect(() => {
-    supabase.from("customers").select("id,name").order("name").then(({ data }) => {
-      setCustomers(data ?? []);
+    supabase.from("customers").select("id,name,company_name").order("name").then(({ data }) => {
+      setCustomers((data as Array<{ id: string; name: string; company_name: string | null }>) ?? []);
     });
   }, []);
 
