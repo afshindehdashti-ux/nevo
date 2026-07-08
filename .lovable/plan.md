@@ -1,134 +1,68 @@
+# Finance backend rewrite
 
-# Smart Invoice Importer
+You chose "full rewrite to your spec." Before I run migrations, I need you to sign off on this plan — the changes are destructive and will break several working modules until every dependency is updated. Everything below matches the field names / table names in your brief.
 
-Add a protected feature that lets NEVO staff upload old invoices (XLSX, XLS, CSV, DOCX, PDF, PNG, JPG, JPEG), extract the fields with AI, review + correct them, and create a **Draft** Proforma or Commercial Invoice in NEVO's existing format. Nothing on the public site changes; nothing is auto-sent or auto-approved.
+## Impact summary (please read)
 
-This is a large feature. I'll ship it in **five reviewable phases**, each independently useful and safe to stop after. Everything lives under `/_authenticated/` and reuses existing tables (`customers`, `products`, `invoices`, `invoice_items`, `orders`) — the importer only adds staging tables and never mutates production records without an explicit "Create Draft" click.
+Modules that currently depend on the existing `invoices` (with `type='proforma'|'commercial'`) and `customers.name` shape and will need code changes or will temporarily break:
 
----
+- `orders → invoice` generation (`src/lib/orders.functions.ts`, order detail actions)
+- `payments` (`src/routes/_authenticated/admin.payments.tsx`, `payments` table FK to invoices)
+- `partner_commissions` (`invoice_id` FK, `auto_request_commission_approval`)
+- `approvals` (`auto_request_invoice_approval` trigger, `decide_approval_request` switch on `entity_type in ('proforma','invoice')`)
+- `invoice_import_jobs`, `invoice_pdf_versions`, `ai_documents.related_invoice_id`
+- `quotations.converted_invoice_id`, quotation → invoice conversion
+- AI features: `InvoiceAiCheckButton`, `ai-summary.functions.ts` for invoices
+- CRM sidebar, guide content, telemetry (`ADMIN_LIST_RESOURCES` includes `invoices`, `proforma_invoices`, etc.)
+- PDF: `src/lib/invoice-pdf.ts` (all field names change)
+- Customer-facing portal (`customer-portal.functions.ts`) — reads invoices for `is_customer_user`
+- Every place that reads `customers.name`, `customers.address`, `invoices.vat_amount`, `invoice_items.vat_pct/discount_pct`
 
-## Phase 1 — Foundations (schema, storage, RLS)
+Existing production data (all rows in `invoices`, `invoice_items`, `customers.name`, etc.) must be migrated. If we don't, the app loses history.
 
-**Tables** (new, all in `public`, all RLS-on, staff-only):
-- `invoice_import_jobs` — one row per upload; tracks `status` (`uploaded | processing | ready_for_review | draft_created | failed | cancelled`), `import_type`, `related_customer_id`, `related_order_id`, `created_invoice_id`, `overall_confidence`.
-- `invoice_import_files` — original uploaded file(s) metadata + storage path.
-- `invoice_import_extracted_data` — `raw_text`, `extracted_json`, `mapped_json`, `confidence_scores`, `validation_warnings` (1-to-1 with job).
-- `invoice_import_audit_log` — every action (upload, extract, edit, create-draft, cancel).
+## Migration strategy
 
-**Storage bucket**: `invoice-imports` (private), path `{user_id}/{job_id}/{filename}`. Signed URLs only.
+1. **Additive column adds first**, no drops. Keep old columns as aliases so the app doesn't break mid-deploy.
+   - `customers`: add `company_name` (copy from `name`), `billing_address` (copy from `address`). Keep `name`/`address` as generated columns mirroring the new ones, so legacy code keeps working.
+2. **Create the two new tables** exactly per your spec:
+   - `proforma_invoices` + `proforma_invoice_items`
+   - Their sequences and numbering triggers (`PRO-YYYY-0001`, `INV-YYYY-0001`, sequential, atomic via `nextval`).
+3. **Backfill**: `insert into proforma_invoices ... from invoices where type = 'proforma'`, same for items. Preserve ids so `converted_invoice_id`-style links keep working.
+4. **Reshape `invoices`** per your spec: add `proforma_invoice_id`, `payment_status`, `discount_total`, `tax_total`, `paid_amount`, `balance`, `payment_terms`, `approved_by`. Drop `type` (only commercial remains). Rename `vat_amount → tax_total`, `amount_paid → paid_amount`. Backfill numeric fields from items.
+5. **Reshape `invoice_items`** per your spec: add `discount`, `tax_rate`, `sort_order`, `line_total`. Rename `discount_pct → discount`, `vat_pct → tax_rate`, `position → sort_order`.
+6. **RLS**: rewrite policies to your matrix — `super_admin`, `management`, `finance` full; `sales` create-only for quotations/proformas, cannot mark paid; customers see own approved/sent only. `has_role`/`has_any_role` already exist.
+7. **Total-calc trigger**: replace `recalc_invoice_totals` with a trigger that runs your formula (`line_subtotal / line_discount_amount / line_taxable / line_tax / line_total → sums → payments → balance → payment_status`). Same for a new `recalc_proforma_totals`.
+8. **Activity logs**: add triggers on `proforma_invoices` and `invoices` for created/updated/approved/sent/converted/paid; add a helper `log_finance_event(...)`.
+9. **Convert-proforma-to-invoice**: `convert_proforma_to_invoice(_proforma_id)` SECURITY DEFINER RPC that copies fields/items, sets `invoice.proforma_invoice_id`, sets proforma `status = 'converted_to_invoice'`, logs activity.
 
-**Roles** (via existing `has_role` / `app_role`): allow `super_admin`, `management`, `sales`, `finance`; block `read_only` and `operations` (operations can VIEW jobs linked to their orders but not create).
+## App code changes
 
-**Grants + policies**: standard `authenticated` + `service_role` grants, plus role-scoped policies using `has_role`. No `anon`.
+- Rewrite `src/lib/invoice-pdf.ts` to read the new field names (`company_name`, `billing_address`, `discount_total`, `tax_total`, `paid_amount`, `balance`, `payment_terms`, `delivery_terms`, `valid_until`).
+- Rewrite `src/lib/invoices.functions.ts` and add `src/lib/proforma-invoices.functions.ts`.
+- **New UI (unavoidable)**: `/admin/invoices/new` and `/admin/proforma-invoices/new` with customer picker (searches `customers`), line-item editor with live totals, validation per your list (rules 4 and 5), submit. Your rule "Do not add new UI" is incompatible with your rules 6 and 7 which explicitly require these flows — I'm interpreting the ban as "no unrequested UI." Confirm.
+- Update `admin.invoices.$id.tsx` and `admin.proforma-invoices.$id.tsx` detail pages to read new fields and expose Approve / Mark sent / Convert to invoice / Add payment / Download PDF actions.
+- Update every query that reads invoices to project `customers ( company_name, email, phone, billing_address, country )`.
+- Update orders → invoice generation, payments page, commissions, approvals switch to use new tables/fields.
+- Update `ADMIN_LIST_RESOURCES` and telemetry.
+- Update `src/integrations/supabase/types.ts` regenerates after migration approval.
 
-Deliverable at end of phase 1: migration reviewed and applied, bucket created, no UI yet.
+## Test data + acceptance run
 
----
+After deploy I'll:
 
-## Phase 2 — Upload + extraction pipeline (server)
+1. Insert `NEVO Test Customer LLC` into `customers`.
+2. Drive Playwright: create proforma with 2 items → verify list + detail + PDF → convert to invoice → verify new invoice → add payment → verify `balance` and `payment_status`.
+3. Screenshot each step and attach.
+4. Run `bun run lint`, `bunx vitest run`, and the admin-list telemetry check.
 
-**Server functions** (`src/lib/invoice-import.functions.ts`, `.server.ts` helpers):
-- `createImportJob({ file, importType, relatedCustomerId?, relatedOrderId? })` — validates file type/size (≤20 MB), uploads to storage via signed upload, inserts `invoice_import_jobs` + `invoice_import_files`, returns `jobId`.
-- `runExtraction({ jobId })` — status → `processing`, dispatches per file type, writes result, status → `ready_for_review` or `failed`.
-- `getImportJob({ jobId })` — returns job + extracted + mapped JSON for the review UI.
-- `updateMappedData({ jobId, mapped })` — user edits during review.
-- `cancelImportJob({ jobId })`.
+## Estimated blast radius
 
-All use `.middleware([requireSupabaseAuth])` and re-check role with `has_role` inside the handler.
+~15–20 files edited, 1 large migration, 2 new routes, 1 new server-function module, PDF generator rewrite. Realistic first-cut ETA is several hours of work; there **will** be follow-up fixes as I find modules still reading the old shape.
 
-**Extractors** (per file type, all server-side):
-- **XLSX/XLS/CSV** — `exceljs` / `papaparse`. Detect header key/value pairs, item table (by header row heuristics: `qty`, `unit price`, `description`), totals block.
-- **DOCX** — `mammoth` for text + `docx4js` tables (or plain XML fallback shipped in the docs skill).
-- **PDF (text)** — `pdf-parse`. If extracted text is thin (< 200 chars) or scanned, fall through to OCR.
-- **PDF (scanned) / PNG / JPG** — send the file (base64) to Lovable AI Gateway as an `image_url` block with a Gemini vision model (`google/gemini-2.5-flash` for cost, `google/gemini-2.5-pro` fallback). Prompt requests strict JSON matching our schema with per-field `confidence` (0–1).
+## Confirm before I start
 
-**AI normalisation step** (all file types): feed the raw structured guess to `google/gemini-2.5-flash` with our target schema and Zod-validated output — normalises currency codes, dates, VAT %, line items. Assigns a `confidence` per field.
+1. **Proceed with destructive rename+backfill of `customers.name → company_name` and `customers.address → billing_address`?** (I'll keep `name`/`address` as generated aliases so nothing else breaks.)
+2. **Confirm the two new create routes are OK** despite "no new UI." They're required by your rules 6 and 7.
+3. **OK to run this in one big migration**, or split into 4 (schema add → backfill → app code → drop old columns much later)? I recommend the 4-step split; safer to roll back.
 
-**Runtime note**: no `child_process`, no `sharp`, no native binaries — all extractors are pure JS or delegate to the AI Gateway. Fits Cloudflare Workers.
-
-Deliverable: unit tests hitting extractors with 1 fixture per file type; integration test that mocks the AI Gateway.
-
----
-
-## Phase 3 — Review UI + validation
-
-**Route**: `src/routes/_authenticated/admin.invoice-imports.$jobId.tsx` (review) and `admin.invoice-imports.tsx` (history list — reuses the existing `ListErrorState` / `ListEmptyState` / skeleton pattern documented in `docs/admin-list-states.md`).
-
-**Modal component**: `<ImportFromFileModal />` in `src/components/invoice-import/` with:
-- Drag-and-drop + browse (accepts the 8 file types only, ≤20 MB).
-- Import-as picker: Proforma, Commercial, Customer + Invoice, Order + Invoice, Draft Only.
-- Optional "link to existing customer / order" search boxes.
-- Progress steps: Uploading → Reading → Extracting → Mapping → Checking totals → Ready.
-
-**Review page layout**:
-- Left: original file preview (image inline, PDF via `<iframe src=signedUrl>`, DOCX/XLSX show a "Download original" button + parsed text summary).
-- Right: form of extracted fields — every field editable, yellow background if `confidence < 0.8`, red if `< 0.6`, required badge on critical fields (customer, date, currency, ≥1 item, qty, unit price, grand total).
-- Bottom: item table (add/remove/edit rows).
-- Customer matcher: server fn `matchCustomer` searches by name/email/phone/VAT and returns exact / possible / none, with a "Create new" toggle.
-- Product matcher: similar via SKU/name.
-
-**Validation** (`src/lib/invoice-import-validate.ts`, shared client+server):
-- Math: `qty × unit_price = line_total`; `subtotal = Σ line_total`; `grand_total = subtotal − discount + vat`.
-- Warnings for currency/VAT/duplicate invoice number/missing bank/etc.
-- If imported total ≠ calculated, show side-by-side + choose imported / calculated / manual.
-- Blocks "Create Draft" until every critical field is present and non-critical warnings acknowledged.
-
-Buttons: **Re-run extraction**, **Save as Draft** (persists edits without creating invoice), **Create NEVO Invoice**, **Cancel**.
-
----
-
-## Phase 4 — Wire into existing modules + PDF
-
-**Buttons — `Import From File`** placed next to existing "New …" buttons on:
-- Proforma Invoices list, Commercial Invoices list (both filtered variants of `admin.invoices`),
-- Customer profile (`admin.customers.$id.tsx` — Documents / Invoices tab),
-- Order page (`admin.orders.$id.tsx` — Related Documents),
-- AI Assistant → new sub-route `/_authenticated/admin.ai-assistant.document-check.tsx`.
-
-**Create Draft flow** (`createInvoiceFromImport` server fn):
-1. Validate mapped data server-side (re-runs the same rules).
-2. If `create_customer`, upsert into `customers`; if match, link.
-3. Upsert `products` for new items; link `invoice_items.product_id` where matched, otherwise leave as free-text line with description/price.
-4. Insert `invoices` with `status = 'draft'`, `type = 'proforma' | 'commercial'`, auto-numbered (`PI-NEVO-YYYY-#####` / `INV-NEVO-YYYY-#####` — allocator function in DB with advisory lock).
-5. Store the imported original number in `invoices.original_document_reference` (new nullable column, added in Phase 1 migration).
-6. Update job: `status='draft_created'`, `created_invoice_id`.
-7. Audit-log the creation.
-
-Nothing is auto-sent, auto-approved, or auto-paid.
-
-**PDF**: reuse the existing NEVO invoice PDF renderer (whatever `invoice_pdf_versions` currently uses). The importer produces a normal `invoices` row, so preview/download/convert-to-order all work through the existing pipeline. Company header/logo/footer come from `company_settings` (already populated with the NEVO details in the prompt).
-
----
-
-## Phase 5 — AI Check + polish
-
-- **AI Check button** on the review page → server fn `aiCheckImport({ jobId })` sends the mapped JSON + validation warnings to the AI Gateway with a rubric prompt; returns markdown list of: missing fields, low-confidence fields, calc issues, possible duplicate customer, product-match issues, currency/VAT/payment-term warnings, and recommended corrections. Rendered in a right-side drawer.
-- Assistant slash commands: `/extract-invoice`, `/check-invoice`, `/missing-fields`, `/vat-check`, `/match-customer`, `/convert-to-nevo`, `/explain-warnings` — each maps to a server fn already built above.
-- **Import History** page finalised with statuses, filters, and row actions (View original, View extracted, Continue review, Create invoice, Delete, Re-run).
-- Telemetry: reuse `logClientEvent` / `reportClientError` — events `invoice_import_uploaded`, `_extracted`, `_review_opened`, `_draft_created`, `_failed`, `_ai_checked`.
-
----
-
-## Out-of-scope for this feature (explicit)
-
-- Public-site changes: none.
-- Existing invoice records: untouched; the importer only inserts new drafts.
-- Emailing / approval / payment marking: unchanged, still manual.
-- Bulk import (multi-file at once): possible later; single-file per job for v1.
-- Non-English OCR quality: Gemini handles Arabic/EN reasonably; other scripts best-effort.
-
-## Technical section (for reviewers)
-
-- Stack: TanStack Start server functions (`createServerFn`, `requireSupabaseAuth`), never Supabase Edge Functions for app-internal work.
-- Secrets: `LOVABLE_API_KEY` (auto), no other API keys. Ensure via `ai_gateway--create` at start of Phase 2.
-- Packages: `exceljs`, `papaparse`, `mammoth`, `pdf-parse`, `zod` (already present). All Worker-compatible.
-- Files: server-only extractors live in `src/lib/invoice-import/*.server.ts`; server fns in `src/lib/invoice-import.functions.ts`; components in `src/components/invoice-import/`.
-- Follows the existing admin-list state contract from `docs/admin-list-states.md`.
-- Shared `classifyListState` used for the Import History table.
-
-## Confirmations before I start
-
-1. Ship in the 5 phases above, one migration+PR per phase, or roll it into fewer/more?
-2. AI model default: `google/gemini-2.5-flash` for cost, escalate to `google/gemini-2.5-pro` on low confidence — OK, or force one model?
-3. `original_document_reference` as a new nullable column on `invoices` — any objection to adding it in Phase 1?
-4. Operations role: read-only on jobs linked to their orders, no create — matches the prompt's "cannot create invoice unless permitted"?
+Reply "go" (single migration) or "split" (4 steps) or edits, and I'll start.
