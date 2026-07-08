@@ -50,7 +50,7 @@ describe("ListErrorState telemetry", () => {
     const onRetry = vi.fn();
     render(
       <ListErrorState
-        resource="commissions"
+        resource="commission_invoices"
         error={new Error("network")}
         onRetry={onRetry}
       />,
