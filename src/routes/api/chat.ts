@@ -1,4 +1,5 @@
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { withMethodGuards } from "@/lib/api-http";
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 
