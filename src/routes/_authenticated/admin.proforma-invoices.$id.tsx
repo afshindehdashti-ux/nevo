@@ -64,7 +64,7 @@ type ProformaRow = {
 function ProformaInvoiceDetail() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
-  const router = useRouter();
+
 
   const { data: pi, isLoading } = useQuery({
     queryKey: ["proforma_invoice", id],
