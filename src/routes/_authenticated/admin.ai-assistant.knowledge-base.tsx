@@ -263,7 +263,15 @@ function KnowledgeBasePage() {
                 rows={2}
               />
             </div>
-            <div className="space-y-1">
+            <div
+              className="space-y-1"
+              onDragOver={(e) => { e.preventDefault(); }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const f = e.dataTransfer.files?.[0];
+                if (f) setFile(f);
+              }}
+            >
               <Label>Upload file (TXT, MD, CSV, JSON, PDF, DOCX, XLSX — up to ~10 MB)</Label>
               <Input
                 type="file"
@@ -271,9 +279,15 @@ function KnowledgeBasePage() {
                 accept=".txt,.md,.markdown,.csv,.tsv,.json,.log,.html,.xml,.yml,.yaml,.pdf,.docx,.xlsx,.xls,text/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               />
+              {file && (
+                <p className="text-[11px] text-emerald-700">
+                  Selected: {file.name} ({(file.size / 1024).toFixed(1)} KB)
+                </p>
+              )}
               <p className="text-[11px] text-neutral-500">
-                Text is extracted, chunked, and embedded automatically. Scanned/image-only PDFs
-                will not be searchable without OCR.
+                Drag &amp; drop is supported. Text is extracted, chunked, and embedded automatically.
+                Scanned/image-only PDFs will not be searchable without OCR — paste the content as raw
+                text instead if extraction fails.
               </p>
             </div>
             <div className="space-y-1">

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
+import { ImportWizard } from "@/components/import/ImportWizard";
+import { SUPPORTED_IMPORT_TYPES } from "@/lib/import-schemas";
 
 type ImportJob = Database["public"]["Tables"]["import_jobs"]["Row"];
 type JobStatus = Database["public"]["Enums"]["import_job_status"];
@@ -67,6 +70,7 @@ function useImportJobs() {
 
 function ImportDataPage() {
   const { data: jobs, isLoading, error } = useImportJobs();
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   const byCategory = IMPORT_TYPES.reduce<Record<string, typeof IMPORT_TYPES>>((acc, t) => {
     (acc[t.category] = acc[t.category] ?? []).push(t);
@@ -75,6 +79,7 @@ function ImportDataPage() {
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-[1400px] mx-auto">
+      <ImportWizard open={wizardOpen} onOpenChange={setWizardOpen} />
       <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground">Admin Tools</p>
@@ -83,7 +88,7 @@ function ImportDataPage() {
             Bulk-import CRM, operations, finance, and document records from CSV, XLSX, or JSON.
           </p>
         </div>
-        <Button size="lg" disabled title="Wizard ships in the next update">
+        <Button size="lg" onClick={() => setWizardOpen(true)}>
           <Upload className="mr-2 h-4 w-4" /> New import
         </Button>
       </header>
@@ -97,12 +102,16 @@ function ImportDataPage() {
             </CardHeader>
             <CardContent className="text-sm">
               <ul className="space-y-1.5">
-                {items.map((t) => (
-                  <li key={t.value} className="flex items-center gap-2">
-                    <FileSpreadsheet className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span>{t.label}</span>
-                  </li>
-                ))}
+                {items.map((t) => {
+                  const supported = SUPPORTED_IMPORT_TYPES.includes(t.value);
+                  return (
+                    <li key={t.value} className="flex items-center gap-2">
+                      <FileSpreadsheet className={`h-3.5 w-3.5 ${supported ? "text-emerald-600" : "text-muted-foreground"}`} />
+                      <span>{t.label}</span>
+                      {supported && <Badge variant="outline" className="ml-auto text-[10px] py-0 px-1.5">Ready</Badge>}
+                    </li>
+                  );
+                })}
               </ul>
             </CardContent>
           </Card>
@@ -187,16 +196,14 @@ function ImportDataPage() {
         )}
       </section>
 
-      <Card className="border-amber-500/30 bg-amber-500/5">
+      <Card className="border-emerald-500/30 bg-emerald-500/5">
         <CardContent className="p-4 text-sm">
-          <p className="font-medium mb-1">Wizard coming next</p>
+          <p className="font-medium mb-1">Wizard live</p>
           <p className="text-muted-foreground">
-            The full upload → column mapping → validation → confirm-and-run flow is scheduled for the next
-            update. This page already lists every historical job and every supported import type, and the
-            database tables, RLS policies, and audit hooks are ready. See{" "}
-            <Link to="/admin" className="text-emerald-600 hover:underline">
-              Dashboard
-            </Link>{" "}
+            Upload → column mapping → validation → confirm-and-run is now available for the entity types
+            marked <span className="text-emerald-700 font-medium">Ready</span>. Additional entity types
+            will be enabled as their coercion rules are wired. See{" "}
+            <Link to="/admin" className="text-emerald-600 hover:underline">Dashboard</Link>{" "}
             for real-time counts.
           </p>
         </CardContent>
