@@ -109,6 +109,26 @@ export function ErpFinanceDiagnostic() {
     }
   }
 
+  async function onRunPdfE2e() {
+    setPdfLoading(true);
+    try {
+      const r = await assertLatestProformaPdf();
+      setPdfReport(r);
+      if (r.pass) {
+        toast.success(
+          `Proforma PDF e2e passed for ${r.proformaNumber ?? r.proformaId.slice(0, 8)}`,
+        );
+      } else {
+        const failed = r.assertions.filter((a) => !a.found).length;
+        toast.error(`Proforma PDF e2e: ${failed} assertion(s) failed`);
+      }
+    } catch (e) {
+      toast.error(`Proforma PDF e2e failed: ${(e as Error).message}`);
+    } finally {
+      setPdfLoading(false);
+    }
+  }
+
   const failedChecks = qa?.results.filter((r) => r.status === "fail") ?? [];
   const warnChecks = qa?.results.filter((r) => r.status === "warn") ?? [];
 
