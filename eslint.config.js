@@ -40,6 +40,7 @@ export default tseslint.config(
       "admin-list-telemetry/valid-resource-prop": "error",
       "admin-list-telemetry/valid-empty-reason": "error",
       "admin-list-telemetry/no-raw-empty-event": "error",
+      "admin-list-telemetry/no-conflicting-empty-flags": "error",
     },
   },
   {
