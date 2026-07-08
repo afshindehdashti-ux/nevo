@@ -31,7 +31,7 @@ function CommissionInvoicesList() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("partner_commissions")
-        .select("id,amount,currency,status,earned_at,paid_at,partner:partners(company_name),customer:customers(name),created_at")
+        .select(COMMISSIONS_SELECT)
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;
