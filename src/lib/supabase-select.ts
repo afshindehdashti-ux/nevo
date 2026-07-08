@@ -56,7 +56,15 @@ export function buildSelect<T extends TableName>(
   if (columns.length === 0 && embeds.length === 0) {
     throw new Error(`buildSelect(${table}): select must project at least one column`);
   }
-  return [...columns, ...embeds.map((e) => embed(e))].join(",");
+  const embedStrs = embeds.map((e) => {
+    if (e.columns.length === 0) {
+      throw new Error(`embed(${e.table}): at least one column is required`);
+    }
+    const cols = (e.columns as readonly string[]).join(",");
+    return e.as ? `${e.as}:${e.table}(${cols})` : `${e.table}(${cols})`;
+  });
+  return [...columns, ...embedStrs].join(",");
 }
+
 
 
