@@ -68,6 +68,16 @@ type CheckResult = {
   details?: string;
   suggestedFix?: string;
   lastTested?: number;
+  /** Postgres / PostgREST error code (e.g. "42501", "PGRST116"). */
+  errorCode?: string;
+  /** Raw error message from Supabase / thrown Error. */
+  errorMessage?: string;
+  /** Optional hint returned by Postgres/PostgREST. */
+  errorHint?: string;
+  /** The SQL / PostgREST call the check was running when it failed. */
+  query?: string;
+  /** CRM tables, RPCs, or routes this check touched. */
+  endpoints?: string[];
 };
 
 const INITIAL_CHECKS: CheckResult[] = [
@@ -93,6 +103,123 @@ const INITIAL_CHECKS: CheckResult[] = [
   { id: "crm_connectivity", title: "20. CRM Connectivity (leads/opps/contacts/tasks)", status: "idle" },
   { id: "realtime", title: "21. Realtime Channel Connectivity", status: "idle" },
 ];
+
+/**
+ * Static metadata per check: the query / RPC / route each check exercises and
+ * the CRM endpoints (tables, RPCs, routes) it touches. Merged into failure
+ * cards so operators can see exactly what broke without re-reading the code.
+ */
+const CHECK_META: Record<string, { query?: string; endpoints?: string[] }> = {
+  auth: { query: "supabase.auth.getUser()", endpoints: ["auth.users"] },
+  db: {
+    query: `select count(*) from public.<table> -- for each REQUIRED_TABLES entry`,
+    endpoints: [
+      "profiles", "customers", "suppliers", "products", "orders", "quotations",
+      "proforma_invoices", "invoices", "partner_commissions", "payments",
+      "documents", "activity_logs", "company_settings", "document_settings",
+      "import_jobs",
+    ],
+  },
+  crm: { query: "select count(*) from public.profiles", endpoints: ["profiles"] },
+  customer_crud: {
+    query: "insert into public.customers ...; update public.customers set name=$1 where id=$2",
+    endpoints: ["customers", "RLS: Staff manage customers"],
+  },
+  supplier_crud: {
+    query: "insert into public.suppliers (name) values ($1)",
+    endpoints: ["suppliers", "RLS: Staff manage suppliers"],
+  },
+  product_crud: {
+    query: "insert into public.products (name) values ($1)",
+    endpoints: ["products", "RLS: Staff manage products"],
+  },
+  quotation: {
+    query:
+      "insert into public.quotations ...; insert into public.quotation_items ...; select subtotal,vat_amount,total,customer_id,valid_until,quotation_number from public.quotations where id=$1",
+    endpoints: [
+      "quotations", "quotation_items",
+      "trigger: trg_quotations_number", "trigger: trg_qitems_recalc",
+      "route: /admin/quotations/:id",
+    ],
+  },
+  proforma: {
+    query:
+      "insert into public.proforma_invoices ...; insert into public.proforma_invoice_items ...; update public.proforma_invoices set amount_paid=$1; delete from public.proforma_invoice_items where id=$1; delete from public.proforma_invoices where id=$1",
+    endpoints: [
+      "proforma_invoices", "proforma_invoice_items",
+      "trigger: recalc_proforma_totals", "trigger: proforma_invoices_sync_mirrors",
+      "route: /admin/proforma-invoices/:id",
+    ],
+  },
+  commercial: {
+    query: "select count(*) from public.invoices",
+    endpoints: ["invoices", "route: /admin/invoices"],
+  },
+  commission: {
+    query: "select count(*) from public.partner_commissions",
+    endpoints: ["partner_commissions", "route: /admin/partners"],
+  },
+  purchase_order: {
+    query: "select count(*) from public.orders",
+    endpoints: ["orders", "route: /admin/orders"],
+  },
+  pdf: {
+    query: "n/a (client-side jsPDF builders)",
+    endpoints: [
+      "src/lib/quotation-pdf.ts", "src/lib/proforma-invoice-pdf.ts", "src/lib/invoice-pdf.ts",
+      "route: /admin/quotations/:id/print",
+    ],
+  },
+  files: {
+    query: "select count(*) from public.documents",
+    endpoints: ["documents", "storage.buckets (documents)"],
+  },
+  doc_import: {
+    query: "select count(*) from public.import_jobs",
+    endpoints: ["import_jobs", "route: /admin/imports"],
+  },
+  ai: {
+    query: "select count(*) from public.ai_assistant_conversations",
+    endpoints: ["ai_assistant_conversations", "ai_chat_messages", "ai_documents"],
+  },
+  role: { query: "n/a (client role membership check)", endpoints: ["user_roles"] },
+  rls: {
+    query: "select public.has_role(auth.uid(), 'super_admin'::app_role)",
+    endpoints: ["rpc: has_role", "user_roles"],
+  },
+  auth_session: { query: "supabase.auth.getSession()", endpoints: ["auth.sessions"] },
+  rls_enforced: {
+    query: "select user_id from public.user_roles",
+    endpoints: ["user_roles", "policy: user_roles SELECT scoped to auth.uid()"],
+  },
+  crm_connectivity: {
+    query: "select count(*) from public.<table> -- leads, opportunities, contacts, tasks",
+    endpoints: ["leads", "opportunities", "contacts", "tasks"],
+  },
+  realtime: {
+    query: "supabase.channel('health-check-*').subscribe()",
+    endpoints: ["realtime (websocket)"],
+  },
+};
+
+/** Extract PostgrestError-style fields off a thrown value. */
+function extractErr(e: unknown): {
+  errorCode?: string;
+  errorMessage?: string;
+  errorHint?: string;
+} {
+  if (!e || typeof e !== "object") {
+    return { errorMessage: typeof e === "string" ? e : String(e) };
+  }
+  const anyE = e as {
+    code?: string; status?: number; message?: string; hint?: string; details?: string;
+    error_description?: string;
+  };
+  const code = anyE.code || (anyE.status ? `HTTP ${anyE.status}` : undefined);
+  const message = anyE.message || anyE.error_description || anyE.details || String(e);
+  const hint = anyE.hint || undefined;
+  return { errorCode: code, errorMessage: message, errorHint: hint };
+}
 
 const REQUIRED_TABLES = [
   "profiles",
