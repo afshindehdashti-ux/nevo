@@ -1596,6 +1596,193 @@ export type Database = {
         }
         Relationships: []
       }
+      invoice_import_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          import_job_id: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          import_job_id: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          import_job_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_import_audit_log_import_job_id_fkey"
+            columns: ["import_job_id"]
+            isOneToOne: false
+            referencedRelation: "invoice_import_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_import_extracted_data: {
+        Row: {
+          confidence_scores: Json | null
+          created_at: string
+          extracted_json: Json | null
+          id: string
+          import_job_id: string
+          mapped_json: Json | null
+          raw_text: string | null
+          updated_at: string
+          validation_warnings: Json | null
+        }
+        Insert: {
+          confidence_scores?: Json | null
+          created_at?: string
+          extracted_json?: Json | null
+          id?: string
+          import_job_id: string
+          mapped_json?: Json | null
+          raw_text?: string | null
+          updated_at?: string
+          validation_warnings?: Json | null
+        }
+        Update: {
+          confidence_scores?: Json | null
+          created_at?: string
+          extracted_json?: Json | null
+          id?: string
+          import_job_id?: string
+          mapped_json?: Json | null
+          raw_text?: string | null
+          updated_at?: string
+          validation_warnings?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_import_extracted_data_import_job_id_fkey"
+            columns: ["import_job_id"]
+            isOneToOne: true
+            referencedRelation: "invoice_import_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_import_files: {
+        Row: {
+          created_at: string
+          file_size: number
+          file_type: string
+          id: string
+          import_job_id: string
+          original_file_name: string
+          storage_path: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          file_size: number
+          file_type: string
+          id?: string
+          import_job_id: string
+          original_file_name: string
+          storage_path: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          file_size?: number
+          file_type?: string
+          id?: string
+          import_job_id?: string
+          original_file_name?: string
+          storage_path?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_import_files_import_job_id_fkey"
+            columns: ["import_job_id"]
+            isOneToOne: false
+            referencedRelation: "invoice_import_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_import_jobs: {
+        Row: {
+          created_at: string
+          created_invoice_id: string | null
+          error_message: string | null
+          extraction_summary: string | null
+          id: string
+          import_type: Database["public"]["Enums"]["invoice_import_type"]
+          overall_confidence: number | null
+          related_customer_id: string | null
+          related_order_id: string | null
+          status: Database["public"]["Enums"]["invoice_import_status"]
+          updated_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          created_invoice_id?: string | null
+          error_message?: string | null
+          extraction_summary?: string | null
+          id?: string
+          import_type: Database["public"]["Enums"]["invoice_import_type"]
+          overall_confidence?: number | null
+          related_customer_id?: string | null
+          related_order_id?: string | null
+          status?: Database["public"]["Enums"]["invoice_import_status"]
+          updated_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          created_invoice_id?: string | null
+          error_message?: string | null
+          extraction_summary?: string | null
+          id?: string
+          import_type?: Database["public"]["Enums"]["invoice_import_type"]
+          overall_confidence?: number | null
+          related_customer_id?: string | null
+          related_order_id?: string | null
+          status?: Database["public"]["Enums"]["invoice_import_status"]
+          updated_at?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_import_jobs_created_invoice_id_fkey"
+            columns: ["created_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_import_jobs_related_customer_id_fkey"
+            columns: ["related_customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_import_jobs_related_order_id_fkey"
+            columns: ["related_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_items: {
         Row: {
           created_at: string
@@ -1723,6 +1910,7 @@ export type Database = {
           issue_date: string
           notes: string | null
           order_id: string | null
+          original_document_reference: string | null
           pdf_version_retention_count: number | null
           status: Database["public"]["Enums"]["invoice_status"]
           subtotal: number
@@ -1745,6 +1933,7 @@ export type Database = {
           issue_date?: string
           notes?: string | null
           order_id?: string | null
+          original_document_reference?: string | null
           pdf_version_retention_count?: number | null
           status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
@@ -1767,6 +1956,7 @@ export type Database = {
           issue_date?: string
           notes?: string | null
           order_id?: string | null
+          original_document_reference?: string | null
           pdf_version_retention_count?: number | null
           status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
@@ -3229,6 +3419,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      can_use_invoice_importer: { Args: { _user_id: string }; Returns: boolean }
       decide_approval_request: {
         Args: { _decision: string; _id: string; _notes?: string }
         Returns: {
@@ -3428,6 +3619,19 @@ export type Database = {
         | "failed"
         | "cancelled"
       import_row_status: "pending" | "success" | "failed" | "skipped"
+      invoice_import_status:
+        | "uploaded"
+        | "processing"
+        | "ready_for_review"
+        | "draft_created"
+        | "failed"
+        | "cancelled"
+      invoice_import_type:
+        | "proforma"
+        | "commercial"
+        | "customer_and_invoice"
+        | "order_and_invoice"
+        | "draft_only"
       invoice_status:
         | "draft"
         | "issued"
@@ -3679,6 +3883,21 @@ export const Constants = {
         "cancelled",
       ],
       import_row_status: ["pending", "success", "failed", "skipped"],
+      invoice_import_status: [
+        "uploaded",
+        "processing",
+        "ready_for_review",
+        "draft_created",
+        "failed",
+        "cancelled",
+      ],
+      invoice_import_type: [
+        "proforma",
+        "commercial",
+        "customer_and_invoice",
+        "order_and_invoice",
+        "draft_only",
+      ],
       invoice_status: [
         "draft",
         "issued",
