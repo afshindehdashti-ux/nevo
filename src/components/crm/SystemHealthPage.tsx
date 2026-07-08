@@ -316,17 +316,30 @@ export function SystemHealthPage() {
   const toggle = (id: string) => setExpanded((p) => ({ ...p, [id]: !p[id] }));
 
   const copyFix = async (c: CheckResult) => {
-    if (!c.suggestedFix) return;
-    const payload = `[${c.title}] ${c.status.toUpperCase()}\nDetails: ${c.details ?? "-"}\nSuggested fix: ${c.suggestedFix}`;
+    const lines = [
+      `[${c.title}] ${c.status.toUpperCase()}`,
+      c.details ? `Details: ${c.details}` : null,
+      c.errorCode ? `Error code: ${c.errorCode}` : null,
+      c.errorMessage ? `Error message: ${c.errorMessage}` : null,
+      c.errorHint ? `Hint: ${c.errorHint}` : null,
+      c.query ? `Failing query:\n${c.query}` : null,
+      c.endpoints && c.endpoints.length
+        ? `Affected endpoints: ${c.endpoints.join(", ")}`
+        : null,
+      c.suggestedFix ? `Suggested fix: ${c.suggestedFix}` : null,
+    ].filter(Boolean);
+    const payload = lines.join("\n");
+    if (!payload) return;
     try {
       await navigator.clipboard.writeText(payload);
       setCopiedId(c.id);
-      toast.success("Suggested fix copied to clipboard");
+      toast.success("Failure report copied to clipboard");
       window.setTimeout(() => setCopiedId((cur) => (cur === c.id ? null : cur)), 1500);
     } catch {
       toast.error("Could not copy — clipboard unavailable");
     }
   };
+
 
   if (rolesLoading) {
     return (
