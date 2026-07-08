@@ -25,6 +25,39 @@ export interface BlockedVerificationDialogProps {
 }
 
 /**
+ * Pure builder for the "Copy verification report" clipboard payload.
+ *
+ * Exposed as a named export so a snapshot test can lock the exact text —
+ * including the "Expected SHA-256" and "Computed SHA-256" fields — that
+ * ends up on the operator's clipboard. Any future edit to the layout that
+ * would drop, rename or reorder those fields breaks the snapshot on
+ * purpose: this text is what auditors paste into tickets.
+ */
+export function buildVerificationReport(blocked: BlockedVerification): string {
+  const { result, filename, row } = blocked;
+  const isMalformed = result.status === "malformed";
+  const embeddedSha = "embeddedSha" in result ? result.embeddedSha : undefined;
+  const embeddedTs = "embeddedExportedAt" in result ? result.embeddedExportedAt : undefined;
+  const hasMarker = isMalformed ? result.hasMarker : true;
+  const expected = "expected" in result ? result.expected : row.sha256;
+  const computed = "computedSha" in result ? result.computedSha : undefined;
+  return [
+    `Verification: ${isMalformed ? "MALFORMED" : "MISMATCH"}`,
+    `Selected file: ${filename}`,
+    `Audit filename: ${row.filename}`,
+    `Payload marker present: ${hasMarker}`,
+    `Embedded SHA-256: ${embeddedSha ?? "(missing)"}`,
+    `Embedded timestamp: ${embeddedTs ?? "(missing)"}`,
+    `Expected SHA-256: ${expected}`,
+    `Computed SHA-256: ${computed ?? "(not computed)"}`,
+    isMalformed ? `Issues: ${result.issues.join(", ")}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+
+/**
  * Details dialog shown when the Verify & open flow refuses to open a file.
  *
  * Renders side-by-side "Expected (from audit record)" and "Computed (from
