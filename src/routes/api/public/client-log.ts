@@ -1,4 +1,5 @@
 import type { Database } from "@/integrations/supabase/types";
+import { withMethodGuards } from "@/lib/api-http";
 import { createFileRoute } from "@tanstack/react-router";
 
 /**
