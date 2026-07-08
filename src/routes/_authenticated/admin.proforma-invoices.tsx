@@ -350,3 +350,31 @@ function ProformaInvoicesList() {
     </MasterListShell>
   );
 }
+
+function SortButton({
+  label,
+  active,
+  dir,
+  onClick,
+  align,
+}: {
+  label: string;
+  active: boolean;
+  dir: "asc" | "desc";
+  onClick: () => void;
+  align?: "right";
+}) {
+  const Icon = !active ? ArrowUpDown : dir === "asc" ? ArrowUp : ArrowDown;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center gap-1 hover:text-foreground ${
+        active ? "text-foreground" : "text-muted-foreground"
+      } ${align === "right" ? "justify-end w-full" : ""}`}
+    >
+      {label}
+      <Icon className="h-3 w-3" />
+    </button>
+  );
+}
