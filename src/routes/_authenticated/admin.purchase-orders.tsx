@@ -54,7 +54,7 @@ function PurchaseOrdersList() {
 
       {error ? (
         <ListErrorState
-          resource="purchase orders"
+          resource="purchase_orders"
           error={error}
           onRetry={() => refetch()}
           isRetrying={isFetching}
