@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FileDown, Loader2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, FileDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { generateProformaInvoicePdf } from "@/lib/proforma-invoice-pdf";
