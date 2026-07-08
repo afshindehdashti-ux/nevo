@@ -1598,6 +1598,26 @@ function InvoiceDetailPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
+  const convertProformaFn = useServerFn(convertProformaToCommercial);
+  const convertToCommercial = useMutation({
+    mutationFn: async () => {
+      return convertProformaFn({ data: { id } });
+    },
+    onSuccess: (res) => {
+      if (res?.already) {
+        toast.info("Commercial invoice already exists");
+      } else {
+        toast.success("Commercial invoice created");
+      }
+      if (res?.invoice_id) {
+        qc.invalidateQueries({ queryKey: ["invoices"] });
+        navigate({ to: "/admin/invoices/$id", params: { id: res.invoice_id } });
+      }
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Convert failed"),
+  });
+
+
   const addPayment = useMutation({
     mutationFn: async () => {
       if (!invoice) return;
