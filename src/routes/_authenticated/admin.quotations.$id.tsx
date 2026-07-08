@@ -617,6 +617,17 @@ function QuotationEditor() {
       })()}
 
       <CommunicationTimeline entityType="quotation" entityId={id} />
+
+      <QuotationEmailDialog
+        open={emailOpen}
+        onOpenChange={setEmailOpen}
+        quotation={q}
+        items={data.items}
+        onSent={() => {
+          qc.invalidateQueries({ queryKey: ["quotation", id] });
+          qc.invalidateQueries({ queryKey: ["quotations"] });
+        }}
+      />
     </div>
   );
 }
