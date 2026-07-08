@@ -43,10 +43,11 @@ export function embed<T extends TableName>(spec: EmbedSpec<T>): string {
 export function buildSelect<T extends TableName>(
   table: T,
   columns: readonly ColumnOf<T>[],
-  embeds: readonly EmbedSpec[] = [],
+  embeds: readonly EmbedSpec<TableName>[] = [],
 ): string {
   if (columns.length === 0 && embeds.length === 0) {
     throw new Error(`buildSelect(${table}): select must project at least one column`);
   }
   return [...columns, ...embeds.map((e) => embed(e))].join(",");
 }
+
