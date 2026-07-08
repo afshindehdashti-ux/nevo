@@ -3656,7 +3656,9 @@ export type Database = {
           created_at: string
           description: string
           discount_pct: number
+          hs_code: string | null
           id: string
+          item_code: string | null
           line_total: number
           position: number
           product_id: string | null
@@ -3669,7 +3671,9 @@ export type Database = {
           created_at?: string
           description: string
           discount_pct?: number
+          hs_code?: string | null
           id?: string
+          item_code?: string | null
           line_total?: number
           position?: number
           product_id?: string | null
@@ -3682,7 +3686,9 @@ export type Database = {
           created_at?: string
           description?: string
           discount_pct?: number
+          hs_code?: string | null
           id?: string
+          item_code?: string | null
           line_total?: number
           position?: number
           product_id?: string | null
