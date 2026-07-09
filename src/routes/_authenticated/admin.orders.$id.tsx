@@ -57,6 +57,7 @@ type Line = {
 function OrderDetailPage() {
   const { id } = useParams({ from: "/_authenticated/admin/orders/$id" });
   const qc = useQueryClient();
+  const logAudit = useServerFn(logCrmAction);
   const canEdit = useCanEditOrders();
   const canInvoice = useCanEditInvoices();
   const canShip = useCanEditShipments();
