@@ -245,11 +245,12 @@ export async function generateProformaInvoicePdf(
   doc.setFontSize(10);
   doc.setTextColor(20);
   const custLines = [
-    cust?.name || "—",
-    cust?.address || null,
+    customerDisplayName(cust),
+    customerBillingAddress(cust),
     [cust?.city, cust?.country].filter(Boolean).join(", ") || null,
-    cust?.vat_number ? `VAT: ${cust.vat_number}` : null,
+    customerVatNumber(cust) ? `VAT: ${customerVatNumber(cust)}` : null,
     cust?.email || null,
+    cust?.phone || null,
   ].filter(Boolean) as string[];
   custLines.forEach((line, i) => doc.text(line, margin, cursorY + 14 + i * 12));
   cursorY += 14 + custLines.length * 12 + 10;
