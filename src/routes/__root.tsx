@@ -249,11 +249,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  // Subscribe to router state so isBackend re-evaluates on every client-side
-  // navigation — reading router.state.location directly is a snapshot and
-  // would freeze the value at initial mount.
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isBackend = /^\/(admin|crm|backoffice)(\/|$)/.test(pathname);
+  // Shared hook — subscribes to router state so the gate re-evaluates on
+  // every client-side navigation. Layout-level components must use this
+  // helper (not a local regex) to keep public/backend gating consistent.
+  const isBackend = useIsBackend();
 
   return (
     <QueryClientProvider client={queryClient}>
