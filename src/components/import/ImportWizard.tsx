@@ -40,15 +40,42 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
 
   const parseFile = async (f: File) => {
     setFileName(f.name);
-    const bytes = new Uint8Array(await f.arrayBuffer());
-    const wb = XLSX.read(bytes, { type: "array" });
-    const first = wb.Sheets[wb.SheetNames[0]];
-    const json = XLSX.utils.sheet_to_json<Row>(first, { defval: "", raw: false });
+    const isJson = /\.json$/i.test(f.name) || f.type === "application/json";
+    let json: Row[] = [];
+    try {
+      if (isJson) {
+        const text = await f.text();
+        const parsed = JSON.parse(text);
+        const arr = Array.isArray(parsed)
+          ? parsed
+          : Array.isArray((parsed as { rows?: unknown[] }).rows)
+          ? (parsed as { rows: unknown[] }).rows
+          : Array.isArray((parsed as { data?: unknown[] }).data)
+          ? (parsed as { data: unknown[] }).data
+          : null;
+        if (!arr || arr.length === 0 || typeof arr[0] !== "object") {
+          toast.error("JSON must be an array of objects (or { rows: [...] }).");
+          return;
+        }
+        json = arr as Row[];
+      } else {
+        const bytes = new Uint8Array(await f.arrayBuffer());
+        const wb = XLSX.read(bytes, { type: "array" });
+        const first = wb.Sheets[wb.SheetNames[0]];
+        json = XLSX.utils.sheet_to_json<Row>(first, { defval: "", raw: false });
+      }
+    } catch (e) {
+      toast.error(`Failed to parse file: ${e instanceof Error ? e.message : String(e)}`);
+      return;
+    }
     if (!json.length) {
       toast.error("File contains no data rows.");
       return;
     }
-    const heads = Object.keys(json[0]);
+    // Merge keys across rows so headers aren't limited to row 0's columns.
+    const headSet = new Set<string>();
+    for (const r of json) for (const k of Object.keys(r)) headSet.add(k);
+    const heads = Array.from(headSet);
     setHeaders(heads);
     setRows(json.slice(0, 5000));
     setMapping(autoMap(heads, schema.fields));
