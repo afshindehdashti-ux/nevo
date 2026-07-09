@@ -19,6 +19,17 @@ export interface ImportEntitySchema {
   table: string;               // target public.<table>
   category: string;
   supportsUpsert?: boolean;
+  /**
+   * If set, rows sharing the same value of this field key are grouped into
+   * one parent record (e.g. quotations header) with the remaining rows
+   * appended as children (e.g. quotation_items). Server-side code owns the
+   * split; the mapping UI still asks the user to map each field once.
+   */
+  groupBy?: string;
+  /** Field keys that belong to the parent header (only the first row of a group is used). */
+  headerFields?: string[];
+  /** Field keys that belong to child line items (all rows of a group contribute). */
+  itemFields?: string[];
   fields: ImportField[];
 }
 
