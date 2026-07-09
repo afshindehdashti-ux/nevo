@@ -238,8 +238,6 @@ for (const r of results) {
   }
 }
 
-console.log(`\n${failed === 0 ? "✅ ALL CHECKS PASSED" : `❌ ${failed} CHECK(S) FAILED`}`);
-process.exit(failed === 0 ? 0 : 1);
 
 // ---------- Positive-branch check: real customer with billing_address ----------
 console.log("\n=== POSITIVE BRANCH: real customer with billing_address ===");
