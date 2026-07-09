@@ -218,6 +218,7 @@ function OrderDetailPage() {
 
   const setStatus = useMutation({
     mutationFn: async (status: (typeof ORDER_STATUSES)[number]) => {
+      const prevStatus = order?.status ?? null;
       const { error } = await supabase.from("orders").update({ status }).eq("id", id);
       if (error) throw error;
       await logAudit({
@@ -226,6 +227,8 @@ function OrderDetailPage() {
           entity_type: "order",
           entity_id: id,
           metadata: { status },
+          old_values: { status: prevStatus },
+          new_values: { status },
         },
       }).catch(() => undefined);
     },
