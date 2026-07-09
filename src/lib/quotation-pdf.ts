@@ -1,5 +1,11 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import {
+  customerDisplayName,
+  customerBillingAddress,
+  customerVatNumber,
+  type CustomerDisplay,
+} from "./finance-normalization";
 
 type Quotation = {
   id?: string | null;
@@ -14,14 +20,7 @@ type Quotation = {
   total?: number | string | null;
   terms?: string | null;
   notes?: string | null;
-  customers?: {
-    name?: string | null;
-    company_name?: string | null;
-    email?: string | null;
-    city?: string | null;
-    country?: string | null;
-    address?: string | null;
-  } | null;
+  customers?: (CustomerDisplay & { billing_address?: string | null; vat_number?: string | null; phone?: string | null }) | null;
 };
 
 type Item = {
@@ -141,10 +140,12 @@ export function buildQuotationPdf(
   const c = q.customers;
   const toLines = c
     ? ([
-        c.company_name || c.name,
-        c.address,
+        customerDisplayName(c),
+        customerBillingAddress(c),
         [c.city, c.country].filter(Boolean).join(", "),
+        customerVatNumber(c) ? `VAT: ${customerVatNumber(c)}` : null,
         c.email,
+        c.phone,
       ].filter(Boolean) as string[])
     : ["—"];
   doc.text(toLines, pageWidth / 2, y + 5);

@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatDate, formatMoney } from "@/lib/crm-money";
+import { customerDisplayName, type CustomerDisplay } from "@/lib/finance-normalization";
 
 export const Route = createFileRoute("/_authenticated/admin/proforma-invoices")({
   head: () => ({
@@ -72,7 +73,7 @@ function ProformaInvoicesList() {
         .select(
           `id, proforma_number, status, currency, created_at, valid_until,
            grand_total, vat_amount, balance_due, payment_status, approved_by,
-           customers(name)`,
+           customers(name, company_name, email)`,
         )
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -94,7 +95,7 @@ function ProformaInvoicesList() {
     const list = rows.filter((r) => {
       if (paymentFilter !== "all" && r.payment_status !== paymentFilter) return false;
       if (!q) return true;
-      const cName = (r.customers as { name?: string } | null)?.name || "";
+      const cName = customerDisplayName(r.customers as CustomerDisplay | null);
       return (
         (r.proforma_number || "").toLowerCase().includes(q) ||
         cName.toLowerCase().includes(q)
@@ -317,7 +318,7 @@ function ProformaInvoicesList() {
                   </Link>
                 </TableCell>
                 <TableCell>
-                  {(r.customers as { name?: string } | null)?.name || "—"}
+                  {customerDisplayName(r.customers as CustomerDisplay | null)}
                 </TableCell>
                 <TableCell>{formatDate(r.created_at)}</TableCell>
                 <TableCell>{r.valid_until ? formatDate(r.valid_until) : "—"}</TableCell>

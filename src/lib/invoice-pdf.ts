@@ -2,6 +2,12 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney, formatDate } from "./crm-money";
+import {
+  customerDisplayName,
+  customerBillingAddress,
+  customerVatNumber,
+  type CustomerDisplay,
+} from "./finance-normalization";
 
 /**
  * Branded Proforma / Commercial Invoice PDF generator.
@@ -22,14 +28,7 @@ type InvoiceRow = {
   due_date: string | null;
   notes: string | null;
   amount_paid: number | string;
-  customers: {
-    name: string | null;
-    address: string | null;
-    city: string | null;
-    country: string | null;
-    vat_number: string | null;
-    email: string | null;
-  } | null;
+  customers: (CustomerDisplay & Record<string, unknown>) | null;
 };
 
 type ItemRow = {
@@ -143,7 +142,7 @@ export async function fetchInvoiceForPdf(invoiceId: string) {
     supabase
       .from("invoices")
       .select(
-        "id, invoice_number, type, status, currency, issue_date, due_date, notes, amount_paid, customers(name, address, city, country, vat_number, email)",
+        "id, invoice_number, type, status, currency, issue_date, due_date, notes, amount_paid, customers(name, company_name, address, billing_address, city, country, vat_number, email, phone)",
       )
       .eq("id", invoiceId)
       .maybeSingle(),
@@ -259,11 +258,12 @@ export async function generateInvoicePdf(
   doc.setFontSize(10);
   doc.setTextColor(20);
   const custLines = [
-    cust?.name || "—",
-    cust?.address || null,
+    customerDisplayName(cust),
+    customerBillingAddress(cust),
     [cust?.city, cust?.country].filter(Boolean).join(", ") || null,
-    cust?.vat_number ? `VAT: ${cust.vat_number}` : null,
+    customerVatNumber(cust) ? `VAT: ${customerVatNumber(cust)}` : null,
     cust?.email || null,
+    cust?.phone || null,
   ].filter(Boolean) as string[];
   custLines.forEach((line, i) => doc.text(line, margin, cursorY + 14 + i * 12));
 

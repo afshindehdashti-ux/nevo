@@ -29,6 +29,11 @@ import {
 } from "@/components/ui/select";
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import {
+  customerDisplayName,
+  financeBalanceDue,
+  type CustomerDisplay,
+} from "@/lib/finance-normalization";
+import {
   INVOICE_STATUSES,
   invoiceStatusLabel,
   invoiceStatusVariant,
@@ -58,7 +63,7 @@ export function InvoicesList({
     queryFn: async () => {
       const { data, error } = await supabase
         .from("invoices")
-        .select("*, customers(name)")
+        .select("*, customers(name, company_name, email)")
         .eq("type", type)
         .order("issue_date", { ascending: false });
       if (error) throw error;
@@ -71,7 +76,7 @@ export function InvoicesList({
     return invoices.filter((i) => {
       if (statusFilter !== "all" && i.status !== statusFilter) return false;
       if (!q) return true;
-      const cName = (i.customers as { name?: string } | null)?.name || "";
+      const cName = customerDisplayName(i.customers as CustomerDisplay | null);
       return (
         (i.invoice_number || "").toLowerCase().includes(q) ||
         cName.toLowerCase().includes(q)
@@ -254,7 +259,7 @@ export function InvoicesList({
                     {i.invoice_number}
                   </Link>
                 </TableCell>
-                <TableCell>{(i.customers as { name?: string } | null)?.name || "—"}</TableCell>
+                <TableCell>{customerDisplayName(i.customers as CustomerDisplay | null)}</TableCell>
                 <TableCell>{formatDate(i.issue_date)}</TableCell>
                 <TableCell>{formatDate(i.due_date)}</TableCell>
                 <TableCell>
@@ -263,7 +268,7 @@ export function InvoicesList({
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">{formatMoney(i.total, i.currency)}</TableCell>
-                <TableCell className="text-right">{formatMoney(i.balance, i.currency)}</TableCell>
+                <TableCell className="text-right">{formatMoney(financeBalanceDue(i), i.currency)}</TableCell>
               </TableRow>
             ))}
 

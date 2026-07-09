@@ -62,6 +62,14 @@ import { buildEmbeddedAuditMetadata } from "@/lib/csv-export-audit-metadata";
 
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import {
+  customerDisplayName,
+  customerBillingAddress,
+  customerVatNumber,
+  financeBalanceDue,
+  financePaidAmount,
+  type CustomerDisplay,
+} from "@/lib/finance-normalization";
+import {
   INVOICE_STATUSES,
   invoiceStatusLabel,
   invoiceStatusVariant,
@@ -172,7 +180,7 @@ function InvoiceDetailPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("invoices")
-        .select("*, customers(id, name, address, city, country, vat_number, email)")
+        .select("*, customers(id, name, company_name, address, billing_address, city, country, vat_number, email, phone)")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -1457,7 +1465,7 @@ function InvoiceDetailPage() {
       setNotes(invoice.notes || "");
       setIssueDate(invoice.issue_date);
       setDueDate(invoice.due_date || "");
-      setPayAmount(Number(invoice.balance).toString());
+      setPayAmount(financeBalanceDue(invoice).toString());
     }
   }, [invoice]);
 
@@ -1669,15 +1677,9 @@ function InvoiceDetailPage() {
       </div>
     );
 
-  const cust = invoice.customers as {
-    id: string;
-    name: string;
-    address: string | null;
-    city: string | null;
-    country: string | null;
-    vat_number: string | null;
-    email: string | null;
-  } | null;
+  const cust = invoice.customers as
+    | (CustomerDisplay & { id: string })
+    | null;
 
   function updateLine(idx: number, patch: Partial<Line>) {
     setLines((prev) => prev.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
@@ -1727,7 +1729,7 @@ function InvoiceDetailPage() {
                   params={{ id: cust.id }}
                   className="text-primary hover:underline"
                 >
-                  {cust.name}
+                  {customerDisplayName(cust)}
                 </Link>
               ) : (
                 "—"
@@ -1773,7 +1775,7 @@ function InvoiceDetailPage() {
               <Mail className="h-4 w-4 mr-1" />
               Email to customer
             </Button>
-            {canPay && invoice.type === "commercial" && Number(invoice.balance) > 0 && (
+            {canPay && invoice.type === "commercial" && financeBalanceDue(invoice) > 0 && (
               <Button size="sm" onClick={() => setPayOpen(true)}>
                 <Wallet className="h-4 w-4 mr-1" /> Record payment
               </Button>
@@ -1914,13 +1916,13 @@ function InvoiceDetailPage() {
                     }
                   />
                 </div>
-                <Row label="Paid" value={formatMoney(invoice.amount_paid, invoice.currency)} />
+                <Row label="Paid" value={formatMoney(financePaidAmount(invoice), invoice.currency)} />
                 <div className="border-t pt-1">
                   <Row
                     label={<span className="font-semibold">Balance</span>}
                     value={
                       <span className="font-semibold">
-                        {formatMoney(invoice.balance, invoice.currency)}
+                        {formatMoney(financeBalanceDue(invoice), invoice.currency)}
                       </span>
                     }
                   />
@@ -1965,10 +1967,10 @@ function InvoiceDetailPage() {
               </div>
               {cust && (
                 <div className="text-xs text-muted-foreground border-t pt-2">
-                  <p className="font-medium text-foreground">{cust.name}</p>
-                  {cust.address && <p>{cust.address}</p>}
+                  <p className="font-medium text-foreground">{customerDisplayName(cust)}</p>
+                  {customerBillingAddress(cust) && <p>{customerBillingAddress(cust)}</p>}
                   <p>{[cust.city, cust.country].filter(Boolean).join(", ")}</p>
-                  {cust.vat_number && <p>VAT: {cust.vat_number}</p>}
+                  {customerVatNumber(cust) && <p>VAT: {customerVatNumber(cust)}</p>}
                   {cust.email && <p>{cust.email}</p>}
                 </div>
               )}

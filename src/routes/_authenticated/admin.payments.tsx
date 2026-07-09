@@ -15,6 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import { paymentMethodLabel } from "@/lib/crm-status";
+import { customerDisplayName, type CustomerDisplay } from "@/lib/finance-normalization";
 
 export const Route = createFileRoute("/_authenticated/admin/payments")({
   head: () => ({ meta: [{ title: "Payments — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
@@ -29,7 +30,7 @@ function PaymentsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("payments")
-        .select("*, invoices(invoice_number, customer_id, customers(name))")
+        .select("*, invoices(invoice_number, customer_id, customers(name, company_name, email))")
         .order("received_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -42,9 +43,9 @@ function PaymentsPage() {
     return rows.filter((p) => {
       const inv = p.invoices as {
         invoice_number?: string;
-        customers?: { name?: string } | null;
+        customers?: CustomerDisplay | null;
       } | null;
-      const cName = inv?.customers?.name || "";
+      const cName = customerDisplayName(inv?.customers);
       const invNo = inv?.invoice_number || "";
       return (
         cName.toLowerCase().includes(q) ||
@@ -109,7 +110,7 @@ function PaymentsPage() {
             {filtered.map((p) => {
               const inv = p.invoices as {
                 invoice_number?: string;
-                customers?: { name?: string } | null;
+                customers?: CustomerDisplay | null;
               } | null;
               return (
                 <TableRow key={p.id}>
@@ -123,7 +124,7 @@ function PaymentsPage() {
                       {inv?.invoice_number || p.invoice_id.slice(0, 8)}
                     </Link>
                   </TableCell>
-                  <TableCell>{inv?.customers?.name || "—"}</TableCell>
+                  <TableCell>{customerDisplayName(inv?.customers)}</TableCell>
                   <TableCell>
                     <Badge variant="secondary">{paymentMethodLabel(p.method)}</Badge>
                   </TableCell>
