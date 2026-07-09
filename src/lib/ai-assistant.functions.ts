@@ -594,7 +594,7 @@ export const getRecordSummary = createServerFn({ method: "POST" })
         .maybeSingle();
       if (!q) return { summary: null };
       return {
-        summary: `Quotation ${q.quotation_number ?? ""} — status ${q.status}. Total ${q.total} ${q.currency ?? ""}. Valid until ${q.valid_until ?? "n/a"}.`,
+        summary: `Quotation ${q.quotation_number ?? ""} — status ${q.status}. Total ${financeTotalAmount(q)} ${q.currency ?? ""}. Valid until ${q.valid_until ?? "n/a"}.`,
       };
     }
     if (data.module === "lead") {
