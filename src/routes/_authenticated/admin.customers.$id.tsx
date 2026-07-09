@@ -130,8 +130,8 @@ function CustomerDetailPage() {
     );
   }
 
-  const openBalance = invoices.reduce((s, i) => s + Number(i.balance || 0), 0);
-  const lifetime = invoices.reduce((s, i) => s + Number(i.total || 0), 0);
+  const openBalance = invoices.reduce((s, i) => s + financeBalanceDue(i), 0);
+  const lifetime = invoices.reduce((s, i) => s + financeTotalAmount(i), 0);
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-[1600px] mx-auto">
