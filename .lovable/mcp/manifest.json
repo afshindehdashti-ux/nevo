@@ -144,6 +144,81 @@
           }
         },
         "outputSchema": null
+      },
+      {
+        "name": "create_inquiry",
+        "title": "Create project inquiry",
+        "description": "Create a new project inquiry (lead) in the NEVO CRM. Captures contact, company, panel/project type, budget, and message. Works signed-in (uses caller's RLS) or anonymously via the public inquiry channel.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Contact full name."
+            },
+            "email": {
+              "type": "string",
+              "maxLength": 320,
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+              "description": "Contact email."
+            },
+            "company": {
+              "description": "Company / organization.",
+              "type": "string",
+              "maxLength": 200
+            },
+            "role": {
+              "description": "Caller's role or title at the company.",
+              "type": "string",
+              "maxLength": 120
+            },
+            "phone": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "country": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "panel_type": {
+              "description": "Requested sandwich panel type (e.g. PIR, PUR, Rockwool, EPS).",
+              "type": "string",
+              "maxLength": 120
+            },
+            "project_type": {
+              "description": "Application / project type.",
+              "type": "string",
+              "maxLength": 200
+            },
+            "budget_range": {
+              "description": "Budget range, e.g. '10k-50k USD'.",
+              "type": "string",
+              "maxLength": 80
+            },
+            "timeline": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "message": {
+              "type": "string",
+              "maxLength": 5000
+            }
+          },
+          "required": [
+            "name",
+            "email"
+          ]
+        },
+        "outputSchema": null
       }
     ]
   }
