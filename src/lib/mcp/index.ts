@@ -4,6 +4,7 @@ import listCustomersTool from "./tools/list-customers";
 import listLeadsTool from "./tools/list-leads";
 import listInvoicesTool from "./tools/list-invoices";
 import listTasksTool from "./tools/list-tasks";
+import createInquiryTool from "./tools/create-inquiry";
 
 // Direct Supabase issuer (never the .lovable.cloud proxy — mcp-js rejects that
 // as an RFC 8414 issuer mismatch). VITE_SUPABASE_PROJECT_ID is inlined by Vite
