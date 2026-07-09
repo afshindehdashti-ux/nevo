@@ -3,6 +3,7 @@ import {
   Outlet,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -248,8 +249,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router = useRouter();
-  const pathname = router.state.location.pathname;
+  // Subscribe to router state so isBackend re-evaluates on every client-side
+  // navigation — reading router.state.location directly is a snapshot and
+  // would freeze the value at initial mount.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isBackend = /^\/(admin|crm|backoffice)(\/|$)/.test(pathname);
 
   return (
