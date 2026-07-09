@@ -6,6 +6,7 @@ import {
   runErpFinanceTest,
   runProformaE2eIsolated,
   runProformaTriggerRecomputeTest,
+  runQuotationImportE2e,
 } from "@/lib/erp-qa.functions";
 import {
   assertLatestProformaPdf,
@@ -15,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2, XCircle, AlertTriangle, Loader2, Play, FlaskConical, FileCheck2, Calculator } from "lucide-react";
+import { CheckCircle2, XCircle, AlertTriangle, Loader2, Play, FlaskConical, FileCheck2, Calculator, FileInput } from "lucide-react";
 
 type Check = {
   key: string;
@@ -100,6 +101,7 @@ export function ErpFinanceDiagnostic() {
   const runTest = useServerFn(runErpFinanceTest);
   const runIso = useServerFn(runProformaE2eIsolated);
   const runTrig = useServerFn(runProformaTriggerRecomputeTest);
+  const runQuoteImp = useServerFn(runQuotationImportE2e);
   const [qa, setQa] = useState<QaReport | null>(null);
   const [test, setTest] = useState<FinanceReport | null>(null);
   const [pdfReport, setPdfReport] = useState<PdfE2eReport | null>(null);
@@ -107,11 +109,13 @@ export function ErpFinanceDiagnostic() {
   const [trig, setTrig] = useState<
     (IsoReport & { expected: Record<string, number> }) | null
   >(null);
+  const [quoteImp, setQuoteImp] = useState<IsoReport | null>(null);
   const [qaLoading, setQaLoading] = useState(false);
   const [testLoading, setTestLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [isoLoading, setIsoLoading] = useState(false);
   const [trigLoading, setTrigLoading] = useState(false);
+  const [quoteImpLoading, setQuoteImpLoading] = useState(false);
 
   async function onRunQa() {
     setQaLoading(true);
@@ -190,6 +194,20 @@ export function ErpFinanceDiagnostic() {
     }
   }
 
+  async function onRunQuoteImport() {
+    setQuoteImpLoading(true);
+    try {
+      const r = (await runQuoteImp()) as IsoReport;
+      setQuoteImp(r);
+      if (r.failed > 0) toast.error(`Quotation import e2e: ${r.failed} failing step(s)`);
+      else toast.success(`Quotation import e2e passed (run ${r.runId.slice(0, 8)})`);
+    } catch (e) {
+      toast.error(`Quotation import e2e failed: ${(e as Error).message}`);
+    } finally {
+      setQuoteImpLoading(false);
+    }
+  }
+
   const failedChecks = qa?.results.filter((r) => r.status === "fail") ?? [];
   const warnChecks = qa?.results.filter((r) => r.status === "warn") ?? [];
 
@@ -243,6 +261,14 @@ export function ErpFinanceDiagnostic() {
                 <Calculator className="mr-2 h-4 w-4" />
               )}
               Validate trigger recompute
+            </Button>
+            <Button variant="outline" onClick={onRunQuoteImport} disabled={quoteImpLoading}>
+              {quoteImpLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FileInput className="mr-2 h-4 w-4" />
+              )}
+              Run Quotation Import e2e
             </Button>
           </div>
 
@@ -508,6 +534,54 @@ export function ErpFinanceDiagnostic() {
           </CardContent>
         </Card>
       )}
+
+      {quoteImp && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileInput className="h-5 w-5" />
+              Quotation Import e2e
+              <StatusBadge status={quoteImp.failed === 0 ? "pass" : "fail"} />
+            </CardTitle>
+            <CardDescription>
+              Run <code>{quoteImp.runId.slice(0, 8)}</code> · exercises the real
+              <code className="mx-1">runImportJob</code> server function through three
+              scenarios: happy-path totals, existing-customer reuse (case-insensitive),
+              and validation failures that must not leave partial rows. All test data
+              is cleaned up and orphan-verified afterwards.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex flex-wrap gap-4 text-sm">
+              <span className="text-emerald-600 font-medium">{quoteImp.passed} PASS</span>
+              <span className="text-amber-500 font-medium">{quoteImp.warned} WARN</span>
+              <span className="text-red-600 font-medium">{quoteImp.failed} FAIL</span>
+            </div>
+            <ol className="space-y-2">
+              {quoteImp.steps.map((s, i) => (
+                <li key={s.key} className="flex items-start gap-3 rounded-md border p-3">
+                  <span className="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-muted text-center text-xs leading-5">
+                    {i + 1}
+                  </span>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-medium text-sm">{s.label}</div>
+                      <StatusBadge status={s.status} />
+                    </div>
+                    <div className="text-xs text-muted-foreground break-words">{s.message}</div>
+                    {s.details && (
+                      <pre className="mt-1 overflow-x-auto rounded bg-muted p-2 text-xs">
+                        {JSON.stringify(s.details, null, 2)}
+                      </pre>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
+
 
 
 
