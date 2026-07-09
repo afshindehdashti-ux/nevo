@@ -6,6 +6,7 @@
  * All tags are 100% opt-in. No requests are sent without consent.
  */
 import { useEffect, useState } from "react";
+import { useIsBackend } from "@/lib/use-route-area";
 
 const ENV = import.meta.env;
 
@@ -44,8 +45,13 @@ export function Analytics() {
     return () => window.removeEventListener("nevo-consent-change", onChange);
   }, []);
 
+  // Skip marketing-pixel injection on backend routes so staff sessions in
+  // /admin, /crm, /backoffice aren't tracked as marketing traffic.
+  const isBackend = useIsBackend();
+
   useEffect(() => {
-    if (consent !== "accepted") return;
+    if (consent !== "accepted" || isBackend) return;
+
 
     if (IDS.ga4) {
       injectSrc("ga4-src", `https://www.googletagmanager.com/gtag/js?id=${IDS.ga4}`);
@@ -79,7 +85,7 @@ export function Analytics() {
       );
       injectSrc("li-src", "https://snap.licdn.com/li.lms-analytics/insight.min.js");
     }
-  }, [consent]);
+  }, [consent, isBackend]);
 
   return null;
 }

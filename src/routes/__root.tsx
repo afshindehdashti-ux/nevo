@@ -259,11 +259,17 @@ function RootComponent() {
       <LanguageProvider>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
-        {/* Public marketing CTAs — hidden on all admin/CRM/backoffice routes. */}
-        {!isBackend && <AIAssistantLauncher />}
-        {!isBackend && <StickyMobileCTA />}
-        <CookieConsent />
-        <Analytics />
+        {/* Public marketing chrome — hidden on all admin/CRM/backoffice
+            routes. Each component also self-gates via useIsBackend() so
+            they cannot leak if a future parent forgets this wrapper. */}
+        {!isBackend && (
+          <>
+            <AIAssistantLauncher />
+            <StickyMobileCTA />
+            <CookieConsent />
+            <Analytics />
+          </>
+        )}
         <ClientMonitor />
         <Toaster position="top-right" richColors closeButton />
         <LogoTelemetryOverlay />

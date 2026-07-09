@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "@/components/site/LocalizedLink";
+import { useIsBackend } from "@/lib/use-route-area";
 
 export function CookieConsent() {
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
+  // Cookie banner is a public-visitor concern; signed-in staff on
+  // /admin, /crm, /backoffice must not see it (subscribed pathname so
+  // in-app navigation flips visibility correctly).
+  const isBackend = useIsBackend();
 
   useEffect(() => {
     if (!localStorage.getItem("nevo-consent")) setVisible(true);
@@ -16,7 +21,7 @@ export function CookieConsent() {
     setVisible(false);
   };
 
-  if (!visible) return null;
+  if (!visible || isBackend) return null;
 
   return (
     <div
