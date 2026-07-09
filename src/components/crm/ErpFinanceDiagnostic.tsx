@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2, XCircle, AlertTriangle, Loader2, Play, FlaskConical, FileCheck2 } from "lucide-react";
+import { CheckCircle2, XCircle, AlertTriangle, Loader2, Play, FlaskConical, FileCheck2, Calculator } from "lucide-react";
 
 type Check = {
   key: string;
