@@ -32,6 +32,10 @@ import {
 } from "@/lib/crm-status";
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
 import { generateEntitySummary } from "@/lib/ai-summary.functions";
+import {
+  financeBalanceDue,
+  financeTotalAmount,
+} from "@/lib/finance-normalization";
 
 export const Route = createFileRoute("/_authenticated/admin/customers/$id")({
   head: () => ({
@@ -126,8 +130,8 @@ function CustomerDetailPage() {
     );
   }
 
-  const openBalance = invoices.reduce((s, i) => s + Number(i.balance || 0), 0);
-  const lifetime = invoices.reduce((s, i) => s + Number(i.total || 0), 0);
+  const openBalance = invoices.reduce((s, i) => s + financeBalanceDue(i), 0);
+  const lifetime = invoices.reduce((s, i) => s + financeTotalAmount(i), 0);
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-[1600px] mx-auto">
@@ -317,10 +321,10 @@ function CustomerDetailPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatMoney(i.total, i.currency)}
+                        {formatMoney(financeTotalAmount(i), i.currency)}
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatMoney(i.balance, i.currency)}
+                        {formatMoney(financeBalanceDue(i), i.currency)}
                       </TableCell>
                     </TableRow>
                   ))}

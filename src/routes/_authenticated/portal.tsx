@@ -19,6 +19,10 @@ import {
   getMyMessageAttachmentUrl,
   markMyMessagesRead,
 } from "@/lib/customer-portal.functions";
+import {
+  financeBalanceDue,
+  financeTotalAmount,
+} from "@/lib/finance-normalization";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -234,7 +238,7 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
 
   const openOrders = orders.filter((o) => o.status !== "delivered" && o.status !== "cancelled").length;
   const inTransit = shipments.filter((s) => s.status === "in_transit").length;
-  const balanceDue = invoices.reduce((s, i) => s + Number(i.balance ?? 0), 0);
+  const balanceDue = invoices.reduce((s, i) => s + financeBalanceDue(i), 0);
   const currency = invoices[0]?.currency ?? orders[0]?.currency ?? "USD";
 
   async function download(docId: string) {
@@ -368,7 +372,7 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                   q.issue_date,
                   q.valid_until ?? "—",
                   <Badge variant="outline">{q.status}</Badge>,
-                  <span className="tabular-nums">{q.currency} {Number(q.total).toLocaleString()}</span>,
+                  <span className="tabular-nums">{q.currency} {financeTotalAmount(q).toLocaleString()}</span>,
                 ])}
               />
             </Card>
@@ -384,8 +388,8 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                   i.issue_date,
                   i.due_date ?? "—",
                   <Badge variant="outline">{i.status}</Badge>,
-                  <span className="tabular-nums">{i.currency} {Number(i.total).toLocaleString()}</span>,
-                  <span className="tabular-nums">{i.currency} {Number(i.balance).toLocaleString()}</span>,
+                  <span className="tabular-nums">{i.currency} {financeTotalAmount(i).toLocaleString()}</span>,
+                  <span className="tabular-nums">{i.currency} {financeBalanceDue(i).toLocaleString()}</span>,
                 ])}
               />
             </Card>
@@ -401,8 +405,8 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                   i.issue_date,
                   i.due_date ?? "—",
                   <Badge variant={i.status === "paid" ? "default" : i.status === "overdue" ? "destructive" : "outline"}>{i.status}</Badge>,
-                  <span className="tabular-nums">{i.currency} {Number(i.total).toLocaleString()}</span>,
-                  <span className="tabular-nums">{i.currency} {Number(i.balance).toLocaleString()}</span>,
+                  <span className="tabular-nums">{i.currency} {financeTotalAmount(i).toLocaleString()}</span>,
+                  <span className="tabular-nums">{i.currency} {financeBalanceDue(i).toLocaleString()}</span>,
                 ])}
               />
             </Card>
