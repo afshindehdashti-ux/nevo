@@ -428,6 +428,15 @@ export const convertFinanceDocument = createServerFn({ method: "POST" })
       .update({ status: "converted", updated_by: context.userId })
       .eq("id", src.id);
 
+    await writeStatusLog(
+      context.supabase,
+      context.userId,
+      { id: src.id, document_type: src.document_type, document_number: src.document_number },
+      src.status,
+      "converted",
+      `Converted to ${data.target_type}`,
+    );
+
     return { id: newDoc.id };
   });
 
