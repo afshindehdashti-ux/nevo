@@ -76,6 +76,28 @@ function ImportDataPage() {
   const { data: jobs, isLoading, error } = useImportJobs();
   const [wizardOpen, setWizardOpen] = useState(false);
   const [pasteOpen, setPasteOpen] = useState(false);
+  const downloadFailed = useServerFn(getFailedRowsCsv);
+
+  const handleDownloadFailed = async (job: ImportJob) => {
+    try {
+      const res = await downloadFailed({ data: { job_id: job.id } });
+      if (!res.csv) {
+        toast.info("No failed rows to download.");
+        return;
+      }
+      const blob = new Blob([res.csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `failed-rows-${job.import_type}-${job.id.slice(0, 8)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Download failed");
+    }
+  };
 
   const byCategory = IMPORT_TYPES.reduce<Record<string, typeof IMPORT_TYPES>>((acc, t) => {
     (acc[t.category] = acc[t.category] ?? []).push(t);
