@@ -140,10 +140,12 @@ export function buildQuotationPdf(
   const c = q.customers;
   const toLines = c
     ? ([
-        c.company_name || c.name,
-        c.address,
+        customerDisplayName(c),
+        customerBillingAddress(c),
         [c.city, c.country].filter(Boolean).join(", "),
+        customerVatNumber(c) ? `VAT: ${customerVatNumber(c)}` : null,
         c.email,
+        c.phone,
       ].filter(Boolean) as string[])
     : ["—"];
   doc.text(toLines, pageWidth / 2, y + 5);
