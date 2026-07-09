@@ -1,17 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, Clock, ClipboardPaste } from "lucide-react";
+import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, Clock, ClipboardPaste, Download } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import { ImportWizard } from "@/components/import/ImportWizard";
 import { PasteImporter } from "@/components/import/PasteImporter";
 import { SUPPORTED_IMPORT_TYPES } from "@/lib/import-schemas";
+import { getFailedRowsCsv } from "@/lib/import-wizard.functions";
 
 type ImportJob = Database["public"]["Tables"]["import_jobs"]["Row"];
 type JobStatus = Database["public"]["Enums"]["import_job_status"];
