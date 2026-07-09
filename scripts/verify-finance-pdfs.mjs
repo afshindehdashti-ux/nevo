@@ -266,3 +266,7 @@ const posChecks = [
 ];
 for (const [l, ok] of posChecks) console.log(`  ${ok ? "✅" : "❌"} ${l}`);
 console.log("\n(No seed row has vat_number populated; VAT rendering covered by unit tests.)");
+
+console.log(`\n${failed === 0 && posChecks.every(([,ok])=>ok) ? "✅ ALL CHECKS PASSED" : `❌ CHECK(S) FAILED`}`);
+process.exit(failed === 0 && posChecks.every(([,ok])=>ok) ? 0 : 1);
+
