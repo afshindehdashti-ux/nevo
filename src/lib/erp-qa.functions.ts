@@ -927,3 +927,288 @@ export const runProformaE2eIsolated = createServerFn({ method: "POST" })
       steps,
     };
   });
+
+/**
+ * Validates that the database triggers recompute header totals from
+ * line-level discount and tax inputs. Creates an isolated test customer +
+ * proforma, inserts two lines with known values, reads back the header,
+ * asserts vat_rate / discount_amount / grand_total match the spec formula,
+ * and always cleans up.
+ *
+ * Line 1: qty=10 unit=100 → gross 1000; discount_amount=50 → taxable 950;
+ *         tax_rate=5% → tax 47.5; line_total 997.50
+ * Line 2: qty=4  unit=200 → gross  800; discount 10% → taxable 720;
+ *         tax_rate=10% → tax 72;   line_total 792.00
+ *
+ * Expected header:
+ *   subtotal (net) = 1670.00
+ *   discount_amount = 130.00
+ *   vat_amount = 119.50
+ *   vat_rate (blended) = round(119.5 / 1670 * 100, 2) = 7.16
+ *   grand_total = 1789.50
+ */
+export const runProformaTriggerRecomputeTest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const supabase = context.supabase as any;
+    const startedAt = new Date().toISOString();
+    const runId =
+      globalThis.crypto?.randomUUID?.() ??
+      `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    const marker = `trigrecalc:${runId}`;
+
+    const steps: Array<{
+      key: string;
+      label: string;
+      status: CheckStatus;
+      message: string;
+      details?: any;
+    }> = [];
+    const step = (s: (typeof steps)[number]) => steps.push(s);
+
+    const expected = {
+      subtotal_net: 1670.0,
+      discount_amount: 130.0,
+      vat_amount: 119.5,
+      vat_rate: 7.16,
+      grand_total: 1789.5,
+    };
+    const approxEq = (a: number, b: number, tol = 0.02) => Math.abs(a - b) <= tol;
+
+    let customerId: string | null = null;
+    let proformaId: string | null = null;
+
+    try {
+      const { data: cust, error: cErr } = await supabase
+        .from("customers")
+        .insert({
+          company_name: `Trigger Recalc QA ${runId}`,
+          name: `Trigger Recalc QA ${runId}`,
+          email: `trigrecalc+${runId}@nevoindustrial.com`,
+          country: "AE",
+        })
+        .select("id")
+        .single();
+      if (cErr) throw new Error(`customer insert: ${cErr.message}`);
+      customerId = cust.id;
+
+      const { data: pi, error: pErr } = await supabase
+        .from("proforma_invoices")
+        .insert({
+          customer_id: customerId,
+          currency: "USD",
+          status: "draft",
+          notes: marker,
+          created_by: context.userId,
+        })
+        .select("id")
+        .single();
+      if (pErr) throw new Error(`proforma insert: ${pErr.message}`);
+      proformaId = pi.id;
+
+      step({
+        key: "seed",
+        label: "Seed isolated proforma header",
+        status: "pass",
+        message: `proforma=${proformaId}`,
+      });
+
+      // Line 1: fixed discount amount, 5% tax
+      // Line 2: percentage discount, 10% tax
+      const { error: iErr } = await supabase.from("proforma_invoice_items").insert([
+        {
+          proforma_invoice_id: proformaId,
+          description: "Trigger QA Line 1 (fixed discount)",
+          quantity: 10,
+          unit: "pcs",
+          unit_price: 100,
+          discount: 0,
+          discount_amount: 50,
+          tax_rate: 5,
+          sort_order: 0,
+        },
+        {
+          proforma_invoice_id: proformaId,
+          description: "Trigger QA Line 2 (percent discount)",
+          quantity: 4,
+          unit: "pcs",
+          unit_price: 200,
+          discount: 10,
+          discount_amount: 0,
+          tax_rate: 10,
+          sort_order: 1,
+        },
+      ]);
+      if (iErr) throw new Error(`items insert: ${iErr.message}`);
+
+      step({
+        key: "insert_items",
+        label: "Insert 2 line items with mixed discount + tax inputs",
+        status: "pass",
+        message: "Line 1: 10×100, disc_amt=50, tax=5% · Line 2: 4×200, disc=10%, tax=10%",
+      });
+
+      const { data: header, error: hErr } = await supabase
+        .from("proforma_invoices")
+        .select(
+          "subtotal, discount_amount, discount_total, vat_amount, vat_rate, grand_total, total",
+        )
+        .eq("id", proformaId)
+        .maybeSingle();
+      if (hErr) throw new Error(`reread header: ${hErr.message}`);
+
+      const actual = {
+        subtotal: Number(header?.subtotal ?? 0),
+        discount_amount: Number(header?.discount_amount ?? 0),
+        vat_amount: Number(header?.vat_amount ?? 0),
+        vat_rate: Number(header?.vat_rate ?? 0),
+        grand_total: Number(header?.grand_total ?? 0),
+      };
+
+      const checks: Array<[string, number, number]> = [
+        ["subtotal (net)", actual.subtotal, expected.subtotal_net],
+        ["discount_amount", actual.discount_amount, expected.discount_amount],
+        ["vat_amount", actual.vat_amount, expected.vat_amount],
+        ["vat_rate (blended)", actual.vat_rate, expected.vat_rate],
+        ["grand_total", actual.grand_total, expected.grand_total],
+      ];
+      for (const [name, a, e] of checks) {
+        const ok = approxEq(a, e);
+        step({
+          key: `assert_${name}`,
+          label: `Trigger wrote ${name}`,
+          status: ok ? "pass" : "fail",
+          message: `expected=${e} actual=${a}${ok ? "" : " ✗ mismatch"}`,
+          details: { expected: e, actual: a },
+        });
+      }
+
+      // Mirror-column integrity: discount_amount ↔ discount_total, grand_total ↔ total
+      const mirrors: Array<[string, number, number]> = [
+        [
+          "discount_amount ↔ discount_total",
+          Number(header?.discount_amount ?? 0),
+          Number(header?.discount_total ?? 0),
+        ],
+        [
+          "grand_total ↔ total",
+          Number(header?.grand_total ?? 0),
+          Number(header?.total ?? 0),
+        ],
+      ];
+      for (const [name, a, b] of mirrors) {
+        const ok = approxEq(a, b);
+        step({
+          key: `mirror_${name}`,
+          label: `Mirror columns in sync: ${name}`,
+          status: ok ? "pass" : "fail",
+          message: `${a} vs ${b}`,
+        });
+      }
+
+      // Second-pass: mutate one line and confirm triggers re-fire.
+      const { data: firstItem } = await supabase
+        .from("proforma_invoice_items")
+        .select("id")
+        .eq("proforma_invoice_id", proformaId)
+        .order("sort_order", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (firstItem?.id) {
+        // Bump line 1 unit_price 100 → 110 (gross 1100, disc 50, taxable 1050, tax 52.5, line 1102.5)
+        // New totals:
+        //   subtotal_net = 1050 + 720 = 1770
+        //   discount = 50 + 80 = 130
+        //   tax = 52.5 + 72 = 124.5
+        //   grand = 1894.5
+        //   vat_rate = round(124.5 / 1770 * 100, 2) = 7.03
+        await supabase
+          .from("proforma_invoice_items")
+          .update({ unit_price: 110 })
+          .eq("id", firstItem.id);
+        const { data: h2 } = await supabase
+          .from("proforma_invoices")
+          .select("subtotal, discount_amount, vat_amount, vat_rate, grand_total")
+          .eq("id", proformaId)
+          .maybeSingle();
+        const exp2 = {
+          subtotal: 1770.0,
+          discount_amount: 130.0,
+          vat_amount: 124.5,
+          vat_rate: 7.03,
+          grand_total: 1894.5,
+        };
+        const act2 = {
+          subtotal: Number(h2?.subtotal ?? 0),
+          discount_amount: Number(h2?.discount_amount ?? 0),
+          vat_amount: Number(h2?.vat_amount ?? 0),
+          vat_rate: Number(h2?.vat_rate ?? 0),
+          grand_total: Number(h2?.grand_total ?? 0),
+        };
+        const pass2 =
+          approxEq(act2.subtotal, exp2.subtotal) &&
+          approxEq(act2.discount_amount, exp2.discount_amount) &&
+          approxEq(act2.vat_amount, exp2.vat_amount) &&
+          approxEq(act2.vat_rate, exp2.vat_rate) &&
+          approxEq(act2.grand_total, exp2.grand_total);
+        step({
+          key: "recompute_on_update",
+          label: "Trigger re-fires on line UPDATE (unit_price 100→110)",
+          status: pass2 ? "pass" : "fail",
+          message: pass2
+            ? `grand=${act2.grand_total} vat_rate=${act2.vat_rate} ✓`
+            : `expected ${JSON.stringify(exp2)} got ${JSON.stringify(act2)}`,
+          details: { expected: exp2, actual: act2 },
+        });
+      }
+    } catch (e) {
+      step({
+        key: "run",
+        label: "Trigger recompute workflow",
+        status: "fail",
+        message: (e as Error).message,
+      });
+    } finally {
+      try {
+        if (proformaId) {
+          await supabase
+            .from("proforma_invoice_items")
+            .delete()
+            .eq("proforma_invoice_id", proformaId);
+          await supabase.from("proforma_invoices").delete().eq("id", proformaId);
+        }
+        if (customerId) {
+          await supabase.from("customers").delete().eq("id", customerId);
+        }
+        step({
+          key: "cleanup",
+          label: "Guaranteed cleanup",
+          status: "pass",
+          message: "Removed test proforma, items, and customer",
+        });
+      } catch (e) {
+        step({
+          key: "cleanup",
+          label: "Guaranteed cleanup",
+          status: "fail",
+          message: (e as Error).message,
+        });
+      }
+    }
+
+    const passed = steps.filter((s) => s.status === "pass").length;
+    const failed = steps.filter((s) => s.status === "fail").length;
+    const warned = steps.filter((s) => s.status === "warn").length;
+    return {
+      startedAt,
+      finishedAt: new Date().toISOString(),
+      runId,
+      marker,
+      expected,
+      passed,
+      failed,
+      warned,
+      total: steps.length,
+      steps,
+    };
+  });
