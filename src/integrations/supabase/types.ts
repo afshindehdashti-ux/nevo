@@ -3200,6 +3200,7 @@ export type Database = {
           invoice_id: string
           method: Database["public"]["Enums"]["payment_method"]
           notes: string | null
+          payment_number: string | null
           received_at: string
           reference: string | null
           updated_at: string
@@ -3214,6 +3215,7 @@ export type Database = {
           invoice_id: string
           method?: Database["public"]["Enums"]["payment_method"]
           notes?: string | null
+          payment_number?: string | null
           received_at?: string
           reference?: string | null
           updated_at?: string
@@ -3228,6 +3230,7 @@ export type Database = {
           invoice_id?: string
           method?: Database["public"]["Enums"]["payment_method"]
           notes?: string | null
+          payment_number?: string | null
           received_at?: string
           reference?: string | null
           updated_at?: string
@@ -4388,6 +4391,8 @@ export type Database = {
         Args: { _type: Database["public"]["Enums"]["invoice_type"] }
         Returns: string
       }
+      next_order_number: { Args: never; Returns: string }
+      next_payment_number: { Args: never; Returns: string }
       next_po_number: { Args: never; Returns: string }
       next_quotation_number: { Args: never; Returns: string }
       read_email_batch: {
