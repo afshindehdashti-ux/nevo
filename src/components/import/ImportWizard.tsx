@@ -60,6 +60,22 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
     return missing.map((f) => `Required column "${f.label}" is not mapped.`);
   }, [mapping, schema]);
 
+  // For hierarchical schemas (e.g. quotations), estimate parent record count
+  // by counting unique group-by values in the uploaded rows.
+  const groupCount = useMemo(() => {
+    if (!schema.groupBy) return null;
+    const src = mapping[schema.groupBy];
+    if (!src) return null;
+    const seen = new Set<string>();
+    for (const r of rows) {
+      const v = r[src];
+      if (v !== undefined && v !== null && String(v).trim() !== "") {
+        seen.add(String(v).trim());
+      }
+    }
+    return seen.size;
+  }, [rows, mapping, schema]);
+
   const previewRows = rows.slice(0, 5);
 
   const runMut = useMutation({
