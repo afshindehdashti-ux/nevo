@@ -40,15 +40,42 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
 
   const parseFile = async (f: File) => {
     setFileName(f.name);
-    const bytes = new Uint8Array(await f.arrayBuffer());
-    const wb = XLSX.read(bytes, { type: "array" });
-    const first = wb.Sheets[wb.SheetNames[0]];
-    const json = XLSX.utils.sheet_to_json<Row>(first, { defval: "", raw: false });
+    const isJson = /\.json$/i.test(f.name) || f.type === "application/json";
+    let json: Row[] = [];
+    try {
+      if (isJson) {
+        const text = await f.text();
+        const parsed = JSON.parse(text);
+        const arr = Array.isArray(parsed)
+          ? parsed
+          : Array.isArray((parsed as { rows?: unknown[] }).rows)
+          ? (parsed as { rows: unknown[] }).rows
+          : Array.isArray((parsed as { data?: unknown[] }).data)
+          ? (parsed as { data: unknown[] }).data
+          : null;
+        if (!arr || arr.length === 0 || typeof arr[0] !== "object") {
+          toast.error("JSON must be an array of objects (or { rows: [...] }).");
+          return;
+        }
+        json = arr as Row[];
+      } else {
+        const bytes = new Uint8Array(await f.arrayBuffer());
+        const wb = XLSX.read(bytes, { type: "array" });
+        const first = wb.Sheets[wb.SheetNames[0]];
+        json = XLSX.utils.sheet_to_json<Row>(first, { defval: "", raw: false });
+      }
+    } catch (e) {
+      toast.error(`Failed to parse file: ${e instanceof Error ? e.message : String(e)}`);
+      return;
+    }
     if (!json.length) {
       toast.error("File contains no data rows.");
       return;
     }
-    const heads = Object.keys(json[0]);
+    // Merge keys across rows so headers aren't limited to row 0's columns.
+    const headSet = new Set<string>();
+    for (const r of json) for (const k of Object.keys(r)) headSet.add(k);
+    const heads = Array.from(headSet);
     setHeaders(heads);
     setRows(json.slice(0, 5000));
     setMapping(autoMap(heads, schema.fields));
@@ -111,9 +138,10 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Wizard supports {Object.keys(IMPORT_SCHEMAS).length} entity types today (Customers,
-              Contacts, Leads, Suppliers, Products, Quotations). Quotations import groups rows by
-              quotation number into one header + line items.
+              Wizard supports {Object.keys(IMPORT_SCHEMAS).length} entity types. Document imports
+              (quotations, proformas, invoices, orders, shipments) group rows sharing a document
+              number into one header with line items and recalculate subtotal / VAT / total from
+              the lines.
             </p>
             <DialogFooter>
               <Button onClick={() => setStep("upload")}>Next <ArrowRight className="ml-1 h-4 w-4" /></Button>
@@ -124,15 +152,15 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
         {step === "upload" && (
           <div className="space-y-4">
             <div>
-              <Label>Upload CSV or XLSX</Label>
+              <Label>Upload CSV, XLSX, or JSON</Label>
               <Input
                 ref={fileInput}
                 type="file"
-                accept=".csv,.tsv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                accept=".csv,.tsv,.xlsx,.xls,.json,application/json,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
                 onChange={(e) => { const f = e.target.files?.[0]; if (f) void parseFile(f); }}
               />
               <p className="mt-1 text-[11px] text-muted-foreground">
-                Max 5,000 rows per file. First row must be column headers.
+                Max 5,000 rows per file. XLSX/CSV: first row must be column headers. JSON: array of objects or {"{ rows: [...] }"}.
               </p>
             </div>
             <div className="rounded-md border border-border bg-muted/30 p-3 text-xs">

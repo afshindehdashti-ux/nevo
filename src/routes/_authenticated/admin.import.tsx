@@ -1,17 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, Clock, ClipboardPaste } from "lucide-react";
+import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, Clock, ClipboardPaste, Download } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import { ImportWizard } from "@/components/import/ImportWizard";
 import { PasteImporter } from "@/components/import/PasteImporter";
 import { SUPPORTED_IMPORT_TYPES } from "@/lib/import-schemas";
+import { getFailedRowsCsv } from "@/lib/import-wizard.functions";
 
 type ImportJob = Database["public"]["Tables"]["import_jobs"]["Row"];
 type JobStatus = Database["public"]["Enums"]["import_job_status"];
@@ -73,6 +76,28 @@ function ImportDataPage() {
   const { data: jobs, isLoading, error } = useImportJobs();
   const [wizardOpen, setWizardOpen] = useState(false);
   const [pasteOpen, setPasteOpen] = useState(false);
+  const downloadFailed = useServerFn(getFailedRowsCsv);
+
+  const handleDownloadFailed = async (job: ImportJob) => {
+    try {
+      const res = await downloadFailed({ data: { job_id: job.id } });
+      if (!res.csv) {
+        toast.info("No failed rows to download.");
+        return;
+      }
+      const blob = new Blob([res.csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `failed-rows-${job.import_type}-${job.id.slice(0, 8)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Download failed");
+    }
+  };
 
   const byCategory = IMPORT_TYPES.reduce<Record<string, typeof IMPORT_TYPES>>((acc, t) => {
     (acc[t.category] = acc[t.category] ?? []).push(t);
@@ -169,6 +194,7 @@ function ImportDataPage() {
                   <th className="text-right px-3 py-2">Success</th>
                   <th className="text-right px-3 py-2">Failed</th>
                   <th className="text-left px-3 py-2">Started</th>
+                  <th className="text-right px-3 py-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -194,6 +220,20 @@ function ImportDataPage() {
                       </td>
                       <td className="px-3 py-2 text-muted-foreground text-xs">
                         {formatDistanceToNow(new Date(j.created_at), { addSuffix: true })}
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        {j.failed_rows > 0 ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 gap-1 text-xs"
+                            onClick={() => handleDownloadFailed(j)}
+                          >
+                            <Download className="h-3 w-3" /> Failed rows
+                          </Button>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
                       </td>
                     </tr>
                   );
