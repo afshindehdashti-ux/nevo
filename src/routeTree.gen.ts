@@ -13,6 +13,7 @@ import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as CrmRouteImport } from './routes/crm'
 import { Route as BackofficeRouteImport } from './routes/backoffice'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -28,6 +29,8 @@ import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 import { Route as AuthenticatedPartnerPortalRouteImport } from './routes/_authenticated/partner-portal'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as LangSustainabilityRouteImport } from './routes/$lang.sustainability'
 import { Route as LangResearchInnovationRouteImport } from './routes/$lang.research-innovation'
 import { Route as LangQualityRouteImport } from './routes/$lang.quality'
@@ -100,6 +103,7 @@ import { Route as AuthenticatedAdminBackendHealthRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminApprovalsRouteImport } from './routes/_authenticated/admin.approvals'
 import { Route as AuthenticatedAdminAlertsRouteImport } from './routes/_authenticated/admin.alerts'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as LangSolutionsSandwichPanelsRouteImport } from './routes/$lang.solutions.sandwich-panels'
 import { Route as LangSolutionsRawMaterialsRouteImport } from './routes/$lang.solutions.raw-materials'
 import { Route as LangSolutionsProductionLinesRouteImport } from './routes/$lang.solutions.production-lines'
@@ -152,6 +156,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CrmRoute = CrmRouteImport.update({
@@ -229,6 +238,18 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LangSustainabilityRoute = LangSustainabilityRouteImport.update({
   id: '/sustainability',
   path: '/sustainability',
@@ -628,6 +649,12 @@ const AuthenticatedAdminActivityRoute =
     path: '/activity',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LangSolutionsSandwichPanelsRoute =
   LangSolutionsSandwichPanelsRouteImport.update({
     id: '/solutions/sandwich-panels',
@@ -829,6 +856,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/backoffice': typeof BackofficeRoute
   '/crm': typeof CrmRoute
+  '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -857,6 +885,8 @@ export interface FileRoutesByFullPath {
   '/$lang/quality': typeof LangQualityRoute
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/partner-portal': typeof AuthenticatedPartnerPortalRoute
   '/portal': typeof AuthenticatedPortalRoute
@@ -872,6 +902,7 @@ export interface FileRoutesByFullPath {
   '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/alerts': typeof AuthenticatedAdminAlertsRoute
   '/admin/approvals': typeof AuthenticatedAdminApprovalsRouteWithChildren
@@ -953,6 +984,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/backoffice': typeof BackofficeRoute
   '/crm': typeof CrmRoute
+  '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -981,6 +1013,8 @@ export interface FileRoutesByTo {
   '/$lang/quality': typeof LangQualityRoute
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/partner-portal': typeof AuthenticatedPartnerPortalRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/admin/login': typeof AdminLoginRoute
@@ -995,6 +1029,7 @@ export interface FileRoutesByTo {
   '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/alerts': typeof AuthenticatedAdminAlertsRoute
   '/admin/approvals': typeof AuthenticatedAdminApprovalsRouteWithChildren
@@ -1078,6 +1113,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/backoffice': typeof BackofficeRoute
   '/crm': typeof CrmRoute
+  '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -1106,6 +1142,8 @@ export interface FileRoutesById {
   '/$lang/quality': typeof LangQualityRoute
   '/$lang/research-innovation': typeof LangResearchInnovationRoute
   '/$lang/sustainability': typeof LangSustainabilityRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/partner-portal': typeof AuthenticatedPartnerPortalRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
@@ -1121,6 +1159,7 @@ export interface FileRoutesById {
   '/$lang/solutions/production-lines': typeof LangSolutionsProductionLinesRoute
   '/$lang/solutions/raw-materials': typeof LangSolutionsRawMaterialsRoute
   '/$lang/solutions/sandwich-panels': typeof LangSolutionsSandwichPanelsRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/_authenticated/admin/alerts': typeof AuthenticatedAdminAlertsRoute
   '/_authenticated/admin/approvals': typeof AuthenticatedAdminApprovalsRouteWithChildren
@@ -1205,6 +1244,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/backoffice'
     | '/crm'
+    | '/mcp'
     | '/reset-password'
     | '/sitemap.xml'
     | '/status'
@@ -1233,6 +1273,8 @@ export interface FileRouteTypes {
     | '/$lang/quality'
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin'
     | '/partner-portal'
     | '/portal'
@@ -1248,6 +1290,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/production-lines'
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/activity'
     | '/admin/alerts'
     | '/admin/approvals'
@@ -1329,6 +1372,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/backoffice'
     | '/crm'
+    | '/mcp'
     | '/reset-password'
     | '/sitemap.xml'
     | '/status'
@@ -1357,6 +1401,8 @@ export interface FileRouteTypes {
     | '/$lang/quality'
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/partner-portal'
     | '/portal'
     | '/admin/login'
@@ -1371,6 +1417,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/production-lines'
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/activity'
     | '/admin/alerts'
     | '/admin/approvals'
@@ -1453,6 +1500,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/backoffice'
     | '/crm'
+    | '/mcp'
     | '/reset-password'
     | '/sitemap.xml'
     | '/status'
@@ -1481,6 +1529,8 @@ export interface FileRouteTypes {
     | '/$lang/quality'
     | '/$lang/research-innovation'
     | '/$lang/sustainability'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/admin'
     | '/_authenticated/partner-portal'
     | '/_authenticated/portal'
@@ -1496,6 +1546,7 @@ export interface FileRouteTypes {
     | '/$lang/solutions/production-lines'
     | '/$lang/solutions/raw-materials'
     | '/$lang/solutions/sandwich-panels'
+    | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/activity'
     | '/_authenticated/admin/alerts'
     | '/_authenticated/admin/approvals'
@@ -1580,15 +1631,19 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BackofficeRoute: typeof BackofficeRoute
   CrmRoute: typeof CrmRoute
+  McpRoute: typeof McpRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AdminLoginRoute: typeof AdminLoginRoute
   ApiChatRoute: typeof ApiChatRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   KnowledgeSplatRoute: typeof KnowledgeSplatRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiAdminCsvExportAuditRoute: typeof ApiAdminCsvExportAuditRoute
   ApiPublicApprovalNotifyRoute: typeof ApiPublicApprovalNotifyRoute
   ApiPublicBootstrapSuperAdminRoute: typeof ApiPublicBootstrapSuperAdminRoute
@@ -1634,6 +1689,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/crm': {
@@ -1740,6 +1802,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$lang/sustainability': {
       id: '/$lang/sustainability'
@@ -2244,6 +2320,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/activity'
       preLoaderRoute: typeof AuthenticatedAdminActivityRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$lang/solutions/sandwich-panels': {
       id: '/$lang/solutions/sandwich-panels'
@@ -2857,15 +2940,20 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BackofficeRoute: BackofficeRoute,
   CrmRoute: CrmRoute,
+  McpRoute: McpRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AdminLoginRoute: AdminLoginRoute,
   ApiChatRoute: ApiChatRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   KnowledgeSplatRoute: KnowledgeSplatRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiAdminCsvExportAuditRoute: ApiAdminCsvExportAuditRoute,
   ApiPublicApprovalNotifyRoute: ApiPublicApprovalNotifyRoute,
   ApiPublicBootstrapSuperAdminRoute: ApiPublicBootstrapSuperAdminRoute,
