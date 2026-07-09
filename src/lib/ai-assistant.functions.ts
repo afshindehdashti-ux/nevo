@@ -1,6 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import {
+  financeBalanceDue,
+  financeTotalAmount,
+} from "./finance-normalization";
 
 /** All server functions that back the NEVO internal AI Assistant. */
 
@@ -579,7 +583,7 @@ export const getRecordSummary = createServerFn({ method: "POST" })
         .maybeSingle();
       if (!i) return { summary: null };
       return {
-        summary: `${i.type ?? "Invoice"} ${i.invoice_number ?? ""} — status ${i.status}. Total ${i.total} ${i.currency ?? ""}, balance ${i.balance ?? 0}. Due ${i.due_date ?? "n/a"}.`,
+        summary: `${i.type ?? "Invoice"} ${i.invoice_number ?? ""} — status ${i.status}. Total ${financeTotalAmount(i)} ${i.currency ?? ""}, balance ${financeBalanceDue(i)}. Due ${i.due_date ?? "n/a"}.`,
       };
     }
     if (data.module === "quotation") {
@@ -590,7 +594,7 @@ export const getRecordSummary = createServerFn({ method: "POST" })
         .maybeSingle();
       if (!q) return { summary: null };
       return {
-        summary: `Quotation ${q.quotation_number ?? ""} — status ${q.status}. Total ${q.total} ${q.currency ?? ""}. Valid until ${q.valid_until ?? "n/a"}.`,
+        summary: `Quotation ${q.quotation_number ?? ""} — status ${q.status}. Total ${financeTotalAmount(q)} ${q.currency ?? ""}. Valid until ${q.valid_until ?? "n/a"}.`,
       };
     }
     if (data.module === "lead") {
