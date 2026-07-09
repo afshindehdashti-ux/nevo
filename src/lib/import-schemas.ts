@@ -1,10 +1,10 @@
 // Client-safe schema descriptors for the /admin/import wizard.
 // Keep in sync with server-side coercion in import-wizard.functions.ts.
 
-export type ImportFieldType = "text" | "email" | "phone" | "number" | "boolean" | "enum";
+export type ImportFieldType = "text" | "email" | "phone" | "number" | "boolean" | "enum" | "date";
 
 export interface ImportField {
-  key: string;                 // DB column
+  key: string;                 // logical schema key (used by mapping + coerce)
   label: string;               // Human label
   required?: boolean;
   type?: ImportFieldType;
@@ -47,6 +47,22 @@ export function autoMap(headers: string[], fields: ImportField[]): Record<string
   }
   return out;
 }
+
+// Shared line-item field definitions reused across doc-type schemas.
+const commonItemFields: ImportField[] = [
+  { key: "item_code", label: "Item code", aliases: ["sku", "code", "product code"] },
+  {
+    key: "description",
+    label: "Item description",
+    required: true,
+    aliases: ["item", "product", "line description", "desc"],
+  },
+  { key: "quantity", label: "Quantity", type: "number", aliases: ["qty"] },
+  { key: "unit", label: "Unit", aliases: ["uom"] },
+  { key: "unit_price", label: "Unit price", type: "number", aliases: ["price", "rate"] },
+  { key: "discount_pct", label: "Discount %", type: "number", aliases: ["discount", "disc"] },
+  { key: "hs_code", label: "HS code" },
+];
 
 export const IMPORT_SCHEMAS: Record<string, ImportEntitySchema> = {
   customers: {
@@ -155,87 +171,198 @@ export const IMPORT_SCHEMAS: Record<string, ImportEntitySchema> = {
     category: "Finance",
     groupBy: "quotation_number",
     headerFields: [
-      "quotation_number",
-      "customer_name",
-      "issue_date",
-      "valid_until",
-      "currency",
-      "vat_rate",
-      "status",
-      "terms",
-      "notes",
+      "quotation_number", "customer_name", "issue_date", "valid_until",
+      "currency", "vat_rate", "status", "terms", "notes",
     ],
-    itemFields: [
-      "item_code",
-      "description",
-      "quantity",
-      "unit",
-      "unit_price",
-      "discount_pct",
-      "hs_code",
-    ],
+    itemFields: ["item_code", "description", "quantity", "unit", "unit_price", "discount_pct", "hs_code"],
     fields: [
-      // Header — first non-empty value per group wins.
-      {
-        key: "quotation_number",
-        label: "Quotation #",
-        required: true,
+      { key: "quotation_number", label: "Quotation #", required: true,
         aliases: ["quote", "quote number", "quotation no", "quote no", "ref", "reference"],
-        note: "Rows sharing this value merge into one quotation as line items.",
-      },
-      {
-        key: "customer_name",
-        label: "Customer name",
-        required: true,
+        note: "Rows sharing this value merge into one quotation as line items." },
+      { key: "customer_name", label: "Customer name", required: true,
         aliases: ["customer", "company", "account", "client"],
-        note: "Matched to existing customer by name; created if missing.",
-      },
-      { key: "issue_date", label: "Issue date", aliases: ["date", "quote date"] },
-      { key: "valid_until", label: "Valid until", aliases: ["expiry", "expires"] },
+        note: "Matched to existing customer by name; created if missing." },
+      { key: "issue_date", label: "Issue date", type: "date", aliases: ["date", "quote date"] },
+      { key: "valid_until", label: "Valid until", type: "date", aliases: ["expiry", "expires"] },
       { key: "currency", label: "Currency", aliases: ["ccy"] },
-      {
-        key: "vat_rate",
-        label: "VAT %",
-        type: "number",
-        aliases: ["vat", "tax", "tax %", "tax rate"],
-      },
-      {
-        key: "status",
-        label: "Status",
-        type: "enum",
-        enumValues: ["draft", "sent", "approved", "accepted", "rejected", "expired"],
-      },
+      { key: "vat_rate", label: "VAT %", type: "number", aliases: ["vat", "tax", "tax %", "tax rate"] },
+      { key: "status", label: "Status", type: "enum",
+        enumValues: ["draft", "sent", "approved", "accepted", "rejected", "expired"] },
       { key: "terms", label: "Terms" },
       { key: "notes", label: "Notes" },
+      ...commonItemFields,
+    ],
+  },
 
-      // Line items — every row contributes.
-      { key: "item_code", label: "Item code", aliases: ["sku", "code", "product code"] },
-      {
-        key: "description",
-        label: "Item description",
-        required: true,
-        aliases: ["item", "product", "line description", "desc"],
-      },
-      {
-        key: "quantity",
-        label: "Quantity",
-        type: "number",
-        aliases: ["qty"],
-      },
+  // === Finance: doc-type schemas (hierarchical: header + line items) ===
+
+  proforma_invoices: {
+    key: "proforma_invoices",
+    label: "Proforma invoices",
+    table: "proforma_invoices",
+    category: "Finance",
+    groupBy: "proforma_number",
+    headerFields: [
+      "proforma_number", "customer_name", "issue_date", "valid_until",
+      "currency", "vat_rate", "status", "payment_terms", "delivery_terms",
+      "incoterms", "notes",
+    ],
+    itemFields: ["item_code", "description", "quantity", "unit", "unit_price", "discount_pct"],
+    fields: [
+      { key: "proforma_number", label: "Proforma #", required: true,
+        aliases: ["pi", "pi number", "pi no", "proforma", "proforma no", "ref"] },
+      { key: "customer_name", label: "Customer name", required: true,
+        aliases: ["customer", "company", "client", "account"] },
+      { key: "issue_date", label: "Issue date", type: "date", aliases: ["date", "pi date"] },
+      { key: "valid_until", label: "Valid until", type: "date", aliases: ["expiry"] },
+      { key: "currency", label: "Currency", aliases: ["ccy"] },
+      { key: "vat_rate", label: "VAT %", type: "number", aliases: ["vat", "tax rate"] },
+      { key: "status", label: "Status", type: "enum",
+        enumValues: ["draft", "sent", "approved", "converted", "cancelled", "expired"] },
+      { key: "payment_terms", label: "Payment terms" },
+      { key: "delivery_terms", label: "Delivery terms" },
+      { key: "incoterms", label: "Incoterms" },
+      { key: "notes", label: "Notes" },
+      ...commonItemFields,
+    ],
+  },
+
+  invoices: {
+    key: "invoices",
+    label: "Invoices",
+    table: "invoices",
+    category: "Finance",
+    groupBy: "invoice_number",
+    headerFields: [
+      "invoice_number", "customer_name", "issue_date", "due_date",
+      "currency", "vat_rate", "status", "payment_terms", "notes",
+    ],
+    itemFields: ["item_code", "description", "quantity", "unit", "unit_price", "discount_pct"],
+    fields: [
+      { key: "invoice_number", label: "Invoice #", required: true,
+        aliases: ["inv", "inv number", "inv no", "invoice no", "ref"] },
+      { key: "customer_name", label: "Customer name", required: true,
+        aliases: ["customer", "company", "client", "account"] },
+      { key: "issue_date", label: "Issue date", type: "date", aliases: ["date", "invoice date"] },
+      { key: "due_date", label: "Due date", type: "date", aliases: ["due"] },
+      { key: "currency", label: "Currency", aliases: ["ccy"] },
+      { key: "vat_rate", label: "VAT %", type: "number", aliases: ["vat", "tax rate"] },
+      { key: "status", label: "Status", type: "enum",
+        enumValues: ["draft", "issued", "paid", "partially_paid", "overdue", "cancelled"] },
+      { key: "payment_terms", label: "Payment terms" },
+      { key: "notes", label: "Notes" },
+      ...commonItemFields,
+    ],
+  },
+
+  orders: {
+    key: "orders",
+    label: "Projects / Orders",
+    table: "orders",
+    category: "Operations",
+    groupBy: "order_number",
+    headerFields: [
+      "order_number", "customer_name", "order_date", "requested_delivery",
+      "currency", "incoterm", "status", "notes",
+    ],
+    itemFields: ["item_code", "description", "quantity", "unit", "unit_price", "discount_pct"],
+    fields: [
+      { key: "order_number", label: "Order #", required: true,
+        aliases: ["po", "po number", "order no", "ref"] },
+      { key: "customer_name", label: "Customer name", required: true,
+        aliases: ["customer", "company", "client", "account"] },
+      { key: "order_date", label: "Order date", type: "date", aliases: ["date"] },
+      { key: "requested_delivery", label: "Requested delivery", type: "date", aliases: ["delivery date", "eta"] },
+      { key: "currency", label: "Currency", aliases: ["ccy"] },
+      { key: "incoterm", label: "Incoterm", aliases: ["incoterms"] },
+      { key: "status", label: "Status", type: "enum",
+        enumValues: ["draft", "confirmed", "in_production", "ready", "shipped", "delivered", "cancelled"] },
+      { key: "notes", label: "Notes" },
+      ...commonItemFields,
+    ],
+  },
+
+  shipments: {
+    key: "shipments",
+    label: "Shipments",
+    table: "shipments",
+    category: "Operations",
+    groupBy: "shipment_number",
+    headerFields: [
+      "shipment_number", "order_number", "status", "carrier", "tracking_no",
+      "incoterm", "container_no", "bl_number", "shipped_at", "delivered_at", "notes",
+    ],
+    itemFields: ["description", "quantity", "unit"],
+    fields: [
+      { key: "shipment_number", label: "Shipment #", required: true,
+        aliases: ["shp", "shipment no", "ref"] },
+      { key: "order_number", label: "Order # (required)", required: true,
+        aliases: ["order", "po", "po number"],
+        note: "Matched to existing order by order_number." },
+      { key: "status", label: "Status", type: "enum",
+        enumValues: ["pending", "in_transit", "delivered", "cancelled"] },
+      { key: "carrier", label: "Carrier" },
+      { key: "tracking_no", label: "Tracking #", aliases: ["tracking", "awb"] },
+      { key: "incoterm", label: "Incoterm" },
+      { key: "container_no", label: "Container #", aliases: ["container"] },
+      { key: "bl_number", label: "BL #", aliases: ["bl", "bill of lading"] },
+      { key: "shipped_at", label: "Shipped at", type: "date", aliases: ["ship date"] },
+      { key: "delivered_at", label: "Delivered at", type: "date", aliases: ["delivery date"] },
+      { key: "notes", label: "Notes" },
+      { key: "description", label: "Item description", required: true, aliases: ["item", "product"] },
+      { key: "quantity", label: "Quantity", type: "number", aliases: ["qty"] },
       { key: "unit", label: "Unit", aliases: ["uom"] },
-      {
-        key: "unit_price",
-        label: "Unit price",
-        type: "number",
-        aliases: ["price", "rate"],
-      },
-      {
-        key: "discount_pct",
-        label: "Discount %",
-        type: "number",
-        aliases: ["discount", "disc", "disc %"],
-      },
-      { key: "hs_code", label: "HS code" },
+    ],
+  },
+
+  // === Finance: flat schemas (single row = single record) ===
+
+  payments: {
+    key: "payments",
+    label: "Payments",
+    table: "payments",
+    category: "Finance",
+    fields: [
+      { key: "invoice_number", label: "Invoice # (required)", required: true,
+        aliases: ["invoice", "inv", "inv no"],
+        note: "Matched to existing invoice by invoice_number." },
+      { key: "amount", label: "Amount", type: "number", required: true, aliases: ["paid", "value"] },
+      { key: "currency", label: "Currency", aliases: ["ccy"] },
+      { key: "method", label: "Method", type: "enum",
+        enumValues: ["bank_transfer", "cash", "cheque", "card", "wire", "other"],
+        aliases: ["payment method", "type"] },
+      { key: "received_at", label: "Received at", type: "date", required: true,
+        aliases: ["date", "payment date"] },
+      { key: "reference", label: "Reference", aliases: ["ref", "txn", "transaction"] },
+      { key: "notes", label: "Notes" },
+    ],
+  },
+
+  commission_invoices: {
+    key: "commission_invoices",
+    label: "Commission invoices",
+    table: "partner_commissions",
+    category: "Finance",
+    fields: [
+      { key: "partner_name", label: "Partner / Supplier name", required: true,
+        aliases: ["partner", "supplier", "vendor"],
+        note: "Matched to existing partner or supplier by name." },
+      { key: "commission_number", label: "Commission #",
+        aliases: ["com", "com number", "ref"] },
+      { key: "amount", label: "Amount", type: "number", required: true, aliases: ["value"] },
+      { key: "currency", label: "Currency", aliases: ["ccy"] },
+      { key: "invoice_number", label: "Related invoice #",
+        aliases: ["invoice", "inv"] },
+      { key: "order_number", label: "Related order #",
+        aliases: ["order", "po"] },
+      { key: "earned_at", label: "Earned at", type: "date", required: true,
+        aliases: ["date", "earned date"] },
+      { key: "invoice_date", label: "Invoice date", type: "date" },
+      { key: "due_date", label: "Due date", type: "date" },
+      { key: "status", label: "Status", type: "enum",
+        enumValues: ["pending", "approved", "paid", "cancelled"] },
+      { key: "description", label: "Description" },
+      { key: "notes", label: "Notes" },
     ],
   },
 };
