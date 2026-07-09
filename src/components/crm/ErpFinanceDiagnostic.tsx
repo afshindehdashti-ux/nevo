@@ -194,6 +194,20 @@ export function ErpFinanceDiagnostic() {
     }
   }
 
+  async function onRunQuoteImport() {
+    setQuoteImpLoading(true);
+    try {
+      const r = (await runQuoteImp()) as IsoReport;
+      setQuoteImp(r);
+      if (r.failed > 0) toast.error(`Quotation import e2e: ${r.failed} failing step(s)`);
+      else toast.success(`Quotation import e2e passed (run ${r.runId.slice(0, 8)})`);
+    } catch (e) {
+      toast.error(`Quotation import e2e failed: ${(e as Error).message}`);
+    } finally {
+      setQuoteImpLoading(false);
+    }
+  }
+
   const failedChecks = qa?.results.filter((r) => r.status === "fail") ?? [];
   const warnChecks = qa?.results.filter((r) => r.status === "warn") ?? [];
 
