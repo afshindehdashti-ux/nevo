@@ -39,11 +39,15 @@ function AuthPage() {
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
       if (data.user) {
+        if (nextTarget) {
+          window.location.assign(nextTarget);
+          return;
+        }
         const to = await resolveLandingRoute(data.user.id);
         navigate({ to });
       }
     });
-  }, [navigate]);
+  }, [navigate, nextTarget]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,6 +64,10 @@ function AuthPage() {
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        if (nextTarget) {
+          window.location.assign(nextTarget);
+          return;
+        }
         const to = data.user ? await resolveLandingRoute(data.user.id) : "/admin";
         navigate({ to });
       }
