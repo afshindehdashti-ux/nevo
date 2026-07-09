@@ -21,7 +21,10 @@ export type Database = {
           entity_id: string | null
           entity_type: string | null
           id: string
+          ip_address: unknown
           metadata: Json
+          new_values: Json | null
+          old_values: Json | null
           user_id: string | null
         }
         Insert: {
@@ -30,7 +33,10 @@ export type Database = {
           entity_id?: string | null
           entity_type?: string | null
           id?: string
+          ip_address?: unknown
           metadata?: Json
+          new_values?: Json | null
+          old_values?: Json | null
           user_id?: string | null
         }
         Update: {
@@ -39,7 +45,10 @@ export type Database = {
           entity_id?: string | null
           entity_type?: string | null
           id?: string
+          ip_address?: unknown
           metadata?: Json
+          new_values?: Json | null
+          old_values?: Json | null
           user_id?: string | null
         }
         Relationships: []

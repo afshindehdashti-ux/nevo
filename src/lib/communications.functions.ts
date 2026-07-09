@@ -61,15 +61,16 @@ export const createCommunication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => CreateInput.parse(v))
   .handler(async ({ context, data }) => {
+    const insertPayload = {
+      ...data,
+      attachments: data.attachments ?? [],
+      user_id: context.userId,
+      occurred_at: data.occurred_at ?? new Date().toISOString(),
+    };
     const { data: row, error } = await context.supabase
       .from("communications")
-      .insert({
-        ...data,
-        attachments: data.attachments ?? [],
-        user_id: context.userId,
-        occurred_at: data.occurred_at ?? new Date().toISOString(),
-      })
-      .select("id")
+      .insert(insertPayload)
+      .select("*")
       .single();
     if (error) throw new Error(error.message);
     await writeAudit(context.supabase, {
@@ -84,6 +85,8 @@ export const createCommunication = createServerFn({ method: "POST" })
         direction: data.direction,
         has_attachments: (data.attachments?.length ?? 0) > 0,
       },
+      old_values: null,
+      new_values: row,
     });
     return { ok: true, id: row!.id };
   });
@@ -105,6 +108,11 @@ export const updateCommunication = createServerFn({ method: "POST" })
   .inputValidator((v) => UpdateInput.parse(v))
   .handler(async ({ context, data }) => {
     const { id, ...patch } = data;
+    const { data: prev } = await context.supabase
+      .from("communications")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
     const { error } = await context.supabase
       .from("communications")
       .update(patch)
@@ -116,6 +124,8 @@ export const updateCommunication = createServerFn({ method: "POST" })
       entity_type: "communication",
       entity_id: id,
       metadata: { fields: Object.keys(patch) },
+      old_values: prev ?? null,
+      new_values: patch,
     });
     return { ok: true };
   });
@@ -124,6 +134,11 @@ export const deleteCommunication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ context, data }) => {
+    const { data: prev } = await context.supabase
+      .from("communications")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
     const { error } = await context.supabase.from("communications").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     await writeAudit(context.supabase, {
@@ -132,6 +147,8 @@ export const deleteCommunication = createServerFn({ method: "POST" })
       entity_type: "communication",
       entity_id: data.id,
       metadata: {},
+      old_values: prev ?? null,
+      new_values: null,
     });
     return { ok: true };
   });

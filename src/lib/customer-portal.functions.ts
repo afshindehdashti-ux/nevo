@@ -33,6 +33,8 @@ export const getMyCustomerContext = createServerFn({ method: "GET" })
         entity_type: "customer",
         entity_id: primary.id,
         metadata: { portal: "customer", customer_count: customers?.length ?? 0 },
+        old_values: null,
+        new_values: null,
       });
     }
     return { customer: primary, allCustomers: customers ?? [] };
@@ -151,6 +153,8 @@ export const getMyDocumentUrl = createServerFn({ method: "POST" })
         entity_type: doc.entity_type,
         entity_id: doc.entity_id,
       },
+      old_values: null,
+      new_values: null,
     });
     return { url: signed?.signedUrl ?? null, file_name: doc.file_name };
   });
@@ -300,6 +304,8 @@ export const markMyMessagesRead = createServerFn({ method: "POST" })
       entity_type: "customer",
       entity_id: data.customer_id,
       metadata: { portal: "customer", marked: toInsert.length },
+      old_values: null,
+      new_values: { message_ids: ids.filter((id) => !already.has(id)) },
     });
     return { marked: toInsert.length };
   });
@@ -406,6 +412,8 @@ export const getMyMessageAttachmentUrl = createServerFn({ method: "POST" })
       entity_type: "customer",
       entity_id: data.customer_id,
       metadata: { portal: "customer", path: data.path },
+      old_values: null,
+      new_values: null,
     });
     return { url: signed?.signedUrl ?? null };
   });
@@ -511,6 +519,17 @@ export const sendMyMessage = createServerFn({ method: "POST" })
         kind: data.kind,
         parent_id: data.parent_id ?? null,
         attachment_count: uploaded.length,
+      },
+      old_values: null,
+      new_values: {
+        entity_type: parentEntityType ?? "customer",
+        entity_id: parentEntityId ?? data.customer_id,
+        kind: data.kind,
+        direction: "inbound",
+        subject: finalSubject,
+        body: data.body,
+        attachments: uploaded,
+        parent_id: data.parent_id ?? null,
       },
     });
     return { ok: true, id: row!.id };

@@ -189,6 +189,7 @@ function LeadsPage() {
   const updateMutation = useMutation({
     mutationFn: async (patch: Partial<Inquiry> & { id: string }) => {
       const { id, ...rest } = patch;
+      const prev = leads.find((l) => l.id === id) ?? null;
       const { error } = await supabase.from("project_inquiries").update(rest).eq("id", id);
       if (error) throw error;
       await logAudit({
@@ -197,6 +198,10 @@ function LeadsPage() {
           entity_type: "lead",
           entity_id: id,
           metadata: { fields: Object.keys(rest) },
+          old_values: prev
+            ? Object.fromEntries(Object.keys(rest).map((k) => [k, (prev as Record<string, unknown>)[k] ?? null]))
+            : null,
+          new_values: rest as Record<string, unknown>,
         },
       }).catch(() => undefined);
     },

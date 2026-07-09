@@ -137,18 +137,28 @@ function OrderDetailPage() {
   const saveOrder = useMutation({
     mutationFn: async () => {
       if (!order) return;
+      const headerPatch = {
+        notes: notes || null,
+        order_date: orderDate,
+        requested_delivery: requestedDelivery || null,
+        incoterm: incoterm || null,
+        subtotal: totals.subtotal,
+        vat_amount: totals.vat,
+        total: totals.total,
+      };
+      const prevHeader = {
+        notes: order.notes ?? null,
+        order_date: order.order_date,
+        requested_delivery: order.requested_delivery ?? null,
+        incoterm: order.incoterm ?? null,
+        subtotal: order.subtotal ?? null,
+        vat_amount: order.vat_amount ?? null,
+        total: order.total ?? null,
+      };
       // Update header
       const { error: hErr } = await supabase
         .from("orders")
-        .update({
-          notes: notes || null,
-          order_date: orderDate,
-          requested_delivery: requestedDelivery || null,
-          incoterm: incoterm || null,
-          subtotal: totals.subtotal,
-          vat_amount: totals.vat,
-          total: totals.total,
-        })
+        .update(headerPatch)
         .eq("id", order.id);
       if (hErr) throw hErr;
 
@@ -192,6 +202,8 @@ function OrderDetailPage() {
             deleted_items: lines.filter((l) => l._deleted && l.id).length,
             total: totals.total,
           },
+          old_values: { header: prevHeader, items: items ?? [] },
+          new_values: { header: headerPatch, items: lines.filter((x) => !x._deleted) },
         },
       }).catch(() => undefined);
     },
@@ -206,6 +218,7 @@ function OrderDetailPage() {
 
   const setStatus = useMutation({
     mutationFn: async (status: (typeof ORDER_STATUSES)[number]) => {
+      const prevStatus = order?.status ?? null;
       const { error } = await supabase.from("orders").update({ status }).eq("id", id);
       if (error) throw error;
       await logAudit({
@@ -214,6 +227,8 @@ function OrderDetailPage() {
           entity_type: "order",
           entity_id: id,
           metadata: { status },
+          old_values: { status: prevStatus },
+          new_values: { status },
         },
       }).catch(() => undefined);
     },
@@ -270,6 +285,8 @@ function OrderDetailPage() {
           entity_type: "order",
           entity_id: order.id,
           metadata: { invoice_id: inv.id, invoice_type: type, total: totals.total },
+          old_values: null,
+          new_values: { invoice_id: inv.id, invoice_type: type, total: totals.total, line_count: linesToCopy.length },
         },
       }).catch(() => undefined);
       return inv;
@@ -300,6 +317,8 @@ function OrderDetailPage() {
           entity_type: "order",
           entity_id: order.id,
           metadata: { shipment_id: data.id, shipment_number: data.shipment_number },
+          old_values: null,
+          new_values: { shipment_id: data.id, shipment_number: data.shipment_number },
         },
       }).catch(() => undefined);
       return data;
