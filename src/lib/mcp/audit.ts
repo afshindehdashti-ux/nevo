@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { defineTool, type ToolContext } from "@lovable.dev/mcp-js";
+import { assertValidCaller } from "./guard";
 
 // Service-role client — writes audit rows even for unauthenticated calls.
 // Loaded lazily so the MCP entry stays import-safe (no env reads at module load).
@@ -10,14 +11,18 @@ function adminClient() {
 }
 
 /**
- * Wrap a tool definition so every invocation is logged to
- * `public.mcp_tool_invocations` (tool name, caller user id/email, oauth
- * client id, request id, timestamps, duration, status, error, sizes).
- * Never throws; audit failures degrade to console.warn.
+ * Wrap a tool definition so every invocation is:
+ *  1. Validated against issuer/audience/expiry/subject/client claims
+ *     (defense-in-depth on top of mcp-js token verification), unless the
+ *     tool explicitly opts into anonymous access via `allowAnonymous: true`.
+ *  2. Logged to `public.mcp_tool_invocations` (tool name, caller user id/email,
+ *     oauth client id, request id, timestamps, duration, status, error, sizes).
+ * Audit failures degrade to console.warn; guard failures return a tool error.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function withAudit(def: any): any {
   const inner = def.handler;
+  const allowAnonymous = def.allowAnonymous === true;
 
   const wrapped = async (input: unknown, ctx: ToolContext) => {
     const requestId =
