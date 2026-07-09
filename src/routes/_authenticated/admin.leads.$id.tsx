@@ -19,6 +19,7 @@ import {
 import { ArrowLeft, Loader2, UserPlus, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { convertLeadToCustomer } from "@/lib/leads.functions";
+import { logCrmAction } from "@/lib/audit-log.functions";
 import { formatDate } from "@/lib/crm-money";
 import { LEAD_STATUSES } from "./admin.leads";
 
@@ -34,6 +35,7 @@ function LeadDetail() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const convertFn = useServerFn(convertLeadToCustomer);
+  const logAudit = useServerFn(logCrmAction);
 
   const { data: lead, isLoading } = useQuery({
     queryKey: ["lead", id],
@@ -103,6 +105,14 @@ function LeadDetail() {
       };
       const { error } = await supabase.from("project_inquiries").update(patch).eq("id", id);
       if (error) throw error;
+      await logAudit({
+        data: {
+          action: "update",
+          entity_type: "lead",
+          entity_id: id,
+          metadata: { fields: Object.keys(patch) },
+        },
+      }).catch(() => undefined);
     },
     onSuccess: () => {
       toast.success("Lead updated");

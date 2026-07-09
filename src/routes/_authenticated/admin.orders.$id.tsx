@@ -1,8 +1,10 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { logCrmAction } from "@/lib/audit-log.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -55,6 +57,7 @@ type Line = {
 function OrderDetailPage() {
   const { id } = useParams({ from: "/_authenticated/admin/orders/$id" });
   const qc = useQueryClient();
+  const logAudit = useServerFn(logCrmAction);
   const canEdit = useCanEditOrders();
   const canInvoice = useCanEditInvoices();
   const canShip = useCanEditShipments();
@@ -179,6 +182,18 @@ function OrderDetailPage() {
           if (error) throw error;
         }
       }
+      await logAudit({
+        data: {
+          action: "save",
+          entity_type: "order",
+          entity_id: order.id,
+          metadata: {
+            item_count: lines.filter((x) => !x._deleted).length,
+            deleted_items: lines.filter((l) => l._deleted && l.id).length,
+            total: totals.total,
+          },
+        },
+      }).catch(() => undefined);
     },
     onSuccess: () => {
       toast.success("Order saved");
@@ -193,6 +208,14 @@ function OrderDetailPage() {
     mutationFn: async (status: (typeof ORDER_STATUSES)[number]) => {
       const { error } = await supabase.from("orders").update({ status }).eq("id", id);
       if (error) throw error;
+      await logAudit({
+        data: {
+          action: "status_change",
+          entity_type: "order",
+          entity_id: id,
+          metadata: { status },
+        },
+      }).catch(() => undefined);
     },
     onSuccess: () => {
       toast.success("Status updated");
@@ -241,6 +264,14 @@ function OrderDetailPage() {
         const { error: iErr } = await supabase.from("invoice_items").insert(linesToCopy);
         if (iErr) throw iErr;
       }
+      await logAudit({
+        data: {
+          action: "create_invoice_from_order",
+          entity_type: "order",
+          entity_id: order.id,
+          metadata: { invoice_id: inv.id, invoice_type: type, total: totals.total },
+        },
+      }).catch(() => undefined);
       return inv;
     },
     onSuccess: (inv) => {
@@ -263,6 +294,14 @@ function OrderDetailPage() {
         .select()
         .single();
       if (error) throw error;
+      await logAudit({
+        data: {
+          action: "create_shipment",
+          entity_type: "order",
+          entity_id: order.id,
+          metadata: { shipment_id: data.id, shipment_number: data.shipment_number },
+        },
+      }).catch(() => undefined);
       return data;
     },
     onSuccess: (s) => {

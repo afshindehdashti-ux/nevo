@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { writeAudit } from "./audit-log";
 
 const ENTITY_TYPES = [
   "customer",
@@ -71,6 +72,19 @@ export const createCommunication = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "create",
+      entity_type: "communication",
+      entity_id: row!.id,
+      metadata: {
+        parent_entity_type: data.entity_type,
+        parent_entity_id: data.entity_id,
+        kind: data.kind,
+        direction: data.direction,
+        has_attachments: (data.attachments?.length ?? 0) > 0,
+      },
+    });
     return { ok: true, id: row!.id };
   });
 
@@ -96,6 +110,13 @@ export const updateCommunication = createServerFn({ method: "POST" })
       .update(patch)
       .eq("id", id);
     if (error) throw new Error(error.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "update",
+      entity_type: "communication",
+      entity_id: id,
+      metadata: { fields: Object.keys(patch) },
+    });
     return { ok: true };
   });
 
@@ -105,6 +126,13 @@ export const deleteCommunication = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase.from("communications").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "delete",
+      entity_type: "communication",
+      entity_id: data.id,
+      metadata: {},
+    });
     return { ok: true };
   });
 

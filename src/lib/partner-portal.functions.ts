@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { writeAudit } from "./audit-log";
 
 const PartnerScoped = z.object({ partner_id: z.string().uuid() });
 
@@ -31,7 +32,17 @@ export const getMyPartnerContext = createServerFn({ method: "GET" })
       .select("id, company_name, contact_email, country, partner_type, created_at")
       .in("id", ids);
     if (error) throw new Error(error.message);
-    return { partner: partners?.[0] ?? null, allPartners: partners ?? [] };
+    const primary = partners?.[0] ?? null;
+    if (primary) {
+      await writeAudit(context.supabase, {
+        user_id: context.userId,
+        action: "portal_access",
+        entity_type: "partner",
+        entity_id: primary.id,
+        metadata: { portal: "partner", partner_count: partners?.length ?? 0 },
+      });
+    }
+    return { partner: primary, allPartners: partners ?? [] };
   });
 
 export const getMyPartnerLeads = createServerFn({ method: "GET" })
@@ -100,6 +111,13 @@ export const getMyPartnerDocumentUrl = createServerFn({ method: "POST" })
       .from(doc.storage_bucket)
       .createSignedUrl(doc.storage_path, 60 * 10);
     if (sErr) throw new Error(sErr.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "portal_document_access",
+      entity_type: "document",
+      entity_id: data.document_id,
+      metadata: { portal: "partner", partner_id: doc.partner_id, bucket: doc.storage_bucket },
+    });
     return { url: signed?.signedUrl ?? null };
   });
 

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { writeAudit } from "./audit-log";
 
 const ConvertSchema = z.object({
   inquiry_id: z.string().uuid(),
@@ -92,6 +93,18 @@ export const convertLeadToCustomer = createServerFn({ method: "POST" })
         converted_project_id: projectId,
       })
       .eq("id", data.inquiry_id);
+
+    await writeAudit(supabase, {
+      user_id: userId,
+      action: "convert",
+      entity_type: "lead",
+      entity_id: data.inquiry_id,
+      metadata: {
+        customer_id: customerId,
+        project_id: projectId,
+        create_project: data.create_project,
+      },
+    });
 
     return { customer_id: customerId, project_id: projectId };
   });

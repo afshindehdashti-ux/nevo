@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { writeAudit } from "./audit-log";
 
 /**
  * Returns the customer(s) the current signed-in user is linked to via customer_users.
@@ -24,7 +25,17 @@ export const getMyCustomerContext = createServerFn({ method: "GET" })
       )
       .in("id", ids);
     if (error) throw new Error(error.message);
-    return { customer: customers?.[0] ?? null, allCustomers: customers ?? [] };
+    const primary = customers?.[0] ?? null;
+    if (primary) {
+      await writeAudit(context.supabase, {
+        user_id: context.userId,
+        action: "portal_access",
+        entity_type: "customer",
+        entity_id: primary.id,
+        metadata: { portal: "customer", customer_count: customers?.length ?? 0 },
+      });
+    }
+    return { customer: primary, allCustomers: customers ?? [] };
   });
 
 const CustomerScoped = z.object({ customer_id: z.string().uuid() });
@@ -129,6 +140,18 @@ export const getMyDocumentUrl = createServerFn({ method: "POST" })
       .from("documents-private")
       .createSignedUrl(doc.file_path, 300);
     if (sErr) throw new Error(sErr.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "portal_document_access",
+      entity_type: "document",
+      entity_id: data.document_id,
+      metadata: {
+        portal: "customer",
+        file_name: doc.file_name,
+        entity_type: doc.entity_type,
+        entity_id: doc.entity_id,
+      },
+    });
     return { url: signed?.signedUrl ?? null, file_name: doc.file_name };
   });
 
@@ -271,6 +294,13 @@ export const markMyMessagesRead = createServerFn({ method: "POST" })
     if (!toInsert.length) return { marked: 0 };
     const { error } = await admin.from("communication_reads").insert(toInsert);
     if (error) throw new Error(error.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "portal_mark_read",
+      entity_type: "customer",
+      entity_id: data.customer_id,
+      metadata: { portal: "customer", marked: toInsert.length },
+    });
     return { marked: toInsert.length };
   });
 
@@ -370,6 +400,13 @@ export const getMyMessageAttachmentUrl = createServerFn({ method: "POST" })
       .from("crm-docs")
       .createSignedUrl(data.path, 300);
     if (error) throw new Error(error.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "portal_attachment_access",
+      entity_type: "customer",
+      entity_id: data.customer_id,
+      metadata: { portal: "customer", path: data.path },
+    });
     return { url: signed?.signedUrl ?? null };
   });
 
@@ -463,6 +500,19 @@ export const sendMyMessage = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "portal_send_message",
+      entity_type: "communication",
+      entity_id: row!.id,
+      metadata: {
+        portal: "customer",
+        customer_id: data.customer_id,
+        kind: data.kind,
+        parent_id: data.parent_id ?? null,
+        attachment_count: uploaded.length,
+      },
+    });
     return { ok: true, id: row!.id };
   });
 

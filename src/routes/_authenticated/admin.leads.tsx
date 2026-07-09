@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { logCrmAction } from "@/lib/audit-log.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -110,6 +112,7 @@ type Inquiry = {
 
 function LeadsPage() {
   const qc = useQueryClient();
+  const logAudit = useServerFn(logCrmAction);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("open");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
@@ -188,6 +191,14 @@ function LeadsPage() {
       const { id, ...rest } = patch;
       const { error } = await supabase.from("project_inquiries").update(rest).eq("id", id);
       if (error) throw error;
+      await logAudit({
+        data: {
+          action: "update",
+          entity_type: "lead",
+          entity_id: id,
+          metadata: { fields: Object.keys(rest) },
+        },
+      }).catch(() => undefined);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["leads"] });

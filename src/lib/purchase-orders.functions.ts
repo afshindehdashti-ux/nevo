@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { writeAudit } from "./audit-log";
 
 /**
  * Phase 2 CRUD server functions for purchase orders.
@@ -170,17 +171,13 @@ export const createPurchaseOrder = createServerFn({ method: "POST" })
 
     await recalcPurchaseOrderTotalsInternal(context.supabase, inserted.id);
 
-    try {
-      await context.supabase.from("activity_logs").insert({
-        user_id: context.userId,
-        action: "create",
-        entity_type: "purchase_order",
-        entity_id: inserted.id,
-        metadata: { items: data.items.length, currency: data.header.currency },
-      });
-    } catch (err) {
-      console.warn("createPurchaseOrder activity log failed", err);
-    }
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "create",
+      entity_type: "purchase_order",
+      entity_id: inserted.id,
+      metadata: { items: data.items.length, currency: data.header.currency },
+    });
     return { id: inserted.id };
   });
 
@@ -195,6 +192,13 @@ export const updatePurchaseOrderHeader = createServerFn({ method: "POST" })
       .update({ ...data.patch, updated_at: new Date().toISOString(), updated_by: context.userId })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "update_header",
+      entity_type: "purchase_order",
+      entity_id: data.id,
+      metadata: { fields: Object.keys(data.patch) },
+    });
     return { ok: true };
   });
 
@@ -216,6 +220,13 @@ export const addPurchaseOrderItem = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(error.message);
     await recalcPurchaseOrderTotalsInternal(context.supabase, data.order_id);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "add_item",
+      entity_type: "purchase_order",
+      entity_id: data.order_id,
+      metadata: { description: data.description, quantity: data.quantity },
+    });
     return { ok: true };
   });
 
@@ -249,6 +260,13 @@ export const updatePurchaseOrderItem = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (row?.order_id) {
       await recalcPurchaseOrderTotalsInternal(context.supabase, row.order_id);
+      await writeAudit(context.supabase, {
+        user_id: context.userId,
+        action: "update_item",
+        entity_type: "purchase_order",
+        entity_id: row.order_id,
+        metadata: { item_id: data.id, fields: Object.keys(data.patch) },
+      });
     }
     return { ok: true };
   });
@@ -266,6 +284,13 @@ export const removePurchaseOrderItem = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (row?.order_id) {
       await recalcPurchaseOrderTotalsInternal(context.supabase, row.order_id);
+      await writeAudit(context.supabase, {
+        user_id: context.userId,
+        action: "remove_item",
+        entity_type: "purchase_order",
+        entity_id: row.order_id,
+        metadata: { item_id: data.id },
+      });
     }
     return { ok: true };
   });
@@ -319,7 +344,19 @@ export const savePurchaseOrder = createServerFn({ method: "POST" })
         if (error) throw new Error(error.message);
       }
     }
-    return recalcPurchaseOrderTotalsInternal(context.supabase, data.id);
+    const totals = await recalcPurchaseOrderTotalsInternal(context.supabase, data.id);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "save",
+      entity_type: "purchase_order",
+      entity_id: data.id,
+      metadata: {
+        header_fields: Object.keys(data.header),
+        item_count: data.items.length,
+        total: totals.total,
+      },
+    });
+    return totals;
   });
 
 export const deletePurchaseOrder = createServerFn({ method: "POST" })
@@ -329,16 +366,13 @@ export const deletePurchaseOrder = createServerFn({ method: "POST" })
     await context.supabase.from("order_items").delete().eq("order_id", data.id);
     const { error } = await context.supabase.from("orders").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
-    try {
-      await context.supabase.from("activity_logs").insert({
-        user_id: context.userId,
-        action: "delete",
-        entity_type: "purchase_order",
-        entity_id: data.id,
-        metadata: {},
-      });
-    } catch (err) {
-      console.warn("deletePurchaseOrder activity log failed", err);
-    }
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "delete",
+      entity_type: "purchase_order",
+      entity_id: data.id,
+      metadata: {},
+    });
     return { ok: true };
   });
+
