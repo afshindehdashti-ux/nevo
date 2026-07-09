@@ -297,8 +297,6 @@ describe("RootComponent backend CTA gate", () => {
       await expectCtas(false);
     }
   });
-});
-
 
   it("never renders the CTAs while the pathname is a backend route (no flash during client-side transitions)", async () => {
     // If the gate ever lags the router by even one render, we'll see a
