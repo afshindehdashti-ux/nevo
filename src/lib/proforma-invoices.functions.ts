@@ -88,10 +88,7 @@ export const getProformaInvoice = createServerFn({ method: "GET" })
     return { header, items: items ?? [] };
   });
 
-async function recalcProformaTotalsInternal(
-  supabase: ReturnType<typeof requireSupabaseAuth> extends never ? never : any,
-  id: string,
-) {
+async function recalcProformaTotalsInternal(supabase: any, id: string) {
   const { data: items, error } = await supabase
     .from("proforma_invoice_items")
     .select("line_total, quantity, unit_price, discount, discount_amount, tax_rate")
