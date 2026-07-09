@@ -9,14 +9,26 @@ import { resolveLandingRoute } from "@/lib/role-landing";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: typeof s.next === "string" ? s.next : undefined,
+  }),
   head: () => ({
     meta: [{ title: "Sign in — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   component: AuthPage,
 });
 
+// Only allow same-origin relative paths as post-signin targets.
+function safeNext(next: string | undefined): string | null {
+  if (!next || typeof next !== "string") return null;
+  if (!next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
+
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
+  const nextTarget = safeNext(next);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,11 +39,15 @@ function AuthPage() {
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
       if (data.user) {
+        if (nextTarget) {
+          window.location.assign(nextTarget);
+          return;
+        }
         const to = await resolveLandingRoute(data.user.id);
         navigate({ to });
       }
     });
-  }, [navigate]);
+  }, [navigate, nextTarget]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,6 +64,10 @@ function AuthPage() {
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        if (nextTarget) {
+          window.location.assign(nextTarget);
+          return;
+        }
         const to = data.user ? await resolveLandingRoute(data.user.id) : "/admin";
         navigate({ to });
       }
