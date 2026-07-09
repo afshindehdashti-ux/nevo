@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { financePaidAmount } from "./finance-normalization";
 
 /**
  * Phase 2 CRUD server functions for commercial invoices.

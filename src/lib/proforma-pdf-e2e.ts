@@ -8,6 +8,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "./crm-money";
+import { financeTotalAmount } from "./finance-normalization";
 import {
   fetchProformaForPdf,
   generateProformaInvoicePdf,

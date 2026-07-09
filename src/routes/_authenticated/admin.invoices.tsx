@@ -31,6 +31,7 @@ import { formatDate, formatMoney } from "@/lib/crm-money";
 import {
   customerDisplayName,
   financeBalanceDue,
+  financeTotalAmount,
   type CustomerDisplay,
 } from "@/lib/finance-normalization";
 import {
