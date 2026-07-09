@@ -73,3 +73,61 @@ test.describe("Backend routes: CTAs never appear on hard refresh", () => {
     });
   }
 });
+
+test.describe("Backend routes: CTAs are not reachable via keyboard focus", () => {
+  // A hidden-but-present element (e.g. `display: none` toggled by CSS
+  // rather than unmounted from React) would still pass the DOM check
+  // above but could remain in the accessibility tree and be reachable
+  // via Tab. This suite tabs through every focusable element on each
+  // backend route and asserts none of the CTA selectors ever receive
+  // focus.
+  for (const path of BACKEND_PATHS) {
+    test(`tab traversal on ${path} never lands on a public CTA`, async ({ page }) => {
+      await page.goto(path, { waitUntil: "domcontentloaded" });
+      await page.waitForLoadState("networkidle");
+
+      // Belt-and-braces: assert not-in-DOM before checking focus.
+      await assertNoCtas(page, `before tab traversal on ${path}`);
+
+      // Focus body so Tab starts from a known baseline.
+      await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+      await page.locator("body").focus();
+
+      const CTA_SELECTOR_UNION = CTA_SELECTORS.join(", ");
+      const visitedSignatures = new Set<string>();
+
+      // Cap iterations so a focus trap can't hang the test. 200 is far
+      // more than any real backend page's focusable count; break early
+      // once we cycle back to a previously-seen element.
+      const MAX_TABS = 200;
+      for (let i = 0; i < MAX_TABS; i++) {
+        await page.keyboard.press("Tab");
+
+        // Read the currently focused element's identity and check whether
+        // it matches (or is contained within) any CTA selector.
+        const info = await page.evaluate((ctaSelector) => {
+          const el = document.activeElement as HTMLElement | null;
+          if (!el || el === document.body) return { sig: "__body__", matchesCta: false };
+          const sig =
+            (el.tagName || "") +
+            "#" + (el.id || "") +
+            "." + (el.className?.toString?.() || "") +
+            "@" + (el.getAttribute("aria-label") || "") +
+            "$" + (el.textContent?.slice(0, 40) || "");
+          const matchesCta = !!(el.closest(ctaSelector) || el.matches(ctaSelector));
+          return { sig, matchesCta };
+        }, CTA_SELECTOR_UNION);
+
+        expect(
+          info.matchesCta,
+          `Tab reached a public CTA on ${path} at step ${i} (signature: ${info.sig})`,
+        ).toBe(false);
+
+        // Stop once focus cycles.
+        if (visitedSignatures.has(info.sig)) break;
+        visitedSignatures.add(info.sig);
+      }
+    });
+  }
+});
+
