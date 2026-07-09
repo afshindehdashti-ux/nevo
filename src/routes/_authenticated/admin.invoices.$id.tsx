@@ -1967,10 +1967,10 @@ function InvoiceDetailPage() {
               </div>
               {cust && (
                 <div className="text-xs text-muted-foreground border-t pt-2">
-                  <p className="font-medium text-foreground">{cust.name}</p>
-                  {cust.address && <p>{cust.address}</p>}
+                  <p className="font-medium text-foreground">{customerDisplayName(cust)}</p>
+                  {customerBillingAddress(cust) && <p>{customerBillingAddress(cust)}</p>}
                   <p>{[cust.city, cust.country].filter(Boolean).join(", ")}</p>
-                  {cust.vat_number && <p>VAT: {cust.vat_number}</p>}
+                  {customerVatNumber(cust) && <p>VAT: {customerVatNumber(cust)}</p>}
                   {cust.email && <p>{cust.email}</p>}
                 </div>
               )}
