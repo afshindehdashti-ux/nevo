@@ -321,10 +321,10 @@ function CustomerDetailPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatMoney(i.total, i.currency)}
+                        {formatMoney(financeTotalAmount(i), i.currency)}
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatMoney(i.balance, i.currency)}
+                        {formatMoney(financeBalanceDue(i), i.currency)}
                       </TableCell>
                     </TableRow>
                   ))}
