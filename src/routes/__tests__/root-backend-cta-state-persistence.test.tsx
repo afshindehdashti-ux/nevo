@@ -134,6 +134,7 @@ describe("Public marketing chrome — state does not persist across the backend 
   it("closes an open Ask AI drawer when navigating from public into /admin", async () => {
     const router = makeRouter("/");
     render(<RouterProvider router={router} />);
+    await waitFor(() => expect(screen.getByTestId("ask-ai-launcher")).toBeTruthy());
 
     // Open the drawer on the public page.
     fireEvent.click(screen.getByTestId("ask-ai-launcher"));
@@ -173,6 +174,7 @@ describe("Public marketing chrome — state does not persist across the backend 
     it(`resets sticky mobile CTA dismissed state across public → ${label} → public`, async () => {
       const router = makeRouter("/");
       render(<RouterProvider router={router} />);
+      await waitFor(() => expect(screen.getByTestId("sticky-cta")).toBeTruthy());
 
       // Dismiss on the public page.
       fireEvent.click(screen.getByTestId("sticky-cta"));
@@ -204,6 +206,7 @@ describe("Public marketing chrome — state does not persist across the backend 
   it("does not carry drawer/CTA state across three-way public → /crm → public → /backoffice trips", async () => {
     const router = makeRouter("/");
     render(<RouterProvider router={router} />);
+    await waitFor(() => expect(screen.getByTestId("ask-ai-launcher")).toBeTruthy());
 
     // Open drawer + dismiss sticky on the public page.
     fireEvent.click(screen.getByTestId("ask-ai-launcher"));
