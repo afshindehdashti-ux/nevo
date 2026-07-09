@@ -189,39 +189,172 @@ export const removeFinanceDocumentItem = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ---- Status transition state machine -----------------------------------
+// "calculated" is not a persisted enum value in the DB; it's an implicit
+// gate — draft docs with a non-zero grand_total and complete counterparty
+// data are considered "calculated" and eligible for issue.
+const TRANSITIONS: Record<string, string[]> = {
+  draft: ["pending_approval", "issued", "cancelled"],
+  pending_approval: ["approved", "draft", "cancelled"],
+  approved: ["issued", "draft", "cancelled"],
+  issued: ["sent", "partially_paid", "paid", "overdue", "converted", "cancelled", "void"],
+  sent: ["partially_paid", "paid", "overdue", "converted", "cancelled", "void"],
+  partially_paid: ["paid", "overdue", "void"],
+  overdue: ["partially_paid", "paid", "void"],
+  paid: ["converted", "void"],
+  converted: ["void"],
+  cancelled: ["draft"],
+  void: [],
+};
+
+// Which roles can perform status changes on which document types.
+// admin/super_admin/management/finance can do everything; sales owns the
+// quotation lifecycle; operations owns purchase orders; read_only cannot.
+const STATUS_ROLES: Record<string, string[]> = {
+  quotation: ["admin", "super_admin", "management", "finance", "sales"],
+  proforma_invoice: ["admin", "super_admin", "management", "finance", "sales"],
+  commercial_invoice: ["admin", "super_admin", "management", "finance"],
+  purchase_order: ["admin", "super_admin", "management", "finance", "operations"],
+  commission_invoice: ["admin", "super_admin", "management", "finance"],
+};
+
+async function userHasAnyRole(
+  supabase: any,
+  userId: string,
+  roles: string[],
+): Promise<boolean> {
+  for (const role of roles) {
+    const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: role });
+    if (data === true) return true;
+  }
+  return false;
+}
+
+async function writeStatusLog(
+  supabase: any,
+  userId: string,
+  doc: { id: string; document_type: string; document_number?: string | null },
+  from: string,
+  to: string,
+  reason: string | null,
+) {
+  try {
+    await supabase.from("activity_logs").insert({
+      user_id: userId,
+      action: "status_change",
+      entity_type: `finance_document:${doc.document_type}`,
+      entity_id: doc.id,
+      metadata: {
+        document_number: doc.document_number ?? null,
+        from_status: from,
+        to_status: to,
+        reason: reason ?? null,
+      },
+    });
+  } catch (err) {
+    console.warn("finance status_change activity log failed", err);
+  }
+}
+
 export const changeFinanceDocumentStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) =>
-    z.object({ id: z.string().uuid(), status: DocStatus }).parse(v)
+    z
+      .object({
+        id: z.string().uuid(),
+        status: DocStatus,
+        reason: z.string().max(500).nullable().optional(),
+      })
+      .parse(v),
   )
   .handler(async ({ data, context }) => {
     const { data: doc, error: fErr } = await context.supabase
       .from("finance_documents")
-      .select("id, document_type, grand_total, customer_id, supplier_id, partner_id")
+      .select(
+        "id, document_type, document_number, status, grand_total, customer_id, supplier_id, partner_id",
+      )
       .eq("id", data.id)
       .maybeSingle();
     if (fErr) throw new Error(fErr.message);
     if (!doc) throw new Error("Document not found");
 
-    // Guardrails: cannot issue/send zero-total docs, must have counterparty
-    if (["issued", "sent", "approved"].includes(data.status)) {
+    const from = doc.status as string;
+    const to = data.status;
+    if (from === to) return { ok: true, unchanged: true };
+
+    // Permission check
+    const allowedRoles = STATUS_ROLES[doc.document_type] ?? [
+      "admin",
+      "super_admin",
+      "management",
+      "finance",
+    ];
+    const permitted = await userHasAnyRole(context.supabase, context.userId, allowedRoles);
+    if (!permitted) {
+      throw new Error(
+        `Your role is not permitted to change the status of ${doc.document_type.replace("_", " ")} documents`,
+      );
+    }
+
+    // Transition validity
+    const allowedNext = TRANSITIONS[from] ?? [];
+    if (!allowedNext.includes(to)) {
+      throw new Error(`Cannot transition from "${from}" to "${to}"`);
+    }
+
+    // Guardrails when moving into an externally-visible state
+    if (["issued", "sent", "approved"].includes(to)) {
       if (Number(doc.grand_total) <= 0) {
-        throw new Error("Cannot issue a document with a zero total");
+        throw new Error("Document total must be greater than zero — recalculate before issuing");
       }
       const needsCustomer = ["quotation", "proforma_invoice", "commercial_invoice"].includes(
-        doc.document_type
+        doc.document_type,
       );
       if (needsCustomer && !doc.customer_id) throw new Error("Missing customer");
-      if (doc.document_type === "purchase_order" && !doc.supplier_id) throw new Error("Missing supplier");
-      if (doc.document_type === "commission_invoice" && !doc.partner_id) throw new Error("Missing partner");
+      if (doc.document_type === "purchase_order" && !doc.supplier_id)
+        throw new Error("Missing supplier");
+      if (doc.document_type === "commission_invoice" && !doc.partner_id)
+        throw new Error("Missing partner");
     }
 
     const { error } = await context.supabase
       .from("finance_documents")
-      .update({ status: data.status, updated_by: context.userId })
+      .update({ status: to, updated_by: context.userId })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
-    return { ok: true };
+
+    await writeStatusLog(context.supabase, context.userId, doc as any, from, to, data.reason ?? null);
+    return { ok: true, from, to };
+  });
+
+/**
+ * Report allowed next statuses for a document based on current status,
+ * document type, and the caller's roles. UI uses this to render the
+ * status-change menu without duplicating the transition matrix.
+ */
+export const getAllowedStatusTransitions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v: { id: string }) => z.object({ id: z.string().uuid() }).parse(v))
+  .handler(async ({ data, context }) => {
+    const { data: doc, error } = await context.supabase
+      .from("finance_documents")
+      .select("id, document_type, status")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!doc) throw new Error("Document not found");
+    const allowedRoles = STATUS_ROLES[doc.document_type] ?? [
+      "admin",
+      "super_admin",
+      "management",
+      "finance",
+    ];
+    const permitted = await userHasAnyRole(context.supabase, context.userId, allowedRoles);
+    return {
+      current: doc.status,
+      allowed: permitted ? TRANSITIONS[doc.status as string] ?? [] : [],
+      permitted,
+    };
   });
 
 const CONVERSION_MAP: Record<string, string[]> = {
