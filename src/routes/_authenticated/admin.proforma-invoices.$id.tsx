@@ -298,6 +298,15 @@ function ProformaInvoiceDetail() {
         </div>
       </div>
 
+      <ProformaItemsCard
+        proformaId={id}
+        currency={pi.currency}
+        onChanged={() => {
+          qc.invalidateQueries({ queryKey: ["proforma_invoice", id] });
+          qc.invalidateQueries({ queryKey: ["proforma_invoices", "list"] });
+        }}
+      />
+
       <div className="grid md:grid-cols-3 gap-4">
         <Card className="md:col-span-2">
           <CardHeader>
