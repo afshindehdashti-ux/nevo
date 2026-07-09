@@ -388,8 +388,8 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                   i.issue_date,
                   i.due_date ?? "—",
                   <Badge variant="outline">{i.status}</Badge>,
-                  <span className="tabular-nums">{i.currency} {Number(i.total).toLocaleString()}</span>,
-                  <span className="tabular-nums">{i.currency} {Number(i.balance).toLocaleString()}</span>,
+                  <span className="tabular-nums">{i.currency} {financeTotalAmount(i).toLocaleString()}</span>,
+                  <span className="tabular-nums">{i.currency} {financeBalanceDue(i).toLocaleString()}</span>,
                 ])}
               />
             </Card>
