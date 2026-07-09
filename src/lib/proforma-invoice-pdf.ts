@@ -158,6 +158,13 @@ export async function generateProformaInvoicePdf(
   proformaId: string,
   mode: "download" | "blob" = "download",
 ): Promise<ProformaPdfResult> {
+  const { assertDocumentReadyForPdf } = await import(
+    "./document-pdf-validation.functions"
+  );
+  await assertDocumentReadyForPdf({
+    data: { kind: "proforma_invoice", id: proformaId },
+  });
+
   const [{ pi, items }, company] = await Promise.all([
     fetchProformaForPdf(proformaId),
     loadCompany(),

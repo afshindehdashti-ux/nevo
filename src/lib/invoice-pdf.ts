@@ -176,6 +176,12 @@ export async function generateInvoicePdf(
   invoiceId: string,
   mode: "download" | "blob" = "download",
 ): Promise<InvoicePdfResult> {
+  // Server-side gate: refuses to render for incomplete or zero-total docs.
+  const { assertDocumentReadyForPdf } = await import(
+    "./document-pdf-validation.functions"
+  );
+  await assertDocumentReadyForPdf({ data: { kind: "invoice", id: invoiceId } });
+
   const [{ invoice, items }, company] = await Promise.all([
     fetchInvoiceForPdf(invoiceId),
     loadCompany(),

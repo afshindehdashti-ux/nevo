@@ -57,6 +57,12 @@ export function QuotationEmailDialog({ open, onOpenChange, quotation, items, onS
     mutationFn: async () => {
       const errs = validateQuotationForPdf(quotation, items);
       if (errs.length) throw new Error(errs.join(" · "));
+      const { assertDocumentReadyForPdf } = await import(
+        "@/lib/document-pdf-validation.functions"
+      );
+      await assertDocumentReadyForPdf({
+        data: { kind: "quotation", id: quotation.id },
+      });
       const seller = await loadSellerSettings();
       const { base64, filename } = buildQuotationPdf(quotation, items, seller);
       return sendFn({
