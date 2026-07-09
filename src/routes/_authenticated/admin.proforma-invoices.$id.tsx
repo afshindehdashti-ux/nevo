@@ -8,10 +8,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, FileDown, Loader2, Save, ShieldCheck, Wallet } from "lucide-react";
+import { ArrowLeft, FileDown, Loader2, Plus, Save, ShieldCheck, Trash2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import { generateProformaInvoicePdf } from "@/lib/proforma-invoice-pdf";
+
+type ItemRow = {
+  id: string;
+  description: string;
+  item_code: string | null;
+  quantity: number;
+  unit: string;
+  unit_price: number;
+  discount: number;
+  discount_amount: number;
+  tax_rate: number;
+  line_total: number;
+  sort_order: number;
+};
 
 export const Route = createFileRoute("/_authenticated/admin/proforma-invoices/$id")({
   head: () => ({
