@@ -50,11 +50,21 @@ export function withAudit(def: any): any {
     let errorMessage: string | null = null;
 
     try {
-      result = await inner(input, ctx);
-      if (result?.isError) {
-        status = !authed ? "unauthorized" : "error";
-        const first = result.content?.find?.((c: { type: string; text?: string }) => c.type === "text");
-        errorMessage = typeof first?.text === "string" ? first.text.slice(0, 1000) : null;
+      if (!allowAnonymous) {
+        const guard = assertValidCaller(ctx);
+        if (!guard.ok) {
+          status = "unauthorized";
+          errorMessage = guard.error.content[0].text.slice(0, 1000);
+          result = guard.error;
+        }
+      }
+      if (!result) {
+        result = await inner(input, ctx);
+        if (result?.isError) {
+          status = !ctx.isAuthenticated() ? "unauthorized" : "error";
+          const first = result.content?.find?.((c: { type: string; text?: string }) => c.type === "text");
+          errorMessage = typeof first?.text === "string" ? first.text.slice(0, 1000) : null;
+        }
       }
     } catch (err) {
       status = "error";
