@@ -285,6 +285,8 @@ function OrderDetailPage() {
           entity_type: "order",
           entity_id: order.id,
           metadata: { invoice_id: inv.id, invoice_type: type, total: totals.total },
+          old_values: null,
+          new_values: { invoice_id: inv.id, invoice_type: type, total: totals.total, line_count: linesToCopy.length },
         },
       }).catch(() => undefined);
       return inv;
