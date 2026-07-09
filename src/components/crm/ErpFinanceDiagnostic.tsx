@@ -535,6 +535,54 @@ export function ErpFinanceDiagnostic() {
         </Card>
       )}
 
+      {quoteImp && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileInput className="h-5 w-5" />
+              Quotation Import e2e
+              <StatusBadge status={quoteImp.failed === 0 ? "pass" : "fail"} />
+            </CardTitle>
+            <CardDescription>
+              Run <code>{quoteImp.runId.slice(0, 8)}</code> · exercises the real
+              <code className="mx-1">runImportJob</code> server function through three
+              scenarios: happy-path totals, existing-customer reuse (case-insensitive),
+              and validation failures that must not leave partial rows. All test data
+              is cleaned up and orphan-verified afterwards.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex flex-wrap gap-4 text-sm">
+              <span className="text-emerald-600 font-medium">{quoteImp.passed} PASS</span>
+              <span className="text-amber-500 font-medium">{quoteImp.warned} WARN</span>
+              <span className="text-red-600 font-medium">{quoteImp.failed} FAIL</span>
+            </div>
+            <ol className="space-y-2">
+              {quoteImp.steps.map((s, i) => (
+                <li key={s.key} className="flex items-start gap-3 rounded-md border p-3">
+                  <span className="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-muted text-center text-xs leading-5">
+                    {i + 1}
+                  </span>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-medium text-sm">{s.label}</div>
+                      <StatusBadge status={s.status} />
+                    </div>
+                    <div className="text-xs text-muted-foreground break-words">{s.message}</div>
+                    {s.details && (
+                      <pre className="mt-1 overflow-x-auto rounded bg-muted p-2 text-xs">
+                        {JSON.stringify(s.details, null, 2)}
+                      </pre>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
+
+
 
 
 
