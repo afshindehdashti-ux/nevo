@@ -156,4 +156,95 @@ describe("RootComponent backend CTA gate", () => {
     render(<RouterProvider router={router} />);
     await expectCtas(true);
   });
+
+  it("never renders the CTAs while the pathname is a backend route (no flash during client-side transitions)", async () => {
+    // If the gate ever lags the router by even one render, we'll see a
+    // backend pathname in these logs — exactly the flash to guard against.
+    const renderLog: { component: "ask-ai" | "sticky-cta"; pathname: string }[] = [];
+
+    function useCurrentPathname() {
+      return useRouterState({ select: (s) => s.location.pathname });
+    }
+    function LoggedAskAi() {
+      const pathname = useCurrentPathname();
+      renderLog.push({ component: "ask-ai", pathname });
+      return <div data-testid="ask-ai">Ask AI</div>;
+    }
+    function LoggedSticky() {
+      const pathname = useCurrentPathname();
+      renderLog.push({ component: "sticky-cta", pathname });
+      return <div data-testid="sticky-cta">Get a quote</div>;
+    }
+    function InstrumentedRoot() {
+      const pathname = useCurrentPathname();
+      const isBackend = BACKEND_PATTERN.test(pathname);
+      return (
+        <>
+          <Outlet />
+          {!isBackend && <LoggedAskAi />}
+          {!isBackend && <LoggedSticky />}
+        </>
+      );
+    }
+
+    const rootRoute = createRootRoute({ component: InstrumentedRoot });
+    const routes = [
+      createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <div>home</div> }),
+      createRoute({ getParentRoute: () => rootRoute, path: "/about", component: () => <div>about</div> }),
+      createRoute({ getParentRoute: () => rootRoute, path: "/admin/$", component: () => <div>admin</div> }),
+      createRoute({ getParentRoute: () => rootRoute, path: "/crm/$", component: () => <div>crm</div> }),
+      createRoute({ getParentRoute: () => rootRoute, path: "/backoffice/$", component: () => <div>backoffice</div> }),
+    ];
+    const router = createRouter({
+      routeTree: rootRoute.addChildren(routes),
+      history: createMemoryHistory({ initialEntries: ["/"] }),
+      defaultPreload: false,
+    });
+
+    // MutationObserver catches any moment the CTA nodes exist in the DOM
+    // while the router pathname is on a backend route — this catches
+    // flashes that happen between React commits.
+    const domViolations: { pathname: string; testid: string }[] = [];
+    const observer = new MutationObserver(() => {
+      const pathname = router.state.location.pathname;
+      if (!BACKEND_PATTERN.test(pathname)) return;
+      for (const testid of ["ask-ai", "sticky-cta"]) {
+        if (document.querySelector(`[data-testid="${testid}"]`)) {
+          domViolations.push({ pathname, testid });
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    render(<RouterProvider router={router} />);
+    await expectCtas(true);
+
+    const go = async (to: string, splat?: string) => {
+      await act(async () => {
+        if (splat !== undefined) {
+          await router.navigate({ to: to as "/admin/$", params: { _splat: splat } });
+        } else {
+          await router.navigate({ to });
+        }
+      });
+    };
+    await go("/admin/$", "dashboard");
+    await expectCtas(false);
+    await go("/about");
+    await expectCtas(true);
+    await go("/crm/$", "leads");
+    await expectCtas(false);
+    await go("/");
+    await expectCtas(true);
+    await go("/backoffice/$", "tools");
+    await expectCtas(false);
+    await go("/about");
+    await expectCtas(true);
+
+    observer.disconnect();
+
+    const renderFlashes = renderLog.filter((e) => BACKEND_PATTERN.test(e.pathname));
+    expect(renderFlashes).toEqual([]);
+    expect(domViolations).toEqual([]);
+  });
 });
