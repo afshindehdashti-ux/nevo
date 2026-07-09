@@ -54,10 +54,18 @@ function QuotationsPage() {
             proforma or commercial invoices.
           </p>
         </div>
-        <Button onClick={() => setDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          New quotation
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link to="/admin/quotations/new">
+              <Plus className="h-4 w-4 mr-2" />
+              Manual entry
+            </Link>
+          </Button>
+          <Button onClick={() => setDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            New quotation
+          </Button>
+        </div>
       </div>
 
       <NewQuotationDialog open={dialogOpen} onOpenChange={setDialogOpen} />
