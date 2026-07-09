@@ -6,6 +6,7 @@
  * All tags are 100% opt-in. No requests are sent without consent.
  */
 import { useEffect, useState } from "react";
+import { useIsBackend } from "@/lib/use-route-area";
 
 const ENV = import.meta.env;
 
