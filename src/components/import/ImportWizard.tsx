@@ -111,8 +111,9 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Wizard supports {Object.keys(IMPORT_SCHEMAS).length} entity types today (Customers, Contacts,
-              Leads, Suppliers, Products). More coming.
+              Wizard supports {Object.keys(IMPORT_SCHEMAS).length} entity types today (Customers,
+              Contacts, Leads, Suppliers, Products, Quotations). Quotations import groups rows by
+              quotation number into one header + line items.
             </p>
             <DialogFooter>
               <Button onClick={() => setStep("upload")}>Next <ArrowRight className="ml-1 h-4 w-4" /></Button>
