@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { runErpQa, runErpFinanceTest, runProformaE2eIsolated } from "@/lib/erp-qa.functions";
+import {
+  runErpQa,
+  runErpFinanceTest,
+  runProformaE2eIsolated,
+  runProformaTriggerRecomputeTest,
+} from "@/lib/erp-qa.functions";
 import {
   assertLatestProformaPdf,
   type PdfE2eReport,
