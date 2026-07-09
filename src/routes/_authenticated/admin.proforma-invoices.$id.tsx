@@ -615,7 +615,7 @@ function ProformaItemsCard({
       }
       const { error } = await supabase
         .from("proforma_invoice_items")
-        .update(clean)
+        .update(clean as never)
         .eq("id", row.id);
       if (error) throw error;
     },
