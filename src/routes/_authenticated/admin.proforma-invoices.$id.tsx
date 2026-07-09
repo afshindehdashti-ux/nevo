@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, FileDown, Loader2, Plus, Save, ShieldCheck, Trash2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate, formatMoney } from "@/lib/crm-money";
+import { customerDisplayName, type CustomerDisplay } from "@/lib/finance-normalization";
 import { generateProformaInvoicePdf } from "@/lib/proforma-invoice-pdf";
 
 type ItemRow = {
@@ -72,7 +73,7 @@ type ProformaRow = {
   notes: string | null;
   approved_by: string | null;
   prepared_by: string | null;
-  customers: { id: string; name: string | null } | null;
+  customers: (CustomerDisplay & { id: string }) | null;
 };
 
 function ProformaInvoiceDetail() {
@@ -90,7 +91,7 @@ function ProformaInvoiceDetail() {
            subtotal, discount_amount, vat_rate, vat_amount, grand_total,
            amount_paid, balance_due, payment_status, payment_terms, delivery_terms,
            incoterms, terms_conditions, bank_details, notes, approved_by, prepared_by,
-           customers(id, name)`,
+           customers(id, name, company_name, email)`,
         )
         .eq("id", id)
         .maybeSingle();
@@ -263,7 +264,7 @@ function ProformaInvoiceDetail() {
             <Badge variant={paymentBadge}>{pi.payment_status ?? "Unpaid"}</Badge>
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Customer: {pi.customers?.name ?? "—"} · Issued {formatDate(pi.created_at)}
+            Customer: {customerDisplayName(pi.customers)} · Issued {formatDate(pi.created_at)}
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
