@@ -138,9 +138,10 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Wizard supports {Object.keys(IMPORT_SCHEMAS).length} entity types today (Customers,
-              Contacts, Leads, Suppliers, Products, Quotations). Quotations import groups rows by
-              quotation number into one header + line items.
+              Wizard supports {Object.keys(IMPORT_SCHEMAS).length} entity types. Document imports
+              (quotations, proformas, invoices, orders, shipments) group rows sharing a document
+              number into one header with line items and recalculate subtotal / VAT / total from
+              the lines.
             </p>
             <DialogFooter>
               <Button onClick={() => setStep("upload")}>Next <ArrowRight className="ml-1 h-4 w-4" /></Button>
