@@ -535,3 +535,263 @@ function Row({
     </div>
   );
 }
+
+function ProformaItemsCard({
+  proformaId,
+  currency,
+  onChanged,
+}: {
+  proformaId: string;
+  currency: string;
+  onChanged: () => void;
+}) {
+  const qc = useQueryClient();
+  const { data: items, isLoading } = useQuery({
+    queryKey: ["proforma_items", proformaId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("proforma_invoice_items")
+        .select(
+          "id, description, item_code, quantity, unit, unit_price, discount, discount_amount, tax_rate, line_total, sort_order",
+        )
+        .eq("proforma_invoice_id", proformaId)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as ItemRow[];
+    },
+  });
+
+  const [drafts, setDrafts] = useState<Record<string, Partial<ItemRow>>>({});
+  const dirty = (row: ItemRow) => drafts[row.id] !== undefined;
+  const merged = (row: ItemRow): ItemRow => ({ ...row, ...(drafts[row.id] ?? {}) });
+
+  const setField = <K extends keyof ItemRow>(id: string, key: K, val: ItemRow[K]) =>
+    setDrafts((d) => ({ ...d, [id]: { ...(d[id] ?? {}), [key]: val } }));
+
+  const previewLine = (r: ItemRow) => {
+    const gross = Number(r.quantity || 0) * Number(r.unit_price || 0);
+    const discAmt = Number(r.discount_amount || 0);
+    const discPct = gross * Number(r.discount || 0) / 100;
+    const disc = discAmt > 0 ? discAmt : discPct;
+    const taxable = Math.max(gross - disc, 0);
+    const tax = taxable * Number(r.tax_rate || 0) / 100;
+    return Math.round((taxable + tax) * 100) / 100;
+  };
+
+  const addItem = useMutation({
+    mutationFn: async () => {
+      const nextOrder = (items?.length ?? 0);
+      const { error } = await supabase.from("proforma_invoice_items").insert({
+        proforma_invoice_id: proformaId,
+        description: "New line item",
+        quantity: 1,
+        unit: "pcs",
+        unit_price: 0,
+        discount: 0,
+        discount_amount: 0,
+        tax_rate: 0,
+        sort_order: nextOrder,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["proforma_items", proformaId] });
+      onChanged();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Add failed"),
+  });
+
+  const saveRow = useMutation({
+    mutationFn: async (row: ItemRow) => {
+      const patch = drafts[row.id];
+      if (!patch) return;
+      const clean: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(patch)) {
+        if (["quantity", "unit_price", "discount", "discount_amount", "tax_rate"].includes(k)) {
+          clean[k] = Number(v ?? 0);
+        } else {
+          clean[k] = v;
+        }
+      }
+      const { error } = await supabase
+        .from("proforma_invoice_items")
+        .update(clean)
+        .eq("id", row.id);
+      if (error) throw error;
+    },
+    onSuccess: (_d, row) => {
+      setDrafts((d) => {
+        const { [row.id]: _drop, ...rest } = d;
+        return rest;
+      });
+      qc.invalidateQueries({ queryKey: ["proforma_items", proformaId] });
+      onChanged();
+      toast.success("Line saved · totals recomputed");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
+  });
+
+  const deleteRow = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("proforma_invoice_items").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["proforma_items", proformaId] });
+      onChanged();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Delete failed"),
+  });
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <div>
+          <CardTitle className="text-base">Line items</CardTitle>
+          <p className="text-xs text-muted-foreground mt-1">
+            Discount % is applied per line unless a fixed discount amount is set (amount wins).
+            Tax rate is applied on the taxable base (gross − discount). Header VAT %, discount
+            total, and grand total recompute on every save via database triggers.
+          </p>
+        </div>
+        <Button size="sm" onClick={() => addItem.mutate()} disabled={addItem.isPending}>
+          <Plus className="h-4 w-4 mr-1" /> Add line
+        </Button>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading items…
+          </div>
+        ) : (items ?? []).length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No line items yet. Click <strong>Add line</strong> to start.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-xs text-muted-foreground border-b">
+                <tr>
+                  <th className="text-left py-2 pr-2 min-w-[180px]">Description</th>
+                  <th className="text-right py-2 px-2 w-20">Qty</th>
+                  <th className="text-left py-2 px-2 w-20">Unit</th>
+                  <th className="text-right py-2 px-2 w-28">Unit price</th>
+                  <th className="text-right py-2 px-2 w-20">Disc %</th>
+                  <th className="text-right py-2 px-2 w-28">Disc amt</th>
+                  <th className="text-right py-2 px-2 w-20">Tax %</th>
+                  <th className="text-right py-2 px-2 w-32">Line total</th>
+                  <th className="py-2 pl-2 w-24" />
+                </tr>
+              </thead>
+              <tbody>
+                {(items ?? []).map((row) => {
+                  const m = merged(row);
+                  const preview = previewLine(m);
+                  return (
+                    <tr key={row.id} className="border-b last:border-0">
+                      <td className="py-2 pr-2">
+                        <Input
+                          value={m.description}
+                          onChange={(e) => setField(row.id, "description", e.target.value)}
+                        />
+                      </td>
+                      <td className="py-2 px-2">
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.001"
+                          className="text-right"
+                          value={m.quantity}
+                          onChange={(e) => setField(row.id, "quantity", Number(e.target.value))}
+                        />
+                      </td>
+                      <td className="py-2 px-2">
+                        <Input
+                          value={m.unit}
+                          onChange={(e) => setField(row.id, "unit", e.target.value)}
+                        />
+                      </td>
+                      <td className="py-2 px-2">
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.0001"
+                          className="text-right"
+                          value={m.unit_price}
+                          onChange={(e) => setField(row.id, "unit_price", Number(e.target.value))}
+                        />
+                      </td>
+                      <td className="py-2 px-2">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.01"
+                          className="text-right"
+                          value={m.discount}
+                          onChange={(e) => setField(row.id, "discount", Number(e.target.value))}
+                        />
+                      </td>
+                      <td className="py-2 px-2">
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="text-right"
+                          value={m.discount_amount}
+                          onChange={(e) =>
+                            setField(row.id, "discount_amount", Number(e.target.value))
+                          }
+                        />
+                      </td>
+                      <td className="py-2 px-2">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.01"
+                          className="text-right"
+                          value={m.tax_rate}
+                          onChange={(e) => setField(row.id, "tax_rate", Number(e.target.value))}
+                        />
+                      </td>
+                      <td className="py-2 px-2 text-right tabular-nums">
+                        {formatMoney(preview, currency)}
+                        {dirty(row) && (
+                          <div className="text-[10px] text-amber-600">preview · unsaved</div>
+                        )}
+                      </td>
+                      <td className="py-2 pl-2">
+                        <div className="flex gap-1 justify-end">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={!dirty(row) || saveRow.isPending}
+                            onClick={() => saveRow.mutate(row)}
+                          >
+                            <Save className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-destructive"
+                            disabled={deleteRow.isPending}
+                            onClick={() => {
+                              if (confirm("Delete this line?")) deleteRow.mutate(row.id);
+                            }}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
