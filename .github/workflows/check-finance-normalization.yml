@@ -1,0 +1,26 @@
+name: Finance normalization
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  finance-normalization:
+    name: Forbid direct finance-column reads
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node-only check — no dependencies, no build. Scans src/**/*.{ts,tsx}
+      # for direct property reads of balance / balance_due / paid_amount /
+      # amount_paid / grand_total in display/read paths and fails the job if
+      # any slip in outside the write/schema contract allow-list. Read paths
+      # must go through finance-normalization helpers.
+      - name: Scan for disallowed finance-column reads
+        run: node scripts/check-finance-normalization.mjs
