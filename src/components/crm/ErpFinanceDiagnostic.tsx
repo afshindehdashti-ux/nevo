@@ -262,6 +262,14 @@ export function ErpFinanceDiagnostic() {
               )}
               Validate trigger recompute
             </Button>
+            <Button variant="outline" onClick={onRunQuoteImport} disabled={quoteImpLoading}>
+              {quoteImpLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FileInput className="mr-2 h-4 w-4" />
+              )}
+              Run Quotation Import e2e
+            </Button>
           </div>
 
           {qa && (
