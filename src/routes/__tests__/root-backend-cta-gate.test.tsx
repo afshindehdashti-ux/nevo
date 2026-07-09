@@ -15,6 +15,7 @@
  * correctly in both directions.
  */
 import { describe, it, expect, afterEach } from "vitest";
+import { classifyRouteArea } from "@/lib/use-route-area";
 import { render, cleanup, screen, waitFor, act } from "@testing-library/react";
 import {
   Outlet,
