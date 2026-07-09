@@ -2,6 +2,12 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney, formatDate } from "./crm-money";
+import {
+  customerDisplayName,
+  customerBillingAddress,
+  customerVatNumber,
+  type CustomerDisplay,
+} from "./finance-normalization";
 
 /**
  * Branded Proforma Invoice PDF generator (proforma_invoices table).
@@ -36,14 +42,7 @@ type ProformaRow = {
   approved_by: string | null;
   approver: { full_name: string | null } | null;
   preparer: { full_name: string | null } | null;
-  customers: {
-    name: string | null;
-    address: string | null;
-    city: string | null;
-    country: string | null;
-    vat_number: string | null;
-    email: string | null;
-  } | null;
+  customers: (CustomerDisplay & Record<string, unknown>) | null;
 };
 
 type ItemRow = {
@@ -116,7 +115,7 @@ export async function fetchProformaForPdf(proformaId: string) {
          subtotal, discount_amount, vat_rate, vat_amount, grand_total,
          amount_paid, balance_due, payment_status, payment_terms, delivery_terms,
          incoterms, terms_conditions, bank_details, prepared_by, approved_by,
-         customers(name, address, city, country, vat_number, email)`,
+         customers(name, company_name, address, billing_address, city, country, vat_number, email, phone)`,
       )
       .eq("id", proformaId)
       .maybeSingle(),
