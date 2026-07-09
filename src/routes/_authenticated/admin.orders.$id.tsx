@@ -264,6 +264,14 @@ function OrderDetailPage() {
         const { error: iErr } = await supabase.from("invoice_items").insert(linesToCopy);
         if (iErr) throw iErr;
       }
+      await logAudit({
+        data: {
+          action: "create_invoice_from_order",
+          entity_type: "order",
+          entity_id: order.id,
+          metadata: { invoice_id: inv.id, invoice_type: type, total: totals.total },
+        },
+      }).catch(() => undefined);
       return inv;
     },
     onSuccess: (inv) => {
@@ -286,6 +294,14 @@ function OrderDetailPage() {
         .select()
         .single();
       if (error) throw error;
+      await logAudit({
+        data: {
+          action: "create_shipment",
+          entity_type: "order",
+          entity_id: order.id,
+          metadata: { shipment_id: data.id, shipment_number: data.shipment_number },
+        },
+      }).catch(() => undefined);
       return data;
     },
     onSuccess: (s) => {
