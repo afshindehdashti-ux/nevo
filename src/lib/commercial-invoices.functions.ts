@@ -15,17 +15,15 @@ const IdInput = z.object({ id: z.string().uuid() });
 
 const HeaderInput = z.object({
   customer_id: z.string().uuid(),
-  type: z.enum(["proforma", "commercial", "credit_note"]).default("commercial"),
+  type: z.enum(["proforma", "commercial"]).default("commercial"),
   status: z
     .enum([
       "draft",
       "issued",
-      "sent",
       "partially_paid",
       "paid",
       "overdue",
       "void",
-      "cancelled",
     ])
     .optional(),
   order_id: z.string().uuid().nullable().optional(),
