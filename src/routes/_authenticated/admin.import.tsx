@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, Clock, ClipboardPaste } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
 import { ImportWizard } from "@/components/import/ImportWizard";
+import { PasteImporter } from "@/components/import/PasteImporter";
 import { SUPPORTED_IMPORT_TYPES } from "@/lib/import-schemas";
 
 type ImportJob = Database["public"]["Tables"]["import_jobs"]["Row"];
