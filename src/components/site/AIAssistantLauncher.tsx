@@ -4,10 +4,16 @@ import { X, Sparkles, ArrowUpRight } from "lucide-react";
 import { AIChat } from "./AIChat";
 import { cn } from "@/lib/utils";
 import { Link } from "@/components/site/LocalizedLink";
+import { useIsBackend } from "@/lib/use-route-area";
 
 export function AIAssistantLauncher() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  // Self-gate as a safety net so this component can never render on a
+  // backend route even if a future parent forgets to wrap it — subscribed
+  // pathname prevents an initial-render flash during hydration and updates
+  // on every client-side navigation.
+  const isBackend = useIsBackend();
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -23,6 +29,8 @@ export function AIAssistantLauncher() {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  if (isBackend) return null;
 
   return (
     <>

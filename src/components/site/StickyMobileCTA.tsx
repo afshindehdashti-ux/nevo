@@ -2,10 +2,15 @@ import { useTranslation } from "react-i18next";
 import { Link } from "@/components/site/LocalizedLink";
 import { MessageCircle, ClipboardList } from "lucide-react";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
+import { useIsBackend } from "@/lib/use-route-area";
 
 export function StickyMobileCTA() {
   const { t } = useTranslation();
   const wa = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
+  // Self-gate so the CTA never renders on backend routes even if a future
+  // parent forgets the isBackend check. Subscribed pathname → no initial
+  // paint on backend and instant unmount on client-side transitions in.
+  if (useIsBackend()) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[60] flex gap-2 border-t border-border/60 bg-background/95 p-2 backdrop-blur md:hidden">
