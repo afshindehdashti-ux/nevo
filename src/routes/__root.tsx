@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { useIsBackend } from "@/lib/use-route-area";
 import { Link } from "@/components/site/LocalizedLink";
 import { useEffect, type ReactNode } from "react";
 import { BookOpen, Calculator, ClipboardList, ArrowRight, Home } from "lucide-react";
