@@ -261,7 +261,19 @@ export async function loadSellerSettings(): Promise<Seller | null> {
   return (data as Seller) ?? null;
 }
 
-export function downloadQuotationPdf(q: Quotation, items: Item[], seller: Seller | null) {
+export async function downloadQuotationPdf(
+  q: Quotation,
+  items: Item[],
+  seller: Seller | null,
+) {
+  if (q.id) {
+    const { assertDocumentReadyForPdf } = await import(
+      "./document-pdf-validation.functions"
+    );
+    await assertDocumentReadyForPdf({
+      data: { kind: "quotation", id: q.id },
+    });
+  }
   const { blob, filename } = buildQuotationPdf(q, items, seller);
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
