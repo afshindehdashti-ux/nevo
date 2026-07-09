@@ -105,11 +105,17 @@ function StickyMobileCtaProbe() {
 }
 
 function RootShell() {
+  // Mirror the real `RootComponent` in `src/routes/__root.tsx`: gate at
+  // the parent level so navigating into a backend route fully UNMOUNTS
+  // the marketing components (destroying their state), rather than
+  // relying only on the components' internal `if (isBackend) return null`
+  // early-return (which keeps them mounted and preserves state).
+  const isBackend = useIsBackend();
   return (
     <>
       <Outlet />
-      <AskAiLauncherProbe />
-      <StickyMobileCtaProbe />
+      {!isBackend && <AskAiLauncherProbe />}
+      {!isBackend && <StickyMobileCtaProbe />}
     </>
   );
 }
