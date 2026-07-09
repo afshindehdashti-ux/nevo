@@ -2,6 +2,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
 type Quotation = {
+  id?: string | null;
   quotation_number?: string | null;
   status?: string | null;
   issue_date?: string | null;
