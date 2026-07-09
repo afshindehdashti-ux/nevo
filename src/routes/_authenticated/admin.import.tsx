@@ -221,6 +221,20 @@ function ImportDataPage() {
                       <td className="px-3 py-2 text-muted-foreground text-xs">
                         {formatDistanceToNow(new Date(j.created_at), { addSuffix: true })}
                       </td>
+                      <td className="px-3 py-2 text-right">
+                        {j.failed_rows > 0 ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 gap-1 text-xs"
+                            onClick={() => handleDownloadFailed(j)}
+                          >
+                            <Download className="h-3 w-3" /> Failed rows
+                          </Button>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}
