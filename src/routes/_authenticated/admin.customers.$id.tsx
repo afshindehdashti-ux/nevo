@@ -32,6 +32,10 @@ import {
 } from "@/lib/crm-status";
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
 import { generateEntitySummary } from "@/lib/ai-summary.functions";
+import {
+  financeBalanceDue,
+  financeTotalAmount,
+} from "@/lib/finance-normalization";
 
 export const Route = createFileRoute("/_authenticated/admin/customers/$id")({
   head: () => ({
