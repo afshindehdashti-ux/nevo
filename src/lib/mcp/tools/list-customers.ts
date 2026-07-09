@@ -11,7 +11,7 @@ export default withAudit({
     limit: z.number().int().min(1).max(100).optional().describe("Max rows to return (default 25)."),
   },
   annotations: { readOnlyHint: true, openWorldHint: false },
-  handler: async ({ search, limit }, ctx) => {
+  handler: async ({ search, limit }: { search?: string; limit?: number }, ctx: import("@lovable.dev/mcp-js").ToolContext) => {
     if (!ctx.isAuthenticated()) return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
     let q = supabaseForUser(ctx)
       .from("customers")
