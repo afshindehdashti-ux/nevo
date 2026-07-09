@@ -453,6 +453,63 @@ export function ErpFinanceDiagnostic() {
         </Card>
       )}
 
+      {trig && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calculator className="h-5 w-5" />
+              Trigger recompute validation
+              <StatusBadge status={trig.failed === 0 ? "pass" : "fail"} />
+            </CardTitle>
+            <CardDescription>
+              Inserts two line items with mixed discount % / discount amount / tax rate
+              inputs, then asserts the database triggers recompute
+              <code className="mx-1">vat_rate</code>,
+              <code className="mx-1">discount_amount</code>, and
+              <code className="mx-1">grand_total</code> on the parent proforma.
+              Test data is deleted after every run.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid gap-2 text-xs md:grid-cols-5">
+              {Object.entries(trig.expected).map(([k, v]) => (
+                <div key={k} className="rounded border p-2">
+                  <div className="text-muted-foreground">{k}</div>
+                  <div className="font-medium">{v}</div>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-4 text-sm">
+              <span className="text-emerald-600 font-medium">{trig.passed} PASS</span>
+              <span className="text-amber-500 font-medium">{trig.warned} WARN</span>
+              <span className="text-red-600 font-medium">{trig.failed} FAIL</span>
+            </div>
+            <ol className="space-y-2">
+              {trig.steps.map((s, i) => (
+                <li key={s.key} className="flex items-start gap-3 rounded-md border p-3">
+                  <span className="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-muted text-center text-xs leading-5">
+                    {i + 1}
+                  </span>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-medium text-sm">{s.label}</div>
+                      <StatusBadge status={s.status} />
+                    </div>
+                    <div className="text-xs text-muted-foreground break-words">{s.message}</div>
+                    {s.details && (
+                      <pre className="mt-1 overflow-x-auto rounded bg-muted p-2 text-xs">
+                        {JSON.stringify(s.details, null, 2)}
+                      </pre>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
+
+
 
 
 
