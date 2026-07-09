@@ -182,6 +182,18 @@ function OrderDetailPage() {
           if (error) throw error;
         }
       }
+      await logAudit({
+        data: {
+          action: "save",
+          entity_type: "order",
+          entity_id: order.id,
+          metadata: {
+            item_count: lines.filter((x) => !x._deleted).length,
+            deleted_items: lines.filter((l) => l._deleted && l.id).length,
+            total: totals.total,
+          },
+        },
+      }).catch(() => undefined);
     },
     onSuccess: () => {
       toast.success("Order saved");
@@ -196,6 +208,14 @@ function OrderDetailPage() {
     mutationFn: async (status: (typeof ORDER_STATUSES)[number]) => {
       const { error } = await supabase.from("orders").update({ status }).eq("id", id);
       if (error) throw error;
+      await logAudit({
+        data: {
+          action: "status_change",
+          entity_type: "order",
+          entity_id: id,
+          metadata: { status },
+        },
+      }).catch(() => undefined);
     },
     onSuccess: () => {
       toast.success("Status updated");
