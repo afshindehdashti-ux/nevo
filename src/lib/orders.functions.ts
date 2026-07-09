@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { writeAudit } from "./audit-log";
 
 const schema = z.object({
   orderId: z.string().uuid(),
@@ -63,6 +64,13 @@ export const sendOrderConfirmation = createServerFn({ method: "POST" })
         console.error(`order confirmation email failed [${res.status}]: ${body}`);
         return { ok: false as const, reason: "send_failed" };
       }
+      await writeAudit(context.supabase, {
+        user_id: context.userId,
+        action: "send_confirmation",
+        entity_type: "order",
+        entity_id: order.id,
+        metadata: { recipient, order_number: order.order_number ?? null },
+      });
       return { ok: true as const };
     } catch (err) {
       console.error("order confirmation email error", err);

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { writeAudit } from "./audit-log";
 
 const StatusEnum = z.enum(["open", "in_progress", "waiting", "done", "cancelled"]);
 const PriorityEnum = z.enum(["low", "normal", "high", "urgent"]);
@@ -57,6 +58,13 @@ export const upsertTask = createServerFn({ method: "POST" })
       };
       const { error } = await context.supabase.from("tasks").update(patch).eq("id", data.id);
       if (error) throw new Error(error.message);
+      await writeAudit(context.supabase, {
+        user_id: context.userId,
+        action: "update",
+        entity_type: "task",
+        entity_id: data.id,
+        metadata: { status: data.status, priority: data.priority, assigned_to: data.assigned_to ?? null },
+      });
       return { id: data.id };
     }
     const { data: row, error } = await context.supabase
@@ -65,6 +73,21 @@ export const upsertTask = createServerFn({ method: "POST" })
       .select("id")
       .maybeSingle();
     if (error) throw new Error(error.message);
+    if (row?.id) {
+      await writeAudit(context.supabase, {
+        user_id: context.userId,
+        action: "create",
+        entity_type: "task",
+        entity_id: row.id,
+        metadata: {
+          title: data.title,
+          status: data.status,
+          priority: data.priority,
+          entity_type: data.entity_type ?? null,
+          entity_id: data.entity_id ?? null,
+        },
+      });
+    }
     return { id: row?.id };
   });
 
@@ -80,6 +103,13 @@ export const setTaskStatus = createServerFn({ method: "POST" })
     };
     const { error } = await context.supabase.from("tasks").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "status_change",
+      entity_type: "task",
+      entity_id: data.id,
+      metadata: { status: data.status },
+    });
     return { ok: true };
   });
 
@@ -92,5 +122,12 @@ export const approveTask = createServerFn({ method: "POST" })
       .update({ approved_by: context.userId, approved_at: new Date().toISOString() })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "approve",
+      entity_type: "task",
+      entity_id: data.id,
+      metadata: {},
+    });
     return { ok: true };
   });
