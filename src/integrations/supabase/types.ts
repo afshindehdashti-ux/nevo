@@ -2683,6 +2683,57 @@ export type Database = {
         }
         Relationships: []
       }
+      mcp_tool_invocations: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          input_bytes: number | null
+          request_id: string
+          result_rows: number | null
+          started_at: string
+          status: string
+          tool_name: string
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          input_bytes?: number | null
+          request_id: string
+          result_rows?: number | null
+          started_at?: string
+          status: string
+          tool_name: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          input_bytes?: number | null
+          request_id?: string
+          result_rows?: number | null
+          started_at?: string
+          status?: string
+          tool_name?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       number_sequences: {
         Row: {
           created_at: string

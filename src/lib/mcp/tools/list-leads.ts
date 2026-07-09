@@ -1,8 +1,8 @@
-import { defineTool } from "@lovable.dev/mcp-js";
+import { withAudit } from "../audit";
 import { z } from "zod";
 import { supabaseForUser } from "../supabase";
 
-export default defineTool({
+export default withAudit({
   name: "list_leads",
   title: "List leads",
   description: "List CRM leads visible to the signed-in user, most recent first.",

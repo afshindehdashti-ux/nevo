@@ -1,7 +1,7 @@
-import { defineTool } from "@lovable.dev/mcp-js";
+import { withAudit } from "../audit";
 import { z } from "zod";
 
-export default defineTool({
+export default withAudit({
   name: "echo",
   title: "Echo",
   description: "Echo the input text back to the caller. Useful for verifying MCP connectivity.",
