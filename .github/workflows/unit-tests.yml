@@ -42,6 +42,14 @@ jobs:
       - name: Logo telemetry sampling & throttling guard
         run: bunx vitest run src/lib/__tests__/logo-telemetry.test.ts src/lib/__tests__/logo-telemetry-env.test.ts
 
+      # Targeted guard: the backend-route CTA gate. Ensures the public
+      # AI launcher and sticky mobile CTA never render — and never flash —
+      # on /admin, /crm, or /backoffice during client-side navigation.
+      # Regression source: finding ab462d1d ("Marketing chat & mobile CTA
+      # leak into admin pages after in-app navigation").
+      - name: Backend-route CTA gate guard
+        run: bunx vitest run src/routes/__tests__/root-backend-cta-gate.test.tsx
+
       - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v4
