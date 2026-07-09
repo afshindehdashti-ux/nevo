@@ -4,6 +4,7 @@ import {
   customerDisplayName,
   customerBillingAddress,
   customerVatNumber,
+  financeTotalAmount,
   type CustomerDisplay,
 } from "./finance-normalization";
 
@@ -193,7 +194,7 @@ export function buildQuotationPdf(
   row(`VAT (${n(q.vat_rate)}%)`, money(q.vat_amount, currency), false, 6);
   doc.setDrawColor(220);
   doc.line(totalsX, afterTable + 8.5, pageWidth - margin, afterTable + 8.5);
-  row("TOTAL", money(q.total, currency), true, 13);
+  row("TOTAL", money(financeTotalAmount(q), currency), true, 13);
 
   // Terms / Notes / Bank
   let footY = afterTable + 24;

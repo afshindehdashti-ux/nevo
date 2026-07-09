@@ -267,7 +267,7 @@ export function InvoicesList({
                     {invoiceStatusLabel(i.status)}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right">{formatMoney(i.total, i.currency)}</TableCell>
+                <TableCell className="text-right">{formatMoney(financeTotalAmount(i), i.currency)}</TableCell>
                 <TableCell className="text-right">{formatMoney(financeBalanceDue(i), i.currency)}</TableCell>
               </TableRow>
             ))}

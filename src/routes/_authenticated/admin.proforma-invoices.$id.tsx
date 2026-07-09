@@ -11,7 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, FileDown, Loader2, Plus, Save, ShieldCheck, Trash2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate, formatMoney } from "@/lib/crm-money";
-import { customerDisplayName, type CustomerDisplay } from "@/lib/finance-normalization";
+import {
+  customerDisplayName,
+  financeBalanceDue,
+  financePaidAmount,
+  financeTotalAmount,
+  type CustomerDisplay,
+} from "@/lib/finance-normalization";
 import { generateProformaInvoicePdf } from "@/lib/proforma-invoice-pdf";
 
 type ItemRow = {
@@ -185,9 +191,9 @@ function ProformaInvoiceDetail() {
       const amt = Number(paymentAmount);
       if (!Number.isFinite(amt) || amt < 0) throw new Error("Enter a valid amount");
       const nextPaid =
-        paymentMode === "add" ? Number(pi.amount_paid ?? 0) + amt : amt;
+        paymentMode === "add" ? financePaidAmount(pi) + amt : amt;
       if (nextPaid < 0) throw new Error("Amount paid cannot be negative");
-      if (nextPaid > Number(pi.grand_total ?? 0) + 0.009) {
+      if (nextPaid > financeTotalAmount(pi) + 0.009) {
         throw new Error("Amount paid cannot exceed grand total");
       }
       const { error } = await supabase
@@ -407,17 +413,17 @@ function ProformaInvoiceDetail() {
               <div className="border-t pt-2">
                 <Row
                   label="Grand total"
-                  value={formatMoney(pi.grand_total, pi.currency)}
+                  value={formatMoney(financeTotalAmount(pi), pi.currency)}
                   strong
                 />
               </div>
               <Row
                 label="Amount paid"
-                value={formatMoney(pi.amount_paid, pi.currency)}
+                value={formatMoney(financePaidAmount(pi), pi.currency)}
               />
               <Row
                 label="Balance due"
-                value={formatMoney(pi.balance_due, pi.currency)}
+                value={formatMoney(financeBalanceDue(pi), pi.currency)}
                 strong
               />
             </CardContent>
@@ -434,11 +440,11 @@ function ProformaInvoiceDetail() {
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="rounded border p-2">
                   <p className="text-muted-foreground">Paid</p>
-                  <p className="font-semibold">{formatMoney(pi.amount_paid, pi.currency)}</p>
+                  <p className="font-semibold">{formatMoney(financePaidAmount(pi), pi.currency)}</p>
                 </div>
                 <div className="rounded border p-2">
                   <p className="text-muted-foreground">Balance</p>
-                  <p className="font-semibold">{formatMoney(pi.balance_due, pi.currency)}</p>
+                  <p className="font-semibold">{formatMoney(financeBalanceDue(pi), pi.currency)}</p>
                 </div>
               </div>
               <div>
@@ -486,7 +492,7 @@ function ProformaInvoiceDetail() {
                   variant="outline"
                   onClick={() => {
                     setPaymentMode("set");
-                    setPaymentAmount(String(Number(pi.grand_total ?? 0)));
+                    setPaymentAmount(String(financeTotalAmount(pi)));
                   }}
                   disabled={recordPayment.isPending}
                 >

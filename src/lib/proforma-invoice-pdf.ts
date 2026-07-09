@@ -6,6 +6,9 @@ import {
   customerDisplayName,
   customerBillingAddress,
   customerVatNumber,
+  financePaidAmount,
+  financeTotalAmount,
+  financeBalanceDue,
   type CustomerDisplay,
 } from "./finance-normalization";
 
@@ -173,9 +176,9 @@ export async function generateProformaInvoicePdf(
   const subtotal = num(pi.subtotal);
   const discount = num(pi.discount_amount);
   const vat = num(pi.vat_amount);
-  const grand = num(pi.grand_total);
-  const paid = num(pi.amount_paid);
-  const balance = num(pi.balance_due);
+  const grand = financeTotalAmount(pi);
+  const paid = financePaidAmount(pi);
+  const balance = financeBalanceDue(pi);
 
   const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();

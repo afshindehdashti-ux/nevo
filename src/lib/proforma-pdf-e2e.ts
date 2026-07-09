@@ -84,7 +84,7 @@ export async function assertProformaPdfContent(
   const currency = pi.currency;
   const vatRate = Number(pi.vat_rate ?? 0) || 0;
   const vatAmount = Number(pi.vat_amount ?? 0) || 0;
-  const grandTotal = Number(pi.grand_total ?? 0) || 0;
+  const grandTotal = financeTotalAmount(pi);
   const paymentStatus = pi.payment_status ?? "Unpaid";
 
   const { blob, filename } = await generateProformaInvoicePdf(

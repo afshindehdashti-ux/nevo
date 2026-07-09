@@ -6,6 +6,7 @@ import {
   customerDisplayName,
   customerBillingAddress,
   customerVatNumber,
+  financePaidAmount,
   type CustomerDisplay,
 } from "./finance-normalization";
 
@@ -185,7 +186,7 @@ export async function generateInvoicePdf(
     fetchInvoiceForPdf(invoiceId),
     loadCompany(),
   ]);
-  const totals = computeInvoiceTotals(items, Number(invoice.amount_paid) || 0);
+  const totals = computeInvoiceTotals(items, financePaidAmount(invoice));
   const isProforma = invoice.type === "proforma";
   const docTitle = isProforma ? "PROFORMA INVOICE" : "TAX INVOICE";
 

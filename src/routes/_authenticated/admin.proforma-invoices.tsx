@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatDate, formatMoney } from "@/lib/crm-money";
+import { financeTotalAmount, financeBalanceDue } from "@/lib/finance-normalization";
 import { customerDisplayName, type CustomerDisplay } from "@/lib/finance-normalization";
 
 export const Route = createFileRoute("/_authenticated/admin/proforma-invoices")({
@@ -338,10 +339,10 @@ function ProformaInvoicesList() {
                   {formatMoney(Number(r.vat_amount) || 0, r.currency)}
                 </TableCell>
                 <TableCell className="text-right font-medium">
-                  {formatMoney(Number(r.grand_total) || 0, r.currency)}
+                  {formatMoney(financeTotalAmount(r), r.currency)}
                 </TableCell>
                 <TableCell className="text-right">
-                  {formatMoney(Number(r.balance_due) || 0, r.currency)}
+                  {formatMoney(financeBalanceDue(r), r.currency)}
                 </TableCell>
               </TableRow>
             ))}

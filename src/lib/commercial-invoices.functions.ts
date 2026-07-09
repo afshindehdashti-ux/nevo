@@ -119,7 +119,7 @@ async function recalcCommercialInvoiceTotalsInternal(supabase: any, id: string) 
     .select("amount_paid")
     .eq("id", id)
     .maybeSingle();
-  const paid = Number(paidRow?.amount_paid ?? 0);
+  const paid = financePaidAmount(paidRow);
   const { error: upErr } = await supabase
     .from("invoices")
     .update({
