@@ -85,7 +85,7 @@ export function Analytics() {
       );
       injectSrc("li-src", "https://snap.licdn.com/li.lms-analytics/insight.min.js");
     }
-  }, [consent]);
+  }, [consent, isBackend]);
 
   return null;
 }
