@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { defineTool, type ToolContext } from "@lovable.dev/mcp-js";
+import { assertValidCaller } from "./guard";
 
 // Service-role client — writes audit rows even for unauthenticated calls.
 // Loaded lazily so the MCP entry stays import-safe (no env reads at module load).
@@ -10,14 +11,18 @@ function adminClient() {
 }
 
 /**
- * Wrap a tool definition so every invocation is logged to
- * `public.mcp_tool_invocations` (tool name, caller user id/email, oauth
- * client id, request id, timestamps, duration, status, error, sizes).
- * Never throws; audit failures degrade to console.warn.
+ * Wrap a tool definition so every invocation is:
+ *  1. Validated against issuer/audience/expiry/subject/client claims
+ *     (defense-in-depth on top of mcp-js token verification), unless the
+ *     tool explicitly opts into anonymous access via `allowAnonymous: true`.
+ *  2. Logged to `public.mcp_tool_invocations` (tool name, caller user id/email,
+ *     oauth client id, request id, timestamps, duration, status, error, sizes).
+ * Audit failures degrade to console.warn; guard failures return a tool error.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function withAudit(def: any): any {
   const inner = def.handler;
+  const allowAnonymous = def.allowAnonymous === true;
 
   const wrapped = async (input: unknown, ctx: ToolContext) => {
     const requestId =
@@ -45,11 +50,21 @@ export function withAudit(def: any): any {
     let errorMessage: string | null = null;
 
     try {
-      result = await inner(input, ctx);
-      if (result?.isError) {
-        status = !authed ? "unauthorized" : "error";
-        const first = result.content?.find?.((c: { type: string; text?: string }) => c.type === "text");
-        errorMessage = typeof first?.text === "string" ? first.text.slice(0, 1000) : null;
+      if (!allowAnonymous) {
+        const guard = assertValidCaller(ctx);
+        if (!guard.ok) {
+          status = "unauthorized";
+          errorMessage = guard.error.content[0].text.slice(0, 1000);
+          result = guard.error;
+        }
+      }
+      if (!result) {
+        result = await inner(input, ctx);
+        if (result?.isError) {
+          status = !ctx.isAuthenticated() ? "unauthorized" : "error";
+          const first = result.content?.find?.((c: { type: string; text?: string }) => c.type === "text");
+          errorMessage = typeof first?.text === "string" ? first.text.slice(0, 1000) : null;
+        }
       }
     } catch (err) {
       status = "error";
