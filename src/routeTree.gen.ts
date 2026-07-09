@@ -117,6 +117,7 @@ import { Route as ApiPublicAlertsSignInFailedRouteImport } from './routes/api/pu
 import { Route as ApiPublicAlertsEmailDlqRouteImport } from './routes/api/public/alerts/email-dlq'
 import { Route as AuthenticatedAdminUsersInviteRouteImport } from './routes/_authenticated/admin.users.invite'
 import { Route as AuthenticatedAdminShipmentsIdRouteImport } from './routes/_authenticated/admin.shipments.$id'
+import { Route as AuthenticatedAdminQuotationsNewRouteImport } from './routes/_authenticated/admin.quotations.new'
 import { Route as AuthenticatedAdminQuotationsIdRouteImport } from './routes/_authenticated/admin.quotations.$id'
 import { Route as AuthenticatedAdminProformaInvoicesIdRouteImport } from './routes/_authenticated/admin.proforma-invoices.$id'
 import { Route as AuthenticatedAdminOrdersIdRouteImport } from './routes/_authenticated/admin.orders.$id'
@@ -725,6 +726,12 @@ const AuthenticatedAdminShipmentsIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedAdminShipmentsRoute,
   } as any)
+const AuthenticatedAdminQuotationsNewRoute =
+  AuthenticatedAdminQuotationsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedAdminQuotationsRoute,
+  } as any)
 const AuthenticatedAdminQuotationsIdRoute =
   AuthenticatedAdminQuotationsIdRouteImport.update({
     id: '/$id',
@@ -926,6 +933,7 @@ export interface FileRoutesByFullPath {
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/admin/proforma-invoices/$id': typeof AuthenticatedAdminProformaInvoicesIdRoute
   '/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
+  '/admin/quotations/new': typeof AuthenticatedAdminQuotationsNewRoute
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/api/public/alerts/email-dlq': typeof ApiPublicAlertsEmailDlqRoute
@@ -1047,6 +1055,7 @@ export interface FileRoutesByTo {
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/admin/proforma-invoices/$id': typeof AuthenticatedAdminProformaInvoicesIdRoute
   '/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
+  '/admin/quotations/new': typeof AuthenticatedAdminQuotationsNewRoute
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/api/public/alerts/email-dlq': typeof ApiPublicAlertsEmailDlqRoute
@@ -1173,6 +1182,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/_authenticated/admin/proforma-invoices/$id': typeof AuthenticatedAdminProformaInvoicesIdRoute
   '/_authenticated/admin/quotations/$id': typeof AuthenticatedAdminQuotationsIdRouteWithChildren
+  '/_authenticated/admin/quotations/new': typeof AuthenticatedAdminQuotationsNewRoute
   '/_authenticated/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/_authenticated/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/api/public/alerts/email-dlq': typeof ApiPublicAlertsEmailDlqRoute
@@ -1299,6 +1309,7 @@ export interface FileRouteTypes {
     | '/admin/orders/$id'
     | '/admin/proforma-invoices/$id'
     | '/admin/quotations/$id'
+    | '/admin/quotations/new'
     | '/admin/shipments/$id'
     | '/admin/users/invite'
     | '/api/public/alerts/email-dlq'
@@ -1420,6 +1431,7 @@ export interface FileRouteTypes {
     | '/admin/orders/$id'
     | '/admin/proforma-invoices/$id'
     | '/admin/quotations/$id'
+    | '/admin/quotations/new'
     | '/admin/shipments/$id'
     | '/admin/users/invite'
     | '/api/public/alerts/email-dlq'
@@ -1545,6 +1557,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/orders/$id'
     | '/_authenticated/admin/proforma-invoices/$id'
     | '/_authenticated/admin/quotations/$id'
+    | '/_authenticated/admin/quotations/new'
     | '/_authenticated/admin/shipments/$id'
     | '/_authenticated/admin/users/invite'
     | '/api/public/alerts/email-dlq'
@@ -2351,6 +2364,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminShipmentsIdRouteImport
       parentRoute: typeof AuthenticatedAdminShipmentsRoute
     }
+    '/_authenticated/admin/quotations/new': {
+      id: '/_authenticated/admin/quotations/new'
+      path: '/new'
+      fullPath: '/admin/quotations/new'
+      preLoaderRoute: typeof AuthenticatedAdminQuotationsNewRouteImport
+      parentRoute: typeof AuthenticatedAdminQuotationsRoute
+    }
     '/_authenticated/admin/quotations/$id': {
       id: '/_authenticated/admin/quotations/$id'
       path: '/$id'
@@ -2585,12 +2605,14 @@ const AuthenticatedAdminQuotationsIdRouteWithChildren =
 
 interface AuthenticatedAdminQuotationsRouteChildren {
   AuthenticatedAdminQuotationsIdRoute: typeof AuthenticatedAdminQuotationsIdRouteWithChildren
+  AuthenticatedAdminQuotationsNewRoute: typeof AuthenticatedAdminQuotationsNewRoute
 }
 
 const AuthenticatedAdminQuotationsRouteChildren: AuthenticatedAdminQuotationsRouteChildren =
   {
     AuthenticatedAdminQuotationsIdRoute:
       AuthenticatedAdminQuotationsIdRouteWithChildren,
+    AuthenticatedAdminQuotationsNewRoute: AuthenticatedAdminQuotationsNewRoute,
   }
 
 const AuthenticatedAdminQuotationsRouteWithChildren =
