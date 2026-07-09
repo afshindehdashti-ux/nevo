@@ -72,6 +72,7 @@ function useImportJobs() {
 function ImportDataPage() {
   const { data: jobs, isLoading, error } = useImportJobs();
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [pasteOpen, setPasteOpen] = useState(false);
 
   const byCategory = IMPORT_TYPES.reduce<Record<string, typeof IMPORT_TYPES>>((acc, t) => {
     (acc[t.category] = acc[t.category] ?? []).push(t);
@@ -81,6 +82,7 @@ function ImportDataPage() {
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-[1400px] mx-auto">
       <ImportWizard open={wizardOpen} onOpenChange={setWizardOpen} />
+      <PasteImporter open={pasteOpen} onOpenChange={setPasteOpen} importType="quotations" />
       <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground">Admin Tools</p>
@@ -89,9 +91,14 @@ function ImportDataPage() {
             Bulk-import CRM, operations, finance, and document records from CSV, XLSX, or JSON.
           </p>
         </div>
-        <Button size="lg" onClick={() => setWizardOpen(true)}>
-          <Upload className="mr-2 h-4 w-4" /> New import
-        </Button>
+        <div className="flex gap-2">
+          <Button size="lg" variant="outline" onClick={() => setPasteOpen(true)}>
+            <ClipboardPaste className="mr-2 h-4 w-4" /> Paste quotations
+          </Button>
+          <Button size="lg" onClick={() => setWizardOpen(true)}>
+            <Upload className="mr-2 h-4 w-4" /> New import
+          </Button>
+        </div>
       </header>
 
       {/* Supported types grid */}
