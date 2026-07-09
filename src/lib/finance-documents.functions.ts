@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { financeTotalAmount } from "./finance-normalization";
 
 const DocType = z.enum([
   "quotation",
@@ -304,7 +305,7 @@ export const changeFinanceDocumentStatus = createServerFn({ method: "POST" })
 
     // Guardrails when moving into an externally-visible state
     if (["issued", "sent", "approved"].includes(to)) {
-      if (Number(doc.grand_total) <= 0) {
+      if (financeTotalAmount(doc) <= 0) {
         throw new Error("Document total must be greater than zero — recalculate before issuing");
       }
       const needsCustomer = ["quotation", "proforma_invoice", "commercial_invoice"].includes(

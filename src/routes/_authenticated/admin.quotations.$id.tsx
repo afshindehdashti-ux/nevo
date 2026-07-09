@@ -14,6 +14,7 @@ import {
   listInquiriesLite,
 } from "@/lib/quotations.functions";
 import { listProjectsLite } from "@/lib/doc-intel.functions";
+import { financeTotalAmount } from "@/lib/finance-normalization";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -279,7 +280,7 @@ function QuotationEditor() {
             <Badge variant="outline" className="mr-2">
               {q.status}
             </Badge>
-            Total: {q.currency} {Number(q.total).toLocaleString()}
+            Total: {q.currency} {financeTotalAmount(q).toLocaleString()}
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -496,7 +497,7 @@ function QuotationEditor() {
             </div>
             <div className="flex justify-between text-foreground font-semibold text-sm border-t border-border pt-2 mt-2">
               <span>Total</span>
-              <span>{q.currency} {Number(q.total).toLocaleString()}</span>
+              <span>{q.currency} {financeTotalAmount(q).toLocaleString()}</span>
             </div>
           </div>
         </Card>
@@ -637,11 +638,11 @@ function QuotationEditor() {
           <ApprovalPanel
             entityType="quotation_discount"
             entityId={id}
-            suggestedReason={`Quotation ${q.quotation_number ?? "(draft)"} — max line discount ${maxDisc}% · total ${q.currency} ${Number(q.total).toLocaleString()}`}
+            suggestedReason={`Quotation ${q.quotation_number ?? "(draft)"} — max line discount ${maxDisc}% · total ${q.currency} ${financeTotalAmount(q).toLocaleString()}`}
             details={{
               quotation_number: q.quotation_number,
               max_discount_pct: maxDisc,
-              total: Number(q.total),
+              total: financeTotalAmount(q),
               currency: q.currency,
             }}
           />

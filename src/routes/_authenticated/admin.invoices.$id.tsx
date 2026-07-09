@@ -67,6 +67,7 @@ import {
   customerVatNumber,
   financeBalanceDue,
   financePaidAmount,
+  financeTotalAmount,
   type CustomerDisplay,
 } from "@/lib/finance-normalization";
 import {
@@ -1551,7 +1552,7 @@ function InvoiceDetailPage() {
           subtotal: totals.subtotal,
           vat_amount: totals.vat,
           total: totals.total,
-          balance: Math.max(totals.total - Number(invoice.amount_paid || 0), 0),
+          balance: Math.max(totals.total - financePaidAmount(invoice), 0),
         })
         .eq("id", invoice.id);
       if (hErr) throw hErr;
@@ -2022,9 +2023,9 @@ function InvoiceDetailPage() {
             <ApprovalPanel
               entityType={invoice.type === "proforma" ? "proforma" : "invoice"}
               entityId={id}
-              suggestedReason={`${invoice.type === "proforma" ? "Proforma" : "Invoice"} ${invoice.invoice_number ?? "(draft)"} — ${invoice.currency} ${Number(invoice.total).toLocaleString()}`}
+              suggestedReason={`${invoice.type === "proforma" ? "Proforma" : "Invoice"} ${invoice.invoice_number ?? "(draft)"} — ${invoice.currency} ${financeTotalAmount(invoice).toLocaleString()}`}
               details={{
-                total: Number(invoice.total),
+                total: financeTotalAmount(invoice),
                 currency: invoice.currency,
                 type: invoice.type,
                 invoice_number: invoice.invoice_number,

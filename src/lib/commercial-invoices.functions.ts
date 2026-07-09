@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { financePaidAmount } from "./finance-normalization";
 
 /**
  * Phase 2 CRUD server functions for commercial invoices.
@@ -119,7 +120,7 @@ async function recalcCommercialInvoiceTotalsInternal(supabase: any, id: string) 
     .select("amount_paid")
     .eq("id", id)
     .maybeSingle();
-  const paid = Number(paidRow?.amount_paid ?? 0);
+  const paid = financePaidAmount(paidRow);
   const { error: upErr } = await supabase
     .from("invoices")
     .update({

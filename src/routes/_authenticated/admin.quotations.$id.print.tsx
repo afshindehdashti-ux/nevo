@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
 import { getQuotation } from "@/lib/quotations.functions";
+import { financeTotalAmount } from "@/lib/finance-normalization";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 
@@ -90,7 +91,7 @@ function QuotationPrint() {
           <div className="text-right">
             <div className="text-xs uppercase tracking-widest text-gray-500 mb-1">Total</div>
             <div className="text-2xl font-semibold">
-              {q.currency} {Number(q.total).toLocaleString()}
+              {q.currency} {financeTotalAmount(q).toLocaleString()}
             </div>
           </div>
         </section>
@@ -150,7 +151,7 @@ function QuotationPrint() {
             <div className="flex justify-between py-2 border-t border-gray-300 mt-1 font-semibold">
               <span>Total</span>
               <span className="tabular-nums">
-                {q.currency} {Number(q.total).toLocaleString()}
+                {q.currency} {financeTotalAmount(q).toLocaleString()}
               </span>
             </div>
           </div>

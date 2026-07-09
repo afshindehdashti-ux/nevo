@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { listQuotations } from "@/lib/quotations.functions";
+import { financeTotalAmount } from "@/lib/finance-normalization";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -122,7 +123,7 @@ function QuotationsPage() {
                     <Badge variant={statusColor[r.status] ?? "outline"}>{r.status}</Badge>
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {r.currency} {Number(r.total ?? 0).toLocaleString()}
+                    {r.currency} {financeTotalAmount(r).toLocaleString()}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
