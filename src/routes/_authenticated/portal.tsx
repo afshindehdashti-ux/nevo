@@ -19,6 +19,10 @@ import {
   getMyMessageAttachmentUrl,
   markMyMessagesRead,
 } from "@/lib/customer-portal.functions";
+import {
+  financeBalanceDue,
+  financeTotalAmount,
+} from "@/lib/finance-normalization";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
