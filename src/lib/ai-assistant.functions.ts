@@ -583,7 +583,7 @@ export const getRecordSummary = createServerFn({ method: "POST" })
         .maybeSingle();
       if (!i) return { summary: null };
       return {
-        summary: `${i.type ?? "Invoice"} ${i.invoice_number ?? ""} — status ${i.status}. Total ${i.total} ${i.currency ?? ""}, balance ${i.balance ?? 0}. Due ${i.due_date ?? "n/a"}.`,
+        summary: `${i.type ?? "Invoice"} ${i.invoice_number ?? ""} — status ${i.status}. Total ${financeTotalAmount(i)} ${i.currency ?? ""}, balance ${financeBalanceDue(i)}. Due ${i.due_date ?? "n/a"}.`,
       };
     }
     if (data.module === "quotation") {
