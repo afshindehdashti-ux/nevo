@@ -1,0 +1,57 @@
+name: E2E — Backend CTA Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  playwright:
+    name: Playwright (backend CTA gate)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Cache Playwright browsers by the installed version so upgrades bust
+      # the cache automatically.
+      - name: Resolve Playwright version
+        id: pw
+        run: echo "version=$(bun pm ls | grep '@playwright/test' | head -1 | awk '{print $NF}')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      # Build once; the Playwright config's webServer runs `vite preview`
+      # against this build. Fails the job on any test failure, blocking
+      # the merge via required-status-check on `main`.
+      - name: Run E2E — backend CTA gate
+        run: bun run test:e2e:backend-cta
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-backend-cta-report
+          path: |
+            reports/playwright/
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
