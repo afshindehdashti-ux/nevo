@@ -696,3 +696,40 @@ export const emailQuotation = createServerFn({ method: "POST" })
 
 
 
+
+/** Recompute subtotal / vat_amount / total on a quotation from its items.
+ *  DB trigger `recalc_quotation_totals` normally handles this; the app-side
+ *  path exists so all four Phase 2 document types share identical semantics
+ *  and so callers can force a reconciliation after out-of-band edits. */
+export const recalcQuotationTotals = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => IdInput.parse(v))
+  .handler(async ({ context, data }) => {
+    const { data: items, error } = await context.supabase
+      .from("quotation_items")
+      .select("line_total, quantity, unit_price, discount_pct")
+      .eq("quotation_id", data.id);
+    if (error) throw new Error(error.message);
+    const { data: header } = await context.supabase
+      .from("quotations")
+      .select("vat_rate")
+      .eq("id", data.id)
+      .maybeSingle();
+    const vatRate = Number(header?.vat_rate ?? 0);
+    let subtotal = 0;
+    for (const it of items ?? []) {
+      const q = Number(it.quantity);
+      const p = Number(it.unit_price);
+      const d = Number(it.discount_pct);
+      subtotal += q * p * (1 - d / 100);
+    }
+    subtotal = Math.round(subtotal * 100) / 100;
+    const vat_amount = Math.round(subtotal * vatRate) / 100;
+    const total = Math.round((subtotal + vat_amount) * 100) / 100;
+    const { error: upErr } = await context.supabase
+      .from("quotations")
+      .update({ subtotal, vat_amount, total, updated_at: new Date().toISOString() })
+      .eq("id", data.id);
+    if (upErr) throw new Error(upErr.message);
+    return { subtotal, vat_amount, total };
+  });
