@@ -105,6 +105,14 @@ function LeadDetail() {
       };
       const { error } = await supabase.from("project_inquiries").update(patch).eq("id", id);
       if (error) throw error;
+      await logAudit({
+        data: {
+          action: "update",
+          entity_type: "lead",
+          entity_id: id,
+          metadata: { fields: Object.keys(patch) },
+        },
+      }).catch(() => undefined);
     },
     onSuccess: () => {
       toast.success("Lead updated");
