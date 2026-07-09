@@ -238,7 +238,7 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
 
   const openOrders = orders.filter((o) => o.status !== "delivered" && o.status !== "cancelled").length;
   const inTransit = shipments.filter((s) => s.status === "in_transit").length;
-  const balanceDue = invoices.reduce((s, i) => s + Number(i.balance ?? 0), 0);
+  const balanceDue = invoices.reduce((s, i) => s + financeBalanceDue(i), 0);
   const currency = invoices[0]?.currency ?? orders[0]?.currency ?? "USD";
 
   async function download(docId: string) {
