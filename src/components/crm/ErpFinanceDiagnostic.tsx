@@ -99,14 +99,19 @@ export function ErpFinanceDiagnostic() {
   const runQa = useServerFn(runErpQa);
   const runTest = useServerFn(runErpFinanceTest);
   const runIso = useServerFn(runProformaE2eIsolated);
+  const runTrig = useServerFn(runProformaTriggerRecomputeTest);
   const [qa, setQa] = useState<QaReport | null>(null);
   const [test, setTest] = useState<FinanceReport | null>(null);
   const [pdfReport, setPdfReport] = useState<PdfE2eReport | null>(null);
   const [iso, setIso] = useState<IsoReport | null>(null);
+  const [trig, setTrig] = useState<
+    (IsoReport & { expected: Record<string, number> }) | null
+  >(null);
   const [qaLoading, setQaLoading] = useState(false);
   const [testLoading, setTestLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [isoLoading, setIsoLoading] = useState(false);
+  const [trigLoading, setTrigLoading] = useState(false);
 
   async function onRunQa() {
     setQaLoading(true);
