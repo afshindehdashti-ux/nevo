@@ -99,7 +99,7 @@ export const emailInvoicePdf = createServerFn({ method: "POST" })
             // on the same click is.
             idempotencyKey: `invoice-share-${invoice.id}-${data.storagePath}`,
             templateData: {
-              customerName: customer?.name ?? undefined,
+              customerName: customerDisplayName(customer),
               invoiceNumber: invoice.invoice_number ?? undefined,
               invoiceKind,
               currency: invoice.currency ?? "USD",
