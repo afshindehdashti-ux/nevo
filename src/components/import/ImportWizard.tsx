@@ -221,7 +221,16 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
             </div>
             <p className="text-sm">
               Ready to import <span className="font-medium">{rows.length}</span> rows into
-              {" "}<span className="font-medium">{schema.table}</span>. Preview of first 5:
+              {" "}<span className="font-medium">{schema.table}</span>.
+              {schema.groupBy && groupCount !== null && (
+                <>
+                  {" "}Rows will be grouped by
+                  {" "}<code className="rounded bg-muted px-1 text-[11px]">{schema.groupBy}</code>
+                  {" "}into <span className="font-medium">{groupCount}</span> parent record
+                  {groupCount === 1 ? "" : "s"} with line items.
+                </>
+              )}
+              {" "}Preview of first 5 source rows:
             </p>
             <div className="max-h-[280px] overflow-auto rounded-md border border-border">
               <table className="w-full text-xs">
