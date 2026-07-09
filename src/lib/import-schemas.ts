@@ -19,6 +19,17 @@ export interface ImportEntitySchema {
   table: string;               // target public.<table>
   category: string;
   supportsUpsert?: boolean;
+  /**
+   * If set, rows sharing the same value of this field key are grouped into
+   * one parent record (e.g. quotations header) with the remaining rows
+   * appended as children (e.g. quotation_items). Server-side code owns the
+   * split; the mapping UI still asks the user to map each field once.
+   */
+  groupBy?: string;
+  /** Field keys that belong to the parent header (only the first row of a group is used). */
+  headerFields?: string[];
+  /** Field keys that belong to child line items (all rows of a group contribute). */
+  itemFields?: string[];
   fields: ImportField[];
 }
 
@@ -135,6 +146,96 @@ export const IMPORT_SCHEMAS: Record<string, ImportEntitySchema> = {
       { key: "default_commission_pct", label: "Default commission %", type: "number", aliases: ["commission"] },
       { key: "hs_code", label: "HS code" },
       { key: "is_active", label: "Active", type: "boolean" },
+    ],
+  },
+  quotations: {
+    key: "quotations",
+    label: "Quotations",
+    table: "quotations",
+    category: "Finance",
+    groupBy: "quotation_number",
+    headerFields: [
+      "quotation_number",
+      "customer_name",
+      "issue_date",
+      "valid_until",
+      "currency",
+      "vat_rate",
+      "status",
+      "terms",
+      "notes",
+    ],
+    itemFields: [
+      "item_code",
+      "description",
+      "quantity",
+      "unit",
+      "unit_price",
+      "discount_pct",
+      "hs_code",
+    ],
+    fields: [
+      // Header — first non-empty value per group wins.
+      {
+        key: "quotation_number",
+        label: "Quotation #",
+        required: true,
+        aliases: ["quote", "quote number", "quotation no", "quote no", "ref", "reference"],
+        note: "Rows sharing this value merge into one quotation as line items.",
+      },
+      {
+        key: "customer_name",
+        label: "Customer name",
+        required: true,
+        aliases: ["customer", "company", "account", "client"],
+        note: "Matched to existing customer by name; created if missing.",
+      },
+      { key: "issue_date", label: "Issue date", aliases: ["date", "quote date"] },
+      { key: "valid_until", label: "Valid until", aliases: ["expiry", "expires"] },
+      { key: "currency", label: "Currency", aliases: ["ccy"] },
+      {
+        key: "vat_rate",
+        label: "VAT %",
+        type: "number",
+        aliases: ["vat", "tax", "tax %", "tax rate"],
+      },
+      {
+        key: "status",
+        label: "Status",
+        type: "enum",
+        enumValues: ["draft", "sent", "approved", "accepted", "rejected", "expired"],
+      },
+      { key: "terms", label: "Terms" },
+      { key: "notes", label: "Notes" },
+
+      // Line items — every row contributes.
+      { key: "item_code", label: "Item code", aliases: ["sku", "code", "product code"] },
+      {
+        key: "description",
+        label: "Item description",
+        required: true,
+        aliases: ["item", "product", "line description", "desc"],
+      },
+      {
+        key: "quantity",
+        label: "Quantity",
+        type: "number",
+        aliases: ["qty"],
+      },
+      { key: "unit", label: "Unit", aliases: ["uom"] },
+      {
+        key: "unit_price",
+        label: "Unit price",
+        type: "number",
+        aliases: ["price", "rate"],
+      },
+      {
+        key: "discount_pct",
+        label: "Discount %",
+        type: "number",
+        aliases: ["discount", "disc", "disc %"],
+      },
+      { key: "hs_code", label: "HS code" },
     ],
   },
 };

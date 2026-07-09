@@ -60,6 +60,22 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
     return missing.map((f) => `Required column "${f.label}" is not mapped.`);
   }, [mapping, schema]);
 
+  // For hierarchical schemas (e.g. quotations), estimate parent record count
+  // by counting unique group-by values in the uploaded rows.
+  const groupCount = useMemo(() => {
+    if (!schema.groupBy) return null;
+    const src = mapping[schema.groupBy];
+    if (!src) return null;
+    const seen = new Set<string>();
+    for (const r of rows) {
+      const v = r[src];
+      if (v !== undefined && v !== null && String(v).trim() !== "") {
+        seen.add(String(v).trim());
+      }
+    }
+    return seen.size;
+  }, [rows, mapping, schema]);
+
   const previewRows = rows.slice(0, 5);
 
   const runMut = useMutation({
@@ -95,8 +111,9 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Wizard supports {Object.keys(IMPORT_SCHEMAS).length} entity types today (Customers, Contacts,
-              Leads, Suppliers, Products). More coming.
+              Wizard supports {Object.keys(IMPORT_SCHEMAS).length} entity types today (Customers,
+              Contacts, Leads, Suppliers, Products, Quotations). Quotations import groups rows by
+              quotation number into one header + line items.
             </p>
             <DialogFooter>
               <Button onClick={() => setStep("upload")}>Next <ArrowRight className="ml-1 h-4 w-4" /></Button>
@@ -205,7 +222,16 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
             </div>
             <p className="text-sm">
               Ready to import <span className="font-medium">{rows.length}</span> rows into
-              {" "}<span className="font-medium">{schema.table}</span>. Preview of first 5:
+              {" "}<span className="font-medium">{schema.table}</span>.
+              {schema.groupBy && groupCount !== null && (
+                <>
+                  {" "}Rows will be grouped by
+                  {" "}<code className="rounded bg-muted px-1 text-[11px]">{schema.groupBy}</code>
+                  {" "}into <span className="font-medium">{groupCount}</span> parent record
+                  {groupCount === 1 ? "" : "s"} with line items.
+                </>
+              )}
+              {" "}Preview of first 5 source rows:
             </p>
             <div className="max-h-[280px] overflow-auto rounded-md border border-border">
               <table className="w-full text-xs">
