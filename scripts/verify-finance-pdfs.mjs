@@ -25,17 +25,11 @@ import {
 const OUT = "/tmp/pdf-verify";
 mkdirSync(OUT, { recursive: true });
 
-function psql(sql) {
-  const raw = execSync(`psql -A -t -F$'\\t' -c ${JSON.stringify(sql)}`, {
-    encoding: "utf8",
-  });
-  return raw.trim();
-}
 function psqlJson(sql) {
-  const raw = execSync(
-    `psql -A -t -c ${JSON.stringify(`SELECT to_jsonb(x) FROM (${sql}) x`)}`,
-    { encoding: "utf8" },
-  );
+  const raw = execSync(`psql -A -t -X`, {
+    encoding: "utf8",
+    input: `SELECT to_jsonb(x) FROM (${sql}) x;`,
+  });
   return raw
     .split("\n")
     .map((l) => l.trim())
