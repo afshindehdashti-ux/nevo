@@ -52,6 +52,11 @@ export const upsertTask = createServerFn({ method: "POST" })
   .inputValidator((v) => UpsertInput.parse(v))
   .handler(async ({ context, data }) => {
     if (data.id) {
+      const { data: prev } = await context.supabase
+        .from("tasks")
+        .select("*")
+        .eq("id", data.id)
+        .maybeSingle();
       const patch = {
         ...data,
         ...(data.status === "done" ? { completed_at: new Date().toISOString() } : {}),
@@ -64,13 +69,15 @@ export const upsertTask = createServerFn({ method: "POST" })
         entity_type: "task",
         entity_id: data.id,
         metadata: { status: data.status, priority: data.priority, assigned_to: data.assigned_to ?? null },
+        old_values: prev ?? null,
+        new_values: patch,
       });
       return { id: data.id };
     }
     const { data: row, error } = await context.supabase
       .from("tasks")
       .insert(data)
-      .select("id")
+      .select("*")
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (row?.id) {
@@ -86,6 +93,8 @@ export const upsertTask = createServerFn({ method: "POST" })
           entity_type: data.entity_type ?? null,
           entity_id: data.entity_id ?? null,
         },
+        old_values: null,
+        new_values: row,
       });
     }
     return { id: row?.id };
@@ -97,6 +106,11 @@ export const setTaskStatus = createServerFn({ method: "POST" })
     z.object({ id: z.string().uuid(), status: StatusEnum }).parse(v),
   )
   .handler(async ({ context, data }) => {
+    const { data: prev } = await context.supabase
+      .from("tasks")
+      .select("status, completed_at")
+      .eq("id", data.id)
+      .maybeSingle();
     const patch = {
       status: data.status,
       ...(data.status === "done" ? { completed_at: new Date().toISOString() } : {}),
@@ -109,6 +123,8 @@ export const setTaskStatus = createServerFn({ method: "POST" })
       entity_type: "task",
       entity_id: data.id,
       metadata: { status: data.status },
+      old_values: prev ?? null,
+      new_values: patch,
     });
     return { ok: true };
   });
@@ -117,9 +133,15 @@ export const approveTask = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ context, data }) => {
+    const { data: prev } = await context.supabase
+      .from("tasks")
+      .select("approved_by, approved_at")
+      .eq("id", data.id)
+      .maybeSingle();
+    const patch = { approved_by: context.userId, approved_at: new Date().toISOString() };
     const { error } = await context.supabase
       .from("tasks")
-      .update({ approved_by: context.userId, approved_at: new Date().toISOString() })
+      .update(patch)
       .eq("id", data.id);
     if (error) throw new Error(error.message);
     await writeAudit(context.supabase, {
@@ -128,6 +150,8 @@ export const approveTask = createServerFn({ method: "POST" })
       entity_type: "task",
       entity_id: data.id,
       metadata: {},
+      old_values: prev ?? null,
+      new_values: patch,
     });
     return { ok: true };
   });

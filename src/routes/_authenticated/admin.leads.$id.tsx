@@ -103,6 +103,11 @@ function LeadDetail() {
         timeline: form.timeline || null,
         internal_notes: form.internal_notes || null,
       };
+      const old_values = lead
+        ? Object.fromEntries(
+            Object.keys(patch).map((k) => [k, (lead as Record<string, unknown>)[k] ?? null]),
+          )
+        : null;
       const { error } = await supabase.from("project_inquiries").update(patch).eq("id", id);
       if (error) throw error;
       await logAudit({
@@ -111,6 +116,8 @@ function LeadDetail() {
           entity_type: "lead",
           entity_id: id,
           metadata: { fields: Object.keys(patch) },
+          old_values,
+          new_values: patch,
         },
       }).catch(() => undefined);
     },

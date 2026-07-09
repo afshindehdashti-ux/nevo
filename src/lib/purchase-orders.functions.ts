@@ -177,6 +177,8 @@ export const createPurchaseOrder = createServerFn({ method: "POST" })
       entity_type: "purchase_order",
       entity_id: inserted.id,
       metadata: { items: data.items.length, currency: data.header.currency },
+      old_values: null,
+      new_values: { header: data.header, items: data.items },
     });
     return { id: inserted.id };
   });
@@ -187,6 +189,11 @@ export const updatePurchaseOrderHeader = createServerFn({ method: "POST" })
     z.object({ id: z.string().uuid(), patch: HeaderInput.partial() }).parse(v),
   )
   .handler(async ({ context, data }) => {
+    const { data: prev } = await context.supabase
+      .from("orders")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
     const { error } = await context.supabase
       .from("orders")
       .update({ ...data.patch, updated_at: new Date().toISOString(), updated_by: context.userId })
@@ -198,6 +205,8 @@ export const updatePurchaseOrderHeader = createServerFn({ method: "POST" })
       entity_type: "purchase_order",
       entity_id: data.id,
       metadata: { fields: Object.keys(data.patch) },
+      old_values: prev ?? null,
+      new_values: data.patch,
     });
     return { ok: true };
   });
@@ -206,7 +215,7 @@ export const addPurchaseOrderItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => ItemInput.extend({ order_id: z.string().uuid() }).parse(v))
   .handler(async ({ context, data }) => {
-    const { error } = await context.supabase.from("order_items").insert({
+    const insertPayload = {
       order_id: data.order_id,
       product_id: data.product_id ?? null,
       description: data.description,
@@ -217,7 +226,8 @@ export const addPurchaseOrderItem = createServerFn({ method: "POST" })
       vat_pct: data.vat_pct,
       line_total: itemLineTotal(data),
       position: data.position,
-    });
+    };
+    const { error } = await context.supabase.from("order_items").insert(insertPayload);
     if (error) throw new Error(error.message);
     await recalcPurchaseOrderTotalsInternal(context.supabase, data.order_id);
     await writeAudit(context.supabase, {
@@ -226,6 +236,8 @@ export const addPurchaseOrderItem = createServerFn({ method: "POST" })
       entity_type: "purchase_order",
       entity_id: data.order_id,
       metadata: { description: data.description, quantity: data.quantity },
+      old_values: null,
+      new_values: insertPayload,
     });
     return { ok: true };
   });
@@ -237,17 +249,17 @@ export const updatePurchaseOrderItem = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const patch: Record<string, unknown> = { ...data.patch };
+    const { data: prev } = await context.supabase
+      .from("order_items")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
     if (["quantity", "unit_price", "discount_pct", "vat_pct"].some((k) => k in data.patch)) {
-      const { data: current } = await context.supabase
-        .from("order_items")
-        .select("quantity, unit_price, discount_pct, vat_pct")
-        .eq("id", data.id)
-        .maybeSingle();
       const merged = {
-        quantity: Number(data.patch.quantity ?? current?.quantity ?? 0),
-        unit_price: Number(data.patch.unit_price ?? current?.unit_price ?? 0),
-        discount_pct: Number(data.patch.discount_pct ?? current?.discount_pct ?? 0),
-        vat_pct: Number(data.patch.vat_pct ?? current?.vat_pct ?? 0),
+        quantity: Number(data.patch.quantity ?? prev?.quantity ?? 0),
+        unit_price: Number(data.patch.unit_price ?? prev?.unit_price ?? 0),
+        discount_pct: Number(data.patch.discount_pct ?? prev?.discount_pct ?? 0),
+        vat_pct: Number(data.patch.vat_pct ?? prev?.vat_pct ?? 0),
       };
       patch.line_total = itemLineTotal(merged);
     }
@@ -266,6 +278,8 @@ export const updatePurchaseOrderItem = createServerFn({ method: "POST" })
         entity_type: "purchase_order",
         entity_id: row.order_id,
         metadata: { item_id: data.id, fields: Object.keys(data.patch) },
+        old_values: prev ?? null,
+        new_values: patch,
       });
     }
     return { ok: true };
@@ -277,7 +291,7 @@ export const removePurchaseOrderItem = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { data: row } = await context.supabase
       .from("order_items")
-      .select("order_id")
+      .select("*")
       .eq("id", data.id)
       .maybeSingle();
     const { error } = await context.supabase.from("order_items").delete().eq("id", data.id);
@@ -290,6 +304,8 @@ export const removePurchaseOrderItem = createServerFn({ method: "POST" })
         entity_type: "purchase_order",
         entity_id: row.order_id,
         metadata: { item_id: data.id },
+        old_values: row ?? null,
+        new_values: null,
       });
     }
     return { ok: true };
@@ -307,6 +323,15 @@ export const savePurchaseOrder = createServerFn({ method: "POST" })
       .parse(v),
   )
   .handler(async ({ context, data }) => {
+    const { data: prevHeader } = await context.supabase
+      .from("orders")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
+    const { data: prevItems } = await context.supabase
+      .from("order_items")
+      .select("*")
+      .eq("order_id", data.id);
     if (Object.keys(data.header).length) {
       const { error } = await context.supabase
         .from("orders")
@@ -355,6 +380,8 @@ export const savePurchaseOrder = createServerFn({ method: "POST" })
         item_count: data.items.length,
         total: totals.total,
       },
+      old_values: { header: prevHeader ?? null, items: prevItems ?? [] },
+      new_values: { header: data.header, items: data.items, totals },
     });
     return totals;
   });
@@ -363,6 +390,15 @@ export const deletePurchaseOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => IdInput.parse(v))
   .handler(async ({ context, data }) => {
+    const { data: prevHeader } = await context.supabase
+      .from("orders")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
+    const { data: prevItems } = await context.supabase
+      .from("order_items")
+      .select("*")
+      .eq("order_id", data.id);
     await context.supabase.from("order_items").delete().eq("order_id", data.id);
     const { error } = await context.supabase.from("orders").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -372,6 +408,8 @@ export const deletePurchaseOrder = createServerFn({ method: "POST" })
       entity_type: "purchase_order",
       entity_id: data.id,
       metadata: {},
+      old_values: { header: prevHeader ?? null, items: prevItems ?? [] },
+      new_values: null,
     });
     return { ok: true };
   });

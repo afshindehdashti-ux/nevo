@@ -104,6 +104,8 @@ export const convertLeadToCustomer = createServerFn({ method: "POST" })
         project_id: projectId,
         create_project: data.create_project,
       },
+      old_values: { status: inq.status, converted_customer_id: inq.converted_customer_id ?? null, converted_project_id: inq.converted_project_id ?? null },
+      new_values: { status: "converted", converted_customer_id: customerId, converted_project_id: projectId },
     });
 
     return { customer_id: customerId, project_id: projectId };

@@ -40,6 +40,8 @@ export const getMyPartnerContext = createServerFn({ method: "GET" })
         entity_type: "partner",
         entity_id: primary.id,
         metadata: { portal: "partner", partner_count: partners?.length ?? 0 },
+        old_values: null,
+        new_values: null,
       });
     }
     return { partner: primary, allPartners: partners ?? [] };
@@ -117,6 +119,8 @@ export const getMyPartnerDocumentUrl = createServerFn({ method: "POST" })
       entity_type: "document",
       entity_id: data.document_id,
       metadata: { portal: "partner", partner_id: doc.partner_id, bucket: doc.storage_bucket },
+      old_values: null,
+      new_values: null,
     });
     return { url: signed?.signedUrl ?? null };
   });

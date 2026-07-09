@@ -70,6 +70,8 @@ export const sendOrderConfirmation = createServerFn({ method: "POST" })
         entity_type: "order",
         entity_id: order.id,
         metadata: { recipient, order_number: order.order_number ?? null },
+        old_values: null,
+        new_values: { recipient, order_number: order.order_number ?? null, sent_at: new Date().toISOString() },
       });
       return { ok: true as const };
     } catch (err) {
