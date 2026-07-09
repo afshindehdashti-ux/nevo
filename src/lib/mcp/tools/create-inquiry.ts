@@ -34,6 +34,7 @@ export default withAudit({
     message: z.string().trim().max(5000).optional(),
   },
   annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+  allowAnonymous: true,
   handler: async (input: Record<string, string | undefined>, ctx: ToolContext) => {
     const {
       name,
