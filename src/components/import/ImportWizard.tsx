@@ -151,15 +151,15 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
         {step === "upload" && (
           <div className="space-y-4">
             <div>
-              <Label>Upload CSV or XLSX</Label>
+              <Label>Upload CSV, XLSX, or JSON</Label>
               <Input
                 ref={fileInput}
                 type="file"
-                accept=".csv,.tsv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                accept=".csv,.tsv,.xlsx,.xls,.json,application/json,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
                 onChange={(e) => { const f = e.target.files?.[0]; if (f) void parseFile(f); }}
               />
               <p className="mt-1 text-[11px] text-muted-foreground">
-                Max 5,000 rows per file. First row must be column headers.
+                Max 5,000 rows per file. XLSX/CSV: first row must be column headers. JSON: array of objects or {"{ rows: [...] }"}.
               </p>
             </div>
             <div className="rounded-md border border-border bg-muted/30 p-3 text-xs">
