@@ -137,18 +137,28 @@ function OrderDetailPage() {
   const saveOrder = useMutation({
     mutationFn: async () => {
       if (!order) return;
+      const headerPatch = {
+        notes: notes || null,
+        order_date: orderDate,
+        requested_delivery: requestedDelivery || null,
+        incoterm: incoterm || null,
+        subtotal: totals.subtotal,
+        vat_amount: totals.vat,
+        total: totals.total,
+      };
+      const prevHeader = {
+        notes: order.notes ?? null,
+        order_date: order.order_date,
+        requested_delivery: order.requested_delivery ?? null,
+        incoterm: order.incoterm ?? null,
+        subtotal: order.subtotal ?? null,
+        vat_amount: order.vat_amount ?? null,
+        total: order.total ?? null,
+      };
       // Update header
       const { error: hErr } = await supabase
         .from("orders")
-        .update({
-          notes: notes || null,
-          order_date: orderDate,
-          requested_delivery: requestedDelivery || null,
-          incoterm: incoterm || null,
-          subtotal: totals.subtotal,
-          vat_amount: totals.vat,
-          total: totals.total,
-        })
+        .update(headerPatch)
         .eq("id", order.id);
       if (hErr) throw hErr;
 
@@ -192,6 +202,8 @@ function OrderDetailPage() {
             deleted_items: lines.filter((l) => l._deleted && l.id).length,
             total: totals.total,
           },
+          old_values: { header: prevHeader, items: items ?? [] },
+          new_values: { header: headerPatch, items: lines.filter((x) => !x._deleted) },
         },
       }).catch(() => undefined);
     },
