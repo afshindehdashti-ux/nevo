@@ -9,28 +9,21 @@ function adminClient() {
   });
 }
 
-type ToolResult = {
-  content: Array<{ type: string; text?: string } & Record<string, unknown>>;
-  structuredContent?: Record<string, unknown>;
-  isError?: boolean;
-};
-
-type DefineToolArg = Parameters<typeof defineTool>[0];
-type Handler = DefineToolArg["handler"];
-
 /**
  * Wrap a tool definition so every invocation is logged to
  * `public.mcp_tool_invocations` (tool name, caller user id/email, oauth
  * client id, request id, timestamps, duration, status, error, sizes).
  * Never throws; audit failures degrade to console.warn.
  */
-export function withAudit(def: DefineToolArg): ReturnType<typeof defineTool> {
-  const inner = def.handler as Handler;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function withAudit(def: any): any {
+  const inner = def.handler;
 
-  const wrapped: Handler = async (input: unknown, ctx: ToolContext) => {
+  const wrapped = async (input: unknown, ctx: ToolContext) => {
     const requestId =
       (ctx as unknown as { getRequestId?: () => string | undefined })?.getRequestId?.() ??
-      (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      globalThis.crypto?.randomUUID?.() ??
+      `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const startedAt = new Date();
     const t0 = Date.now();
 
@@ -46,19 +39,17 @@ export function withAudit(def: DefineToolArg): ReturnType<typeof defineTool> {
       /* ignore sizing errors */
     }
 
-    let result: ToolResult;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let result: any;
     let status: "ok" | "error" | "unauthorized" = "ok";
     let errorMessage: string | null = null;
 
     try {
-      result = (await (inner as (i: unknown, c: ToolContext) => Promise<ToolResult> | ToolResult)(
-        input,
-        ctx,
-      )) as ToolResult;
+      result = await inner(input, ctx);
       if (result?.isError) {
         status = !authed ? "unauthorized" : "error";
-        errorMessage =
-          result.content?.find((c) => c.type === "text")?.text?.toString().slice(0, 1000) ?? null;
+        const first = result.content?.find?.((c: { type: string; text?: string }) => c.type === "text");
+        errorMessage = typeof first?.text === "string" ? first.text.slice(0, 1000) : null;
       }
     } catch (err) {
       status = "error";
@@ -66,8 +57,8 @@ export function withAudit(def: DefineToolArg): ReturnType<typeof defineTool> {
       result = { content: [{ type: "text", text: errorMessage }], isError: true };
     }
 
-    const rows = Array.isArray((result?.structuredContent as { rows?: unknown[] })?.rows)
-      ? ((result.structuredContent as { rows: unknown[] }).rows.length as number)
+    const rows = Array.isArray(result?.structuredContent?.rows)
+      ? (result.structuredContent.rows.length as number)
       : null;
 
     // Fire-and-forget audit insert.
