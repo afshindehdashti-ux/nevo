@@ -175,6 +175,21 @@ export function ErpFinanceDiagnostic() {
     }
   }
 
+  async function onRunTrigger() {
+    setTrigLoading(true);
+    try {
+      const r = (await runTrig()) as IsoReport & { expected: Record<string, number> };
+      setTrig(r);
+      if (r.failed > 0)
+        toast.error(`Trigger recompute test: ${r.failed} failing assertion(s)`);
+      else toast.success("Trigger recompute test passed (vat_rate, discount_amount, grand_total)");
+    } catch (e) {
+      toast.error(`Trigger recompute test failed: ${(e as Error).message}`);
+    } finally {
+      setTrigLoading(false);
+    }
+  }
+
   const failedChecks = qa?.results.filter((r) => r.status === "fail") ?? [];
   const warnChecks = qa?.results.filter((r) => r.status === "warn") ?? [];
 
