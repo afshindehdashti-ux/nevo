@@ -298,6 +298,70 @@ export const convertFinanceDocument = createServerFn({ method: "POST" })
     return { id: newDoc.id };
   });
 
+/**
+ * One-click "start a Purchase Order from a supplier": creates a draft
+ * `finance_documents` PO pre-populated with the supplier's currency and
+ * payment terms. Items are left empty for the user to fill in — a supplier
+ * has no line items to copy, unlike the quote/proforma/invoice chain.
+ * Idempotency isn't enforced: users can legitimately create many POs for
+ * the same supplier.
+ */
+export const createPurchaseOrderFromSupplier = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v: unknown) =>
+    z
+      .object({
+        supplier_id: z.string().uuid(),
+        currency: z.string().max(8).optional(),
+        payment_terms: z.string().nullable().optional(),
+        notes: z.string().nullable().optional(),
+      })
+      .parse(v),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: supplier, error: sErr } = await context.supabase
+      .from("suppliers")
+      .select("id, name, currency, payment_terms, is_active")
+      .eq("id", data.supplier_id)
+      .maybeSingle();
+    if (sErr) throw new Error(sErr.message);
+    if (!supplier) throw new Error("Supplier not found");
+    if (supplier.is_active === false) throw new Error("Supplier is inactive");
+
+    const { data: ins, error } = await (context.supabase.from("finance_documents") as any)
+      .insert({
+        document_type: "purchase_order",
+        status: "draft",
+        supplier_id: supplier.id,
+        currency: data.currency ?? supplier.currency ?? "USD",
+        payment_terms: data.payment_terms ?? supplier.payment_terms ?? null,
+        notes: data.notes ?? null,
+        created_by: context.userId,
+        updated_by: context.userId,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+
+    try {
+      await context.supabase.from("activity_logs").insert({
+        user_id: context.userId,
+        action: "create",
+        entity_type: "purchase_order_from_supplier",
+        entity_id: ins.id,
+        metadata: {
+          supplier_id: supplier.id,
+          supplier_name: supplier.name,
+          currency: data.currency ?? supplier.currency,
+        },
+      });
+    } catch (err) {
+      console.warn("createPurchaseOrderFromSupplier activity log failed", err);
+    }
+
+    return { id: ins.id as string };
+  });
+
 export const deleteFinanceDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) => z.object({ id: z.string().uuid() }).parse(v))
