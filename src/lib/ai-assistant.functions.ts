@@ -1,6 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import {
+  financeBalanceDue,
+  financeTotalAmount,
+} from "./finance-normalization";
 
 /** All server functions that back the NEVO internal AI Assistant. */
 
