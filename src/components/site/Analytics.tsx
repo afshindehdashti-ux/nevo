@@ -45,8 +45,13 @@ export function Analytics() {
     return () => window.removeEventListener("nevo-consent-change", onChange);
   }, []);
 
+  // Skip marketing-pixel injection on backend routes so staff sessions in
+  // /admin, /crm, /backoffice aren't tracked as marketing traffic.
+  const isBackend = useIsBackend();
+
   useEffect(() => {
-    if (consent !== "accepted") return;
+    if (consent !== "accepted" || isBackend) return;
+
 
     if (IDS.ga4) {
       injectSrc("ga4-src", `https://www.googletagmanager.com/gtag/js?id=${IDS.ga4}`);
