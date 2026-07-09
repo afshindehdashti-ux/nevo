@@ -23,6 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { FileDown, FileSpreadsheet, Loader2 } from "lucide-react";
+import { financeBalanceDue } from "@/lib/finance-normalization";
 import { toast } from "sonner";
 import {
   exportToExcel,
