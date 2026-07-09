@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { customerDisplayName, type CustomerDisplay } from "@/lib/finance-normalization";
 
 const schema = z.object({
   invoiceId: z.string().uuid(),
@@ -31,7 +32,7 @@ export const emailInvoicePdf = createServerFn({ method: "POST" })
     const { data: invoice, error: invErr } = await supabase
       .from("invoices")
       .select(
-        "id, invoice_number, type, currency, total, issue_date, due_date, customer_id, customers(name, email)",
+        "id, invoice_number, type, currency, total, issue_date, due_date, customer_id, customers(name, company_name, email)",
       )
       .eq("id", data.invoiceId)
       .maybeSingle();
@@ -64,9 +65,7 @@ export const emailInvoicePdf = createServerFn({ method: "POST" })
       return { ok: false as const, reason: "no_request_context" };
     }
 
-    const customer = invoice.customers as
-      | { name?: string | null; email?: string | null }
-      | null;
+    const customer = invoice.customers as CustomerDisplay | null;
     const invoiceKind: "proforma" | "commercial" =
       invoice.type === "commercial" ? "commercial" : "proforma";
 
