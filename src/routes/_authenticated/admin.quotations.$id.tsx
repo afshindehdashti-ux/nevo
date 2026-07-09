@@ -248,6 +248,15 @@ function QuotationEditor() {
       toast.error(errs.join(" · "));
       return;
     }
+    try {
+      const { assertDocumentReadyForPdf } = await import(
+        "@/lib/document-pdf-validation.functions"
+      );
+      await assertDocumentReadyForPdf({ data: { kind: "quotation", id: q.id } });
+    } catch (err: any) {
+      toast.error(err?.message ?? "Cannot generate PDF");
+      return;
+    }
     const seller = await loadSellerSettings();
     const { blob } = buildQuotationPdf(q as any, data.items as any, seller);
     window.open(URL.createObjectURL(blob), "_blank");
