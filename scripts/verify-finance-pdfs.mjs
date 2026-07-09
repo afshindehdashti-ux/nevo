@@ -240,3 +240,31 @@ for (const r of results) {
 
 console.log(`\n${failed === 0 ? "✅ ALL CHECKS PASSED" : `❌ ${failed} CHECK(S) FAILED`}`);
 process.exit(failed === 0 ? 0 : 1);
+
+// ---------- Positive-branch check: real customer with billing_address ----------
+console.log("\n=== POSITIVE BRANCH: real customer with billing_address ===");
+const [tp] = psqlJson(`
+  SELECT id, name, company_name, email, billing_address, address, city, country, vat_number, phone
+  FROM customers
+  WHERE billing_address IS NOT NULL
+  ORDER BY created_at DESC LIMIT 1
+`);
+console.log("DB customer:", tp);
+const name = customerDisplayName(tp);
+const addr = customerBillingAddress(tp);
+const vat = customerVatNumber(tp);
+console.log("Rendered display name:", name);
+console.log("Rendered billing address:", JSON.stringify(addr));
+console.log("Rendered VAT:", vat);
+const posDoc = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
+renderBillTo(posDoc, tp, 40, 60);
+const posFile = "/tmp/pdf-verify/positive.pdf";
+writeFileSync(posFile, Buffer.from(posDoc.output("arraybuffer")));
+execSync(`pdftotext -layout ${posFile} ${posFile}.txt`);
+const posText = execSync(`cat ${posFile}.txt`, { encoding: "utf8" });
+const posChecks = [
+  [`display name = "${name}"`, posText.includes(name)],
+  [`billing_address first line rendered`, posText.includes(addr.split("\n")[0])],
+];
+for (const [l, ok] of posChecks) console.log(`  ${ok ? "✅" : "❌"} ${l}`);
+console.log("\n(No seed row has vat_number populated; VAT rendering covered by unit tests.)");
