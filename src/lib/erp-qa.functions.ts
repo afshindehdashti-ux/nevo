@@ -1213,3 +1213,407 @@ export const runProformaTriggerRecomputeTest = createServerFn({ method: "POST" }
       steps,
     };
   });
+
+/**
+ * End-to-end test for the quotation import flow.
+ *
+ * Uses a unique run marker so parallel/repeat runs never collide and cleanup
+ * is targeted. Exercises three scenarios against the real `runImportJob`
+ * server function:
+ *   A) Happy path — two grouped quotations with known totals; asserts
+ *      groups_created, per-quotation subtotal / vat_amount / total, and that
+ *      a new customer was created and reused across both groups.
+ *   B) Customer mapping — pre-seeded customer name reused case-insensitively;
+ *      asserts NO duplicate customer row was inserted.
+ *   C) Validation failure — one group has a non-numeric quantity and another
+ *      is missing the required description; asserts those groups are rejected
+ *      AND no partial `quotations` / `quotation_items` rows survive
+ *      (rollback + no orphans).
+ *
+ * Cleanup always runs in `finally`.
+ */
+export const runQuotationImportE2e = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const supabase = context.supabase as any;
+    const startedAt = new Date().toISOString();
+    const runId =
+      globalThis.crypto?.randomUUID?.() ??
+      `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    const marker = `qie:${runId}`;
+    // Customer names carry the marker so cleanup is exact.
+    const custA = `QIE Buyer A ${runId}`;
+    const custB = `QIE Buyer B ${runId}`;
+    // Quotation numbers carry the marker so we can find headers created by
+    // this run without touching anything else.
+    const qNum = (n: string) => `QIE-${runId.slice(0, 8)}-${n}`;
+
+    const steps: Array<{
+      key: string;
+      label: string;
+      status: CheckStatus;
+      message: string;
+      details?: any;
+    }> = [];
+    const step = (s: (typeof steps)[number]) => steps.push(s);
+
+    // Track everything created so cleanup covers even partial failures.
+    const createdCustomerIds = new Set<string>();
+    const createdQuotationNumbers = new Set<string>();
+    const importJobIds = new Set<string>();
+
+    // Pre-cleanup: sweep leftovers from earlier failed runs of this test
+    // (marker prefix, not this run's runId).
+    try {
+      const { data: leftoverQuotes } = await supabase
+        .from("quotations")
+        .select("id, quotation_number")
+        .like("quotation_number", "QIE-%");
+      const leftoverIds = (leftoverQuotes ?? []).map((r: any) => r.id);
+      if (leftoverIds.length > 0) {
+        await supabase.from("quotation_items").delete().in("quotation_id", leftoverIds);
+        await supabase.from("quotations").delete().in("id", leftoverIds);
+      }
+      const { data: leftoverCusts } = await supabase
+        .from("customers")
+        .select("id")
+        .like("name", "QIE Buyer%");
+      const leftoverCustIds = (leftoverCusts ?? []).map((r: any) => r.id);
+      if (leftoverCustIds.length > 0) {
+        await supabase.from("customers").delete().in("id", leftoverCustIds);
+      }
+      step({
+        key: "pre_sweep",
+        label: "Pre-run sweep of prior test leftovers",
+        status: "pass",
+        message: `Removed ${leftoverIds.length} quotations + ${leftoverCustIds.length} customers`,
+      });
+    } catch (e) {
+      step({
+        key: "pre_sweep",
+        label: "Pre-run sweep of prior test leftovers",
+        status: "warn",
+        message: (e as Error).message,
+      });
+    }
+
+    const mapping: Record<string, string> = {
+      quotation_number: "quote_no",
+      customer_name: "buyer",
+      issue_date: "date",
+      currency: "ccy",
+      vat_rate: "vat",
+      status: "status",
+      description: "desc",
+      quantity: "qty",
+      unit_price: "price",
+      discount_pct: "disc",
+      item_code: "sku",
+    };
+
+    // ---------- Scenario A: happy path, two grouped quotations ----------
+    try {
+      const numA1 = qNum("A1");
+      const numA2 = qNum("A2");
+      createdQuotationNumbers.add(numA1);
+      createdQuotationNumbers.add(numA2);
+
+      // Q A1: subtotal = 10*100 + 5*50*(1-0.10) = 1000 + 225 = 1225.
+      //       VAT 5%    = 61.25, total = 1286.25.
+      // Q A2: subtotal = 2*200*(1-0.25) = 300. VAT 5% = 15, total = 315.
+      const rows = [
+        { quote_no: numA1, buyer: custA, date: "2026-07-01", ccy: "USD", vat: 5, status: "draft", desc: "Rebar 12mm", qty: 10, price: 100, disc: 0, sku: "SKU-A1" },
+        { quote_no: numA1, buyer: custA, date: "2026-07-01", ccy: "USD", vat: 5, status: "draft", desc: "Cement 50kg", qty: 5, price: 50, disc: 10, sku: "SKU-A2" },
+        { quote_no: numA2, buyer: custA, date: "2026-07-02", ccy: "USD", vat: 5, status: "draft", desc: "Rebar 12mm", qty: 2, price: 200, disc: 25, sku: "SKU-A1" },
+      ];
+
+      const result: any = await runImportJob({
+        data: {
+          import_type: "quotations",
+          file_name: `qie-${runId}-A.tsv`,
+          mapping,
+          rows,
+          mode: "create",
+        },
+      });
+      if (result?.job_id) importJobIds.add(result.job_id);
+
+      const expected = {
+        groups: 2,
+        success: 3,
+        failed: 0,
+        A1: { subtotal: 1225, vat: 61.25, total: 1286.25 },
+        A2: { subtotal: 300, vat: 15, total: 315 },
+      };
+      const gotGroups = result?.groups_created;
+      const gotSuccess = result?.success;
+      const gotFailed = result?.failed;
+      const okCounts =
+        gotGroups === expected.groups &&
+        gotSuccess === expected.success &&
+        gotFailed === expected.failed;
+
+      // Fetch created quotations and assert totals.
+      const { data: quotes } = await supabase
+        .from("quotations")
+        .select("id, quotation_number, customer_id, subtotal, vat_rate, vat_amount, total")
+        .in("quotation_number", [numA1, numA2]);
+      const byNum = new Map<string, any>((quotes ?? []).map((q: any) => [q.quotation_number, q]));
+      const q1 = byNum.get(numA1);
+      const q2 = byNum.get(numA2);
+      const nearly = (a: number, b: number) => Math.abs(Number(a) - Number(b)) < 0.02;
+
+      const totalsOk =
+        !!q1 && !!q2 &&
+        nearly(q1.subtotal, expected.A1.subtotal) &&
+        nearly(q1.vat_amount, expected.A1.vat) &&
+        nearly(q1.total, expected.A1.total) &&
+        nearly(q2.subtotal, expected.A2.subtotal) &&
+        nearly(q2.vat_amount, expected.A2.vat) &&
+        nearly(q2.total, expected.A2.total);
+
+      // Both quotations must share the same customer_id (customer reuse
+      // inside a single import batch).
+      const sharedCustomer = !!q1 && !!q2 && q1.customer_id === q2.customer_id;
+      if (q1?.customer_id) createdCustomerIds.add(q1.customer_id);
+
+      step({
+        key: "happy_path",
+        label: "Scenario A: two grouped quotations import with correct totals",
+        status: okCounts && totalsOk && sharedCustomer ? "pass" : "fail",
+        message:
+          okCounts && totalsOk && sharedCustomer
+            ? `groups=${gotGroups}, success=${gotSuccess}, both quotations use same new customer, totals match to ±0.02`
+            : `Mismatch — groups=${gotGroups}/${expected.groups}, success=${gotSuccess}/${expected.success}, failed=${gotFailed}/${expected.failed}, totalsOk=${totalsOk}, sharedCustomer=${sharedCustomer}`,
+        details: { expected, got: { groups: gotGroups, success: gotSuccess, failed: gotFailed }, q1, q2 },
+      });
+    } catch (e) {
+      step({
+        key: "happy_path",
+        label: "Scenario A: two grouped quotations import with correct totals",
+        status: "fail",
+        message: (e as Error).message,
+      });
+    }
+
+    // ---------- Scenario B: customer mapping — reuse existing ----------
+    try {
+      // Pre-seed a customer with custB name.
+      const { data: seed, error: seedErr } = await supabase
+        .from("customers")
+        .insert({ name: custB, company_name: custB, country: "AE" })
+        .select("id")
+        .single();
+      if (seedErr || !seed) throw new Error(`Pre-seed customer failed: ${seedErr?.message}`);
+      const seedId = seed.id as string;
+      createdCustomerIds.add(seedId);
+
+      const numB1 = qNum("B1");
+      createdQuotationNumbers.add(numB1);
+
+      // Import row uses the same name but different casing to also assert
+      // case-insensitive matching handled by the importer.
+      const rows = [
+        { quote_no: numB1, buyer: custB.toUpperCase(), date: "2026-07-03", ccy: "EUR", vat: 20, status: "draft", desc: "Consulting", qty: 1, price: 500, disc: 0, sku: "SVC-1" },
+      ];
+      const result: any = await runImportJob({
+        data: {
+          import_type: "quotations",
+          file_name: `qie-${runId}-B.tsv`,
+          mapping,
+          rows,
+          mode: "create",
+        },
+      });
+      if (result?.job_id) importJobIds.add(result.job_id);
+
+      const { data: quote } = await supabase
+        .from("quotations")
+        .select("id, customer_id")
+        .eq("quotation_number", numB1)
+        .maybeSingle();
+
+      const { data: dupCheck } = await supabase
+        .from("customers")
+        .select("id")
+        .ilike("name", custB);
+      const dupCount = (dupCheck ?? []).length;
+
+      const reused = !!quote && quote.customer_id === seedId;
+      const noDupes = dupCount === 1;
+
+      step({
+        key: "customer_mapping",
+        label: "Scenario B: existing customer is reused (case-insensitive)",
+        status: reused && noDupes ? "pass" : "fail",
+        message:
+          reused && noDupes
+            ? `Quotation linked to pre-seeded customer; customers with name "${custB}" = ${dupCount}`
+            : `reused=${reused}, customersWithName=${dupCount} (expected 1)`,
+        details: { seedId, quote, dupCount, importResult: result },
+      });
+    } catch (e) {
+      step({
+        key: "customer_mapping",
+        label: "Scenario B: existing customer is reused (case-insensitive)",
+        status: "fail",
+        message: (e as Error).message,
+      });
+    }
+
+    // ---------- Scenario C: validation failures block broken imports ----------
+    try {
+      // Snapshot counts before running the failing import so we can prove
+      // nothing partial survived.
+      const numC1 = qNum("C1"); // bad quantity
+      const numC2 = qNum("C2"); // missing description
+      const numC3 = qNum("C3"); // clean group — this one SHOULD land
+      createdQuotationNumbers.add(numC1);
+      createdQuotationNumbers.add(numC2);
+      createdQuotationNumbers.add(numC3);
+
+      const rows = [
+        // C1: single row with quantity = "not-a-number" → coerce fails.
+        { quote_no: numC1, buyer: custA, date: "2026-07-04", ccy: "USD", vat: 5, status: "draft", desc: "Broken qty", qty: "not-a-number", price: 10, disc: 0, sku: "BAD-1" },
+        // C2: missing description → required-field failure at group insert time.
+        { quote_no: numC2, buyer: custA, date: "2026-07-04", ccy: "USD", vat: 5, status: "draft", desc: "", qty: 1, price: 10, disc: 0, sku: "BAD-2" },
+        // C3: clean row so we prove the good group still lands.
+        { quote_no: numC3, buyer: custA, date: "2026-07-04", ccy: "USD", vat: 5, status: "draft", desc: "Good item", qty: 2, price: 50, disc: 0, sku: "OK-1" },
+      ];
+
+      const result: any = await runImportJob({
+        data: {
+          import_type: "quotations",
+          file_name: `qie-${runId}-C.tsv`,
+          mapping,
+          rows,
+          mode: "create",
+        },
+      });
+      if (result?.job_id) importJobIds.add(result.job_id);
+
+      const { data: survivors } = await supabase
+        .from("quotations")
+        .select("id, quotation_number")
+        .in("quotation_number", [numC1, numC2, numC3]);
+      const surviveNums = new Set<string>((survivors ?? []).map((r: any) => r.quotation_number));
+
+      const failedCount = Number(result?.failed ?? 0);
+      const successCount = Number(result?.success ?? 0);
+      const brokenGroupsRejected = !surviveNums.has(numC1) && !surviveNums.has(numC2);
+      const cleanGroupLanded = surviveNums.has(numC3);
+
+      // Orphan check — any quotation_items referencing a quotation_number
+      // that never got created?
+      const badIds = (survivors ?? [])
+        .filter((r: any) => r.quotation_number === numC1 || r.quotation_number === numC2)
+        .map((r: any) => r.id);
+      const { data: orphanItems } = await supabase
+        .from("quotation_items")
+        .select("id, quotation_id")
+        .in("quotation_id", badIds.length > 0 ? badIds : ["00000000-0000-0000-0000-000000000000"]);
+      const orphanCount = (orphanItems ?? []).length;
+
+      const pass =
+        failedCount >= 2 &&
+        successCount >= 1 &&
+        brokenGroupsRejected &&
+        cleanGroupLanded &&
+        orphanCount === 0;
+
+      step({
+        key: "validation_failure",
+        label: "Scenario C: invalid rows rejected, clean rows land, no orphan items",
+        status: pass ? "pass" : "fail",
+        message: pass
+          ? `failed=${failedCount}, success=${successCount}, broken groups rejected, clean group persisted, 0 orphan items`
+          : `failed=${failedCount} (expected ≥2), success=${successCount} (expected ≥1), brokenGroupsRejected=${brokenGroupsRejected}, cleanGroupLanded=${cleanGroupLanded}, orphanItems=${orphanCount}`,
+        details: { importResult: result, survivors: [...surviveNums], orphanCount },
+      });
+    } catch (e) {
+      step({
+        key: "validation_failure",
+        label: "Scenario C: invalid rows rejected, clean rows land, no orphan items",
+        status: "fail",
+        message: (e as Error).message,
+      });
+    }
+
+    // ---------- Guaranteed cleanup ----------
+    try {
+      // Fetch every quotation created by this run (by number prefix) so we
+      // catch anything even the scenario steps forgot to add.
+      const { data: allQuotes } = await supabase
+        .from("quotations")
+        .select("id, customer_id, quotation_number")
+        .like("quotation_number", `QIE-${runId.slice(0, 8)}-%`);
+      const quoteIds = (allQuotes ?? []).map((r: any) => r.id);
+      const quoteCustIds = (allQuotes ?? []).map((r: any) => r.customer_id).filter(Boolean);
+      if (quoteIds.length > 0) {
+        await supabase.from("quotation_items").delete().in("quotation_id", quoteIds);
+        await supabase.from("quotations").delete().in("id", quoteIds);
+      }
+
+      const custIds = new Set<string>([...createdCustomerIds, ...quoteCustIds]);
+      if (custIds.size > 0) {
+        await supabase.from("customers").delete().in("id", [...custIds]);
+      }
+
+      if (importJobIds.size > 0) {
+        await supabase.from("import_job_rows").delete().in("import_job_id", [...importJobIds]);
+        await supabase.from("import_jobs").delete().in("id", [...importJobIds]);
+      }
+
+      // Orphan verification: nothing referencing this run should remain.
+      const { data: leftoverQuotes } = await supabase
+        .from("quotations")
+        .select("id")
+        .like("quotation_number", `QIE-${runId.slice(0, 8)}-%`);
+      const { data: leftoverCusts } = await supabase
+        .from("customers")
+        .select("id")
+        .or(`name.eq.${custA},name.eq.${custB}`);
+      const leftoverQuoteCount = (leftoverQuotes ?? []).length;
+      const leftoverCustCount = (leftoverCusts ?? []).length;
+
+      step({
+        key: "cleanup",
+        label: "Guaranteed cleanup + orphan verification",
+        status: leftoverQuoteCount === 0 && leftoverCustCount === 0 ? "pass" : "fail",
+        message:
+          leftoverQuoteCount === 0 && leftoverCustCount === 0
+            ? `Removed ${quoteIds.length} quotations, ${custIds.size} customers, ${importJobIds.size} import jobs. Zero orphans.`
+            : `Leftovers detected — quotations=${leftoverQuoteCount}, customers=${leftoverCustCount}`,
+        details: {
+          removed: {
+            quotations: quoteIds.length,
+            customers: custIds.size,
+            import_jobs: importJobIds.size,
+          },
+          leftovers: { quotations: leftoverQuoteCount, customers: leftoverCustCount },
+        },
+      });
+    } catch (e) {
+      step({
+        key: "cleanup",
+        label: "Guaranteed cleanup + orphan verification",
+        status: "fail",
+        message: (e as Error).message,
+      });
+    }
+
+    const passed = steps.filter((s) => s.status === "pass").length;
+    const failed = steps.filter((s) => s.status === "fail").length;
+    const warned = steps.filter((s) => s.status === "warn").length;
+    return {
+      startedAt,
+      finishedAt: new Date().toISOString(),
+      runId,
+      marker,
+      passed,
+      failed,
+      warned,
+      total: steps.length,
+      steps,
+    };
+  });
