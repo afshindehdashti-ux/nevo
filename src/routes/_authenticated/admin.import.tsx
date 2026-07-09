@@ -194,6 +194,7 @@ function ImportDataPage() {
                   <th className="text-right px-3 py-2">Success</th>
                   <th className="text-right px-3 py-2">Failed</th>
                   <th className="text-left px-3 py-2">Started</th>
+                  <th className="text-right px-3 py-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
