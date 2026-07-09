@@ -317,6 +317,8 @@ function OrderDetailPage() {
           entity_type: "order",
           entity_id: order.id,
           metadata: { shipment_id: data.id, shipment_number: data.shipment_number },
+          old_values: null,
+          new_values: { shipment_id: data.id, shipment_number: data.shipment_number },
         },
       }).catch(() => undefined);
       return data;
