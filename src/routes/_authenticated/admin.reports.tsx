@@ -635,7 +635,7 @@ async function fetchReport(
             d90p: 0,
             total: 0,
           };
-        const bal = Number(r.balance) || 0;
+        const bal = financeBalanceDue(r);
         const due = r.due_date ? new Date(r.due_date) : null;
         const days = due
           ? Math.floor((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24))
