@@ -372,7 +372,7 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                   q.issue_date,
                   q.valid_until ?? "—",
                   <Badge variant="outline">{q.status}</Badge>,
-                  <span className="tabular-nums">{q.currency} {Number(q.total).toLocaleString()}</span>,
+                  <span className="tabular-nums">{q.currency} {financeTotalAmount(q).toLocaleString()}</span>,
                 ])}
               />
             </Card>
