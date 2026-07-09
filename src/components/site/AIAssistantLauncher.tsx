@@ -30,6 +30,8 @@ export function AIAssistantLauncher() {
     };
   }, [open]);
 
+  if (isBackend) return null;
+
   return (
     <>
       <button
