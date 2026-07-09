@@ -16,14 +16,12 @@ const HeaderInput = z.object({
   status: z
     .enum([
       "draft",
-      "pending_approval",
-      "approved",
+      "confirmed",
       "in_production",
       "ready_to_ship",
       "shipped",
       "delivered",
       "cancelled",
-      "closed",
     ])
     .optional(),
   order_date: z.string().optional(),
