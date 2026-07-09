@@ -157,6 +157,149 @@ describe("RootComponent backend CTA gate", () => {
     await expectCtas(true);
   });
 
+  // ---------------------------------------------------------------------------
+  // Query params and trailing slashes.
+  //
+  // TanStack Router's `location.pathname` excludes the search string, so a
+  // URL like "/admin/orders?tab=open&page=2" arrives at the gate as just
+  // "/admin/orders". These tests pin that contract in place — if a future
+  // change ever surfaces `search` inside `pathname` (or a component starts
+  // reading `href`/`location.pathname + location.search` instead), these
+  // tests will catch the regression before it ships.
+  //
+  // Trailing slashes are also exercised because router config
+  // (`trailingSlash: "preserve"` or a manual normalize step) can produce
+  // "/admin/" or "/admin/orders/" at runtime.
+  // ---------------------------------------------------------------------------
+
+  // Pure classifier tests — these guarantee the shared `classifyRouteArea`
+  // regex handles the exact pathname shapes the router hands us.
+  describe("classifyRouteArea — query params and trailing slashes", () => {
+    const backendPaths = [
+      "/admin",
+      "/admin/",
+      "/admin/orders",
+      "/admin/orders/",
+      "/admin/orders/123",
+      "/admin/orders/123/",
+      "/crm",
+      "/crm/",
+      "/crm/leads/42",
+      "/crm/leads/42/",
+      "/backoffice",
+      "/backoffice/",
+      "/backoffice/tools/export",
+      "/backoffice/tools/export/",
+    ];
+    const publicPaths = [
+      "/",
+      "/about",
+      "/about/",
+      "/administration",           // lookalike prefix
+      "/administration/settings",
+      "/crm-info",                  // lookalike prefix
+      "/backoffice-help",           // lookalike prefix
+      "/blog/admin-guide",          // "admin" mid-path, not a backend prefix
+    ];
+
+    for (const p of backendPaths) {
+      it(`classifies "${p}" as backend`, () => {
+        expect(classifyRouteArea(p)).toBe("backend");
+      });
+    }
+    for (const p of publicPaths) {
+      it(`classifies "${p}" as public`, () => {
+        expect(classifyRouteArea(p)).toBe("public");
+      });
+    }
+  });
+
+  it("hides CTAs on backend routes with query params (?tab=open&page=2)", async () => {
+    // Build a router with a real search-validating backend route so we can
+    // navigate to /admin/orders?tab=open&page=2 and assert the gate still
+    // suppresses the CTAs.
+    const rootRoute = createRootRoute({ component: RootShell });
+    const routes = [
+      createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <div>home</div> }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/admin/$",
+        validateSearch: (s: Record<string, unknown>) => ({
+          tab: typeof s.tab === "string" ? s.tab : undefined,
+          page: typeof s.page === "number" ? s.page : undefined,
+          q: typeof s.q === "string" ? s.q : undefined,
+        }),
+        component: () => <div>admin</div>,
+      }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/crm/$",
+        validateSearch: (s: Record<string, unknown>) => ({
+          filter: typeof s.filter === "string" ? s.filter : undefined,
+        }),
+        component: () => <div>crm</div>,
+      }),
+    ];
+    const router = createRouter({
+      routeTree: rootRoute.addChildren(routes),
+      history: createMemoryHistory({
+        initialEntries: ["/admin/orders?tab=open&page=2"],
+      }),
+      defaultPreload: false,
+    });
+    render(<RouterProvider router={router} />);
+    await expectCtas(false);
+
+    // Public → backend with a query string.
+    await act(async () => {
+      await router.navigate({ to: "/" });
+    });
+    await expectCtas(true);
+
+    await act(async () => {
+      await router.navigate({
+        to: "/crm/$",
+        params: { _splat: "leads" },
+        search: { filter: "hot" },
+      });
+    });
+    await expectCtas(false);
+
+    // Mutating just the query string on a backend route must not
+    // re-enable the CTAs.
+    await act(async () => {
+      await router.navigate({
+        to: "/crm/$",
+        params: { _splat: "leads" },
+        search: { filter: "cold" },
+      });
+    });
+    await expectCtas(false);
+  });
+
+  it("hides CTAs on backend routes served with a trailing slash", async () => {
+    const rootRoute = createRootRoute({ component: RootShell });
+    const routes = [
+      createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <div>home</div> }),
+      createRoute({ getParentRoute: () => rootRoute, path: "/admin/$", component: () => <div>admin</div> }),
+      createRoute({ getParentRoute: () => rootRoute, path: "/backoffice/$", component: () => <div>backoffice</div> }),
+    ];
+    // Exercise every trailing-slash shape a hosting layer might hand us.
+    const initialUrls = ["/admin/", "/admin/orders/", "/backoffice/tools/export/"];
+    for (const initial of initialUrls) {
+      cleanup();
+      const router = createRouter({
+        routeTree: rootRoute.addChildren(routes),
+        history: createMemoryHistory({ initialEntries: [initial] }),
+        defaultPreload: false,
+      });
+      render(<RouterProvider router={router} />);
+      await expectCtas(false);
+    }
+  });
+});
+
+
   it("never renders the CTAs while the pathname is a backend route (no flash during client-side transitions)", async () => {
     // If the gate ever lags the router by even one render, we'll see a
     // backend pathname in these logs — exactly the flash to guard against.
