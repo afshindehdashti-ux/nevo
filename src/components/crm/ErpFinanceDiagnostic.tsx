@@ -236,6 +236,14 @@ export function ErpFinanceDiagnostic() {
               )}
               Run Isolated Proforma e2e
             </Button>
+            <Button variant="outline" onClick={onRunTrigger} disabled={trigLoading}>
+              {trigLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Calculator className="mr-2 h-4 w-4" />
+              )}
+              Validate trigger recompute
+            </Button>
           </div>
 
           {qa && (
