@@ -157,10 +157,10 @@ export const assertDocumentReadyForPdf = createServerFn({ method: "POST" })
     const issueDate = header.issue_date ?? header.created_at ?? null;
     if (!issueDate) errors.push("Issue date is required");
 
-    // Blocked statuses for PDF generation
-    if (["cancelled", "void"].includes(header.status)) {
-      errors.push(`Cannot generate PDF for a ${header.status} document`);
-    }
+    // Note: we intentionally do NOT block PDF generation for
+    // cancelled/void documents or zero-total documents. Finance users
+    // must be able to re-download or re-email historical records
+    // (voided invoices, $0 sample/complimentary quotations, etc.).
 
     // Line items
     if (items.length === 0) {
@@ -169,20 +169,14 @@ export const assertDocumentReadyForPdf = createServerFn({ method: "POST" })
       items.forEach((it, i) => {
         if (!it.description || String(it.description).trim() === "")
           errors.push(`Line ${i + 1}: description is required`);
-        if (num(it.quantity) <= 0)
-          errors.push(`Line ${i + 1}: quantity must be greater than zero`);
+        if (num(it.quantity) < 0)
+          errors.push(`Line ${i + 1}: quantity cannot be negative`);
         if (num(it.unit_price) < 0)
           errors.push(`Line ${i + 1}: unit price cannot be negative`);
       });
     }
 
-    // Non-zero total (financially consistent)
     const total = num(header[loaded.totalField as keyof typeof header]);
-    if (total <= 0) {
-      errors.push(
-        "Document total must be greater than zero — recalculate before generating PDF",
-      );
-    }
 
     if (errors.length) throw new PdfValidationError(errors);
 
