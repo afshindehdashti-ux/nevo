@@ -26,17 +26,53 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+      - name: Run requested checks
+        id: checks
+        shell: bash
+        run: |
+          mkdir -p verify-logs
+          set +e
 
-      - name: Typecheck
-        run: pnpm typecheck
+          pnpm install --no-frozen-lockfile > verify-logs/install.log 2>&1
+          INSTALL_EXIT=$?
 
-      - name: Lint
-        run: pnpm lint
+          if [ "$INSTALL_EXIT" -eq 0 ]; then
+            pnpm typecheck > verify-logs/typecheck.log 2>&1
+            TYPECHECK_EXIT=$?
+            pnpm lint > verify-logs/lint.log 2>&1
+            LINT_EXIT=$?
+            pnpm test > verify-logs/test.log 2>&1
+            TEST_EXIT=$?
+            pnpm build > verify-logs/build.log 2>&1
+            BUILD_EXIT=$?
+          else
+            TYPECHECK_EXIT=127
+            LINT_EXIT=127
+            TEST_EXIT=127
+            BUILD_EXIT=127
+            echo "Skipped because install failed." > verify-logs/typecheck.log
+            echo "Skipped because install failed." > verify-logs/lint.log
+            echo "Skipped because install failed." > verify-logs/test.log
+            echo "Skipped because install failed." > verify-logs/build.log
+          fi
 
-      - name: Test
-        run: pnpm test
+          {
+            echo "install=$INSTALL_EXIT"
+            echo "typecheck=$TYPECHECK_EXIT"
+            echo "lint=$LINT_EXIT"
+            echo "test=$TEST_EXIT"
+            echo "build=$BUILD_EXIT"
+          } | tee verify-logs/summary.txt
 
-      - name: Build
-        run: pnpm build
+          if [ "$INSTALL_EXIT" -ne 0 ] || [ "$TYPECHECK_EXIT" -ne 0 ] || [ "$LINT_EXIT" -ne 0 ] || [ "$TEST_EXIT" -ne 0 ] || [ "$BUILD_EXIT" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Upload verify logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-logs
+          path: verify-logs/
+          if-no-files-found: warn
+          retention-days: 14
