@@ -1,5 +1,6 @@
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { withMethodGuards } from "@/lib/api-http";
+import { assertRateLimit, jsonError } from "@/lib/api-security";
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 
@@ -48,30 +49,29 @@ export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: withMethodGuards({
       POST: async ({ request }) => {
-        const body = (await request.json()) as { messages?: unknown };
-        if (!Array.isArray(body.messages)) {
-          return new Response("Messages are required", { status: 400 });
+        const limited = assertRateLimit(request, "api-chat", { limit: 20, windowMs: 60_000 });
+        if (limited) return limited;
+
+        let body: { messages?: unknown };
+        try {
+          body = (await request.json()) as { messages?: unknown };
+        } catch {
+          return jsonError(400, "invalid_json");
         }
+
+        if (!Array.isArray(body.messages)) return jsonError(400, "messages_required");
         const messages = body.messages as UIMessage[];
-        if (messages.length === 0 || messages.length > MAX_MESSAGES) {
-          return new Response("Too many messages", { status: 413 });
-        }
+        if (messages.length === 0 || messages.length > MAX_MESSAGES) return jsonError(413, "too_many_messages");
         for (const m of messages) {
           for (const p of m.parts ?? []) {
-            if (
-              p.type === "text" &&
-              typeof p.text === "string" &&
-              p.text.length > MAX_SINGLE_MESSAGE_CHARS
-            ) {
-              return new Response("Message too long", { status: 413 });
+            if (p.type === "text" && typeof p.text === "string" && p.text.length > MAX_SINGLE_MESSAGE_CHARS) {
+              return jsonError(413, "message_too_long");
             }
           }
         }
-        if (totalChars(messages) > MAX_TOTAL_CHARS) {
-          return new Response("Conversation too long", { status: 413 });
-        }
+        if (totalChars(messages) > MAX_TOTAL_CHARS) return jsonError(413, "conversation_too_long");
         const key = process.env.LOVABLE_API_KEY;
-        if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
+        if (!key) return jsonError(500, "server_misconfigured");
 
         const gateway = createLovableAiGatewayProvider(key);
         const result = streamText({
@@ -80,9 +80,7 @@ export const Route = createFileRoute("/api/chat")({
           messages: await convertToModelMessages(messages),
         });
 
-        return result.toUIMessageStreamResponse({
-          originalMessages: messages,
-        });
+        return result.toUIMessageStreamResponse({ originalMessages: messages });
       },
     }),
   },
