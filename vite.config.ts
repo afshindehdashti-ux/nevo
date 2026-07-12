@@ -14,6 +14,12 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    // React Email still references the legacy entities path; map it to the supported export.
+    resolve: {
+      alias: {
+        "entities/lib/decode.js": "entities/decode",
+      },
+    },
     plugins: [mcpPlugin()],
   },
 });
