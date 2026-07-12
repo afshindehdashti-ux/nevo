@@ -1,1 +1,619 @@
-import[^w.-]+createServerFn[^w.-]+from[^w.-]+tanstack[^w.-]+react-start[^w.-]+import[^w.-]+requireSupabaseAuth[^w.-]+from[^w.-]+integrations[^w.-]+supabase[^w.-]+auth-middleware[^w.-]+import[^w.-]+z[^w.-]+from[^w.-]+zod[^w.-]+import[^w.-]+writeAudit[^w.-]+from[^w.-]+.[^w.-]+audit-log[^w.-]+Returns[^w.-]+the[^w.-]+customer[^w.-]+s[^w.-]+the[^w.-]+current[^w.-]+signed-in[^w.-]+user[^w.-]+is[^w.-]+linked[^w.-]+to[^w.-]+via[^w.-]+customer_users.[^w.-]+Empty[^w.-]+array[^w.-]+means[^w.-]+the[^w.-]+user[^w.-]+has[^w.-]+not[^w.-]+been[^w.-]+linked[^w.-]+to[^w.-]+a[^w.-]+customer[^w.-]+yet.[^w.-]+export[^w.-]+const[^w.-]+getMyCustomerContext[^w.-]+createServerFn[^w.-]+method[^w.-]+GET[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+const[^w.-]+data[^w.-]+links[^w.-]+error[^w.-]+linkErr[^w.-]+await[^w.-]+context.supabase[^w.-]+.from[^w.-]+customer_users[^w.-]+.select[^w.-]+customer_id[^w.-]+.eq[^w.-]+user_id[^w.-]+context.userId[^w.-]+if[^w.-]+linkErr[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+linkErr.message[^w.-]+const[^w.-]+ids[^w.-]+links[^w.-]+.map[^w.-]+l[^w.-]+l.customer_id[^w.-]+if[^w.-]+ids.length[^w.-]+0[^w.-]+return[^w.-]+customer[^w.-]+null[^w.-]+allCustomers[^w.-]+const[^w.-]+data[^w.-]+customers[^w.-]+error[^w.-]+await[^w.-]+context.supabase[^w.-]+.from[^w.-]+customers[^w.-]+.select[^w.-]+id[^w.-]+name[^w.-]+contact_person[^w.-]+email[^w.-]+phone[^w.-]+whatsapp[^w.-]+city[^w.-]+country[^w.-]+currency[^w.-]+payment_terms[^w.-]+.in[^w.-]+id[^w.-]+ids[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+const[^w.-]+primary[^w.-]+customers[^w.-]+.[^w.-]+0[^w.-]+null[^w.-]+if[^w.-]+primary[^w.-]+await[^w.-]+writeAudit[^w.-]+context.supabase[^w.-]+user_id[^w.-]+context.userId[^w.-]+action[^w.-]+portal_access[^w.-]+entity_type[^w.-]+customer[^w.-]+entity_id[^w.-]+primary.id[^w.-]+metadata[^w.-]+portal[^w.-]+customer[^w.-]+customer_count[^w.-]+customers[^w.-]+.length[^w.-]+0[^w.-]+old_values[^w.-]+null[^w.-]+new_values[^w.-]+null[^w.-]+return[^w.-]+customer[^w.-]+primary[^w.-]+allCustomers[^w.-]+customers[^w.-]+const[^w.-]+CustomerScoped[^w.-]+z.object[^w.-]+customer_id[^w.-]+z.string[^w.-]+.uuid[^w.-]+export[^w.-]+const[^w.-]+getMyOrders[^w.-]+createServerFn[^w.-]+method[^w.-]+GET[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+CustomerScoped.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+const[^w.-]+data[^w.-]+rows[^w.-]+error[^w.-]+await[^w.-]+context.supabase[^w.-]+.from[^w.-]+orders[^w.-]+.select[^w.-]+id[^w.-]+order_number[^w.-]+status[^w.-]+order_date[^w.-]+requested_delivery[^w.-]+currency[^w.-]+total[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+.order[^w.-]+order_date[^w.-]+ascending[^w.-]+false[^w.-]+.limit[^w.-]+100[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+return[^w.-]+rows[^w.-]+export[^w.-]+const[^w.-]+getMyInvoices[^w.-]+createServerFn[^w.-]+method[^w.-]+GET[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+CustomerScoped.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+const[^w.-]+data[^w.-]+rows[^w.-]+error[^w.-]+await[^w.-]+context.supabase[^w.-]+.from[^w.-]+invoices[^w.-]+.select[^w.-]+id[^w.-]+invoice_number[^w.-]+type[^w.-]+status[^w.-]+issue_date[^w.-]+due_date[^w.-]+currency[^w.-]+total[^w.-]+amount_paid[^w.-]+balance[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+.order[^w.-]+issue_date[^w.-]+ascending[^w.-]+false[^w.-]+.limit[^w.-]+100[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+return[^w.-]+rows[^w.-]+export[^w.-]+const[^w.-]+getMyShipments[^w.-]+createServerFn[^w.-]+method[^w.-]+GET[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+CustomerScoped.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+shipments[^w.-]+live[^w.-]+under[^w.-]+orders[^w.-]+filter[^w.-]+by[^w.-]+orders.customer_id[^w.-]+const[^w.-]+data[^w.-]+orders[^w.-]+error[^w.-]+oErr[^w.-]+await[^w.-]+context.supabase[^w.-]+.from[^w.-]+orders[^w.-]+.select[^w.-]+id[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+if[^w.-]+oErr[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+oErr.message[^w.-]+const[^w.-]+ids[^w.-]+orders[^w.-]+.map[^w.-]+o[^w.-]+o.id[^w.-]+if[^w.-]+ids.length[^w.-]+0[^w.-]+return[^w.-]+const[^w.-]+data[^w.-]+rows[^w.-]+error[^w.-]+await[^w.-]+context.supabase[^w.-]+.from[^w.-]+shipments[^w.-]+.select[^w.-]+id[^w.-]+shipment_number[^w.-]+status[^w.-]+carrier[^w.-]+tracking_no[^w.-]+container_no[^w.-]+incoterm[^w.-]+shipped_at[^w.-]+delivered_at[^w.-]+order_id[^w.-]+.in[^w.-]+order_id[^w.-]+ids[^w.-]+.order[^w.-]+shipped_at[^w.-]+ascending[^w.-]+false[^w.-]+nullsFirst[^w.-]+false[^w.-]+.limit[^w.-]+100[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+return[^w.-]+rows[^w.-]+export[^w.-]+const[^w.-]+getMyQuotations[^w.-]+createServerFn[^w.-]+method[^w.-]+GET[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+CustomerScoped.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+const[^w.-]+data[^w.-]+rows[^w.-]+error[^w.-]+await[^w.-]+context.supabase[^w.-]+.from[^w.-]+quotations[^w.-]+.select[^w.-]+id[^w.-]+quotation_number[^w.-]+status[^w.-]+issue_date[^w.-]+valid_until[^w.-]+currency[^w.-]+total[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+.in[^w.-]+status[^w.-]+sent[^w.-]+accepted[^w.-]+converted[^w.-]+.order[^w.-]+issue_date[^w.-]+ascending[^w.-]+false[^w.-]+.limit[^w.-]+100[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+return[^w.-]+rows[^w.-]+export[^w.-]+const[^w.-]+getMyDocuments[^w.-]+createServerFn[^w.-]+method[^w.-]+GET[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+CustomerScoped.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+const[^w.-]+data[^w.-]+rows[^w.-]+error[^w.-]+await[^w.-]+context.supabase[^w.-]+.from[^w.-]+documents[^w.-]+.select[^w.-]+id[^w.-]+entity_type[^w.-]+entity_id[^w.-]+kind[^w.-]+file_name[^w.-]+mime_type[^w.-]+size_bytes[^w.-]+created_at[^w.-]+file_path[^w.-]+.eq[^w.-]+entity_type[^w.-]+customer[^w.-]+.eq[^w.-]+entity_id[^w.-]+data.customer_id[^w.-]+.order[^w.-]+created_at[^w.-]+ascending[^w.-]+false[^w.-]+.limit[^w.-]+200[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+return[^w.-]+rows[^w.-]+export[^w.-]+const[^w.-]+getMyDocumentUrl[^w.-]+createServerFn[^w.-]+method[^w.-]+POST[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+z.object[^w.-]+document_id[^w.-]+z.string[^w.-]+.uuid[^w.-]+.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+const[^w.-]+data[^w.-]+doc[^w.-]+error[^w.-]+await[^w.-]+context.supabase[^w.-]+.from[^w.-]+documents[^w.-]+.select[^w.-]+file_path[^w.-]+file_name[^w.-]+entity_type[^w.-]+entity_id[^w.-]+.eq[^w.-]+id[^w.-]+data.document_id[^w.-]+.maybeSingle[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+if[^w.-]+doc[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+Document[^w.-]+not[^w.-]+found[^w.-]+const[^w.-]+data[^w.-]+signed[^w.-]+error[^w.-]+sErr[^w.-]+await[^w.-]+context.supabase.storage[^w.-]+.from[^w.-]+documents-private[^w.-]+.createSignedUrl[^w.-]+doc.file_path[^w.-]+300[^w.-]+if[^w.-]+sErr[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+sErr.message[^w.-]+await[^w.-]+writeAudit[^w.-]+context.supabase[^w.-]+user_id[^w.-]+context.userId[^w.-]+action[^w.-]+portal_document_access[^w.-]+entity_type[^w.-]+document[^w.-]+entity_id[^w.-]+data.document_id[^w.-]+metadata[^w.-]+portal[^w.-]+customer[^w.-]+file_name[^w.-]+doc.file_name[^w.-]+entity_type[^w.-]+doc.entity_type[^w.-]+entity_id[^w.-]+doc.entity_id[^w.-]+old_values[^w.-]+null[^w.-]+new_values[^w.-]+null[^w.-]+return[^w.-]+url[^w.-]+signed[^w.-]+.signedUrl[^w.-]+null[^w.-]+file_name[^w.-]+doc.file_name[^w.-]+Verify[^w.-]+the[^w.-]+caller[^w.-]+is[^w.-]+linked[^w.-]+to[^w.-]+customer_id[^w.-]+via[^w.-]+customer_users.[^w.-]+Throws[^w.-]+on[^w.-]+mismatch.[^w.-]+Returns[^w.-]+a[^w.-]+service-role[^w.-]+admin[^w.-]+client[^w.-]+used[^w.-]+for[^w.-]+scoped[^w.-]+reads[^w.-]+across[^w.-]+tables[^w.-]+whose[^w.-]+RLS[^w.-]+does[^w.-]+not[^w.-]+currently[^w.-]+grant[^w.-]+customer_users[^w.-]+direct[^w.-]+access.[^w.-]+All[^w.-]+reads[^w.-]+still[^w.-]+filter[^w.-]+by[^w.-]+customer_id[^w.-]+or[^w.-]+a[^w.-]+derived[^w.-]+list[^w.-]+so[^w.-]+the[^w.-]+caller[^w.-]+only[^w.-]+ever[^w.-]+sees[^w.-]+their[^w.-]+own[^w.-]+data.[^w.-]+async[^w.-]+function[^w.-]+verifyCustomerAccess[^w.-]+userId[^w.-]+string[^w.-]+customerId[^w.-]+string[^w.-]+const[^w.-]+supabaseAdmin[^w.-]+await[^w.-]+import[^w.-]+integrations[^w.-]+supabase[^w.-]+client.server[^w.-]+const[^w.-]+data[^w.-]+error[^w.-]+await[^w.-]+supabaseAdmin[^w.-]+.from[^w.-]+customer_users[^w.-]+.select[^w.-]+customer_id[^w.-]+.eq[^w.-]+user_id[^w.-]+userId[^w.-]+.eq[^w.-]+customer_id[^w.-]+customerId[^w.-]+.maybeSingle[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+if[^w.-]+data[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+Not[^w.-]+authorized[^w.-]+for[^w.-]+this[^w.-]+customer[^w.-]+return[^w.-]+supabaseAdmin[^w.-]+export[^w.-]+const[^w.-]+getMyProjects[^w.-]+createServerFn[^w.-]+method[^w.-]+GET[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+CustomerScoped.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+const[^w.-]+admin[^w.-]+await[^w.-]+verifyCustomerAccess[^w.-]+context.userId[^w.-]+data.customer_id[^w.-]+const[^w.-]+data[^w.-]+rows[^w.-]+error[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+projects[^w.-]+.select[^w.-]+id[^w.-]+project_name[^w.-]+project_type[^w.-]+status[^w.-]+country[^w.-]+ai_summary[^w.-]+created_at[^w.-]+updated_at[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+.order[^w.-]+updated_at[^w.-]+ascending[^w.-]+false[^w.-]+.limit[^w.-]+100[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+return[^w.-]+rows[^w.-]+export[^w.-]+const[^w.-]+getMyPayments[^w.-]+createServerFn[^w.-]+method[^w.-]+GET[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+CustomerScoped.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+const[^w.-]+admin[^w.-]+await[^w.-]+verifyCustomerAccess[^w.-]+context.userId[^w.-]+data.customer_id[^w.-]+const[^w.-]+data[^w.-]+invs[^w.-]+error[^w.-]+iErr[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+invoices[^w.-]+.select[^w.-]+id[^w.-]+invoice_number[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+if[^w.-]+iErr[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+iErr.message[^w.-]+const[^w.-]+list[^w.-]+invs[^w.-]+const[^w.-]+ids[^w.-]+list.map[^w.-]+i[^w.-]+i.id[^w.-]+if[^w.-]+ids.length[^w.-]+0[^w.-]+return[^w.-]+const[^w.-]+numByInv[^w.-]+new[^w.-]+Map[^w.-]+list.map[^w.-]+i[^w.-]+i.id[^w.-]+i.invoice_number[^w.-]+const[^w.-]+data[^w.-]+rows[^w.-]+error[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+payments[^w.-]+.select[^w.-]+id[^w.-]+invoice_id[^w.-]+amount[^w.-]+currency[^w.-]+method[^w.-]+reference[^w.-]+received_at[^w.-]+notes[^w.-]+.in[^w.-]+invoice_id[^w.-]+ids[^w.-]+.order[^w.-]+received_at[^w.-]+ascending[^w.-]+false[^w.-]+.limit[^w.-]+200[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+return[^w.-]+rows[^w.-]+.map[^w.-]+p[^w.-]+...p[^w.-]+invoice_number[^w.-]+numByInv.get[^w.-]+p.invoice_id[^w.-]+null[^w.-]+export[^w.-]+const[^w.-]+getMyMessages[^w.-]+createServerFn[^w.-]+method[^w.-]+GET[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+CustomerScoped.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+const[^w.-]+admin[^w.-]+await[^w.-]+verifyCustomerAccess[^w.-]+context.userId[^w.-]+data.customer_id[^w.-]+Messages[^w.-]+tied[^w.-]+to[^w.-]+the[^w.-]+customer[^w.-]+entity[^w.-]+plus[^w.-]+any[^w.-]+of[^w.-]+the[^w.-]+customer[^w.-]+s[^w.-]+projects[^w.-]+orders.[^w.-]+const[^w.-]+projs[^w.-]+orders[^w.-]+await[^w.-]+Promise.all[^w.-]+admin.from[^w.-]+projects[^w.-]+.select[^w.-]+id[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+admin.from[^w.-]+orders[^w.-]+.select[^w.-]+id[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+const[^w.-]+projIds[^w.-]+projs.data[^w.-]+.map[^w.-]+r[^w.-]+r.id[^w.-]+const[^w.-]+orderIds[^w.-]+orders.data[^w.-]+.map[^w.-]+r[^w.-]+r.id[^w.-]+const[^w.-]+filters[^w.-]+string[^w.-]+and[^w.-]+entity_type.eq.customer[^w.-]+entity_id.eq.[^w.-]+data.customer_id[^w.-]+if[^w.-]+projIds.length[^w.-]+filters.push[^w.-]+and[^w.-]+entity_type.eq.project[^w.-]+entity_id.in.[^w.-]+projIds.join[^w.-]+if[^w.-]+orderIds.length[^w.-]+filters.push[^w.-]+and[^w.-]+entity_type.eq.order[^w.-]+entity_id.in.[^w.-]+orderIds.join[^w.-]+const[^w.-]+data[^w.-]+rows[^w.-]+error[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+communications[^w.-]+.select[^w.-]+id[^w.-]+entity_type[^w.-]+entity_id[^w.-]+kind[^w.-]+direction[^w.-]+subject[^w.-]+body[^w.-]+occurred_at[^w.-]+contact_name[^w.-]+attachments[^w.-]+thread_id[^w.-]+parent_id[^w.-]+.or[^w.-]+filters.join[^w.-]+.order[^w.-]+occurred_at[^w.-]+ascending[^w.-]+true[^w.-]+.limit[^w.-]+500[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+const[^w.-]+list[^w.-]+rows[^w.-]+const[^w.-]+ids[^w.-]+list.map[^w.-]+r[^w.-]+r.id[^w.-]+let[^w.-]+readSet[^w.-]+new[^w.-]+Set[^w.-]+string[^w.-]+if[^w.-]+ids.length[^w.-]+const[^w.-]+data[^w.-]+reads[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+communication_reads[^w.-]+.select[^w.-]+message_id[^w.-]+.eq[^w.-]+user_id[^w.-]+context.userId[^w.-]+.in[^w.-]+message_id[^w.-]+ids[^w.-]+readSet[^w.-]+new[^w.-]+Set[^w.-]+reads[^w.-]+.map[^w.-]+r[^w.-]+r.message_id[^w.-]+as[^w.-]+string[^w.-]+return[^w.-]+list.map[^w.-]+m[^w.-]+...m[^w.-]+read[^w.-]+m.direction[^w.-]+inbound[^w.-]+true[^w.-]+readSet.has[^w.-]+m.id[^w.-]+export[^w.-]+const[^w.-]+markMyMessagesRead[^w.-]+createServerFn[^w.-]+method[^w.-]+POST[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+CustomerScoped.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+const[^w.-]+admin[^w.-]+await[^w.-]+verifyCustomerAccess[^w.-]+context.userId[^w.-]+data.customer_id[^w.-]+const[^w.-]+projs[^w.-]+orders[^w.-]+await[^w.-]+Promise.all[^w.-]+admin.from[^w.-]+projects[^w.-]+.select[^w.-]+id[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+admin.from[^w.-]+orders[^w.-]+.select[^w.-]+id[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+const[^w.-]+projIds[^w.-]+projs.data[^w.-]+.map[^w.-]+r[^w.-]+r.id[^w.-]+const[^w.-]+orderIds[^w.-]+orders.data[^w.-]+.map[^w.-]+r[^w.-]+r.id[^w.-]+const[^w.-]+filters[^w.-]+string[^w.-]+and[^w.-]+entity_type.eq.customer[^w.-]+entity_id.eq.[^w.-]+data.customer_id[^w.-]+if[^w.-]+projIds.length[^w.-]+filters.push[^w.-]+and[^w.-]+entity_type.eq.project[^w.-]+entity_id.in.[^w.-]+projIds.join[^w.-]+if[^w.-]+orderIds.length[^w.-]+filters.push[^w.-]+and[^w.-]+entity_type.eq.order[^w.-]+entity_id.in.[^w.-]+orderIds.join[^w.-]+const[^w.-]+data[^w.-]+outbound[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+communications[^w.-]+.select[^w.-]+id[^w.-]+.eq[^w.-]+direction[^w.-]+outbound[^w.-]+.or[^w.-]+filters.join[^w.-]+.limit[^w.-]+1000[^w.-]+const[^w.-]+ids[^w.-]+outbound[^w.-]+.map[^w.-]+r[^w.-]+r.id[^w.-]+if[^w.-]+ids.length[^w.-]+return[^w.-]+marked[^w.-]+0[^w.-]+const[^w.-]+data[^w.-]+existing[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+communication_reads[^w.-]+.select[^w.-]+message_id[^w.-]+.eq[^w.-]+user_id[^w.-]+context.userId[^w.-]+.in[^w.-]+message_id[^w.-]+ids[^w.-]+const[^w.-]+already[^w.-]+new[^w.-]+Set[^w.-]+existing[^w.-]+.map[^w.-]+r[^w.-]+r.message_id[^w.-]+as[^w.-]+string[^w.-]+const[^w.-]+toInsert[^w.-]+ids[^w.-]+.filter[^w.-]+id[^w.-]+already.has[^w.-]+id[^w.-]+.map[^w.-]+id[^w.-]+message_id[^w.-]+id[^w.-]+user_id[^w.-]+context.userId[^w.-]+if[^w.-]+toInsert.length[^w.-]+return[^w.-]+marked[^w.-]+0[^w.-]+const[^w.-]+error[^w.-]+await[^w.-]+admin.from[^w.-]+communication_reads[^w.-]+.insert[^w.-]+toInsert[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+await[^w.-]+writeAudit[^w.-]+context.supabase[^w.-]+user_id[^w.-]+context.userId[^w.-]+action[^w.-]+portal_mark_read[^w.-]+entity_type[^w.-]+customer[^w.-]+entity_id[^w.-]+data.customer_id[^w.-]+metadata[^w.-]+portal[^w.-]+customer[^w.-]+marked[^w.-]+toInsert.length[^w.-]+old_values[^w.-]+null[^w.-]+new_values[^w.-]+message_ids[^w.-]+ids.filter[^w.-]+id[^w.-]+already.has[^w.-]+id[^w.-]+return[^w.-]+marked[^w.-]+toInsert.length[^w.-]+export[^w.-]+type[^w.-]+TimelineEvent[^w.-]+id[^w.-]+string[^w.-]+at[^w.-]+string[^w.-]+kind[^w.-]+order[^w.-]+invoice[^w.-]+payment[^w.-]+shipment[^w.-]+message[^w.-]+document[^w.-]+title[^w.-]+string[^w.-]+detail[^w.-]+string[^w.-]+null[^w.-]+export[^w.-]+const[^w.-]+getMyTimeline[^w.-]+createServerFn[^w.-]+method[^w.-]+GET[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+CustomerScoped.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+Promise[^w.-]+TimelineEvent[^w.-]+const[^w.-]+admin[^w.-]+await[^w.-]+verifyCustomerAccess[^w.-]+context.userId[^w.-]+data.customer_id[^w.-]+const[^w.-]+ordersRes[^w.-]+invoicesRes[^w.-]+shipmentsRes[^w.-]+await[^w.-]+Promise.all[^w.-]+admin[^w.-]+.from[^w.-]+orders[^w.-]+.select[^w.-]+id[^w.-]+order_number[^w.-]+status[^w.-]+order_date[^w.-]+created_at[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+.order[^w.-]+created_at[^w.-]+ascending[^w.-]+false[^w.-]+.limit[^w.-]+50[^w.-]+admin[^w.-]+.from[^w.-]+invoices[^w.-]+.select[^w.-]+id[^w.-]+invoice_number[^w.-]+type[^w.-]+status[^w.-]+issue_date[^w.-]+total[^w.-]+currency[^w.-]+created_at[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+.order[^w.-]+created_at[^w.-]+ascending[^w.-]+false[^w.-]+.limit[^w.-]+50[^w.-]+admin.from[^w.-]+orders[^w.-]+.select[^w.-]+id[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+const[^w.-]+orderIds[^w.-]+shipmentsRes.data[^w.-]+.map[^w.-]+o[^w.-]+o.id[^w.-]+const[^w.-]+shipRows[^w.-]+payRows[^w.-]+msgRows[^w.-]+await[^w.-]+Promise.all[^w.-]+orderIds.length[^w.-]+admin[^w.-]+.from[^w.-]+shipments[^w.-]+.select[^w.-]+id[^w.-]+shipment_number[^w.-]+status[^w.-]+shipped_at[^w.-]+delivered_at[^w.-]+created_at[^w.-]+.in[^w.-]+order_id[^w.-]+orderIds[^w.-]+.order[^w.-]+created_at[^w.-]+ascending[^w.-]+false[^w.-]+.limit[^w.-]+50[^w.-]+Promise.resolve[^w.-]+data[^w.-]+as[^w.-]+Array[^w.-]+id[^w.-]+string[^w.-]+shipment_number[^w.-]+string[^w.-]+status[^w.-]+string[^w.-]+shipped_at[^w.-]+string[^w.-]+null[^w.-]+delivered_at[^w.-]+string[^w.-]+null[^w.-]+created_at[^w.-]+string[^w.-]+error[^w.-]+null[^w.-]+async[^w.-]+const[^w.-]+invIds[^w.-]+invoicesRes.data[^w.-]+.map[^w.-]+i[^w.-]+i.id[^w.-]+if[^w.-]+invIds.length[^w.-]+return[^w.-]+data[^w.-]+as[^w.-]+Array[^w.-]+id[^w.-]+string[^w.-]+amount[^w.-]+number[^w.-]+currency[^w.-]+string[^w.-]+received_at[^w.-]+string[^w.-]+invoice_id[^w.-]+string[^w.-]+error[^w.-]+null[^w.-]+return[^w.-]+admin[^w.-]+.from[^w.-]+payments[^w.-]+.select[^w.-]+id[^w.-]+amount[^w.-]+currency[^w.-]+received_at[^w.-]+invoice_id[^w.-]+.in[^w.-]+invoice_id[^w.-]+invIds[^w.-]+.order[^w.-]+received_at[^w.-]+ascending[^w.-]+false[^w.-]+.limit[^w.-]+50[^w.-]+admin[^w.-]+.from[^w.-]+communications[^w.-]+.select[^w.-]+id[^w.-]+subject[^w.-]+kind[^w.-]+direction[^w.-]+occurred_at[^w.-]+.eq[^w.-]+entity_type[^w.-]+customer[^w.-]+.eq[^w.-]+entity_id[^w.-]+data.customer_id[^w.-]+.order[^w.-]+occurred_at[^w.-]+ascending[^w.-]+false[^w.-]+.limit[^w.-]+50[^w.-]+const[^w.-]+events[^w.-]+TimelineEvent[^w.-]+ordersRes.data[^w.-]+.forEach[^w.-]+o[^w.-]+events.push[^w.-]+id[^w.-]+o-[^w.-]+o.id[^w.-]+at[^w.-]+o.created_at[^w.-]+kind[^w.-]+order[^w.-]+title[^w.-]+Order[^w.-]+o.order_number[^w.-]+detail[^w.-]+Status[^w.-]+o.status[^w.-]+invoicesRes.data[^w.-]+.forEach[^w.-]+i[^w.-]+events.push[^w.-]+id[^w.-]+i-[^w.-]+i.id[^w.-]+at[^w.-]+i.created_at[^w.-]+kind[^w.-]+invoice[^w.-]+title[^w.-]+i.type[^w.-]+proforma[^w.-]+Proforma[^w.-]+Invoice[^w.-]+i.invoice_number[^w.-]+detail[^w.-]+i.status[^w.-]+i.currency[^w.-]+Number[^w.-]+i.total[^w.-]+.toLocaleString[^w.-]+shipRows.data[^w.-]+.forEach[^w.-]+s[^w.-]+events.push[^w.-]+id[^w.-]+s-[^w.-]+s.id[^w.-]+at[^w.-]+s.delivered_at[^w.-]+s.shipped_at[^w.-]+s.created_at[^w.-]+kind[^w.-]+shipment[^w.-]+title[^w.-]+Shipment[^w.-]+s.shipment_number[^w.-]+detail[^w.-]+Status[^w.-]+s.status[^w.-]+payRows.data[^w.-]+.forEach[^w.-]+p[^w.-]+events.push[^w.-]+id[^w.-]+p-[^w.-]+p.id[^w.-]+at[^w.-]+p.received_at[^w.-]+kind[^w.-]+payment[^w.-]+title[^w.-]+Payment[^w.-]+received[^w.-]+detail[^w.-]+p.currency[^w.-]+Number[^w.-]+p.amount[^w.-]+.toLocaleString[^w.-]+msgRows.data[^w.-]+.forEach[^w.-]+m[^w.-]+events.push[^w.-]+id[^w.-]+m-[^w.-]+m.id[^w.-]+at[^w.-]+m.occurred_at[^w.-]+kind[^w.-]+message[^w.-]+title[^w.-]+m.subject[^w.-]+m.kind[^w.-]+m.direction[^w.-]+detail[^w.-]+null[^w.-]+events.sort[^w.-]+a[^w.-]+b[^w.-]+a.at[^w.-]+b.at[^w.-]+1[^w.-]+-1[^w.-]+return[^w.-]+events.slice[^w.-]+0[^w.-]+100[^w.-]+const[^w.-]+MessageAttachmentInput[^w.-]+z.object[^w.-]+customer_id[^w.-]+z.string[^w.-]+.uuid[^w.-]+path[^w.-]+z.string[^w.-]+.min[^w.-]+1[^w.-]+export[^w.-]+const[^w.-]+getMyMessageAttachmentUrl[^w.-]+createServerFn[^w.-]+method[^w.-]+POST[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+MessageAttachmentInput.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+const[^w.-]+admin[^w.-]+await[^w.-]+verifyCustomerAccess[^w.-]+context.userId[^w.-]+data.customer_id[^w.-]+Scope[^w.-]+only[^w.-]+allow[^w.-]+paths[^w.-]+under[^w.-]+this[^w.-]+customer[^w.-]+s[^w.-]+folder[^w.-]+OR[^w.-]+attachments[^w.-]+referenced[^w.-]+by[^w.-]+messages[^w.-]+already[^w.-]+visible[^w.-]+to[^w.-]+this[^w.-]+customer.[^w.-]+const[^w.-]+ownedPrefix[^w.-]+customer[^w.-]+data.customer_id[^w.-]+if[^w.-]+data.path.startsWith[^w.-]+ownedPrefix[^w.-]+const[^w.-]+data[^w.-]+rows[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+communications[^w.-]+.select[^w.-]+attachments[^w.-]+.eq[^w.-]+entity_type[^w.-]+customer[^w.-]+.eq[^w.-]+entity_id[^w.-]+data.customer_id[^w.-]+const[^w.-]+known[^w.-]+new[^w.-]+Set[^w.-]+string[^w.-]+for[^w.-]+const[^w.-]+r[^w.-]+of[^w.-]+rows[^w.-]+for[^w.-]+const[^w.-]+a[^w.-]+of[^w.-]+r.attachments[^w.-]+as[^w.-]+any[^w.-]+if[^w.-]+a[^w.-]+.path[^w.-]+known.add[^w.-]+a.path[^w.-]+if[^w.-]+known.has[^w.-]+data.path[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+Not[^w.-]+authorized[^w.-]+for[^w.-]+this[^w.-]+attachment[^w.-]+const[^w.-]+data[^w.-]+signed[^w.-]+error[^w.-]+await[^w.-]+admin.storage[^w.-]+.from[^w.-]+crm-docs[^w.-]+.createSignedUrl[^w.-]+data.path[^w.-]+300[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+await[^w.-]+writeAudit[^w.-]+context.supabase[^w.-]+user_id[^w.-]+context.userId[^w.-]+action[^w.-]+portal_attachment_access[^w.-]+entity_type[^w.-]+customer[^w.-]+entity_id[^w.-]+data.customer_id[^w.-]+metadata[^w.-]+portal[^w.-]+customer[^w.-]+path[^w.-]+data.path[^w.-]+old_values[^w.-]+null[^w.-]+new_values[^w.-]+null[^w.-]+return[^w.-]+url[^w.-]+signed[^w.-]+.signedUrl[^w.-]+null[^w.-]+const[^w.-]+AttachmentInput[^w.-]+z.object[^w.-]+name[^w.-]+z.string[^w.-]+.min[^w.-]+1[^w.-]+.max[^w.-]+200[^w.-]+mime[^w.-]+z.string[^w.-]+.optional[^w.-]+base64[^w.-]+z.string[^w.-]+.min[^w.-]+1[^w.-]+const[^w.-]+SendMessageInput[^w.-]+z.object[^w.-]+customer_id[^w.-]+z.string[^w.-]+.uuid[^w.-]+kind[^w.-]+z.enum[^w.-]+note[^w.-]+email[^w.-]+whatsapp[^w.-]+call[^w.-]+meeting[^w.-]+.default[^w.-]+email[^w.-]+subject[^w.-]+z.string[^w.-]+.max[^w.-]+300[^w.-]+.nullable[^w.-]+.optional[^w.-]+body[^w.-]+z.string[^w.-]+.min[^w.-]+1[^w.-]+.max[^w.-]+20000[^w.-]+attachments[^w.-]+z.array[^w.-]+AttachmentInput[^w.-]+.max[^w.-]+10[^w.-]+.optional[^w.-]+parent_id[^w.-]+z.string[^w.-]+.uuid[^w.-]+.nullable[^w.-]+.optional[^w.-]+export[^w.-]+const[^w.-]+sendMyMessage[^w.-]+createServerFn[^w.-]+method[^w.-]+POST[^w.-]+.middleware[^w.-]+requireSupabaseAuth[^w.-]+.inputValidator[^w.-]+v[^w.-]+SendMessageInput.parse[^w.-]+v[^w.-]+.handler[^w.-]+async[^w.-]+context[^w.-]+data[^w.-]+const[^w.-]+admin[^w.-]+await[^w.-]+verifyCustomerAccess[^w.-]+context.userId[^w.-]+data.customer_id[^w.-]+const[^w.-]+uploaded[^w.-]+Array[^w.-]+name[^w.-]+string[^w.-]+path[^w.-]+string[^w.-]+size[^w.-]+number[^w.-]+mime[^w.-]+string[^w.-]+for[^w.-]+const[^w.-]+a[^w.-]+of[^w.-]+data.attachments[^w.-]+const[^w.-]+bytes[^w.-]+Buffer.from[^w.-]+a.base64[^w.-]+base64[^w.-]+if[^w.-]+bytes.byteLength[^w.-]+15[^w.-]+1024[^w.-]+1024[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+Attachment[^w.-]+a.name[^w.-]+exceeds[^w.-]+15[^w.-]+MB[^w.-]+limit[^w.-]+const[^w.-]+safe[^w.-]+a.name.replace[^w.-]+w.[^w.-]+-[^w.-]+g[^w.-]+_[^w.-]+const[^w.-]+path[^w.-]+customer[^w.-]+data.customer_id[^w.-]+messages[^w.-]+crypto.randomUUID[^w.-]+-[^w.-]+safe[^w.-]+const[^w.-]+error[^w.-]+upErr[^w.-]+await[^w.-]+admin.storage[^w.-]+.from[^w.-]+crm-docs[^w.-]+.upload[^w.-]+path[^w.-]+bytes[^w.-]+contentType[^w.-]+a.mime[^w.-]+application[^w.-]+octet-stream[^w.-]+upsert[^w.-]+false[^w.-]+if[^w.-]+upErr[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+upErr.message[^w.-]+uploaded.push[^w.-]+name[^w.-]+a.name[^w.-]+path[^w.-]+size[^w.-]+bytes.byteLength[^w.-]+mime[^w.-]+a.mime[^w.-]+const[^w.-]+data[^w.-]+prof[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+profiles[^w.-]+.select[^w.-]+full_name[^w.-]+.eq[^w.-]+id[^w.-]+context.userId[^w.-]+.maybeSingle[^w.-]+let[^w.-]+parentEntityType[^w.-]+string[^w.-]+null[^w.-]+null[^w.-]+let[^w.-]+parentEntityId[^w.-]+string[^w.-]+null[^w.-]+null[^w.-]+let[^w.-]+parentSubject[^w.-]+string[^w.-]+null[^w.-]+null[^w.-]+if[^w.-]+data.parent_id[^w.-]+const[^w.-]+data[^w.-]+parent[^w.-]+error[^w.-]+pErr[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+communications[^w.-]+.select[^w.-]+id[^w.-]+entity_type[^w.-]+entity_id[^w.-]+subject[^w.-]+.eq[^w.-]+id[^w.-]+data.parent_id[^w.-]+.maybeSingle[^w.-]+if[^w.-]+pErr[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+pErr.message[^w.-]+if[^w.-]+parent[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+Parent[^w.-]+message[^w.-]+not[^w.-]+found[^w.-]+Verify[^w.-]+the[^w.-]+parent[^w.-]+is[^w.-]+visible[^w.-]+to[^w.-]+this[^w.-]+customer[^w.-]+via[^w.-]+the[^w.-]+same[^w.-]+scoping[^w.-]+used[^w.-]+in[^w.-]+getMyMessages[^w.-]+const[^w.-]+scoped[^w.-]+parent.entity_type[^w.-]+customer[^w.-]+parent.entity_id[^w.-]+data.customer_id[^w.-]+parent.entity_type[^w.-]+project[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+projects[^w.-]+.select[^w.-]+id[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+.eq[^w.-]+id[^w.-]+parent.entity_id[^w.-]+.maybeSingle[^w.-]+.data[^w.-]+parent.entity_type[^w.-]+order[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+orders[^w.-]+.select[^w.-]+id[^w.-]+.eq[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+.eq[^w.-]+id[^w.-]+parent.entity_id[^w.-]+.maybeSingle[^w.-]+.data[^w.-]+if[^w.-]+scoped[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+Not[^w.-]+authorized[^w.-]+to[^w.-]+reply[^w.-]+to[^w.-]+this[^w.-]+message[^w.-]+parentEntityType[^w.-]+parent.entity_type[^w.-]+parentEntityId[^w.-]+parent.entity_id[^w.-]+parentSubject[^w.-]+parent.subject[^w.-]+const[^w.-]+finalSubject[^w.-]+data.subject[^w.-]+parentSubject[^w.-]+parentSubject.startsWith[^w.-]+Re[^w.-]+parentSubject[^w.-]+Re[^w.-]+parentSubject[^w.-]+null[^w.-]+const[^w.-]+data[^w.-]+row[^w.-]+error[^w.-]+await[^w.-]+admin[^w.-]+.from[^w.-]+communications[^w.-]+.insert[^w.-]+entity_type[^w.-]+parentEntityType[^w.-]+customer[^w.-]+entity_id[^w.-]+parentEntityId[^w.-]+data.customer_id[^w.-]+kind[^w.-]+data.kind[^w.-]+direction[^w.-]+inbound[^w.-]+subject[^w.-]+finalSubject[^w.-]+body[^w.-]+data.body[^w.-]+attachments[^w.-]+uploaded[^w.-]+contact_name[^w.-]+prof[^w.-]+.full_name[^w.-]+null[^w.-]+user_id[^w.-]+context.userId[^w.-]+occurred_at[^w.-]+new[^w.-]+Date[^w.-]+.toISOString[^w.-]+parent_id[^w.-]+data.parent_id[^w.-]+null[^w.-]+.select[^w.-]+id[^w.-]+.single[^w.-]+if[^w.-]+error[^w.-]+throw[^w.-]+new[^w.-]+Error[^w.-]+error.message[^w.-]+await[^w.-]+writeAudit[^w.-]+context.supabase[^w.-]+user_id[^w.-]+context.userId[^w.-]+action[^w.-]+portal_send_message[^w.-]+entity_type[^w.-]+communication[^w.-]+entity_id[^w.-]+row[^w.-]+.id[^w.-]+metadata[^w.-]+portal[^w.-]+customer[^w.-]+customer_id[^w.-]+data.customer_id[^w.-]+kind[^w.-]+data.kind[^w.-]+parent_id[^w.-]+data.parent_id[^w.-]+null[^w.-]+attachment_count[^w.-]+uploaded.length[^w.-]+old_values[^w.-]+null[^w.-]+new_values[^w.-]+entity_type[^w.-]+parentEntityType[^w.-]+customer[^w.-]+entity_id[^w.-]+parentEntityId[^w.-]+data.customer_id[^w.-]+kind[^w.-]+data.kind[^w.-]+direction[^w.-]+inbound[^w.-]+subject[^w.-]+finalSubject[^w.-]+body[^w.-]+data.body[^w.-]+attachments[^w.-]+uploaded[^w.-]+parent_id[^w.-]+data.parent_id[^w.-]+null[^w.-]+return[^w.-]+ok[^w.-]+true[^w.-]+id[^w.-]+row[^w.-]+.id[^w.-]+
+import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { z } from "zod";
+import { writeAudit } from "./audit-log";
+
+/**
+ * Returns the customer(s) the current signed-in user is linked to via customer_users.
+ * Empty array means the user has not been linked to a customer yet.
+ */
+export const getMyCustomerContext = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: links, error: linkErr } = await context.supabase
+      .from("customer_users")
+      .select("customer_id")
+      .eq("user_id", context.userId);
+    if (linkErr) throw new Error(linkErr.message);
+    const ids = (links ?? []).map((l) => l.customer_id);
+    if (ids.length === 0) return { customer: null, allCustomers: [] };
+
+    const { data: customers, error } = await context.supabase
+      .from("customers")
+      .select(
+        "id, name, contact_person, email, phone, whatsapp, city, country, currency, payment_terms",
+      )
+      .in("id", ids);
+    if (error) throw new Error(error.message);
+    const primary = customers?.[0] ?? null;
+    if (primary) {
+      await writeAudit(context.supabase, {
+        user_id: context.userId,
+        action: "portal_access",
+        entity_type: "customer",
+        entity_id: primary.id,
+        metadata: { portal: "customer", customer_count: customers?.length ?? 0 },
+        old_values: null,
+        new_values: null,
+      });
+    }
+    return { customer: primary, allCustomers: customers ?? [] };
+  });
+
+const CustomerScoped = z.object({ customer_id: z.string().uuid() });
+
+export const getMyOrders = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CustomerScoped.parse(v))
+  .handler(async ({ context, data }) => {
+    const { data: rows, error } = await context.supabase
+      .from("orders")
+      .select("id, order_number, status, order_date, requested_delivery, currency, total")
+      .eq("customer_id", data.customer_id)
+      .order("order_date", { ascending: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const getMyInvoices = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CustomerScoped.parse(v))
+  .handler(async ({ context, data }) => {
+    const { data: rows, error } = await context.supabase
+      .from("invoices")
+      .select(
+        "id, invoice_number, type, status, issue_date, due_date, currency, total, amount_paid, balance",
+      )
+      .eq("customer_id", data.customer_id)
+      .order("issue_date", { ascending: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const getMyShipments = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CustomerScoped.parse(v))
+  .handler(async ({ context, data }) => {
+    // shipments live under orders → filter by orders.customer_id
+    const { data: orders, error: oErr } = await context.supabase
+      .from("orders")
+      .select("id")
+      .eq("customer_id", data.customer_id);
+    if (oErr) throw new Error(oErr.message);
+    const ids = (orders ?? []).map((o) => o.id);
+    if (ids.length === 0) return [];
+    const { data: rows, error } = await context.supabase
+      .from("shipments")
+      .select(
+        "id, shipment_number, status, carrier, tracking_no, container_no, incoterm, shipped_at, delivered_at, order_id",
+      )
+      .in("order_id", ids)
+      .order("shipped_at", { ascending: false, nullsFirst: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const getMyQuotations = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CustomerScoped.parse(v))
+  .handler(async ({ context, data }) => {
+    const { data: rows, error } = await context.supabase
+      .from("quotations")
+      .select("id, quotation_number, status, issue_date, valid_until, currency, total")
+      .eq("customer_id", data.customer_id)
+      .in("status", ["sent", "accepted", "converted"])
+      .order("issue_date", { ascending: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const getMyDocuments = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CustomerScoped.parse(v))
+  .handler(async ({ context, data }) => {
+    const { data: rows, error } = await context.supabase
+      .from("documents")
+      .select(
+        "id, entity_type, entity_id, kind, file_name, mime_type, size_bytes, created_at, file_path",
+      )
+      .eq("entity_type", "customer")
+      .eq("entity_id", data.customer_id)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const getMyDocumentUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => z.object({ document_id: z.string().uuid() }).parse(v))
+  .handler(async ({ context, data }) => {
+    const { data: doc, error } = await context.supabase
+      .from("documents")
+      .select("file_path, file_name, entity_type, entity_id")
+      .eq("id", data.document_id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!doc) throw new Error("Document not found");
+
+    const { data: signed, error: sErr } = await context.supabase.storage
+      .from("documents-private")
+      .createSignedUrl(doc.file_path, 300);
+    if (sErr) throw new Error(sErr.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "portal_document_access",
+      entity_type: "document",
+      entity_id: data.document_id,
+      metadata: {
+        portal: "customer",
+        file_name: doc.file_name,
+        entity_type: doc.entity_type,
+        entity_id: doc.entity_id,
+      },
+      old_values: null,
+      new_values: null,
+    });
+    return { url: signed?.signedUrl ?? null, file_name: doc.file_name };
+  });
+
+/**
+ * Verify the caller is linked to `customer_id` via customer_users. Throws on mismatch.
+ * Returns a service-role admin client used for scoped reads across tables whose RLS
+ * does not currently grant customer_users direct access. All reads still filter by
+ * `customer_id` (or a derived list) so the caller only ever sees their own data.
+ */
+async function verifyCustomerAccess(userId: string, customerId: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("customer_users")
+    .select("customer_id")
+    .eq("user_id", userId)
+    .eq("customer_id", customerId)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Not authorized for this customer");
+  return supabaseAdmin;
+}
+
+export const getMyProjects = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CustomerScoped.parse(v))
+  .handler(async ({ context, data }) => {
+    const admin = await verifyCustomerAccess(context.userId, data.customer_id);
+    const { data: rows, error } = await admin
+      .from("projects")
+      .select("id, project_name, project_type, status, country, ai_summary, created_at, updated_at")
+      .eq("customer_id", data.customer_id)
+      .order("updated_at", { ascending: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const getMyPayments = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CustomerScoped.parse(v))
+  .handler(async ({ context, data }) => {
+    const admin = await verifyCustomerAccess(context.userId, data.customer_id);
+    const { data: invs, error: iErr } = await admin
+      .from("invoices")
+      .select("id, invoice_number")
+      .eq("customer_id", data.customer_id);
+    if (iErr) throw new Error(iErr.message);
+    const list = invs ?? [];
+    const ids = list.map((i) => i.id);
+    if (ids.length === 0) return [];
+    const numByInv = new Map(list.map((i) => [i.id, i.invoice_number]));
+    const { data: rows, error } = await admin
+      .from("payments")
+      .select("id, invoice_id, amount, currency, method, reference, received_at, notes")
+      .in("invoice_id", ids)
+      .order("received_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    return (rows ?? []).map((p) => ({ ...p, invoice_number: numByInv.get(p.invoice_id) ?? null }));
+  });
+
+export const getMyMessages = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CustomerScoped.parse(v))
+  .handler(async ({ context, data }) => {
+    const admin = await verifyCustomerAccess(context.userId, data.customer_id);
+    // Messages tied to the customer entity, plus any of the customer's projects/orders.
+    const [projs, orders] = await Promise.all([
+      admin.from("projects").select("id").eq("customer_id", data.customer_id),
+      admin.from("orders").select("id").eq("customer_id", data.customer_id),
+    ]);
+    const projIds = (projs.data ?? []).map((r) => r.id);
+    const orderIds = (orders.data ?? []).map((r) => r.id);
+
+    const filters: string[] = [`and(entity_type.eq.customer,entity_id.eq.${data.customer_id})`];
+    if (projIds.length)
+      filters.push(`and(entity_type.eq.project,entity_id.in.(${projIds.join(",")}))`);
+    if (orderIds.length)
+      filters.push(`and(entity_type.eq.order,entity_id.in.(${orderIds.join(",")}))`);
+
+    const { data: rows, error } = await admin
+      .from("communications")
+      .select(
+        "id, entity_type, entity_id, kind, direction, subject, body, occurred_at, contact_name, attachments, thread_id, parent_id",
+      )
+      .or(filters.join(","))
+      .order("occurred_at", { ascending: true })
+      .limit(500);
+    if (error) throw new Error(error.message);
+    const list = rows ?? [];
+    const ids = list.map((r) => r.id);
+    let readSet = new Set<string>();
+    if (ids.length) {
+      const { data: reads } = await admin
+        .from("communication_reads")
+        .select("message_id")
+        .eq("user_id", context.userId)
+        .in("message_id", ids);
+      readSet = new Set((reads ?? []).map((r) => r.message_id as string));
+    }
+    return list.map((m) => ({
+      ...m,
+      read: m.direction === "inbound" ? true : readSet.has(m.id),
+    }));
+  });
+
+export const markMyMessagesRead = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CustomerScoped.parse(v))
+  .handler(async ({ context, data }) => {
+    const admin = await verifyCustomerAccess(context.userId, data.customer_id);
+    const [projs, orders] = await Promise.all([
+      admin.from("projects").select("id").eq("customer_id", data.customer_id),
+      admin.from("orders").select("id").eq("customer_id", data.customer_id),
+    ]);
+    const projIds = (projs.data ?? []).map((r) => r.id);
+    const orderIds = (orders.data ?? []).map((r) => r.id);
+    const filters: string[] = [`and(entity_type.eq.customer,entity_id.eq.${data.customer_id})`];
+    if (projIds.length)
+      filters.push(`and(entity_type.eq.project,entity_id.in.(${projIds.join(",")}))`);
+    if (orderIds.length)
+      filters.push(`and(entity_type.eq.order,entity_id.in.(${orderIds.join(",")}))`);
+
+    const { data: outbound } = await admin
+      .from("communications")
+      .select("id")
+      .eq("direction", "outbound")
+      .or(filters.join(","))
+      .limit(1000);
+    const ids = (outbound ?? []).map((r) => r.id);
+    if (!ids.length) return { marked: 0 };
+
+    const { data: existing } = await admin
+      .from("communication_reads")
+      .select("message_id")
+      .eq("user_id", context.userId)
+      .in("message_id", ids);
+    const already = new Set((existing ?? []).map((r) => r.message_id as string));
+    const toInsert = ids
+      .filter((id) => !already.has(id))
+      .map((id) => ({ message_id: id, user_id: context.userId }));
+    if (!toInsert.length) return { marked: 0 };
+    const { error } = await admin.from("communication_reads").insert(toInsert);
+    if (error) throw new Error(error.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "portal_mark_read",
+      entity_type: "customer",
+      entity_id: data.customer_id,
+      metadata: { portal: "customer", marked: toInsert.length },
+      old_values: null,
+      new_values: { message_ids: ids.filter((id) => !already.has(id)) },
+    });
+    return { marked: toInsert.length };
+  });
+
+export type TimelineEvent = {
+  id: string;
+  at: string;
+  kind: "order" | "invoice" | "payment" | "shipment" | "message" | "document";
+  title: string;
+  detail: string | null;
+};
+
+export const getMyTimeline = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => CustomerScoped.parse(v))
+  .handler(async ({ context, data }): Promise<TimelineEvent[]> => {
+    const admin = await verifyCustomerAccess(context.userId, data.customer_id);
+
+    const [ordersRes, invoicesRes, shipmentsRes] = await Promise.all([
+      admin
+        .from("orders")
+        .select("id, order_number, status, order_date, created_at")
+        .eq("customer_id", data.customer_id)
+        .order("created_at", { ascending: false })
+        .limit(50),
+      admin
+        .from("invoices")
+        .select("id, invoice_number, type, status, issue_date, total, currency, created_at")
+        .eq("customer_id", data.customer_id)
+        .order("created_at", { ascending: false })
+        .limit(50),
+      admin.from("orders").select("id").eq("customer_id", data.customer_id),
+    ]);
+
+    const orderIds = (shipmentsRes.data ?? []).map((o) => o.id);
+    const [shipRows, payRows, msgRows] = await Promise.all([
+      orderIds.length
+        ? admin
+            .from("shipments")
+            .select("id, shipment_number, status, shipped_at, delivered_at, created_at")
+            .in("order_id", orderIds)
+            .order("created_at", { ascending: false })
+            .limit(50)
+        : Promise.resolve({
+            data: [] as Array<{
+              id: string;
+              shipment_number: string;
+              status: string;
+              shipped_at: string | null;
+              delivered_at: string | null;
+              created_at: string;
+            }>,
+            error: null,
+          }),
+      (async () => {
+        const invIds = (invoicesRes.data ?? []).map((i) => i.id);
+        if (!invIds.length)
+          return {
+            data: [] as Array<{
+              id: string;
+              amount: number;
+              currency: string;
+              received_at: string;
+              invoice_id: string;
+            }>,
+            error: null,
+          };
+        return admin
+          .from("payments")
+          .select("id, amount, currency, received_at, invoice_id")
+          .in("invoice_id", invIds)
+          .order("received_at", { ascending: false })
+          .limit(50);
+      })(),
+      admin
+        .from("communications")
+        .select("id, subject, kind, direction, occurred_at")
+        .eq("entity_type", "customer")
+        .eq("entity_id", data.customer_id)
+        .order("occurred_at", { ascending: false })
+        .limit(50),
+    ]);
+
+    const events: TimelineEvent[] = [];
+    (ordersRes.data ?? []).forEach((o) =>
+      events.push({
+        id: `o-${o.id}`,
+        at: o.created_at,
+        kind: "order",
+        title: `Order ${o.order_number}`,
+        detail: `Status: ${o.status}`,
+      }),
+    );
+    (invoicesRes.data ?? []).forEach((i) =>
+      events.push({
+        id: `i-${i.id}`,
+        at: i.created_at,
+        kind: "invoice",
+        title: `${i.type === "proforma" ? "Proforma" : "Invoice"} ${i.invoice_number}`,
+        detail: `${i.status} · ${i.currency} ${Number(i.total).toLocaleString()}`,
+      }),
+    );
+    (shipRows.data ?? []).forEach((s) =>
+      events.push({
+        id: `s-${s.id}`,
+        at: s.delivered_at ?? s.shipped_at ?? s.created_at,
+        kind: "shipment",
+        title: `Shipment ${s.shipment_number}`,
+        detail: `Status: ${s.status}`,
+      }),
+    );
+    (payRows.data ?? []).forEach((p) =>
+      events.push({
+        id: `p-${p.id}`,
+        at: p.received_at,
+        kind: "payment",
+        title: `Payment received`,
+        detail: `${p.currency} ${Number(p.amount).toLocaleString()}`,
+      }),
+    );
+    (msgRows.data ?? []).forEach((m) =>
+      events.push({
+        id: `m-${m.id}`,
+        at: m.occurred_at,
+        kind: "message",
+        title: m.subject ?? `${m.kind} (${m.direction})`,
+        detail: null,
+      }),
+    );
+
+    events.sort((a, b) => (a.at < b.at ? 1 : -1));
+    return events.slice(0, 100);
+  });
+
+const MessageAttachmentInput = z.object({
+  customer_id: z.string().uuid(),
+  path: z.string().min(1),
+});
+
+export const getMyMessageAttachmentUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => MessageAttachmentInput.parse(v))
+  .handler(async ({ context, data }) => {
+    const admin = await verifyCustomerAccess(context.userId, data.customer_id);
+    // Scope: only allow paths under this customer's folder OR attachments referenced by
+    // messages already visible to this customer.
+    const ownedPrefix = `customer/${data.customer_id}/`;
+    if (!data.path.startsWith(ownedPrefix)) {
+      const { data: rows } = await admin
+        .from("communications")
+        .select("attachments")
+        .eq("entity_type", "customer")
+        .eq("entity_id", data.customer_id);
+      const known = new Set<string>();
+      for (const r of rows ?? []) {
+        for (const a of (r.attachments as any[]) ?? []) if (a?.path) known.add(a.path);
+      }
+      if (!known.has(data.path)) throw new Error("Not authorized for this attachment");
+    }
+    const { data: signed, error } = await admin.storage
+      .from("crm-docs")
+      .createSignedUrl(data.path, 300);
+    if (error) throw new Error(error.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "portal_attachment_access",
+      entity_type: "customer",
+      entity_id: data.customer_id,
+      metadata: { portal: "customer", path: data.path },
+      old_values: null,
+      new_values: null,
+    });
+    return { url: signed?.signedUrl ?? null };
+  });
+
+const AttachmentInput = z.object({
+  name: z.string().min(1).max(200),
+  mime: z.string().optional(),
+  base64: z.string().min(1),
+});
+
+const SendMessageInput = z.object({
+  customer_id: z.string().uuid(),
+  kind: z.enum(["note", "email", "whatsapp", "call", "meeting"]).default("email"),
+  subject: z.string().max(300).nullable().optional(),
+  body: z.string().min(1).max(20000),
+  attachments: z.array(AttachmentInput).max(10).optional(),
+  parent_id: z.string().uuid().nullable().optional(),
+});
+
+export const sendMyMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => SendMessageInput.parse(v))
+  .handler(async ({ context, data }) => {
+    const admin = await verifyCustomerAccess(context.userId, data.customer_id);
+
+    const uploaded: Array<{ name: string; path: string; size: number; mime?: string }> = [];
+    for (const a of data.attachments ?? []) {
+      const bytes = Buffer.from(a.base64, "base64");
+      if (bytes.byteLength > 15 * 1024 * 1024) {
+        throw new Error(`Attachment ${a.name} exceeds 15 MB limit`);
+      }
+      const safe = a.name.replace(/[^\w.-]+/g, "_");
+      const path = `customer/${data.customer_id}/messages/${crypto.randomUUID()}-${safe}`;
+      const { error: upErr } = await admin.storage
+        .from("crm-docs")
+        .upload(path, bytes, { contentType: a.mime ?? "application/octet-stream", upsert: false });
+      if (upErr) throw new Error(upErr.message);
+      uploaded.push({ name: a.name, path, size: bytes.byteLength, mime: a.mime });
+    }
+
+    const { data: prof } = await admin
+      .from("profiles")
+      .select("full_name")
+      .eq("id", context.userId)
+      .maybeSingle();
+
+    let parentEntityType: string | null = null;
+    let parentEntityId: string | null = null;
+    let parentSubject: string | null = null;
+    if (data.parent_id) {
+      const { data: parent, error: pErr } = await admin
+        .from("communications")
+        .select("id, entity_type, entity_id, subject")
+        .eq("id", data.parent_id)
+        .maybeSingle();
+      if (pErr) throw new Error(pErr.message);
+      if (!parent) throw new Error("Parent message not found");
+      // Verify the parent is visible to this customer via the same scoping used in getMyMessages
+      const scoped =
+        (parent.entity_type === "customer" && parent.entity_id === data.customer_id) ||
+        (parent.entity_type === "project" &&
+          (
+            await admin
+              .from("projects")
+              .select("id")
+              .eq("customer_id", data.customer_id)
+              .eq("id", parent.entity_id)
+              .maybeSingle()
+          ).data) ||
+        (parent.entity_type === "order" &&
+          (
+            await admin
+              .from("orders")
+              .select("id")
+              .eq("customer_id", data.customer_id)
+              .eq("id", parent.entity_id)
+              .maybeSingle()
+          ).data);
+      if (!scoped) throw new Error("Not authorized to reply to this message");
+      parentEntityType = parent.entity_type;
+      parentEntityId = parent.entity_id;
+      parentSubject = parent.subject;
+    }
+
+    const finalSubject =
+      data.subject ??
+      (parentSubject
+        ? parentSubject.startsWith("Re:")
+          ? parentSubject
+          : `Re: ${parentSubject}`
+        : null);
+
+    const { data: row, error } = await admin
+      .from("communications")
+      .insert({
+        entity_type: parentEntityType ?? "customer",
+        entity_id: parentEntityId ?? data.customer_id,
+        kind: data.kind,
+        direction: "inbound",
+        subject: finalSubject,
+        body: data.body,
+        attachments: uploaded,
+        contact_name: prof?.full_name ?? null,
+        user_id: context.userId,
+        occurred_at: new Date().toISOString(),
+        parent_id: data.parent_id ?? null,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    await writeAudit(context.supabase, {
+      user_id: context.userId,
+      action: "portal_send_message",
+      entity_type: "communication",
+      entity_id: row!.id,
+      metadata: {
+        portal: "customer",
+        customer_id: data.customer_id,
+        kind: data.kind,
+        parent_id: data.parent_id ?? null,
+        attachment_count: uploaded.length,
+      },
+      old_values: null,
+      new_values: {
+        entity_type: parentEntityType ?? "customer",
+        entity_id: parentEntityId ?? data.customer_id,
+        kind: data.kind,
+        direction: "inbound",
+        subject: finalSubject,
+        body: data.body,
+        attachments: uploaded,
+        parent_id: data.parent_id ?? null,
+      },
+    });
+    return { ok: true, id: row!.id };
+  });
