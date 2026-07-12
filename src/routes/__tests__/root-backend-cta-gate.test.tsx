@@ -106,25 +106,25 @@ describe("RootComponent backend CTA gate", () => {
 
     // Public → /admin: gate must re-evaluate and hide CTAs.
     await act(async () => {
-      await router.navigate({ to: "/admin/$", params: { _splat: "dashboard" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/admin/$", params: { _splat: "dashboard" } });
     });
     await expectCtas(false);
 
     // /admin → /crm: still a backend route.
     await act(async () => {
-      await router.navigate({ to: "/crm/$", params: { _splat: "leads" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/crm/$", params: { _splat: "leads" } });
     });
     await expectCtas(false);
 
     // /crm → /backoffice: still backend.
     await act(async () => {
-      await router.navigate({ to: "/backoffice/$", params: { _splat: "tools" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/backoffice/$", params: { _splat: "tools" } });
     });
     await expectCtas(false);
 
     // Backend → public: CTAs must come back.
     await act(async () => {
-      await router.navigate({ to: "/about" });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/about" });
     });
     await expectCtas(true);
   });
@@ -136,7 +136,7 @@ describe("RootComponent backend CTA gate", () => {
 
     // Backend-first → public: CTAs appear.
     await act(async () => {
-      await router.navigate({ to: "/" });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/" });
     });
     await expectCtas(true);
   });
@@ -257,12 +257,12 @@ describe("RootComponent backend CTA gate", () => {
 
     // Public → backend with a query string.
     await act(async () => {
-      await router.navigate({ to: "/" });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/" });
     });
     await expectCtas(true);
 
     await act(async () => {
-      await router.navigate({
+      await (router.navigate as (options: unknown) => Promise<void>)({
         to: "/crm/$",
         params: { _splat: "leads" },
         search: { filter: "hot" },
@@ -273,7 +273,7 @@ describe("RootComponent backend CTA gate", () => {
     // Mutating just the query string on a backend route must not
     // re-enable the CTAs.
     await act(async () => {
-      await router.navigate({
+      await (router.navigate as (options: unknown) => Promise<void>)({
         to: "/crm/$",
         params: { _splat: "leads" },
         search: { filter: "cold" },
@@ -392,9 +392,9 @@ describe("RootComponent backend CTA gate", () => {
     const go = async (to: string, splat?: string) => {
       await act(async () => {
         if (splat !== undefined) {
-          await router.navigate({ to: to as "/admin/$", params: { _splat: splat } });
+          await (router.navigate as (options: unknown) => Promise<void>)({ to: to as "/admin/$", params: { _splat: splat } });
         } else {
-          await router.navigate({ to });
+          await (router.navigate as (options: unknown) => Promise<void>)({ to });
         }
       });
     };

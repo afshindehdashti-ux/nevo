@@ -56,7 +56,7 @@ function coerce(field: ImportField, raw: unknown): unknown {
       }
       const iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
       if (iso) return `${iso[1]}-${iso[2].padStart(2, "0")}-${iso[3].padStart(2, "0")}`;
-      const dmy = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+      const dmy = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2,4})$/);
       if (dmy) {
         const yy = dmy[3].length === 2 ? `20${dmy[3]}` : dmy[3];
         // Assume dd/mm/yyyy (UAE convention) unless day > 12 and month <= 12.

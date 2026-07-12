@@ -306,7 +306,7 @@ const ApproveInput = z.object({
 });
 
 function sanitizeSegment(s: string) {
-  return s.replace(/[^A-Za-z0-9._\-\/]+/g, "_").replace(/^\/+|\/+$/g, "");
+  return s.replace(/[^A-Za-z0-9._/-]+/g, "_").replace(/^[/]+|[/]+$/g, "");
 }
 
 export const approveDocument = createServerFn({ method: "POST" })

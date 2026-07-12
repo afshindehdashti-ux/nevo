@@ -175,7 +175,9 @@ export const testMailboxConnection = createServerFn({ method: "POST" })
     } finally {
       try {
         if (client) await client.logout();
-      } catch {}
+      } catch {
+        // Best-effort IMAP logout cleanup.
+      }
     }
   });
 
@@ -207,7 +209,9 @@ export const listImapMailboxes = createServerFn({ method: "POST" })
     } finally {
       try {
         if (client) await client.logout();
-      } catch {}
+      } catch {
+        // Best-effort IMAP logout cleanup.
+      }
     }
   });
 
@@ -271,7 +275,9 @@ export const listImapMessages = createServerFn({ method: "POST" })
     } finally {
       try {
         if (client) await client.logout();
-      } catch {}
+      } catch {
+        // Best-effort IMAP logout cleanup.
+      }
     }
   });
 
@@ -307,7 +313,9 @@ export const getImapMessage = createServerFn({ method: "POST" })
         // Mark as read
         try {
           await client.messageFlagsAdd({ uid: data.uid }, ["\\Seen"], { uid: true });
-        } catch {}
+        } catch {
+        // Best-effort IMAP logout cleanup.
+      }
 
         return {
           uid: msg.uid,
@@ -334,7 +342,9 @@ export const getImapMessage = createServerFn({ method: "POST" })
     } finally {
       try {
         if (client) await client.logout();
-      } catch {}
+      } catch {
+        // Best-effort IMAP logout cleanup.
+      }
     }
   });
 
@@ -368,7 +378,9 @@ export const setImapSeen = createServerFn({ method: "POST" })
     } finally {
       try {
         if (client) await client.logout();
-      } catch {}
+      } catch {
+        // Best-effort IMAP logout cleanup.
+      }
     }
   });
 
@@ -397,7 +409,9 @@ export const deleteImapMessage = createServerFn({ method: "POST" })
     } finally {
       try {
         if (client) await client.logout();
-      } catch {}
+      } catch {
+        // Best-effort IMAP logout cleanup.
+      }
     }
   });
 

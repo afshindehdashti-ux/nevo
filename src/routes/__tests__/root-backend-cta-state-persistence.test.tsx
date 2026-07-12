@@ -156,7 +156,7 @@ describe("Public marketing chrome — state does not persist across the backend 
     // Navigate to /admin. The drawer, launcher, and body-overflow lock
     // must all be gone.
     await act(async () => {
-      await router.navigate({ to: "/admin/$", params: { _splat: "dashboard" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/admin/$", params: { _splat: "dashboard" } });
     });
     await waitFor(() => {
       expect(screen.queryByTestId("ask-ai-launcher")).toBeNull();
@@ -167,7 +167,7 @@ describe("Public marketing chrome — state does not persist across the backend 
     // Return to a public page — the drawer must NOT still be open (state
     // reset because the component unmounted, not just hid).
     await act(async () => {
-      await router.navigate({ to: "/about" });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/about" });
     });
     await waitFor(() => {
       expect(screen.getByTestId("ask-ai-launcher")).toBeTruthy();
@@ -194,7 +194,7 @@ describe("Public marketing chrome — state does not persist across the backend 
 
       // Enter backend — CTA must be fully gone.
       await act(async () => {
-        await router.navigate({ to: target, params: { _splat: splat } });
+        await (router.navigate as (options: unknown) => Promise<void>)({ to: target, params: { _splat: splat } });
       });
       await waitFor(() => {
         expect(screen.queryByTestId("sticky-cta")).toBeNull();
@@ -204,7 +204,7 @@ describe("Public marketing chrome — state does not persist across the backend 
       // Back to public — the CTA re-appears in its *initial* (un-dismissed)
       // state because unmounting destroyed the previous instance's state.
       await act(async () => {
-        await router.navigate({ to: "/about" });
+        await (router.navigate as (options: unknown) => Promise<void>)({ to: "/about" });
       });
       await waitFor(() => {
         expect(screen.getByTestId("sticky-cta")).toBeTruthy();
@@ -229,7 +229,7 @@ describe("Public marketing chrome — state does not persist across the backend 
 
     // /crm — both gone, body-overflow reset.
     await act(async () => {
-      await router.navigate({ to: "/crm/$", params: { _splat: "leads" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/crm/$", params: { _splat: "leads" } });
     });
     await waitFor(() => {
       expect(screen.queryByTestId("ask-ai-drawer")).toBeNull();
@@ -240,7 +240,7 @@ describe("Public marketing chrome — state does not persist across the backend 
 
     // Public — fresh instances.
     await act(async () => {
-      await router.navigate({ to: "/" });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/" });
     });
     await waitFor(() => {
       expect(screen.getByTestId("ask-ai-launcher")).toBeTruthy();
@@ -251,7 +251,7 @@ describe("Public marketing chrome — state does not persist across the backend 
 
     // /backoffice — gone again; body remains unlocked.
     await act(async () => {
-      await router.navigate({ to: "/backoffice/$", params: { _splat: "tools" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/backoffice/$", params: { _splat: "tools" } });
     });
     await waitFor(() => {
       expect(screen.queryByTestId("ask-ai-launcher")).toBeNull();

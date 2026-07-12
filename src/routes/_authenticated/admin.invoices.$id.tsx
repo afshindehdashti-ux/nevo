@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -207,9 +207,9 @@ function PurgeAuditSkeleton({ rows = 5 }: { rows?: number }) {
 }
 
 function InvoiceDetailPage() {
-  const { id } = useParams({ from: "/_authenticated/admin/invoices/$id" });
+  const { id } = Route.useParams();
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/_authenticated/admin/invoices/$id" });
+  const navigate = Route.useNavigate();
   const qc = useQueryClient();
   const canEdit = useCanEditInvoices();
   const canPay = useCanEditPayments();

@@ -79,7 +79,9 @@ export const Route = createFileRoute("/api/public/oauth/google/callback")({
               const ui: any = await uiRes.json();
               authorizedEmail = ui?.email ?? null;
             }
-          } catch {}
+          } catch {
+            // The profile lookup is optional; token persistence remains valid.
+          }
 
           const expiresAt = tokenJson.expires_in
             ? new Date(Date.now() + Number(tokenJson.expires_in) * 1000).toISOString()

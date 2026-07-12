@@ -109,7 +109,7 @@ function LogoEventsAdmin() {
     mutationFn: async () => {
       await supabase.auth.signOut();
     },
-    onSuccess: () => navigate({ to: "/auth" }),
+    onSuccess: () => navigate({ to: "/auth", search: { next: undefined } }),
   });
 
   if (rolesQ.isLoading) {
