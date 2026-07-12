@@ -1,7 +1,9 @@
 name: One-time CI cleanup
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - codex/backend-connection-hardening
 
 permissions:
   contents: write
