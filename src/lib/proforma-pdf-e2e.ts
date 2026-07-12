@@ -9,10 +9,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "./crm-money";
 import { financeTotalAmount } from "./finance-normalization";
-import {
-  fetchProformaForPdf,
-  generateProformaInvoicePdf,
-} from "./proforma-invoice-pdf";
+import { fetchProformaForPdf, generateProformaInvoicePdf } from "./proforma-invoice-pdf";
 
 export type PdfAssertion = {
   key: string;
@@ -65,7 +62,10 @@ async function extractPdfText(blob: Blob): Promise<{ text: string; pages: number
 function normalize(s: string) {
   // pdfjs sometimes inserts spaces between glyphs; collapse whitespace and
   // strip non-breaking spaces used by Intl.NumberFormat for currencies.
-  return s.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+  return s
+    .replace(/\u00a0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function contains(hay: string, needle: string) {
@@ -78,9 +78,7 @@ function contains(hay: string, needle: string) {
  * Generate the PDF for a proforma, extract text, and assert on totals
  * (vat_rate%, vat_amount, grand_total) plus the payment status stamp.
  */
-export async function assertProformaPdfContent(
-  proformaId: string,
-): Promise<PdfE2eReport> {
+export async function assertProformaPdfContent(proformaId: string): Promise<PdfE2eReport> {
   const { pi } = await fetchProformaForPdf(proformaId);
   const currency = pi.currency;
   const vatRate = Number(pi.vat_rate ?? 0) || 0;
@@ -88,10 +86,7 @@ export async function assertProformaPdfContent(
   const grandTotal = financeTotalAmount(pi);
   const paymentStatus = pi.payment_status ?? "Unpaid";
 
-  const { blob, filename } = await generateProformaInvoicePdf(
-    proformaId,
-    "blob",
-  );
+  const { blob, filename } = await generateProformaInvoicePdf(proformaId, "blob");
 
   const { text, pages } = await extractPdfText(blob);
 

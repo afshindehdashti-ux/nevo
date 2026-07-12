@@ -55,7 +55,11 @@ function makeRouter(initialPath: string) {
   const rootRoute = createRootRoute({ component: RootShell });
   const routes = [
     createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <div>home</div> }),
-    createRoute({ getParentRoute: () => rootRoute, path: "/about", component: () => <div>about</div> }),
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/about",
+      component: () => <div>about</div>,
+    }),
     createRoute({
       getParentRoute: () => rootRoute,
       path: "/admin/$",
@@ -196,11 +200,11 @@ describe("RootComponent backend CTA gate", () => {
       "/",
       "/about",
       "/about/",
-      "/administration",           // lookalike prefix
+      "/administration", // lookalike prefix
       "/administration/settings",
-      "/crm-info",                  // lookalike prefix
-      "/backoffice-help",           // lookalike prefix
-      "/blog/admin-guide",          // "admin" mid-path, not a backend prefix
+      "/crm-info", // lookalike prefix
+      "/backoffice-help", // lookalike prefix
+      "/blog/admin-guide", // "admin" mid-path, not a backend prefix
     ];
 
     for (const p of backendPaths) {
@@ -282,8 +286,16 @@ describe("RootComponent backend CTA gate", () => {
     const rootRoute = createRootRoute({ component: RootShell });
     const routes = [
       createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <div>home</div> }),
-      createRoute({ getParentRoute: () => rootRoute, path: "/admin/$", component: () => <div>admin</div> }),
-      createRoute({ getParentRoute: () => rootRoute, path: "/backoffice/$", component: () => <div>backoffice</div> }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/admin/$",
+        component: () => <div>admin</div>,
+      }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/backoffice/$",
+        component: () => <div>backoffice</div>,
+      }),
     ];
     // Exercise every trailing-slash shape a hosting layer might hand us.
     const initialUrls = ["/admin/", "/admin/orders/", "/backoffice/tools/export/"];
@@ -332,10 +344,26 @@ describe("RootComponent backend CTA gate", () => {
     const rootRoute = createRootRoute({ component: InstrumentedRoot });
     const routes = [
       createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <div>home</div> }),
-      createRoute({ getParentRoute: () => rootRoute, path: "/about", component: () => <div>about</div> }),
-      createRoute({ getParentRoute: () => rootRoute, path: "/admin/$", component: () => <div>admin</div> }),
-      createRoute({ getParentRoute: () => rootRoute, path: "/crm/$", component: () => <div>crm</div> }),
-      createRoute({ getParentRoute: () => rootRoute, path: "/backoffice/$", component: () => <div>backoffice</div> }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/about",
+        component: () => <div>about</div>,
+      }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/admin/$",
+        component: () => <div>admin</div>,
+      }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/crm/$",
+        component: () => <div>crm</div>,
+      }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/backoffice/$",
+        component: () => <div>backoffice</div>,
+      }),
     ];
     const router = createRouter({
       routeTree: rootRoute.addChildren(routes),

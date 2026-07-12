@@ -28,11 +28,7 @@ import {
 } from "@/components/ui/table";
 import { ArrowLeft, Plus, Trash2, Save, FileText, Truck } from "lucide-react";
 import { formatMoney, formatDate } from "@/lib/crm-money";
-import {
-  ORDER_STATUSES,
-  orderStatusLabel,
-  orderStatusVariant,
-} from "@/lib/crm-status";
+import { ORDER_STATUSES, orderStatusLabel, orderStatusVariant } from "@/lib/crm-status";
 import { useCanEditOrders, useCanEditInvoices, useCanEditShipments } from "@/lib/crm-permissions";
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
 
@@ -156,10 +152,7 @@ function OrderDetailPage() {
         total: order.total ?? null,
       };
       // Update header
-      const { error: hErr } = await supabase
-        .from("orders")
-        .update(headerPatch)
-        .eq("id", order.id);
+      const { error: hErr } = await supabase.from("orders").update(headerPatch).eq("id", order.id);
       if (hErr) throw hErr;
 
       // Handle line deletes
@@ -181,7 +174,9 @@ function OrderDetailPage() {
           vat_pct: l.vat_pct,
           position: l.position,
           line_total:
-            l.quantity * l.unit_price * (1 - (l.discount_pct || 0) / 100) *
+            l.quantity *
+            l.unit_price *
+            (1 - (l.discount_pct || 0) / 100) *
             (1 + (l.vat_pct || 0) / 100),
         };
         if (l.id) {
@@ -272,7 +267,9 @@ function OrderDetailPage() {
           vat_pct: l.vat_pct,
           position: l.position,
           line_total:
-            l.quantity * l.unit_price * (1 - (l.discount_pct || 0) / 100) *
+            l.quantity *
+            l.unit_price *
+            (1 - (l.discount_pct || 0) / 100) *
             (1 + (l.vat_pct || 0) / 100),
         }));
       if (linesToCopy.length) {
@@ -286,7 +283,12 @@ function OrderDetailPage() {
           entity_id: order.id,
           metadata: { invoice_id: inv.id, invoice_type: type, total: totals.total },
           old_values: null,
-          new_values: { invoice_id: inv.id, invoice_type: type, total: totals.total, line_count: linesToCopy.length },
+          new_values: {
+            invoice_id: inv.id,
+            invoice_type: type,
+            total: totals.total,
+            line_count: linesToCopy.length,
+          },
         },
       }).catch(() => undefined);
       return inv;
@@ -489,7 +491,9 @@ function OrderDetailPage() {
                 {lines.map((l, idx) => {
                   if (l._deleted) return null;
                   const lt =
-                    l.quantity * l.unit_price * (1 - (l.discount_pct || 0) / 100) *
+                    l.quantity *
+                    l.unit_price *
+                    (1 - (l.discount_pct || 0) / 100) *
                     (1 + (l.vat_pct || 0) / 100);
                   return (
                     <TableRow key={l.id ?? `new-${idx}`}>

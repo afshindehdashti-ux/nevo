@@ -57,8 +57,7 @@ export const emailInvoicePdf = createServerFn({ method: "POST" })
     }
 
     const req = getRequest();
-    const authHeader =
-      req?.headers.get("authorization") ?? req?.headers.get("Authorization");
+    const authHeader = req?.headers.get("authorization") ?? req?.headers.get("Authorization");
     const host = req?.headers.get("host");
     const proto = req?.headers.get("x-forwarded-proto") ?? "https";
     if (!authHeader || !host) {
@@ -83,37 +82,34 @@ export const emailInvoicePdf = createServerFn({ method: "POST" })
     }
 
     try {
-      const res = await fetch(
-        `${proto}://${host}/lovable/email/transactional/send`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authHeader,
-          },
-          body: JSON.stringify({
-            templateName: "invoice-share",
-            recipientEmail: data.recipientEmail,
-            // One idempotency key per (invoice, storage upload) so re-sending
-            // a freshly re-generated PDF is not deduped, but a double-click
-            // on the same click is.
-            idempotencyKey: `invoice-share-${invoice.id}-${data.storagePath}`,
-            templateData: {
-              customerName: customerDisplayName(customer),
-              invoiceNumber: invoice.invoice_number ?? undefined,
-              invoiceKind,
-              currency: invoice.currency ?? "USD",
-              total: invoice.total ?? undefined,
-              issueDate: invoice.issue_date ?? undefined,
-              dueDate: invoice.due_date ?? undefined,
-              downloadUrl: signed.signedUrl,
-              expiresInHours: Math.floor(SIGNED_URL_TTL_SECONDS / 3600),
-              message: data.message ?? undefined,
-              senderName: senderName ?? undefined,
-            },
-          }),
+      const res = await fetch(`${proto}://${host}/lovable/email/transactional/send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: authHeader,
         },
-      );
+        body: JSON.stringify({
+          templateName: "invoice-share",
+          recipientEmail: data.recipientEmail,
+          // One idempotency key per (invoice, storage upload) so re-sending
+          // a freshly re-generated PDF is not deduped, but a double-click
+          // on the same click is.
+          idempotencyKey: `invoice-share-${invoice.id}-${data.storagePath}`,
+          templateData: {
+            customerName: customerDisplayName(customer),
+            invoiceNumber: invoice.invoice_number ?? undefined,
+            invoiceKind,
+            currency: invoice.currency ?? "USD",
+            total: invoice.total ?? undefined,
+            issueDate: invoice.issue_date ?? undefined,
+            dueDate: invoice.due_date ?? undefined,
+            downloadUrl: signed.signedUrl,
+            expiresInHours: Math.floor(SIGNED_URL_TTL_SECONDS / 3600),
+            message: data.message ?? undefined,
+            senderName: senderName ?? undefined,
+          },
+        }),
+      });
       if (!res.ok) {
         const body = await res.text().catch(() => "");
         console.error(`invoice share email failed [${res.status}]: ${body}`);

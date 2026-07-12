@@ -17,16 +17,7 @@ const IdInput = z.object({ id: z.string().uuid() });
 const HeaderInput = z.object({
   customer_id: z.string().uuid(),
   type: z.enum(["proforma", "commercial"]).default("commercial"),
-  status: z
-    .enum([
-      "draft",
-      "issued",
-      "partially_paid",
-      "paid",
-      "overdue",
-      "void",
-    ])
-    .optional(),
+  status: z.enum(["draft", "issued", "partially_paid", "paid", "overdue", "void"]).optional(),
   order_id: z.string().uuid().nullable().optional(),
   proforma_invoice_id: z.string().uuid().nullable().optional(),
   issue_date: z.string().optional(),
@@ -105,11 +96,11 @@ async function recalcCommercialInvoiceTotalsInternal(supabase: any, id: string) 
   let taxTotal = 0;
   for (const it of items ?? []) {
     const gross = Number(it.quantity) * Number(it.unit_price);
-    const discAmt = gross * Number(it.discount) / 100;
+    const discAmt = (gross * Number(it.discount)) / 100;
     const taxable = gross - discAmt;
     subtotal += taxable;
     discountTotal += discAmt;
-    taxTotal += taxable * Number(it.tax_rate) / 100;
+    taxTotal += (taxable * Number(it.tax_rate)) / 100;
   }
   subtotal = round2(subtotal);
   discountTotal = round2(discountTotal);
@@ -135,13 +126,21 @@ async function recalcCommercialInvoiceTotalsInternal(supabase: any, id: string) 
     })
     .eq("id", id);
   if (upErr) throw new Error(upErr.message);
-  return { subtotal, discount_total: discountTotal, tax_total: taxTotal, vat_amount: taxTotal, total };
+  return {
+    subtotal,
+    discount_total: discountTotal,
+    tax_total: taxTotal,
+    vat_amount: taxTotal,
+    total,
+  };
 }
 
 export const recalcCommercialInvoiceTotals = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => IdInput.parse(v))
-  .handler(async ({ context, data }) => recalcCommercialInvoiceTotalsInternal(context.supabase, data.id));
+  .handler(async ({ context, data }) =>
+    recalcCommercialInvoiceTotalsInternal(context.supabase, data.id),
+  );
 
 export const createCommercialInvoice = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -201,7 +200,11 @@ export const createCommercialInvoice = createServerFn({ method: "POST" })
         action: "create",
         entity_type: "invoice",
         entity_id: inserted.id,
-        metadata: { items: data.items.length, currency: data.header.currency, type: data.header.type },
+        metadata: {
+          items: data.items.length,
+          currency: data.header.currency,
+          type: data.header.type,
+        },
       });
     } catch (err) {
       console.warn("createCommercialInvoice activity log failed", err);
@@ -211,9 +214,7 @@ export const createCommercialInvoice = createServerFn({ method: "POST" })
 
 export const updateCommercialInvoiceHeader = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
-    z.object({ id: z.string().uuid(), patch: HeaderInput.partial() }).parse(v),
-  )
+  .inputValidator((v) => z.object({ id: z.string().uuid(), patch: HeaderInput.partial() }).parse(v))
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase
       .from("invoices")
@@ -225,9 +226,7 @@ export const updateCommercialInvoiceHeader = createServerFn({ method: "POST" })
 
 export const addCommercialInvoiceItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
-    ItemInput.extend({ invoice_id: z.string().uuid() }).parse(v),
-  )
+  .inputValidator((v) => ItemInput.extend({ invoice_id: z.string().uuid() }).parse(v))
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase.from("invoice_items").insert({
       invoice_id: data.invoice_id,
@@ -251,9 +250,7 @@ export const addCommercialInvoiceItem = createServerFn({ method: "POST" })
 
 export const updateCommercialInvoiceItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
-    z.object({ id: z.string().uuid(), patch: ItemInput.partial() }).parse(v),
-  )
+  .inputValidator((v) => z.object({ id: z.string().uuid(), patch: ItemInput.partial() }).parse(v))
   .handler(async ({ context, data }) => {
     const patch: Record<string, unknown> = { ...data.patch };
     if (data.patch.discount !== undefined) patch.discount_pct = data.patch.discount;
@@ -321,7 +318,11 @@ export const saveCommercialInvoice = createServerFn({ method: "POST" })
     if (Object.keys(data.header).length) {
       const { error } = await context.supabase
         .from("invoices")
-        .update({ ...data.header, updated_at: new Date().toISOString(), updated_by: context.userId })
+        .update({
+          ...data.header,
+          updated_at: new Date().toISOString(),
+          updated_by: context.userId,
+        })
         .eq("id", data.id);
       if (error) throw new Error(error.message);
     }

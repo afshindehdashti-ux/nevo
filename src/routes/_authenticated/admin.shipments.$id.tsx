@@ -196,7 +196,11 @@ function ShipmentDetailPage() {
             </div>
             <div>
               <Label>Carrier</Label>
-              <Input value={carrier} onChange={(e) => setCarrier(e.target.value)} disabled={!canEdit} />
+              <Input
+                value={carrier}
+                onChange={(e) => setCarrier(e.target.value)}
+                disabled={!canEdit}
+              />
             </div>
             <div>
               <Label>Tracking number</Label>

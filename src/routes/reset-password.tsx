@@ -9,10 +9,7 @@ import { ShieldCheck } from "lucide-react";
 export const Route = createFileRoute("/reset-password")({
   ssr: false,
   head: () => ({
-    meta: [
-      { title: "Reset password — NEVO CRM" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Reset password — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   component: ResetPasswordPage,
 });
@@ -82,9 +79,7 @@ function ResetPasswordPage() {
       >
         <div className="flex items-center gap-2 text-primary">
           <ShieldCheck className="h-5 w-5" />
-          <span className="text-xs uppercase tracking-widest font-semibold">
-            NEVO Back Office
-          </span>
+          <span className="text-xs uppercase tracking-widest font-semibold">NEVO Back Office</span>
         </div>
         <div>
           <h1 className="text-xl font-semibold">Set a new password</h1>
@@ -130,8 +125,8 @@ function ResetPasswordPage() {
         </Button>
 
         <p className="text-[11px] text-muted-foreground text-center border-t border-border pt-3">
-          Reset links expire quickly and can only be used once. Request a new one from the
-          sign-in page if this link no longer works.
+          Reset links expire quickly and can only be used once. Request a new one from the sign-in
+          page if this link no longer works.
         </p>
       </form>
     </div>

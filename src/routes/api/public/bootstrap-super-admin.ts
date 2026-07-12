@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { withMethodGuards } from "@/lib/api-http";
-import { assertAllowedOrigin, assertRateLimit, corsHeaders, jsonError, timingSafeEqualText } from "@/lib/api-security";
+import {
+  assertAllowedOrigin,
+  assertRateLimit,
+  corsHeaders,
+  jsonError,
+  timingSafeEqualText,
+} from "@/lib/api-security";
 import { z } from "zod";
 
 /**
@@ -27,20 +33,25 @@ export const Route = createFileRoute("/api/public/bootstrap-super-admin")({
   server: {
     handlers: withMethodGuards({
       OPTIONS: async ({ request }) => {
-        const headers = corsHeaders(request)
-        const blocked = assertAllowedOrigin(request, headers)
-        if (blocked) return blocked
-        return new Response(null, { status: 204, headers })
+        const headers = corsHeaders(request);
+        const blocked = assertAllowedOrigin(request, headers);
+        if (blocked) return blocked;
+        return new Response(null, { status: 204, headers });
       },
       POST: async ({ request }) => {
-        const headers = corsHeaders(request)
-        const blocked = assertAllowedOrigin(request, headers)
-        if (blocked) return blocked
-        const limited = assertRateLimit(request, "bootstrap-super-admin", { limit: 3, windowMs: 10 * 60_000 });
+        const headers = corsHeaders(request);
+        const blocked = assertAllowedOrigin(request, headers);
+        if (blocked) return blocked;
+        const limited = assertRateLimit(request, "bootstrap-super-admin", {
+          limit: 3,
+          windowMs: 10 * 60_000,
+        });
         if (limited) return limited;
 
-        if (!process.env.NEVO_BOOTSTRAP_TOKEN) return jsonError(503, "bootstrap_not_configured", undefined, headers);
-        if (!hasValidBootstrapToken(request)) return jsonError(401, "invalid_bootstrap_token", undefined, headers);
+        if (!process.env.NEVO_BOOTSTRAP_TOKEN)
+          return jsonError(503, "bootstrap_not_configured", undefined, headers);
+        if (!hasValidBootstrapToken(request))
+          return jsonError(401, "invalid_bootstrap_token", undefined, headers);
 
         let body: unknown;
         try {
@@ -49,7 +60,8 @@ export const Route = createFileRoute("/api/public/bootstrap-super-admin")({
           return jsonError(400, "invalid_json", undefined, headers);
         }
         const parsed = schema.safeParse(body);
-        if (!parsed.success) return jsonError(400, "validation_failed", { details: parsed.error.flatten() }, headers);
+        if (!parsed.success)
+          return jsonError(400, "validation_failed", { details: parsed.error.flatten() }, headers);
         const { email, full_name } = parsed.data;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -67,12 +79,16 @@ export const Route = createFileRoute("/api/public/bootstrap-super-admin")({
         const siteUrl = process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
 
         let userId: string | null = null;
-        const { data: invited, error: inviteErr } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-          redirectTo: `${siteUrl}/admin/login`,
-          data: { full_name },
-        });
+        const { data: invited, error: inviteErr } =
+          await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+            redirectTo: `${siteUrl}/admin/login`,
+            data: { full_name },
+          });
         if (inviteErr) {
-          const { data: list, error: listErr } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
+          const { data: list, error: listErr } = await supabaseAdmin.auth.admin.listUsers({
+            page: 1,
+            perPage: 200,
+          });
           if (listErr) return jsonError(500, "user_lookup_failed", undefined, headers);
           const found = list.users.find((u) => u.email?.toLowerCase() === email.toLowerCase());
           if (!found) return jsonError(500, "invite_failed", undefined, headers);
@@ -82,10 +98,15 @@ export const Route = createFileRoute("/api/public/bootstrap-super-admin")({
         }
         if (!userId) return jsonError(500, "user_id_not_resolved", undefined, headers);
 
-        await supabaseAdmin.from("profiles").upsert({ id: userId, full_name, is_active: true }, { onConflict: "id" });
+        await supabaseAdmin
+          .from("profiles")
+          .upsert({ id: userId, full_name, is_active: true }, { onConflict: "id" });
 
-        const { error: roleErr } = await supabaseAdmin.from("user_roles").insert({ user_id: userId, role: "super_admin" });
-        if (roleErr && !roleErr.message.includes("duplicate")) return jsonError(500, "role_grant_failed", undefined, headers);
+        const { error: roleErr } = await supabaseAdmin
+          .from("user_roles")
+          .insert({ user_id: userId, role: "super_admin" });
+        if (roleErr && !roleErr.message.includes("duplicate"))
+          return jsonError(500, "role_grant_failed", undefined, headers);
 
         await supabaseAdmin.from("activity_logs").insert({
           user_id: userId,

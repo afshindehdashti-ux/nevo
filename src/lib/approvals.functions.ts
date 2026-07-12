@@ -40,7 +40,6 @@ const SubmitInput = z.object({
   details: z.record(z.string(), z.any()).optional(),
 });
 
-
 export const submitApprovalRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => SubmitInput.parse(v))
@@ -196,8 +195,8 @@ export const listApprovalRequests = createServerFn({ method: "GET" })
     return list.map((r) => ({
       ...r,
       entity_label: labels.get(key(r.entity_type, r.entity_id)) ?? null,
-      requested_by_name: r.requested_by ? names.get(r.requested_by) ?? null : null,
-      decided_by_name: r.decided_by ? names.get(r.decided_by) ?? null : null,
+      requested_by_name: r.requested_by ? (names.get(r.requested_by) ?? null) : null,
+      decided_by_name: r.decided_by ? (names.get(r.decided_by) ?? null) : null,
     }));
   });
 

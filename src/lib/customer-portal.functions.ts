@@ -117,7 +117,9 @@ export const getMyDocuments = createServerFn({ method: "GET" })
   .handler(async ({ context, data }) => {
     const { data: rows, error } = await context.supabase
       .from("documents")
-      .select("id, entity_type, entity_id, kind, file_name, mime_type, size_bytes, created_at, file_path")
+      .select(
+        "id, entity_type, entity_id, kind, file_name, mime_type, size_bytes, created_at, file_path",
+      )
       .eq("entity_type", "customer")
       .eq("entity_id", data.customer_id)
       .order("created_at", { ascending: false })
@@ -238,7 +240,9 @@ export const getMyMessages = createServerFn({ method: "GET" })
 
     const { data: rows, error } = await admin
       .from("communications")
-      .select("id, entity_type, entity_id, kind, direction, subject, body, occurred_at, contact_name, attachments, thread_id, parent_id")
+      .select(
+        "id, entity_type, entity_id, kind, direction, subject, body, occurred_at, contact_name, attachments, thread_id, parent_id",
+      )
       .or(filters.join(","))
       .order("occurred_at", { ascending: true })
       .limit(500);
@@ -325,53 +329,116 @@ export const getMyTimeline = createServerFn({ method: "GET" })
     const admin = await verifyCustomerAccess(context.userId, data.customer_id);
 
     const [ordersRes, invoicesRes, shipmentsRes] = await Promise.all([
-      admin.from("orders").select("id, order_number, status, order_date, created_at")
-        .eq("customer_id", data.customer_id).order("created_at", { ascending: false }).limit(50),
-      admin.from("invoices").select("id, invoice_number, type, status, issue_date, total, currency, created_at")
-        .eq("customer_id", data.customer_id).order("created_at", { ascending: false }).limit(50),
+      admin
+        .from("orders")
+        .select("id, order_number, status, order_date, created_at")
+        .eq("customer_id", data.customer_id)
+        .order("created_at", { ascending: false })
+        .limit(50),
+      admin
+        .from("invoices")
+        .select("id, invoice_number, type, status, issue_date, total, currency, created_at")
+        .eq("customer_id", data.customer_id)
+        .order("created_at", { ascending: false })
+        .limit(50),
       admin.from("orders").select("id").eq("customer_id", data.customer_id),
     ]);
 
     const orderIds = (shipmentsRes.data ?? []).map((o) => o.id);
     const [shipRows, payRows, msgRows] = await Promise.all([
       orderIds.length
-        ? admin.from("shipments").select("id, shipment_number, status, shipped_at, delivered_at, created_at")
-            .in("order_id", orderIds).order("created_at", { ascending: false }).limit(50)
-        : Promise.resolve({ data: [] as Array<{ id: string; shipment_number: string; status: string; shipped_at: string | null; delivered_at: string | null; created_at: string }>, error: null }),
+        ? admin
+            .from("shipments")
+            .select("id, shipment_number, status, shipped_at, delivered_at, created_at")
+            .in("order_id", orderIds)
+            .order("created_at", { ascending: false })
+            .limit(50)
+        : Promise.resolve({
+            data: [] as Array<{
+              id: string;
+              shipment_number: string;
+              status: string;
+              shipped_at: string | null;
+              delivered_at: string | null;
+              created_at: string;
+            }>,
+            error: null,
+          }),
       (async () => {
         const invIds = (invoicesRes.data ?? []).map((i) => i.id);
-        if (!invIds.length) return { data: [] as Array<{ id: string; amount: number; currency: string; received_at: string; invoice_id: string }>, error: null };
-        return admin.from("payments").select("id, amount, currency, received_at, invoice_id")
-          .in("invoice_id", invIds).order("received_at", { ascending: false }).limit(50);
+        if (!invIds.length)
+          return {
+            data: [] as Array<{
+              id: string;
+              amount: number;
+              currency: string;
+              received_at: string;
+              invoice_id: string;
+            }>,
+            error: null,
+          };
+        return admin
+          .from("payments")
+          .select("id, amount, currency, received_at, invoice_id")
+          .in("invoice_id", invIds)
+          .order("received_at", { ascending: false })
+          .limit(50);
       })(),
-      admin.from("communications")
+      admin
+        .from("communications")
         .select("id, subject, kind, direction, occurred_at")
-        .eq("entity_type", "customer").eq("entity_id", data.customer_id)
-        .order("occurred_at", { ascending: false }).limit(50),
+        .eq("entity_type", "customer")
+        .eq("entity_id", data.customer_id)
+        .order("occurred_at", { ascending: false })
+        .limit(50),
     ]);
 
     const events: TimelineEvent[] = [];
-    (ordersRes.data ?? []).forEach((o) => events.push({
-      id: `o-${o.id}`, at: o.created_at, kind: "order",
-      title: `Order ${o.order_number}`, detail: `Status: ${o.status}`,
-    }));
-    (invoicesRes.data ?? []).forEach((i) => events.push({
-      id: `i-${i.id}`, at: i.created_at, kind: "invoice",
-      title: `${i.type === "proforma" ? "Proforma" : "Invoice"} ${i.invoice_number}`,
-      detail: `${i.status} · ${i.currency} ${Number(i.total).toLocaleString()}`,
-    }));
-    (shipRows.data ?? []).forEach((s) => events.push({
-      id: `s-${s.id}`, at: s.delivered_at ?? s.shipped_at ?? s.created_at,
-      kind: "shipment", title: `Shipment ${s.shipment_number}`, detail: `Status: ${s.status}`,
-    }));
-    (payRows.data ?? []).forEach((p) => events.push({
-      id: `p-${p.id}`, at: p.received_at, kind: "payment",
-      title: `Payment received`, detail: `${p.currency} ${Number(p.amount).toLocaleString()}`,
-    }));
-    (msgRows.data ?? []).forEach((m) => events.push({
-      id: `m-${m.id}`, at: m.occurred_at, kind: "message",
-      title: m.subject ?? `${m.kind} (${m.direction})`, detail: null,
-    }));
+    (ordersRes.data ?? []).forEach((o) =>
+      events.push({
+        id: `o-${o.id}`,
+        at: o.created_at,
+        kind: "order",
+        title: `Order ${o.order_number}`,
+        detail: `Status: ${o.status}`,
+      }),
+    );
+    (invoicesRes.data ?? []).forEach((i) =>
+      events.push({
+        id: `i-${i.id}`,
+        at: i.created_at,
+        kind: "invoice",
+        title: `${i.type === "proforma" ? "Proforma" : "Invoice"} ${i.invoice_number}`,
+        detail: `${i.status} · ${i.currency} ${Number(i.total).toLocaleString()}`,
+      }),
+    );
+    (shipRows.data ?? []).forEach((s) =>
+      events.push({
+        id: `s-${s.id}`,
+        at: s.delivered_at ?? s.shipped_at ?? s.created_at,
+        kind: "shipment",
+        title: `Shipment ${s.shipment_number}`,
+        detail: `Status: ${s.status}`,
+      }),
+    );
+    (payRows.data ?? []).forEach((p) =>
+      events.push({
+        id: `p-${p.id}`,
+        at: p.received_at,
+        kind: "payment",
+        title: `Payment received`,
+        detail: `${p.currency} ${Number(p.amount).toLocaleString()}`,
+      }),
+    );
+    (msgRows.data ?? []).forEach((m) =>
+      events.push({
+        id: `m-${m.id}`,
+        at: m.occurred_at,
+        kind: "message",
+        title: m.subject ?? `${m.kind} (${m.direction})`,
+        detail: null,
+      }),
+    );
 
     events.sort((a, b) => (a.at < b.at ? 1 : -1));
     return events.slice(0, 100);
@@ -474,12 +541,24 @@ export const sendMyMessage = createServerFn({ method: "POST" })
       // Verify the parent is visible to this customer via the same scoping used in getMyMessages
       const scoped =
         (parent.entity_type === "customer" && parent.entity_id === data.customer_id) ||
-        (parent.entity_type === "project" && (
-          await admin.from("projects").select("id").eq("customer_id", data.customer_id).eq("id", parent.entity_id).maybeSingle()
-        ).data) ||
-        (parent.entity_type === "order" && (
-          await admin.from("orders").select("id").eq("customer_id", data.customer_id).eq("id", parent.entity_id).maybeSingle()
-        ).data);
+        (parent.entity_type === "project" &&
+          (
+            await admin
+              .from("projects")
+              .select("id")
+              .eq("customer_id", data.customer_id)
+              .eq("id", parent.entity_id)
+              .maybeSingle()
+          ).data) ||
+        (parent.entity_type === "order" &&
+          (
+            await admin
+              .from("orders")
+              .select("id")
+              .eq("customer_id", data.customer_id)
+              .eq("id", parent.entity_id)
+              .maybeSingle()
+          ).data);
       if (!scoped) throw new Error("Not authorized to reply to this message");
       parentEntityType = parent.entity_type;
       parentEntityId = parent.entity_id;
@@ -488,7 +567,11 @@ export const sendMyMessage = createServerFn({ method: "POST" })
 
     const finalSubject =
       data.subject ??
-      (parentSubject ? (parentSubject.startsWith("Re:") ? parentSubject : `Re: ${parentSubject}`) : null);
+      (parentSubject
+        ? parentSubject.startsWith("Re:")
+          ? parentSubject
+          : `Re: ${parentSubject}`
+        : null);
 
     const { data: row, error } = await admin
       .from("communications")
@@ -534,4 +617,3 @@ export const sendMyMessage = createServerFn({ method: "POST" })
     });
     return { ok: true, id: row!.id };
   });
-

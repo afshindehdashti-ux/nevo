@@ -41,12 +41,7 @@ export const Route = createFileRoute("/_authenticated/admin/reports")({
 });
 
 type ReportKey =
-  | "customers"
-  | "leads_pipeline"
-  | "sales_orders"
-  | "invoices_ar"
-  | "payments"
-  | "ar_aging";
+  "customers" | "leads_pipeline" | "sales_orders" | "invoices_ar" | "payments" | "ar_aging";
 
 const REPORTS: Record<ReportKey, { label: string; description: string }> = {
   customers: {
@@ -192,11 +187,7 @@ function ReportsPage() {
 
             <div className="space-y-2">
               <Label>Status</Label>
-              <Select
-                value={status}
-                onValueChange={setStatus}
-                disabled={!statusOptions.length}
-              >
+              <Select value={status} onValueChange={setStatus} disabled={!statusOptions.length}>
                 <SelectTrigger>
                   <SelectValue placeholder="All" />
                 </SelectTrigger>
@@ -260,10 +251,7 @@ function ReportsPage() {
                 <TableHeader>
                   <TableRow>
                     {cfg.columns.map((c) => (
-                      <TableHead
-                        key={c.key}
-                        className={c.align === "right" ? "text-right" : ""}
-                      >
+                      <TableHead key={c.key} className={c.align === "right" ? "text-right" : ""}>
                         {c.header}
                       </TableHead>
                     ))}
@@ -274,11 +262,7 @@ function ReportsPage() {
                     <TableRow key={i}>
                       {cfg.columns.map((c) => {
                         const raw = row[c.key];
-                        const val = c.format
-                          ? c.format(raw, row)
-                          : raw == null
-                            ? ""
-                            : String(raw);
+                        const val = c.format ? c.format(raw, row) : raw == null ? "" : String(raw);
                         return (
                           <TableCell
                             key={c.key}
@@ -498,16 +482,10 @@ function getConfig(report: ReportKey): ReportConfig {
 
 type Filters = { from: string; to: string; status: string };
 
-async function fetchReport(
-  report: ReportKey,
-  f: Filters,
-): Promise<Record<string, unknown>[]> {
+async function fetchReport(report: ReportKey, f: Filters): Promise<Record<string, unknown>[]> {
   switch (report) {
     case "customers": {
-      const { data, error } = await supabase
-        .from("customers")
-        .select("*")
-        .order("name");
+      const { data, error } = await supabase.from("customers").select("*").order("name");
       if (error) throw error;
       return (data ?? []) as Record<string, unknown>[];
     }
@@ -523,7 +501,9 @@ async function fetchReport(
       if (f.status !== "all") q = q.eq("status", f.status);
       const { data, error } = await q;
       if (error) throw error;
-      const ids = Array.from(new Set((data ?? []).map((r) => r.assigned_to).filter(Boolean))) as string[];
+      const ids = Array.from(
+        new Set((data ?? []).map((r) => r.assigned_to).filter(Boolean)),
+      ) as string[];
       const map = new Map<string, string>();
       if (ids.length) {
         const { data: profs } = await supabase
@@ -549,8 +529,7 @@ async function fetchReport(
       if (error) throw error;
       return (data ?? []).map((r) => ({
         ...r,
-        customer_name:
-          (r as { customer?: { name?: string } | null }).customer?.name ?? "—",
+        customer_name: (r as { customer?: { name?: string } | null }).customer?.name ?? "—",
       }));
     }
     case "invoices_ar": {
@@ -565,8 +544,7 @@ async function fetchReport(
       if (error) throw error;
       return (data ?? []).map((r) => ({
         ...r,
-        customer_name:
-          (r as { customer?: { name?: string } | null }).customer?.name ?? "—",
+        customer_name: (r as { customer?: { name?: string } | null }).customer?.name ?? "—",
       }));
     }
     case "payments": {
@@ -623,18 +601,16 @@ async function fetchReport(
           customer?: { name?: string } | null;
         };
         const key = `${r.customer_id}::${r.currency}`;
-        const b =
-          buckets.get(key) ??
-          {
-            customer_name: r.customer?.name ?? "—",
-            currency: r.currency ?? "USD",
-            current: 0,
-            d1_30: 0,
-            d31_60: 0,
-            d61_90: 0,
-            d90p: 0,
-            total: 0,
-          };
+        const b = buckets.get(key) ?? {
+          customer_name: r.customer?.name ?? "—",
+          currency: r.currency ?? "USD",
+          current: 0,
+          d1_30: 0,
+          d31_60: 0,
+          d61_90: 0,
+          d90p: 0,
+          total: 0,
+        };
         const bal = financeBalanceDue(r);
         const due = r.due_date ? new Date(r.due_date) : null;
         const days = due

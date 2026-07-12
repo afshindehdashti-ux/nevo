@@ -1,19 +1,11 @@
-import * as React from 'react'
-import {
-  Body,
-  Container,
-  Heading,
-  Html,
-  Preview,
-  Section,
-  Text,
-} from '@react-email/components'
-import { brand, styles } from './_shared'
-import { EmailHead } from './EmailHead'
-import { BrandHeader } from './BrandHeader'
+import * as React from "react";
+import { Body, Container, Heading, Html, Preview, Section, Text } from "@react-email/components";
+import { brand, styles } from "./_shared";
+import { EmailHead } from "./EmailHead";
+import { BrandHeader } from "./BrandHeader";
 
 interface ReauthenticationEmailProps {
-  token: string
+  token: string;
 }
 
 export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => (
@@ -25,15 +17,19 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
         <BrandHeader />
 
         <Section style={styles.card} className="card">
-          <Heading style={styles.h1} className="h1">Confirm it's you</Heading>
+          <Heading style={styles.h1} className="h1">
+            Confirm it's you
+          </Heading>
           <Text style={styles.text} className="text">
-            Enter the verification code below to confirm your identity and
-            continue the sensitive action you just started.
+            Enter the verification code below to confirm your identity and continue the sensitive
+            action you just started.
           </Text>
-          <Text style={styles.codeBox} className="code-box">{token}</Text>
+          <Text style={styles.codeBox} className="code-box">
+            {token}
+          </Text>
           <Text style={styles.small} className="small">
-            This code expires in a few minutes. If you didn't request it, you
-            can safely ignore this email.
+            This code expires in a few minutes. If you didn't request it, you can safely ignore this
+            email.
           </Text>
         </Section>
 
@@ -45,6 +41,6 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
       </Container>
     </Body>
   </Html>
-)
+);
 
-export default ReauthenticationEmail
+export default ReauthenticationEmail;

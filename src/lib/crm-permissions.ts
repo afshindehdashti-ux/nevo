@@ -31,13 +31,7 @@ export function useCanEditShipments() {
   return useHasAnyRole(["super_admin", "management", "operations"]);
 }
 export function useCanUploadDocuments() {
-  return useHasAnyRole([
-    "super_admin",
-    "management",
-    "sales",
-    "operations",
-    "finance",
-  ]);
+  return useHasAnyRole(["super_admin", "management", "sales", "operations", "finance"]);
 }
 export function useCanApproveDocIntel() {
   return useHasAnyRole(["super_admin", "management"]);

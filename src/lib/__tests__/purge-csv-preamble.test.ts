@@ -45,9 +45,7 @@ describe("buildPreamble", () => {
   it("produces the exact 4-line format the verifier expects", () => {
     const sha = "a".repeat(64);
     const p = buildPreamble({ sha256: sha, exportedAtIso: ISO });
-    expect(p).toBe(
-      `"${SHA_LABEL}","${sha}"\n"${TIMESTAMP_LABEL}","${ISO}"\n"${PAYLOAD_MARKER}"\n`,
-    );
+    expect(p).toBe(`"${SHA_LABEL}","${sha}"\n"${TIMESTAMP_LABEL}","${ISO}"\n"${PAYLOAD_MARKER}"\n`);
   });
   it("falls back to (unavailable) when SHA is empty", () => {
     const p = buildPreamble({ sha256: "", exportedAtIso: ISO });
@@ -124,15 +122,11 @@ describe("computeSha256Hex", () => {
   it("matches a known reference vector for the empty string", async () => {
     // sha256("") -> RFC test vector
     const empty = await computeSha256Hex("");
-    expect(empty).toBe(
-      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    );
+    expect(empty).toBe("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
   });
   it("matches a known reference vector for 'abc'", async () => {
     const abc = await computeSha256Hex("abc");
-    expect(abc).toBe(
-      "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
-    );
+    expect(abc).toBe("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
   });
 });
 
@@ -253,20 +247,14 @@ describe("inspectCsvStructure (payload-marker + preamble validation)", () => {
   });
 
   it("flags missing-sha-row when the SHA preamble line is stripped", () => {
-    const csv =
-      `"${TIMESTAMP_LABEL}","${ISO}"\n` +
-      PAYLOAD_MARKER_LINE +
-      PAYLOAD;
+    const csv = `"${TIMESTAMP_LABEL}","${ISO}"\n` + PAYLOAD_MARKER_LINE + PAYLOAD;
     const report = inspectCsvStructure(csv);
     expect(report.issues).toContain("missing-sha-row");
   });
 
   it("flags missing-timestamp-row when the timestamp preamble line is stripped", () => {
     const sha = "1".repeat(64);
-    const csv =
-      `"${SHA_LABEL}","${sha}"\n` +
-      PAYLOAD_MARKER_LINE +
-      PAYLOAD;
+    const csv = `"${SHA_LABEL}","${sha}"\n` + PAYLOAD_MARKER_LINE + PAYLOAD;
     const report = inspectCsvStructure(csv);
     expect(report.issues).toContain("missing-timestamp-row");
   });
@@ -285,9 +273,7 @@ describe("inspectCsvStructure (payload-marker + preamble validation)", () => {
   it("flags empty-payload when marker is present but nothing follows it", () => {
     const sha = "3".repeat(64);
     const csv =
-      `"${SHA_LABEL}","${sha}"\n` +
-      `"${TIMESTAMP_LABEL}","${ISO}"\n` +
-      PAYLOAD_MARKER_LINE;
+      `"${SHA_LABEL}","${sha}"\n` + `"${TIMESTAMP_LABEL}","${ISO}"\n` + PAYLOAD_MARKER_LINE;
     const report = inspectCsvStructure(csv);
     expect(report.issues).toContain("empty-payload");
   });
@@ -317,9 +303,7 @@ describe("inspectCsvStructure (payload-marker + preamble validation)", () => {
       expect(msg.length).toBeGreaterThan(5);
     }
     // The marker-missing message must name the marker text so users can act on it.
-    expect(describeStructureIssue("missing-payload-marker")).toContain(
-      PAYLOAD_MARKER,
-    );
+    expect(describeStructureIssue("missing-payload-marker")).toContain(PAYLOAD_MARKER);
   });
 });
 
@@ -339,4 +323,3 @@ describe("verifyCsvText — malformed path is preferred over hash check", () => 
     }
   });
 });
-

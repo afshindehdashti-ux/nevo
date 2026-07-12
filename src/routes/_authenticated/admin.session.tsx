@@ -22,10 +22,7 @@ import {
 
 export const Route = createFileRoute("/_authenticated/admin/session")({
   head: () => ({
-    meta: [
-      { title: "Session status — NEVO CRM" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Session status — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   component: SessionStatusPage,
 });
@@ -53,7 +50,6 @@ const ROLE_TONE: Partial<Record<AppRole, string>> = {
   moderator: "bg-amber-500/10 text-amber-700 border-amber-500/30",
   user: "bg-muted text-muted-foreground border-border",
 };
-
 
 function fmt(ts?: string | number | null): string {
   if (!ts) return "—";
@@ -126,7 +122,14 @@ function SessionStatusPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => { refetchRoles(); refetchHistory(); }}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              refetchRoles();
+              refetchHistory();
+            }}
+          >
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
@@ -234,7 +237,6 @@ function SessionStatusPage() {
                     {ROLE_LABEL[r] ?? r}
                   </span>
                 ))}
-
               </div>
             )}
             <div className="pt-2 text-xs text-muted-foreground space-y-1">
@@ -251,10 +253,7 @@ function SessionStatusPage() {
             <CardDescription>Active Supabase auth session</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <Row
-              label="Provider"
-              value={sessionInfo?.provider ?? "email"}
-            />
+            <Row label="Provider" value={sessionInfo?.provider ?? "email"} />
             <Row
               label="Last sign-in"
               value={
@@ -277,7 +276,9 @@ function SessionStatusPage() {
                   <Globe className="h-3.5 w-3.5 text-muted-foreground" />
                   <code className="text-xs">{currentEvent?.ip ?? "—"}</code>
                   {currentEvent?.country && (
-                    <Badge variant="secondary" className="ml-1">{currentEvent.country}</Badge>
+                    <Badge variant="secondary" className="ml-1">
+                      {currentEvent.country}
+                    </Badge>
                   )}
                 </span>
               }
@@ -308,9 +309,7 @@ function SessionStatusPage() {
                 <Skeleton className="h-6 w-2/3" />
               </div>
             ) : !history || history.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No sign-in events recorded yet.
-              </p>
+              <p className="text-sm text-muted-foreground">No sign-in events recorded yet.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -326,7 +325,9 @@ function SessionStatusPage() {
                     {history.map((e) => (
                       <tr key={e.id} className="border-b border-border/60 last:border-0 align-top">
                         <td className="py-2 pr-4 whitespace-nowrap">{fmt(e.at)}</td>
-                        <td className="py-2 pr-4"><code className="text-xs">{e.ip ?? "—"}</code></td>
+                        <td className="py-2 pr-4">
+                          <code className="text-xs">{e.ip ?? "—"}</code>
+                        </td>
                         <td className="py-2 pr-4">{e.country ?? "—"}</td>
                         <td className="py-2 text-xs text-muted-foreground break-all max-w-[24rem]">
                           {e.user_agent ?? "—"}
@@ -340,7 +341,6 @@ function SessionStatusPage() {
           </CardContent>
         </Card>
       </div>
-
 
       <div className="flex justify-end gap-2 pt-2">
         <Button asChild variant="outline">

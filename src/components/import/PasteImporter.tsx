@@ -15,13 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  Loader2,
-  Upload,
-  CheckCircle2,
-  AlertCircle,
-  ClipboardPaste,
-} from "lucide-react";
+import { Loader2, Upload, CheckCircle2, AlertCircle, ClipboardPaste } from "lucide-react";
 import { IMPORT_SCHEMAS, autoMap } from "@/lib/import-schemas";
 import { runImportJob } from "@/lib/import-wizard.functions";
 
@@ -104,7 +98,12 @@ export function PasteImporter({
   const schema = IMPORT_SCHEMAS[importType];
 
   const [pasted, setPasted] = useState("");
-  const [done, setDone] = useState<{ success: number; failed: number; skipped: number; total: number } | null>(null);
+  const [done, setDone] = useState<{
+    success: number;
+    failed: number;
+    skipped: number;
+    total: number;
+  } | null>(null);
 
   const { headers, rows } = useMemo(() => parsePaste(pasted), [pasted]);
   const mapping = useMemo(
@@ -128,12 +127,22 @@ export function PasteImporter({
         const raw = (r[src] ?? "").toString().trim();
         if (!raw) {
           if (f.required) {
-            issues.push({ row: rowNo, column: f.label, message: "Required value is empty", severity: "error" });
+            issues.push({
+              row: rowNo,
+              column: f.label,
+              message: "Required value is empty",
+              severity: "error",
+            });
           }
           continue;
         }
         if (f.type === "number" && Number.isNaN(Number(raw.replace(/,/g, "")))) {
-          issues.push({ row: rowNo, column: f.label, message: `Not a number: "${raw}"`, severity: "error" });
+          issues.push({
+            row: rowNo,
+            column: f.label,
+            message: `Not a number: "${raw}"`,
+            severity: "error",
+          });
         }
         if (f.type === "enum" && f.enumValues && !f.enumValues.includes(raw.toLowerCase())) {
           issues.push({
@@ -144,7 +153,12 @@ export function PasteImporter({
           });
         }
         if (f.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) {
-          issues.push({ row: rowNo, column: f.label, message: `Invalid email: "${raw}"`, severity: "warning" });
+          issues.push({
+            row: rowNo,
+            column: f.label,
+            message: `Invalid email: "${raw}"`,
+            severity: "warning",
+          });
         }
       }
     });
@@ -209,8 +223,8 @@ export function PasteImporter({
             <ClipboardPaste className="h-5 w-5" /> Paste table — {schema.label}
           </DialogTitle>
           <DialogDescription>
-            Copy rows from Excel, Google Sheets, or Numbers and paste below. First row must be column headers.
-            Validation runs live; fix errors before importing.
+            Copy rows from Excel, Google Sheets, or Numbers and paste below. First row must be
+            column headers. Validation runs live; fix errors before importing.
           </DialogDescription>
         </DialogHeader>
 
@@ -225,7 +239,8 @@ export function PasteImporter({
               <div>
                 <p className="font-medium">Import finished</p>
                 <p className="text-sm text-muted-foreground">
-                  {done.success} imported · {done.failed} failed · {done.skipped} skipped · {done.total} total
+                  {done.success} imported · {done.failed} failed · {done.skipped} skipped ·{" "}
+                  {done.total} total
                 </p>
               </div>
             </div>
@@ -265,7 +280,10 @@ export function PasteImporter({
                   {schema.fields.map((f) => {
                     const src = mapping[f.key];
                     return (
-                      <Badge key={f.key} variant={src ? "default" : f.required ? "destructive" : "outline"}>
+                      <Badge
+                        key={f.key}
+                        variant={src ? "default" : f.required ? "destructive" : "outline"}
+                      >
                         {f.label}
                         {f.required ? " *" : ""}
                         {src ? ` ← ${src}` : ""}
@@ -291,9 +309,15 @@ export function PasteImporter({
                 <div className="flex items-center justify-between px-3 py-2 bg-muted/40 text-xs">
                   <span className="font-medium">
                     {errors.length} error{errors.length === 1 ? "" : "s"}
-                    {warnings.length > 0 && ` · ${warnings.length} warning${warnings.length === 1 ? "" : "s"}`}
+                    {warnings.length > 0 &&
+                      ` · ${warnings.length} warning${warnings.length === 1 ? "" : "s"}`}
                   </span>
-                  <span className="text-muted-foreground">Rows {errors.length > 0 ? "with errors block import" : "with warnings can still import"}</span>
+                  <span className="text-muted-foreground">
+                    Rows{" "}
+                    {errors.length > 0
+                      ? "with errors block import"
+                      : "with warnings can still import"}
+                  </span>
                 </div>
                 <div className="max-h-[200px] overflow-auto">
                   <table className="w-full text-xs">

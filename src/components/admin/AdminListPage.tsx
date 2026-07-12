@@ -115,9 +115,7 @@ export function AdminListPage<T>(props: AdminListPageProps<T>) {
           <p className="text-xs uppercase tracking-widest text-muted-foreground">{eyebrow}</p>
         ) : null}
         <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">{title}</h1>
-        {subtitle ? (
-          <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
-        ) : null}
+        {subtitle ? <p className="text-sm text-muted-foreground mt-1">{subtitle}</p> : null}
       </header>
 
       {toolbar}
@@ -130,12 +128,7 @@ export function AdminListPage<T>(props: AdminListPageProps<T>) {
           isRetrying={isFetching}
         />
       ) : view.kind === "loading" ? (
-        <div
-          data-testid="list-skeleton"
-          aria-busy="true"
-          aria-live="polite"
-          className="space-y-2"
-        >
+        <div data-testid="list-skeleton" aria-busy="true" aria-live="polite" className="space-y-2">
           {Array.from({ length: skeletonRows }).map((_, i) => (
             <Skeleton key={i} className="h-12 w-full" />
           ))}

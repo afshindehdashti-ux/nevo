@@ -16,16 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  ArrowLeft,
-  ArrowUp,
-  ArrowDown,
-  Copy,
-  Plus,
-  Save,
-  Trash2,
-  Loader2,
-} from "lucide-react";
+import { ArrowLeft, ArrowUp, ArrowDown, Copy, Plus, Save, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 type Line = {
@@ -67,10 +58,7 @@ const lineTotal = (l: Line) =>
 
 export const Route = createFileRoute("/_authenticated/admin/quotations/new")({
   head: () => ({
-    meta: [
-      { title: "New quotation — NEVO CRM" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "New quotation — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   component: NewQuotationSheet,
 });
@@ -163,7 +151,8 @@ function NewQuotationSheet() {
           unit_price: Number(l.unit_price) || 0,
           discount_pct: Number(l.discount_pct) || 0,
         }));
-      if (payloadItems.length === 0) throw new Error("Add at least one line item with a description");
+      if (payloadItems.length === 0)
+        throw new Error("Add at least one line item with a description");
       const invalid = payloadItems.find((i) => i.quantity < 0 || i.unit_price < 0);
       if (invalid) throw new Error("Quantities and prices must be zero or positive");
       return createFn({
@@ -238,11 +227,21 @@ function NewQuotationSheet() {
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Issue date</Label>
-            <Input type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} className="h-9" />
+            <Input
+              type="date"
+              value={issueDate}
+              onChange={(e) => setIssueDate(e.target.value)}
+              className="h-9"
+            />
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Valid until</Label>
-            <Input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} className="h-9" />
+            <Input
+              type="date"
+              value={validUntil}
+              onChange={(e) => setValidUntil(e.target.value)}
+              className="h-9"
+            />
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Currency</Label>
@@ -305,7 +304,9 @@ function NewQuotationSheet() {
                   const lt = lineTotal(l);
                   return (
                     <tr key={l.key} className="border-t border-border hover:bg-muted/20">
-                      <td className="px-2 py-1 text-xs text-muted-foreground font-mono align-middle">{i + 1}</td>
+                      <td className="px-2 py-1 text-xs text-muted-foreground font-mono align-middle">
+                        {i + 1}
+                      </td>
                       <td className="px-1 py-1">
                         <Input
                           value={l.item_code}
@@ -350,7 +351,9 @@ function NewQuotationSheet() {
                           min={0}
                           step="0.01"
                           value={l.unit_price}
-                          onChange={(e) => updateLine(i, { unit_price: Number(e.target.value) || 0 })}
+                          onChange={(e) =>
+                            updateLine(i, { unit_price: Number(e.target.value) || 0 })
+                          }
                           className="h-8 text-xs text-right"
                         />
                       </td>
@@ -361,7 +364,9 @@ function NewQuotationSheet() {
                           max={100}
                           step="0.1"
                           value={l.discount_pct}
-                          onChange={(e) => updateLine(i, { discount_pct: Number(e.target.value) || 0 })}
+                          onChange={(e) =>
+                            updateLine(i, { discount_pct: Number(e.target.value) || 0 })
+                          }
                           className="h-8 text-xs text-right"
                         />
                       </td>
@@ -450,7 +455,8 @@ function NewQuotationSheet() {
             </table>
           </div>
           <div className="p-3 text-[11px] text-muted-foreground border-t border-border">
-            Press <kbd className="rounded border px-1">Enter</kbd> in the last description to add a new row.
+            Press <kbd className="rounded border px-1">Enter</kbd> in the last description to add a
+            new row.
             {totals.filledLines === 0 && " Add at least one item with a description to save."}
           </div>
         </CardContent>
@@ -463,7 +469,12 @@ function NewQuotationSheet() {
             <CardTitle className="text-sm font-medium">Notes</CardTitle>
           </CardHeader>
           <CardContent>
-            <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Internal notes or customer message…" />
+            <Textarea
+              rows={4}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Internal notes or customer message…"
+            />
           </CardContent>
         </Card>
         <Card>
@@ -471,7 +482,12 @@ function NewQuotationSheet() {
             <CardTitle className="text-sm font-medium">Terms</CardTitle>
           </CardHeader>
           <CardContent>
-            <Textarea rows={4} value={terms} onChange={(e) => setTerms(e.target.value)} placeholder="Payment, delivery, incoterms…" />
+            <Textarea
+              rows={4}
+              value={terms}
+              onChange={(e) => setTerms(e.target.value)}
+              placeholder="Payment, delivery, incoterms…"
+            />
           </CardContent>
         </Card>
       </div>

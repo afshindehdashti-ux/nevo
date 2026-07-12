@@ -36,10 +36,7 @@ import {
 
 export const Route = createFileRoute("/_authenticated/partner-portal")({
   head: () => ({
-    meta: [
-      { title: "Partner Portal — NEVO Industrial" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Partner Portal — NEVO Industrial" }, { name: "robots", content: "noindex" }],
   }),
   component: PartnerPortalPage,
 });
@@ -68,8 +65,8 @@ function PartnerPortalPage() {
             <div>
               <h1 className="font-semibold">Partner access pending</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Your account isn't linked to a NEVO partner yet. Please contact your NEVO
-                partner manager to enable portal access.
+                Your account isn't linked to a NEVO partner yet. Please contact your NEVO partner
+                manager to enable portal access.
               </p>
               <div className="mt-4">
                 <Button asChild variant="outline">
@@ -141,8 +138,18 @@ function PartnerContent({ partnerId, partnerName }: { partnerId: string; partner
 
       <div className="max-w-6xl mx-auto px-6 py-6 space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <KpiCard icon={Target} label="Leads" value={perf?.leadsTotal ?? 0} sub={`${perf?.leadsConverted ?? 0} converted`} />
-          <KpiCard icon={Users} label="Assigned customers" value={perf?.customersTotal ?? 0} sub={`${perf?.customersActive ?? 0} active`} />
+          <KpiCard
+            icon={Target}
+            label="Leads"
+            value={perf?.leadsTotal ?? 0}
+            sub={`${perf?.leadsConverted ?? 0} converted`}
+          />
+          <KpiCard
+            icon={Users}
+            label="Assigned customers"
+            value={perf?.customersTotal ?? 0}
+            sub={`${perf?.customersActive ?? 0} active`}
+          />
           <KpiCard
             icon={Wallet}
             label="Commissions pending"
@@ -158,19 +165,24 @@ function PartnerContent({ partnerId, partnerName }: { partnerId: string; partner
         <Tabs defaultValue="dashboard">
           <TabsList className="flex-wrap h-auto">
             <TabsTrigger value="dashboard">
-              <TrendingUp className="h-3.5 w-3.5 mr-1" />Performance
+              <TrendingUp className="h-3.5 w-3.5 mr-1" />
+              Performance
             </TabsTrigger>
             <TabsTrigger value="leads">
-              <Target className="h-3.5 w-3.5 mr-1" />Leads
+              <Target className="h-3.5 w-3.5 mr-1" />
+              Leads
             </TabsTrigger>
             <TabsTrigger value="customers">
-              <Users className="h-3.5 w-3.5 mr-1" />Customers
+              <Users className="h-3.5 w-3.5 mr-1" />
+              Customers
             </TabsTrigger>
             <TabsTrigger value="commissions">
-              <Wallet className="h-3.5 w-3.5 mr-1" />Commissions
+              <Wallet className="h-3.5 w-3.5 mr-1" />
+              Commissions
             </TabsTrigger>
             <TabsTrigger value="docs">
-              <FileText className="h-3.5 w-3.5 mr-1" />Documents
+              <FileText className="h-3.5 w-3.5 mr-1" />
+              Documents
             </TabsTrigger>
           </TabsList>
 

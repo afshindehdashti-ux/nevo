@@ -51,10 +51,7 @@ export function ListEmptyState({
     const key = `${resource}::${reason}`;
     if (loggedRef.current === key) return;
     loggedRef.current = key;
-    emitAdminListEmptyShown(
-      { surface: "admin_list", resource, reason },
-      logClientEvent,
-    );
+    emitAdminListEmptyShown({ surface: "admin_list", resource, reason }, logClientEvent);
   }, [resource, reason]);
 
   return (

@@ -75,10 +75,7 @@ export function GuideMeButton({
               </Link>
             </Button>
             <Button asChild className="justify-start bg-emerald-600 hover:bg-emerald-700">
-              <Link
-                to="/admin/ai-assistant"
-                onClick={() => setOpen(false)}
-              >
+              <Link to="/admin/ai-assistant" onClick={() => setOpen(false)}>
                 <Sparkles className="mr-2 h-4 w-4" />
                 Ask AI about “{section.title}”
               </Link>

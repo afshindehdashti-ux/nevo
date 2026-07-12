@@ -9,12 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
  */
 function ListLoadingSkeleton({ rows = 3 }: { rows?: number }) {
   return (
-    <div
-      data-testid="list-skeleton"
-      aria-busy="true"
-      aria-live="polite"
-      className="space-y-2"
-    >
+    <div data-testid="list-skeleton" aria-busy="true" aria-live="polite" className="space-y-2">
       {Array.from({ length: rows }).map((_, i) => (
         <Skeleton key={i} className="h-12 w-full" />
       ))}
@@ -33,7 +28,7 @@ const meta: Meta<typeof ListLoadingSkeleton> = {
           "Rank 2 in the admin-list precedence chain (**error → loading → empty → ready**). " +
           "Renders only on React Query's initial `isLoading`, never on background " +
           "`isFetching`, so it never flashes during refetches. Contract: " +
-          "`data-testid=\"list-skeleton\"` + `aria-busy=\"true\"` — tests assert on both.",
+          '`data-testid="list-skeleton"` + `aria-busy="true"` — tests assert on both.',
       },
     },
   },

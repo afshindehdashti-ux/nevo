@@ -37,29 +37,19 @@ export type AdminListResource = (typeof ADMIN_LIST_RESOURCES)[number];
  *                      to `warn` in telemetry
  *  - `filtered_out`  → rows exist, but current filters exclude them
  */
-export const ADMIN_LIST_EMPTY_REASONS = [
-  "no_records",
-  "seed_missing",
-  "filtered_out",
-] as const;
+export const ADMIN_LIST_EMPTY_REASONS = ["no_records", "seed_missing", "filtered_out"] as const;
 
 export type AdminListEmptyReason = (typeof ADMIN_LIST_EMPTY_REASONS)[number];
 
 /** Runtime guard for slugs coming from untrusted callers (tests, scripts). */
 export function isAdminListResource(value: unknown): value is AdminListResource {
-  return (
-    typeof value === "string" &&
-    (ADMIN_LIST_RESOURCES as readonly string[]).includes(value)
-  );
+  return typeof value === "string" && (ADMIN_LIST_RESOURCES as readonly string[]).includes(value);
 }
 
 /** Runtime guard for reasons coming from untrusted callers. */
-export function isAdminListEmptyReason(
-  value: unknown,
-): value is AdminListEmptyReason {
+export function isAdminListEmptyReason(value: unknown): value is AdminListEmptyReason {
   return (
-    typeof value === "string" &&
-    (ADMIN_LIST_EMPTY_REASONS as readonly string[]).includes(value)
+    typeof value === "string" && (ADMIN_LIST_EMPTY_REASONS as readonly string[]).includes(value)
   );
 }
 
@@ -113,9 +103,7 @@ export function emitAdminListEmptyShown(
   logger: ClientEventLogger,
 ): EmitAdminListEmptyResult {
   const obj =
-    candidate && typeof candidate === "object"
-      ? (candidate as Record<string, unknown>)
-      : {};
+    candidate && typeof candidate === "object" ? (candidate as Record<string, unknown>) : {};
 
   if (obj.surface !== "admin_list") {
     const result = {
@@ -183,4 +171,3 @@ function safeLog(
     /* intentionally silent */
   }
 }
-

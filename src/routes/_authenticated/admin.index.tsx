@@ -60,16 +60,12 @@ function toneClass(tone?: Tone) {
 }
 
 /** Count helper — returns null on error so the UI can show em-dash instead of 0. */
-async function countRows(
-  table: string,
-  build?: (q: any) => any,
-) {
+async function countRows(table: string, build?: (q: any) => any) {
   const base = (supabase.from(table as any) as any).select("id", { count: "exact", head: true });
   const { count, error } = await (build ? build(base) : base);
   if (error) return null;
   return count ?? 0;
 }
-
 
 function useDashboardData() {
   const startOfMonth = new Date();
@@ -109,20 +105,30 @@ function useDashboardData() {
         countRows("customers", (q) => q.eq("is_active", true)),
         countRows("suppliers", (q) => q.eq("is_active", true)),
         countRows("products", (q) => q.eq("is_active", true)),
-        countRows("leads", (q) => q.in("status", ["new", "contacted", "qualified", "proposal", "negotiation"])),
-        countRows("opportunities", (q) => q.in("stage", ["prospecting", "qualification", "proposal", "negotiation"])),
-        countRows("orders", (q) => q.in("status", ["draft", "confirmed", "in_production", "ready_to_ship"])),
+        countRows("leads", (q) =>
+          q.in("status", ["new", "contacted", "qualified", "proposal", "negotiation"]),
+        ),
+        countRows("opportunities", (q) =>
+          q.in("stage", ["prospecting", "qualification", "proposal", "negotiation"]),
+        ),
+        countRows("orders", (q) =>
+          q.in("status", ["draft", "confirmed", "in_production", "ready_to_ship"]),
+        ),
         countRows("orders", (q) => q.eq("status", "in_production")),
         countRows("shipments", (q) => q.eq("status", "in_transit")),
         countRows("shipments", (q) => q.eq("status", "delivered").gte("delivered_at", startIso)),
         countRows("invoices", (q) => q.eq("type", "proforma").in("status", ["draft", "issued"])),
-        countRows("invoices", (q) => q.eq("type", "commercial").in("status", ["draft", "issued", "partially_paid"])),
+        countRows("invoices", (q) =>
+          q.eq("type", "commercial").in("status", ["draft", "issued", "partially_paid"]),
+        ),
         countRows("invoices", (q) => q.eq("status", "overdue")),
         countRows("partner_commissions", (q) => q.in("status", ["pending", "approved"])),
         countRows("doc_intel_documents", (q) => q.eq("status", "pending_approval")),
         countRows("tasks", (q) => q.in("status", ["open", "in_progress"]).lt("due_date", today)),
         countRows("tasks", (q) => q.in("status", ["open", "in_progress"]).eq("due_date", today)),
-        countRows("import_jobs", (q) => q.gte("created_at", new Date(Date.now() - 7 * 86400_000).toISOString())),
+        countRows("import_jobs", (q) =>
+          q.gte("created_at", new Date(Date.now() - 7 * 86400_000).toISOString()),
+        ),
         supabase
           .from("invoices")
           .select("balance,currency")
@@ -157,7 +163,14 @@ function useDashboardData() {
       ]);
 
       const sumByCurrency = (
-        rows: { amount?: number | null; total?: number | null; balance?: number | null; currency: string }[] | null,
+        rows:
+          | {
+              amount?: number | null;
+              total?: number | null;
+              balance?: number | null;
+              currency: string;
+            }[]
+          | null,
         key: "amount" | "total" | "balance",
       ) => {
         const map = new Map<string, number>();
@@ -221,23 +234,90 @@ function Dashboard() {
   const c = data?.counts;
 
   const metrics: Metric[] = [
-    { label: "Active Customers", value: c?.customers ?? null, icon: Users, tone: "success", to: "/admin/customers" },
-    { label: "Active Suppliers", value: c?.suppliers ?? null, icon: Package, to: "/admin/suppliers" },
+    {
+      label: "Active Customers",
+      value: c?.customers ?? null,
+      icon: Users,
+      tone: "success",
+      to: "/admin/customers",
+    },
+    {
+      label: "Active Suppliers",
+      value: c?.suppliers ?? null,
+      icon: Package,
+      to: "/admin/suppliers",
+    },
     { label: "Active Products", value: c?.products ?? null, icon: Boxes, to: "/admin/products" },
     { label: "Active Leads", value: c?.newLeads ?? null, icon: Target, to: "/admin/leads" },
-    { label: "Open Opportunities", value: c?.openOpportunities ?? null, icon: TrendingUp, to: "/admin/opportunities" },
+    {
+      label: "Open Opportunities",
+      value: c?.openOpportunities ?? null,
+      icon: TrendingUp,
+      to: "/admin/opportunities",
+    },
     { label: "Active Orders", value: c?.activeOrders ?? null, icon: Truck, to: "/admin/orders" },
     { label: "In Production", value: c?.inProduction ?? null, icon: Factory, to: "/admin/orders" },
     { label: "In Shipment", value: c?.inShipment ?? null, icon: Ship, to: "/admin/shipments" },
-    { label: "Delivered (Month)", value: c?.deliveredThisMonth ?? null, icon: PackageCheck, tone: "success", to: "/admin/shipments" },
-    { label: "Pending Proformas", value: c?.pendingProformas ?? null, icon: FileText, to: "/admin/proforma-invoices" },
-    { label: "Pending Invoices", value: c?.pendingInvoices ?? null, icon: Receipt, tone: "warn", to: "/admin/invoices" },
-    { label: "Overdue Invoices", value: c?.overdueInvoices ?? null, icon: AlertCircle, tone: "danger", to: "/admin/invoices" },
-    { label: "Pending Commission", value: c?.pendingCommissions ?? null, icon: Percent, tone: "warn", to: "/admin/commission-invoices" },
-    { label: "Docs Pending Approval", value: c?.documentsPending ?? null, icon: FileCheck, tone: "warn", to: "/admin/document-intelligence" },
-    { label: "Overdue Tasks", value: c?.overdueTasks ?? null, icon: AlertTriangle, tone: "danger", to: "/admin/tasks" },
-    { label: "Tasks Due Today", value: c?.tasksDueToday ?? null, icon: CheckSquare, to: "/admin/tasks" },
-    { label: "Imports This Week", value: c?.importsThisWeek ?? null, icon: Upload, to: "/admin/import" },
+    {
+      label: "Delivered (Month)",
+      value: c?.deliveredThisMonth ?? null,
+      icon: PackageCheck,
+      tone: "success",
+      to: "/admin/shipments",
+    },
+    {
+      label: "Pending Proformas",
+      value: c?.pendingProformas ?? null,
+      icon: FileText,
+      to: "/admin/proforma-invoices",
+    },
+    {
+      label: "Pending Invoices",
+      value: c?.pendingInvoices ?? null,
+      icon: Receipt,
+      tone: "warn",
+      to: "/admin/invoices",
+    },
+    {
+      label: "Overdue Invoices",
+      value: c?.overdueInvoices ?? null,
+      icon: AlertCircle,
+      tone: "danger",
+      to: "/admin/invoices",
+    },
+    {
+      label: "Pending Commission",
+      value: c?.pendingCommissions ?? null,
+      icon: Percent,
+      tone: "warn",
+      to: "/admin/commission-invoices",
+    },
+    {
+      label: "Docs Pending Approval",
+      value: c?.documentsPending ?? null,
+      icon: FileCheck,
+      tone: "warn",
+      to: "/admin/document-intelligence",
+    },
+    {
+      label: "Overdue Tasks",
+      value: c?.overdueTasks ?? null,
+      icon: AlertTriangle,
+      tone: "danger",
+      to: "/admin/tasks",
+    },
+    {
+      label: "Tasks Due Today",
+      value: c?.tasksDueToday ?? null,
+      icon: CheckSquare,
+      to: "/admin/tasks",
+    },
+    {
+      label: "Imports This Week",
+      value: c?.importsThisWeek ?? null,
+      icon: Upload,
+      to: "/admin/import",
+    },
   ];
 
   return (
@@ -254,7 +334,10 @@ function Dashboard() {
             Real-time overview of customers, orders, invoices and commissions.
           </p>
         </div>
-        <Badge variant="outline" className="border-emerald-500/30 text-emerald-700 dark:text-emerald-400">
+        <Badge
+          variant="outline"
+          className="border-emerald-500/30 text-emerald-700 dark:text-emerald-400"
+        >
           Live data
         </Badge>
       </div>
@@ -307,7 +390,11 @@ function Dashboard() {
               <AlertCircle className={`h-4 w-4 ${toneClass("danger")}`} />
             </div>
             <div className={`text-xl font-semibold ${toneClass("danger")}`}>
-              {isLoading ? <Skeleton className="h-6 w-40" /> : formatMoneyMap(data?.unpaidByCurrency ?? new Map())}
+              {isLoading ? (
+                <Skeleton className="h-6 w-40" />
+              ) : (
+                formatMoneyMap(data?.unpaidByCurrency ?? new Map())
+              )}
             </div>
           </CardContent>
         </Card>
@@ -320,7 +407,11 @@ function Dashboard() {
               <DollarSign className={`h-4 w-4 ${toneClass("success")}`} />
             </div>
             <div className={`text-xl font-semibold ${toneClass("success")}`}>
-              {isLoading ? <Skeleton className="h-6 w-40" /> : formatMoneyMap(data?.paidByCurrency ?? new Map())}
+              {isLoading ? (
+                <Skeleton className="h-6 w-40" />
+              ) : (
+                formatMoneyMap(data?.paidByCurrency ?? new Map())
+              )}
             </div>
           </CardContent>
         </Card>
@@ -333,7 +424,11 @@ function Dashboard() {
               <LineChart className="h-4 w-4 text-foreground" />
             </div>
             <div className="text-xl font-semibold">
-              {isLoading ? <Skeleton className="h-6 w-40" /> : formatMoneyMap(data?.revenueByCurrency ?? new Map())}
+              {isLoading ? (
+                <Skeleton className="h-6 w-40" />
+              ) : (
+                formatMoneyMap(data?.revenueByCurrency ?? new Map())
+              )}
             </div>
           </CardContent>
         </Card>
@@ -427,7 +522,10 @@ function Dashboard() {
                 {data!.recentImports.map((j: any) => (
                   <li key={j.id} className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <Link to="/admin/import" className="font-medium hover:underline block truncate">
+                      <Link
+                        to="/admin/import"
+                        className="font-medium hover:underline block truncate"
+                      >
                         {j.import_type}
                       </Link>
                       <p className="text-xs text-muted-foreground truncate">{j.file_name}</p>

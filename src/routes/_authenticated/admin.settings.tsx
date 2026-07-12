@@ -458,10 +458,7 @@ function SecurityAlertsForm({ canEdit }: { canEdit: boolean }) {
         security_signin_failure_window_minutes: Math.floor(windowMin),
         security_new_country_dedup_minutes: Math.floor(dedupMin),
       };
-      const { error } = await supabase
-        .from("company_settings")
-        .update(payload)
-        .eq("id", data.id);
+      const { error } = await supabase.from("company_settings").update(payload).eq("id", data.id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -485,8 +482,8 @@ function SecurityAlertsForm({ canEdit }: { canEdit: boolean }) {
         <CardHeader>
           <CardTitle className="text-base">Failed sign-in alerts</CardTitle>
           <CardDescription>
-            Trigger a security-alert email when a single email address hits this many
-            failed sign-in attempts inside the rolling window.
+            Trigger a security-alert email when a single email address hits this many failed sign-in
+            attempts inside the rolling window.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -527,8 +524,8 @@ function SecurityAlertsForm({ canEdit }: { canEdit: boolean }) {
         <CardHeader>
           <CardTitle className="text-base">New-country sign-in alerts</CardTitle>
           <CardDescription>
-            Suppress repeat &ldquo;new country&rdquo; alerts for the same user and
-            country during this window.
+            Suppress repeat &ldquo;new country&rdquo; alerts for the same user and country during
+            this window.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">

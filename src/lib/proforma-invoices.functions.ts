@@ -105,18 +105,19 @@ async function recalcProformaTotalsInternal(supabase: any, id: string) {
   let taxTotal = 0;
   for (const it of items ?? []) {
     const gross = Number(it.quantity) * Number(it.unit_price);
-    const discAmt = Number(it.discount_amount) > 0
-      ? Number(it.discount_amount)
-      : gross * Number(it.discount) / 100;
+    const discAmt =
+      Number(it.discount_amount) > 0
+        ? Number(it.discount_amount)
+        : (gross * Number(it.discount)) / 100;
     const taxable = gross - discAmt;
     subtotal += taxable;
     discountTotal += discAmt;
-    taxTotal += taxable * Number(it.tax_rate) / 100;
+    taxTotal += (taxable * Number(it.tax_rate)) / 100;
   }
   subtotal = round2(subtotal);
   discountTotal = round2(discountTotal);
   taxTotal = round2(taxTotal);
-  const vatAmount = round2(subtotal * vatRate / 100);
+  const vatAmount = round2((subtotal * vatRate) / 100);
   const grand = round2(subtotal + Math.max(taxTotal, vatAmount));
   const { error: upErr } = await supabase
     .from("proforma_invoices")
@@ -133,7 +134,13 @@ async function recalcProformaTotalsInternal(supabase: any, id: string) {
     })
     .eq("id", id);
   if (upErr) throw new Error(upErr.message);
-  return { subtotal, discount_total: discountTotal, tax_total: taxTotal, vat_amount: vatAmount, grand_total: grand };
+  return {
+    subtotal,
+    discount_total: discountTotal,
+    tax_total: taxTotal,
+    vat_amount: vatAmount,
+    grand_total: grand,
+  };
 }
 
 export const recalcProformaTotals = createServerFn({ method: "POST" })
@@ -209,9 +216,7 @@ export const createProformaInvoice = createServerFn({ method: "POST" })
 
 export const updateProformaInvoiceHeader = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
-    z.object({ id: z.string().uuid(), patch: HeaderInput.partial() }).parse(v),
-  )
+  .inputValidator((v) => z.object({ id: z.string().uuid(), patch: HeaderInput.partial() }).parse(v))
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase
       .from("proforma_invoices")
@@ -226,9 +231,7 @@ export const updateProformaInvoiceHeader = createServerFn({ method: "POST" })
 
 export const addProformaInvoiceItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
-    ItemInput.extend({ proforma_invoice_id: z.string().uuid() }).parse(v),
-  )
+  .inputValidator((v) => ItemInput.extend({ proforma_invoice_id: z.string().uuid() }).parse(v))
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase.from("proforma_invoice_items").insert({
       proforma_invoice_id: data.proforma_invoice_id,
@@ -250,9 +253,7 @@ export const addProformaInvoiceItem = createServerFn({ method: "POST" })
 
 export const updateProformaInvoiceItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
-    z.object({ id: z.string().uuid(), patch: ItemInput.partial() }).parse(v),
-  )
+  .inputValidator((v) => z.object({ id: z.string().uuid(), patch: ItemInput.partial() }).parse(v))
   .handler(async ({ context, data }) => {
     const { data: row, error: rErr } = await context.supabase
       .from("proforma_invoice_items")
@@ -307,7 +308,10 @@ export const saveProformaInvoice = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
     }
     const kept = data.items.filter((i) => i.id).map((i) => i.id!) as string[];
-    let del = context.supabase.from("proforma_invoice_items").delete().eq("proforma_invoice_id", data.id);
+    let del = context.supabase
+      .from("proforma_invoice_items")
+      .delete()
+      .eq("proforma_invoice_id", data.id);
     if (kept.length) del = del.not("id", "in", `(${kept.join(",")})`);
     const { error: dErr } = await del;
     if (dErr) throw new Error(dErr.message);
@@ -333,9 +337,7 @@ export const saveProformaInvoice = createServerFn({ method: "POST" })
           .eq("id", it.id);
         if (error) throw new Error(error.message);
       } else {
-        const { error } = await context.supabase
-          .from("proforma_invoice_items")
-          .insert(payload);
+        const { error } = await context.supabase.from("proforma_invoice_items").insert(payload);
         if (error) throw new Error(error.message);
       }
     }
@@ -346,7 +348,10 @@ export const deleteProformaInvoice = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => IdInput.parse(v))
   .handler(async ({ context, data }) => {
-    await context.supabase.from("proforma_invoice_items").delete().eq("proforma_invoice_id", data.id);
+    await context.supabase
+      .from("proforma_invoice_items")
+      .delete()
+      .eq("proforma_invoice_id", data.id);
     const { error } = await context.supabase.from("proforma_invoices").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     try {

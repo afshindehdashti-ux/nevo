@@ -9,7 +9,10 @@ const ALLOWED_ROLES: AppRole[] = ["super_admin", "management", "finance"];
 
 const Input = z.object({
   audit_id: z.string().uuid(),
-  file_text: z.string().min(1).max(50 * 1024 * 1024), // hard cap 50MB
+  file_text: z
+    .string()
+    .min(1)
+    .max(50 * 1024 * 1024), // hard cap 50MB
 });
 
 export type VerifyInput = z.infer<typeof Input>;
@@ -44,11 +47,12 @@ export interface VerifierSupabaseClient {
   ): Promise<{ data: boolean | null; error: { message: string } | null }>;
   from(table: "csv_export_audit"): {
     select(cols: string): {
-      eq(col: string, value: string): {
+      eq(
+        col: string,
+        value: string,
+      ): {
         maybeSingle(): Promise<{
-          data:
-            | { id: string; filename: string; sha256: string; created_at: string }
-            | null;
+          data: { id: string; filename: string; sha256: string; created_at: string } | null;
           error: { message: string } | null;
         }>;
       };

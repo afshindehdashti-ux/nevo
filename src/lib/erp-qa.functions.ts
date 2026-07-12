@@ -103,7 +103,9 @@ export const runErpQa = createServerFn({ method: "POST" })
     }
 
     try {
-      const { data, error } = await supabase.rpc("next_document_number", { _doc_type: "quotation" });
+      const { data, error } = await supabase.rpc("next_document_number", {
+        _doc_type: "quotation",
+      });
       if (error) throw new Error(error.message);
       push({
         key: "numbering:function",
@@ -318,7 +320,9 @@ export const runErpQa = createServerFn({ method: "POST" })
 
     // 10. Activity log connection
     try {
-      const { error } = await supabase.from("activity_logs").select("id", { head: true, count: "exact" });
+      const { error } = await supabase
+        .from("activity_logs")
+        .select("id", { head: true, count: "exact" });
       if (error) throw new Error(error.message);
       push({
         key: "workflow:activity_log",
@@ -365,7 +369,9 @@ export const runErpQa = createServerFn({ method: "POST" })
 
     // 12. Line-item recompute (trigger fd_recalc_totals)
     try {
-      const { data: proc, error } = await supabase.rpc("pg_get_functiondef", { funcid: 0 }).select?.() as any;
+      const { data: proc, error } = (await supabase
+        .rpc("pg_get_functiondef", { funcid: 0 })
+        .select?.()) as any;
       // Fallback: assume trigger exists if we can insert and read totals in the workflow test below.
       push({
         key: "workflow:total_calc",
@@ -415,7 +421,13 @@ export const runErpFinanceTest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const supabase = context.supabase as any;
-    const steps: Array<{ key: string; label: string; status: CheckStatus; message: string; details?: any }> = [];
+    const steps: Array<{
+      key: string;
+      label: string;
+      status: CheckStatus;
+      message: string;
+      details?: any;
+    }> = [];
     const step = (s: (typeof steps)[number]) => steps.push(s);
     const startedAt = new Date().toISOString();
     let customerId: string | null = null;
@@ -433,7 +445,12 @@ export const runErpFinanceTest = createServerFn({ method: "POST" })
           .maybeSingle();
         if (found?.id) {
           customerId = found.id;
-          step({ key: "customer", label: "Test customer", status: "pass", message: `Found: ${testName}` });
+          step({
+            key: "customer",
+            label: "Test customer",
+            status: "pass",
+            message: `Found: ${testName}`,
+          });
         } else {
           const { data: created, error } = await supabase
             .from("customers")
@@ -447,10 +464,20 @@ export const runErpFinanceTest = createServerFn({ method: "POST" })
             .single();
           if (error) throw new Error(error.message);
           customerId = created.id;
-          step({ key: "customer", label: "Test customer", status: "pass", message: `Created: ${testName}` });
+          step({
+            key: "customer",
+            label: "Test customer",
+            status: "pass",
+            message: `Created: ${testName}`,
+          });
         }
       } catch (e) {
-        step({ key: "customer", label: "Test customer", status: "fail", message: (e as Error).message });
+        step({
+          key: "customer",
+          label: "Test customer",
+          status: "fail",
+          message: (e as Error).message,
+        });
         throw e;
       }
 
@@ -478,24 +505,39 @@ export const runErpFinanceTest = createServerFn({ method: "POST" })
           details: { id: data.id, number: data.document_number },
         });
       } catch (e) {
-        step({ key: "create_doc", label: "Create draft quotation", status: "fail", message: (e as Error).message });
+        step({
+          key: "create_doc",
+          label: "Create draft quotation",
+          status: "fail",
+          message: (e as Error).message,
+        });
         throw e;
       }
 
       // 3. Add 3 items
       try {
         const items = [
-          { description: "PIR Panel 100mm — 200 sqm", quantity: 200, unit_price: 42.5, unit: "sqm" },
+          {
+            description: "PIR Panel 100mm — 200 sqm",
+            quantity: 200,
+            unit_price: 42.5,
+            unit: "sqm",
+          },
           { description: "Installation crew — 1 week", quantity: 5, unit_price: 850, unit: "day" },
           { description: "Delivery to Sharjah", quantity: 1, unit_price: 1200, unit: "trip" },
         ];
-        const { error } = await supabase.from("finance_document_items").insert(
-          items.map((it, i) => ({ document_id: docId, sort_order: i, ...it })),
-        );
+        const { error } = await supabase
+          .from("finance_document_items")
+          .insert(items.map((it, i) => ({ document_id: docId, sort_order: i, ...it })));
         if (error) throw new Error(error.message);
         step({ key: "add_items", label: "Add 3 line items", status: "pass", message: "Inserted" });
       } catch (e) {
-        step({ key: "add_items", label: "Add 3 line items", status: "fail", message: (e as Error).message });
+        step({
+          key: "add_items",
+          label: "Add 3 line items",
+          status: "fail",
+          message: (e as Error).message,
+        });
         throw e;
       }
 
@@ -515,7 +557,12 @@ export const runErpFinanceTest = createServerFn({ method: "POST" })
           message: `subtotal=${data?.subtotal} grand_total=${gt}`,
         });
       } catch (e) {
-        step({ key: "totals", label: "Calculate total", status: "fail", message: (e as Error).message });
+        step({
+          key: "totals",
+          label: "Calculate total",
+          status: "fail",
+          message: (e as Error).message,
+        });
       }
 
       // 5. Open + edit round-trip
@@ -532,9 +579,19 @@ export const runErpFinanceTest = createServerFn({ method: "POST" })
           .update({ notes: "QA edit round-trip", updated_by: context.userId })
           .eq("id", docId);
         if (uErr) throw new Error(uErr.message);
-        step({ key: "edit", label: "Open + edit round-trip", status: "pass", message: "Read + update OK" });
+        step({
+          key: "edit",
+          label: "Open + edit round-trip",
+          status: "pass",
+          message: "Read + update OK",
+        });
       } catch (e) {
-        step({ key: "edit", label: "Open + edit round-trip", status: "fail", message: (e as Error).message });
+        step({
+          key: "edit",
+          label: "Open + edit round-trip",
+          status: "fail",
+          message: (e as Error).message,
+        });
       }
 
       // 6. PDF engine
@@ -572,7 +629,12 @@ export const runErpFinanceTest = createServerFn({ method: "POST" })
           generated_by: context.userId,
         });
         if (error) throw new Error(error.message);
-        step({ key: "files", label: "Save PDF link to document_files", status: "pass", message: "Row inserted" });
+        step({
+          key: "files",
+          label: "Save PDF link to document_files",
+          status: "pass",
+          message: "Row inserted",
+        });
       } catch (e) {
         step({
           key: "files",
@@ -594,7 +656,12 @@ export const runErpFinanceTest = createServerFn({ method: "POST" })
         if (error) throw new Error(error.message);
         step({ key: "log", label: "Log to activity_logs", status: "pass", message: "OK" });
       } catch (e) {
-        step({ key: "log", label: "Log to activity_logs", status: "warn", message: (e as Error).message });
+        step({
+          key: "log",
+          label: "Log to activity_logs",
+          status: "warn",
+          message: (e as Error).message,
+        });
       }
     } catch {
       // fatal earlier — continue to cleanup
@@ -604,7 +671,12 @@ export const runErpFinanceTest = createServerFn({ method: "POST" })
         try {
           await supabase.from("document_files").delete().eq("document_id", docId);
           await supabase.from("finance_documents").delete().eq("id", docId);
-          step({ key: "cleanup", label: "Cleanup test document", status: "pass", message: "Removed" });
+          step({
+            key: "cleanup",
+            label: "Cleanup test document",
+            status: "pass",
+            message: "Removed",
+          });
         } catch (e) {
           step({
             key: "cleanup",
@@ -668,9 +740,7 @@ export const runProformaE2eIsolated = createServerFn({ method: "POST" })
         .select("id, customer_id")
         .like("notes", "e2e:%");
       const leftoverIds = (leftovers ?? []).map((r: any) => r.id);
-      const leftoverCustomerIds = (leftovers ?? [])
-        .map((r: any) => r.customer_id)
-        .filter(Boolean);
+      const leftoverCustomerIds = (leftovers ?? []).map((r: any) => r.customer_id).filter(Boolean);
       if (leftoverIds.length > 0) {
         await supabase.from("proforma_invoices").delete().in("id", leftoverIds);
       }
@@ -870,11 +940,7 @@ export const runProformaE2eIsolated = createServerFn({ method: "POST" })
           .from("proforma_invoice_items")
           .select("id, proforma_invoice_id");
         const parentIds = Array.from(
-          new Set(
-            (allItems ?? [])
-              .map((r: any) => r.proforma_invoice_id)
-              .filter(Boolean),
-          ),
+          new Set((allItems ?? []).map((r: any) => r.proforma_invoice_id).filter(Boolean)),
         ) as string[];
         let orphanItems: any[] = [];
         if (parentIds.length > 0) {
@@ -883,13 +949,10 @@ export const runProformaE2eIsolated = createServerFn({ method: "POST" })
             .select("id")
             .in("id", parentIds);
           const alive = new Set((parents ?? []).map((r: any) => r.id));
-          orphanItems = (allItems ?? []).filter(
-            (r: any) => !alive.has(r.proforma_invoice_id),
-          );
+          orphanItems = (allItems ?? []).filter((r: any) => !alive.has(r.proforma_invoice_id));
         }
 
-        const orphansFound =
-          markerCount > 0 || runItemsLeft > 0 || orphanItems.length > 0;
+        const orphansFound = markerCount > 0 || runItemsLeft > 0 || orphanItems.length > 0;
         step({
           key: "verify_no_orphans",
           label: "No orphaned proforma_invoice_items remain",
@@ -1091,11 +1154,7 @@ export const runProformaTriggerRecomputeTest = createServerFn({ method: "POST" }
           Number(header?.discount_amount ?? 0),
           Number(header?.discount_total ?? 0),
         ],
-        [
-          "grand_total ↔ total",
-          Number(header?.grand_total ?? 0),
-          Number(header?.total ?? 0),
-        ],
+        ["grand_total ↔ total", Number(header?.grand_total ?? 0), Number(header?.total ?? 0)],
       ];
       for (const [name, a, b] of mirrors) {
         const ok = approxEq(a, b);
@@ -1322,9 +1381,45 @@ export const runQuotationImportE2e = createServerFn({ method: "POST" })
       //       VAT 5%    = 61.25, total = 1286.25.
       // Q A2: subtotal = 2*200*(1-0.25) = 300. VAT 5% = 15, total = 315.
       const rows = [
-        { quote_no: numA1, buyer: custA, date: "2026-07-01", ccy: "USD", vat: 5, status: "draft", desc: "Rebar 12mm", qty: 10, price: 100, disc: 0, sku: "SKU-A1" },
-        { quote_no: numA1, buyer: custA, date: "2026-07-01", ccy: "USD", vat: 5, status: "draft", desc: "Cement 50kg", qty: 5, price: 50, disc: 10, sku: "SKU-A2" },
-        { quote_no: numA2, buyer: custA, date: "2026-07-02", ccy: "USD", vat: 5, status: "draft", desc: "Rebar 12mm", qty: 2, price: 200, disc: 25, sku: "SKU-A1" },
+        {
+          quote_no: numA1,
+          buyer: custA,
+          date: "2026-07-01",
+          ccy: "USD",
+          vat: 5,
+          status: "draft",
+          desc: "Rebar 12mm",
+          qty: 10,
+          price: 100,
+          disc: 0,
+          sku: "SKU-A1",
+        },
+        {
+          quote_no: numA1,
+          buyer: custA,
+          date: "2026-07-01",
+          ccy: "USD",
+          vat: 5,
+          status: "draft",
+          desc: "Cement 50kg",
+          qty: 5,
+          price: 50,
+          disc: 10,
+          sku: "SKU-A2",
+        },
+        {
+          quote_no: numA2,
+          buyer: custA,
+          date: "2026-07-02",
+          ccy: "USD",
+          vat: 5,
+          status: "draft",
+          desc: "Rebar 12mm",
+          qty: 2,
+          price: 200,
+          disc: 25,
+          sku: "SKU-A1",
+        },
       ];
 
       const result: any = await runImportJob({
@@ -1364,7 +1459,8 @@ export const runQuotationImportE2e = createServerFn({ method: "POST" })
       const nearly = (a: number, b: number) => Math.abs(Number(a) - Number(b)) < 0.02;
 
       const totalsOk =
-        !!q1 && !!q2 &&
+        !!q1 &&
+        !!q2 &&
         nearly(q1.subtotal, expected.A1.subtotal) &&
         nearly(q1.vat_amount, expected.A1.vat) &&
         nearly(q1.total, expected.A1.total) &&
@@ -1385,7 +1481,12 @@ export const runQuotationImportE2e = createServerFn({ method: "POST" })
           okCounts && totalsOk && sharedCustomer
             ? `groups=${gotGroups}, success=${gotSuccess}, both quotations use same new customer, totals match to ±0.02`
             : `Mismatch — groups=${gotGroups}/${expected.groups}, success=${gotSuccess}/${expected.success}, failed=${gotFailed}/${expected.failed}, totalsOk=${totalsOk}, sharedCustomer=${sharedCustomer}`,
-        details: { expected, got: { groups: gotGroups, success: gotSuccess, failed: gotFailed }, q1, q2 },
+        details: {
+          expected,
+          got: { groups: gotGroups, success: gotSuccess, failed: gotFailed },
+          q1,
+          q2,
+        },
       });
     } catch (e) {
       step({
@@ -1414,7 +1515,19 @@ export const runQuotationImportE2e = createServerFn({ method: "POST" })
       // Import row uses the same name but different casing to also assert
       // case-insensitive matching handled by the importer.
       const rows = [
-        { quote_no: numB1, buyer: custB.toUpperCase(), date: "2026-07-03", ccy: "EUR", vat: 20, status: "draft", desc: "Consulting", qty: 1, price: 500, disc: 0, sku: "SVC-1" },
+        {
+          quote_no: numB1,
+          buyer: custB.toUpperCase(),
+          date: "2026-07-03",
+          ccy: "EUR",
+          vat: 20,
+          status: "draft",
+          desc: "Consulting",
+          qty: 1,
+          price: 500,
+          disc: 0,
+          sku: "SVC-1",
+        },
       ];
       const result: any = await runImportJob({
         data: {
@@ -1433,10 +1546,7 @@ export const runQuotationImportE2e = createServerFn({ method: "POST" })
         .eq("quotation_number", numB1)
         .maybeSingle();
 
-      const { data: dupCheck } = await supabase
-        .from("customers")
-        .select("id")
-        .ilike("name", custB);
+      const { data: dupCheck } = await supabase.from("customers").select("id").ilike("name", custB);
       const dupCount = (dupCheck ?? []).length;
 
       const reused = !!quote && quote.customer_id === seedId;
@@ -1474,11 +1584,47 @@ export const runQuotationImportE2e = createServerFn({ method: "POST" })
 
       const rows = [
         // C1: single row with quantity = "not-a-number" → coerce fails.
-        { quote_no: numC1, buyer: custA, date: "2026-07-04", ccy: "USD", vat: 5, status: "draft", desc: "Broken qty", qty: "not-a-number", price: 10, disc: 0, sku: "BAD-1" },
+        {
+          quote_no: numC1,
+          buyer: custA,
+          date: "2026-07-04",
+          ccy: "USD",
+          vat: 5,
+          status: "draft",
+          desc: "Broken qty",
+          qty: "not-a-number",
+          price: 10,
+          disc: 0,
+          sku: "BAD-1",
+        },
         // C2: missing description → required-field failure at group insert time.
-        { quote_no: numC2, buyer: custA, date: "2026-07-04", ccy: "USD", vat: 5, status: "draft", desc: "", qty: 1, price: 10, disc: 0, sku: "BAD-2" },
+        {
+          quote_no: numC2,
+          buyer: custA,
+          date: "2026-07-04",
+          ccy: "USD",
+          vat: 5,
+          status: "draft",
+          desc: "",
+          qty: 1,
+          price: 10,
+          disc: 0,
+          sku: "BAD-2",
+        },
         // C3: clean row so we prove the good group still lands.
-        { quote_no: numC3, buyer: custA, date: "2026-07-04", ccy: "USD", vat: 5, status: "draft", desc: "Good item", qty: 2, price: 50, disc: 0, sku: "OK-1" },
+        {
+          quote_no: numC3,
+          buyer: custA,
+          date: "2026-07-04",
+          ccy: "USD",
+          vat: 5,
+          status: "draft",
+          desc: "Good item",
+          qty: 2,
+          price: 50,
+          disc: 0,
+          sku: "OK-1",
+        },
       ];
 
       const result: any = await runImportJob({
@@ -1556,12 +1702,21 @@ export const runQuotationImportE2e = createServerFn({ method: "POST" })
 
       const custIds = new Set<string>([...createdCustomerIds, ...quoteCustIds]);
       if (custIds.size > 0) {
-        await supabase.from("customers").delete().in("id", [...custIds]);
+        await supabase
+          .from("customers")
+          .delete()
+          .in("id", [...custIds]);
       }
 
       if (importJobIds.size > 0) {
-        await supabase.from("import_job_rows").delete().in("import_job_id", [...importJobIds]);
-        await supabase.from("import_jobs").delete().in("id", [...importJobIds]);
+        await supabase
+          .from("import_job_rows")
+          .delete()
+          .in("import_job_id", [...importJobIds]);
+        await supabase
+          .from("import_jobs")
+          .delete()
+          .in("id", [...importJobIds]);
       }
 
       // Orphan verification: nothing referencing this run should remain.

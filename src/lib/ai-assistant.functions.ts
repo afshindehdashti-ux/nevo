@@ -1,10 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import {
-  financeBalanceDue,
-  financeTotalAmount,
-} from "./finance-normalization";
+import { financeBalanceDue, financeTotalAmount } from "./finance-normalization";
 
 /** All server functions that back the NEVO internal AI Assistant. */
 
@@ -318,7 +315,10 @@ export const deleteKnowledgeDocument = createServerFn({ method: "POST" })
     const { error } = await context.supabase.from("ai_documents").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     if (doc?.file_url) {
-      await context.supabase.storage.from("ai-knowledge").remove([doc.file_url]).catch(() => {});
+      await context.supabase.storage
+        .from("ai-knowledge")
+        .remove([doc.file_url])
+        .catch(() => {});
     }
     return { ok: true };
   });
@@ -349,9 +349,8 @@ export const ingestKnowledgeDocument = createServerFn({ method: "POST" })
       .parse(raw),
   )
   .handler(async ({ data, context }) => {
-    const { chunkText, embedBatch, extractText, AI_EMBED_BATCH } = await import(
-      "./ai-assistant.server"
-    );
+    const { chunkText, embedBatch, extractText, AI_EMBED_BATCH } =
+      await import("./ai-assistant.server");
     const { supabase, userId } = context;
 
     // Insert the parent doc row in `processing` state.

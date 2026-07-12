@@ -20,7 +20,9 @@ import { formatDistanceToNow } from "date-fns";
 import { NewQuotationDialog } from "@/components/crm/NewQuotationDialog";
 
 export const Route = createFileRoute("/_authenticated/admin/quotations")({
-  head: () => ({ meta: [{ title: "Quotations — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Quotations — NEVO CRM" }, { name: "robots", content: "noindex" }],
+  }),
   component: QuotationsPage,
 });
 
@@ -71,7 +73,6 @@ function QuotationsPage() {
 
       <NewQuotationDialog open={dialogOpen} onOpenChange={setDialogOpen} />
 
-
       <Card>
         <Table>
           <TableHeader>
@@ -104,7 +105,9 @@ function QuotationsPage() {
             )}
             {rows.map((r: any) => {
               const customerName =
-                r.customers?.company_name || r.customers?.name || (r.customer_id ? "(unnamed)" : "—");
+                r.customers?.company_name ||
+                r.customers?.name ||
+                (r.customer_id ? "(unnamed)" : "—");
               const itemsCount = Array.isArray(r.quotation_items)
                 ? Number(r.quotation_items[0]?.count ?? 0)
                 : 0;

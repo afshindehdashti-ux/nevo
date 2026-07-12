@@ -86,7 +86,9 @@ export const getMyPartnerDocuments = createServerFn({ method: "GET" })
     await assertLinked(context, data.partner_id);
     const { data: rows, error } = await context.supabase
       .from("doc_intel_documents")
-      .select("id, title, category, storage_bucket, storage_path, mime_type, file_size, created_at, status")
+      .select(
+        "id, title, category, storage_bucket, storage_path, mime_type, file_size, created_at, status",
+      )
       .eq("partner_id", data.partner_id)
       .eq("status", "approved")
       .order("created_at", { ascending: false })
@@ -176,16 +178,17 @@ export const getMyPartnerPerformance = createServerFn({ method: "GET" })
 
     return {
       leadsTotal: leads.length,
-      leadsNew: leads.filter((l: any) => ["new", "contacted"].includes((l.status ?? "").toLowerCase())).length,
-      leadsConverted: leads.filter((l: any) => (l.status ?? "").toLowerCase() === "converted").length,
+      leadsNew: leads.filter((l: any) =>
+        ["new", "contacted"].includes((l.status ?? "").toLowerCase()),
+      ).length,
+      leadsConverted: leads.filter((l: any) => (l.status ?? "").toLowerCase() === "converted")
+        .length,
       customersTotal: customers.length,
       customersActive: customers.filter((c: any) => c.is_active).length,
       currency,
       commissionPending: sumBy((c) => c.status === "pending" || c.status === "approved"),
       commissionPaid: sumBy((c) => c.status === "paid"),
-      commissionYtd: sumBy(
-        (c) => c.status === "paid" && new Date(c.earned_at) >= ytdStart,
-      ),
+      commissionYtd: sumBy((c) => c.status === "paid" && new Date(c.earned_at) >= ytdStart),
       commissionCount: commissions.length,
     };
   });

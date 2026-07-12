@@ -12,7 +12,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  reporter: process.env.CI ? [["list"], ["junit", { outputFile: "reports/playwright/junit.xml" }]] : "list",
+  reporter: process.env.CI
+    ? [["list"], ["junit", { outputFile: "reports/playwright/junit.xml" }]]
+    : "list",
   use: {
     baseURL: process.env.E2E_BASE_URL ?? "http://127.0.0.1:4173",
     trace: "retain-on-failure",

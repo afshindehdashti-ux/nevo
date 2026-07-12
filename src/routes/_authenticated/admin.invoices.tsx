@@ -42,18 +42,13 @@ import {
 } from "@/lib/crm-status";
 
 export const Route = createFileRoute("/_authenticated/admin/invoices")({
-  head: () => ({ meta: [{ title: "Invoices — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Invoices — NEVO CRM" }, { name: "robots", content: "noindex" }],
+  }),
   component: () => <InvoicesList type="commercial" title="Invoices" />,
 });
 
-
-export function InvoicesList({
-  type,
-  title,
-}: {
-  type: "commercial" | "proforma";
-  title: string;
-}) {
+export function InvoicesList({ type, title }: { type: "commercial" | "proforma"; title: string }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | "all">("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -78,10 +73,7 @@ export function InvoicesList({
       if (statusFilter !== "all" && i.status !== statusFilter) return false;
       if (!q) return true;
       const cName = customerDisplayName(i.customers as CustomerDisplay | null);
-      return (
-        (i.invoice_number || "").toLowerCase().includes(q) ||
-        cName.toLowerCase().includes(q)
-      );
+      return (i.invoice_number || "").toLowerCase().includes(q) || cName.toLowerCase().includes(q);
     });
   }, [invoices, search, statusFilter]);
 
@@ -152,7 +144,6 @@ export function InvoicesList({
     }
   };
 
-
   return (
     <MasterListShell
       title={title}
@@ -174,7 +165,10 @@ export function InvoicesList({
     >
       <div className="p-3 border-b flex gap-2 items-center">
         <Label className="text-xs text-muted-foreground">Status</Label>
-        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as InvoiceStatus | "all")}>
+        <Select
+          value={statusFilter}
+          onValueChange={(v) => setStatusFilter(v as InvoiceStatus | "all")}
+        >
           <SelectTrigger className="w-52 h-8">
             <SelectValue />
           </SelectTrigger>
@@ -197,11 +191,19 @@ export function InvoicesList({
             onClick={handleBulkExport}
             disabled={selected.size === 0 || exporting}
           >
-            {exporting ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <FileDown className="h-3.5 w-3.5 mr-1" />}
+            {exporting ? (
+              <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+            ) : (
+              <FileDown className="h-3.5 w-3.5 mr-1" />
+            )}
             Export PDF{selected.size > 1 ? "s" : ""}
           </Button>
           <p className="text-xs text-muted-foreground">
-            Create from an <Link to="/admin/orders" className="text-primary hover:underline">order</Link>.
+            Create from an{" "}
+            <Link to="/admin/orders" className="text-primary hover:underline">
+              order
+            </Link>
+            .
           </p>
         </div>
       </div>
@@ -268,11 +270,14 @@ export function InvoicesList({
                     {invoiceStatusLabel(i.status)}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right">{formatMoney(financeTotalAmount(i), i.currency)}</TableCell>
-                <TableCell className="text-right">{formatMoney(financeBalanceDue(i), i.currency)}</TableCell>
+                <TableCell className="text-right">
+                  {formatMoney(financeTotalAmount(i), i.currency)}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatMoney(financeBalanceDue(i), i.currency)}
+                </TableCell>
               </TableRow>
             ))}
-
           </TableBody>
         </Table>
       </div>

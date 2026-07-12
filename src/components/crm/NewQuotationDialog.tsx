@@ -3,10 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  createQuotationWithItems,
-  createCustomerLite,
-} from "@/lib/quotations.functions";
+import { createQuotationWithItems, createCustomerLite } from "@/lib/quotations.functions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -57,8 +54,7 @@ const emptyLine = (): Line => ({
   discount_pct: 0,
 });
 
-const lineSubtotal = (l: Line) =>
-  l.quantity * l.unit_price * (1 - (l.discount_pct ?? 0) / 100);
+const lineSubtotal = (l: Line) => l.quantity * l.unit_price * (1 - (l.discount_pct ?? 0) / 100);
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 const inDaysISO = (days: number) => {
@@ -128,10 +124,7 @@ export function NewQuotationDialog({
     setNewCustomerCountry("");
   }, [open]);
 
-  const subtotal = useMemo(
-    () => lines.reduce((sum, l) => sum + lineSubtotal(l), 0),
-    [lines],
-  );
+  const subtotal = useMemo(() => lines.reduce((sum, l) => sum + lineSubtotal(l), 0), [lines]);
   const vat = useMemo(() => (subtotal * vatRate) / 100, [subtotal, vatRate]);
   const total = subtotal + vat;
 
@@ -208,8 +201,8 @@ export function NewQuotationDialog({
         <DialogHeader>
           <DialogTitle>New quotation</DialogTitle>
           <DialogDescription>
-            A customer, validity date, and at least one line item are required.
-            Full editing is available on the next screen.
+            A customer, validity date, and at least one line item are required. Full editing is
+            available on the next screen.
           </DialogDescription>
         </DialogHeader>
 
@@ -276,18 +269,11 @@ export function NewQuotationDialog({
           </div>
           <div>
             <Label>Valid until *</Label>
-            <Input
-              type="date"
-              value={validUntil}
-              onChange={(e) => setValidUntil(e.target.value)}
-            />
+            <Input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} />
           </div>
           <div>
             <Label>Currency</Label>
-            <Input
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value.toUpperCase())}
-            />
+            <Input value={currency} onChange={(e) => setCurrency(e.target.value.toUpperCase())} />
           </div>
           <div>
             <Label>VAT %</Label>
@@ -388,7 +374,9 @@ export function NewQuotationDialog({
                       <Input
                         type="number"
                         value={l.unit_price}
-                        onChange={(e) => updateLine(idx, { unit_price: Number(e.target.value) || 0 })}
+                        onChange={(e) =>
+                          updateLine(idx, { unit_price: Number(e.target.value) || 0 })
+                        }
                       />
                     </TableCell>
                     <TableCell>
@@ -466,8 +454,7 @@ export function NewQuotationDialog({
           <div className="flex justify-between text-muted-foreground">
             <span>Subtotal</span>
             <span>
-              {currency}{" "}
-              {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              {currency} {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </span>
           </div>
           <div className="flex justify-between text-muted-foreground">
@@ -488,10 +475,7 @@ export function NewQuotationDialog({
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={() => create.mutate()}
-            disabled={!canSubmit || create.isPending}
-          >
+          <Button onClick={() => create.mutate()} disabled={!canSubmit || create.isPending}>
             {create.isPending ? "Saving…" : "Save draft"}
           </Button>
         </DialogFooter>

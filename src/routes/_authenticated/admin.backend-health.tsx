@@ -33,10 +33,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export const Route = createFileRoute("/_authenticated/admin/backend-health")({
   head: () => ({
-    meta: [
-      { title: "Backend Health — NEVO CRM" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Backend Health — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   component: BackendHealthPage,
 });
@@ -112,16 +109,12 @@ function BackendHealthPage() {
   const dbOk = h?.database.ok ?? false;
   const apiOk = h?.api.ok ?? false;
   const cronOk = h?.cron.scheduled ?? false;
-  const dlqCount =
-    (h?.queues.auth_emails_dlq ?? 0) + (h?.queues.transactional_emails_dlq ?? 0);
-  const queueDepth =
-    (h?.queues.auth_emails ?? 0) + (h?.queues.transactional_emails ?? 0);
+  const dlqCount = (h?.queues.auth_emails_dlq ?? 0) + (h?.queues.transactional_emails_dlq ?? 0);
+  const queueDepth = (h?.queues.auth_emails ?? 0) + (h?.queues.transactional_emails ?? 0);
   const emailFailed = (h?.email.stats.dlq ?? 0) + (h?.email.stats.failed ?? 0);
   const emailTotal = h?.email.stats.total ?? 0;
   const successRate =
-    emailTotal > 0
-      ? Math.round(((h?.email.stats.sent ?? 0) / emailTotal) * 100)
-      : null;
+    emailTotal > 0 ? Math.round(((h?.email.stats.sent ?? 0) / emailTotal) * 100) : null;
 
   const retryUntil = h?.email.state?.retry_after_until
     ? new Date(h.email.state.retry_after_until)
@@ -139,7 +132,8 @@ function BackendHealthPage() {
             Live status of database, API, message queues and email delivery.
             {h && (
               <>
-                {" "}Updated{" "}
+                {" "}
+                Updated{" "}
                 <span className="font-medium">
                   {formatDistanceToNow(new Date(h.generatedAt), { addSuffix: true })}
                 </span>
@@ -173,7 +167,9 @@ function BackendHealthPage() {
       {dlqCount > 0 && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Dead-letter queue has {dlqCount} message{dlqCount === 1 ? "" : "s"}</AlertTitle>
+          <AlertTitle>
+            Dead-letter queue has {dlqCount} message{dlqCount === 1 ? "" : "s"}
+          </AlertTitle>
           <AlertDescription>
             One or more emails failed after all retries. Review recent failures below.
           </AlertDescription>
@@ -200,7 +196,7 @@ function BackendHealthPage() {
           hint={
             h?.database.latencyMs != null
               ? `Round-trip ${h.database.latencyMs} ms`
-              : h?.database.error ?? undefined
+              : (h?.database.error ?? undefined)
           }
         />
         <StatCard
@@ -214,19 +210,9 @@ function BackendHealthPage() {
           title="Queue depth"
           value={loading ? <Skeleton className="h-7 w-14" /> : queueDepth}
           hint={
-            h
-              ? `${h.queues.auth_emails} auth · ${h.queues.transactional_emails} app`
-              : undefined
+            h ? `${h.queues.auth_emails} auth · ${h.queues.transactional_emails} app` : undefined
           }
-          right={
-            !loading && (
-              <StatusPill
-                ok={cronOk}
-                okLabel="Cron on"
-                badLabel="No cron"
-              />
-            )
-          }
+          right={!loading && <StatusPill ok={cronOk} okLabel="Cron on" badLabel="No cron" />}
         />
         <StatCard
           icon={Mail}
@@ -270,9 +256,7 @@ function BackendHealthPage() {
               <TableBody>
                 <TableRow>
                   <TableCell className="font-medium">Auth emails</TableCell>
-                  <TableCell className="text-right">
-                    {h?.queues.auth_emails ?? "—"}
-                  </TableCell>
+                  <TableCell className="text-right">{h?.queues.auth_emails ?? "—"}</TableCell>
                   <TableCell className="text-right">
                     <DlqCell n={h?.queues.auth_emails_dlq ?? 0} />
                   </TableCell>
@@ -293,18 +277,14 @@ function BackendHealthPage() {
               <StatusPill ok={cronOk} okLabel="scheduled" badLabel="unscheduled" />
               {h?.cron.schedule && <span>({h.cron.schedule})</span>}
             </div>
-            {h?.metricsError && (
-              <p className="text-xs text-rose-500 mt-2">{h.metricsError}</p>
-            )}
+            {h?.metricsError && <p className="text-xs text-rose-500 mt-2">{h.metricsError}</p>}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Email delivery (last 24h)</CardTitle>
-            <CardDescription>
-              Deduplicated by message. Latest status per email.
-            </CardDescription>
+            <CardDescription>Deduplicated by message. Latest status per email.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {loading ? (
@@ -329,8 +309,7 @@ function BackendHealthPage() {
             )}
             {h?.email.state && (
               <div className="text-xs text-muted-foreground border-t pt-3">
-                Throughput: batch {h.email.state.batch_size} · delay{" "}
-                {h.email.state.send_delay_ms}ms
+                Throughput: batch {h.email.state.batch_size} · delay {h.email.state.send_delay_ms}ms
               </div>
             )}
           </CardContent>
@@ -369,9 +348,7 @@ function BackendHealthPage() {
                     <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(f.created_at), { addSuffix: true })}
                     </TableCell>
-                    <TableCell className="font-mono text-xs">
-                      {f.template_name ?? "—"}
-                    </TableCell>
+                    <TableCell className="font-mono text-xs">{f.template_name ?? "—"}</TableCell>
                     <TableCell className="text-xs">{f.recipient_email ?? "—"}</TableCell>
                     <TableCell>
                       <Badge variant="destructive" className="capitalize">
@@ -394,9 +371,7 @@ function BackendHealthPage() {
 
 function DlqCell({ n }: { n: number }) {
   if (n === 0) return <span className="text-muted-foreground">0</span>;
-  return (
-    <span className="text-rose-600 dark:text-rose-400 font-semibold">{n}</span>
-  );
+  return <span className="text-rose-600 dark:text-rose-400 font-semibold">{n}</span>;
 }
 
 function MiniStat({
@@ -419,9 +394,7 @@ function MiniStat({
   return (
     <div className="rounded-md border bg-card p-2">
       <div className={`text-xl font-semibold ${color}`}>{value}</div>
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-        {label}
-      </div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
     </div>
   );
 }

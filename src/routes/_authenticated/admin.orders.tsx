@@ -29,7 +29,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatMoney, formatDate } from "@/lib/crm-money";
 import {
   ORDER_STATUSES,
@@ -84,10 +90,7 @@ function OrdersPage() {
       if (statusFilter !== "all" && o.status !== statusFilter) return false;
       if (!q) return true;
       const cName = (o.customers as { name?: string } | null)?.name || "";
-      return (
-        (o.order_number || "").toLowerCase().includes(q) ||
-        cName.toLowerCase().includes(q)
-      );
+      return (o.order_number || "").toLowerCase().includes(q) || cName.toLowerCase().includes(q);
     });
   }, [orders, search, statusFilter]);
 
@@ -95,9 +98,7 @@ function OrdersPage() {
   const create = useMutation({
     mutationFn: async () => {
       if (!customerId) throw new Error("Select a customer");
-      const orderNumber = `ORD-${new Date().getFullYear()}-${String(
-        Date.now(),
-      ).slice(-6)}`;
+      const orderNumber = `ORD-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
       const { data, error } = await supabase
         .from("orders")
         .insert({
@@ -132,7 +133,6 @@ function OrdersPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
-
   return (
     <>
       <MasterListShell
@@ -148,7 +148,10 @@ function OrdersPage() {
       >
         <div className="p-3 border-b flex gap-2 items-center">
           <Label className="text-xs text-muted-foreground">Status</Label>
-          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as OrderStatus | "all")}>
+          <Select
+            value={statusFilter}
+            onValueChange={(v) => setStatusFilter(v as OrderStatus | "all")}
+          >
             <SelectTrigger className="w-52 h-8">
               <SelectValue />
             </SelectTrigger>
@@ -199,18 +202,14 @@ function OrdersPage() {
                       {o.order_number || o.id.slice(0, 8)}
                     </Link>
                   </TableCell>
-                  <TableCell>
-                    {(o.customers as { name?: string } | null)?.name || "—"}
-                  </TableCell>
+                  <TableCell>{(o.customers as { name?: string } | null)?.name || "—"}</TableCell>
                   <TableCell>{formatDate(o.order_date)}</TableCell>
                   <TableCell>
                     <Badge variant={orderStatusVariant(o.status)}>
                       {orderStatusLabel(o.status)}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">
-                    {formatMoney(o.total, o.currency)}
-                  </TableCell>
+                  <TableCell className="text-right">{formatMoney(o.total, o.currency)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

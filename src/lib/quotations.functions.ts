@@ -83,7 +83,9 @@ export const getQuotation = createServerFn({ method: "GET" })
     const [{ data: quotation, error: qErr }, { data: items, error: iErr }] = await Promise.all([
       context.supabase
         .from("quotations")
-        .select("*, customers(id,name,company_name,email,phone,address,billing_address,city,country,currency,vat_number)")
+        .select(
+          "*, customers(id,name,company_name,email,phone,address,billing_address,city,country,currency,vat_number)",
+        )
         .eq("id", data.id)
         .maybeSingle(),
       context.supabase
@@ -175,9 +177,7 @@ export const createQuotationWithItems = createServerFn({ method: "POST" })
 
     const rows = data.items.map((it, idx) => {
       const line_total =
-        Math.round(
-          it.quantity * it.unit_price * (1 - (it.discount_pct ?? 0) / 100) * 100,
-        ) / 100;
+        Math.round(it.quantity * it.unit_price * (1 - (it.discount_pct ?? 0) / 100) * 100) / 100;
       return {
         quotation_id: inserted.id,
         position: idx + 1,
@@ -212,7 +212,6 @@ export const createQuotationWithItems = createServerFn({ method: "POST" })
     return { id: inserted.id };
   });
 
-
 const ItemInput = z.object({
   id: z.string().uuid().optional(),
   quotation_id: z.string().uuid(),
@@ -230,8 +229,7 @@ export const upsertQuotationItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => ItemInput.parse(v))
   .handler(async ({ context, data }) => {
-    const line_total =
-      data.quantity * data.unit_price * (1 - (data.discount_pct ?? 0) / 100);
+    const line_total = data.quantity * data.unit_price * (1 - (data.discount_pct ?? 0) / 100);
     const payload = { ...data, line_total: Math.round(line_total * 100) / 100 };
     if (data.id) {
       const { error } = await context.supabase
@@ -257,21 +255,19 @@ export const duplicateQuotationItem = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Item not found");
-    const { error: insErr } = await context.supabase
-      .from("quotation_items")
-      .insert({
-        quotation_id: row.quotation_id,
-        description: row.description,
-        item_code: row.item_code ?? null,
-        hs_code: row.hs_code ?? null,
-        quantity: row.quantity,
-        unit: row.unit,
-        unit_price: row.unit_price,
-        discount_pct: row.discount_pct,
-        line_total: row.line_total,
-        position: (row.position ?? 0) + 1,
-        product_id: row.product_id ?? null,
-      });
+    const { error: insErr } = await context.supabase.from("quotation_items").insert({
+      quotation_id: row.quotation_id,
+      description: row.description,
+      item_code: row.item_code ?? null,
+      hs_code: row.hs_code ?? null,
+      quantity: row.quantity,
+      unit: row.unit,
+      unit_price: row.unit_price,
+      discount_pct: row.discount_pct,
+      line_total: row.line_total,
+      position: (row.position ?? 0) + 1,
+      product_id: row.product_id ?? null,
+    });
     if (insErr) throw new Error(insErr.message);
     return { ok: true };
   });
@@ -542,9 +538,7 @@ export const convertProformaToCommercial = createServerFn({ method: "POST" })
         position: it.position,
         product_id: it.product_id ?? null,
       }));
-      const { error: itemsErr } = await context.supabase
-        .from("invoice_items")
-        .insert(rows);
+      const { error: itemsErr } = await context.supabase.from("invoice_items").insert(rows);
       if (itemsErr) throw new Error(itemsErr.message);
     }
 
@@ -693,9 +687,6 @@ export const emailQuotation = createServerFn({ method: "POST" })
 
     return { ok: true, resend_id: responseJson.id ?? null };
   });
-
-
-
 
 /** Recompute subtotal / vat_amount / total on a quotation from its items.
  *  DB trigger `recalc_quotation_totals` normally handles this; the app-side

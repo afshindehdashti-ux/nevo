@@ -28,10 +28,7 @@ import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/admin/ai-assistant/")({
   head: () => ({
-    meta: [
-      { title: "NEVO AI Assistant — Internal" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "NEVO AI Assistant — Internal" }, { name: "robots", content: "noindex" }],
   }),
   component: AiAssistantPage,
 });
@@ -375,10 +372,7 @@ function AiAssistantPage() {
           ) : (
             <ol className="space-y-3 text-xs">
               {lastSources.map((s, i) => (
-                <li
-                  key={i}
-                  className="rounded border border-neutral-200 bg-neutral-50 p-2"
-                >
+                <li key={i} className="rounded border border-neutral-200 bg-neutral-50 p-2">
                   <div className="mb-1 flex items-center gap-1 text-[10px] text-emerald-700">
                     <span className="font-semibold">[{i + 1}]</span>
                     <span className="truncate font-medium text-neutral-900">

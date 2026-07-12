@@ -120,10 +120,7 @@ export async function purgeOlderInvoicePdfVersions(
   }
 
   const ids = toDelete.map((r) => r.id);
-  const { error: delErr } = await supabase
-    .from("invoice_pdf_versions")
-    .delete()
-    .in("id", ids);
+  const { error: delErr } = await supabase.from("invoice_pdf_versions").delete().in("id", ids);
   if (delErr) throw delErr;
 
   // Audit log — best-effort; do not fail the purge if logging fails.
@@ -138,4 +135,3 @@ export async function purgeOlderInvoicePdfVersions(
 
   return toDelete.length;
 }
-

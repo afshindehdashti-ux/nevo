@@ -1,7 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { IMPORT_SCHEMAS, type ImportField, type ImportEntitySchema, SUPPORTED_IMPORT_TYPES } from "./import-schemas";
+import {
+  IMPORT_SCHEMAS,
+  type ImportField,
+  type ImportEntitySchema,
+  SUPPORTED_IMPORT_TYPES,
+} from "./import-schemas";
 
 /* -------------------------------------------------------------------------- */
 /* Coercion                                                                    */
@@ -37,7 +42,9 @@ function coerce(field: ImportField, raw: unknown): unknown {
     case "enum": {
       const l = s.toLowerCase().replace(/\s+/g, "_");
       if (!field.enumValues?.includes(l))
-        throw new Error(`"${field.label}" must be one of ${field.enumValues?.join(", ")}, got "${s}"`);
+        throw new Error(
+          `"${field.label}" must be one of ${field.enumValues?.join(", ")}, got "${s}"`,
+        );
       return l;
     }
     case "date": {
@@ -76,7 +83,10 @@ const RowsInput = z.object({
   file_name: z.string().min(1).max(300),
   mode: z.enum(["create", "upsert", "skip_duplicates"]).default("create"),
   mapping: z.record(z.string(), z.string()),
-  rows: z.array(z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()]))).min(1).max(5000),
+  rows: z
+    .array(z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])))
+    .min(1)
+    .max(5000),
 });
 type ImportInput = z.infer<typeof RowsInput>;
 
@@ -108,7 +118,11 @@ type DocConfig = {
     userId: string;
   }) => Record<string, unknown>;
   // Build items rows (already computed)
-  buildItem?: (item: Record<string, unknown>, idx: number, parentId: string) => Record<string, unknown>;
+  buildItem?: (
+    item: Record<string, unknown>,
+    idx: number,
+    parentId: string,
+  ) => Record<string, unknown>;
 };
 
 const DOC_CONFIGS: Record<string, DocConfig> = {
@@ -312,7 +326,13 @@ export const runImportJob = createServerFn({ method: "POST" })
 
     // Route to specialized handlers where applicable.
     if (schema.groupBy && DOC_CONFIGS[schema.key]) {
-      return runHierarchicalImport({ supabase, userId, data, schema, config: DOC_CONFIGS[schema.key] });
+      return runHierarchicalImport({
+        supabase,
+        userId,
+        data,
+        schema,
+        config: DOC_CONFIGS[schema.key],
+      });
     }
     if (schema.key === "payments") {
       return runPaymentsImport({ supabase, userId, data, schema });
@@ -352,7 +372,8 @@ async function finishJob(
   jobId: string,
   totals: { success: number; failed: number; skipped: number; samples: string[] },
 ) {
-  const finalStatus = totals.failed === 0 ? "completed" : totals.success === 0 ? "failed" : "completed";
+  const finalStatus =
+    totals.failed === 0 ? "completed" : totals.success === 0 ? "failed" : "completed";
   await supabase
     .from("import_jobs")
     .update({
@@ -367,8 +388,16 @@ async function finishJob(
 }
 
 async function runFlatImport({
-  supabase, userId, data, schema,
-}: { supabase: any; userId: string; data: ImportInput; schema: ImportEntitySchema }) {
+  supabase,
+  userId,
+  data,
+  schema,
+}: {
+  supabase: any;
+  userId: string;
+  data: ImportInput;
+  schema: ImportEntitySchema;
+}) {
   const jobId = await createJob(supabase, data);
   const totals = { success: 0, failed: 0, skipped: 0, samples: [] as string[] };
 
@@ -450,7 +479,8 @@ function makeCustomerResolver(supabase: any, userId: string, autoCreate: boolean
       .insert({ name: name.trim(), company_name: name.trim(), created_by: userId })
       .select("id")
       .single();
-    if (error || !created) throw new Error(`Failed to create customer "${name}": ${error?.message}`);
+    if (error || !created)
+      throw new Error(`Failed to create customer "${name}": ${error?.message}`);
     cache.set(key, created.id);
     return created.id;
   };
@@ -501,7 +531,8 @@ async function resolvePartnerId(supabase: any, partnerName: string) {
       .insert({ name: partnerName.trim(), supplier_id: s.id })
       .select("id")
       .single();
-    if (error || !newP) throw new Error(`Failed to link partner "${partnerName}": ${error?.message}`);
+    if (error || !newP)
+      throw new Error(`Failed to link partner "${partnerName}": ${error?.message}`);
     return newP.id as string;
   }
   throw new Error(`Partner / supplier "${partnerName}" not found`);
@@ -512,7 +543,11 @@ async function resolvePartnerId(supabase: any, partnerName: string) {
 /* -------------------------------------------------------------------------- */
 
 async function runHierarchicalImport({
-  supabase, userId, data, schema, config,
+  supabase,
+  userId,
+  data,
+  schema,
+  config,
 }: {
   supabase: any;
   userId: string;
@@ -524,7 +559,11 @@ async function runHierarchicalImport({
   const headerKeys = new Set(schema.headerFields ?? []);
   const itemKeys = new Set(schema.itemFields ?? []);
 
-  type MappedRow = { rowNumber: number; raw: (typeof data.rows)[number]; mapped: Record<string, unknown> };
+  type MappedRow = {
+    rowNumber: number;
+    raw: (typeof data.rows)[number];
+    mapped: Record<string, unknown>;
+  };
   const groups = new Map<string, MappedRow[]>();
   const rowErrors: Array<{ rowNumber: number; error: string; raw: any }> = [];
 
@@ -622,12 +661,20 @@ async function runHierarchicalImport({
         if (!item.description) throw new Error(`Row ${r.rowNumber}: description required`);
         return item;
       });
-      const subtotal = Math.round(items.reduce((s, it) => s + Number(it.line_total ?? 0), 0) * 100) / 100;
+      const subtotal =
+        Math.round(items.reduce((s, it) => s + Number(it.line_total ?? 0), 0) * 100) / 100;
       const vatAmount = Math.round(subtotal * (vatRate / 100) * 100) / 100;
       const total = Math.round((subtotal + vatAmount) * 100) / 100;
 
       const parentPayload = config.buildParent({
-        header, customerId, orderId, subtotal, vatAmount, total, vatRate, userId,
+        header,
+        customerId,
+        orderId,
+        subtotal,
+        vatAmount,
+        total,
+        vatRate,
+        userId,
       });
       // Strip helper fields (prefixed _)
       for (const k of Object.keys(parentPayload)) {
@@ -639,7 +686,8 @@ async function runHierarchicalImport({
         .insert(parentPayload as never)
         .select("id")
         .single();
-      if (pErr || !parent) throw new Error(pErr?.message || `Failed to create ${config.parentTable}`);
+      if (pErr || !parent)
+        throw new Error(pErr?.message || `Failed to create ${config.parentTable}`);
       const parentId = (parent as { id: string }).id;
 
       const itemsPayload = items.map((it, idx) =>
@@ -647,9 +695,14 @@ async function runHierarchicalImport({
           ? config.buildItem(it, idx, parentId)
           : { ...it, [config.itemsFkCol]: parentId },
       );
-      const { error: iErr } = await supabase.from(config.itemsTable as never).insert(itemsPayload as never);
+      const { error: iErr } = await supabase
+        .from(config.itemsTable as never)
+        .insert(itemsPayload as never);
       if (iErr) {
-        await supabase.from(config.parentTable as never).delete().eq("id", parentId);
+        await supabase
+          .from(config.parentTable as never)
+          .delete()
+          .eq("id", parentId);
         throw new Error(`Line items failed: ${iErr.message}`);
       }
 
@@ -701,8 +754,16 @@ async function runHierarchicalImport({
 /* -------------------------------------------------------------------------- */
 
 async function runPaymentsImport({
-  supabase, userId, data, schema,
-}: { supabase: any; userId: string; data: ImportInput; schema: ImportEntitySchema }) {
+  supabase,
+  userId,
+  data,
+  schema,
+}: {
+  supabase: any;
+  userId: string;
+  data: ImportInput;
+  schema: ImportEntitySchema;
+}) {
   const jobId = await createJob(supabase, data);
   const totals = { success: 0, failed: 0, skipped: 0, samples: [] as string[] };
   const invoiceCache = new Map<string, { id: string; currency: string }>();
@@ -767,7 +828,13 @@ async function runPaymentsImport({
   }
 
   await finishJob(supabase, jobId, totals);
-  return { job_id: jobId, success: totals.success, failed: totals.failed, skipped: totals.skipped, total: data.rows.length };
+  return {
+    job_id: jobId,
+    success: totals.success,
+    failed: totals.failed,
+    skipped: totals.skipped,
+    total: data.rows.length,
+  };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -775,8 +842,16 @@ async function runPaymentsImport({
 /* -------------------------------------------------------------------------- */
 
 async function runCommissionsImport({
-  supabase, userId, data, schema,
-}: { supabase: any; userId: string; data: ImportInput; schema: ImportEntitySchema }) {
+  supabase,
+  userId,
+  data,
+  schema,
+}: {
+  supabase: any;
+  userId: string;
+  data: ImportInput;
+  schema: ImportEntitySchema;
+}) {
   const jobId = await createJob(supabase, data);
   const totals = { success: 0, failed: 0, skipped: 0, samples: [] as string[] };
   const partnerCache = new Map<string, string>();
@@ -870,7 +945,13 @@ async function runCommissionsImport({
   }
 
   await finishJob(supabase, jobId, totals);
-  return { job_id: jobId, success: totals.success, failed: totals.failed, skipped: totals.skipped, total: data.rows.length };
+  return {
+    job_id: jobId,
+    success: totals.success,
+    failed: totals.failed,
+    skipped: totals.skipped,
+    total: data.rows.length,
+  };
 }
 
 /* -------------------------------------------------------------------------- */

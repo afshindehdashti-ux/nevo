@@ -5,14 +5,19 @@ import { supabaseForUser } from "../supabase";
 export default withAudit({
   name: "list_customers",
   title: "List customers",
-  description: "List customers visible to the signed-in user. Optionally filter by a search term matching company name or email.",
+  description:
+    "List customers visible to the signed-in user. Optionally filter by a search term matching company name or email.",
   inputSchema: {
     search: z.string().trim().optional().describe("Optional search term (company name or email)."),
     limit: z.number().int().min(1).max(100).optional().describe("Max rows to return (default 25)."),
   },
   annotations: { readOnlyHint: true, openWorldHint: false },
-  handler: async ({ search, limit }: { search?: string; limit?: number }, ctx: import("@lovable.dev/mcp-js").ToolContext) => {
-    if (!ctx.isAuthenticated()) return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
+  handler: async (
+    { search, limit }: { search?: string; limit?: number },
+    ctx: import("@lovable.dev/mcp-js").ToolContext,
+  ) => {
+    if (!ctx.isAuthenticated())
+      return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
     let q = supabaseForUser(ctx)
       .from("customers")
       .select("id, company_name, email, phone, country, status, created_at")

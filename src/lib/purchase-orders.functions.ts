@@ -102,7 +102,7 @@ async function recalcPurchaseOrderTotalsInternal(supabase: any, id: string) {
     const gross = Number(it.quantity) * Number(it.unit_price);
     const taxable = gross * (1 - Number(it.discount_pct) / 100);
     subtotal += taxable;
-    taxTotal += taxable * Number(it.vat_pct) / 100;
+    taxTotal += (taxable * Number(it.vat_pct)) / 100;
   }
   subtotal = round2(subtotal);
   taxTotal = round2(taxTotal);
@@ -123,7 +123,9 @@ async function recalcPurchaseOrderTotalsInternal(supabase: any, id: string) {
 export const recalcPurchaseOrderTotals = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => IdInput.parse(v))
-  .handler(async ({ context, data }) => recalcPurchaseOrderTotalsInternal(context.supabase, data.id));
+  .handler(async ({ context, data }) =>
+    recalcPurchaseOrderTotalsInternal(context.supabase, data.id),
+  );
 
 export const createPurchaseOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -185,9 +187,7 @@ export const createPurchaseOrder = createServerFn({ method: "POST" })
 
 export const updatePurchaseOrderHeader = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
-    z.object({ id: z.string().uuid(), patch: HeaderInput.partial() }).parse(v),
-  )
+  .inputValidator((v) => z.object({ id: z.string().uuid(), patch: HeaderInput.partial() }).parse(v))
   .handler(async ({ context, data }) => {
     const { data: prev } = await context.supabase
       .from("orders")
@@ -244,9 +244,7 @@ export const addPurchaseOrderItem = createServerFn({ method: "POST" })
 
 export const updatePurchaseOrderItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
-    z.object({ id: z.string().uuid(), patch: ItemInput.partial() }).parse(v),
-  )
+  .inputValidator((v) => z.object({ id: z.string().uuid(), patch: ItemInput.partial() }).parse(v))
   .handler(async ({ context, data }) => {
     const patch: Record<string, unknown> = { ...data.patch };
     const { data: prev } = await context.supabase
@@ -335,7 +333,11 @@ export const savePurchaseOrder = createServerFn({ method: "POST" })
     if (Object.keys(data.header).length) {
       const { error } = await context.supabase
         .from("orders")
-        .update({ ...data.header, updated_at: new Date().toISOString(), updated_by: context.userId })
+        .update({
+          ...data.header,
+          updated_at: new Date().toISOString(),
+          updated_by: context.userId,
+        })
         .eq("id", data.id);
       if (error) throw new Error(error.message);
     }
@@ -413,4 +415,3 @@ export const deletePurchaseOrder = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
-

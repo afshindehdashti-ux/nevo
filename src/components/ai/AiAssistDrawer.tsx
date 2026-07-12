@@ -7,11 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import {
-  askAssistant,
-  createChatSession,
-  getRecordSummary,
-} from "@/lib/ai-assistant.functions";
+import { askAssistant, createChatSession, getRecordSummary } from "@/lib/ai-assistant.functions";
 
 type Msg = {
   role: "user" | "assistant";

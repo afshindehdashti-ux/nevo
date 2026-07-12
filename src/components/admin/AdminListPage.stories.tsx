@@ -115,7 +115,8 @@ export const EmptyWithSeedExpected: Story = {
   parameters: {
     docs: {
       description: {
-        story: "`expectSeed` flips the empty reason to `seed_missing` and escalates telemetry to `warn`.",
+        story:
+          "`expectSeed` flips the empty reason to `seed_missing` and escalates telemetry to `warn`.",
       },
     },
   },

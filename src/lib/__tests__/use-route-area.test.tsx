@@ -101,9 +101,9 @@ describe("classifyRouteArea", () => {
       "/backoffice-help",
       "/backoffice-portal",
       "/backofficehelp",
-      "/authorize",       // auth lookalike
-      "/authority",       // auth lookalike
-      "/authenticated",   // auth lookalike (the underscore-layout name)
+      "/authorize", // auth lookalike
+      "/authority", // auth lookalike
+      "/authenticated", // auth lookalike (the underscore-layout name)
       // "admin" as a mid-path segment is not a backend route:
       "/blog/admin-guide",
       "/docs/admin",

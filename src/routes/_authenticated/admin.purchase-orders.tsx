@@ -16,7 +16,6 @@ const ORDERS_SELECT = buildSelect(
   [{ as: "customer", table: "customers", columns: ["name"] }],
 );
 
-
 export const Route = createFileRoute("/_authenticated/admin/purchase-orders")({
   head: () => ({
     meta: [{ title: "Purchase Orders — NEVO CRM" }, { name: "robots", content: "noindex" }],
@@ -90,10 +89,20 @@ function PurchaseOrdersList() {
                 <tr key={o.id} className="border-t border-border hover:bg-muted/20">
                   <td className="px-3 py-2 font-medium">{o.order_number}</td>
                   <td className="px-3 py-2 text-muted-foreground">{o.customer?.name ?? "—"}</td>
-                  <td className="px-3 py-2"><Badge variant="outline" className="capitalize">{o.status}</Badge></td>
-                  <td className="px-3 py-2 text-muted-foreground">{o.order_date ? formatDate(o.order_date) : "—"}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{o.requested_delivery ? formatDate(o.requested_delivery) : "—"}</td>
-                  <td className="px-3 py-2 text-right tabular-nums">{formatMoney(Number(o.total ?? 0), o.currency ?? "EUR")}</td>
+                  <td className="px-3 py-2">
+                    <Badge variant="outline" className="capitalize">
+                      {o.status}
+                    </Badge>
+                  </td>
+                  <td className="px-3 py-2 text-muted-foreground">
+                    {o.order_date ? formatDate(o.order_date) : "—"}
+                  </td>
+                  <td className="px-3 py-2 text-muted-foreground">
+                    {o.requested_delivery ? formatDate(o.requested_delivery) : "—"}
+                  </td>
+                  <td className="px-3 py-2 text-right tabular-nums">
+                    {formatMoney(Number(o.total ?? 0), o.currency ?? "EUR")}
+                  </td>
                 </tr>
               ))}
             </tbody>

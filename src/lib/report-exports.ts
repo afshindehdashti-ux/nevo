@@ -85,9 +85,7 @@ export function exportToPDF<T>(opts: {
     body: rows.map((r) => columns.map((c) => cellValue(r, c))),
     styles: { fontSize: 8, cellPadding: 4, overflow: "linebreak" },
     headStyles: { fillColor: [30, 41, 59], textColor: 255, fontStyle: "bold" },
-    columnStyles: Object.fromEntries(
-      columns.map((c, i) => [i, { halign: c.align ?? "left" }]),
-    ),
+    columnStyles: Object.fromEntries(columns.map((c, i) => [i, { halign: c.align ?? "left" }])),
     margin: { left: 30, right: 30 },
   });
 

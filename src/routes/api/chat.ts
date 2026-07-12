@@ -61,10 +61,15 @@ export const Route = createFileRoute("/api/chat")({
 
         if (!Array.isArray(body.messages)) return jsonError(400, "messages_required");
         const messages = body.messages as UIMessage[];
-        if (messages.length === 0 || messages.length > MAX_MESSAGES) return jsonError(413, "too_many_messages");
+        if (messages.length === 0 || messages.length > MAX_MESSAGES)
+          return jsonError(413, "too_many_messages");
         for (const m of messages) {
           for (const p of m.parts ?? []) {
-            if (p.type === "text" && typeof p.text === "string" && p.text.length > MAX_SINGLE_MESSAGE_CHARS) {
+            if (
+              p.type === "text" &&
+              typeof p.text === "string" &&
+              p.text.length > MAX_SINGLE_MESSAGE_CHARS
+            ) {
               return jsonError(413, "message_too_long");
             }
           }

@@ -48,7 +48,6 @@ async function sendWelcomeEmail(params: {
   }
 }
 
-
 const inviteSchema = z.object({
   email: z.string().email(),
   fullName: z.string().min(1).max(200),

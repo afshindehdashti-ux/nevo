@@ -1,9 +1,6 @@
 type JsonBody = Record<string, unknown>;
 
-const DEFAULT_ALLOWED_ORIGINS = [
-  "https://nevoindustrial.com",
-  "https://www.nevoindustrial.com",
-];
+const DEFAULT_ALLOWED_ORIGINS = ["https://nevoindustrial.com", "https://www.nevoindustrial.com"];
 
 type RateLimitBucket = {
   count: number;
@@ -42,11 +39,15 @@ export function isAllowedOrigin(request: Request): boolean {
   return configuredOrigins().includes(origin);
 }
 
-export function corsHeaders(request: Request, options?: { methods?: string; headers?: string }): HeadersInit {
+export function corsHeaders(
+  request: Request,
+  options?: { methods?: string; headers?: string },
+): HeadersInit {
   const origin = requestOrigin(request);
   const headers: Record<string, string> = {
     "access-control-allow-methods": options?.methods ?? "POST, OPTIONS",
-    "access-control-allow-headers": options?.headers ?? "content-type, authorization, x-bootstrap-token",
+    "access-control-allow-headers":
+      options?.headers ?? "content-type, authorization, x-bootstrap-token",
     "access-control-max-age": "86400",
     vary: "Origin",
   };
@@ -58,7 +59,12 @@ export function corsHeaders(request: Request, options?: { methods?: string; head
   return headers;
 }
 
-export function jsonError(status: number, error: string, extra?: JsonBody, headers?: HeadersInit): Response {
+export function jsonError(
+  status: number,
+  error: string,
+  extra?: JsonBody,
+  headers?: HeadersInit,
+): Response {
   return Response.json({ ok: false, error, ...(extra ?? {}) }, { status, headers });
 }
 

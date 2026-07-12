@@ -62,20 +62,12 @@ function AskAiLauncherProbe() {
 
   return (
     <>
-      <button
-        type="button"
-        data-testid="ask-ai-launcher"
-        onClick={() => setOpen(true)}
-      >
+      <button type="button" data-testid="ask-ai-launcher" onClick={() => setOpen(true)}>
         Ask AI
       </button>
       {open && (
         <div role="dialog" aria-modal="true" data-testid="ask-ai-drawer">
-          <button
-            type="button"
-            data-testid="ask-ai-close"
-            onClick={() => setOpen(false)}
-          >
+          <button type="button" data-testid="ask-ai-close" onClick={() => setOpen(false)}>
             Close
           </button>
           <span>drawer contents</span>
@@ -94,11 +86,7 @@ function StickyMobileCtaProbe() {
   if (isBackend) return null;
   if (dismissed) return <div data-testid="sticky-cta-dismissed" />;
   return (
-    <button
-      type="button"
-      data-testid="sticky-cta"
-      onClick={() => setDismissed(true)}
-    >
+    <button type="button" data-testid="sticky-cta" onClick={() => setDismissed(true)}>
       WhatsApp
     </button>
   );
@@ -124,10 +112,26 @@ function makeRouter(initial: string) {
   const rootRoute = createRootRoute({ component: RootShell });
   const routes = [
     createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <div>home</div> }),
-    createRoute({ getParentRoute: () => rootRoute, path: "/about", component: () => <div>about</div> }),
-    createRoute({ getParentRoute: () => rootRoute, path: "/admin/$", component: () => <div>admin</div> }),
-    createRoute({ getParentRoute: () => rootRoute, path: "/crm/$", component: () => <div>crm</div> }),
-    createRoute({ getParentRoute: () => rootRoute, path: "/backoffice/$", component: () => <div>backoffice</div> }),
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/about",
+      component: () => <div>about</div>,
+    }),
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/admin/$",
+      component: () => <div>admin</div>,
+    }),
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/crm/$",
+      component: () => <div>crm</div>,
+    }),
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/backoffice/$",
+      component: () => <div>backoffice</div>,
+    }),
   ];
   return createRouter({
     routeTree: rootRoute.addChildren(routes),

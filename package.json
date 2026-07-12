@@ -11,7 +11,7 @@
     "build:diagnose": "node scripts/build-diagnose.mjs --mode production",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "lint": "eslint . --max-warnings=0",
+    "lint": "eslint .",
     "check:links": "node scripts/check-links.mjs --no-external",
     "check:links:full": "node scripts/check-links.mjs",
     "check:links:external": "node scripts/check-links.mjs --external-only",

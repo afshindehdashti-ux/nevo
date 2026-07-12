@@ -53,7 +53,10 @@ export const Route = createFileRoute("/api/public/oauth/google/callback")({
           });
           const tokenJson: any = await tokenRes.json();
           if (!tokenRes.ok) {
-            const msg = tokenJson?.error_description || tokenJson?.error || `token_exchange_${tokenRes.status}`;
+            const msg =
+              tokenJson?.error_description ||
+              tokenJson?.error ||
+              `token_exchange_${tokenRes.status}`;
             await supabaseAdmin
               .from("mailbox_connections")
               .update({

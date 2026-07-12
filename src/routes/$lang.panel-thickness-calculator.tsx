@@ -677,14 +677,7 @@ function BarChart({
 
 // ---------------- Input validation / engineering guardrails ----------------
 type IssueField =
-  | "app"
-  | "core"
-  | "climate"
-  | "temp"
-  | "fire"
-  | "thickness"
-  | "extSteel"
-  | "intSteel";
+  "app" | "core" | "climate" | "temp" | "fire" | "thickness" | "extSteel" | "intSteel";
 
 type Issue = {
   field: IssueField;

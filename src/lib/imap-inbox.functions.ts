@@ -5,7 +5,10 @@ import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
 
 async function ensureSuperAdmin(supabase: SupabaseClient<Database>, userId: string) {
-  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "super_admin" });
+  const { data, error } = await supabase.rpc("has_role", {
+    _user_id: userId,
+    _role: "super_admin",
+  });
   if (error) throw new Error("Role check failed: " + error.message);
   if (!data) throw new Error("Forbidden: super_admin role required");
 }
@@ -22,7 +25,14 @@ async function loadActiveConfig(supabase: SupabaseClient<Database>) {
 
 function maskPassword(row: any) {
   if (!row) return null;
-  const { imap_password, gmail_client_secret, gmail_refresh_token, gmail_access_token, gmail_oauth_state, ...rest } = row;
+  const {
+    imap_password,
+    gmail_client_secret,
+    gmail_refresh_token,
+    gmail_access_token,
+    gmail_oauth_state,
+    ...rest
+  } = row;
   return {
     ...rest,
     imap_password_set: Boolean(imap_password),
@@ -30,7 +40,6 @@ function maskPassword(row: any) {
     gmail_authorized: Boolean(gmail_refresh_token),
   };
 }
-
 
 // ============ SETTINGS ============
 
@@ -55,7 +64,6 @@ const saveConfigSchema = z.object({
   notes: z.string().max(1000).optional().nullable(),
 });
 export type SaveMailboxConfigInput = z.infer<typeof saveConfigSchema>;
-
 
 export const saveMailboxConfig = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -83,7 +91,6 @@ export const saveMailboxConfig = createServerFn({ method: "POST" })
       payload.gmail_client_secret = data.gmail_client_secret;
     }
 
-
     if (existing) {
       const { error } = await context.supabase
         .from("mailbox_connections")
@@ -94,9 +101,7 @@ export const saveMailboxConfig = createServerFn({ method: "POST" })
       if (data.provider === "imap" && !payload.imap_password) {
         throw new Error("IMAP password is required on first save.");
       }
-      const { error } = await context.supabase
-        .from("mailbox_connections")
-        .insert(payload);
+      const { error } = await context.supabase.from("mailbox_connections").insert(payload);
       if (error) throw new Error(error.message);
     }
 
@@ -168,7 +173,9 @@ export const testMailboxConnection = createServerFn({ method: "POST" })
       await recordTest(context.supabase, row.id, false, msg);
       return { ok: false as const, error: msg };
     } finally {
-      try { if (client) await client.logout(); } catch {}
+      try {
+        if (client) await client.logout();
+      } catch {}
     }
   });
 
@@ -198,7 +205,9 @@ export const listImapMailboxes = createServerFn({ method: "POST" })
         })),
       };
     } finally {
-      try { if (client) await client.logout(); } catch {}
+      try {
+        if (client) await client.logout();
+      } catch {}
     }
   });
 
@@ -242,19 +251,27 @@ export const listImapMessages = createServerFn({ method: "POST" })
             seen: (msg.flags ?? new Set()).has("\\Seen"),
             date: msg.envelope?.date ?? msg.internalDate ?? null,
             subject: msg.envelope?.subject ?? "(no subject)",
-            from: (msg.envelope?.from ?? []).map((a: any) => ({ name: a.name, address: a.address })),
+            from: (msg.envelope?.from ?? []).map((a: any) => ({
+              name: a.name,
+              address: a.address,
+            })),
             to: (msg.envelope?.to ?? []).map((a: any) => ({ name: a.name, address: a.address })),
             messageId: msg.envelope?.messageId ?? null,
             size: msg.size,
           });
         }
-        messages.sort((a, b) => (b.date ? new Date(b.date).getTime() : 0) - (a.date ? new Date(a.date).getTime() : 0));
+        messages.sort(
+          (a, b) =>
+            (b.date ? new Date(b.date).getTime() : 0) - (a.date ? new Date(a.date).getTime() : 0),
+        );
         return { messages, total, unseen: status.unseen ?? 0 };
       } finally {
         lock.release();
       }
     } finally {
-      try { if (client) await client.logout(); } catch {}
+      try {
+        if (client) await client.logout();
+      } catch {}
     }
   });
 
@@ -288,7 +305,9 @@ export const getImapMessage = createServerFn({ method: "POST" })
         const parsed = await simpleParser(msg.source as Buffer);
 
         // Mark as read
-        try { await client.messageFlagsAdd({ uid: data.uid }, ["\\Seen"], { uid: true }); } catch {}
+        try {
+          await client.messageFlagsAdd({ uid: data.uid }, ["\\Seen"], { uid: true });
+        } catch {}
 
         return {
           uid: msg.uid,
@@ -313,7 +332,9 @@ export const getImapMessage = createServerFn({ method: "POST" })
         lock.release();
       }
     } finally {
-      try { if (client) await client.logout(); } catch {}
+      try {
+        if (client) await client.logout();
+      } catch {}
     }
   });
 
@@ -340,10 +361,14 @@ export const setImapSeen = createServerFn({ method: "POST" })
         } else {
           await client.messageFlagsRemove({ uid: data.uid }, ["\\Seen"], { uid: true });
         }
-      } finally { lock.release(); }
+      } finally {
+        lock.release();
+      }
       return { ok: true as const };
     } finally {
-      try { if (client) await client.logout(); } catch {}
+      try {
+        if (client) await client.logout();
+      } catch {}
     }
   });
 
@@ -365,10 +390,14 @@ export const deleteImapMessage = createServerFn({ method: "POST" })
       const lock = await client.getMailboxLock(mailbox);
       try {
         await client.messageDelete({ uid: data.uid }, { uid: true });
-      } finally { lock.release(); }
+      } finally {
+        lock.release();
+      }
       return { ok: true as const };
     } finally {
-      try { if (client) await client.logout(); } catch {}
+      try {
+        if (client) await client.logout();
+      } catch {}
     }
   });
 
@@ -383,7 +412,9 @@ const GMAIL_SCOPES = [
 function randomState() {
   const bytes = new Uint8Array(24);
   crypto.getRandomValues(bytes);
-  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 const startOAuthSchema = z.object({

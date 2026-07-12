@@ -24,10 +24,18 @@ vi.mock("@/lib/client-monitor", () => ({
 
 function makeBuilder() {
   const chain: any = {
-    select() { return chain; },
-    order() { return chain; },
-    eq() { return chain; },
-    limit() { return Promise.resolve({ data: [], error: null }); },
+    select() {
+      return chain;
+    },
+    order() {
+      return chain;
+    },
+    eq() {
+      return chain;
+    },
+    limit() {
+      return Promise.resolve({ data: [], error: null });
+    },
     then(onFulfilled: any, onRejected: any) {
       return Promise.resolve({ data: [], error: null }).then(onFulfilled, onRejected);
     },
@@ -109,43 +117,38 @@ describe("admin list pages: admin_list_empty_shown contract", () => {
     expect(new Set(slugs).size, "resource slugs must be unique").toBe(slugs.length);
   });
 
-  describe.each(REGISTRY)(
-    "$label",
-    ({ routePath, emptyTitle, expectedResource }) => {
-      it(`emits admin_list_empty_shown once with resource="${expectedResource}" and an allowed reason`, async () => {
-        await renderRoute(routePath);
-        await waitFor(() =>
-          screen.getByRole("heading", { name: emptyTitle }),
-        );
+  describe.each(REGISTRY)("$label", ({ routePath, emptyTitle, expectedResource }) => {
+    it(`emits admin_list_empty_shown once with resource="${expectedResource}" and an allowed reason`, async () => {
+      await renderRoute(routePath);
+      await waitFor(() => screen.getByRole("heading", { name: emptyTitle }));
 
-        const emptyCalls = logClientEvent.mock.calls.filter(
-          ([name]) => name === "admin_list_empty_shown",
-        );
+      const emptyCalls = logClientEvent.mock.calls.filter(
+        ([name]) => name === "admin_list_empty_shown",
+      );
 
-        // Exactly one emission per (resource, reason) — dedup guarantee.
-        expect(emptyCalls).toHaveLength(1);
+      // Exactly one emission per (resource, reason) — dedup guarantee.
+      expect(emptyCalls).toHaveLength(1);
 
-        const [, payload, level] = emptyCalls[0] as [
-          string,
-          { surface: string; resource: string; reason: string },
-          "info" | "warn" | "error",
-        ];
+      const [, payload, level] = emptyCalls[0] as [
+        string,
+        { surface: string; resource: string; reason: string },
+        "info" | "warn" | "error",
+      ];
 
-        expect(payload.surface).toBe("admin_list");
-        expect(payload.resource).toBe(expectedResource);
-        expect(payload.resource).toMatch(SNAKE_CASE);
-        expect(ALLOWED_REASONS).toContain(payload.reason as AllowedReason);
+      expect(payload.surface).toBe("admin_list");
+      expect(payload.resource).toBe(expectedResource);
+      expect(payload.resource).toMatch(SNAKE_CASE);
+      expect(ALLOWED_REASONS).toContain(payload.reason as AllowedReason);
 
-        // Level must correlate with reason per docs/admin-list-states.md.
-        if (payload.reason === "seed_missing") {
-          expect(level).toBe("warn");
-        } else {
-          expect(level).toBe("info");
-        }
+      // Level must correlate with reason per docs/admin-list-states.md.
+      if (payload.reason === "seed_missing") {
+        expect(level).toBe("warn");
+      } else {
+        expect(level).toBe("info");
+      }
 
-        // Empty-state render must never fire an error report.
-        expect(reportClientError).not.toHaveBeenCalled();
-      });
-    },
-  );
+      // Empty-state render must never fire an error report.
+      expect(reportClientError).not.toHaveBeenCalled();
+    });
+  });
 });

@@ -30,8 +30,12 @@ function makeBuilder(table: string) {
       selectCalls.push(`${table}:${cols}`);
       return chain;
     },
-    order() { return chain; },
-    eq() { return chain; },
+    order() {
+      return chain;
+    },
+    eq() {
+      return chain;
+    },
     limit() {
       return Promise.resolve({ data: mockRows, error: null });
     },
@@ -78,7 +82,6 @@ beforeEach(() => {
   vi.resetModules();
 });
 afterEach(() => cleanup());
-
 
 describe("admin.opportunities — customer embed integration", () => {
   it("selects customer:customers(name) and renders customer.name in the table", async () => {

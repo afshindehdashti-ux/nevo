@@ -125,9 +125,13 @@ function TasksPage() {
               <div className="grid grid-cols-2 gap-2">
                 <Select
                   value={form.priority}
-                  onValueChange={(v) => setForm((f) => ({ ...f, priority: v as typeof form.priority }))}
+                  onValueChange={(v) =>
+                    setForm((f) => ({ ...f, priority: v as typeof form.priority }))
+                  }
                 >
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="low">Low</SelectItem>
                     <SelectItem value="normal">Normal</SelectItem>
@@ -172,10 +176,7 @@ function TasksPage() {
                     <Badge
                       variant={
                         (priorityColor[t.priority] ?? "outline") as
-                          | "default"
-                          | "secondary"
-                          | "destructive"
-                          | "outline"
+                          "default" | "secondary" | "destructive" | "outline"
                       }
                     >
                       {t.priority}
@@ -201,9 +202,7 @@ function TasksPage() {
                 </Card>
               ))}
               {grouped[status].length === 0 && (
-                <div className="text-xs text-muted-foreground italic px-2 py-4">
-                  No tasks.
-                </div>
+                <div className="text-xs text-muted-foreground italic px-2 py-4">No tasks.</div>
               )}
             </div>
           </div>

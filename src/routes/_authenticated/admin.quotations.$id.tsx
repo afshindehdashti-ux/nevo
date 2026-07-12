@@ -39,13 +39,31 @@ import {
 } from "@/components/ui/table";
 import { CommunicationTimeline } from "@/components/crm/CommunicationTimeline";
 import { ApprovalPanel } from "@/components/crm/ApprovalPanel";
-import { Trash2, Plus, Send, Check, X, FileDown, ArrowRightCircle, Mail, Copy, Lock } from "lucide-react";
+import {
+  Trash2,
+  Plus,
+  Send,
+  Check,
+  X,
+  FileDown,
+  ArrowRightCircle,
+  Mail,
+  Copy,
+  Lock,
+} from "lucide-react";
 import { toast } from "sonner";
 import { QuotationEmailDialog } from "@/components/crm/QuotationEmailDialog";
-import { buildQuotationPdf, downloadQuotationPdf, loadSellerSettings, validateQuotationForPdf } from "@/lib/quotation-pdf";
+import {
+  buildQuotationPdf,
+  downloadQuotationPdf,
+  loadSellerSettings,
+  validateQuotationForPdf,
+} from "@/lib/quotation-pdf";
 
 export const Route = createFileRoute("/_authenticated/admin/quotations/$id")({
-  head: () => ({ meta: [{ title: "Quotation — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Quotation — NEVO CRM" }, { name: "robots", content: "noindex" }],
+  }),
   component: QuotationEditor,
 });
 
@@ -69,11 +87,19 @@ function QuotationEditor() {
     queryFn: () => getFn({ data: { id } }),
   });
 
-  const [customers, setCustomers] = useState<Array<{ id: string; name: string; company_name: string | null }>>([]);
+  const [customers, setCustomers] = useState<
+    Array<{ id: string; name: string; company_name: string | null }>
+  >([]);
   useEffect(() => {
-    supabase.from("customers").select("id,name,company_name").order("name").then(({ data }) => {
-      setCustomers((data as Array<{ id: string; name: string; company_name: string | null }>) ?? []);
-    });
+    supabase
+      .from("customers")
+      .select("id,name,company_name")
+      .order("name")
+      .then(({ data }) => {
+        setCustomers(
+          (data as Array<{ id: string; name: string; company_name: string | null }>) ?? [],
+        );
+      });
   }, []);
 
   const { data: inquiries = [] } = useQuery({
@@ -187,16 +213,18 @@ function QuotationEditor() {
   });
 
   const changeStatus = useMutation({
-    mutationFn: (status:
-      | "draft"
-      | "pending_approval"
-      | "approved"
-      | "sent"
-      | "accepted"
-      | "rejected"
-      | "expired"
-      | "converted"
-      | "void") => statusFn({ data: { id, status } }),
+    mutationFn: (
+      status:
+        | "draft"
+        | "pending_approval"
+        | "approved"
+        | "sent"
+        | "accepted"
+        | "rejected"
+        | "expired"
+        | "converted"
+        | "void",
+    ) => statusFn({ data: { id, status } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["quotation", id] });
       qc.invalidateQueries({ queryKey: ["quotations"] });
@@ -218,7 +246,9 @@ function QuotationEditor() {
     onSuccess: (r) => {
       qc.invalidateQueries({ queryKey: ["quotation", id] });
       qc.invalidateQueries({ queryKey: ["quotations"] });
-      toast.success(r.already ? "Already converted — opening proforma" : "Proforma invoice created");
+      toast.success(
+        r.already ? "Already converted — opening proforma" : "Proforma invoice created",
+      );
       if (r.invoice_id) navigate({ to: "/admin/invoices/$id", params: { id: r.invoice_id } });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -250,9 +280,7 @@ function QuotationEditor() {
       return;
     }
     try {
-      const { assertDocumentReadyForPdf } = await import(
-        "@/lib/document-pdf-validation.functions"
-      );
+      const { assertDocumentReadyForPdf } = await import("@/lib/document-pdf-validation.functions");
       await assertDocumentReadyForPdf({ data: { kind: "quotation", id: q.id } });
     } catch (err: any) {
       toast.error(err?.message ?? "Cannot generate PDF");
@@ -273,9 +301,7 @@ function QuotationEditor() {
           >
             ← All quotations
           </button>
-          <h1 className="text-2xl font-semibold mt-1">
-            {q.quotation_number ?? "New quotation"}
-          </h1>
+          <h1 className="text-2xl font-semibold mt-1">{q.quotation_number ?? "New quotation"}</h1>
           <div className="text-sm text-muted-foreground">
             <Badge variant="outline" className="mr-2">
               {q.status}
@@ -288,10 +314,7 @@ function QuotationEditor() {
             {save.isPending ? "Saving…" : "Save"}
           </Button>
           {q.status === "draft" && (
-            <Button
-              variant="secondary"
-              onClick={() => changeStatus.mutate("pending_approval")}
-            >
+            <Button variant="secondary" onClick={() => changeStatus.mutate("pending_approval")}>
               Request approval
             </Button>
           )}
@@ -320,7 +343,11 @@ function QuotationEditor() {
             </>
           )}
           {(q.status === "accepted" || q.status === "approved") && !q.converted_invoice_id && (
-            <Button variant="secondary" onClick={() => convert.mutate()} disabled={convert.isPending}>
+            <Button
+              variant="secondary"
+              onClick={() => convert.mutate()}
+              disabled={convert.isPending}
+            >
               <ArrowRightCircle className="h-4 w-4 mr-1" />
               {convert.isPending ? "Converting…" : "Convert to proforma"}
             </Button>
@@ -365,275 +392,301 @@ function QuotationEditor() {
         <div className="flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-900 dark:text-amber-200">
           <Lock className="h-4 w-4 mt-0.5 shrink-0" />
           <span>
-            This quotation is <b>{q.status}</b> and locked. Create a revision or return it to
-            draft to edit the header, line items, or terms.
+            This quotation is <b>{q.status}</b> and locked. Create a revision or return it to draft
+            to edit the header, line items, or terms.
           </span>
         </div>
       )}
 
       <fieldset disabled={!isDraft} className="contents">
-      <div className="grid md:grid-cols-3 gap-4">
-        <Card className="p-4 md:col-span-2 space-y-3">
-          <h3 className="text-sm font-semibold">Header</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Customer</Label>
-              <Select
-                value={form.customer_id}
-                onValueChange={(v) => setForm((f) => ({ ...f, customer_id: v }))}
-              >
-                <SelectTrigger><SelectValue placeholder="Select customer" /></SelectTrigger>
-                <SelectContent>
-                  {customers.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.company_name || c.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        <div className="grid md:grid-cols-3 gap-4">
+          <Card className="p-4 md:col-span-2 space-y-3">
+            <h3 className="text-sm font-semibold">Header</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Customer</Label>
+                <Select
+                  value={form.customer_id}
+                  onValueChange={(v) => setForm((f) => ({ ...f, customer_id: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select customer" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {customers.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.company_name || c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Currency</Label>
+                <Input
+                  value={form.currency}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, currency: e.target.value.toUpperCase() }))
+                  }
+                />
+              </div>
+              <div>
+                <Label>Issue date</Label>
+                <Input
+                  type="date"
+                  value={form.issue_date}
+                  onChange={(e) => setForm((f) => ({ ...f, issue_date: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label>Valid until</Label>
+                <Input
+                  type="date"
+                  value={form.valid_until}
+                  onChange={(e) => setForm((f) => ({ ...f, valid_until: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label>VAT %</Label>
+                <Input
+                  type="number"
+                  value={form.vat_rate}
+                  onChange={(e) => setForm((f) => ({ ...f, vat_rate: Number(e.target.value) }))}
+                />
+              </div>
+              <div>
+                <Label>Lead / inquiry</Label>
+                <Select
+                  value={form.inquiry_id || "__none"}
+                  onValueChange={(v) =>
+                    setForm((f) => ({ ...f, inquiry_id: v === "__none" ? "" : v }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="No lead" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none">— None —</SelectItem>
+                    {inquiries.map((i) => (
+                      <SelectItem key={i.id} value={i.id}>
+                        {i.name}
+                        {i.company ? ` · ${i.company}` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Project</Label>
+                <Select
+                  value={form.project_id || "__none"}
+                  onValueChange={(v) =>
+                    setForm((f) => ({ ...f, project_id: v === "__none" ? "" : v }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="No project" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none">— None —</SelectItem>
+                    {projects.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.project_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div>
-              <Label>Currency</Label>
-              <Input
-                value={form.currency}
-                onChange={(e) => setForm((f) => ({ ...f, currency: e.target.value.toUpperCase() }))}
+              <Label>Terms &amp; conditions</Label>
+              <Textarea
+                rows={3}
+                value={form.terms}
+                onChange={(e) => setForm((f) => ({ ...f, terms: e.target.value }))}
               />
             </div>
             <div>
-              <Label>Issue date</Label>
-              <Input
-                type="date"
-                value={form.issue_date}
-                onChange={(e) => setForm((f) => ({ ...f, issue_date: e.target.value }))}
+              <Label>Notes for customer</Label>
+              <Textarea
+                rows={2}
+                value={form.notes}
+                onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
               />
             </div>
             <div>
-              <Label>Valid until</Label>
-              <Input
-                type="date"
-                value={form.valid_until}
-                onChange={(e) => setForm((f) => ({ ...f, valid_until: e.target.value }))}
+              <Label>Internal notes</Label>
+              <Textarea
+                rows={2}
+                value={form.internal_notes}
+                onChange={(e) => setForm((f) => ({ ...f, internal_notes: e.target.value }))}
               />
             </div>
-            <div>
-              <Label>VAT %</Label>
-              <Input
-                type="number"
-                value={form.vat_rate}
-                onChange={(e) => setForm((f) => ({ ...f, vat_rate: Number(e.target.value) }))}
-              />
-            </div>
-            <div>
-              <Label>Lead / inquiry</Label>
-              <Select
-                value={form.inquiry_id || "__none"}
-                onValueChange={(v) =>
-                  setForm((f) => ({ ...f, inquiry_id: v === "__none" ? "" : v }))
-                }
-              >
-                <SelectTrigger><SelectValue placeholder="No lead" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none">— None —</SelectItem>
-                  {inquiries.map((i) => (
-                    <SelectItem key={i.id} value={i.id}>
-                      {i.name}{i.company ? ` · ${i.company}` : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Project</Label>
-              <Select
-                value={form.project_id || "__none"}
-                onValueChange={(v) =>
-                  setForm((f) => ({ ...f, project_id: v === "__none" ? "" : v }))
-                }
-              >
-                <SelectTrigger><SelectValue placeholder="No project" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none">— None —</SelectItem>
-                  {projects.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.project_name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div>
-            <Label>Terms &amp; conditions</Label>
-            <Textarea
-              rows={3}
-              value={form.terms}
-              onChange={(e) => setForm((f) => ({ ...f, terms: e.target.value }))}
-            />
-          </div>
-          <div>
-            <Label>Notes for customer</Label>
-            <Textarea
-              rows={2}
-              value={form.notes}
-              onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-            />
-          </div>
-          <div>
-            <Label>Internal notes</Label>
-            <Textarea
-              rows={2}
-              value={form.internal_notes}
-              onChange={(e) => setForm((f) => ({ ...f, internal_notes: e.target.value }))}
-            />
-          </div>
-        </Card>
+          </Card>
 
-        <Card className="p-4 space-y-2">
-          <h3 className="text-sm font-semibold">Totals</h3>
-          <div className="text-xs text-muted-foreground space-y-1">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span>{q.currency} {Number(q.subtotal).toLocaleString()}</span>
+          <Card className="p-4 space-y-2">
+            <h3 className="text-sm font-semibold">Totals</h3>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>
+                  {q.currency} {Number(q.subtotal).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>VAT ({Number(q.vat_rate)}%)</span>
+                <span>
+                  {q.currency} {Number(q.vat_amount).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between text-foreground font-semibold text-sm border-t border-border pt-2 mt-2">
+                <span>Total</span>
+                <span>
+                  {q.currency} {financeTotalAmount(q).toLocaleString()}
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span>VAT ({Number(q.vat_rate)}%)</span>
-              <span>{q.currency} {Number(q.vat_amount).toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between text-foreground font-semibold text-sm border-t border-border pt-2 mt-2">
-              <span>Total</span>
-              <span>{q.currency} {financeTotalAmount(q).toLocaleString()}</span>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      <Card>
-        <div className="p-4 flex items-center justify-between">
-          <h3 className="text-sm font-semibold">Line items</h3>
-          <Button size="sm" onClick={() => addItem.mutate()}>
-            <Plus className="h-4 w-4 mr-1" />
-            Add line
-          </Button>
+          </Card>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-24">Item code</TableHead>
-              <TableHead className="w-24">HS code</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead className="w-24">Qty</TableHead>
-              <TableHead className="w-20">Unit</TableHead>
-              <TableHead className="w-32">Unit price</TableHead>
-              <TableHead className="w-24">Discount %</TableHead>
-              <TableHead className="w-32 text-right">Total</TableHead>
-              <TableHead className="w-20" />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.items.map((it: any) => {
-              const liveTotal =
-                Number(it.quantity ?? 0) *
-                Number(it.unit_price ?? 0) *
-                (1 - (Number(it.discount_pct ?? 0)) / 100);
-              const base = {
-                id: it.id,
-                description: it.description,
-                quantity: Number(it.quantity),
-                unit_price: Number(it.unit_price),
-                discount_pct: Number(it.discount_pct),
-                position: it.position,
-                unit: it.unit ?? null,
-                item_code: it.item_code ?? null,
-                hs_code: it.hs_code ?? null,
-              };
-              return (
-                <TableRow key={it.id}>
-                  <TableCell>
-                    <Input
-                      defaultValue={it.item_code ?? ""}
-                      onBlur={(e) => updateItem.mutate({ ...base, item_code: e.target.value || null })}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      defaultValue={it.hs_code ?? ""}
-                      onBlur={(e) => updateItem.mutate({ ...base, hs_code: e.target.value || null })}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      defaultValue={it.description}
-                      onBlur={(e) => updateItem.mutate({ ...base, description: e.target.value })}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      defaultValue={Number(it.quantity)}
-                      onBlur={(e) => updateItem.mutate({ ...base, quantity: Number(e.target.value) })}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      defaultValue={it.unit ?? ""}
-                      onBlur={(e) => updateItem.mutate({ ...base, unit: e.target.value || null })}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      defaultValue={Number(it.unit_price)}
-                      onBlur={(e) => updateItem.mutate({ ...base, unit_price: Number(e.target.value) })}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      defaultValue={Number(it.discount_pct)}
-                      onBlur={(e) => updateItem.mutate({ ...base, discount_pct: Number(e.target.value) })}
-                    />
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {q.currency}{" "}
-                    {liveTotal.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => dupItem.mutate(it.id)}
-                        className="text-muted-foreground hover:text-foreground"
-                        title="Duplicate row"
-                      >
-                        <Copy className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => delItem.mutate(it.id)}
-                        className="text-muted-foreground hover:text-destructive"
-                        title="Delete row"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
+
+        <Card>
+          <div className="p-4 flex items-center justify-between">
+            <h3 className="text-sm font-semibold">Line items</h3>
+            <Button size="sm" onClick={() => addItem.mutate()}>
+              <Plus className="h-4 w-4 mr-1" />
+              Add line
+            </Button>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-24">Item code</TableHead>
+                <TableHead className="w-24">HS code</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead className="w-24">Qty</TableHead>
+                <TableHead className="w-20">Unit</TableHead>
+                <TableHead className="w-32">Unit price</TableHead>
+                <TableHead className="w-24">Discount %</TableHead>
+                <TableHead className="w-32 text-right">Total</TableHead>
+                <TableHead className="w-20" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data.items.map((it: any) => {
+                const liveTotal =
+                  Number(it.quantity ?? 0) *
+                  Number(it.unit_price ?? 0) *
+                  (1 - Number(it.discount_pct ?? 0) / 100);
+                const base = {
+                  id: it.id,
+                  description: it.description,
+                  quantity: Number(it.quantity),
+                  unit_price: Number(it.unit_price),
+                  discount_pct: Number(it.discount_pct),
+                  position: it.position,
+                  unit: it.unit ?? null,
+                  item_code: it.item_code ?? null,
+                  hs_code: it.hs_code ?? null,
+                };
+                return (
+                  <TableRow key={it.id}>
+                    <TableCell>
+                      <Input
+                        defaultValue={it.item_code ?? ""}
+                        onBlur={(e) =>
+                          updateItem.mutate({ ...base, item_code: e.target.value || null })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        defaultValue={it.hs_code ?? ""}
+                        onBlur={(e) =>
+                          updateItem.mutate({ ...base, hs_code: e.target.value || null })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        defaultValue={it.description}
+                        onBlur={(e) => updateItem.mutate({ ...base, description: e.target.value })}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        defaultValue={Number(it.quantity)}
+                        onBlur={(e) =>
+                          updateItem.mutate({ ...base, quantity: Number(e.target.value) })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        defaultValue={it.unit ?? ""}
+                        onBlur={(e) => updateItem.mutate({ ...base, unit: e.target.value || null })}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        defaultValue={Number(it.unit_price)}
+                        onBlur={(e) =>
+                          updateItem.mutate({ ...base, unit_price: Number(e.target.value) })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        defaultValue={Number(it.discount_pct)}
+                        onBlur={(e) =>
+                          updateItem.mutate({ ...base, discount_pct: Number(e.target.value) })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {q.currency}{" "}
+                      {liveTotal.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => dupItem.mutate(it.id)}
+                          className="text-muted-foreground hover:text-foreground"
+                          title="Duplicate row"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => delItem.mutate(it.id)}
+                          className="text-muted-foreground hover:text-destructive"
+                          title="Delete row"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+              {data.items.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center text-muted-foreground py-6 text-sm">
+                    No line items yet.
                   </TableCell>
                 </TableRow>
-              );
-            })}
-            {data.items.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center text-muted-foreground py-6 text-sm">
-                  No line items yet.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </Card>
+              )}
+            </TableBody>
+          </Table>
+        </Card>
       </fieldset>
 
       {(() => {
-        const maxDisc = data.items.reduce(
-          (m, it) => Math.max(m, Number(it.discount_pct) || 0),
-          0,
-        );
+        const maxDisc = data.items.reduce((m, it) => Math.max(m, Number(it.discount_pct) || 0), 0);
         return (
           <ApprovalPanel
             entityType="quotation_discount"

@@ -68,7 +68,11 @@ export const upsertTask = createServerFn({ method: "POST" })
         action: "update",
         entity_type: "task",
         entity_id: data.id,
-        metadata: { status: data.status, priority: data.priority, assigned_to: data.assigned_to ?? null },
+        metadata: {
+          status: data.status,
+          priority: data.priority,
+          assigned_to: data.assigned_to ?? null,
+        },
         old_values: prev ?? null,
         new_values: patch,
       });
@@ -102,9 +106,7 @@ export const upsertTask = createServerFn({ method: "POST" })
 
 export const setTaskStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
-    z.object({ id: z.string().uuid(), status: StatusEnum }).parse(v),
-  )
+  .inputValidator((v) => z.object({ id: z.string().uuid(), status: StatusEnum }).parse(v))
   .handler(async ({ context, data }) => {
     const { data: prev } = await context.supabase
       .from("tasks")
@@ -139,10 +141,7 @@ export const approveTask = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .maybeSingle();
     const patch = { approved_by: context.userId, approved_at: new Date().toISOString() };
-    const { error } = await context.supabase
-      .from("tasks")
-      .update(patch)
-      .eq("id", data.id);
+    const { error } = await context.supabase.from("tasks").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
     await writeAudit(context.supabase, {
       user_id: context.userId,
