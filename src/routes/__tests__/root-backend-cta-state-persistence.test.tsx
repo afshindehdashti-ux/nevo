@@ -156,7 +156,10 @@ describe("Public marketing chrome — state does not persist across the backend 
     // Navigate to /admin. The drawer, launcher, and body-overflow lock
     // must all be gone.
     await act(async () => {
-      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/admin/$", params: { _splat: "dashboard" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/admin/$",
+        params: { _splat: "dashboard" },
+      });
     });
     await waitFor(() => {
       expect(screen.queryByTestId("ask-ai-launcher")).toBeNull();
@@ -194,7 +197,10 @@ describe("Public marketing chrome — state does not persist across the backend 
 
       // Enter backend — CTA must be fully gone.
       await act(async () => {
-        await (router.navigate as (options: unknown) => Promise<void>)({ to: target, params: { _splat: splat } });
+        await (router.navigate as (options: unknown) => Promise<void>)({
+          to: target,
+          params: { _splat: splat },
+        });
       });
       await waitFor(() => {
         expect(screen.queryByTestId("sticky-cta")).toBeNull();
@@ -229,7 +235,10 @@ describe("Public marketing chrome — state does not persist across the backend 
 
     // /crm — both gone, body-overflow reset.
     await act(async () => {
-      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/crm/$", params: { _splat: "leads" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/crm/$",
+        params: { _splat: "leads" },
+      });
     });
     await waitFor(() => {
       expect(screen.queryByTestId("ask-ai-drawer")).toBeNull();
@@ -251,7 +260,10 @@ describe("Public marketing chrome — state does not persist across the backend 
 
     // /backoffice — gone again; body remains unlocked.
     await act(async () => {
-      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/backoffice/$", params: { _splat: "tools" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/backoffice/$",
+        params: { _splat: "tools" },
+      });
     });
     await waitFor(() => {
       expect(screen.queryByTestId("ask-ai-launcher")).toBeNull();

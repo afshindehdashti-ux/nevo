@@ -106,19 +106,28 @@ describe("RootComponent backend CTA gate", () => {
 
     // Public → /admin: gate must re-evaluate and hide CTAs.
     await act(async () => {
-      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/admin/$", params: { _splat: "dashboard" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/admin/$",
+        params: { _splat: "dashboard" },
+      });
     });
     await expectCtas(false);
 
     // /admin → /crm: still a backend route.
     await act(async () => {
-      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/crm/$", params: { _splat: "leads" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/crm/$",
+        params: { _splat: "leads" },
+      });
     });
     await expectCtas(false);
 
     // /crm → /backoffice: still backend.
     await act(async () => {
-      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/backoffice/$", params: { _splat: "tools" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/backoffice/$",
+        params: { _splat: "tools" },
+      });
     });
     await expectCtas(false);
 
@@ -392,7 +401,10 @@ describe("RootComponent backend CTA gate", () => {
     const go = async (to: string, splat?: string) => {
       await act(async () => {
         if (splat !== undefined) {
-          await (router.navigate as (options: unknown) => Promise<void>)({ to: to as "/admin/$", params: { _splat: splat } });
+          await (router.navigate as (options: unknown) => Promise<void>)({
+            to: to as "/admin/$",
+            params: { _splat: splat },
+          });
         } else {
           await (router.navigate as (options: unknown) => Promise<void>)({ to });
         }

@@ -210,22 +210,34 @@ describe("useRouteArea / useIsBackend", () => {
     await expectArea("public");
 
     await act(async () => {
-      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/admin/$", params: { _splat: "dashboard" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/admin/$",
+        params: { _splat: "dashboard" },
+      });
     });
     await expectArea("backend");
 
     await act(async () => {
-      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/crm/$", params: { _splat: "leads/1" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/crm/$",
+        params: { _splat: "leads/1" },
+      });
     });
     await expectArea("backend");
 
     await act(async () => {
-      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/backoffice/$", params: { _splat: "tools" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/backoffice/$",
+        params: { _splat: "tools" },
+      });
     });
     await expectArea("backend");
 
     await act(async () => {
-      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/auth/$", params: { _splat: "sign-in" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/auth/$",
+        params: { _splat: "sign-in" },
+      });
     });
     await expectArea("auth");
 

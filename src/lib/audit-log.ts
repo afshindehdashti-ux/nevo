@@ -28,7 +28,6 @@ async function resolveRequestIp(explicit?: string | null): Promise<string | null
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function writeAudit(
   supabase: any,
   entry: {

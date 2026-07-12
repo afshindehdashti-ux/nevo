@@ -70,7 +70,9 @@ function PartnerPortalPage() {
               </p>
               <div className="mt-4">
                 <Button asChild variant="outline">
-                  <Link to="/$lang/contact" params={{ lang: "en" }}>Contact NEVO</Link>
+                  <Link to="/$lang/contact" params={{ lang: "en" }}>
+                    Contact NEVO
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -131,7 +133,9 @@ function PartnerContent({ partnerId, partnerName }: { partnerId: string; partner
             <h1 className="text-lg font-semibold">{partnerName}</h1>
           </div>
           <Button asChild variant="outline" size="sm">
-            <Link to="/$lang" params={{ lang: "en" }}>Back to nevoindustrial.com</Link>
+            <Link to="/$lang" params={{ lang: "en" }}>
+              Back to nevoindustrial.com
+            </Link>
           </Button>
         </div>
       </header>

@@ -314,8 +314,8 @@ export const getImapMessage = createServerFn({ method: "POST" })
         try {
           await client.messageFlagsAdd({ uid: data.uid }, ["\\Seen"], { uid: true });
         } catch {
-        // Best-effort IMAP logout cleanup.
-      }
+          // Best-effort IMAP logout cleanup.
+        }
 
         return {
           uid: msg.uid,

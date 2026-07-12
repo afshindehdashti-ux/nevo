@@ -32,10 +32,7 @@ export function chunkText(
   size = AI_CHUNK_SIZE,
   overlap = AI_CHUNK_OVERLAP,
 ): string[] {
-  const cleaned = text
-    .replace(/\r\n/g, "\n")
-    .replaceAll(String.fromCharCode(0), " ")
-    .trim();
+  const cleaned = text.replace(/\r\n/g, "\n").replaceAll(String.fromCharCode(0), " ").trim();
   if (!cleaned) return [];
   if (cleaned.length <= size) return [cleaned];
 
