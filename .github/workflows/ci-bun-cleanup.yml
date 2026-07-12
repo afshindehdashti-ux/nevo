@@ -1,0 +1,49 @@
+name: One-time Bun CI cleanup
+
+on:
+  push:
+    branches:
+      - codex/backend-connection-hardening
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Align lockfiles and formatting
+        shell: bash
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare pnpm@10 --activate
+          pnpm install --no-frozen-lockfile
+          bun install
+          bunx prettier --write .
+          bunx eslint . --fix
+          rm .github/workflows/ci-bun-cleanup.yml
+
+      - name: Commit cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git diff --cached --quiet && exit 0
+          git commit -m "ci: align formatter and lockfiles"
+          git push origin "HEAD:${{ github.ref_name }}"
