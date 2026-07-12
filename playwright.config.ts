@@ -28,7 +28,7 @@ export default defineConfig({
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
-        command: "bun run build && bun run preview -- --port 4173 --host 127.0.0.1 --strictPort",
+        command: "pnpm build && pnpm preview -- --port 4173 --host 127.0.0.1 --strictPort",
         url: "http://127.0.0.1:4173",
         reuseExistingServer: !process.env.CI,
         timeout: 180_000,
