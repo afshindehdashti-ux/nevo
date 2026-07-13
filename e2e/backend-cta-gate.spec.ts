@@ -46,6 +46,11 @@ async function assertNoCtas(page: Page, when: string) {
   }
 }
 
+async function waitForHydration(page: Page) {
+  await page.waitForLoadState("load");
+  await page.waitForTimeout(500);
+}
+
 test.describe("Backend routes: CTAs never appear on hard refresh", () => {
   for (const path of BACKEND_PATHS) {
     test(`hard-refresh on ${path} shows no public CTAs`, async ({ page }) => {
@@ -60,7 +65,7 @@ test.describe("Backend routes: CTAs never appear on hard refresh", () => {
       await assertNoCtas(page, `on initial paint of ${path}`);
 
       // 2) After the network settles and React hydrates.
-      await page.waitForLoadState("networkidle");
+      await waitForHydration(page);
       await assertNoCtas(page, `after hydration of ${path}`);
 
       // 3) A short additional wait to catch any late-mounting portal that
@@ -81,7 +86,7 @@ test.describe("Backend routes: CTAs are not reachable via keyboard focus", () =>
   for (const path of BACKEND_PATHS) {
     test(`tab traversal on ${path} never lands on a public CTA`, async ({ page }) => {
       await page.goto(path, { waitUntil: "domcontentloaded" });
-      await page.waitForLoadState("networkidle");
+      await waitForHydration(page);
 
       // Belt-and-braces: assert not-in-DOM before checking focus.
       await assertNoCtas(page, `before tab traversal on ${path}`);
