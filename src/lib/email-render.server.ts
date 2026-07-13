@@ -5,7 +5,8 @@ type RenderOptions = {
   plainText?: boolean;
 };
 
-const BREAK_TAGS = /<\/?(?:address|article|blockquote|br|div|footer|h[1-6]|header|hr|li|main|ol|p|section|table|td|th|tr|ul)\b[^>]*>/gi;
+const BREAK_TAGS =
+  /<\/?(?:address|article|blockquote|br|div|footer|h[1-6]|header|hr|li|main|ol|p|section|table|td|th|tr|ul)\b[^>]*>/gi;
 const NAMED_ENTITIES: Record<string, string> = {
   "&amp;": "&",
   "&apos;": "'",
@@ -17,8 +18,12 @@ const NAMED_ENTITIES: Record<string, string> = {
 
 function decodeEntities(value: string) {
   return value
-    .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
-    .replace(/&#(\d+);/g, (_, decimal: string) => String.fromCodePoint(Number.parseInt(decimal, 10)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) =>
+      String.fromCodePoint(Number.parseInt(hex, 16)),
+    )
+    .replace(/&#(\d+);/g, (_, decimal: string) =>
+      String.fromCodePoint(Number.parseInt(decimal, 10)),
+    )
     .replace(/&(amp|apos|gt|lt|nbsp|quot);/g, (entity) => NAMED_ENTITIES[entity] ?? entity);
 }
 
