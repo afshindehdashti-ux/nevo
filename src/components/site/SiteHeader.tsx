@@ -432,7 +432,7 @@ export function SiteHeader() {
         <header>
           <div className="container-wide flex h-[72px] items-center justify-between gap-6 px-5 sm:px-6 md:h-20 md:px-6 lg:h-[88px] lg:px-8">
             <Link
-              to="/"
+              to="/$lang/"
               className="relative flex items-center py-2"
               aria-label="NEVO Industrial home"
             >
