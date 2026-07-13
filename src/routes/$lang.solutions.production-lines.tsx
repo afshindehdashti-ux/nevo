@@ -3,7 +3,7 @@ import { Link } from "@/components/site/LocalizedLink";
 import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
 import { useRef, useState } from "react";
 import { motion } from "motion/react";
-import { submitLeadForm } from "@/lib/lead-submit";
+import { deliverPublicLead, submitLeadForm } from "@/lib/lead-submit";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -1101,6 +1101,7 @@ function ProjectInquiry() {
       ],
       successTitle: "Proposal request received",
       successDescription: "Our production-line team will follow up within one business day.",
+      deliver: (payload) => deliverPublicLead(payload, "production-lines-inquiry"),
     });
     setBusy(false);
     if (ok) formRef.current?.reset();
