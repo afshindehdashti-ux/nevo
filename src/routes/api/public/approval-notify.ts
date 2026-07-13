@@ -1,4 +1,5 @@
 import { withMethodGuards } from "@/lib/api-http";
+import { timingSafeEqualText } from "@/lib/api-security";
 import * as React from "react";
 import { render } from "@react-email/render";
 import { createClient } from "@supabase/supabase-js";
@@ -208,7 +209,7 @@ export const Route = createFileRoute("/api/public/approval-notify")({
         // Bearer must equal the service-role key (same secret used by the DB trigger via vault)
         const auth = request.headers.get("Authorization") ?? "";
         const provided = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
-        if (!provided || provided !== serviceKey) {
+        if (!provided || !timingSafeEqualText(provided, serviceKey)) {
           return Response.json({ error: "unauthorized" }, { status: 401 });
         }
 
