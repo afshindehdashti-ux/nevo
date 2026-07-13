@@ -168,13 +168,21 @@ async function startDevServer() {
     ["node_modules/vite/bin/vite.js", "dev", "--port", String(PORT), "--host", "127.0.0.1"],
     { stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, NODE_ENV: "development" } },
   );
-  proc.stdout.on("data", () => {});
-  proc.stderr.on("data", () => {});
+  const output = [];
+  const captureOutput = (chunk) => {
+    output.push(String(chunk));
+    if (output.length > 40) output.shift();
+  };
+  proc.stdout.on("data", captureOutput);
+  proc.stderr.on("data", captureOutput);
   const baseUrl = `http://127.0.0.1:${PORT}`;
   const ok = await waitForServer(baseUrl);
   if (!ok) {
     proc.kill("SIGTERM");
-    throw new Error(`Dev server on ${baseUrl} did not become ready`);
+    const diagnostic = output.join("").trim().slice(-4_000);
+    throw new Error(
+      `Dev server on ${baseUrl} did not become ready${diagnostic ? `\nVite output:\n${diagnostic}` : ""}`,
+    );
   }
   return { baseUrl, proc };
 }
