@@ -67,6 +67,13 @@ function flatten(obj, prefix = "", out = new Set()) {
   return out;
 }
 
+// `i18next` permits `t("section.items", { returnObjects: true })` for an
+// object or array. `flatten()` deliberately stores leaves for drift checks, so
+// parent keys need a prefix lookup when we validate those calls.
+function hasTranslationKey(keys, key) {
+  return keys.has(key) || [...keys].some((candidate) => candidate.startsWith(`${key}.`));
+}
+
 // Find duplicate keys inside a raw JSON string (JSON.parse silently keeps last).
 function findDuplicateKeys(raw) {
   const dupes = [];
@@ -177,7 +184,7 @@ let hasErrors = false;
 for (const [code, keys] of Object.entries(locales)) {
   // Missing = used in code but absent from this locale
   const missing = [];
-  for (const k of staticKeys) if (!keys.has(k)) missing.push(k);
+  for (const k of staticKeys) if (!hasTranslationKey(keys, k)) missing.push(k);
 
   // Extra = defined in this locale but never referenced (and not covered by dynamic prefix)
   const extra = [];
