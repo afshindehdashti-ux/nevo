@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render } from "@react-email/render";
+import { render } from "@/lib/email-render.server";
 import { createFileRoute } from "@tanstack/react-router";
 import { SignupEmail } from "@/lib/email-templates/signup";
 import { InviteEmail } from "@/lib/email-templates/invite";
