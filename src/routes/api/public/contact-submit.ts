@@ -28,7 +28,6 @@ export const Route = createFileRoute("/api/public/contact-submit")({
         if (blocked) return blocked;
         const limited = assertRateLimit(request, "contact-submit", { limit: 8, windowMs: 60_000 });
         if (limited) return limited;
-
         let body: unknown;
         try {
           body = await request.json();
@@ -44,30 +43,31 @@ export const Route = createFileRoute("/api/public/contact-submit")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+        // Persist in the CRM's canonical web-inquiry table. The admin Leads
+        // screens intentionally read project_inquiries, not the legacy leads
+        // table, so using that table keeps every public request actionable.
         let leadId: string | null = null;
-        const noteParts: string[] = [];
-        if (data.message) noteParts.push(data.message);
-        if (data.source) noteParts.push(`[source: ${data.source}]`);
         const { data: inserted, error: insertErr } = await supabaseAdmin
-          .from("leads")
+          .from("project_inquiries")
           .insert({
             name: data.name,
             email: data.email,
             phone: data.phone ?? null,
             company: data.company ?? null,
             country: data.country ?? null,
-            notes: noteParts.join("\n\n") || null,
-            source: "web",
+            message: data.message ?? null,
+            source_page: data.source ?? "website-contact",
             status: "new",
-          } as never)
+          })
           .select("id")
           .single();
         if (insertErr) {
           console.error("contact-submit: lead insert failed", insertErr);
-        } else {
-          leadId = (inserted as { id: string } | null)?.id ?? null;
+          return jsonError(503, "inquiry_store_failed", undefined, headers);
         }
+        leadId = (inserted as { id: string } | null)?.id ?? null;
 
+        // Send the confirmation email (fire-and-forget for the customer response)
         try {
           const { enqueueTransactionalEmail } = await import("@/lib/email-enqueue.server");
           const referenceId = leadId ? `INQ-${leadId.slice(0, 8).toUpperCase()}` : undefined;
