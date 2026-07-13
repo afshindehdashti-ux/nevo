@@ -68,7 +68,8 @@ export const Route = createFileRoute("/api/chat")({
           return jsonError(400, "invalid_json", undefined, headers);
         }
 
-        if (!Array.isArray(body.messages)) return jsonError(400, "messages_required", undefined, headers);
+        if (!Array.isArray(body.messages))
+          return jsonError(400, "messages_required", undefined, headers);
         const messages = body.messages as UIMessage[];
         if (messages.length === 0 || messages.length > MAX_MESSAGES)
           return jsonError(413, "too_many_messages", undefined, headers);
@@ -83,7 +84,8 @@ export const Route = createFileRoute("/api/chat")({
             }
           }
         }
-        if (totalChars(messages) > MAX_TOTAL_CHARS) return jsonError(413, "conversation_too_long", undefined, headers);
+        if (totalChars(messages) > MAX_TOTAL_CHARS)
+          return jsonError(413, "conversation_too_long", undefined, headers);
         const key = process.env.LOVABLE_API_KEY;
         if (!key) return jsonError(503, "chat_unavailable", undefined, headers);
 
