@@ -1,12 +1,10 @@
 import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useTranslation } from "react-i18next";
-import heroDesktopAsset from "@/assets/premium/homepage-hero-desktop.jpg.asset.json";
-import heroMobileAsset from "@/assets/premium/homepage-hero-mobile.jpg.asset.json";
+import heroDesktop from "@/assets/hero-nevo-line.jpg";
+import heroMobile from "@/assets/hero-nevo-mobile.jpg";
 import { Button } from "@/components/ui/button";
 
-const heroDesktop = heroDesktopAsset.url;
-const heroMobile = heroMobileAsset.url;
 
 /** Original hero photography only: no video, no added panel, no duplicated object. */
 export function Hero() {
