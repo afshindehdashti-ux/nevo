@@ -42,11 +42,25 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
-      # Build once; the Playwright config's webServer runs `vite preview`
-      # against this build. Fails the job on any test failure, blocking
-      # the merge via required-status-check on `main`.
+      - name: Start Vite server
+        run: |
+          node node_modules/vite/bin/vite.js dev --port 4173 --host 127.0.0.1 --strictPort > vite-e2e.log 2>&1 &
+          echo "VITE_E2E_PID=$!" >> "$GITHUB_ENV"
+          for _ in $(seq 1 120); do
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat vite-e2e.log
+          exit 1
+
       - name: Run E2E — backend CTA gate
-        run: pnpm test:e2e:backend-cta
+        run: E2E_BASE_URL=http://127.0.0.1:4173 pnpm test:e2e:backend-cta
+
+      - name: Stop Vite server
+        if: always()
+        run: kill "$VITE_E2E_PID" || true
 
       - name: Upload Playwright report
         if: always()
