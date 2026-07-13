@@ -1,4 +1,5 @@
 import { withMethodGuards } from "@/lib/api-http";
+import { timingSafeEqualText } from "@/lib/api-security";
 // Backend alert endpoint — receives DLQ notifications from the database
 // trigger `notify_email_dlq` on public.email_send_log and enqueues a branded
 // alert email to the operations mailbox. Bearer-protected with the same
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/api/public/alerts/email-dlq")({
 
         const auth = request.headers.get("Authorization") ?? "";
         const provided = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
-        if (!provided || provided !== serviceKey) {
+        if (!provided || !timingSafeEqualText(provided, serviceKey)) {
           return Response.json({ error: "unauthorized" }, { status: 401 });
         }
 
