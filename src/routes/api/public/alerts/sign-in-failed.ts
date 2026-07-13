@@ -1,4 +1,5 @@
 import { withMethodGuards } from "@/lib/api-http";
+import { assertAllowedOrigin, assertRateLimit, corsHeaders } from "@/lib/api-security";
 // Public endpoint called by the sign-in page when supabase.auth.signInWithPassword
 // returns an error. Records a `sign_in_failed` row in activity_logs and, when
 // a threshold of failures for the same email in a rolling window is crossed,
@@ -21,7 +22,18 @@ function normalizeEmail(v: unknown): string | null {
 export const Route = createFileRoute("/api/public/alerts/sign-in-failed")({
   server: {
     handlers: withMethodGuards({
+      OPTIONS: async ({ request }) => {
+        const headers = corsHeaders(request);
+        const blocked = assertAllowedOrigin(request, headers);
+        if (blocked) return blocked;
+        return new Response(null, { status: 204, headers });
+      },
       POST: async ({ request }) => {
+        const headers = corsHeaders(request);
+        const blocked = assertAllowedOrigin(request, headers);
+        if (blocked) return blocked;
+        const limited = assertRateLimit(request, "sign-in-failed", { limit: 12, windowMs: 60_000 });
+        if (limited) return limited;
         const url = process.env.SUPABASE_URL ?? import.meta.env.VITE_SUPABASE_URL;
         const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (!url || !serviceKey) {
