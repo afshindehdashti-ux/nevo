@@ -48,7 +48,9 @@
     "test:e2e:admin-access": "python3 scripts/e2e/admin-system-health-access.py",
     "test:e2e:admin-qa-run": "python3 scripts/e2e/admin-qa-run-full-backend-test.py",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "check:launch": "node scripts/check-launch-readiness.mjs",
+    "check:launch:local": "node --env-file=.env scripts/check-launch-readiness.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "1",
