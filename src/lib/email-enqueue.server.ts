@@ -2,7 +2,7 @@
 // for the process-email-queue dispatcher. Bypasses JWT — callers must handle
 // authorization themselves before invoking.
 import * as React from "react";
-import { render } from "@react-email/render";
+import { render } from "./email-render.server";
 import { createClient } from "@supabase/supabase-js";
 import { TEMPLATES } from "./email-templates/registry";
 
