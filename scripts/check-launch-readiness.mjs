@@ -48,7 +48,9 @@ if (publicUrl && publicKey && !missing.length) {
 }
 
 if (missing.length) {
-  console.error("Launch readiness failed. Configure the missing server-only values in the deployment platform.");
+  console.error(
+    "Launch readiness failed. Configure the missing server-only values in the deployment platform.",
+  );
   process.exit(1);
 }
 
