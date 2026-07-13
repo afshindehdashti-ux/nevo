@@ -15,12 +15,23 @@ function redirectBack(origin: string, status: "ok" | "error", reason?: string) {
   return new Response(null, { status: 302, headers: { Location: url.toString() } });
 }
 
+function configuredAppOrigin(): string {
+  const fallback = "https://www.nevoindustrial.com";
+  const configured = process.env.APP_URL || process.env.SITE_URL || fallback;
+  try {
+    return new URL(configured).origin;
+  } catch {
+    return fallback;
+  }
+}
+
 export const Route = createFileRoute("/api/public/oauth/google/callback")({
   server: {
     handlers: withMethodGuards({
       GET: async ({ request }) => {
         const url = new URL(request.url);
-        const origin = url.origin;
+        // Never derive a redirect target from the untrusted Host header.
+        const origin = configuredAppOrigin();
         const code = url.searchParams.get("code");
         const state = url.searchParams.get("state");
         const err = url.searchParams.get("error");
