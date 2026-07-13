@@ -19,13 +19,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 22
+
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10 --activate
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Detect SHA-verify related changes
         id: detect
@@ -42,7 +47,7 @@ jobs:
           fi
 
       - name: Run verify-csv-export test suite
-        run: bunx vitest run src/lib/__tests__/verify-csv-export.test.ts src/lib/__tests__/verify-csv-export-server.test.ts --reporter=verbose
+        run: pnpm exec vitest run src/lib/__tests__/verify-csv-export.test.ts src/lib/__tests__/verify-csv-export-server.test.ts --reporter=verbose
 
       - name: Enforce block on SHA-verify changes
         if: github.event_name == 'pull_request' && steps.detect.outputs.sha_verify_changed == 'true'
