@@ -159,7 +159,7 @@ export const renderEmailPreview = createServerFn({ method: "POST" })
     await assertAdmin(context);
 
     const React = await import("react");
-    const { render } = await import("@react-email/render");
+    const { render } = await import("./email-render.server");
     const { TEMPLATES } = await import("@/lib/email-templates/registry");
     const overrides = data.overrides ?? {};
 
@@ -227,7 +227,7 @@ export const sendTestEmail = createServerFn({ method: "POST" })
     await assertAdmin(context);
 
     const React = await import("react");
-    const { render } = await import("@react-email/render");
+    const { render } = await import("./email-render.server");
     const { TEMPLATES } = await import("@/lib/email-templates/registry");
     const { createClient } = await import("@supabase/supabase-js");
 
