@@ -1,8 +1,12 @@
 import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useTranslation } from "react-i18next";
-import heroProductionLine from "@/assets/machinery/04-double-belt-laminator.jpg";
+import heroDesktopAsset from "@/assets/premium/homepage-hero-desktop.jpg.asset.json";
+import heroMobileAsset from "@/assets/premium/homepage-hero-mobile.jpg.asset.json";
 import { Button } from "@/components/ui/button";
+
+const heroDesktop = heroDesktopAsset.url;
+const heroMobile = heroMobileAsset.url;
 
 
 /** Original hero photography only: no video, no added panel, no duplicated object. */
@@ -32,7 +36,7 @@ function HeroDesktop() {
     <div className="relative hidden min-h-[85vh] md:block lg:min-h-[95vh]">
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <motion.img
-          src={heroProductionLine}
+          src={heroDesktop}
           alt="NEVO continuous double-belt laminator producing a PIR sandwich panel with PPGI facings"
           className="h-full w-full object-cover will-change-transform"
           fetchPriority="high"
@@ -126,7 +130,7 @@ function HeroMobile() {
   return (
     <div className="relative block min-h-[100svh] overflow-hidden md:hidden">
       <motion.img
-        src={heroProductionLine}
+        src={heroMobile}
         alt="NEVO double-belt laminator producing a PIR sandwich panel with PPGI facings"
         className="absolute inset-0 h-full w-full object-cover will-change-transform"
         style={{ objectPosition: "50% center", y: reduce ? 0 : imageY }}
