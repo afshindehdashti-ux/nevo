@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { withMethodGuards } from "@/lib/api-http";
+import { timingSafeEqualText } from "@/lib/api-security";
 import {
   assertAllowedOrigin,
   assertRateLimit,
