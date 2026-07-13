@@ -47,7 +47,8 @@ async function assertNoCtas(page: Page, when: string) {
 }
 
 async function waitForHydration(page: Page) {
-  await page.waitForLoadState("load");
+  // Navigation already waits for DOM content. Avoid waiting on unrelated
+  // long-lived requests before checking the hydrated UI.
   await page.waitForTimeout(500);
 }
 
