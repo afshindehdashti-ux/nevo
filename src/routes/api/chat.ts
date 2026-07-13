@@ -1,6 +1,6 @@
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { withMethodGuards } from "@/lib/api-http";
-import { assertRateLimit, jsonError } from "@/lib/api-security";
+import { assertAllowedOrigin, assertRateLimit, corsHeaders, jsonError } from "@/lib/api-security";
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 
@@ -48,7 +48,16 @@ function totalChars(messages: UIMessage[]): number {
 export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: withMethodGuards({
+      OPTIONS: async ({ request }) => {
+        const headers = corsHeaders(request);
+        const blocked = assertAllowedOrigin(request, headers);
+        if (blocked) return blocked;
+        return new Response(null, { status: 204, headers });
+      },
       POST: async ({ request }) => {
+        const headers = corsHeaders(request);
+        const blocked = assertAllowedOrigin(request, headers);
+        if (blocked) return blocked;
         const limited = assertRateLimit(request, "api-chat", { limit: 20, windowMs: 60_000 });
         if (limited) return limited;
 
@@ -56,13 +65,13 @@ export const Route = createFileRoute("/api/chat")({
         try {
           body = (await request.json()) as { messages?: unknown };
         } catch {
-          return jsonError(400, "invalid_json");
+          return jsonError(400, "invalid_json", undefined, headers);
         }
 
-        if (!Array.isArray(body.messages)) return jsonError(400, "messages_required");
+        if (!Array.isArray(body.messages)) return jsonError(400, "messages_required", undefined, headers);
         const messages = body.messages as UIMessage[];
         if (messages.length === 0 || messages.length > MAX_MESSAGES)
-          return jsonError(413, "too_many_messages");
+          return jsonError(413, "too_many_messages", undefined, headers);
         for (const m of messages) {
           for (const p of m.parts ?? []) {
             if (
@@ -70,13 +79,13 @@ export const Route = createFileRoute("/api/chat")({
               typeof p.text === "string" &&
               p.text.length > MAX_SINGLE_MESSAGE_CHARS
             ) {
-              return jsonError(413, "message_too_long");
+              return jsonError(413, "message_too_long", undefined, headers);
             }
           }
         }
-        if (totalChars(messages) > MAX_TOTAL_CHARS) return jsonError(413, "conversation_too_long");
+        if (totalChars(messages) > MAX_TOTAL_CHARS) return jsonError(413, "conversation_too_long", undefined, headers);
         const key = process.env.LOVABLE_API_KEY;
-        if (!key) return jsonError(500, "server_misconfigured");
+        if (!key) return jsonError(503, "chat_unavailable", undefined, headers);
 
         const gateway = createLovableAiGatewayProvider(key);
         const result = streamText({
@@ -85,7 +94,9 @@ export const Route = createFileRoute("/api/chat")({
           messages: await convertToModelMessages(messages),
         });
 
-        return result.toUIMessageStreamResponse({ originalMessages: messages });
+        const response = result.toUIMessageStreamResponse({ originalMessages: messages });
+        new Headers(headers).forEach((value, key) => response.headers.set(key, value));
+        return response;
       },
     }),
   },
