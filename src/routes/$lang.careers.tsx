@@ -240,6 +240,11 @@ function CareersPage() {
           successDescription: cvName
             ? `CV "${cvName}" uploaded successfully. Generating your PDF confirmation…`
             : "Generating your PDF confirmation…",
+          deliver: () =>
+            fetch("/api/public/career-submit", {
+              method: "POST",
+              body: new FormData(form),
+            }),
         });
       } catch (err) {
         caughtDetail = err instanceof Error ? err.message : String(err);
