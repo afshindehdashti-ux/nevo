@@ -20,15 +20,12 @@ import {
   Zap,
 } from "lucide-react";
 
-import heroAsset from "@/assets/premium/24-masterplan.jpg.asset.json";
-import surveyAsset from "@/assets/premium/22-site-survey.jpg.asset.json";
-import bimAsset from "@/assets/premium/12-engineer-bim.jpg.asset.json";
-import commissioningAsset from "@/assets/premium/23-commissioning.jpg.asset.json";
-import boardroomAsset from "@/assets/premium/18-boardroom.jpg.asset.json";
-import warehouseAsset from "@/assets/premium/04-warehouse-racking.jpg.asset.json";
-
-const heroImg = heroAsset.url;
-const investmentImg = boardroomAsset.url;
+import heroImg from "@/assets/project/hero-factory.jpg";
+import surveyImg from "@/assets/engineering/21-structural.jpg";
+import bimImg from "@/assets/engineering/05-layout.jpg";
+import commissioningImg from "@/assets/engineering/13-commissioning.jpg";
+import warehouseImg from "@/assets/engineering/18-raw.jpg";
+import investmentImg from "@/assets/engineering/23-roi.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { InquiryCTA } from "@/components/site/InquiryCTA";
@@ -98,22 +95,22 @@ const PILLARS = [
 const SCOPE = [
   {
     title: "01 / Site & Market Definition",
-    image: surveyAsset.url,
+    image: surveyImg,
     body: "Location, utilities, logistics, climate, labour model and target customer segments.",
   },
   {
     title: "02 / Process Layout",
-    image: bimAsset.url,
+    image: bimImg,
     body: "Coil storage, chemical room, line hall, QC lab, finished goods and loading circulation.",
   },
   {
     title: "03 / Production System",
-    image: commissioningAsset.url,
+    image: commissioningImg,
     body: "Line sizing, equipment specifications, automation levels and future upgrade envelopes.",
   },
   {
     title: "04 / Material Flow",
-    image: warehouseAsset.url,
+    image: warehouseImg,
     body: "Incoming materials, FIFO control, safety stock, packaging, dispatch and traceability.",
   },
 ];
