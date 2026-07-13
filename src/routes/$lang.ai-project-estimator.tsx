@@ -1006,7 +1006,7 @@ function EquipmentRow() {
               <img
                 loading="lazy"
                 decoding="async"
-                src={e.img.url}
+                src={e.img}
                 alt={e.title}
                 className="h-full w-full object-cover"
               />
