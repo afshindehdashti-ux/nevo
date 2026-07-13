@@ -29,10 +29,8 @@ import {
   Download,
   Loader2,
 } from "lucide-react";
-import heroImgAsset from "@/assets/premium/25-prodline-hero.jpg.asset.json";
-import philosophyImgAsset from "@/assets/premium/26-prodline-detail.jpg.asset.json";
-const heroImg = heroImgAsset.url;
-const philosophyImg = philosophyImgAsset.url;
+import heroImg from "@/assets/hero-production-line.jpg";
+import philosophyImg from "@/assets/knowledge/07_laminator.jpg";
 import eq01 from "@/assets/machinery/01-decoiler.jpg";
 import eq02 from "@/assets/machinery/02-roll-former.jpg";
 import eq03 from "@/assets/machinery/03-foam-injection.jpg";
