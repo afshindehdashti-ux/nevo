@@ -17,8 +17,6 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
-  // This backend uses Node-only libraries for email delivery and IMAP inbox processing.
-  nitro: { preset: "node-server" },
   vite: {
     // React Email still references the legacy entities path; map it to the supported export.
     resolve: {
