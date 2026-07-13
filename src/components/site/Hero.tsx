@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 const heroDesktop = heroDesktopAsset.url;
 const heroMobile = heroMobileAsset.url;
 
-
 /** Original hero photography only: no video, no added panel, no duplicated object. */
 export function Hero() {
   const { t } = useTranslation();
