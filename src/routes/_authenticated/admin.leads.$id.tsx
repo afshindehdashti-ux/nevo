@@ -16,9 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Loader2, UserPlus, ExternalLink } from "lucide-react";
+import { ArrowLeft, Download, ExternalLink, Loader2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { convertLeadToCustomer } from "@/lib/leads.functions";
+import { getCareerCvDownload } from "@/lib/career-applications.functions";
 import { logCrmAction } from "@/lib/audit-log.functions";
 import { formatDate } from "@/lib/crm-money";
 import { LEAD_STATUSES } from "./admin.leads";
@@ -35,6 +36,7 @@ function LeadDetail() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const convertFn = useServerFn(convertLeadToCustomer);
+  const getCareerCv = useServerFn(getCareerCvDownload);
   const logAudit = useServerFn(logCrmAction);
 
   const { data: lead, isLoading } = useQuery({
@@ -74,6 +76,23 @@ function LeadDetail() {
     timeline: "",
     internal_notes: "",
   });
+
+  const { data: careerCv, isLoading: isCareerCvLoading } = useQuery({
+    queryKey: ["career-cv", id],
+    queryFn: () => getCareerCv({ data: { inquiryId: id } }),
+    retry: false,
+  });
+
+  async function downloadCareerCv() {
+    if (!careerCv) return;
+    const anchor = document.createElement("a");
+    anchor.href = careerCv.url;
+    anchor.download = careerCv.filename;
+    anchor.rel = "noopener";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+  }
 
   useEffect(() => {
     if (!lead) return;
@@ -217,6 +236,24 @@ function LeadDetail() {
               <Info label="Message" value={lead.message} full multiline />
             </CardContent>
           </Card>
+
+          {(careerCv || isCareerCvLoading) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Candidate CV</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-muted-foreground">
+                  {isCareerCvLoading ? "Checking for an uploaded CV..." : careerCv?.filename}
+                </p>
+                {careerCv && (
+                  <Button type="button" variant="outline" onClick={() => void downloadCareerCv()}>
+                    <Download className="mr-2 h-4 w-4" /> Download CV
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>
