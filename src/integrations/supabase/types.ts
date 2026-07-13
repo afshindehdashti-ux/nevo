@@ -503,6 +503,56 @@ export type Database = {
           },
         ]
       }
+      career_applications: {
+        Row: {
+          created_at: string
+          cv_bucket: string | null
+          cv_content_type: string | null
+          cv_filename: string | null
+          cv_path: string | null
+          cv_size_bytes: number | null
+          id: string
+          inquiry_id: string
+          linkedin_url: string | null
+          preferred_team: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cv_bucket?: string | null
+          cv_content_type?: string | null
+          cv_filename?: string | null
+          cv_path?: string | null
+          cv_size_bytes?: number | null
+          id?: string
+          inquiry_id: string
+          linkedin_url?: string | null
+          preferred_team?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cv_bucket?: string | null
+          cv_content_type?: string | null
+          cv_filename?: string | null
+          cv_path?: string | null
+          cv_size_bytes?: number | null
+          id?: string
+          inquiry_id?: string
+          linkedin_url?: string | null
+          preferred_team?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "career_applications_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: true
+            referencedRelation: "project_inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_settings: {
         Row: {
           address: string | null
