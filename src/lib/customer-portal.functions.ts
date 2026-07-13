@@ -141,7 +141,7 @@ export const getMyDocumentUrl = createServerFn({ method: "POST" })
     if (!doc) throw new Error("Document not found");
 
     const { data: signed, error: sErr } = await context.supabase.storage
-      .from("documents-private")
+      .from("crm-docs")
       .createSignedUrl(doc.file_path, 300);
     if (sErr) throw new Error(sErr.message);
     await writeAudit(context.supabase, {
