@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  entities: 6.0.1
+  entities: 4.5.0
 
 importers:
 
@@ -3551,7 +3551,7 @@ packages:
     resolution: {integrity: sha512-aNnGCvbJ/RIyWo1IuhNdVjnNF+EjH9wpzpNHt+ci/m9He9LJvUN8wrCcXjp9cWsGNAuvSpVFTx/vraAFQ8qGjQ==}
     engines: {node: '>=10.13.0'}
 
-  entities@6.0.1:
+  entities@4.5.0:
     resolution: {integrity: sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==}
     engines: {node: '>=0.12'}
 
@@ -7463,7 +7463,7 @@ snapshots:
 
   '@react-email/render@2.1.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      entities: 6.0.1
+      entities: 4.5.0
       html-to-text: 9.0.5
       html5parser: 3.0.0
       prettier: 3.9.4
@@ -8729,7 +8729,7 @@ snapshots:
     dependencies:
       domelementtype: 2.3.0
       domhandler: 5.0.3
-      entities: 6.0.1
+      entities: 4.5.0
 
   domelementtype@2.3.0: {}
 
@@ -8782,7 +8782,7 @@ snapshots:
       graceful-fs: 4.2.11
       tapable: 2.3.3
 
-  entities@6.0.1: {}
+  entities@4.5.0: {}
 
   env-runner@0.1.15:
     dependencies:
@@ -9170,7 +9170,7 @@ snapshots:
       '@types/whatwg-mimetype': 3.0.2
       '@types/ws': 8.18.1
       buffer-image-size: 0.6.4
-      entities: 6.0.1
+      entities: 4.5.0
       whatwg-mimetype: 3.0.0
       ws: 8.21.0
     transitivePeerDependencies:
@@ -9256,14 +9256,14 @@ snapshots:
       domelementtype: 2.3.0
       domhandler: 5.0.3
       domutils: 3.2.2
-      entities: 6.0.1
+      entities: 4.5.0
 
   htmlparser2@8.0.2:
     dependencies:
       domelementtype: 2.3.0
       domhandler: 5.0.3
       domutils: 3.2.2
-      entities: 6.0.1
+      entities: 4.5.0
 
   http-errors@2.0.1:
     dependencies:
@@ -10124,7 +10124,7 @@ snapshots:
 
   parse5@8.0.1:
     dependencies:
-      entities: 6.0.1
+      entities: 4.5.0
 
   parseley@0.12.1:
     dependencies:
