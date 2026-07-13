@@ -42,14 +42,14 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { buildSeo, orgJsonLd, breadcrumbJsonLd, faqJsonLd, SITE, WHATSAPP_URL } from "@/lib/seo";
 
-import panelHero from "@/assets/estimator/est-panel-hero.png.asset.json";
-import layoutImg from "@/assets/estimator/est-layout.png.asset.json";
-import reportImg from "@/assets/estimator/est-report.png.asset.json";
-import eq1 from "@/assets/estimator/est-eq1.png.asset.json";
-import eq2 from "@/assets/estimator/est-eq2.png.asset.json";
-import eq3 from "@/assets/estimator/est-eq3.png.asset.json";
-import eq4 from "@/assets/estimator/est-eq4.png.asset.json";
-import eq5 from "@/assets/estimator/est-eq5.png.asset.json";
+import panelHero from "@/assets/knowledge/27_cross_section.jpg";
+import layoutImg from "@/assets/factory-layout/master-3d.png";
+import reportImg from "@/assets/knowledge/36_investment_report.jpg";
+import eq1 from "@/assets/machinery/04-double-belt-laminator.jpg";
+import eq2 from "@/assets/machinery/03-foam-injection.jpg";
+import eq3 from "@/assets/machinery/02-roll-former.jpg";
+import eq4 from "@/assets/machinery/05-flying-saw.jpg";
+import eq5 from "@/assets/machinery/07-stacking-system.jpg";
 
 const EQUIPMENT = [
   { img: eq1, title: "Double Belt Laminator", units: "2 Units" },
@@ -91,7 +91,7 @@ export const Route = createFileRoute("/$lang/ai-project-estimator")({
       description:
         "Get instant AI-powered feasibility for your sandwich panel factory. Estimate investment, utilities, capacity, ROI, IRR and payback in seconds — trained on 1,500+ NEVO Industrial projects.",
       path: "/ai-project-estimator",
-      image: panelHero.url,
+      image: panelHero,
       keywords: [
         "sandwich panel factory",
         "project estimator",
@@ -404,7 +404,7 @@ function EstimatorPage() {
               <img
                 loading="lazy"
                 decoding="async"
-                src={panelHero.url}
+                src={panelHero}
                 alt="Panel cross-section"
                 className="w-full rounded-xl object-cover"
               />
@@ -1068,7 +1068,7 @@ function LayoutAndRecommend({ panel, auto, ftype, r }: LayoutAndRecommendProps) 
             <img
               loading="lazy"
               decoding="async"
-              src={layoutImg.url}
+              src={layoutImg}
               alt="Factory Layout"
               className="h-full w-full object-cover"
             />
@@ -1108,7 +1108,7 @@ function LayoutAndRecommend({ panel, auto, ftype, r }: LayoutAndRecommendProps) 
         <img
           loading="lazy"
           decoding="async"
-          src={panelHero.url}
+          src={panelHero}
           alt="Recommended panel"
           className="mt-4 w-full rounded-xl border border-white/10"
         />
@@ -1260,7 +1260,7 @@ function ReportPreview() {
           <img
             loading="lazy"
             decoding="async"
-            src={reportImg.url}
+            src={reportImg}
             alt="Report Preview"
             className="w-full object-cover"
           />
