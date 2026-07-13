@@ -9,8 +9,7 @@ import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 
 // Preserve the original Lovable-hosted photography when running the project locally.
 // A deployment can override this with its own LOVABLE_PREVIEW_HOST value.
-process.env.LOVABLE_PREVIEW_HOST ??=
-  "project--d4274815-117e-4165-b985-4a102b99aa9c.lovable.app";
+process.env.LOVABLE_PREVIEW_HOST ??= "project--d4274815-117e-4165-b985-4a102b99aa9c.lovable.app";
 
 export default defineConfig({
   tanstackStart: {
