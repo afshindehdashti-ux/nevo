@@ -1,7 +1,7 @@
 import { withMethodGuards } from "@/lib/api-http";
 import { timingSafeEqualText } from "@/lib/api-security";
 import * as React from "react";
-import { render } from "@react-email/render";
+import { render } from "@/lib/email-render.server";
 import { createClient } from "@supabase/supabase-js";
 import { createFileRoute } from "@tanstack/react-router";
 import { TEMPLATES } from "@/lib/email-templates/registry";
