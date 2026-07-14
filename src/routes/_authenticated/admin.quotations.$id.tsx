@@ -249,7 +249,12 @@ function QuotationEditor() {
       toast.success(
         r.already ? "Already converted — opening proforma" : "Proforma invoice created",
       );
-      if (r.invoice_id) navigate({ to: "/admin/invoices/$id", params: { id: r.invoice_id } });
+      if (r.proforma_invoice_id) {
+        navigate({
+          to: "/admin/proforma-invoices/$id",
+          params: { id: r.proforma_invoice_id },
+        });
+      }
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -342,17 +347,32 @@ function QuotationEditor() {
               </Button>
             </>
           )}
-          {(q.status === "accepted" || q.status === "approved") && !q.converted_invoice_id && (
+          {(q.status === "accepted" || q.status === "approved") &&
+            !q.converted_proforma_invoice_id &&
+            !q.converted_invoice_id && (
+              <Button
+                variant="secondary"
+                onClick={() => convert.mutate()}
+                disabled={convert.isPending}
+              >
+                <ArrowRightCircle className="h-4 w-4 mr-1" />
+                {convert.isPending ? "Converting…" : "Convert to proforma"}
+              </Button>
+            )}
+          {q.converted_proforma_invoice_id && (
             <Button
-              variant="secondary"
-              onClick={() => convert.mutate()}
-              disabled={convert.isPending}
+              variant="outline"
+              onClick={() =>
+                navigate({
+                  to: "/admin/proforma-invoices/$id",
+                  params: { id: q.converted_proforma_invoice_id! },
+                })
+              }
             >
-              <ArrowRightCircle className="h-4 w-4 mr-1" />
-              {convert.isPending ? "Converting…" : "Convert to proforma"}
+              Open proforma
             </Button>
           )}
-          {q.converted_invoice_id && (
+          {q.converted_invoice_id && !q.converted_proforma_invoice_id && (
             <Button
               variant="secondary"
               onClick={() =>

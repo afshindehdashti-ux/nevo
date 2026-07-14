@@ -10,20 +10,19 @@ import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 // Preserve the original Lovable-hosted photography when running the project locally.
 // A deployment can override this with its own LOVABLE_PREVIEW_HOST value.
 process.env.LOVABLE_PREVIEW_HOST ??= "project--d4274815-117e-4165-b985-4a102b99aa9c.lovable.app";
+// Keep Cloudflare builds reproducible across local time zones.
+process.env.NITRO_COMPATIBILITY_DATE ??= "2026-07-14";
 
 export default defineConfig({
   tanstackStart: {
+    router: {
+      routeFileIgnorePattern: "__tests__",
+    },
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
   },
   vite: {
-    // React Email still references the legacy entities path; map it to the supported export.
-    resolve: {
-      alias: {
-        "entities/lib/decode.js": "entities/decode",
-      },
-    },
     plugins: [mcpPlugin()],
   },
 });

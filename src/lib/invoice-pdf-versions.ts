@@ -18,8 +18,9 @@ export type InvoicePdfVersionRow = {
 
 /**
  * Upload the generated PDF blob to crm-docs and record a version row.
- * Non-fatal: errors bubble up so callers can toast, but no throw when
- * only the audit-row insert fails (upload is the source of truth).
+ * The upload and version record are kept consistent. If the database record
+ * cannot be written, the just-uploaded object is removed before the error is
+ * returned to the caller.
  */
 export async function recordInvoicePdfVersion(params: {
   invoiceId: string;
@@ -54,7 +55,13 @@ export async function recordInvoicePdfVersion(params: {
     generated_by: uid,
     note: trimmedNote,
   });
-  if (insErr) console.error("invoice_pdf_versions insert failed", insErr);
+  if (insErr) {
+    const { error: cleanupError } = await supabase.storage.from("crm-docs").remove([storagePath]);
+    if (cleanupError) {
+      console.error("invoice PDF cleanup failed after version insert error", cleanupError);
+    }
+    throw insErr;
+  }
 
   return { storagePath };
 }

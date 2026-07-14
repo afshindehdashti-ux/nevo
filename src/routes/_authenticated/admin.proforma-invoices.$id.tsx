@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +14,7 @@ import {
   FileDown,
   Loader2,
   Plus,
+  Receipt,
   Save,
   ShieldCheck,
   Trash2,
@@ -28,6 +30,7 @@ import {
   type CustomerDisplay,
 } from "@/lib/finance-normalization";
 import { generateProformaInvoicePdf } from "@/lib/proforma-invoice-pdf";
+import { convertProformaInvoiceToCommercial } from "@/lib/proforma-invoices.functions";
 
 type ItemRow = {
   id: string;
@@ -93,6 +96,8 @@ type ProformaRow = {
 function ProformaInvoiceDetail() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
+  const navigate = useNavigate();
+  const convertFn = useServerFn(convertProformaInvoiceToCommercial);
 
   const { data: pi, isLoading } = useQuery({
     queryKey: ["proforma_invoice", id],
@@ -188,6 +193,20 @@ function ProformaInvoiceDetail() {
       qc.invalidateQueries({ queryKey: ["proforma_invoices", "list"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Approve failed"),
+  });
+
+  const convert = useMutation({
+    mutationFn: () => convertFn({ data: { id } }),
+    onSuccess: (result) => {
+      toast.success(
+        result.already ? "Commercial invoice already exists" : "Commercial invoice created",
+      );
+      qc.invalidateQueries({ queryKey: ["proforma_invoice", id] });
+      qc.invalidateQueries({ queryKey: ["proforma_invoices", "list"] });
+      qc.invalidateQueries({ queryKey: ["invoices"] });
+      navigate({ to: "/admin/invoices/$id", params: { id: result.invoice_id } });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Conversion failed"),
   });
 
   // Payment capture
@@ -293,7 +312,7 @@ function ProformaInvoiceDetail() {
           <Button
             variant="secondary"
             onClick={() => approve.mutate()}
-            disabled={approve.isPending || !!pi.approved_by}
+            disabled={approve.isPending || !!pi.approved_by || pi.status === "converted_to_invoice"}
           >
             {approve.isPending ? (
               <Loader2 className="h-4 w-4 mr-1 animate-spin" />
@@ -302,6 +321,20 @@ function ProformaInvoiceDetail() {
             )}
             {pi.approved_by ? "Approved" : "Approve"}
           </Button>
+          {(pi.status === "approved" ||
+            pi.status === "accepted" ||
+            pi.status === "converted_to_invoice") && (
+            <Button onClick={() => convert.mutate()} disabled={convert.isPending}>
+              {convert.isPending ? (
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+              ) : (
+                <Receipt className="h-4 w-4 mr-1" />
+              )}
+              {pi.status === "converted_to_invoice"
+                ? "Open commercial invoice"
+                : "Convert to commercial invoice"}
+            </Button>
+          )}
           <Button onClick={() => save.mutate()} disabled={save.isPending}>
             {save.isPending ? (
               <Loader2 className="h-4 w-4 mr-1 animate-spin" />

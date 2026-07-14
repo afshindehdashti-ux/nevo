@@ -3833,6 +3833,7 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           converted_invoice_id: string | null
+          converted_proforma_invoice_id: string | null
           created_at: string
           created_by: string | null
           currency: string
@@ -3860,6 +3861,7 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           converted_invoice_id?: string | null
+          converted_proforma_invoice_id?: string | null
           created_at?: string
           created_by?: string | null
           currency?: string
@@ -3887,6 +3889,7 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           converted_invoice_id?: string | null
+          converted_proforma_invoice_id?: string | null
           created_at?: string
           created_by?: string | null
           currency?: string
@@ -3915,6 +3918,13 @@ export type Database = {
             columns: ["converted_invoice_id"]
             isOneToOne: false
             referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotations_converted_proforma_invoice_id_fkey"
+            columns: ["converted_proforma_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "proforma_invoices"
             referencedColumns: ["id"]
           },
           {
@@ -4309,6 +4319,10 @@ export type Database = {
         Returns: boolean
       }
       can_use_invoice_importer: { Args: { _user_id: string }; Returns: boolean }
+      convert_quotation_to_proforma: {
+        Args: { _quotation_id: string }
+        Returns: string
+      }
       convert_proforma_to_invoice: {
         Args: { _proforma_id: string }
         Returns: string

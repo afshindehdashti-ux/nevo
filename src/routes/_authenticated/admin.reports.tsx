@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/table";
 import { FileDown, FileSpreadsheet, Loader2 } from "lucide-react";
 import { financeBalanceDue } from "@/lib/finance-normalization";
+import { financePaidAmount, financeTotalAmount } from "@/lib/finance-normalization";
+import { formatLocalDate, nextCalendarDate } from "@/lib/report-date-range";
 import { toast } from "sonner";
 import {
   exportToExcel,
@@ -41,7 +43,13 @@ export const Route = createFileRoute("/_authenticated/admin/reports")({
 });
 
 type ReportKey =
-  "customers" | "leads_pipeline" | "sales_orders" | "invoices_ar" | "payments" | "ar_aging";
+  | "customers"
+  | "leads_pipeline"
+  | "sales_orders"
+  | "proforma_invoices"
+  | "invoices_ar"
+  | "payments"
+  | "ar_aging";
 
 const REPORTS: Record<ReportKey, { label: string; description: string }> = {
   customers: {
@@ -55,6 +63,10 @@ const REPORTS: Record<ReportKey, { label: string; description: string }> = {
   sales_orders: {
     label: "Sales Orders",
     description: "Orders by status and date, with totals per customer.",
+  },
+  proforma_invoices: {
+    label: "Proforma Invoices",
+    description: "Proforma totals, payment progress, and conversion status.",
   },
   invoices_ar: {
     label: "Invoices & A/R",
@@ -71,7 +83,7 @@ const REPORTS: Record<ReportKey, { label: string; description: string }> = {
 };
 
 function ymd(d: Date) {
-  return d.toISOString().slice(0, 10);
+  return formatLocalDate(d);
 }
 
 function ReportsPage() {
@@ -414,6 +426,45 @@ function getConfig(report: ReportKey): ReportConfig {
           },
         ],
       };
+    case "proforma_invoices":
+      return {
+        statusOptions: [
+          "draft",
+          "sent",
+          "approved",
+          "accepted",
+          "rejected",
+          "converted_to_invoice",
+          "cancelled",
+        ],
+        columns: [
+          { key: "proforma_number", header: "Proforma #" },
+          { key: "created_at", header: "Created", format: fmtDate },
+          { key: "valid_until", header: "Valid until", format: fmtDate },
+          { key: "customer_name", header: "Customer" },
+          { key: "status", header: "Status" },
+          { key: "payment_status", header: "Payment" },
+          { key: "currency", header: "Ccy" },
+          {
+            key: "total",
+            header: "Total",
+            align: "right",
+            format: (v, r) => fmtMoney(v, String(r.currency ?? "USD")),
+          },
+          {
+            key: "amount_paid",
+            header: "Paid",
+            align: "right",
+            format: (v, r) => fmtMoney(v, String(r.currency ?? "USD")),
+          },
+          {
+            key: "balance",
+            header: "Balance",
+            align: "right",
+            format: (v, r) => fmtMoney(v, String(r.currency ?? "USD")),
+          },
+        ],
+      };
     case "payments":
       return {
         columns: [
@@ -496,7 +547,7 @@ async function fetchReport(report: ReportKey, f: Filters): Promise<Record<string
           "id,created_at,name,email,company,country,application,status,priority,assigned_to,internal_score,next_action_date,budget_range",
         )
         .gte("created_at", f.from)
-        .lte("created_at", f.to + "T23:59:59")
+        .lt("created_at", nextCalendarDate(f.to))
         .order("created_at", { ascending: false });
       if (f.status !== "all") q = q.eq("status", f.status);
       const { data, error } = await q;
@@ -547,12 +598,32 @@ async function fetchReport(report: ReportKey, f: Filters): Promise<Record<string
         customer_name: (r as { customer?: { name?: string } | null }).customer?.name ?? "—",
       }));
     }
+    case "proforma_invoices": {
+      let q = supabase
+        .from("proforma_invoices")
+        .select(
+          "proforma_number,created_at,valid_until,status,payment_status,currency,total,grand_total,amount_paid,balance_due,customer:customers(name)",
+        )
+        .gte("created_at", f.from)
+        .lt("created_at", nextCalendarDate(f.to))
+        .order("created_at", { ascending: false });
+      if (f.status !== "all") q = q.eq("status", f.status);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data ?? []).map((row) => ({
+        ...row,
+        customer_name: (row as { customer?: { name?: string } | null }).customer?.name ?? "—",
+        total: financeTotalAmount(row),
+        amount_paid: financePaidAmount(row),
+        balance: financeBalanceDue(row),
+      }));
+    }
     case "payments": {
       const { data, error } = await supabase
         .from("payments")
         .select("*, invoice:invoices(invoice_number, customer:customers(name))")
         .gte("received_at", f.from)
-        .lte("received_at", f.to)
+        .lt("received_at", nextCalendarDate(f.to))
         .order("received_at", { ascending: false });
       if (error) throw error;
       return (data ?? []).map((r) => {

@@ -10,7 +10,7 @@ import { z } from "zod";
  *   - a counterparty exists (customer / supplier / partner as appropriate)
  *   - an issue date is set
  *   - at least one line item with positive qty and non-negative price
- *   - a strictly positive grand total (financially consistent)
+ *   - a calculated grand total (zero-value historical documents remain printable)
  *   - a currency
  *
  * Client-side validators can drift or be bypassed; this gate blocks the
@@ -83,7 +83,10 @@ async function loadDoc(supabase: any, kind: Kind, id: string) {
           )
           .eq("id", id)
           .maybeSingle(),
-        items: await supabase.from("invoice_items").select("id, description, quantity, unit_price"),
+        items: await supabase
+          .from("invoice_items")
+          .select("id, description, quantity, unit_price")
+          .eq("invoice_id", id),
         counterparty: "customer" as const,
         totalField: "total",
       };
@@ -116,21 +119,9 @@ export const assertDocumentReadyForPdf = createServerFn({ method: "POST" })
     const header = headerRes.data;
     if (!header) throw new Error("Document not found");
 
-    // The invoice_items query is scoped inside for readability; run it now
-    // when the invoices branch skipped its eq.
-    let items: any[] = [];
-    if (data.kind === "invoice") {
-      const { data: rows, error } = await context.supabase
-        .from("invoice_items")
-        .select("id, description, quantity, unit_price")
-        .eq("invoice_id", data.id);
-      if (error) throw new Error(error.message);
-      items = rows ?? [];
-    } else {
-      const itemsRes = loaded.items as { data: any[]; error: any };
-      if (itemsRes.error) throw new Error(itemsRes.error.message);
-      items = itemsRes.data ?? [];
-    }
+    const itemsRes = loaded.items as { data: any[]; error: any };
+    if (itemsRes.error) throw new Error(itemsRes.error.message);
+    const items = itemsRes.data ?? [];
 
     const errors: string[] = [];
 
@@ -165,7 +156,7 @@ export const assertDocumentReadyForPdf = createServerFn({ method: "POST" })
       items.forEach((it, i) => {
         if (!it.description || String(it.description).trim() === "")
           errors.push(`Line ${i + 1}: description is required`);
-        if (num(it.quantity) < 0) errors.push(`Line ${i + 1}: quantity cannot be negative`);
+        if (num(it.quantity) <= 0) errors.push(`Line ${i + 1}: quantity must be greater than zero`);
         if (num(it.unit_price) < 0) errors.push(`Line ${i + 1}: unit price cannot be negative`);
       });
     }

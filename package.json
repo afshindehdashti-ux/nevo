@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "build:dev:diagnose": "node scripts/build-diagnose.mjs --mode development",
     "build:diagnose": "node scripts/build-diagnose.mjs --mode production",
-    "preview": "vite preview",
+    "preview": "nitro preview",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
     "check:links": "node scripts/check-links.mjs --no-external",
@@ -155,6 +155,7 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^8.0.16",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "wrangler": "4.110.0"
   }
 }

@@ -1596,14 +1596,23 @@ function InvoiceDetailPage() {
 
   const totals = useMemo(() => {
     let subtotal = 0;
+    let discount = 0;
     let vat = 0;
     for (const l of lines.filter((x) => !x._deleted)) {
       const gross = l.quantity * l.unit_price;
-      const afterDisc = gross * (1 - (l.discount_pct || 0) / 100);
+      const lineDiscount = gross * ((l.discount_pct || 0) / 100);
+      const afterDisc = gross - lineDiscount;
+      discount += lineDiscount;
       subtotal += afterDisc;
       vat += afterDisc * ((l.vat_pct || 0) / 100);
     }
-    return { subtotal, vat, total: subtotal + vat };
+    const round2 = (value: number) => Math.round(value * 100) / 100;
+    return {
+      subtotal: round2(subtotal),
+      discount: round2(discount),
+      vat: round2(vat),
+      total: round2(subtotal + vat),
+    };
   }, [lines]);
 
   const filteredPdfVersions = useMemo(() => {
@@ -1674,7 +1683,9 @@ function InvoiceDetailPage() {
           issue_date: issueDate,
           due_date: dueDate || null,
           subtotal: totals.subtotal,
+          discount_total: totals.discount,
           vat_amount: totals.vat,
+          tax_total: totals.vat,
           total: totals.total,
           balance: Math.max(totals.total - financePaidAmount(invoice), 0),
         })
@@ -1694,13 +1705,19 @@ function InvoiceDetailPage() {
           unit: l.unit,
           unit_price: l.unit_price,
           discount_pct: l.discount_pct,
+          discount: l.discount_pct,
           vat_pct: l.vat_pct,
+          tax_rate: l.vat_pct,
           position: l.position,
+          sort_order: l.position,
           line_total:
-            l.quantity *
-            l.unit_price *
-            (1 - (l.discount_pct || 0) / 100) *
-            (1 + (l.vat_pct || 0) / 100),
+            Math.round(
+              l.quantity *
+                l.unit_price *
+                (1 - (l.discount_pct || 0) / 100) *
+                (1 + (l.vat_pct || 0) / 100) *
+                100,
+            ) / 100,
         };
         if (l.id) {
           const { error } = await supabase.from("invoice_items").update(payload).eq("id", l.id);

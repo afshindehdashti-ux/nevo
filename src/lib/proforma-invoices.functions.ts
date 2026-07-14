@@ -148,6 +148,29 @@ export const recalcProformaTotals = createServerFn({ method: "POST" })
   .inputValidator((v) => IdInput.parse(v))
   .handler(async ({ context, data }) => recalcProformaTotalsInternal(context.supabase, data.id));
 
+export const convertProformaInvoiceToCommercial = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => IdInput.parse(v))
+  .handler(async ({ context, data }) => {
+    const { data: existing, error: existingError } = await context.supabase
+      .from("invoices")
+      .select("id")
+      .eq("proforma_invoice_id", data.id)
+      .eq("type", "commercial")
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (existingError) throw new Error(existingError.message);
+    if (existing?.id) return { invoice_id: existing.id, already: true };
+
+    const { data: invoiceId, error } = await context.supabase.rpc("convert_proforma_to_invoice", {
+      _proforma_id: data.id,
+    });
+    if (error) throw new Error(error.message);
+    if (!invoiceId) throw new Error("Could not create commercial invoice");
+    return { invoice_id: invoiceId, already: false };
+  });
+
 export const createProformaInvoice = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) =>
