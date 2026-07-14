@@ -14,14 +14,23 @@ jobs:
   breadcrumbs:
     name: BreadcrumbList JSON-LD (Solutions × 10 locales)
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
+      VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 22
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10 --activate
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # Boots Vite dev on 127.0.0.1:4322, fetches every /{locale}/solutions*
       # page, parses each <script type="application/ld+json">, and fails the
@@ -29,4 +38,4 @@ jobs:
       # a non-absolute item URL / malformed ListItem chain. Exit 1 -> red check
       # on the PR, which blocks merge when required.
       - name: Validate BreadcrumbList presence, uniqueness, and absolute URLs
-        run: bun run check:breadcrumbs
+        run: pnpm check:breadcrumbs

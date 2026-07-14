@@ -27,8 +27,12 @@ function normaliseAiError(status: number, body?: string): Error {
 }
 
 /** Split plain text into ~1000-char chunks with overlap. */
-export function chunkText(text: string, size = AI_CHUNK_SIZE, overlap = AI_CHUNK_OVERLAP): string[] {
-  const cleaned = text.replace(/\r\n/g, "\n").replace(/\u0000/g, " ").trim();
+export function chunkText(
+  text: string,
+  size = AI_CHUNK_SIZE,
+  overlap = AI_CHUNK_OVERLAP,
+): string[] {
+  const cleaned = text.replace(/\r\n/g, "\n").replaceAll(String.fromCharCode(0), " ").trim();
   if (!cleaned) return [];
   if (cleaned.length <= size) return [cleaned];
 

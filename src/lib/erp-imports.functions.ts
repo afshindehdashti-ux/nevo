@@ -9,12 +9,7 @@ import { z } from "zod";
  * Records an audit row in `imports` with per-row error details.
  */
 
-const ImportType = z.enum([
-  "customers",
-  "suppliers",
-  "products",
-  "finance_documents",
-]);
+const ImportType = z.enum(["customers", "suppliers", "products", "finance_documents"]);
 
 const RunInput = z.object({
   import_type: ImportType,
@@ -156,7 +151,11 @@ export const runImport = createServerFn({ method: "POST" })
 
     await (context.supabase.from("imports") as any)
       .update({
-        status: data.dry_run ? "dry_run_complete" : errors.length ? "completed_with_errors" : "completed",
+        status: data.dry_run
+          ? "dry_run_complete"
+          : errors.length
+            ? "completed_with_errors"
+            : "completed",
         processed_count: processed,
         error_count: errors.length,
         errors: errors as any,

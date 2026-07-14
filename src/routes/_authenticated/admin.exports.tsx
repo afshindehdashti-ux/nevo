@@ -6,9 +6,24 @@ import { z } from "zod";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileDown, Search, ShieldAlert, Copy, RefreshCw, Loader2, Save, X, Bookmark, FileSpreadsheet, AlertTriangle } from "lucide-react";
+import {
+  FileDown,
+  Search,
+  ShieldAlert,
+  Copy,
+  RefreshCw,
+  Loader2,
+  Save,
+  X,
+  Bookmark,
+  FileSpreadsheet,
+  AlertTriangle,
+} from "lucide-react";
 import { VerifyOpenButton } from "@/components/exports/VerifyOpenButton";
-import { BlockedVerificationDialog, type BlockedVerification } from "@/components/exports/BlockedVerificationDialog";
+import {
+  BlockedVerificationDialog,
+  type BlockedVerification,
+} from "@/components/exports/BlockedVerificationDialog";
 
 import { listCsvExportAudit } from "@/lib/invoice-purge-audit.functions";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
@@ -32,16 +47,26 @@ function parseCsvRows(text: string, maxRows: number): string[][] {
     const ch = text[i];
     if (inQuotes) {
       if (ch === '"') {
-        if (text[i + 1] === '"') { field += '"'; i++; }
-        else inQuotes = false;
+        if (text[i + 1] === '"') {
+          field += '"';
+          i++;
+        } else inQuotes = false;
       } else field += ch;
       continue;
     }
-    if (ch === '"') { inQuotes = true; continue; }
-    if (ch === ",") { row.push(field); field = ""; continue; }
+    if (ch === '"') {
+      inQuotes = true;
+      continue;
+    }
+    if (ch === ",") {
+      row.push(field);
+      field = "";
+      continue;
+    }
     if (ch === "\n" || ch === "\r") {
       if (ch === "\r" && text[i + 1] === "\n") i++;
-      row.push(field); field = "";
+      row.push(field);
+      field = "";
       if (row.length > 1 || row[0] !== "") rows.push(row);
       row = [];
       continue;
@@ -102,10 +127,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_authenticated/admin/exports")({
   head: () => ({
-    meta: [
-      { title: "CSV Export History — NEVO CRM" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "CSV Export History — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   validateSearch: zodValidator(searchSchema),
   component: ExportsHistoryPage,
@@ -202,7 +224,6 @@ function ExportsHistoryPage() {
     }
   }
 
-
   function triggerVerifyAndOpen(row: CsvExportAuditRecord) {
     pendingRowRef.current = row;
     const input = fileInputRef.current;
@@ -261,14 +282,7 @@ function ExportsHistoryPage() {
   }
 
   const query = useQuery({
-    queryKey: [
-      "csv-export-audit",
-      search.q,
-      search.scope,
-      search.user,
-      search.from,
-      search.to,
-    ],
+    queryKey: ["csv-export-audit", search.q, search.scope, search.user, search.from, search.to],
     enabled: allowed,
     queryFn: () =>
       listFn({
@@ -468,8 +482,8 @@ function ExportsHistoryPage() {
             CSV Export History
           </CardTitle>
           <CardDescription>
-            Every exported CSV is recorded with its SHA-256 checksum, scope,
-            filters, and the user who generated it.
+            Every exported CSV is recorded with its SHA-256 checksum, scope, filters, and the user
+            who generated it.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -603,7 +617,6 @@ function ExportsHistoryPage() {
             </div>
           </div>
 
-
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <span>
               {query.isFetching
@@ -625,7 +638,13 @@ function ExportsHistoryPage() {
               Drift only ({driftCount})
             </Button>
             {activeFilters > 0 && (
-              <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={clearAll}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2"
+                onClick={clearAll}
+              >
                 Clear filters ({activeFilters})
               </Button>
             )}
@@ -691,13 +710,18 @@ function ExportsHistoryPage() {
                   Array.from({ length: 6 }).map((_, i) => (
                     <TableRow key={`sk-${i}`}>
                       {Array.from({ length: 9 }).map((_, j) => (
-                        <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
+                        <TableCell key={j}>
+                          <Skeleton className="h-4 w-full" />
+                        </TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : visibleRows.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-8">
+                    <TableCell
+                      colSpan={9}
+                      className="text-center text-sm text-muted-foreground py-8"
+                    >
                       {driftOnly
                         ? "No drift detected in the currently loaded exports."
                         : "No CSV exports match these filters."}
@@ -705,7 +729,10 @@ function ExportsHistoryPage() {
                   </TableRow>
                 ) : (
                   visibleRows.map((r) => (
-                    <TableRow key={r.id} data-state={selectedIds.has(r.id) ? "selected" : undefined}>
+                    <TableRow
+                      key={r.id}
+                      data-state={selectedIds.has(r.id) ? "selected" : undefined}
+                    >
                       <TableCell>
                         <Checkbox
                           checked={selectedIds.has(r.id)}
@@ -717,16 +744,20 @@ function ExportsHistoryPage() {
                         {format(new Date(r.created_at), "yyyy-MM-dd HH:mm:ss")}
                       </TableCell>
                       <TableCell className="text-xs">
-                        {r.user_id ? actorMap[r.user_id] ?? "Unknown user" : "System"}
+                        {r.user_id ? (actorMap[r.user_id] ?? "Unknown user") : "System"}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="capitalize">{r.scope ?? "—"}</Badge>
+                        <Badge variant="outline" className="capitalize">
+                          {r.scope ?? "—"}
+                        </Badge>
                       </TableCell>
                       <TableCell className="font-mono text-[11px] break-all max-w-[320px]">
                         {r.filename}
                       </TableCell>
                       <TableCell className="text-right text-xs">{r.row_count}</TableCell>
-                      <TableCell className="text-right text-xs">{formatBytes(r.byte_size)}</TableCell>
+                      <TableCell className="text-right text-xs">
+                        {formatBytes(r.byte_size)}
+                      </TableCell>
                       <TableCell className="font-mono text-[11px]">
                         <span title={r.sha256}>{r.sha256.slice(0, 16)}…</span>
                       </TableCell>
@@ -783,9 +814,7 @@ function ExportsHistoryPage() {
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Export details</DialogTitle>
-            <DialogDescription>
-              Full record for this CSV export.
-            </DialogDescription>
+            <DialogDescription>Full record for this CSV export.</DialogDescription>
           </DialogHeader>
           {detail && (
             <div className="flex justify-end">
@@ -811,13 +840,10 @@ function ExportsHistoryPage() {
                   ].join("\n");
                   void navigator.clipboard
                     .writeText(summary)
-                    .then(() =>
-                      toast.success("Audit summary copied to clipboard"),
-                    )
+                    .then(() => toast.success("Audit summary copied to clipboard"))
                     .catch((err) =>
                       toast.error("Copy failed", {
-                        description:
-                          err instanceof Error ? err.message : String(err),
+                        description: err instanceof Error ? err.message : String(err),
                       }),
                     );
                 }}
@@ -828,7 +854,6 @@ function ExportsHistoryPage() {
             </div>
           )}
           {detail && (
-
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-[140px_1fr] gap-y-2">
                 <span className="text-muted-foreground">Filename</span>
@@ -838,15 +863,22 @@ function ExportsHistoryPage() {
                 <span className="text-muted-foreground">Exported at</span>
                 <span>{new Date(detail.created_at).toLocaleString()}</span>
                 <span className="text-muted-foreground">User</span>
-                <span>{detail.user_id ? actorMap[detail.user_id] ?? "Unknown user" : "System"}</span>
+                <span>
+                  {detail.user_id ? (actorMap[detail.user_id] ?? "Unknown user") : "System"}
+                </span>
                 <span className="text-muted-foreground">Type / Scope</span>
-                <span>{detail.export_type} / {detail.scope ?? "—"}</span>
+                <span>
+                  {detail.export_type} / {detail.scope ?? "—"}
+                </span>
                 <span className="text-muted-foreground">Entity</span>
                 <span className="font-mono text-xs break-all">
-                  {detail.entity_type ?? "—"}{detail.entity_id ? ` · ${detail.entity_id}` : ""}
+                  {detail.entity_type ?? "—"}
+                  {detail.entity_id ? ` · ${detail.entity_id}` : ""}
                 </span>
                 <span className="text-muted-foreground">Rows / Size</span>
-                <span>{detail.row_count} · {formatBytes(detail.byte_size)}</span>
+                <span>
+                  {detail.row_count} · {formatBytes(detail.byte_size)}
+                </span>
                 {(() => {
                   const md = (detail.metadata ?? {}) as {
                     embedded_sha256?: string;
@@ -862,9 +894,7 @@ function ExportsHistoryPage() {
                       >
                         {md.embedded_sha256 ?? "—"}
                         {detectShaDrift({ sha256: detail.sha256, metadata: detail.metadata }) && (
-                          <span className="ml-2 text-destructive">
-                            (differs from column value)
-                          </span>
+                          <span className="ml-2 text-destructive">(differs from column value)</span>
                         )}
                       </span>
                       <span className="text-muted-foreground">Embedded timestamp</span>
@@ -872,10 +902,12 @@ function ExportsHistoryPage() {
                         {md.embedded_exported_at_iso ?? "—"}
                         {md.embedded_exported_at_iso && (
                           <span className="ml-2 text-muted-foreground">
-                            ({(() => {
+                            (
+                            {(() => {
                               const d = new Date(md.embedded_exported_at_iso);
                               return isNaN(d.getTime()) ? "invalid" : d.toLocaleString();
-                            })()})
+                            })()}
+                            )
                           </span>
                         )}
                       </span>
@@ -897,14 +929,12 @@ function ExportsHistoryPage() {
               </div>
 
               <div className="space-y-2">
-
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <div className="text-xs text-muted-foreground">
-                      Payload preview
-                    </div>
+                    <div className="text-xs text-muted-foreground">Payload preview</div>
                     <div className="text-[11px] text-muted-foreground">
-                      Load the CSV file to re-verify its SHA-256 and preview the first {PREVIEW_ROW_LIMIT - 1} data rows.
+                      Load the CSV file to re-verify its SHA-256 and preview the first{" "}
+                      {PREVIEW_ROW_LIMIT - 1} data rows.
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -935,7 +965,8 @@ function ExportsHistoryPage() {
                       <Alert>
                         <AlertTitle>SHA-256 verified</AlertTitle>
                         <AlertDescription className="font-mono text-[11px] break-all">
-                          {preview.filename} · computed {preview.result.computedSha.slice(0, 16)}… matches audit record.
+                          {preview.filename} · computed {preview.result.computedSha.slice(0, 16)}…
+                          matches audit record.
                         </AlertDescription>
                       </Alert>
                     )}
@@ -944,7 +975,9 @@ function ExportsHistoryPage() {
                         <ShieldAlert className="h-4 w-4" />
                         <AlertTitle>SHA-256 mismatch</AlertTitle>
                         <AlertDescription className="font-mono text-[11px] break-all">
-                          Expected {preview.result.expected.slice(0, 16)}… but computed {preview.result.computedSha.slice(0, 16)}…. Preview shown for inspection only — do NOT trust this file.
+                          Expected {preview.result.expected.slice(0, 16)}… but computed{" "}
+                          {preview.result.computedSha.slice(0, 16)}…. Preview shown for inspection
+                          only — do NOT trust this file.
                         </AlertDescription>
                       </Alert>
                     )}
@@ -952,9 +985,7 @@ function ExportsHistoryPage() {
                       <Alert variant="destructive">
                         <ShieldAlert className="h-4 w-4" />
                         <AlertTitle>CSV structure is malformed</AlertTitle>
-                        <AlertDescription>
-                          {preview.result.messages.join(" · ")}
-                        </AlertDescription>
+                        <AlertDescription>{preview.result.messages.join(" · ")}</AlertDescription>
                       </Alert>
                     )}
 
@@ -1013,5 +1044,3 @@ function ExportsHistoryPage() {
     </div>
   );
 }
-
-

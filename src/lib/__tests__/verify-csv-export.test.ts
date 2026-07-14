@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  assembleCsv,
-  computeSha256Hex,
-  verifyCsvText,
-} from "../purge-csv-preamble";
+import { assembleCsv, computeSha256Hex, verifyCsvText } from "../purge-csv-preamble";
 import { shouldOpenAfterVerify } from "../verify-csv-export.functions";
 
 const ISO = "2026-07-07T22:05:50.123Z";
@@ -61,7 +57,9 @@ describe("Verify & open — server verification behaviour", () => {
 describe("shouldOpenAfterVerify — decision gate", () => {
   it("returns true ONLY for status === 'match'", () => {
     expect(shouldOpenAfterVerify({ status: "match", computedSha: "x", expected: "x" })).toBe(true);
-    expect(shouldOpenAfterVerify({ status: "mismatch", computedSha: "x", expected: "y" })).toBe(false);
+    expect(shouldOpenAfterVerify({ status: "mismatch", computedSha: "x", expected: "y" })).toBe(
+      false,
+    );
     expect(
       shouldOpenAfterVerify({
         status: "malformed",
@@ -70,9 +68,7 @@ describe("shouldOpenAfterVerify — decision gate", () => {
         hasMarker: false,
       }),
     ).toBe(false);
-    expect(
-      shouldOpenAfterVerify({ status: "no-expected", computedSha: "x" }),
-    ).toBe(false);
+    expect(shouldOpenAfterVerify({ status: "no-expected", computedSha: "x" })).toBe(false);
   });
 });
 
@@ -86,8 +82,12 @@ describe("Verify & open — edge-case CSV parsing", () => {
   it("blocks when preamble labels are misspelled (missing-sha-row + missing-timestamp-row)", async () => {
     const { sha } = await makeValidExport();
     const bad =
-      '"SHA-256","' + sha + '"\n' +
-      '"Exported At","' + ISO + '"\n' +
+      '"SHA-256","' +
+      sha +
+      '"\n' +
+      '"Exported At","' +
+      ISO +
+      '"\n' +
       '"--- PAYLOAD BELOW ---"\n' +
       PAYLOAD;
     const result = await verifyCsvText(bad, { expectedSha: sha });
@@ -102,8 +102,12 @@ describe("Verify & open — edge-case CSV parsing", () => {
   it("blocks when preamble rows have extra columns (label regex requires exactly 2 quoted fields)", async () => {
     const { sha } = await makeValidExport();
     const bad =
-      '"SHA-256 (of payload below)","' + sha + '","extra"\n' +
-      '"Export Timestamp (ISO)","' + ISO + '","extra"\n' +
+      '"SHA-256 (of payload below)","' +
+      sha +
+      '","extra"\n' +
+      '"Export Timestamp (ISO)","' +
+      ISO +
+      '","extra"\n' +
       '"--- PAYLOAD BELOW ---"\n' +
       PAYLOAD;
     const result = await verifyCsvText(bad, { expectedSha: sha });
@@ -117,9 +121,13 @@ describe("Verify & open — edge-case CSV parsing", () => {
   it("blocks a malformed marker block (marker not quoted / trailing junk)", async () => {
     const { sha } = await makeValidExport();
     const bad =
-      '"SHA-256 (of payload below)","' + sha + '"\n' +
-      '"Export Timestamp (ISO)","' + ISO + '"\n' +
-      '--- PAYLOAD BELOW ---\n' +
+      '"SHA-256 (of payload below)","' +
+      sha +
+      '"\n' +
+      '"Export Timestamp (ISO)","' +
+      ISO +
+      '"\n' +
+      "--- PAYLOAD BELOW ---\n" +
       PAYLOAD;
     const result = await verifyCsvText(bad, { expectedSha: sha });
     expect(result.status).toBe("malformed");
@@ -133,8 +141,12 @@ describe("Verify & open — edge-case CSV parsing", () => {
   it("blocks when the marker line carries a trailing suffix on the same line", async () => {
     const { sha } = await makeValidExport();
     const bad =
-      '"SHA-256 (of payload below)","' + sha + '"\n' +
-      '"Export Timestamp (ISO)","' + ISO + '"\n' +
+      '"SHA-256 (of payload below)","' +
+      sha +
+      '"\n' +
+      '"Export Timestamp (ISO)","' +
+      ISO +
+      '"\n' +
       '"--- PAYLOAD BELOW ---",extra\n' +
       PAYLOAD;
     const result = await verifyCsvText(bad, { expectedSha: sha });
@@ -148,7 +160,9 @@ describe("Verify & open — edge-case CSV parsing", () => {
   it("blocks when the embedded SHA is not a 64-char hex digest", async () => {
     const bad =
       '"SHA-256 (of payload below)","not-a-real-sha"\n' +
-      '"Export Timestamp (ISO)","' + ISO + '"\n' +
+      '"Export Timestamp (ISO)","' +
+      ISO +
+      '"\n' +
       '"--- PAYLOAD BELOW ---"\n' +
       PAYLOAD;
     const result = await verifyCsvText(bad, { expectedSha: "a".repeat(64) });
@@ -161,8 +175,12 @@ describe("Verify & open — edge-case CSV parsing", () => {
 
   it("blocks when the payload marker exists but the payload is empty", async () => {
     const bad =
-      '"SHA-256 (of payload below)","' + "a".repeat(64) + '"\n' +
-      '"Export Timestamp (ISO)","' + ISO + '"\n' +
+      '"SHA-256 (of payload below)","' +
+      "a".repeat(64) +
+      '"\n' +
+      '"Export Timestamp (ISO)","' +
+      ISO +
+      '"\n' +
       '"--- PAYLOAD BELOW ---"\n';
     const result = await verifyCsvText(bad, { expectedSha: "a".repeat(64) });
     expect(result.status).toBe("malformed");
@@ -175,7 +193,9 @@ describe("Verify & open — edge-case CSV parsing", () => {
   it("blocks when the embedded timestamp is not ISO-8601", async () => {
     const { sha } = await makeValidExport();
     const bad =
-      '"SHA-256 (of payload below)","' + sha + '"\n' +
+      '"SHA-256 (of payload below)","' +
+      sha +
+      '"\n' +
       '"Export Timestamp (ISO)","yesterday"\n' +
       '"--- PAYLOAD BELOW ---"\n' +
       PAYLOAD;
@@ -192,8 +212,12 @@ describe("Verify & open — edge-case CSV parsing", () => {
     const tamperedPayload =
       'col_a,col_b,col_c\n"hello","world","injected"\n"a,b","he said ""hi""","x"\n';
     const csv =
-      '"SHA-256 (of payload below)","' + sha + '"\n' +
-      '"Export Timestamp (ISO)","' + ISO + '"\n' +
+      '"SHA-256 (of payload below)","' +
+      sha +
+      '"\n' +
+      '"Export Timestamp (ISO)","' +
+      ISO +
+      '"\n' +
       '"--- PAYLOAD BELOW ---"\n' +
       tamperedPayload;
     const result = await verifyCsvText(csv, { expectedSha: sha });
@@ -205,8 +229,12 @@ describe("Verify & open — edge-case CSV parsing", () => {
     const { sha } = await makeValidExport();
     const renamed = PAYLOAD.replace("col_a,col_b", "column_a,column_b");
     const csv =
-      '"SHA-256 (of payload below)","' + sha + '"\n' +
-      '"Export Timestamp (ISO)","' + ISO + '"\n' +
+      '"SHA-256 (of payload below)","' +
+      sha +
+      '"\n' +
+      '"Export Timestamp (ISO)","' +
+      ISO +
+      '"\n' +
       '"--- PAYLOAD BELOW ---"\n' +
       renamed;
     const result = await verifyCsvText(csv, { expectedSha: sha });

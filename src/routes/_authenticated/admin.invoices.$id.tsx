@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -35,13 +35,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, ArrowUpDown, Plus, Save, Trash2, Printer, Wallet, FileDown, Mail, History, Archive, Copy, Download } from "lucide-react";
-import { cn } from "@/lib/utils";
 import {
-  assembleCsv,
-  computeSha256Hex,
-  verifyCsvText,
-} from "@/lib/purge-csv-preamble";
+  ArrowLeft,
+  ArrowUpDown,
+  Plus,
+  Save,
+  Trash2,
+  Printer,
+  Wallet,
+  FileDown,
+  Mail,
+  History,
+  Archive,
+  Copy,
+  Download,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { assembleCsv, computeSha256Hex, verifyCsvText } from "@/lib/purge-csv-preamble";
 import JSZip from "jszip";
 import { useServerFn } from "@tanstack/react-start";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
@@ -79,7 +89,11 @@ import {
   type InvoiceStatus,
   type PaymentMethod,
 } from "@/lib/crm-status";
-import { useCanEditInvoices, useCanEditPayments, useCanPurgeInvoicePdfVersions } from "@/lib/crm-permissions";
+import {
+  useCanEditInvoices,
+  useCanEditPayments,
+  useCanPurgeInvoicePdfVersions,
+} from "@/lib/crm-permissions";
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
 import { ApprovalPanel } from "@/components/crm/ApprovalPanel";
 import { InvoiceAiCheckButton } from "@/components/ai/InvoiceAiCheckButton";
@@ -136,26 +150,54 @@ function PurgeAuditSkeleton({ rows = 5 }: { rows?: number }) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-10"><Skeleton className="h-4 w-4" /></TableHead>
-          <TableHead><Skeleton className="h-4 w-24" /></TableHead>
-          <TableHead><Skeleton className="h-4 w-20" /></TableHead>
-          <TableHead className="text-right"><Skeleton className="h-4 w-10 ml-auto" /></TableHead>
-          <TableHead className="text-right"><Skeleton className="h-4 w-10 ml-auto" /></TableHead>
-          <TableHead className="text-right"><Skeleton className="h-4 w-10 ml-auto" /></TableHead>
-          <TableHead><Skeleton className="h-4 w-48" /></TableHead>
+          <TableHead className="w-10">
+            <Skeleton className="h-4 w-4" />
+          </TableHead>
+          <TableHead>
+            <Skeleton className="h-4 w-24" />
+          </TableHead>
+          <TableHead>
+            <Skeleton className="h-4 w-20" />
+          </TableHead>
+          <TableHead className="text-right">
+            <Skeleton className="h-4 w-10 ml-auto" />
+          </TableHead>
+          <TableHead className="text-right">
+            <Skeleton className="h-4 w-10 ml-auto" />
+          </TableHead>
+          <TableHead className="text-right">
+            <Skeleton className="h-4 w-10 ml-auto" />
+          </TableHead>
+          <TableHead>
+            <Skeleton className="h-4 w-48" />
+          </TableHead>
           <TableHead className="w-10"></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {[...Array(rows)].map((_, i) => (
           <TableRow key={i}>
-            <TableCell className="w-10"><Skeleton className="h-4 w-4" /></TableCell>
-            <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-            <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-            <TableCell className="text-right"><Skeleton className="h-4 w-8 ml-auto" /></TableCell>
-            <TableCell className="text-right"><Skeleton className="h-4 w-10 ml-auto" /></TableCell>
-            <TableCell className="text-right"><Skeleton className="h-4 w-8 ml-auto" /></TableCell>
-            <TableCell><Skeleton className="h-4 w-64" /></TableCell>
+            <TableCell className="w-10">
+              <Skeleton className="h-4 w-4" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-32" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-24" />
+            </TableCell>
+            <TableCell className="text-right">
+              <Skeleton className="h-4 w-8 ml-auto" />
+            </TableCell>
+            <TableCell className="text-right">
+              <Skeleton className="h-4 w-10 ml-auto" />
+            </TableCell>
+            <TableCell className="text-right">
+              <Skeleton className="h-4 w-8 ml-auto" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-64" />
+            </TableCell>
             <TableCell className="w-10"></TableCell>
           </TableRow>
         ))}
@@ -165,9 +207,9 @@ function PurgeAuditSkeleton({ rows = 5 }: { rows?: number }) {
 }
 
 function InvoiceDetailPage() {
-  const { id } = useParams({ from: "/_authenticated/admin/invoices/$id" });
+  const { id } = Route.useParams();
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/_authenticated/admin/invoices/$id" });
+  const navigate = Route.useNavigate();
   const qc = useQueryClient();
   const canEdit = useCanEditInvoices();
   const canPay = useCanEditPayments();
@@ -181,7 +223,9 @@ function InvoiceDetailPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("invoices")
-        .select("*, customers(id, name, company_name, address, billing_address, city, country, vat_number, email, phone)")
+        .select(
+          "*, customers(id, name, company_name, address, billing_address, city, country, vat_number, email, phone)",
+        )
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -229,7 +273,8 @@ function InvoiceDetailPage() {
   });
 
   const generatorIds = useMemo(
-    () => Array.from(new Set(pdfVersions.map((v) => v.generated_by).filter((x): x is string => !!x))),
+    () =>
+      Array.from(new Set(pdfVersions.map((v) => v.generated_by).filter((x): x is string => !!x))),
     [pdfVersions],
   );
   const { data: generatorMap = {} } = useQuery({
@@ -271,12 +316,30 @@ function InvoiceDetailPage() {
     };
   }, [search.purgeSort]);
   const setPurgeSort = (column: "created_at" | "user", direction: "asc" | "desc") =>
-    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeSort: `${column}_${direction}`, purgePage: 0 }) });
-  function SortHeader({ column, label, className }: { column: "created_at" | "user"; label: string; className?: string }) {
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({
+        ...prev,
+        purgeSort: `${column}_${direction}`,
+        purgePage: 0,
+      }),
+    });
+  function SortHeader({
+    column,
+    label,
+    className,
+  }: {
+    column: "created_at" | "user";
+    label: string;
+    className?: string;
+  }) {
     const active = purgeSort.column === column;
     const direction = active
-      ? purgeSort.direction === "asc" ? "desc" : "asc"
-      : column === "created_at" ? "desc" : "asc";
+      ? purgeSort.direction === "asc"
+        ? "desc"
+        : "asc"
+      : column === "created_at"
+        ? "desc"
+        : "asc";
     return (
       <TableHead
         className={cn("cursor-pointer select-none", className)}
@@ -284,33 +347,61 @@ function InvoiceDetailPage() {
       >
         <span className="flex items-center gap-1">
           {label}
-          <ArrowUpDown className={cn("h-3 w-3", active ? "text-foreground" : "text-muted-foreground")} />
+          <ArrowUpDown
+            className={cn("h-3 w-3", active ? "text-foreground" : "text-muted-foreground")}
+          />
         </span>
       </TableHead>
     );
   }
 
   const setPurgeUserFilter = (value: string) =>
-    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeUser: value, purgePage: 0 }) });
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeUser: value, purgePage: 0 }),
+    });
   const setPurgeFromDate = (value: string) =>
-    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeFrom: value, purgePage: 0 }) });
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeFrom: value, purgePage: 0 }),
+    });
   const setPurgeToDate = (value: string) =>
-    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeTo: value, purgePage: 0 }) });
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeTo: value, purgePage: 0 }),
+    });
   const setPurgeVersionQuery = (value: string) =>
-    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeVersion: value, purgePage: 0 }) });
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeVersion: value, purgePage: 0 }),
+    });
   const setPurgeMinBytes = (value: string) =>
-    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeMinBytes: value, purgePage: 0 }) });
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeMinBytes: value, purgePage: 0 }),
+    });
   const setPurgeMaxBytes = (value: string) =>
-    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeMaxBytes: value, purgePage: 0 }) });
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeMaxBytes: value, purgePage: 0 }),
+    });
   const setPurgePageSize = (value: number) =>
-    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeSize: value, purgePage: 0 }) });
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({ ...prev, purgeSize: value, purgePage: 0 }),
+    });
   const setPurgePage = (updater: number | ((prev: number) => number)) =>
-    navigate({ search: (prev: InvoiceDetailSearch) => ({ ...prev, purgePage: typeof updater === "function" ? updater(prev.purgePage) : updater }) });
-
-
+    navigate({
+      search: (prev: InvoiceDetailSearch) => ({
+        ...prev,
+        purgePage: typeof updater === "function" ? updater(prev.purgePage) : updater,
+      }),
+    });
 
   const purgeLogsQuery = useQuery({
-    queryKey: ["invoice-purge-logs", id, purgeUserFilter, purgeFromDate, purgeToDate, purgePage, purgePageSize, purgeSort],
+    queryKey: [
+      "invoice-purge-logs",
+      id,
+      purgeUserFilter,
+      purgeFromDate,
+      purgeToDate,
+      purgePage,
+      purgePageSize,
+      purgeSort,
+    ],
     queryFn: async () => {
       const from = purgePage * purgePageSize;
       const to = from + purgePageSize - 1;
@@ -325,8 +416,10 @@ function InvoiceDetailPage() {
       } else if (purgeUserFilter !== "all") {
         query = query.eq("user_id", purgeUserFilter);
       }
-      if (purgeFromDate) query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
-      if (purgeToDate) query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
+      if (purgeFromDate)
+        query = query.gte("created_at", new Date(purgeFromDate + "T00:00:00").toISOString());
+      if (purgeToDate)
+        query = query.lte("created_at", new Date(purgeToDate + "T23:59:59.999").toISOString());
       const sortColumn = purgeSort.column === "user" ? "user_id" : "created_at";
       const { data, error, count } = await query
         .order(sortColumn, { ascending: purgeSort.direction === "asc" })
@@ -367,10 +460,13 @@ function InvoiceDetailPage() {
   });
 
   const purgeActorIds = useMemo(
-    () => Array.from(new Set([
-      ...purgeDistinctUsers.filter((x): x is string => !!x),
-      ...purgeLogs.map((l) => l.user_id).filter((x): x is string => !!x),
-    ])),
+    () =>
+      Array.from(
+        new Set([
+          ...purgeDistinctUsers.filter((x): x is string => !!x),
+          ...purgeLogs.map((l) => l.user_id).filter((x): x is string => !!x),
+        ]),
+      ),
     [purgeDistinctUsers, purgeLogs],
   );
   const { data: purgeActorMap = {} } = useQuery({
@@ -392,7 +488,7 @@ function InvoiceDetailPage() {
     return purgeDistinctUsers
       .map((uid) => ({
         id: uid ?? "__system__",
-        label: uid ? purgeActorMap[uid] ?? "Unknown user" : "System",
+        label: uid ? (purgeActorMap[uid] ?? "Unknown user") : "System",
       }))
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [purgeDistinctUsers, purgeActorMap]);
@@ -421,9 +517,11 @@ function InvoiceDetailPage() {
     }
     if (purgeSort.column === "user") {
       rows = [...rows].sort((a, b) => {
-        const nameA = a.user_id ? purgeActorMap[a.user_id] ?? "Unknown user" : "System";
-        const nameB = b.user_id ? purgeActorMap[b.user_id] ?? "Unknown user" : "System";
-        return purgeSort.direction === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+        const nameA = a.user_id ? (purgeActorMap[a.user_id] ?? "Unknown user") : "System";
+        const nameB = b.user_id ? (purgeActorMap[b.user_id] ?? "Unknown user") : "System";
+        return purgeSort.direction === "asc"
+          ? nameA.localeCompare(nameB)
+          : nameB.localeCompare(nameA);
       });
     } else if (purgeSort.column === "created_at") {
       rows = [...rows].sort((a, b) => {
@@ -469,14 +567,13 @@ function InvoiceDetailPage() {
     });
   };
 
-
-
   // -------- Purge audit row selection --------
   const [selectedPurgeIds, setSelectedPurgeIds] = useState<Set<string>>(new Set());
   const togglePurgeSelected = (logId: string, checked: boolean) => {
     setSelectedPurgeIds((prev) => {
       const next = new Set(prev);
-      if (checked) next.add(logId); else next.delete(logId);
+      if (checked) next.add(logId);
+      else next.delete(logId);
       return next;
     });
   };
@@ -600,14 +697,11 @@ function InvoiceDetailPage() {
           duration: 10000,
         });
       }
-
     } catch (e) {
       setPurgeVerifyState({ status: "idle" });
       toast.error(e instanceof Error ? e.message : "Failed to compute checksum");
     }
   }
-
-
 
   // Export confirmation modal state.
   const [purgeExportConfirmOpen, setPurgeExportConfirmOpen] = useState(false);
@@ -619,9 +713,6 @@ function InvoiceDetailPage() {
     loading: boolean;
   } | null>(null);
   const [purgeExporting, setPurgeExporting] = useState(false);
-
-
-
 
   const [lines, setLines] = useState<Line[]>([]);
   const [notes, setNotes] = useState("");
@@ -638,7 +729,9 @@ function InvoiceDetailPage() {
     blob: Blob;
   } | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
-  const [pdfDocTypeFilter, setPdfDocTypeFilter] = useState<"all" | "proforma" | "commercial">("all");
+  const [pdfDocTypeFilter, setPdfDocTypeFilter] = useState<"all" | "proforma" | "commercial">(
+    "all",
+  );
   const [pdfFromDate, setPdfFromDate] = useState("");
   const [pdfToDate, setPdfToDate] = useState("");
   const [pdfNote, setPdfNote] = useState("");
@@ -679,7 +772,11 @@ function InvoiceDetailPage() {
     setTimeout(() => {
       setRemovedItems((prev) => {
         prev.forEach((r) => {
-          try { URL.revokeObjectURL(r.blobUrl); } catch { /* noop */ }
+          try {
+            URL.revokeObjectURL(r.blobUrl);
+          } catch {
+            /* noop */
+          }
         });
         return [];
       });
@@ -690,11 +787,15 @@ function InvoiceDetailPage() {
       setRetentionInput(String(retentionSetting.pdf_version_retention_count));
     }
   }, [retentionSetting?.pdf_version_retention_count]);
-  const globalRetentionCount = Math.max(1, Math.min(500, parseInt(retentionInput || "20", 10) || 20));
+  const globalRetentionCount = Math.max(
+    1,
+    Math.min(500, parseInt(retentionInput || "20", 10) || 20),
+  );
 
   // -------- Per-invoice retention override --------
-  const invoiceOverride = (invoice as { pdf_version_retention_count?: number | null } | undefined)
-    ?.pdf_version_retention_count ?? null;
+  const invoiceOverride =
+    (invoice as { pdf_version_retention_count?: number | null } | undefined)
+      ?.pdf_version_retention_count ?? null;
   const [overrideEnabled, setOverrideEnabled] = useState(false);
   const [overrideInput, setOverrideInput] = useState<string>("20");
   const [savingOverride, setSavingOverride] = useState(false);
@@ -708,7 +809,8 @@ function InvoiceDetailPage() {
   }, [invoiceOverride]);
   const overrideCount = Math.max(1, Math.min(500, parseInt(overrideInput || "20", 10) || 20));
   const effectiveRetention = overrideEnabled ? overrideCount : globalRetentionCount;
-  const effectiveRetentionPersisted = invoiceOverride ?? retentionSetting?.pdf_version_retention_count ?? null;
+  const effectiveRetentionPersisted =
+    invoiceOverride ?? retentionSetting?.pdf_version_retention_count ?? null;
 
   const overRetentionCount = Math.max(0, pdfVersions.length - effectiveRetention);
   const toPurgeVersions = useMemo(
@@ -746,7 +848,6 @@ function InvoiceDetailPage() {
       console.warn("auto-prune failed", e);
     }
   }
-
 
   async function saveRetentionSetting() {
     if (!retentionSetting?.id) {
@@ -823,7 +924,9 @@ function InvoiceDetailPage() {
   async function copyPurgeLogLink(logId: string) {
     try {
       await navigator.clipboard.writeText(getPurgeLogDeepLink(logId));
-      toast.success("Link copied", { description: "Deep link to this audit entry is on the clipboard." });
+      toast.success("Link copied", {
+        description: "Deep link to this audit entry is on the clipboard.",
+      });
     } catch {
       toast.error("Copy failed", { description: "Could not access the clipboard." });
     }
@@ -885,12 +988,14 @@ function InvoiceDetailPage() {
 
       setRemovedItems(snapshots);
       toast.success(`Purged ${removed} PDF version${removed === 1 ? "" : "s"}`, {
-        description: snapshots.length > 0
-          ? `${snapshots.length} archived for download. A new audit log entry was created.`
-          : "A new entry has been added to the purge audit log.",
-        action: snapshots.length > 0
-          ? { label: "View removed PDFs", onClick: () => setRemovedOpen(true) }
-          : { label: "View log entry", onClick: () => scrollToPurgeLog(latestLog?.id) },
+        description:
+          snapshots.length > 0
+            ? `${snapshots.length} archived for download. A new audit log entry was created.`
+            : "A new entry has been added to the purge audit log.",
+        action:
+          snapshots.length > 0
+            ? { label: "View removed PDFs", onClick: () => setRemovedOpen(true) }
+            : { label: "View log entry", onClick: () => scrollToPurgeLog(latestLog?.id) },
       });
       setPurgeOpen(false);
     } catch (e) {
@@ -900,18 +1005,25 @@ function InvoiceDetailPage() {
     }
   }
 
-
   function exportPurgeListCsv() {
     const rows = toPurgeVersions;
     if (rows.length === 0) return;
-    const header = ["Version ID", "Generated At", "Generated By", "Source", "Type", "Filename", "Storage Path"];
+    const header = [
+      "Version ID",
+      "Generated At",
+      "Generated By",
+      "Source",
+      "Type",
+      "Filename",
+      "Storage Path",
+    ];
     const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
     const lines = [
       header.join(","),
       ...rows.map((v) => {
         const dt = new Date(v.created_at);
         const stamp = dt.toISOString();
-        const who = v.generated_by ? generatorMap[v.generated_by] ?? "Unknown user" : "System";
+        const who = v.generated_by ? (generatorMap[v.generated_by] ?? "Unknown user") : "System";
         const source = v.source;
         const type = v.doc_type === "proforma" ? "Proforma" : "Commercial";
         return [
@@ -947,7 +1059,10 @@ function InvoiceDetailPage() {
     maxBytes?: string;
   };
 
-  async function exportPurgeAuditCsv(rows?: PurgeLogRow[], meta: PurgeExportMeta = { scope: "filtered" }) {
+  async function exportPurgeAuditCsv(
+    rows?: PurgeLogRow[],
+    meta: PurgeExportMeta = { scope: "filtered" },
+  ) {
     if (!canPurgePdf) {
       toast.error("You don't have permission to export the purge audit log.", {
         description: "Only Super Admin, Management, or Finance can export purge history.",
@@ -996,9 +1111,11 @@ function InvoiceDetailPage() {
       // Apply the same audit-log sort to the exported rows.
       if (purgeSort.column === "user") {
         source = [...source].sort((a, b) => {
-          const nameA = a.user_id ? purgeActorMap[a.user_id] ?? "Unknown user" : "System";
-          const nameB = b.user_id ? purgeActorMap[b.user_id] ?? "Unknown user" : "System";
-          return purgeSort.direction === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+          const nameA = a.user_id ? (purgeActorMap[a.user_id] ?? "Unknown user") : "System";
+          const nameB = b.user_id ? (purgeActorMap[b.user_id] ?? "Unknown user") : "System";
+          return purgeSort.direction === "asc"
+            ? nameA.localeCompare(nameB)
+            : nameB.localeCompare(nameA);
         });
       } else if (purgeSort.column === "created_at") {
         source = [...source].sort((a, b) => {
@@ -1086,7 +1203,7 @@ function InvoiceDetailPage() {
           version_ids?: string[];
           total_bytes?: number;
         };
-        const who = log.user_id ? purgeActorMap[log.user_id] ?? "Unknown user" : "System";
+        const who = log.user_id ? (purgeActorMap[log.user_id] ?? "Unknown user") : "System";
         const ids = Array.isArray(logMeta.version_ids) ? logMeta.version_ids : [];
         const totalBytes = logMeta.total_bytes ?? 0;
         return [
@@ -1098,7 +1215,11 @@ function InvoiceDetailPage() {
           escape(meta.scope === "filtered" ? (meta.minBytes ?? "") : ""),
           escape(meta.scope === "filtered" ? (meta.maxBytes ?? "") : ""),
           escape(meta.scope === "selected" ? String(source.length) : ""),
-          escape(meta.scope === "selected" && selectedVersionInfo ? String(selectedVersionInfo.count) : ""),
+          escape(
+            meta.scope === "selected" && selectedVersionInfo
+              ? String(selectedVersionInfo.count)
+              : "",
+          ),
           escape(meta.scope === "selected" && selectedVersionInfo ? selectedVersionInfo.ids : ""),
           escape(log.id),
           escape(log.created_at),
@@ -1168,9 +1289,7 @@ function InvoiceDetailPage() {
           ? {
               selected_row_count: source.length,
               selected_version_count: selectedVersionInfo.count,
-              selected_version_ids: selectedVersionInfo.ids
-                .split("; ")
-                .filter(Boolean),
+              selected_version_ids: selectedVersionInfo.ids.split("; ").filter(Boolean),
             }
           : {};
       try {
@@ -1201,9 +1320,12 @@ function InvoiceDetailPage() {
         });
       }
     }
-    toast.success(`Exported ${source.length} ${meta.scope} audit entr${source.length === 1 ? "y" : "ies"}`, {
-      description: sha256 ? `SHA-256: ${sha256.slice(0, 16)}…` : undefined,
-    });
+    toast.success(
+      `Exported ${source.length} ${meta.scope} audit entr${source.length === 1 ? "y" : "ies"}`,
+      {
+        description: sha256 ? `SHA-256: ${sha256.slice(0, 16)}…` : undefined,
+      },
+    );
   }
 
   async function openPurgeExportConfirm(scope: "filtered" | "selected") {
@@ -1271,9 +1393,11 @@ function InvoiceDetailPage() {
       // Apply the current audit-log sort.
       if (purgeSort.column === "user") {
         source = [...source].sort((a, b) => {
-          const nameA = a.user_id ? purgeActorMap[a.user_id] ?? "Unknown user" : "System";
-          const nameB = b.user_id ? purgeActorMap[b.user_id] ?? "Unknown user" : "System";
-          return purgeSort.direction === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+          const nameA = a.user_id ? (purgeActorMap[a.user_id] ?? "Unknown user") : "System";
+          const nameB = b.user_id ? (purgeActorMap[b.user_id] ?? "Unknown user") : "System";
+          return purgeSort.direction === "asc"
+            ? nameA.localeCompare(nameB)
+            : nameB.localeCompare(nameA);
         });
       } else if (purgeSort.column === "created_at") {
         source = [...source].sort((a, b) => {
@@ -1319,7 +1443,8 @@ function InvoiceDetailPage() {
               userLabel:
                 purgeUserFilter === "all"
                   ? "All users"
-                  : purgeUserOptions.find((u) => u.id === purgeUserFilter)?.label ?? purgeUserFilter,
+                  : (purgeUserOptions.find((u) => u.id === purgeUserFilter)?.label ??
+                    purgeUserFilter),
               fromDate: purgeFromDate,
               toDate: purgeToDate,
               versionQuery: purgeVersionQuery,
@@ -1380,7 +1505,6 @@ function InvoiceDetailPage() {
       console.warn("Failed to archive PDF version", e);
     }
   }
-
 
   // -------- Email to customer --------
   const emailFn = useServerFn(emailInvoicePdf);
@@ -1472,14 +1596,23 @@ function InvoiceDetailPage() {
 
   const totals = useMemo(() => {
     let subtotal = 0;
+    let discount = 0;
     let vat = 0;
     for (const l of lines.filter((x) => !x._deleted)) {
       const gross = l.quantity * l.unit_price;
-      const afterDisc = gross * (1 - (l.discount_pct || 0) / 100);
+      const lineDiscount = gross * ((l.discount_pct || 0) / 100);
+      const afterDisc = gross - lineDiscount;
+      discount += lineDiscount;
       subtotal += afterDisc;
       vat += afterDisc * ((l.vat_pct || 0) / 100);
     }
-    return { subtotal, vat, total: subtotal + vat };
+    const round2 = (value: number) => Math.round(value * 100) / 100;
+    return {
+      subtotal: round2(subtotal),
+      discount: round2(discount),
+      vat: round2(vat),
+      total: round2(subtotal + vat),
+    };
   }, [lines]);
 
   const filteredPdfVersions = useMemo(() => {
@@ -1550,7 +1683,9 @@ function InvoiceDetailPage() {
           issue_date: issueDate,
           due_date: dueDate || null,
           subtotal: totals.subtotal,
+          discount_total: totals.discount,
           vat_amount: totals.vat,
+          tax_total: totals.vat,
           total: totals.total,
           balance: Math.max(totals.total - financePaidAmount(invoice), 0),
         })
@@ -1570,11 +1705,19 @@ function InvoiceDetailPage() {
           unit: l.unit,
           unit_price: l.unit_price,
           discount_pct: l.discount_pct,
+          discount: l.discount_pct,
           vat_pct: l.vat_pct,
+          tax_rate: l.vat_pct,
           position: l.position,
+          sort_order: l.position,
           line_total:
-            l.quantity * l.unit_price * (1 - (l.discount_pct || 0) / 100) *
-            (1 + (l.vat_pct || 0) / 100),
+            Math.round(
+              l.quantity *
+                l.unit_price *
+                (1 - (l.discount_pct || 0) / 100) *
+                (1 + (l.vat_pct || 0) / 100) *
+                100,
+            ) / 100,
         };
         if (l.id) {
           const { error } = await supabase.from("invoice_items").update(payload).eq("id", l.id);
@@ -1625,7 +1768,6 @@ function InvoiceDetailPage() {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Convert failed"),
   });
-
 
   const addPayment = useMutation({
     mutationFn: async () => {
@@ -1678,9 +1820,7 @@ function InvoiceDetailPage() {
       </div>
     );
 
-  const cust = invoice.customers as
-    | (CustomerDisplay & { id: string })
-    | null;
+  const cust = invoice.customers as (CustomerDisplay & { id: string }) | null;
 
   function updateLine(idx: number, patch: Partial<Line>) {
     setLines((prev) => prev.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
@@ -1713,7 +1853,8 @@ function InvoiceDetailPage() {
       <div className="print:hidden">
         <Button asChild variant="ghost" size="sm" className="mb-2">
           <Link to={invoice.type === "proforma" ? "/admin/proforma-invoices" : "/admin/invoices"}>
-            <ArrowLeft className="h-4 w-4 mr-1" /> All {invoice.type === "proforma" ? "proforma" : "invoices"}
+            <ArrowLeft className="h-4 w-4 mr-1" /> All{" "}
+            {invoice.type === "proforma" ? "proforma" : "invoices"}
           </Link>
         </Button>
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
@@ -1763,12 +1904,7 @@ function InvoiceDetailPage() {
               <Printer className="h-4 w-4 mr-1" /> Print
             </Button>
             <InvoiceAiCheckButton invoiceId={invoice.id} />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={openPdfPreview}
-              disabled={pdfLoading}
-            >
+            <Button variant="outline" size="sm" onClick={openPdfPreview} disabled={pdfLoading}>
               <FileDown className="h-4 w-4 mr-1" />
               {pdfLoading ? "Preparing…" : "Preview PDF"}
             </Button>
@@ -1829,7 +1965,9 @@ function InvoiceDetailPage() {
                 {lines.map((l, idx) => {
                   if (l._deleted) return null;
                   const lt =
-                    l.quantity * l.unit_price * (1 - (l.discount_pct || 0) / 100) *
+                    l.quantity *
+                    l.unit_price *
+                    (1 - (l.discount_pct || 0) / 100) *
                     (1 + (l.vat_pct || 0) / 100);
                   return (
                     <TableRow key={l.id ?? `new-${idx}`}>
@@ -1917,7 +2055,10 @@ function InvoiceDetailPage() {
                     }
                   />
                 </div>
-                <Row label="Paid" value={formatMoney(financePaidAmount(invoice), invoice.currency)} />
+                <Row
+                  label="Paid"
+                  value={formatMoney(financePaidAmount(invoice), invoice.currency)}
+                />
                 <div className="border-t pt-1">
                   <Row
                     label={<span className="font-semibold">Balance</span>}
@@ -2211,7 +2352,6 @@ function InvoiceDetailPage() {
                     </p>
                   </div>
 
-
                   {filteredPdfVersions.length === 0 ? (
                     <p className="px-4 py-6 text-sm text-muted-foreground text-center">
                       No PDF versions match the selected filters.
@@ -2235,7 +2375,7 @@ function InvoiceDetailPage() {
                             key={v.id}
                             v={v}
                             generatorName={
-                              v.generated_by ? generatorMap[v.generated_by] ?? "" : ""
+                              v.generated_by ? (generatorMap[v.generated_by] ?? "") : ""
                             }
                           />
                         ))}
@@ -2257,7 +2397,9 @@ function InvoiceDetailPage() {
                     {purgeTotal}
                   </Badge>
                   {selectedPurgeIds.size > 0 && (
-                    <Badge variant="outline" className="ml-1">{selectedPurgeIds.size} selected</Badge>
+                    <Badge variant="outline" className="ml-1">
+                      {selectedPurgeIds.size} selected
+                    </Badge>
                   )}
                 </CardTitle>
                 <div className="flex items-center gap-2">
@@ -2268,8 +2410,14 @@ function InvoiceDetailPage() {
                         size="sm"
                         className="h-8"
                         disabled={!canPurgePdf}
-                        title={!canPurgePdf ? "Only Super Admin, Management, or Finance can export purge history." : undefined}
-                        onClick={() => { void openPurgeExportConfirm("selected"); }}
+                        title={
+                          !canPurgePdf
+                            ? "Only Super Admin, Management, or Finance can export purge history."
+                            : undefined
+                        }
+                        onClick={() => {
+                          void openPurgeExportConfirm("selected");
+                        }}
                       >
                         <FileDown className="h-3.5 w-3.5 mr-1" />
                         Export selected ({selectedPurgeIds.size})
@@ -2301,9 +2449,15 @@ function InvoiceDetailPage() {
                     variant="outline"
                     size="sm"
                     className="h-8"
-                    onClick={() => { void openPurgeExportConfirm("filtered"); }}
-                    disabled={!canPurgePdf || (purgeTotal === 0)}
-                    title={!canPurgePdf ? "Only Super Admin, Management, or Finance can export purge history." : undefined}
+                    onClick={() => {
+                      void openPurgeExportConfirm("filtered");
+                    }}
+                    disabled={!canPurgePdf || purgeTotal === 0}
+                    title={
+                      !canPurgePdf
+                        ? "Only Super Admin, Management, or Finance can export purge history."
+                        : undefined
+                    }
                   >
                     <FileDown className="h-3.5 w-3.5 mr-1" />
                     Export CSV{purgeFiltersActive ? " (filtered)" : ""}
@@ -2317,7 +2471,8 @@ function InvoiceDetailPage() {
                     <span className="text-muted-foreground">{lastPurgeExport.filename}</span>
                     <Badge variant="outline">{lastPurgeExport.scope}</Badge>
                     <span className="text-muted-foreground">
-                      {lastPurgeExport.rowCount} row{lastPurgeExport.rowCount === 1 ? "" : "s"} · {lastPurgeExport.byteSize} B
+                      {lastPurgeExport.rowCount} row{lastPurgeExport.rowCount === 1 ? "" : "s"} ·{" "}
+                      {lastPurgeExport.byteSize} B
                     </span>
                     <span className="text-muted-foreground">
                       {new Date(lastPurgeExport.exportedAt).toLocaleString()}
@@ -2355,7 +2510,9 @@ function InvoiceDetailPage() {
                       disabled={!lastPurgeExport.sha256 || purgeVerifyState.status === "verifying"}
                       onClick={() => purgeVerifyInputRef.current?.click()}
                     >
-                      {purgeVerifyState.status === "verifying" ? "Verifying…" : "Verify downloaded file"}
+                      {purgeVerifyState.status === "verifying"
+                        ? "Verifying…"
+                        : "Verify downloaded file"}
                     </Button>
                     <input
                       ref={purgeVerifyInputRef}
@@ -2372,12 +2529,10 @@ function InvoiceDetailPage() {
                   {purgeVerifyState.status === "match" && (
                     <div className="mt-2 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2 py-1.5 text-[11px] text-emerald-700 dark:text-emerald-300 space-y-0.5">
                       <div>
-                        ✓ {purgeVerifyState.filename} matches the displayed SHA-256
-                        · verified {new Date(purgeVerifyState.verifiedAt).toLocaleString()}
+                        ✓ {purgeVerifyState.filename} matches the displayed SHA-256 · verified{" "}
+                        {new Date(purgeVerifyState.verifiedAt).toLocaleString()}
                       </div>
-                      <div className="font-mono break-all">
-                        computed: {purgeVerifyState.sha256}
-                      </div>
+                      <div className="font-mono break-all">computed: {purgeVerifyState.sha256}</div>
                       {purgeVerifyState.embeddedSha && (
                         <div className="font-mono break-all">
                           embedded: {purgeVerifyState.embeddedSha}
@@ -2399,14 +2554,13 @@ function InvoiceDetailPage() {
                   {purgeVerifyState.status === "mismatch" && (
                     <div className="mt-2 rounded-md border border-destructive/50 bg-destructive/10 px-2 py-1.5 text-[11px] text-destructive space-y-0.5">
                       <div className="font-medium">
-                        ✗ Checksum mismatch — {purgeVerifyState.filename} may be altered or corrupted.
+                        ✗ Checksum mismatch — {purgeVerifyState.filename} may be altered or
+                        corrupted.
                       </div>
                       <div className="font-mono break-all">
                         expected: {purgeVerifyState.expected}
                       </div>
-                      <div className="font-mono break-all">
-                        computed: {purgeVerifyState.sha256}
-                      </div>
+                      <div className="font-mono break-all">computed: {purgeVerifyState.sha256}</div>
                       {purgeVerifyState.embeddedSha && (
                         <div className="font-mono break-all">
                           embedded: {purgeVerifyState.embeddedSha}
@@ -2434,8 +2588,8 @@ function InvoiceDetailPage() {
                         ⚠ Malformed CSV — {purgeVerifyState.filename} cannot be verified
                       </div>
                       <div>
-                        The file does not match the NEVO export format. Verification was
-                        aborted before hashing:
+                        The file does not match the NEVO export format. Verification was aborted
+                        before hashing:
                       </div>
                       <ul className="list-disc list-inside space-y-0.5">
                         {purgeVerifyState.messages.map((msg, i) => (
@@ -2454,9 +2608,6 @@ function InvoiceDetailPage() {
                       )}
                     </div>
                   )}
-
-
-
                 </div>
               )}
             </CardHeader>
@@ -2467,26 +2618,43 @@ function InvoiceDetailPage() {
                 </p>
               ) : (
                 <>
-                  <div id="purge-audit-filters" className="px-4 pb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5 items-end">
+                  <div
+                    id="purge-audit-filters"
+                    className="px-4 pb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5 items-end"
+                  >
                     <div className="space-y-1">
                       <Label className="text-xs">User</Label>
                       <Select value={purgeUserFilter} onValueChange={setPurgeUserFilter}>
-                        <SelectTrigger className="h-8"><SelectValue placeholder="All users" /></SelectTrigger>
+                        <SelectTrigger className="h-8">
+                          <SelectValue placeholder="All users" />
+                        </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All users</SelectItem>
                           {purgeUserOptions.map((u) => (
-                            <SelectItem key={u.id} value={u.id}>{u.label}</SelectItem>
+                            <SelectItem key={u.id} value={u.id}>
+                              {u.label}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-1">
                       <Label className="text-xs">From</Label>
-                      <Input type="date" className="h-8" value={purgeFromDate} onChange={(e) => setPurgeFromDate(e.target.value)} />
+                      <Input
+                        type="date"
+                        className="h-8"
+                        value={purgeFromDate}
+                        onChange={(e) => setPurgeFromDate(e.target.value)}
+                      />
                     </div>
                     <div className="space-y-1">
                       <Label className="text-xs">To</Label>
-                      <Input type="date" className="h-8" value={purgeToDate} onChange={(e) => setPurgeToDate(e.target.value)} />
+                      <Input
+                        type="date"
+                        className="h-8"
+                        value={purgeToDate}
+                        onChange={(e) => setPurgeToDate(e.target.value)}
+                      />
                     </div>
                     <div className="space-y-1 lg:col-span-1">
                       <Label className="text-xs">Version ID contains</Label>
@@ -2561,13 +2729,18 @@ function InvoiceDetailPage() {
                       No entries match the current filters.
                     </p>
                   ) : (
-
                     <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead className="w-10">
                             <Checkbox
-                              checked={allFilteredSelected ? true : someFilteredSelected ? "indeterminate" : false}
+                              checked={
+                                allFilteredSelected
+                                  ? true
+                                  : someFilteredSelected
+                                    ? "indeterminate"
+                                    : false
+                              }
                               onCheckedChange={(v) => toggleAllFiltered(v === true)}
                               aria-label="Select all filtered rows"
                             />
@@ -2590,11 +2763,13 @@ function InvoiceDetailPage() {
                             total_bytes?: number;
                           };
                           const who = log.user_id
-                            ? purgeActorMap[log.user_id] ?? "Unknown user"
+                            ? (purgeActorMap[log.user_id] ?? "Unknown user")
                             : "System";
                           const ids = Array.isArray(meta.version_ids) ? meta.version_ids : [];
                           const idQ = purgeVersionQuery.trim().toLowerCase();
-                          const displayIds = idQ ? ids.filter((v) => v.toLowerCase().includes(idQ)) : ids;
+                          const displayIds = idQ
+                            ? ids.filter((v) => v.toLowerCase().includes(idQ))
+                            : ids;
                           return (
                             <TableRow
                               key={log.id}
@@ -2659,11 +2834,19 @@ function InvoiceDetailPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs">Rows</Label>
-                      <Select value={String(purgePageSize)} onValueChange={(v) => setPurgePageSize(parseInt(v, 10))} disabled={purgeLoading}>
-                        <SelectTrigger className="h-7 w-[70px]"><SelectValue /></SelectTrigger>
+                      <Select
+                        value={String(purgePageSize)}
+                        onValueChange={(v) => setPurgePageSize(parseInt(v, 10))}
+                        disabled={purgeLoading}
+                      >
+                        <SelectTrigger className="h-7 w-[70px]">
+                          <SelectValue />
+                        </SelectTrigger>
                         <SelectContent>
                           {[10, 25, 50, 100].map((n) => (
-                            <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                            <SelectItem key={n} value={String(n)}>
+                              {n}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -2676,7 +2859,9 @@ function InvoiceDetailPage() {
                       >
                         Prev
                       </Button>
-                      <span>Page {purgePage + 1} / {purgePageCount}</span>
+                      <span>
+                        Page {purgePage + 1} / {purgePageCount}
+                      </span>
                       <Button
                         size="sm"
                         variant="outline"
@@ -2689,11 +2874,9 @@ function InvoiceDetailPage() {
                     </div>
                   </div>
                 </>
-
               )}
             </CardContent>
           </Card>
-
         </div>
       </div>
 
@@ -2781,12 +2964,7 @@ function InvoiceDetailPage() {
               <Button size="sm" variant="outline" onClick={openPdfPreview} disabled={pdfLoading}>
                 {pdfLoading ? "Refreshing…" : "Refresh"}
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={openEmailDialog}
-                disabled={!pdfPreview}
-              >
+              <Button size="sm" variant="outline" onClick={openEmailDialog} disabled={!pdfPreview}>
                 <Mail className="h-4 w-4 mr-1" /> Email
               </Button>
               <Button size="sm" onClick={downloadCurrentPdf} disabled={!pdfPreview}>
@@ -2795,7 +2973,10 @@ function InvoiceDetailPage() {
             </div>
           </DialogHeader>
           <div className="px-4 py-2 border-b bg-background flex items-center gap-2">
-            <Label htmlFor="pdf-note-input" className="text-xs text-muted-foreground whitespace-nowrap">
+            <Label
+              htmlFor="pdf-note-input"
+              className="text-xs text-muted-foreground whitespace-nowrap"
+            >
               Generation note (optional)
             </Label>
             <Input
@@ -2863,8 +3044,8 @@ function InvoiceDetailPage() {
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              The current PDF is uploaded to secure storage and shared via a
-              7-day download link. The audit log records who sent it.
+              The current PDF is uploaded to secure storage and shared via a 7-day download link.
+              The audit log records who sent it.
             </p>
           </div>
           <DialogFooter>
@@ -2889,12 +3070,15 @@ function InvoiceDetailPage() {
           <div className="space-y-4 overflow-hidden flex flex-col">
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <p className="text-muted-foreground">
-                Keeping the latest {effectiveRetention} version{effectiveRetention === 1 ? "" : "s"}. The following{" "}
-                {overRetentionCount} version{overRetentionCount === 1 ? "" : "s"} will be permanently deleted:
+                Keeping the latest {effectiveRetention} version{effectiveRetention === 1 ? "" : "s"}
+                . The following {overRetentionCount} version{overRetentionCount === 1 ? "" : "s"}{" "}
+                will be permanently deleted:
               </p>
               <div className="ml-auto flex items-center gap-2 text-xs">
                 <span className="text-muted-foreground">Total size:</span>
-                <span className="font-medium font-mono">{formatBytes(toPurgeVersions.reduce((sum, v) => sum + (v.byte_size ?? 0), 0))}</span>
+                <span className="font-medium font-mono">
+                  {formatBytes(toPurgeVersions.reduce((sum, v) => sum + (v.byte_size ?? 0), 0))}
+                </span>
               </div>
             </div>
             <div className="border rounded-md overflow-auto">
@@ -2915,25 +3099,40 @@ function InvoiceDetailPage() {
                   {toPurgeVersions.map((v, idx) => {
                     const dt = new Date(v.created_at);
                     const stamp = `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
-                    const who = v.generated_by ? generatorMap[v.generated_by] ?? "Unknown user" : "System";
+                    const who = v.generated_by
+                      ? (generatorMap[v.generated_by] ?? "Unknown user")
+                      : "System";
                     return (
                       <TableRow key={v.id}>
-                        <TableCell className="text-xs text-center text-muted-foreground">{idx + 1}</TableCell>
+                        <TableCell className="text-xs text-center text-muted-foreground">
+                          {idx + 1}
+                        </TableCell>
                         <TableCell className="text-xs whitespace-nowrap">{stamp}</TableCell>
-                        <TableCell className="text-xs max-w-[140px] truncate" title={who}>{who}</TableCell>
+                        <TableCell className="text-xs max-w-[140px] truncate" title={who}>
+                          {who}
+                        </TableCell>
                         <TableCell className="text-xs">
                           {v.source === "download" && "Download"}
                           {v.source === "email" && "Emailed"}
                           {v.source === "bulk" && "Bulk export"}
                           {v.source === "preview" && "Preview"}
-                          {! ["download", "email", "bulk", "preview"].includes(v.source) && v.source}
+                          {!["download", "email", "bulk", "preview"].includes(v.source) && v.source}
                         </TableCell>
                         <TableCell className="text-xs">
                           {v.doc_type === "proforma" ? "Proforma" : "Commercial"}
                         </TableCell>
-                        <TableCell className="text-xs font-mono max-w-[200px] truncate" title={v.filename}>{v.filename}</TableCell>
-                        <TableCell className="text-xs text-right font-mono">{formatBytes(v.byte_size ?? 0)}</TableCell>
-                        <TableCell className="text-xs max-w-[180px] truncate" title={v.note ?? ""}>{v.note ?? "—"}</TableCell>
+                        <TableCell
+                          className="text-xs font-mono max-w-[200px] truncate"
+                          title={v.filename}
+                        >
+                          {v.filename}
+                        </TableCell>
+                        <TableCell className="text-xs text-right font-mono">
+                          {formatBytes(v.byte_size ?? 0)}
+                        </TableCell>
+                        <TableCell className="text-xs max-w-[180px] truncate" title={v.note ?? ""}>
+                          {v.note ?? "—"}
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -2941,14 +3140,19 @@ function InvoiceDetailPage() {
               </Table>
             </div>
             <p className="text-xs text-muted-foreground">
-              Review the list carefully. Export a CSV below for compliance records before confirming.
+              Review the list carefully. Export a CSV below for compliance records before
+              confirming.
             </p>
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setPurgeOpen(false)} disabled={purging}>
               Cancel
             </Button>
-            <Button variant="outline" onClick={exportPurgeListCsv} disabled={purging || toPurgeVersions.length === 0}>
+            <Button
+              variant="outline"
+              onClick={exportPurgeListCsv}
+              disabled={purging || toPurgeVersions.length === 0}
+            >
               <FileDown className="h-4 w-4 mr-1" />
               Export CSV
             </Button>
@@ -2984,7 +3188,9 @@ function InvoiceDetailPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Scope</span>
                     <span className="font-medium">
-                      {purgeExportConfirmState?.scope === "selected" ? "Selected rows" : "Filtered results"}
+                      {purgeExportConfirmState?.scope === "selected"
+                        ? "Selected rows"
+                        : "Filtered results"}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -3000,22 +3206,29 @@ function InvoiceDetailPage() {
                   <div className="rounded-md border border-border bg-muted/40 px-3 py-2 text-sm">
                     <p className="font-medium text-foreground">Export capped at 10,000 rows</p>
                     <p className="text-muted-foreground">
-                      {purgeExportConfirmState.total.toLocaleString()} entries match your filters. Narrow the date range, user, or version filters to export the rest.
+                      {purgeExportConfirmState.total.toLocaleString()} entries match your filters.
+                      Narrow the date range, user, or version filters to export the rest.
                     </p>
                   </div>
                 )}
                 {purgeExportConfirmState?.scope === "filtered" && purgeFiltersActive && (
                   <div className="space-y-1 text-sm">
-                    <p className="font-medium text-xs text-muted-foreground uppercase tracking-wider">Active filters</p>
+                    <p className="font-medium text-xs text-muted-foreground uppercase tracking-wider">
+                      Active filters
+                    </p>
                     <ul className="space-y-1 text-muted-foreground">
                       {purgeUserFilter !== "all" && (
                         <li>
-                          User: {purgeUserOptions.find((u) => u.id === purgeUserFilter)?.label ?? purgeUserFilter}
+                          User:{" "}
+                          {purgeUserOptions.find((u) => u.id === purgeUserFilter)?.label ??
+                            purgeUserFilter}
                         </li>
                       )}
                       {purgeFromDate && <li>From: {purgeFromDate}</li>}
                       {purgeToDate && <li>To: {purgeToDate}</li>}
-                      {purgeVersionQuery.trim() && <li>Version ID contains: {purgeVersionQuery.trim()}</li>}
+                      {purgeVersionQuery.trim() && (
+                        <li>Version ID contains: {purgeVersionQuery.trim()}</li>
+                      )}
                       {purgeMinBytes !== "" && <li>Min removed size: {purgeMinBytes} MB</li>}
                       {purgeMaxBytes !== "" && <li>Max removed size: {purgeMaxBytes} MB</li>}
                     </ul>
@@ -3023,7 +3236,9 @@ function InvoiceDetailPage() {
                 )}
                 {purgeExportConfirmState?.scope === "selected" && (
                   <p className="text-sm text-muted-foreground">
-                    Only the {purgeExportConfirmState.rows.length} selected audit log entr{purgeExportConfirmState.rows.length === 1 ? "y" : "ies"} will be included in the CSV.
+                    Only the {purgeExportConfirmState.rows.length} selected audit log entr
+                    {purgeExportConfirmState.rows.length === 1 ? "y" : "ies"} will be included in
+                    the CSV.
                   </p>
                 )}
               </>
@@ -3050,13 +3265,18 @@ function InvoiceDetailPage() {
               }
             >
               <FileDown className="h-4 w-4 mr-1" />
-              {purgeExporting ? "Exporting…" : `Export ${purgeExportConfirmState?.rows.length ?? 0} rows`}
+              {purgeExporting
+                ? "Exporting…"
+                : `Export ${purgeExportConfirmState?.rows.length ?? 0} rows`}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={removedOpen} onOpenChange={(o) => (o ? setRemovedOpen(true) : closeRemovedModal())}>
+      <Dialog
+        open={removedOpen}
+        onOpenChange={(o) => (o ? setRemovedOpen(true) : closeRemovedModal())}
+      >
         <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>
@@ -3065,7 +3285,9 @@ function InvoiceDetailPage() {
           </DialogHeader>
           <div className="space-y-3 overflow-hidden flex flex-col">
             <p className="text-xs text-muted-foreground">
-              These versions have been permanently deleted from storage. The archived copies below are held in this browser session only — download them now if you need them for records.
+              These versions have been permanently deleted from storage. The archived copies below
+              are held in this browser session only — download them now if you need them for
+              records.
             </p>
             <div className="border rounded-md overflow-auto">
               <Table>
@@ -3083,57 +3305,63 @@ function InvoiceDetailPage() {
                 <TableBody>
                   {removedItems.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-xs text-center text-muted-foreground py-6">
+                      <TableCell
+                        colSpan={7}
+                        className="text-xs text-center text-muted-foreground py-6"
+                      >
                         No archived copies available.
                       </TableCell>
                     </TableRow>
-                  ) : removedItems.map((r, idx) => {
-                    const dt = new Date(r.created_at);
-                    const stamp = `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
-                    return (
-                      <TableRow key={r.id}>
-                        <TableCell className="text-xs text-center text-muted-foreground">{idx + 1}</TableCell>
-                        <TableCell className="text-xs whitespace-nowrap">{stamp}</TableCell>
-                        <TableCell className="text-xs">{r.doc_type === "proforma" ? "Proforma" : "Commercial"}</TableCell>
-                        <TableCell className="text-xs capitalize">{r.source}</TableCell>
-                        <TableCell className="text-xs font-mono max-w-[220px] truncate" title={r.filename}>{r.filename}</TableCell>
-                        <TableCell className="text-xs text-right font-mono">{formatBytes(r.byte_size ?? 0)}</TableCell>
-                        <TableCell className="text-xs text-right">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            asChild
+                  ) : (
+                    removedItems.map((r, idx) => {
+                      const dt = new Date(r.created_at);
+                      const stamp = `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+                      return (
+                        <TableRow key={r.id}>
+                          <TableCell className="text-xs text-center text-muted-foreground">
+                            {idx + 1}
+                          </TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">{stamp}</TableCell>
+                          <TableCell className="text-xs">
+                            {r.doc_type === "proforma" ? "Proforma" : "Commercial"}
+                          </TableCell>
+                          <TableCell className="text-xs capitalize">{r.source}</TableCell>
+                          <TableCell
+                            className="text-xs font-mono max-w-[220px] truncate"
+                            title={r.filename}
                           >
-                            <a href={r.blobUrl} download={r.filename}>
-                              <Download className="h-3.5 w-3.5 mr-1" /> Download
-                            </a>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                            {r.filename}
+                          </TableCell>
+                          <TableCell className="text-xs text-right font-mono">
+                            {formatBytes(r.byte_size ?? 0)}
+                          </TableCell>
+                          <TableCell className="text-xs text-right">
+                            <Button size="sm" variant="outline" asChild>
+                              <a href={r.blobUrl} download={r.filename}>
+                                <Download className="h-3.5 w-3.5 mr-1" /> Download
+                              </a>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
                 </TableBody>
               </Table>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={closeRemovedModal}>Close</Button>
+            <Button variant="ghost" onClick={closeRemovedModal}>
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
-
-
   );
 }
 
-function PdfVersionRow({
-  v,
-  generatorName,
-}: {
-  v: InvoicePdfVersionRow;
-  generatorName: string;
-}) {
+function PdfVersionRow({ v, generatorName }: { v: InvoicePdfVersionRow; generatorName: string }) {
   const [busy, setBusy] = useState(false);
   const sourceLabel: Record<string, string> = {
     download: "Download",
@@ -3166,17 +3394,19 @@ function PdfVersionRow({
   return (
     <TableRow>
       <TableCell className="whitespace-nowrap text-sm">{stamp}</TableCell>
-      <TableCell className="text-sm max-w-[160px] truncate" title={who}>{who}</TableCell>
+      <TableCell className="text-sm max-w-[160px] truncate" title={who}>
+        {who}
+      </TableCell>
       <TableCell>
         <Badge variant="secondary">{sourceLabel[v.source] ?? v.source}</Badge>
       </TableCell>
       <TableCell>
-        <Badge variant="outline">
-          {v.doc_type === "proforma" ? "Proforma" : "Commercial"}
-        </Badge>
+        <Badge variant="outline">{v.doc_type === "proforma" ? "Proforma" : "Commercial"}</Badge>
       </TableCell>
       <TableCell className="max-w-[260px]">
-        <div className="text-xs font-mono truncate" title={v.filename}>{v.filename}</div>
+        <div className="text-xs font-mono truncate" title={v.filename}>
+          {v.filename}
+        </div>
         {v.note && (
           <div className="text-xs text-muted-foreground italic truncate" title={v.note}>
             “{v.note}”
@@ -3190,11 +3420,9 @@ function PdfVersionRow({
           {busy ? "…" : "Get"}
         </Button>
       </TableCell>
-
     </TableRow>
   );
 }
-
 
 function Row({ label, value }: { label: React.ReactNode; value: React.ReactNode }) {
   return (

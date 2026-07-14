@@ -61,6 +61,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicContactSubmitRouteImport } from './routes/api/public/contact-submit'
 import { Route as ApiPublicClientLogRouteImport } from './routes/api/public/client-log'
+import { Route as ApiPublicCareerSubmitRouteImport } from './routes/api/public/career-submit'
 import { Route as ApiPublicBootstrapSuperAdminRouteImport } from './routes/api/public/bootstrap-super-admin'
 import { Route as ApiPublicApprovalNotifyRouteImport } from './routes/api/public/approval-notify'
 import { Route as ApiAdminCsvExportAuditRouteImport } from './routes/api/admin/csv-export-audit'
@@ -403,6 +404,11 @@ const ApiPublicContactSubmitRoute = ApiPublicContactSubmitRouteImport.update({
 const ApiPublicClientLogRoute = ApiPublicClientLogRouteImport.update({
   id: '/api/public/client-log',
   path: '/api/public/client-log',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCareerSubmitRoute = ApiPublicCareerSubmitRouteImport.update({
+  id: '/api/public/career-submit',
+  path: '/api/public/career-submit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicBootstrapSuperAdminRoute =
@@ -952,6 +958,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/csv-export-audit': typeof ApiAdminCsvExportAuditRoute
   '/api/public/approval-notify': typeof ApiPublicApprovalNotifyRoute
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
+  '/api/public/career-submit': typeof ApiPublicCareerSubmitRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/contact-submit': typeof ApiPublicContactSubmitRoute
   '/api/public/health': typeof ApiPublicHealthRoute
@@ -1079,6 +1086,7 @@ export interface FileRoutesByTo {
   '/api/admin/csv-export-audit': typeof ApiAdminCsvExportAuditRoute
   '/api/public/approval-notify': typeof ApiPublicApprovalNotifyRoute
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
+  '/api/public/career-submit': typeof ApiPublicCareerSubmitRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/contact-submit': typeof ApiPublicContactSubmitRoute
   '/api/public/health': typeof ApiPublicHealthRoute
@@ -1211,6 +1219,7 @@ export interface FileRoutesById {
   '/api/admin/csv-export-audit': typeof ApiAdminCsvExportAuditRoute
   '/api/public/approval-notify': typeof ApiPublicApprovalNotifyRoute
   '/api/public/bootstrap-super-admin': typeof ApiPublicBootstrapSuperAdminRoute
+  '/api/public/career-submit': typeof ApiPublicCareerSubmitRoute
   '/api/public/client-log': typeof ApiPublicClientLogRoute
   '/api/public/contact-submit': typeof ApiPublicContactSubmitRoute
   '/api/public/health': typeof ApiPublicHealthRoute
@@ -1343,6 +1352,7 @@ export interface FileRouteTypes {
     | '/api/admin/csv-export-audit'
     | '/api/public/approval-notify'
     | '/api/public/bootstrap-super-admin'
+    | '/api/public/career-submit'
     | '/api/public/client-log'
     | '/api/public/contact-submit'
     | '/api/public/health'
@@ -1470,6 +1480,7 @@ export interface FileRouteTypes {
     | '/api/admin/csv-export-audit'
     | '/api/public/approval-notify'
     | '/api/public/bootstrap-super-admin'
+    | '/api/public/career-submit'
     | '/api/public/client-log'
     | '/api/public/contact-submit'
     | '/api/public/health'
@@ -1601,6 +1612,7 @@ export interface FileRouteTypes {
     | '/api/admin/csv-export-audit'
     | '/api/public/approval-notify'
     | '/api/public/bootstrap-super-admin'
+    | '/api/public/career-submit'
     | '/api/public/client-log'
     | '/api/public/contact-submit'
     | '/api/public/health'
@@ -1660,6 +1672,7 @@ export interface RootRouteChildren {
   ApiAdminCsvExportAuditRoute: typeof ApiAdminCsvExportAuditRoute
   ApiPublicApprovalNotifyRoute: typeof ApiPublicApprovalNotifyRoute
   ApiPublicBootstrapSuperAdminRoute: typeof ApiPublicBootstrapSuperAdminRoute
+  ApiPublicCareerSubmitRoute: typeof ApiPublicCareerSubmitRoute
   ApiPublicClientLogRoute: typeof ApiPublicClientLogRoute
   ApiPublicContactSubmitRoute: typeof ApiPublicContactSubmitRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
@@ -2038,6 +2051,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/client-log'
       fullPath: '/api/public/client-log'
       preLoaderRoute: typeof ApiPublicClientLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/career-submit': {
+      id: '/api/public/career-submit'
+      path: '/api/public/career-submit'
+      fullPath: '/api/public/career-submit'
+      preLoaderRoute: typeof ApiPublicCareerSubmitRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/bootstrap-super-admin': {
@@ -2978,6 +2998,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminCsvExportAuditRoute: ApiAdminCsvExportAuditRoute,
   ApiPublicApprovalNotifyRoute: ApiPublicApprovalNotifyRoute,
   ApiPublicBootstrapSuperAdminRoute: ApiPublicBootstrapSuperAdminRoute,
+  ApiPublicCareerSubmitRoute: ApiPublicCareerSubmitRoute,
   ApiPublicClientLogRoute: ApiPublicClientLogRoute,
   ApiPublicContactSubmitRoute: ApiPublicContactSubmitRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,

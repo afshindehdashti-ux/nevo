@@ -62,12 +62,14 @@ const DocumentInput = z.object({
 
 export const listFinanceDocuments = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v: { document_type?: string; status?: string; limit?: number } | undefined) => v ?? {})
+  .inputValidator(
+    (v: { document_type?: string; status?: string; limit?: number } | undefined) => v ?? {},
+  )
   .handler(async ({ data, context }) => {
     let q: any = context.supabase
       .from("finance_documents")
       .select(
-        "id, document_type, document_number, status, issue_date, valid_until, due_date, currency, subtotal, discount_total, tax_total, shipping_total, grand_total, amount_paid, balance, customer_id, supplier_id, partner_id, source_document_id, created_at, updated_at, customers(company_name, name, email), suppliers(name, email), finance_document_items(count)"
+        "id, document_type, document_number, status, issue_date, valid_until, due_date, currency, subtotal, discount_total, tax_total, shipping_total, grand_total, amount_paid, balance, customer_id, supplier_id, partner_id, source_document_id, created_at, updated_at, customers(company_name, name, email), suppliers(name, email), finance_document_items(count)",
       )
       .order("created_at", { ascending: false })
       .limit(data.limit ?? 200);
@@ -85,7 +87,7 @@ export const getFinanceDocument = createServerFn({ method: "GET" })
     const { data: doc, error } = await context.supabase
       .from("finance_documents")
       .select(
-        "*, customers(id, company_name, name, email, phone, address_line1, country), suppliers(id, name, email, phone), partners(id, company_name), finance_document_items(*)"
+        "*, customers(id, company_name, name, email, phone, address_line1, country), suppliers(id, name, email, phone), partners(id, company_name), finance_document_items(*)",
       )
       .eq("id", data.id)
       .maybeSingle();
@@ -113,7 +115,9 @@ export const upsertFinanceDocument = createServerFn({ method: "POST" })
     const payload: any = { ...header, updated_by: context.userId };
     let docId = id;
     if (id) {
-      const { error } = await (context.supabase.from("finance_documents") as any).update(payload).eq("id", id);
+      const { error } = await (context.supabase.from("finance_documents") as any)
+        .update(payload)
+        .eq("id", id);
       if (error) throw new Error(error.message);
     } else {
       payload.created_by = context.userId;
@@ -146,7 +150,9 @@ export const upsertFinanceDocument = createServerFn({ method: "POST" })
           tax_percent: it.tax_percent ?? 0,
           sort_order: it.sort_order ?? idx,
         }));
-        const { error: insErr } = await (context.supabase.from("finance_document_items") as any).insert(rows);
+        const { error: insErr } = await (
+          context.supabase.from("finance_document_items") as any
+        ).insert(rows);
         if (insErr) throw new Error(insErr.message);
       }
     }
@@ -156,7 +162,7 @@ export const upsertFinanceDocument = createServerFn({ method: "POST" })
 export const addFinanceDocumentItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) =>
-    z.object({ document_id: z.string().uuid(), item: ItemInput }).parse(v)
+    z.object({ document_id: z.string().uuid(), item: ItemInput }).parse(v),
   )
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
@@ -185,7 +191,10 @@ export const removeFinanceDocumentItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("finance_document_items").delete().eq("id", data.id);
+    const { error } = await context.supabase
+      .from("finance_document_items")
+      .delete()
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -219,11 +228,7 @@ const STATUS_ROLES: Record<string, string[]> = {
   commission_invoice: ["admin", "super_admin", "management", "finance"],
 };
 
-async function userHasAnyRole(
-  supabase: any,
-  userId: string,
-  roles: string[],
-): Promise<boolean> {
+async function userHasAnyRole(supabase: any, userId: string, roles: string[]): Promise<boolean> {
   for (const role of roles) {
     const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: role });
     if (data === true) return true;
@@ -324,7 +329,14 @@ export const changeFinanceDocumentStatus = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
 
-    await writeStatusLog(context.supabase, context.userId, doc as any, from, to, data.reason ?? null);
+    await writeStatusLog(
+      context.supabase,
+      context.userId,
+      doc as any,
+      from,
+      to,
+      data.reason ?? null,
+    );
     return { ok: true, from, to };
   });
 
@@ -353,7 +365,7 @@ export const getAllowedStatusTransitions = createServerFn({ method: "GET" })
     const permitted = await userHasAnyRole(context.supabase, context.userId, allowedRoles);
     return {
       current: doc.status,
-      allowed: permitted ? TRANSITIONS[doc.status as string] ?? [] : [],
+      allowed: permitted ? (TRANSITIONS[doc.status as string] ?? []) : [],
       permitted,
     };
   });
@@ -366,7 +378,7 @@ const CONVERSION_MAP: Record<string, string[]> = {
 export const convertFinanceDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) =>
-    z.object({ id: z.string().uuid(), target_type: DocType }).parse(v)
+    z.object({ id: z.string().uuid(), target_type: DocType }).parse(v),
   )
   .handler(async ({ data, context }) => {
     const { data: src, error } = await context.supabase
@@ -418,9 +430,9 @@ export const convertFinanceDocument = createServerFn({ method: "POST" })
         tax_percent: it.tax_percent ?? 0,
         sort_order: it.sort_order ?? 0,
       }));
-      const { error: itemsErr } = await (context.supabase
-        .from("finance_document_items") as any)
-        .insert(rows);
+      const { error: itemsErr } = await (
+        context.supabase.from("finance_document_items") as any
+      ).insert(rows);
       if (itemsErr) throw new Error(itemsErr.message);
     }
 

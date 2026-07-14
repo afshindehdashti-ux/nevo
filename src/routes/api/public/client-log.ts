@@ -1,5 +1,6 @@
 import type { Database } from "@/integrations/supabase/types";
 import { withMethodGuards } from "@/lib/api-http";
+import { assertAllowedOrigin, assertRateLimit, corsHeaders } from "@/lib/api-security";
 import { createFileRoute } from "@tanstack/react-router";
 
 /**
@@ -48,43 +49,41 @@ const s = (v: unknown, cap = MAX_STRING): string => {
   return str.length > cap ? str.slice(0, cap) + "…[truncated]" : str;
 };
 
-function corsHeaders(): HeadersInit {
-  return {
-    "access-control-allow-origin": "*",
-    "access-control-allow-methods": "POST, OPTIONS",
-    "access-control-allow-headers": "content-type",
-    "access-control-max-age": "86400",
-  };
-}
-
 export const Route = createFileRoute("/api/public/client-log")({
   server: {
     handlers: withMethodGuards({
-      OPTIONS: async () => new Response(null, { status: 204, headers: corsHeaders() }),
+      OPTIONS: async ({ request }) => {
+        const headers = corsHeaders(request);
+        const blocked = assertAllowedOrigin(request, headers);
+        if (blocked) return blocked;
+        return new Response(null, { status: 204, headers });
+      },
       POST: async ({ request }) => {
+        const headers = corsHeaders(request);
+        const blocked = assertAllowedOrigin(request, headers);
+        if (blocked) return blocked;
+        const limited = assertRateLimit(request, "client-log", { limit: 60, windowMs: 60_000 });
+        if (limited) return limited;
         try {
           const cl = Number(request.headers.get("content-length") || "0");
           if (cl > MAX_BODY_BYTES) {
             return Response.json(
               { ok: false, error: "payload_too_large" },
-              { status: 413, headers: corsHeaders() },
+              { status: 413, headers },
             );
           }
           const raw = await request.text();
           if (raw.length > MAX_BODY_BYTES) {
             return Response.json(
               { ok: false, error: "payload_too_large" },
-              { status: 413, headers: corsHeaders() },
+              { status: 413, headers },
             );
           }
           let payload: { entries?: ClientLogEntry[] } = {};
           try {
             payload = JSON.parse(raw);
           } catch {
-            return Response.json(
-              { ok: false, error: "invalid_json" },
-              { status: 400, headers: corsHeaders() },
-            );
+            return Response.json({ ok: false, error: "invalid_json" }, { status: 400, headers });
           }
           const entries = Array.isArray(payload.entries)
             ? payload.entries.slice(0, MAX_ENTRIES)
@@ -273,15 +272,12 @@ export const Route = createFileRoute("/api/public/client-log")({
             }
           }
 
-          return Response.json({ ok: true, received: entries.length }, { headers: corsHeaders() });
+          return Response.json({ ok: true, received: entries.length }, { headers });
         } catch (err) {
           console.error("[client-log] sink failed:", err);
-          return Response.json(
-            { ok: false, error: "sink_failed" },
-            { status: 500, headers: corsHeaders() },
-          );
+          return Response.json({ ok: false, error: "sink_failed" }, { status: 500, headers });
         }
       },
-    }, corsHeaders()),
+    }),
   },
 });

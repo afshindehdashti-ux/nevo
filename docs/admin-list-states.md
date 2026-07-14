@@ -6,14 +6,15 @@ components below. This keeps behaviour, a11y, and telemetry consistent.
 
 ## The four states
 
-| Order | State    | Component                          | Role / a11y                        | Telemetry emitted                                    |
-|-------|----------|------------------------------------|------------------------------------|------------------------------------------------------|
-| 1     | Error    | `ListErrorState`                   | `role="alert"` + `aria-live`       | `reportClientError` (dedup per resource+message) + `admin_list_retry_clicked` on retry |
-| 2     | Loading  | `<Skeleton />` block               | `data-testid="list-skeleton"`, `aria-busy="true"` | none                                                 |
-| 3     | Empty    | `ListEmptyState`                   | `role="status"`                    | `admin_list_empty_shown` (dedup per resource+reason) |
-| 4     | Ready    | data `<table>`                     | native table semantics             | none                                                 |
+| Order | State   | Component            | Role / a11y                                       | Telemetry emitted                                                                      |
+| ----- | ------- | -------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| 1     | Error   | `ListErrorState`     | `role="alert"` + `aria-live`                      | `reportClientError` (dedup per resource+message) + `admin_list_retry_clicked` on retry |
+| 2     | Loading | `<Skeleton />` block | `data-testid="list-skeleton"`, `aria-busy="true"` | none                                                                                   |
+| 3     | Empty   | `ListEmptyState`     | `role="status"`                                   | `admin_list_empty_shown` (dedup per resource+reason)                                   |
+| 4     | Ready   | data `<table>`       | native table semantics                            | none                                                                                   |
 
 Rules:
+
 - Precedence is **error → loading → empty → ready**. Never render two at once.
 - Loading gates on React Query's `isLoading` (initial fetch only), never
   `isFetching` — background refetches must not flash the skeleton.
@@ -99,6 +100,7 @@ return (
 ## Component contracts
 
 ### `ListErrorState`
+
 - Props: `resource`, `error`, `onRetry`, `isRetrying?`.
 - Renders a non-destructive card (prior cached data stays untouched).
 - Fires `reportClientError({ surface: "admin_list", resource, kind: "supabase_query_failure" })`
@@ -107,11 +109,13 @@ return (
   before calling `onRetry`.
 
 ### Loading skeleton
+
 - Always `data-testid="list-skeleton"` and `aria-busy="true"` — tests assert on both.
 - 3 rows of `<Skeleton className="h-12 w-full" />` is the house style.
 - No telemetry (loading is expected).
 
 ### `ListEmptyState`
+
 - Props: `icon`, `title`, `description`, `action?`, `resource?`, `reason?`.
 - Renders `role="status"` card with icon + title + description (+ optional CTA).
 - When `resource` is set, fires `logClientEvent("admin_list_empty_shown", { surface, resource, reason }, level)`
@@ -119,6 +123,7 @@ return (
 - Allowed reasons: `no_records` (default), `seed_missing`, `filtered_out`.
 
 ### `classifyListState<T>({ isLoading, error, data, expectSeed? })`
+
 - Returns a discriminated `ListViewState<T>` — use in smoke tests / helpers
   that need to reason about the current state programmatically.
 - Non-array `data` → `{ kind: "error", error: … }` so the UI shows
@@ -170,11 +175,11 @@ silently drops the page from ops visibility. Walk this list before merging:
   Allowed characters: `[a-z0-9_]+`.
 - **Matches the URL**: `resource` equals the last `/admin/<segment>` chunk
   with `-` → `_`. Examples:
-  | Route                         | `resource` slug         |
-  |-------------------------------|-------------------------|
-  | `/admin/opportunities`        | `opportunities`         |
-  | `/admin/commission-invoices`  | `commission_invoices`   |
-  | `/admin/purchase-orders`      | `purchase_orders`       |
+  | Route                        | `resource` slug       |
+  | ---------------------------- | --------------------- |
+  | `/admin/opportunities`       | `opportunities`       |
+  | `/admin/commission-invoices` | `commission_invoices` |
+  | `/admin/purchase-orders`     | `purchase_orders`     |
 - **Unique**: grep the repo — no other page uses the same slug. Two pages
   sharing a slug collide in telemetry and the dedup ref cancels the second
   event.
@@ -185,17 +190,17 @@ silently drops the page from ops visibility. Walk this list before merging:
 
 Only these three values are allowed (`ListEmptyState` prop type enforces it):
 
-| `reason`        | When to use                                                                                | Telemetry level |
-|-----------------|--------------------------------------------------------------------------------------------|-----------------|
-| `no_records`    | Default. A fresh environment or genuinely empty table.                                     | `info`          |
-| `seed_missing`  | Env should have seeded rows but doesn't (smoke test failed, seed script skipped).          | `warn`          |
-| `filtered_out`  | User's active filters/search excluded every row — data exists, just none matches.          | `info`          |
+| `reason`       | When to use                                                                       | Telemetry level |
+| -------------- | --------------------------------------------------------------------------------- | --------------- |
+| `no_records`   | Default. A fresh environment or genuinely empty table.                            | `info`          |
+| `seed_missing` | Env should have seeded rows but doesn't (smoke test failed, seed script skipped). | `warn`          |
+| `filtered_out` | User's active filters/search excluded every row — data exists, just none matches. | `info`          |
 
 Rules:
 
 - **Default to `no_records`** — don't pass `reason` at all unless one of the
   other two applies.
-- **`seed_missing`** is only correct when the caller can *prove* seeded data
+- **`seed_missing`** is only correct when the caller can _prove_ seeded data
   should exist (e.g. `expectSeed` on `<AdminListPage>` in a smoke env). Never
   hard-code it in the page.
 - **`filtered_out`** requires that at least one filter/search is currently
@@ -226,7 +231,6 @@ Rules:
    an empty table, filter DevTools console for `admin_list_empty_shown`, and
    verify the payload's `resource` and `reason` match the checklist above.
 
-
 ## Allowed registries (single source of truth)
 
 Both TypeScript types and every automated check (ESLint plugin, CI grep,
@@ -237,25 +241,24 @@ type or extend the tuple in that file first.
 
 ### `ADMIN_LIST_RESOURCES`
 
-| Slug                  | URL segment                    |
-|-----------------------|--------------------------------|
-| `opportunities`       | `/admin/opportunities`         |
-| `commission_invoices` | `/admin/commission-invoices`   |
-| `purchase_orders`     | `/admin/purchase-orders`       |
+| Slug                  | URL segment                  |
+| --------------------- | ---------------------------- |
+| `opportunities`       | `/admin/opportunities`       |
+| `commission_invoices` | `/admin/commission-invoices` |
+| `purchase_orders`     | `/admin/purchase-orders`     |
 
 ### `ADMIN_LIST_EMPTY_REASONS`
 
-| Reason         | Telemetry level | When to use                                                    |
-|----------------|-----------------|----------------------------------------------------------------|
-| `no_records`   | `info`          | Default. Table is genuinely empty (or `reason` prop omitted).  |
-| `seed_missing` | `warn`          | Env was expected to have seeded data but doesn't.              |
-| `filtered_out` | `info`          | Rows exist; the user's active filters exclude all of them.     |
+| Reason         | Telemetry level | When to use                                                   |
+| -------------- | --------------- | ------------------------------------------------------------- |
+| `no_records`   | `info`          | Default. Table is genuinely empty (or `reason` prop omitted). |
+| `seed_missing` | `warn`          | Env was expected to have seeded data but doesn't.             |
+| `filtered_out` | `info`          | Rows exist; the user's active filters exclude all of them.    |
 
 To add a new resource, append to `ADMIN_LIST_RESOURCES` (never rename or
 reorder existing entries — dashboards key off them). Reasons are frozen;
 adding a new one requires updating the wrapper, the ESLint rule, the CI
 grep script, and the dashboards in tandem.
-
 
 ## Enforcement — how the guardrails compose
 
@@ -283,7 +286,6 @@ Four layers catch drift, in this order:
    `admin_list_empty_shown__rejected` diagnostic so drift is visible in
    telemetry instead of polluting real events.
 
-
 ## Copy-paste examples that satisfy every rule
 
 Every snippet below has been verified against the ESLint plugin. Copy
@@ -293,7 +295,7 @@ verbatim, then swap in your slug and copy strings.
 
 ```tsx
 <AdminListPage
-  resource="opportunities"           // must be in ADMIN_LIST_RESOURCES
+  resource="opportunities" // must be in ADMIN_LIST_RESOURCES
   title="Opportunities"
   isLoading={isLoading}
   error={error}
@@ -326,7 +328,7 @@ verbatim, then swap in your slug and copy strings.
     icon: Percent,
     title: "No invoices match your filters",
     description: "Clear filters to see invoices that will show up here.",
-    filtersActive: activeFilterCount > 0,   // → reason="filtered_out"
+    filtersActive: activeFilterCount > 0, // → reason="filtered_out"
     // NEVER also set expectSeed — no-conflicting-empty-flags will fail.
   }}
 >
@@ -360,8 +362,8 @@ verbatim, then swap in your slug and copy strings.
 
 ```tsx
 <ListEmptyState
-  resource="opportunities"           // required, must be in registry
-  reason="filtered_out"              // optional, must be in registry
+  resource="opportunities" // required, must be in registry
+  reason="filtered_out" // optional, must be in registry
   icon={Target}
   title="No opportunities match your filters"
   description="Clear filters to see opportunities that will show up here."
@@ -398,9 +400,7 @@ bun run check:admin-list-telemetry    # CI grep with per-file drift report
 bunx vitest run                       # runtime wrapper + component tests
 ```
 
-
 ## Add a new admin list page
-
 
 Five steps. If you skip step 1, the `resource` prop in step 3 won't compile.
 If you skip step 5, `bun run check:admin-list-telemetry` will fail in CI.
@@ -487,8 +487,7 @@ function ShipmentsPage() {
         icon: Truck,
         title: "No shipments yet",
         // Keep the phrase "will show up here" or "will appear here".
-        description:
-          "Shipments will show up here as orders leave the warehouse.",
+        description: "Shipments will show up here as orders leave the warehouse.",
       }}
     >
       {(rows) => (
@@ -511,13 +510,13 @@ function ShipmentsPage() {
 
 That single JSX block emits:
 
-| Situation                                | Event                        | Payload                                                             | Level |
-| ---------------------------------------- | ---------------------------- | ------------------------------------------------------------------- | ----- |
-| Query resolves with `[]`                 | `admin_list_empty_shown`     | `{ surface: "admin_list", resource: "shipments", reason: "no_records" }` | info  |
-| `[]` while `expectSeed` is set           | `admin_list_empty_shown`     | `{ …, reason: "seed_missing" }`                                     | warn  |
-| `[]` while `filtersActive` is set        | `admin_list_empty_shown`     | `{ …, reason: "filtered_out" }`                                     | info  |
-| Query throws                             | `reportClientError` + `admin_list_retry_clicked` on retry | `{ surface: "admin_list", resource: "shipments", kind: "supabase_query_failure" }` | error |
-| Non-array response (schema drift)        | Same as query throw          | Error message: "Unexpected response shape…"                         | error |
+| Situation                         | Event                                                     | Payload                                                                            | Level |
+| --------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------- | ----- |
+| Query resolves with `[]`          | `admin_list_empty_shown`                                  | `{ surface: "admin_list", resource: "shipments", reason: "no_records" }`           | info  |
+| `[]` while `expectSeed` is set    | `admin_list_empty_shown`                                  | `{ …, reason: "seed_missing" }`                                                    | warn  |
+| `[]` while `filtersActive` is set | `admin_list_empty_shown`                                  | `{ …, reason: "filtered_out" }`                                                    | info  |
+| Query throws                      | `reportClientError` + `admin_list_retry_clicked` on retry | `{ surface: "admin_list", resource: "shipments", kind: "supabase_query_failure" }` | error |
+| Non-array response (schema drift) | Same as query throw                                       | Error message: "Unexpected response shape…"                                        | error |
 
 ### 4. Extend the contract test
 
@@ -547,8 +546,6 @@ Both must pass before CI. The static guard also runs in
 new page skips `resource`, uses an unregistered slug, uses an unapproved
 `reason`, or hand-rolls a raw `logClientEvent("admin_list_empty_shown", …)`
 outside `ListEmptyState.tsx`.
-
-
 
 ## Do / don't
 

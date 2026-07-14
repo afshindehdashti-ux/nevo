@@ -14,36 +14,53 @@ jobs:
   playwright:
     name: Playwright (backend CTA gate)
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
+      VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 22
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10 --activate
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      # Cache Playwright browsers by the installed version so upgrades bust
-      # the cache automatically.
-      - name: Resolve Playwright version
-        id: pw
-        run: echo "version=$(bun pm ls | grep '@playwright/test' | head -1 | awk '{print $NF}')" >> "$GITHUB_OUTPUT"
+        run: pnpm install --frozen-lockfile
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install Playwright browsers
-        run: bunx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
 
-      # Build once; the Playwright config's webServer runs `vite preview`
-      # against this build. Fails the job on any test failure, blocking
-      # the merge via required-status-check on `main`.
+      - name: Start Vite server
+        run: |
+          node node_modules/vite/bin/vite.js dev --port 4173 --host 127.0.0.1 --strictPort > vite-e2e.log 2>&1 &
+          echo "VITE_E2E_PID=$!" >> "$GITHUB_ENV"
+          for _ in $(seq 1 120); do
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat vite-e2e.log
+          exit 1
+
       - name: Run E2E — backend CTA gate
-        run: bun run test:e2e:backend-cta
+        run: E2E_BASE_URL=http://127.0.0.1:4173 pnpm test:e2e:backend-cta
+
+      - name: Stop Vite server
+        if: always()
+        run: kill "$VITE_E2E_PID" || true
 
       - name: Upload Playwright report
         if: always()

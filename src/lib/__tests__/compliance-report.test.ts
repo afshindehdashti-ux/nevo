@@ -44,9 +44,7 @@ describe("buildComplianceReportCsv", () => {
     expect(csv).toContain("# Drift flagged: 0");
     // Column header is the second-to-last non-empty line before the record.
     const headerLine = csv.split("\n").find((l) => l.startsWith('"audit_id"'));
-    expect(headerLine).toBe(
-      COMPLIANCE_REPORT_COLUMNS.map((c) => `"${c}"`).join(","),
-    );
+    expect(headerLine).toBe(COMPLIANCE_REPORT_COLUMNS.map((c) => `"${c}"`).join(","));
   });
 
   it("marks sha_drift as 'match' when embedded == recorded", () => {
@@ -56,10 +54,9 @@ describe("buildComplianceReportCsv", () => {
   });
 
   it("marks sha_drift as 'DRIFT' when embedded differs and counts it in the header", () => {
-    const csv = buildComplianceReportCsv(
-      [row({ metadata: { embedded_sha256: SHA_B } })],
-      { generatedAtIso },
-    );
+    const csv = buildComplianceReportCsv([row({ metadata: { embedded_sha256: SHA_B } })], {
+      generatedAtIso,
+    });
     expect(csv).toMatch(/"DRIFT"/);
     expect(csv).toContain("# Drift flagged: 1");
   });
@@ -93,10 +90,7 @@ describe("buildComplianceReportCsv", () => {
   });
 
   it("CSV-escapes filenames containing quotes and commas", () => {
-    const csv = buildComplianceReportCsv(
-      [row({ filename: 'a,"weird".csv' })],
-      { generatedAtIso },
-    );
+    const csv = buildComplianceReportCsv([row({ filename: 'a,"weird".csv' })], { generatedAtIso });
     expect(csv).toContain('"a,""weird"".csv"');
   });
 });

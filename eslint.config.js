@@ -63,5 +63,15 @@ export default tseslint.config(
     },
   },
   eslintPluginPrettier,
+  {
+    files: [
+      "src/routes/mcp.ts",
+      "src/routes/[[]*.mcp[]]/**/*.ts",
+      "src/routes/[[]*.well-known[]]/**/*.ts",
+    ],
+    rules: {
+      // The Lovable MCP plugin rewrites these route files during build.
+      "prettier/prettier": "off",
+    },
+  },
 );
-

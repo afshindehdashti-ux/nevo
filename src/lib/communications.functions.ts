@@ -113,10 +113,7 @@ export const updateCommunication = createServerFn({ method: "POST" })
       .select("*")
       .eq("id", id)
       .maybeSingle();
-    const { error } = await context.supabase
-      .from("communications")
-      .update(patch)
-      .eq("id", id);
+    const { error } = await context.supabase.from("communications").update(patch).eq("id", id);
     if (error) throw new Error(error.message);
     await writeAudit(context.supabase, {
       user_id: context.userId,
@@ -203,7 +200,9 @@ export const listCommunicationsCenter = createServerFn({ method: "GET" })
     if (data.only_follow_ups) q = q.not("follow_up_at", "is", null).eq("follow_up_done", false);
     if (data.q && data.q.trim()) {
       const needle = `%${data.q.trim()}%`;
-      q = q.or(`subject.ilike.${needle},body.ilike.${needle},contact_name.ilike.${needle},contact_email.ilike.${needle}`);
+      q = q.or(
+        `subject.ilike.${needle},body.ilike.${needle},contact_name.ilike.${needle},contact_email.ilike.${needle}`,
+      );
     }
 
     const { data: rows, error } = await q;
@@ -227,7 +226,8 @@ export const listCommunicationsCenter = createServerFn({ method: "GET" })
           .from("customers")
           .select("id, name, contact_person")
           .in("id", ids);
-        for (const r of data ?? []) labels.set(key(t, r.id), r.name || r.contact_person || "Customer");
+        for (const r of data ?? [])
+          labels.set(key(t, r.id), r.name || r.contact_person || "Customer");
       } else if (t === "lead") {
         const { data } = await context.supabase
           .from("project_inquiries")
@@ -269,7 +269,8 @@ export const listCommunicationsCenter = createServerFn({ method: "GET" })
           .from("shipments")
           .select("id, shipment_number, tracking_no")
           .in("id", ids);
-        for (const r of data ?? []) labels.set(key(t, r.id), r.shipment_number || r.tracking_no || "Shipment");
+        for (const r of data ?? [])
+          labels.set(key(t, r.id), r.shipment_number || r.tracking_no || "Shipment");
       }
     }
 

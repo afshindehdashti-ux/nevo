@@ -42,11 +42,14 @@ const CTA_SELECTORS = [
 async function assertNoCtas(page: Page, when: string) {
   for (const selector of CTA_SELECTORS) {
     const count = await page.locator(selector).count();
-    expect(
-      count,
-      `Expected 0 matches for ${selector} ${when} but found ${count}`,
-    ).toBe(0);
+    expect(count, `Expected 0 matches for ${selector} ${when} but found ${count}`).toBe(0);
   }
+}
+
+async function waitForHydration(page: Page) {
+  // Navigation already waits for DOM content. Avoid waiting on unrelated
+  // long-lived requests before checking the hydrated UI.
+  await page.waitForTimeout(500);
 }
 
 test.describe("Backend routes: CTAs never appear on hard refresh", () => {
@@ -63,7 +66,7 @@ test.describe("Backend routes: CTAs never appear on hard refresh", () => {
       await assertNoCtas(page, `on initial paint of ${path}`);
 
       // 2) After the network settles and React hydrates.
-      await page.waitForLoadState("networkidle");
+      await waitForHydration(page);
       await assertNoCtas(page, `after hydration of ${path}`);
 
       // 3) A short additional wait to catch any late-mounting portal that
@@ -84,7 +87,7 @@ test.describe("Backend routes: CTAs are not reachable via keyboard focus", () =>
   for (const path of BACKEND_PATHS) {
     test(`tab traversal on ${path} never lands on a public CTA`, async ({ page }) => {
       await page.goto(path, { waitUntil: "domcontentloaded" });
-      await page.waitForLoadState("networkidle");
+      await waitForHydration(page);
 
       // Belt-and-braces: assert not-in-DOM before checking focus.
       await assertNoCtas(page, `before tab traversal on ${path}`);
@@ -110,10 +113,14 @@ test.describe("Backend routes: CTAs are not reachable via keyboard focus", () =>
           if (!el || el === document.body) return { sig: "__body__", matchesCta: false };
           const sig =
             (el.tagName || "") +
-            "#" + (el.id || "") +
-            "." + (el.className?.toString?.() || "") +
-            "@" + (el.getAttribute("aria-label") || "") +
-            "$" + (el.textContent?.slice(0, 40) || "");
+            "#" +
+            (el.id || "") +
+            "." +
+            (el.className?.toString?.() || "") +
+            "@" +
+            (el.getAttribute("aria-label") || "") +
+            "$" +
+            (el.textContent?.slice(0, 40) || "");
           const matchesCta = !!(el.closest(ctaSelector) || el.matches(ctaSelector));
           return { sig, matchesCta };
         }, CTA_SELECTOR_UNION);
@@ -130,4 +137,3 @@ test.describe("Backend routes: CTAs are not reachable via keyboard focus", () =>
     });
   }
 });
-

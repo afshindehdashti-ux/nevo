@@ -60,14 +60,7 @@ import {
 } from "@/lib/factory-layout";
 
 type ViewMode =
-  | "top"
-  | "iso"
-  | "material"
-  | "truck"
-  | "operator"
-  | "utility"
-  | "expansion"
-  | "equipment";
+  "top" | "iso" | "material" | "truck" | "operator" | "utility" | "expansion" | "equipment";
 
 const VIEW_MODES: {
   id: ViewMode;

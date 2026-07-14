@@ -37,10 +37,7 @@ import { useMyRoles } from "@/lib/crm-hooks";
 
 export const Route = createFileRoute("/_authenticated/admin/ai-assistant/knowledge-base")({
   head: () => ({
-    meta: [
-      { title: "AI Knowledge Base — NEVO Internal" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "AI Knowledge Base — NEVO Internal" }, { name: "robots", content: "noindex" }],
   }),
   component: KnowledgeBasePage,
 });
@@ -119,8 +116,7 @@ function KnowledgeBasePage() {
   const uploadMut = useMutation({
     mutationFn: async () => {
       if (!title.trim()) throw new Error("Title is required");
-      if (!file && !rawText.trim())
-        throw new Error("Upload a file or paste text content");
+      if (!file && !rawText.trim()) throw new Error("Upload a file or paste text content");
 
       let storagePath: string | undefined;
       let fileType: string | undefined;
@@ -193,8 +189,7 @@ function KnowledgeBasePage() {
             <BookOpen className="h-6 w-6 text-emerald-600" /> AI Knowledge Base
           </h1>
           <p className="mt-1 text-sm text-neutral-600">
-            Upload internal documents so the assistant can cite them when answering questions.
-            {" "}
+            Upload internal documents so the assistant can cite them when answering questions.{" "}
             <span className="text-neutral-500">
               {totalReady} indexed · TXT, MD, CSV, JSON, PDF, DOCX and XLSX are extracted and
               embedded automatically.
@@ -265,7 +260,9 @@ function KnowledgeBasePage() {
             </div>
             <div
               className="space-y-1"
-              onDragOver={(e) => { e.preventDefault(); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+              }}
               onDrop={(e) => {
                 e.preventDefault();
                 const f = e.dataTransfer.files?.[0];
@@ -285,9 +282,9 @@ function KnowledgeBasePage() {
                 </p>
               )}
               <p className="text-[11px] text-neutral-500">
-                Drag &amp; drop is supported. Text is extracted, chunked, and embedded automatically.
-                Scanned/image-only PDFs will not be searchable without OCR — paste the content as raw
-                text instead if extraction fails.
+                Drag &amp; drop is supported. Text is extracted, chunked, and embedded
+                automatically. Scanned/image-only PDFs will not be searchable without OCR — paste
+                the content as raw text instead if extraction fails.
               </p>
             </div>
             <div className="space-y-1">
@@ -376,8 +373,7 @@ function KnowledgeBasePage() {
                     <p className="truncate text-sm font-medium text-neutral-900">{d.title}</p>
                     <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-neutral-500">
                       <Badge variant="outline">
-                        {CATEGORY_OPTIONS.find((c) => c.value === d.category)?.label ??
-                          d.category}
+                        {CATEGORY_OPTIONS.find((c) => c.value === d.category)?.label ?? d.category}
                       </Badge>
                       <Badge variant="outline">
                         {ACCESS_OPTIONS.find((a) => a.value === d.access_level)?.label ??

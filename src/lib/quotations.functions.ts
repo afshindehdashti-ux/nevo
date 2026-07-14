@@ -37,7 +37,7 @@ export const listQuotations = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("quotations")
       .select(
-        "id, quotation_number, status, issue_date, valid_until, currency, subtotal, vat_amount, total, customer_id, customers(name, company_name, email), created_at, sent_at, converted_invoice_id, quotation_items(count)",
+        "id, quotation_number, status, issue_date, valid_until, currency, subtotal, vat_amount, total, customer_id, customers(name, company_name, email), created_at, sent_at, converted_invoice_id, converted_proforma_invoice_id, quotation_items(count)",
       )
       .order("created_at", { ascending: false })
       .limit(500);
@@ -83,7 +83,9 @@ export const getQuotation = createServerFn({ method: "GET" })
     const [{ data: quotation, error: qErr }, { data: items, error: iErr }] = await Promise.all([
       context.supabase
         .from("quotations")
-        .select("*, customers(id,name,company_name,email,phone,address,billing_address,city,country,currency,vat_number)")
+        .select(
+          "*, customers(id,name,company_name,email,phone,address,billing_address,city,country,currency,vat_number)",
+        )
         .eq("id", data.id)
         .maybeSingle(),
       context.supabase
@@ -175,9 +177,7 @@ export const createQuotationWithItems = createServerFn({ method: "POST" })
 
     const rows = data.items.map((it, idx) => {
       const line_total =
-        Math.round(
-          it.quantity * it.unit_price * (1 - (it.discount_pct ?? 0) / 100) * 100,
-        ) / 100;
+        Math.round(it.quantity * it.unit_price * (1 - (it.discount_pct ?? 0) / 100) * 100) / 100;
       return {
         quotation_id: inserted.id,
         position: idx + 1,
@@ -212,7 +212,6 @@ export const createQuotationWithItems = createServerFn({ method: "POST" })
     return { id: inserted.id };
   });
 
-
 const ItemInput = z.object({
   id: z.string().uuid().optional(),
   quotation_id: z.string().uuid(),
@@ -230,8 +229,7 @@ export const upsertQuotationItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => ItemInput.parse(v))
   .handler(async ({ context, data }) => {
-    const line_total =
-      data.quantity * data.unit_price * (1 - (data.discount_pct ?? 0) / 100);
+    const line_total = data.quantity * data.unit_price * (1 - (data.discount_pct ?? 0) / 100);
     const payload = { ...data, line_total: Math.round(line_total * 100) / 100 };
     if (data.id) {
       const { error } = await context.supabase
@@ -257,21 +255,19 @@ export const duplicateQuotationItem = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Item not found");
-    const { error: insErr } = await context.supabase
-      .from("quotation_items")
-      .insert({
-        quotation_id: row.quotation_id,
-        description: row.description,
-        item_code: row.item_code ?? null,
-        hs_code: row.hs_code ?? null,
-        quantity: row.quantity,
-        unit: row.unit,
-        unit_price: row.unit_price,
-        discount_pct: row.discount_pct,
-        line_total: row.line_total,
-        position: (row.position ?? 0) + 1,
-        product_id: row.product_id ?? null,
-      });
+    const { error: insErr } = await context.supabase.from("quotation_items").insert({
+      quotation_id: row.quotation_id,
+      description: row.description,
+      item_code: row.item_code ?? null,
+      hs_code: row.hs_code ?? null,
+      quantity: row.quantity,
+      unit: row.unit,
+      unit_price: row.unit_price,
+      discount_pct: row.discount_pct,
+      line_total: row.line_total,
+      position: (row.position ?? 0) + 1,
+      product_id: row.product_id ?? null,
+    });
     if (insErr) throw new Error(insErr.message);
     return { ok: true };
   });
@@ -346,115 +342,27 @@ export const listInquiriesLite = createServerFn({ method: "GET" })
     }[];
   });
 
-/**
- * Convert an approved/accepted quotation into a proforma invoice.
- * Copies line items, sets the quotation to `converted`, and links back
- * via quotations.converted_invoice_id.
- */
+/** Convert an approved/accepted quotation into the canonical proforma tables. */
 export const convertQuotationToProforma = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
-    z
-      .object({
-        id: z.string().uuid(),
-        due_date: z.string().nullable().optional(),
-      })
-      .parse(v),
-  )
+  .inputValidator((v) => IdInput.parse(v))
   .handler(async ({ context, data }) => {
-    const [{ data: q, error: qErr }, { data: items, error: iErr }] = await Promise.all([
-      context.supabase
-        .from("quotations")
-        .select(
-          "id, customer_id, currency, vat_rate, subtotal, vat_amount, total, terms, notes, converted_invoice_id, status",
-        )
-        .eq("id", data.id)
-        .maybeSingle(),
-      context.supabase
-        .from("quotation_items")
-        .select("description, quantity, unit, unit_price, discount_pct, position, product_id")
-        .eq("quotation_id", data.id)
-        .order("position"),
-    ]);
-    if (qErr) throw new Error(qErr.message);
-    if (iErr) throw new Error(iErr.message);
-    if (!q) throw new Error("Quotation not found");
-    if (!q.customer_id) throw new Error("Quotation has no customer");
-    if (q.converted_invoice_id) {
-      return { invoice_id: q.converted_invoice_id, already: true };
-    }
-
-    const { data: inv, error: invErr } = await context.supabase
-      .from("invoices")
-      .insert({
-        type: "proforma",
-        status: "draft",
-        customer_id: q.customer_id,
-        currency: q.currency,
-        issue_date: new Date().toISOString().slice(0, 10),
-        due_date: data.due_date ?? null,
-        subtotal: Number(q.subtotal ?? 0),
-        vat_amount: Number(q.vat_amount ?? 0),
-        total: Number(q.total ?? 0),
-        notes: q.notes ?? null,
-        payment_terms: q.terms ?? null,
-      })
-      .select("id, invoice_number")
-      .maybeSingle();
-    if (invErr) throw new Error(invErr.message);
-    if (!inv?.id) throw new Error("Could not create proforma invoice");
-
-    if ((items ?? []).length > 0) {
-      const rate = Number(q.vat_rate ?? 0);
-      const rows = (items ?? []).map((it) => {
-        const qty = Number(it.quantity ?? 0);
-        const price = Number(it.unit_price ?? 0);
-        const discount = Number(it.discount_pct ?? 0);
-        const line_total = Math.round(qty * price * (1 - discount / 100) * 100) / 100;
-        return {
-          invoice_id: inv.id,
-          description: it.description,
-          quantity: qty,
-          unit: it.unit ?? "unit",
-          unit_price: price,
-          discount_pct: discount,
-          vat_pct: rate,
-          line_total,
-          position: it.position,
-          product_id: it.product_id ?? null,
-        };
-      });
-      const { error: itemsErr } = await context.supabase.from("invoice_items").insert(rows);
-      if (itemsErr) throw new Error(itemsErr.message);
-    }
-
-    const { error: linkErr } = await context.supabase
+    const { data: quotation, error: readError } = await context.supabase
       .from("quotations")
-      .update({ converted_invoice_id: inv.id, status: "converted" })
-      .eq("id", data.id);
-    if (linkErr) throw new Error(linkErr.message);
+      .select("converted_proforma_invoice_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (readError) throw new Error(readError.message);
+    if (!quotation) throw new Error("Quotation not found");
 
-    // Audit trail — best-effort.
-    try {
-      await context.supabase.from("activity_logs").insert({
-        user_id: context.userId,
-        action: "convert",
-        entity_type: "quotation_to_proforma",
-        entity_id: data.id,
-        metadata: {
-          quotation_id: data.id,
-          proforma_invoice_id: inv.id,
-          proforma_number: inv.invoice_number,
-          items: (items ?? []).length,
-          total: Number(q.total ?? 0),
-          currency: q.currency,
-        },
-      });
-    } catch (err) {
-      console.warn("convertQuotationToProforma activity log failed", err);
-    }
-
-    return { invoice_id: inv.id, already: false };
+    const existingId = quotation.converted_proforma_invoice_id;
+    const { data: proformaId, error } = await context.supabase.rpc(
+      "convert_quotation_to_proforma",
+      { _quotation_id: data.id },
+    );
+    if (error) throw new Error(error.message);
+    if (!proformaId) throw new Error("Could not create proforma invoice");
+    return { proforma_invoice_id: proformaId, already: !!existingId };
   });
 
 /**
@@ -478,7 +386,7 @@ export const convertProformaToCommercial = createServerFn({ method: "POST" })
       context.supabase
         .from("invoices")
         .select(
-          "id, type, customer_id, currency, subtotal, vat_amount, total, notes, payment_terms, invoice_number",
+          "id, type, customer_id, currency, subtotal, discount_total, vat_amount, tax_total, total, notes, payment_terms, invoice_number",
         )
         .eq("id", data.id)
         .maybeSingle(),
@@ -518,8 +426,11 @@ export const convertProformaToCommercial = createServerFn({ method: "POST" })
         issue_date: new Date().toISOString().slice(0, 10),
         due_date: data.due_date ?? null,
         subtotal: Number(pi.subtotal ?? 0),
+        discount_total: Number(pi.discount_total ?? 0),
         vat_amount: Number(pi.vat_amount ?? 0),
+        tax_total: Number(pi.tax_total ?? pi.vat_amount ?? 0),
         total: Number(pi.total ?? 0),
+        balance: Number(pi.total ?? 0),
         notes: pi.notes ?? null,
         payment_terms: pi.payment_terms ?? null,
         proforma_invoice_id: pi.id,
@@ -530,21 +441,26 @@ export const convertProformaToCommercial = createServerFn({ method: "POST" })
     if (!inv?.id) throw new Error("Could not create commercial invoice");
 
     if ((items ?? []).length > 0) {
-      const rows = (items ?? []).map((it) => ({
-        invoice_id: inv.id,
-        description: it.description,
-        quantity: Number(it.quantity ?? 0),
-        unit: it.unit ?? "unit",
-        unit_price: Number(it.unit_price ?? 0),
-        discount_pct: Number(it.discount_pct ?? 0),
-        vat_pct: Number(it.vat_pct ?? 0),
-        line_total: Number(it.line_total ?? 0),
-        position: it.position,
-        product_id: it.product_id ?? null,
-      }));
-      const { error: itemsErr } = await context.supabase
-        .from("invoice_items")
-        .insert(rows);
+      const rows = (items ?? []).map((it) => {
+        const discount = Number(it.discount_pct ?? 0);
+        const taxRate = Number(it.vat_pct ?? 0);
+        return {
+          invoice_id: inv.id,
+          description: it.description,
+          quantity: Number(it.quantity ?? 0),
+          unit: it.unit ?? "unit",
+          unit_price: Number(it.unit_price ?? 0),
+          discount_pct: discount,
+          discount,
+          vat_pct: taxRate,
+          tax_rate: taxRate,
+          line_total: Number(it.line_total ?? 0),
+          position: it.position,
+          sort_order: it.position,
+          product_id: it.product_id ?? null,
+        };
+      });
+      const { error: itemsErr } = await context.supabase.from("invoice_items").insert(rows);
       if (itemsErr) throw new Error(itemsErr.message);
     }
 
@@ -580,10 +496,10 @@ export const convertProformaToCommercial = createServerFn({ method: "POST" })
 const EmailInput = z.object({
   id: z.string().uuid(),
   to: z.string().email(),
-  cc: z.array(z.string().email()).optional(),
+  cc: z.array(z.string().email()).max(10).optional(),
   subject: z.string().min(1).max(300),
   message: z.string().max(20_000).optional().default(""),
-  pdf_base64: z.string().min(100),
+  pdf_base64: z.string().min(100).max(15_000_000),
   pdf_filename: z.string().min(1).max(200),
 });
 
@@ -593,7 +509,8 @@ export const emailQuotation = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const lovableKey = process.env.LOVABLE_API_KEY;
     const resendKey = process.env.RESEND_API_KEY;
-    if (!lovableKey || !resendKey) {
+    const configuredFrom = process.env.EMAIL_FROM;
+    if (!lovableKey || !resendKey || !configuredFrom) {
       throw new Error("Email provider is not configured. Contact an administrator.");
     }
 
@@ -606,9 +523,9 @@ export const emailQuotation = createServerFn({ method: "POST" })
     if (qErr) throw new Error(qErr.message);
     if (!q) throw new Error("Quotation not found");
 
-    // Pull sender identity from company settings; fall back to a Resend
-    // sandbox address (only deliverable to the account owner) so the call
-    // never silently fails at build time.
+    // Pull the display name from company settings. The sender address itself
+    // must be deployment-configured so a contact email cannot accidentally be
+    // used as an unverified Resend sender.
     const { data: settings } = await context.supabase
       .from("company_settings")
       .select("legal_name, email")
@@ -617,18 +534,25 @@ export const emailQuotation = createServerFn({ method: "POST" })
       .limit(1)
       .maybeSingle();
     const fromName = settings?.legal_name || "NEVO Industrial";
-    const fromEmail = settings?.email || "onboarding@resend.dev";
-    const from = `${fromName} <${fromEmail}>`;
+    const from = configuredFrom.includes("<") ? configuredFrom : `${fromName} <${configuredFrom}>`;
+
+    const escapeHtml = (value: string) =>
+      value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
     const html = [
       `<div style="font-family:Arial,sans-serif;font-size:14px;color:#111;line-height:1.55">`,
       data.message
         ? data.message
             .split("\n")
-            .map((l) => `<p style="margin:0 0 10px">${l.replace(/</g, "&lt;")}</p>`)
+            .map((line) => `<p style="margin:0 0 10px">${escapeHtml(line)}</p>`)
             .join("")
-        : `<p>Please find attached quotation <b>${q.quotation_number ?? ""}</b>.</p>`,
-      `<p style="margin-top:24px;color:#666;font-size:12px">${fromName}</p>`,
+        : `<p>Please find attached quotation <b>${escapeHtml(q.quotation_number ?? "")}</b>.</p>`,
+      `<p style="margin-top:24px;color:#666;font-size:12px">${escapeHtml(fromName)}</p>`,
       `</div>`,
     ].join("");
 
@@ -693,9 +617,6 @@ export const emailQuotation = createServerFn({ method: "POST" })
 
     return { ok: true, resend_id: responseJson.id ?? null };
   });
-
-
-
 
 /** Recompute subtotal / vat_amount / total on a quotation from its items.
  *  DB trigger `recalc_quotation_totals` normally handles this; the app-side

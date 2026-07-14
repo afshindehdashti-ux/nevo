@@ -34,9 +34,14 @@ function normalizeFields(v: unknown): Record<string, string | number | boolean |
   const out: Record<string, string | number | boolean | null> = {};
   for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
     if (val === null || val === undefined) out[k] = null;
-    else if (typeof val === "string" || typeof val === "number" || typeof val === "boolean") out[k] = val;
+    else if (typeof val === "string" || typeof val === "number" || typeof val === "boolean")
+      out[k] = val;
     else {
-      try { out[k] = JSON.stringify(val); } catch { out[k] = String(val); }
+      try {
+        out[k] = JSON.stringify(val);
+      } catch {
+        out[k] = String(val);
+      }
     }
   }
   return out;

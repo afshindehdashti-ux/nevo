@@ -106,12 +106,7 @@ function ControlPanel() {
     queryKey: ["cp", "counts"],
     enabled: isSuperAdmin,
     queryFn: async () => {
-      const tables = [
-        "customers",
-        "suppliers",
-        "products",
-        "project_inquiries",
-      ] as const;
+      const tables = ["customers", "suppliers", "products", "project_inquiries"] as const;
       const results = await Promise.all(
         tables.map(async (t) => {
           const { count, error } = await supabase
@@ -147,9 +142,7 @@ function ControlPanel() {
         <Alert variant="destructive">
           <ShieldAlert className="h-4 w-4" />
           <AlertTitle>Restricted area</AlertTitle>
-          <AlertDescription>
-            The control panel is available to Super Admins only.
-          </AlertDescription>
+          <AlertDescription>The control panel is available to Super Admins only.</AlertDescription>
         </Alert>
       </div>
     );
@@ -201,19 +194,19 @@ function ControlPanel() {
         />
         <StatCard
           label="Super Admins"
-          value={rolesQ.isLoading ? null : roleStats.get("super_admin") ?? 0}
+          value={rolesQ.isLoading ? null : (roleStats.get("super_admin") ?? 0)}
           hint="Highest access tier"
           icon={<ShieldCheck className="h-4 w-4" />}
         />
         <StatCard
           label="Customers"
-          value={counts.isLoading ? null : counts.data?.customers ?? 0}
+          value={counts.isLoading ? null : (counts.data?.customers ?? 0)}
           hint="Records in CRM"
           icon={<Users className="h-4 w-4" />}
         />
         <StatCard
           label="Inquiries"
-          value={counts.isLoading ? null : counts.data?.project_inquiries ?? 0}
+          value={counts.isLoading ? null : (counts.data?.project_inquiries ?? 0)}
           hint="Total received"
           icon={<Target className="h-4 w-4" />}
         />
@@ -280,7 +273,9 @@ function ControlPanel() {
                       {formatDistanceToNow(new Date(row.created_at), { addSuffix: true })}
                     </TableCell>
                     <TableCell className="text-sm">
-                      {row.user_id ? nameById.get(row.user_id) || "Unknown" : (
+                      {row.user_id ? (
+                        nameById.get(row.user_id) || "Unknown"
+                      ) : (
                         <span className="text-muted-foreground italic">system</span>
                       )}
                     </TableCell>
@@ -335,11 +330,7 @@ function ControlPanel() {
             count={counts.data?.products}
             icon={<Boxes className="h-4 w-4" />}
           />
-          <ModuleLink
-            to="/admin/orders"
-            label="Orders"
-            icon={<Truck className="h-4 w-4" />}
-          />
+          <ModuleLink to="/admin/orders" label="Orders" icon={<Truck className="h-4 w-4" />} />
           <ModuleLink
             to="/admin/proforma-invoices"
             label="Proforma"
@@ -350,16 +341,8 @@ function ControlPanel() {
             label="Invoices"
             icon={<FileText className="h-4 w-4" />}
           />
-          <ModuleLink
-            to="/admin/leads"
-            label="Leads"
-            icon={<Target className="h-4 w-4" />}
-          />
-          <ModuleLink
-            to="/admin/reports"
-            label="Reports"
-            icon={<Activity className="h-4 w-4" />}
-          />
+          <ModuleLink to="/admin/leads" label="Leads" icon={<Target className="h-4 w-4" />} />
+          <ModuleLink to="/admin/reports" label="Reports" icon={<Activity className="h-4 w-4" />} />
         </CardContent>
       </Card>
     </div>

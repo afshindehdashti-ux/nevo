@@ -3,13 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsSuperAdmin, useMyRoles } from "@/lib/crm-hooks";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -118,17 +112,13 @@ const CATEGORIES = [
   { value: "definer_other", label: "Other security-definer actions" },
 ] as const;
 
-const CATEGORY_FILTER: Record<
-  (typeof CATEGORIES)[number]["value"],
-  (r: LogRow) => boolean
-> = {
+const CATEGORY_FILTER: Record<(typeof CATEGORIES)[number]["value"], (r: LogRow) => boolean> = {
   all: () => true,
   sign_in: (r) => r.action === "sign_in",
   sessions: (r) => SESSION_ACTIONS.includes(r.action),
   alerts: (r) => ALERT_ACTIONS.includes(r.action),
   approvals: (r) =>
-    APPROVAL_ACTIONS.includes(r.action) ||
-    (r.entity_type ?? "").startsWith("approval:"),
+    APPROVAL_ACTIONS.includes(r.action) || (r.entity_type ?? "").startsWith("approval:"),
   role_changes: (r) => r.entity_type === "user_roles",
   user_mgmt: (r) => USER_MGMT_ACTIONS.includes(r.action),
   deletes: (r) => r.action === "delete",
@@ -149,10 +139,7 @@ const CATEGORY_FILTER: Record<
 
 export const Route = createFileRoute("/_authenticated/admin/security-audit")({
   head: () => ({
-    meta: [
-      { title: "Security Audit — NEVO CRM" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Security Audit — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   component: SecurityAuditPage,
 });
@@ -162,17 +149,14 @@ function SecurityAuditPage() {
   const { isLoading: rolesLoading } = useMyRoles();
   const queryClient = useQueryClient();
 
-  const [category, setCategory] =
-    useState<(typeof CATEGORIES)[number]["value"]>("all");
+  const [category, setCategory] = useState<(typeof CATEGORIES)[number]["value"]>("all");
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
   const [actor, setActor] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<LogRow | null>(null);
   const [actorDetail, setActorDetail] = useState<string | null>(null);
-  const [liveStatus, setLiveStatus] = useState<"connecting" | "live" | "off">(
-    "connecting",
-  );
+  const [liveStatus, setLiveStatus] = useState<"connecting" | "live" | "off">("connecting");
 
   // Real-time refresh — subscribe to inserts on activity_logs and invalidate
   // the audit query whenever a security-significant event lands. Filtering on
@@ -196,8 +180,7 @@ function SecurityAuditPage() {
       )
       .subscribe((status) => {
         if (status === "SUBSCRIBED") setLiveStatus("live");
-        else if (status === "CHANNEL_ERROR" || status === "CLOSED")
-          setLiveStatus("off");
+        else if (status === "CHANNEL_ERROR" || status === "CLOSED") setLiveStatus("off");
       });
     return () => {
       supabase.removeChannel(channel);
@@ -216,8 +199,7 @@ function SecurityAuditPage() {
 
       // Server-side pre-filter for categories that map to a single column
       if (category === "sign_in") q = q.eq("action", "sign_in");
-      else if (category === "role_changes")
-        q = q.eq("entity_type", "user_roles");
+      else if (category === "role_changes") q = q.eq("entity_type", "user_roles");
       else if (category === "deletes") q = q.eq("action", "delete");
       else if (category === "approvals") q = q.in("action", APPROVAL_ACTIONS);
       else if (category === "sessions") q = q.in("action", SESSION_ACTIONS);
@@ -229,8 +211,7 @@ function SecurityAuditPage() {
         q = q.in("action", [...SECURITY_ACTIONS]);
       }
 
-      if (actor !== "all")
-        q = actor === "system" ? q.is("user_id", null) : q.eq("user_id", actor);
+      if (actor !== "all") q = actor === "system" ? q.is("user_id", null) : q.eq("user_id", actor);
       if (dateFrom) q = q.gte("created_at", new Date(dateFrom).toISOString());
       if (dateTo) {
         const end = new Date(dateTo);
@@ -316,22 +297,14 @@ function SecurityAuditPage() {
   const exportRows = useMemo(() => {
     return filteredRows.map((r) => {
       const md = r.metadata as { ip?: string | null; country?: string | null };
-      const actorName = r.user_id
-        ? (profilesQ.data?.get(r.user_id) ?? r.user_id)
-        : "system";
+      const actorName = r.user_id ? (profilesQ.data?.get(r.user_id) ?? r.user_id) : "system";
       const ipDetail =
-        r.action === "sign_in" && md?.ip
-          ? md.country
-            ? `${md.ip} (${md.country})`
-            : md.ip
-          : "—";
+        r.action === "sign_in" && md?.ip ? (md.country ? `${md.ip} (${md.country})` : md.ip) : "—";
       return {
         when: format(new Date(r.created_at), "yyyy-MM-dd HH:mm:ss"),
         actor: actorName,
         event: EVENT_LABELS[r.action] ?? r.action,
-        scope: r.entity_id
-          ? `${r.entity_type ?? "—"} (${r.entity_id})`
-          : (r.entity_type ?? "—"),
+        scope: r.entity_id ? `${r.entity_type ?? "—"} (${r.entity_id})` : (r.entity_type ?? "—"),
         ip: ipDetail,
       };
     });
@@ -350,20 +323,11 @@ function SecurityAuditPage() {
   }
 
   function exportPdf() {
-    downloadPdf(
-      "security-audit",
-      "NEVO CRM — Security Audit",
-      EXPORT_COLUMNS,
-      exportRows,
-    );
+    downloadPdf("security-audit", "NEVO CRM — Security Audit", EXPORT_COLUMNS, exportRows);
   }
 
   if (rolesLoading) {
-    return (
-      <div className="p-6 text-sm text-muted-foreground">
-        Checking permissions…
-      </div>
-    );
+    return <div className="p-6 text-sm text-muted-foreground">Checking permissions…</div>;
   }
 
   if (!isSuperAdmin) {
@@ -388,8 +352,7 @@ function SecurityAuditPage() {
           <div>
             <h1 className="text-2xl font-semibold">Security Audit</h1>
             <p className="text-sm text-muted-foreground">
-              Sign-ins, approvals, role changes and deletes recorded by
-              privileged server functions.
+              Sign-ins, approvals, role changes and deletes recorded by privileged server functions.
             </p>
           </div>
         </div>
@@ -423,22 +386,14 @@ function SecurityAuditPage() {
           </span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={!filteredRows.length}
-              >
+              <Button variant="outline" size="sm" disabled={!filteredRows.length}>
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={exportCsv}>
-                Download CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={exportPdf}>
-                Download PDF
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={exportCsv}>Download CSV</DropdownMenuItem>
+              <DropdownMenuItem onClick={exportPdf}>Download PDF</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -448,11 +403,7 @@ function SecurityAuditPage() {
         <MiniStat icon={LogIn} label="Sign-ins" value={stats.signIn} />
         <MiniStat icon={LogOut} label="Session revocations" value={stats.sessions} />
         <MiniStat icon={Bell} label="Security alerts" value={stats.alerts} />
-        <MiniStat
-          icon={CheckCircle2}
-          label="Approval decisions"
-          value={stats.approvals}
-        />
+        <MiniStat icon={CheckCircle2} label="Approval decisions" value={stats.approvals} />
         <MiniStat icon={UserCog} label="Role changes" value={stats.roleChanges} />
         <MiniStat icon={UserPlus} label="User management" value={stats.userMgmt} />
         <MiniStat icon={Trash2} label="Deletes" value={stats.deletes} />
@@ -461,9 +412,7 @@ function SecurityAuditPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Filters</CardTitle>
-          <CardDescription>
-            Latest 1,000 security-significant entries.
-          </CardDescription>
+          <CardDescription>Latest 1,000 security-significant entries.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
           <div className="space-y-1">
@@ -483,19 +432,11 @@ function SecurityAuditPage() {
           </div>
           <div className="space-y-1">
             <Label>From</Label>
-            <Input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-            />
+            <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
           </div>
           <div className="space-y-1">
             <Label>To</Label>
-            <Input
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-            />
+            <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
           </div>
           <div className="space-y-1">
             <Label>Actor</Label>
@@ -537,9 +478,7 @@ function SecurityAuditPage() {
           {logsQ.error ? (
             <Alert variant="destructive">
               <AlertTitle>Failed to load audit log</AlertTitle>
-              <AlertDescription>
-                {(logsQ.error as Error).message}
-              </AlertDescription>
+              <AlertDescription>{(logsQ.error as Error).message}</AlertDescription>
             </Alert>
           ) : (
             <Table>
@@ -556,10 +495,7 @@ function SecurityAuditPage() {
               <TableBody>
                 {filteredRows.length === 0 && !logsQ.isLoading ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      className="text-center text-muted-foreground py-8"
-                    >
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                       No matching security events.
                     </TableCell>
                   </TableRow>
@@ -573,10 +509,7 @@ function SecurityAuditPage() {
                       <TableRow key={row.id}>
                         <TableCell className="whitespace-nowrap">
                           <div className="font-mono text-xs">
-                            {format(
-                              new Date(row.created_at),
-                              "yyyy-MM-dd HH:mm:ss",
-                            )}
+                            {format(new Date(row.created_at), "yyyy-MM-dd HH:mm:ss")}
                           </div>
                           <div className="text-[10px] text-muted-foreground">
                             {formatDistanceToNow(new Date(row.created_at), {
@@ -599,9 +532,7 @@ function SecurityAuditPage() {
                               )}
                             </button>
                           ) : (
-                            <span className="text-muted-foreground italic">
-                              system
-                            </span>
+                            <span className="text-muted-foreground italic">system</span>
                           )}
                         </TableCell>
                         <TableCell>
@@ -620,9 +551,7 @@ function SecurityAuditPage() {
                             <span>
                               {md.ip}
                               {md.country ? (
-                                <span className="ml-1 text-muted-foreground">
-                                  ({md.country})
-                                </span>
+                                <span className="ml-1 text-muted-foreground">({md.country})</span>
                               ) : null}
                             </span>
                           ) : (
@@ -630,11 +559,7 @@ function SecurityAuditPage() {
                           )}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSelected(row)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => setSelected(row)}>
                             View
                           </Button>
                         </TableCell>
@@ -648,10 +573,7 @@ function SecurityAuditPage() {
         </CardContent>
       </Card>
 
-      <Dialog
-        open={!!selected}
-        onOpenChange={(o) => !o && setSelected(null)}
-      >
+      <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Security event</DialogTitle>
@@ -674,16 +596,13 @@ function SecurityAuditPage() {
                       onClick={() => setActorDetail(selected.user_id)}
                       className="text-left text-primary hover:underline"
                     >
-                      {profilesQ.data?.get(selected.user_id) ??
-                        selected.user_id}
+                      {profilesQ.data?.get(selected.user_id) ?? selected.user_id}
                     </button>
                   ) : (
                     "system"
                   )}
                 </MetaField>
-                <MetaField label="Record ID">
-                  {selected.entity_id ?? "—"}
-                </MetaField>
+                <MetaField label="Record ID">{selected.entity_id ?? "—"}</MetaField>
               </div>
               <div>
                 <Label className="text-xs uppercase tracking-wide text-muted-foreground">
@@ -714,18 +633,10 @@ function SecurityAuditPage() {
   );
 }
 
-function MetaField({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function MetaField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-        {label}
-      </Label>
+      <Label className="text-xs uppercase tracking-wide text-muted-foreground">{label}</Label>
       <div className="mt-1 font-mono text-xs break-all">{children}</div>
     </div>
   );
@@ -772,10 +683,7 @@ function EventBadge({ action }: { action: string }) {
   const ok = "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400";
   const info = "bg-sky-500/15 text-sky-600 dark:text-sky-400";
   const muted = "bg-muted text-muted-foreground";
-  const map: Record<
-    string,
-    { icon: React.ComponentType<{ className?: string }>; cls: string }
-  > = {
+  const map: Record<string, { icon: React.ComponentType<{ className?: string }>; cls: string }> = {
     sign_in: { icon: LogIn, cls: info },
     sign_in_failed: { icon: ShieldAlert, cls: warn },
     security_alert: { icon: Bell, cls: warn },
@@ -871,9 +779,7 @@ function ActorDetailDialog({
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Actor profile</DialogTitle>
-          <DialogDescription>
-            Recent security events attributed to this user.
-          </DialogDescription>
+          <DialogDescription>Recent security events attributed to this user.</DialogDescription>
         </DialogHeader>
 
         {!userId ? null : profileQ.isLoading ? (
@@ -886,14 +792,10 @@ function ActorDetailDialog({
               <MetaField label="Phone">{profile?.phone ?? "—"}</MetaField>
               <MetaField label="User ID">{userId}</MetaField>
               <MetaField label="Joined">
-                {profile?.created_at
-                  ? format(new Date(profile.created_at), "PPpp")
-                  : "—"}
+                {profile?.created_at ? format(new Date(profile.created_at), "PPpp") : "—"}
               </MetaField>
               <MetaField label="Last login">
-                {profile?.last_login_at
-                  ? format(new Date(profile.last_login_at), "PPpp")
-                  : "—"}
+                {profile?.last_login_at ? format(new Date(profile.last_login_at), "PPpp") : "—"}
               </MetaField>
               <MetaField label="Roles">
                 {rolesQ.data && rolesQ.data.length > 0 ? (
@@ -914,11 +816,7 @@ function ActorDetailDialog({
               <Button size="sm" variant="outline" asChild>
                 <Link to="/admin/users">Manage in Users & Roles</Link>
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => onFilterByActor(userId)}
-              >
+              <Button size="sm" variant="outline" onClick={() => onFilterByActor(userId)}>
                 Filter audit by this actor
               </Button>
             </div>
@@ -973,11 +871,7 @@ function ActorDetailDialog({
                             )}
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => onViewEvent(row)}
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => onViewEvent(row)}>
                               View
                             </Button>
                           </TableCell>

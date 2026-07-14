@@ -29,7 +29,12 @@ export default withAudit({
       .optional()
       .describe("Requested sandwich panel type (e.g. PIR, PUR, Rockwool, EPS)."),
     project_type: z.string().trim().max(200).optional().describe("Application / project type."),
-    budget_range: z.string().trim().max(80).optional().describe("Budget range, e.g. '10k-50k USD'."),
+    budget_range: z
+      .string()
+      .trim()
+      .max(80)
+      .optional()
+      .describe("Budget range, e.g. '10k-50k USD'."),
     timeline: z.string().trim().max(120).optional(),
     message: z.string().trim().max(5000).optional(),
   },

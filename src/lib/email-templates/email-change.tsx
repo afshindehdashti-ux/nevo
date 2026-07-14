@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from "react";
 import {
   Body,
   Button,
@@ -9,17 +9,17 @@ import {
   Preview,
   Section,
   Text,
-} from '@react-email/components'
-import { brand, styles } from './_shared'
-import { EmailHead } from './EmailHead'
-import { BrandHeader } from './BrandHeader'
+} from "@react-email/components";
+import { brand, styles } from "./_shared";
+import { EmailHead } from "./EmailHead";
+import { BrandHeader } from "./BrandHeader";
 
 interface EmailChangeEmailProps {
-  siteName: string
-  oldEmail: string
-  email: string
-  newEmail: string
-  confirmationUrl: string
+  siteName: string;
+  oldEmail: string;
+  email: string;
+  newEmail: string;
+  confirmationUrl: string;
 }
 
 export const EmailChangeEmail = ({
@@ -35,14 +35,15 @@ export const EmailChangeEmail = ({
         <BrandHeader />
 
         <Section style={styles.card} className="card">
-          <Heading style={styles.h1} className="h1">Confirm your email change</Heading>
+          <Heading style={styles.h1} className="h1">
+            Confirm your email change
+          </Heading>
           <Text style={styles.text} className="text">
-            You requested to change the email on your NEVO Industrial account
-            from{' '}
+            You requested to change the email on your NEVO Industrial account from{" "}
             <Link href={`mailto:${oldEmail}`} style={styles.link} className="link">
               {oldEmail}
-            </Link>{' '}
-            to{' '}
+            </Link>{" "}
+            to{" "}
             <Link href={`mailto:${newEmail}`} style={styles.link} className="link">
               {newEmail}
             </Link>
@@ -52,7 +53,7 @@ export const EmailChangeEmail = ({
             Confirm email change
           </Button>
           <Text style={styles.small} className="small">
-            If you didn't request this change, please contact us immediately at{' '}
+            If you didn't request this change, please contact us immediately at{" "}
             <Link href={`mailto:${brand.supportEmail}`} style={styles.link} className="link">
               {brand.supportEmail}
             </Link>
@@ -68,6 +69,6 @@ export const EmailChangeEmail = ({
       </Container>
     </Body>
   </Html>
-)
+);
 
-export default EmailChangeEmail
+export default EmailChangeEmail;

@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  buildEmbeddedAuditMetadata,
-  detectShaDrift,
-} from "@/lib/csv-export-audit-metadata";
+import { buildEmbeddedAuditMetadata, detectShaDrift } from "@/lib/csv-export-audit-metadata";
 import {
   PAYLOAD_MARKER,
   SHA_LABEL,
@@ -12,8 +9,7 @@ import {
   parsePreambleAndSplitPayload,
 } from "@/lib/purge-csv-preamble";
 
-const SAMPLE_SHA =
-  "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789";
+const SAMPLE_SHA = "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789";
 const SAMPLE_ISO = "2026-07-07T12:34:56.000Z";
 
 describe("buildEmbeddedAuditMetadata", () => {

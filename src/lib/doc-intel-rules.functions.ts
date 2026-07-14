@@ -14,7 +14,10 @@ const READ_ROLES = [
 
 async function assertRole(
   supabase: {
-    rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
+    rpc: (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: { message: string } | null }>;
   },
   userId: string,
   roles: readonly string[],
@@ -186,10 +189,9 @@ export const reapplyRulesToDocument = createServerFn({ method: "POST" })
     if (outcome.added_tags.length > 0) {
       await context.supabase
         .from("doc_intel_tags")
-        .upsert(
-          outcome.added_tags.map((tag: string) => ({ document_id: doc.id, tag })) as never,
-          { onConflict: "document_id,tag" as never },
-        );
+        .upsert(outcome.added_tags.map((tag: string) => ({ document_id: doc.id, tag })) as never, {
+          onConflict: "document_id,tag" as never,
+        });
     }
     await context.supabase.from("doc_intel_audit_logs").insert({
       document_id: doc.id,

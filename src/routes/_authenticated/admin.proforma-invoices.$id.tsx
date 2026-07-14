@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +9,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, FileDown, Loader2, Plus, Save, ShieldCheck, Trash2, Wallet } from "lucide-react";
+import {
+  ArrowLeft,
+  FileDown,
+  Loader2,
+  Plus,
+  Receipt,
+  Save,
+  ShieldCheck,
+  Trash2,
+  Wallet,
+} from "lucide-react";
 import { toast } from "sonner";
 import { formatDate, formatMoney } from "@/lib/crm-money";
 import {
@@ -19,6 +30,7 @@ import {
   type CustomerDisplay,
 } from "@/lib/finance-normalization";
 import { generateProformaInvoicePdf } from "@/lib/proforma-invoice-pdf";
+import { convertProformaInvoiceToCommercial } from "@/lib/proforma-invoices.functions";
 
 type ItemRow = {
   id: string;
@@ -36,16 +48,15 @@ type ItemRow = {
 
 export const Route = createFileRoute("/_authenticated/admin/proforma-invoices/$id")({
   head: () => ({
-    meta: [
-      { title: "Proforma Invoice — NEVO CRM" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Proforma Invoice — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   component: ProformaInvoiceDetail,
   errorComponent: ({ error, reset }) => (
     <div className="p-8">
       <p className="text-destructive mb-3">Failed to load proforma invoice: {error.message}</p>
-      <Button onClick={reset} variant="outline">Retry</Button>
+      <Button onClick={reset} variant="outline">
+        Retry
+      </Button>
     </div>
   ),
   notFoundComponent: () => (
@@ -85,7 +96,8 @@ type ProformaRow = {
 function ProformaInvoiceDetail() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
-
+  const navigate = useNavigate();
+  const convertFn = useServerFn(convertProformaInvoiceToCommercial);
 
   const { data: pi, isLoading } = useQuery({
     queryKey: ["proforma_invoice", id],
@@ -165,7 +177,9 @@ function ProformaInvoiceDetail() {
 
   const approve = useMutation({
     mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("Not signed in");
       const { error } = await supabase
         .from("proforma_invoices")
@@ -181,6 +195,20 @@ function ProformaInvoiceDetail() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Approve failed"),
   });
 
+  const convert = useMutation({
+    mutationFn: () => convertFn({ data: { id } }),
+    onSuccess: (result) => {
+      toast.success(
+        result.already ? "Commercial invoice already exists" : "Commercial invoice created",
+      );
+      qc.invalidateQueries({ queryKey: ["proforma_invoice", id] });
+      qc.invalidateQueries({ queryKey: ["proforma_invoices", "list"] });
+      qc.invalidateQueries({ queryKey: ["invoices"] });
+      navigate({ to: "/admin/invoices/$id", params: { id: result.invoice_id } });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Conversion failed"),
+  });
+
   // Payment capture
   const [paymentAmount, setPaymentAmount] = useState<string>("");
   const [paymentMode, setPaymentMode] = useState<"add" | "set">("add");
@@ -190,8 +218,7 @@ function ProformaInvoiceDetail() {
       if (!pi) throw new Error("Not loaded");
       const amt = Number(paymentAmount);
       if (!Number.isFinite(amt) || amt < 0) throw new Error("Enter a valid amount");
-      const nextPaid =
-        paymentMode === "add" ? financePaidAmount(pi) + amt : amt;
+      const nextPaid = paymentMode === "add" ? financePaidAmount(pi) + amt : amt;
       if (nextPaid < 0) throw new Error("Amount paid cannot be negative");
       if (nextPaid > financeTotalAmount(pi) + 0.009) {
         throw new Error("Amount paid cannot exceed grand total");
@@ -285,7 +312,7 @@ function ProformaInvoiceDetail() {
           <Button
             variant="secondary"
             onClick={() => approve.mutate()}
-            disabled={approve.isPending || !!pi.approved_by}
+            disabled={approve.isPending || !!pi.approved_by || pi.status === "converted_to_invoice"}
           >
             {approve.isPending ? (
               <Loader2 className="h-4 w-4 mr-1 animate-spin" />
@@ -294,6 +321,20 @@ function ProformaInvoiceDetail() {
             )}
             {pi.approved_by ? "Approved" : "Approve"}
           </Button>
+          {(pi.status === "approved" ||
+            pi.status === "accepted" ||
+            pi.status === "converted_to_invoice") && (
+            <Button onClick={() => convert.mutate()} disabled={convert.isPending}>
+              {convert.isPending ? (
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+              ) : (
+                <Receipt className="h-4 w-4 mr-1" />
+              )}
+              {pi.status === "converted_to_invoice"
+                ? "Open commercial invoice"
+                : "Convert to commercial invoice"}
+            </Button>
+          )}
           <Button onClick={() => save.mutate()} disabled={save.isPending}>
             {save.isPending ? (
               <Loader2 className="h-4 w-4 mr-1 animate-spin" />
@@ -401,10 +442,7 @@ function ProformaInvoiceDetail() {
             <CardContent className="text-sm space-y-2">
               <Row label="Subtotal" value={formatMoney(pi.subtotal, pi.currency)} />
               {Number(pi.discount_amount) > 0 && (
-                <Row
-                  label="Discount"
-                  value={`− ${formatMoney(pi.discount_amount, pi.currency)}`}
-                />
+                <Row label="Discount" value={`− ${formatMoney(pi.discount_amount, pi.currency)}`} />
               )}
               <Row
                 label={`VAT${pi.vat_rate ? ` (${Number(pi.vat_rate)}%)` : ""}`}
@@ -417,10 +455,7 @@ function ProformaInvoiceDetail() {
                   strong
                 />
               </div>
-              <Row
-                label="Amount paid"
-                value={formatMoney(financePaidAmount(pi), pi.currency)}
-              />
+              <Row label="Amount paid" value={formatMoney(financePaidAmount(pi), pi.currency)} />
               <Row
                 label="Balance due"
                 value={formatMoney(financeBalanceDue(pi), pi.currency)}
@@ -428,7 +463,6 @@ function ProformaInvoiceDetail() {
               />
             </CardContent>
           </Card>
-
 
           <Card>
             <CardHeader>
@@ -448,7 +482,9 @@ function ProformaInvoiceDetail() {
                 </div>
               </div>
               <div>
-                <Label htmlFor="pay_mode" className="text-xs">Mode</Label>
+                <Label htmlFor="pay_mode" className="text-xs">
+                  Mode
+                </Label>
                 <select
                   id="pay_mode"
                   className="w-full border rounded h-9 px-2 bg-background text-sm"
@@ -512,9 +548,7 @@ function ProformaInvoiceDetail() {
             <CardContent className="text-sm space-y-2">
               <p className="text-muted-foreground text-xs">Approved by</p>
               <p className="font-medium">
-                {pi.approved_by
-                  ? approverProfile?.full_name ?? "Approved"
-                  : "— (pending)"}
+                {pi.approved_by ? (approverProfile?.full_name ?? "Approved") : "— (pending)"}
               </p>
               <p className="text-muted-foreground text-xs mt-3">Payment status</p>
               <Badge variant={paymentBadge}>{pi.payment_status ?? "Unpaid"}</Badge>
@@ -526,15 +560,7 @@ function ProformaInvoiceDetail() {
   );
 }
 
-function Row({
-  label,
-  value,
-  strong,
-}: {
-  label: string;
-  value: string;
-  strong?: boolean;
-}) {
+function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (
     <div className={`flex justify-between ${strong ? "font-semibold" : ""}`}>
       <span className="text-muted-foreground">{label}</span>
@@ -578,16 +604,16 @@ function ProformaItemsCard({
   const previewLine = (r: ItemRow) => {
     const gross = Number(r.quantity || 0) * Number(r.unit_price || 0);
     const discAmt = Number(r.discount_amount || 0);
-    const discPct = gross * Number(r.discount || 0) / 100;
+    const discPct = (gross * Number(r.discount || 0)) / 100;
     const disc = discAmt > 0 ? discAmt : discPct;
     const taxable = Math.max(gross - disc, 0);
-    const tax = taxable * Number(r.tax_rate || 0) / 100;
+    const tax = (taxable * Number(r.tax_rate || 0)) / 100;
     return Math.round((taxable + tax) * 100) / 100;
   };
 
   const addItem = useMutation({
     mutationFn: async () => {
-      const nextOrder = (items?.length ?? 0);
+      const nextOrder = items?.length ?? 0;
       const { error } = await supabase.from("proforma_invoice_items").insert({
         proforma_invoice_id: proformaId,
         description: "New line item",
@@ -656,9 +682,9 @@ function ProformaItemsCard({
         <div>
           <CardTitle className="text-base">Line items</CardTitle>
           <p className="text-xs text-muted-foreground mt-1">
-            Discount % is applied per line unless a fixed discount amount is set (amount wins).
-            Tax rate is applied on the taxable base (gross − discount). Header VAT %, discount
-            total, and grand total recompute on every save via database triggers.
+            Discount % is applied per line unless a fixed discount amount is set (amount wins). Tax
+            rate is applied on the taxable base (gross − discount). Header VAT %, discount total,
+            and grand total recompute on every save via database triggers.
           </p>
         </div>
         <Button size="sm" onClick={() => addItem.mutate()} disabled={addItem.isPending}>

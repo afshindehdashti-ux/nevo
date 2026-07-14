@@ -26,19 +26,14 @@ export function csvEscape(value: string): string {
 
 /** Inverse of csvEscape for a single fully-quoted field. */
 function csvUnquote(v: string): string {
-  return v.startsWith('"') && v.endsWith('"')
-    ? v.slice(1, -1).replace(/""/g, '"')
-    : v;
+  return v.startsWith('"') && v.endsWith('"') ? v.slice(1, -1).replace(/""/g, '"') : v;
 }
 
 /**
  * Build the full CSV string by prepending the preamble to a payload CSV.
  * Given the same inputs this is deterministic and byte-stable.
  */
-export function buildPreamble(opts: {
-  sha256: string;
-  exportedAtIso: string;
-}): string {
+export function buildPreamble(opts: { sha256: string; exportedAtIso: string }): string {
   return [
     `${csvEscape(SHA_LABEL)},${csvEscape(opts.sha256 || "(unavailable)")}`,
     `${csvEscape(TIMESTAMP_LABEL)},${csvEscape(opts.exportedAtIso)}`,
@@ -142,14 +137,10 @@ export function inspectCsvStructure(text: string): CsvStructureReport {
   const parsed = parsePreambleAndSplitPayload(text);
   if (!parsed.hasMarker) issues.push("missing-payload-marker");
   if (parsed.embeddedSha === undefined) issues.push("missing-sha-row");
-  else if (
-    !isValidSha256Hex(parsed.embeddedSha) &&
-    parsed.embeddedSha !== "(unavailable)"
-  )
+  else if (!isValidSha256Hex(parsed.embeddedSha) && parsed.embeddedSha !== "(unavailable)")
     issues.push("invalid-sha-format");
   if (parsed.embeddedExportedAt === undefined) issues.push("missing-timestamp-row");
-  else if (!ISO_8601.test(parsed.embeddedExportedAt))
-    issues.push("invalid-timestamp-format");
+  else if (!ISO_8601.test(parsed.embeddedExportedAt)) issues.push("invalid-timestamp-format");
   if (parsed.hasMarker && parsed.payload.length === 0) issues.push("empty-payload");
   return {
     ok: issues.length === 0,
@@ -166,11 +157,9 @@ const STRUCTURE_ISSUE_MESSAGES: Record<CsvStructureIssue, string> = {
   "missing-payload-marker":
     'The "--- PAYLOAD BELOW ---" marker line is missing — this file was not produced by the NEVO exporter or has been truncated.',
   "missing-sha-row": "The preamble is missing the SHA-256 row.",
-  "invalid-sha-format":
-    "The embedded SHA-256 value is not a 64-character hex digest.",
+  "invalid-sha-format": "The embedded SHA-256 value is not a 64-character hex digest.",
   "missing-timestamp-row": "The preamble is missing the Export Timestamp row.",
-  "invalid-timestamp-format":
-    "The embedded Export Timestamp is not a valid ISO-8601 value.",
+  "invalid-timestamp-format": "The embedded Export Timestamp is not a valid ISO-8601 value.",
   "empty-payload": "The payload section (after the marker) is empty.",
 };
 

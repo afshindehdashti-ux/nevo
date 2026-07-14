@@ -6,12 +6,7 @@
  * common mistakes, and a best-practice note.
  */
 
-export type GuideCategory =
-  | "sales"
-  | "finance"
-  | "operations"
-  | "management"
-  | "admin";
+export type GuideCategory = "sales" | "finance" | "operations" | "management" | "admin";
 
 export type GuideSection = {
   id: string;
@@ -194,8 +189,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       "Missing unit or currency.",
       "Wrong HS code on export items.",
     ],
-    bestPractice:
-      "Keep product names short and consistent so they render cleanly on PDFs.",
+    bestPractice: "Keep product names short and consistent so they render cleanly on PDFs.",
     relatedRoute: { label: "Open Products", to: "/admin/products" },
   },
   {
@@ -431,8 +425,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       "Comparing reports across different currencies without conversion.",
       "Exporting without setting a date range.",
     ],
-    bestPractice:
-      "Always confirm the currency and date range before sharing a report externally.",
+    bestPractice: "Always confirm the currency and date range before sharing a report externally.",
     relatedRoute: { label: "Open Reports", to: "/admin/reports" },
   },
   {

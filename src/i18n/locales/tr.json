@@ -128,122 +128,73 @@
         {
           "t": "Soğuk Depo Tesisleri",
           "d": "Lojistik merkezleri, dağıtım merkezleri ve −40 °C dondurucu depolar için hava sızdırmaz düşük sıcaklık kabukları.",
-          "apps": [
-            "Dondurulmuş dağıtım",
-            "Soğuk lojistik",
-            "Şok dondurucular"
-          ],
+          "apps": ["Dondurulmuş dağıtım", "Soğuk lojistik", "Şok dondurucular"],
           "panel": "PIR — 100–200 mm, cam-lock joints"
         },
         {
           "t": "Temiz Odalar ve Farma Tesisleri",
           "d": "Hijyenik düz yüzeyli paneller ve kontrollü hava sızdırmazlık ile ISO sınıflandırılmış ortamlar.",
-          "apps": [
-            "Farmasötik tesisler",
-            "Yarı iletken fabrikaları",
-            "Hastane ameliyathanesi"
-          ],
+          "apps": ["Farmasötik tesisler", "Yarı iletken fabrikaları", "Hastane ameliyathanesi"],
           "panel": "Clean Room Panel — flush face, PIR/Rock Wool core"
         },
         {
           "t": "Gıda İşleme Tesisleri",
           "d": "Gıda sınıfı kaplamalar ve sızdırmaz sıhhi derzler ile HACCP uyumlu hijyenik kabuklar.",
-          "apps": [
-            "Et ve kümes",
-            "Süt ürünleri",
-            "Fırın",
-            "İçecek"
-          ],
+          "apps": ["Et ve kümes", "Süt ürünleri", "Fırın", "İçecek"],
           "panel": "PIR / Rock Wool — HDP food-grade facing"
         },
         {
           "t": "Endüstriyel Binalar",
           "d": "Mühendislik yapısı yangın ve yapısal performansa sahip üretim salonları, atölyeler ve ağır sanayi kabukları.",
-          "apps": [
-            "Üretim",
-            "Ağır sanayi",
-            "Montaj tesisleri"
-          ],
+          "apps": ["Üretim", "Ağır sanayi", "Montaj tesisleri"],
           "panel": "PIR / Rock Wool — 80–150 mm structural"
         },
         {
           "t": "Depolar ve Lojistik Merkezleri",
           "d": "Dağıtım, e-ticaret ve kargo merkezleri için geniş açıklıklı kabuklar — hızlı montaj, düşük yaşam döngüsü maliyeti.",
-          "apps": [
-            "Dağıtım",
-            "E-ticaret sipariş karşılama",
-            "Kargo terminalleri"
-          ],
+          "apps": ["Dağıtım", "E-ticaret sipariş karşılama", "Kargo terminalleri"],
           "panel": "PIR wall + PIR/Rock Wool roof"
         },
         {
           "t": "Ticari Binalar",
           "d": "Mimari tasarım ile mühendislik performansını birleştiren showroomlar, perakende ve ofis cepheleri.",
-          "apps": [
-            "Showroomlar",
-            "Ofisler",
-            "Perakende"
-          ],
+          "apps": ["Showroomlar", "Ofisler", "Perakende"],
           "panel": "Hidden-fix PIR facade + insulated glass"
         },
         {
           "t": "Tarımsal Binalar",
           "d": "Nem, amonyak ve uzun açıklıklar için tasarlanmış çiftlik hayvanı, depolama ve agro-endüstriyel kabuklar.",
-          "apps": [
-            "Çiftlik hayvanı",
-            "Tahıl depolama",
-            "Tarımsal işleme"
-          ],
+          "apps": ["Çiftlik hayvanı", "Tahıl depolama", "Tarımsal işleme"],
           "panel": "PIR — corrosion-resistant PVDF facing"
         },
         {
           "t": "Modüler Binalar",
           "d": "Ofisler, kamplar ve şantiye konaklaması için önceden üretilmiş modüler sistemler — fabrikada üretilir, sahada montaj yapılır.",
-          "apps": [
-            "Şantiye ofisleri",
-            "İşçi konaklaması",
-            "Prefabrik klinikler"
-          ],
+          "apps": ["Şantiye ofisleri", "İşçi konaklaması", "Prefabrik klinikler"],
           "panel": "PIR — 50–80 mm lightweight"
         },
         {
           "t": "Veri Merkezleri",
           "d": "EMI korumalı yüzeyler ve sıkı yangın bölümlendirmesi ile yanmaz kabuklar.",
-          "apps": [
-            "Hyperscale salonlar",
-            "Edge veri merkezleri",
-            "Modüler kapsüller"
-          ],
+          "apps": ["Hyperscale salonlar", "Edge veri merkezleri", "Modüler kapsüller"],
           "panel": "Rock Wool — 120–150 mm A2 fire class"
         },
         {
           "t": "Perakende ve Süpermarketler",
           "d": "Termal konfor, hızlı yapım ve entegre soğuk depo arka mekanlarını birleştiren perakende kabukları.",
-          "apps": [
-            "Süpermarketler",
-            "Büyük perakende",
-            "Yapı marketler"
-          ],
+          "apps": ["Süpermarketler", "Büyük perakende", "Yapı marketler"],
           "panel": "PIR facade + integrated cold rooms"
         },
         {
           "t": "Spor ve Rekreasyon Tesisleri",
           "d": "Mühendislik yapısı akustik ve termal kabuklara sahip uzun açıklıklı spor salonları, arenalar ve buz pistleri.",
-          "apps": [
-            "Spor salonları",
-            "Buz pistleri",
-            "Kapalı arenalar"
-          ],
+          "apps": ["Spor salonları", "Buz pistleri", "Kapalı arenalar"],
           "panel": "Rock Wool — acoustic Rw 32+ dB"
         },
         {
           "t": "Havalimanı ve Ulaşım Tesisleri",
           "d": "Yangın, güvenlik ve uzun açıklıklı çatı yapıları için tasarlanmış terminaller, hangarlar ve MRO tesisleri.",
-          "apps": [
-            "Terminaller",
-            "Hangarlar",
-            "MRO tesisleri"
-          ],
+          "apps": ["Terminaller", "Hangarlar", "MRO tesisleri"],
           "panel": "Rock Wool + PIR — certified fire/thermal"
         }
       ]

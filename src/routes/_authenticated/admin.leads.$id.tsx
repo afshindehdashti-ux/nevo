@@ -16,9 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Loader2, UserPlus, ExternalLink } from "lucide-react";
+import { ArrowLeft, Download, ExternalLink, Loader2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { convertLeadToCustomer } from "@/lib/leads.functions";
+import { getCareerCvDownload } from "@/lib/career-applications.functions";
 import { logCrmAction } from "@/lib/audit-log.functions";
 import { formatDate } from "@/lib/crm-money";
 import { LEAD_STATUSES } from "./admin.leads";
@@ -35,6 +36,7 @@ function LeadDetail() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const convertFn = useServerFn(convertLeadToCustomer);
+  const getCareerCv = useServerFn(getCareerCvDownload);
   const logAudit = useServerFn(logCrmAction);
 
   const { data: lead, isLoading } = useQuery({
@@ -74,6 +76,23 @@ function LeadDetail() {
     timeline: "",
     internal_notes: "",
   });
+
+  const { data: careerCv, isLoading: isCareerCvLoading } = useQuery({
+    queryKey: ["career-cv", id],
+    queryFn: () => getCareerCv({ data: { inquiryId: id } }),
+    retry: false,
+  });
+
+  async function downloadCareerCv() {
+    if (!careerCv) return;
+    const anchor = document.createElement("a");
+    anchor.href = careerCv.url;
+    anchor.download = careerCv.filename;
+    anchor.rel = "noopener";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+  }
 
   useEffect(() => {
     if (!lead) return;
@@ -194,9 +213,7 @@ function LeadDetail() {
           <div className="flex gap-2 flex-wrap">
             <Badge variant="outline">Received {formatDate(lead.created_at)}</Badge>
             {isConverted && (
-              <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">
-                Converted
-              </Badge>
+              <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">Converted</Badge>
             )}
           </div>
         </div>
@@ -220,6 +237,24 @@ function LeadDetail() {
             </CardContent>
           </Card>
 
+          {(careerCv || isCareerCvLoading) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Candidate CV</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-muted-foreground">
+                  {isCareerCvLoading ? "Checking for an uploaded CV..." : careerCv?.filename}
+                </p>
+                {careerCv && (
+                  <Button type="button" variant="outline" onClick={() => void downloadCareerCv()}>
+                    <Download className="mr-2 h-4 w-4" /> Download CV
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Qualification & internal notes</CardTitle>
@@ -229,9 +264,7 @@ function LeadDetail() {
                 <Field label="Project type">
                   <Input
                     value={form.project_type}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, project_type: e.target.value }))
-                    }
+                    onChange={(e) => setForm((f) => ({ ...f, project_type: e.target.value }))}
                     placeholder="e.g. Sandwich panel line"
                     maxLength={100}
                   />
@@ -239,9 +272,7 @@ function LeadDetail() {
                 <Field label="Budget range">
                   <Input
                     value={form.budget_range}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, budget_range: e.target.value }))
-                    }
+                    onChange={(e) => setForm((f) => ({ ...f, budget_range: e.target.value }))}
                     placeholder="e.g. $500k–$1M"
                     maxLength={80}
                   />
@@ -258,9 +289,7 @@ function LeadDetail() {
               <Field label="Internal notes (not visible to customer)">
                 <Textarea
                   value={form.internal_notes}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, internal_notes: e.target.value }))
-                  }
+                  onChange={(e) => setForm((f) => ({ ...f, internal_notes: e.target.value }))}
                   rows={5}
                   maxLength={5000}
                   placeholder="Add discovery notes, competitor info, requirements…"
@@ -268,9 +297,7 @@ function LeadDetail() {
               </Field>
               <div className="flex justify-end">
                 <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
-                  {saveMutation.isPending && (
-                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                  )}
+                  {saveMutation.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
                   Save changes
                 </Button>
               </div>
@@ -341,18 +368,14 @@ function LeadDetail() {
                   min={0}
                   max={100}
                   value={form.internal_score}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, internal_score: e.target.value }))
-                  }
+                  onChange={(e) => setForm((f) => ({ ...f, internal_score: e.target.value }))}
                 />
               </Field>
               <Field label="Next action date">
                 <Input
                   type="date"
                   value={form.next_action_date}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, next_action_date: e.target.value }))
-                  }
+                  onChange={(e) => setForm((f) => ({ ...f, next_action_date: e.target.value }))}
                 />
               </Field>
             </CardContent>
@@ -368,10 +391,7 @@ function LeadDetail() {
                   <p className="text-muted-foreground">This lead is already converted.</p>
                   {lead.converted_customer_id && (
                     <Button asChild variant="outline" size="sm" className="w-full">
-                      <Link
-                        to="/admin/customers/$id"
-                        params={{ id: lead.converted_customer_id }}
-                      >
+                      <Link to="/admin/customers/$id" params={{ id: lead.converted_customer_id }}>
                         <ExternalLink className="h-4 w-4 mr-1" /> Open customer
                       </Link>
                     </Button>

@@ -57,9 +57,7 @@ export function QuotationEmailDialog({ open, onOpenChange, quotation, items, onS
     mutationFn: async () => {
       const errs = validateQuotationForPdf(quotation, items);
       if (errs.length) throw new Error(errs.join(" · "));
-      const { assertDocumentReadyForPdf } = await import(
-        "@/lib/document-pdf-validation.functions"
-      );
+      const { assertDocumentReadyForPdf } = await import("@/lib/document-pdf-validation.functions");
       await assertDocumentReadyForPdf({
         data: { kind: "quotation", id: quotation.id },
       });
@@ -103,7 +101,11 @@ export function QuotationEmailDialog({ open, onOpenChange, quotation, items, onS
         <div className="space-y-3">
           <div>
             <Label>To *</Label>
-            <Input value={to} onChange={(e) => setTo(e.target.value)} placeholder="customer@company.com" />
+            <Input
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              placeholder="customer@company.com"
+            />
           </div>
           <div>
             <Label>Cc (comma-separated)</Label>

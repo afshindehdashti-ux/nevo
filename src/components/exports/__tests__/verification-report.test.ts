@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  buildVerificationReport,
-  type BlockedVerification,
-} from "../BlockedVerificationDialog";
+import { buildVerificationReport, type BlockedVerification } from "../BlockedVerificationDialog";
 import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
 
 // Snapshot tests for the one-click "Copy verification report" payload.
@@ -12,12 +9,9 @@ import type { CsvExportAuditRecord } from "@/lib/invoice-purge-audit.functions";
 // must not silently drift. Any accidental rename, reorder or drop of
 // those fields breaks these snapshots on purpose.
 
-const EXPECTED_SHA =
-  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-const COMPUTED_SHA =
-  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
-const EMBEDDED_SHA =
-  "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+const EXPECTED_SHA = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+const COMPUTED_SHA = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+const EMBEDDED_SHA = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
 const EMBEDDED_TS = "2026-07-07T22:05:50.123Z";
 
 const AUDIT_ROW: CsvExportAuditRecord = {

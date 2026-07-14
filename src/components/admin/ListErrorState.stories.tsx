@@ -17,7 +17,7 @@ const meta: Meta<typeof ListErrorState> = {
   },
   args: {
     resource: "opportunities",
-    error: new Error("relation \"public.opportunities\" does not exist"),
+    error: new Error('relation "public.opportunities" does not exist'),
     onRetry: () => {},
     isRetrying: false,
   },
@@ -31,7 +31,9 @@ export const Default: Story = {};
 export const Retrying: Story = {
   args: { isRetrying: true },
   parameters: {
-    docs: { description: { story: "Retry button disabled + spinner while the refetch is in flight." } },
+    docs: {
+      description: { story: "Retry button disabled + spinner while the refetch is in flight." },
+    },
   },
 };
 
@@ -42,6 +44,10 @@ export const NetworkError: Story = {
 export const NonErrorThrown: Story = {
   args: { error: "unexpected string thrown from loader" },
   parameters: {
-    docs: { description: { story: "Defensive path — non-Error values are coerced to a readable message." } },
+    docs: {
+      description: {
+        story: "Defensive path — non-Error values are coerced to a readable message.",
+      },
+    },
   },
 };

@@ -1,0 +1,98 @@
+name: Verify
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - codex/backend-connection-hardening
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run requested checks
+        id: checks
+        shell: bash
+        run: |
+          mkdir -p verify-logs
+          set +e
+
+          corepack enable > verify-logs/corepack.log 2>&1
+          COREPACK_EXIT=$?
+          if [ "$COREPACK_EXIT" -eq 0 ]; then
+            corepack prepare pnpm@10 --activate >> verify-logs/corepack.log 2>&1
+            COREPACK_EXIT=$?
+          fi
+
+          if [ "$COREPACK_EXIT" -eq 0 ]; then
+            pnpm install > verify-logs/install.log 2>&1
+            INSTALL_EXIT=$?
+          else
+            INSTALL_EXIT=127
+            echo "Skipped because Corepack failed." > verify-logs/install.log
+          fi
+
+          if [ "$INSTALL_EXIT" -eq 0 ]; then
+            pnpm typecheck > verify-logs/typecheck.log 2>&1
+            TYPECHECK_EXIT=$?
+            pnpm lint > verify-logs/lint.log 2>&1
+            LINT_EXIT=$?
+            pnpm test > verify-logs/test.log 2>&1
+            TEST_EXIT=$?
+            pnpm build > verify-logs/build.log 2>&1
+            BUILD_EXIT=$?
+          else
+            TYPECHECK_EXIT=127
+            LINT_EXIT=127
+            TEST_EXIT=127
+            BUILD_EXIT=127
+            echo "Skipped because install failed." > verify-logs/typecheck.log
+            echo "Skipped because install failed." > verify-logs/lint.log
+            echo "Skipped because install failed." > verify-logs/test.log
+            echo "Skipped because install failed." > verify-logs/build.log
+          fi
+
+          {
+            echo "corepack=$COREPACK_EXIT"
+            echo "install=$INSTALL_EXIT"
+            echo "typecheck=$TYPECHECK_EXIT"
+            echo "lint=$LINT_EXIT"
+            echo "test=$TEST_EXIT"
+            echo "build=$BUILD_EXIT"
+          } | tee verify-logs/summary.txt
+
+          if [ "$COREPACK_EXIT" -ne 0 ] || [ "$INSTALL_EXIT" -ne 0 ] || [ "$TYPECHECK_EXIT" -ne 0 ] || [ "$LINT_EXIT" -ne 0 ] || [ "$TEST_EXIT" -ne 0 ] || [ "$BUILD_EXIT" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Print failed check logs
+        if: failure()
+        shell: bash
+        run: |
+          for log in verify-logs/*.log; do
+            [ -f "$log" ] || continue
+            echo "::group::$log"
+            cat "$log"
+            echo "::endgroup::"
+          done
+
+      - name: Upload verify logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-logs
+          path: verify-logs/
+          if-no-files-found: warn
+          retention-days: 14

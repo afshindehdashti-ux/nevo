@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
 import { motion } from "motion/react";
 import { useRef, useState } from "react";
-import { submitLeadForm } from "@/lib/lead-submit";
+import { deliverPublicLead, submitLeadForm } from "@/lib/lead-submit";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -1020,6 +1020,7 @@ function InquiryForm() {
       ],
       successTitle: "Quotation request received",
       successDescription: "A NEVO material specialist will respond within one business day.",
+      deliver: (payload) => deliverPublicLead(payload, "raw-materials-inquiry"),
     });
     setBusy(false);
     if (ok) formRef.current?.reset();

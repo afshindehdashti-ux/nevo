@@ -3,16 +3,17 @@ import { classifyListState } from "@/components/admin/list-state";
 
 describe("classifyListState", () => {
   it("returns loading when isLoading and no error", () => {
-    expect(
-      classifyListState({ isLoading: true, error: null, data: undefined }),
-    ).toEqual({ kind: "loading" });
+    expect(classifyListState({ isLoading: true, error: null, data: undefined })).toEqual({
+      kind: "loading",
+    });
   });
 
   it("prefers error over loading", () => {
     const err = new Error("boom");
-    expect(
-      classifyListState({ isLoading: true, error: err, data: undefined }),
-    ).toEqual({ kind: "error", error: err });
+    expect(classifyListState({ isLoading: true, error: err, data: undefined })).toEqual({
+      kind: "error",
+      error: err,
+    });
   });
 
   it("flags non-array data as an error so telemetry fires", () => {
@@ -28,9 +29,10 @@ describe("classifyListState", () => {
   });
 
   it("returns empty:no_records for [] by default", () => {
-    expect(
-      classifyListState({ isLoading: false, error: null, data: [] }),
-    ).toEqual({ kind: "empty", reason: "no_records" });
+    expect(classifyListState({ isLoading: false, error: null, data: [] })).toEqual({
+      kind: "empty",
+      reason: "no_records",
+    });
   });
 
   it("returns empty:seed_missing when expectSeed is true", () => {

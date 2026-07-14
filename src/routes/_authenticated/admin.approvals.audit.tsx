@@ -37,11 +37,31 @@ const ENTITY_LABEL: Record<ApprovalEntityType, string> = {
 
 const ACTION_META: Record<
   string,
-  { label: string; icon: typeof CheckCircle2; className: string; badgeVariant: "default" | "secondary" | "destructive" | "outline" }
+  {
+    label: string;
+    icon: typeof CheckCircle2;
+    className: string;
+    badgeVariant: "default" | "secondary" | "destructive" | "outline";
+  }
 > = {
-  approve: { label: "Approved", icon: CheckCircle2, className: "text-emerald-600", badgeVariant: "default" },
-  reject: { label: "Rejected", icon: XCircle, className: "text-destructive", badgeVariant: "destructive" },
-  cancel: { label: "Cancelled", icon: ShieldAlert, className: "text-muted-foreground", badgeVariant: "outline" },
+  approve: {
+    label: "Approved",
+    icon: CheckCircle2,
+    className: "text-emerald-600",
+    badgeVariant: "default",
+  },
+  reject: {
+    label: "Rejected",
+    icon: XCircle,
+    className: "text-destructive",
+    badgeVariant: "destructive",
+  },
+  cancel: {
+    label: "Cancelled",
+    icon: ShieldAlert,
+    className: "text-muted-foreground",
+    badgeVariant: "outline",
+  },
 };
 
 function ApprovalsAuditPage() {
@@ -90,11 +110,15 @@ function ApprovalsAuditPage() {
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Entity</label>
             <Select value={entityType} onValueChange={(v) => setEntityType(v as any)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All entities</SelectItem>
                 {APPROVAL_ENTITY_TYPES.map((t) => (
-                  <SelectItem key={t} value={t}>{ENTITY_LABEL[t]}</SelectItem>
+                  <SelectItem key={t} value={t}>
+                    {ENTITY_LABEL[t]}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -102,7 +126,9 @@ function ApprovalsAuditPage() {
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Decision</label>
             <Select value={action} onValueChange={(v) => setAction(v as any)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All decisions</SelectItem>
                 <SelectItem value="approve">Approved</SelectItem>
@@ -112,7 +138,9 @@ function ApprovalsAuditPage() {
             </Select>
           </div>
           <div className="md:col-span-2">
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Entity ID (UUID)</label>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
+              Entity ID (UUID)
+            </label>
             <div className="flex gap-2">
               <Input
                 value={entityId}
@@ -146,7 +174,9 @@ function ApprovalsAuditPage() {
         {q.isLoading ? (
           <div className="p-6 text-sm text-muted-foreground">Loading audit trail…</div>
         ) : rows.length === 0 ? (
-          <div className="p-6 text-sm text-muted-foreground">No audit events match your filters.</div>
+          <div className="p-6 text-sm text-muted-foreground">
+            No audit events match your filters.
+          </div>
         ) : (
           <ul className="divide-y">
             {rows.map((r) => (
@@ -216,8 +246,12 @@ function AuditRow({ row }: { row: ApprovalAuditEntry }) {
               <dl className="mt-1 grid gap-x-3 gap-y-0.5 text-xs [grid-template-columns:auto_1fr]">
                 {Object.entries(row.affected_fields).map(([k, v]) => (
                   <>
-                    <dt key={`k-${k}`} className="text-muted-foreground">{k}</dt>
-                    <dd key={`v-${k}`} className="font-mono break-all">{formatVal(v)}</dd>
+                    <dt key={`k-${k}`} className="text-muted-foreground">
+                      {k}
+                    </dt>
+                    <dd key={`v-${k}`} className="font-mono break-all">
+                      {formatVal(v)}
+                    </dd>
                   </>
                 ))}
               </dl>

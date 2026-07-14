@@ -73,10 +73,7 @@ import { formatDate } from "@/lib/crm-money";
 
 export const Route = createFileRoute("/_authenticated/admin/document-intelligence")({
   head: () => ({
-    meta: [
-      { title: "Document Intelligence — NEVO CRM" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Document Intelligence — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   component: DocIntelPage,
 });
@@ -164,9 +161,18 @@ function UploadPanel({ onOpen }: { onOpen: (id: string) => void }) {
   const createFn = useServerFn(createDocumentRow);
   const analyzeFn = useServerFn(analyzeDocument);
 
-  const { data: customers = [] } = useQuery({ queryKey: ["di", "customers"], queryFn: () => customersFn() });
-  const { data: partners = [] } = useQuery({ queryKey: ["di", "partners"], queryFn: () => partnersFn() });
-  const { data: projects = [] } = useQuery({ queryKey: ["di", "projects"], queryFn: () => projectsFn() });
+  const { data: customers = [] } = useQuery({
+    queryKey: ["di", "customers"],
+    queryFn: () => customersFn(),
+  });
+  const { data: partners = [] } = useQuery({
+    queryKey: ["di", "partners"],
+    queryFn: () => partnersFn(),
+  });
+  const { data: projects = [] } = useQuery({
+    queryKey: ["di", "projects"],
+    queryFn: () => projectsFn(),
+  });
 
   async function processFile(file: File) {
     const localId = `${Date.now()}-${file.name}-${Math.random()}`;
@@ -286,15 +292,9 @@ function UploadPanel({ onOpen }: { onOpen: (id: string) => void }) {
                       }
                     />
                   )}
-                  {it.stage === "error" && (
-                    <p className="text-xs text-destructive">{it.error}</p>
-                  )}
+                  {it.stage === "error" && <p className="text-xs text-destructive">{it.error}</p>}
                   {it.stage === "ready" && it.documentId && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => onOpen(it.documentId!)}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => onOpen(it.documentId!)}>
                       Review AI analysis
                     </Button>
                   )}
@@ -363,8 +363,7 @@ function UploadPanel({ onOpen }: { onOpen: (id: string) => void }) {
             <AlertTitle className="text-xs">How routing works</AlertTitle>
             <AlertDescription className="text-xs">
               AI classifies each file, then a human approves and routes it. Contracts, NDAs,
-              invoices and QC reports always require manual approval and cannot be routed as
-              public.
+              invoices and QC reports always require manual approval and cannot be routed as public.
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -461,7 +460,8 @@ function DocumentTable({
   const [visibilitySel, setVisibilitySel] = useState<string>("");
   const qc = useQueryClient();
 
-  const effectiveStatus = statusSel || (statusFilter && statusFilter.length === 1 ? statusFilter[0] : "");
+  const effectiveStatus =
+    statusSel || (statusFilter && statusFilter.length === 1 ? statusFilter[0] : "");
   const queryKey = useMemo(
     () => ["di", "list", { effectiveStatus, categorySel, visibilitySel, search, statusFilter }],
     [effectiveStatus, categorySel, visibilitySel, search, statusFilter],
@@ -520,7 +520,11 @@ function DocumentTable({
               placeholder="Any visibility"
             />
           </div>
-          <Button size="sm" variant="outline" onClick={() => qc.invalidateQueries({ queryKey: ["di"] })}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => qc.invalidateQueries({ queryKey: ["di"] })}
+          >
             <RefreshCw className="h-3.5 w-3.5 mr-1" /> Refresh
           </Button>
         </div>
@@ -564,7 +568,9 @@ function DocumentTable({
                   <TableRow key={r.id} className="cursor-pointer" onClick={() => onOpen(r.id)}>
                     <TableCell className="max-w-[280px]">
                       <p className="font-medium truncate">{r.title || r.original_filename}</p>
-                      <p className="text-xs text-muted-foreground truncate">{r.original_filename}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {r.original_filename}
+                      </p>
                     </TableCell>
                     <TableCell className="text-xs">{r.category ?? "—"}</TableCell>
                     <TableCell className="text-xs">{r.destination ?? "—"}</TableCell>
@@ -585,7 +591,14 @@ function DocumentTable({
                       {formatDate(r.created_at)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); onOpen(r.id); }}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpen(r.id);
+                        }}
+                      >
                         Open
                       </Button>
                     </TableCell>
@@ -639,7 +652,9 @@ function StatusBadge({ s }: { s: string | null }) {
   };
   const label = (s ?? "").replace(/_/g, " ");
   return (
-    <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${map[s ?? ""] ?? "bg-muted"}`}>
+    <span
+      className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${map[s ?? ""] ?? "bg-muted"}`}
+    >
       {label || "—"}
     </span>
   );
@@ -695,7 +710,10 @@ function DocumentDrawer({ id, onClose }: { id: string | null; onClose: () => voi
   const [tagsInput, setTagsInput] = useState("");
 
   const doc = data?.document as DocRow | undefined;
-  const initialTags = useMemo(() => (data?.tags ?? []).map((t: { tag: string }) => t.tag).join(", "), [data]);
+  const initialTags = useMemo(
+    () => (data?.tags ?? []).map((t: { tag: string }) => t.tag).join(", "),
+    [data],
+  );
 
   const currentEdits = useMemo(() => {
     if (!doc) return {};
@@ -728,7 +746,11 @@ function DocumentDrawer({ id, onClose }: { id: string | null; onClose: () => voi
     },
     onSuccess: (_r, action) => {
       toast.success(
-        action === "approve" ? "Approved and routed" : action === "reject" ? "Rejected" : "Sent to review",
+        action === "approve"
+          ? "Approved and routed"
+          : action === "reject"
+            ? "Rejected"
+            : "Sent to review",
       );
       qc.invalidateQueries({ queryKey: ["di"] });
       setEdited({});
@@ -795,7 +817,6 @@ function DocumentDrawer({ id, onClose }: { id: string | null; onClose: () => voi
             <Separator />
 
             <div className="space-y-3">
-
               <FieldRow label="Recommended title">
                 <Input
                   value={currentEdits.title}
@@ -890,10 +911,7 @@ function DocumentDrawer({ id, onClose }: { id: string | null; onClose: () => voi
                 />
               </FieldRow>
               <FieldRow label="Tags (comma-separated)">
-                <Input
-                  defaultValue={initialTags}
-                  onChange={(e) => setTagsInput(e.target.value)}
-                />
+                <Input defaultValue={initialTags} onChange={(e) => setTagsInput(e.target.value)} />
               </FieldRow>
             </div>
 
@@ -956,16 +974,24 @@ function DocumentDrawer({ id, onClose }: { id: string | null; onClose: () => voi
                 <p className="text-xs text-muted-foreground">No versions yet.</p>
               ) : (
                 <ul className="text-xs space-y-1">
-                  {data!.versions.map((v: { id: string; version_number: number; filename: string | null; created_at: string; change_note: string | null }) => (
-                    <li key={v.id} className="flex justify-between border rounded-md px-2 py-1">
-                      <span>
-                        v{v.version_number} · {v.filename ?? "—"}
-                      </span>
-                      <span className="text-muted-foreground">
-                        {formatDate(v.created_at)} · {v.change_note ?? ""}
-                      </span>
-                    </li>
-                  ))}
+                  {data!.versions.map(
+                    (v: {
+                      id: string;
+                      version_number: number;
+                      filename: string | null;
+                      created_at: string;
+                      change_note: string | null;
+                    }) => (
+                      <li key={v.id} className="flex justify-between border rounded-md px-2 py-1">
+                        <span>
+                          v{v.version_number} · {v.filename ?? "—"}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {formatDate(v.created_at)} · {v.change_note ?? ""}
+                        </span>
+                      </li>
+                    ),
+                  )}
                 </ul>
               )}
             </div>
@@ -1031,8 +1057,7 @@ function AiSuggestionsPanel({
   }
 
   const conf = typeof confidence === "number" ? confidence : null;
-  const confTone =
-    conf === null ? "muted" : conf >= 0.85 ? "ok" : conf >= 0.6 ? "warn" : "bad";
+  const confTone = conf === null ? "muted" : conf >= 0.85 ? "ok" : conf >= 0.6 ? "warn" : "bad";
   const confLabel =
     conf === null
       ? "Unknown confidence"
@@ -1124,9 +1149,7 @@ function AiSuggestionsPanel({
           label="Confidentiality"
           value={suggested.confidentiality_level}
           hint="How sensitive the AI thinks the content is."
-          onApply={() =>
-            onApply({ confidentiality_level: suggested.confidentiality_level })
-          }
+          onApply={() => onApply({ confidentiality_level: suggested.confidentiality_level })}
         />
         <SuggestField
           label="Portal visibility"
@@ -1152,12 +1175,8 @@ function AiSuggestionsPanel({
 
       {(products.length > 0 || standards.length > 0 || tags.length > 0) && (
         <div className="space-y-1.5">
-          {products.length > 0 && (
-            <ChipRow label="Products" items={products} />
-          )}
-          {standards.length > 0 && (
-            <ChipRow label="Standards" items={standards} />
-          )}
+          {products.length > 0 && <ChipRow label="Products" items={products} />}
+          {standards.length > 0 && <ChipRow label="Standards" items={standards} />}
           {tags.length > 0 && (
             <div className="flex items-start gap-2 flex-wrap">
               <span className="text-muted-foreground">Tags</span>

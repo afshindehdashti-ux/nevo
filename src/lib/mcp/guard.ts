@@ -79,8 +79,7 @@ export function assertValidCaller(
   // Audience must include "authenticated".
   const aud = claims.aud;
   const audOk =
-    aud === EXPECTED_AUDIENCE ||
-    (Array.isArray(aud) && aud.includes(EXPECTED_AUDIENCE));
+    aud === EXPECTED_AUDIENCE || (Array.isArray(aud) && aud.includes(EXPECTED_AUDIENCE));
   if (!audOk) {
     return {
       ok: false,
@@ -118,9 +117,7 @@ export function assertValidCaller(
       return {
         ok: false,
         reason: "missing_client",
-        error: toolError(
-          "Unauthorized: token is not an OAuth client token (missing client_id).",
-        ),
+        error: toolError("Unauthorized: token is not an OAuth client token (missing client_id)."),
       };
     }
   }

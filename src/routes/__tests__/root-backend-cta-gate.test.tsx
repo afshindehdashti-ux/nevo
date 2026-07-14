@@ -55,7 +55,11 @@ function makeRouter(initialPath: string) {
   const rootRoute = createRootRoute({ component: RootShell });
   const routes = [
     createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <div>home</div> }),
-    createRoute({ getParentRoute: () => rootRoute, path: "/about", component: () => <div>about</div> }),
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/about",
+      component: () => <div>about</div>,
+    }),
     createRoute({
       getParentRoute: () => rootRoute,
       path: "/admin/$",
@@ -102,25 +106,34 @@ describe("RootComponent backend CTA gate", () => {
 
     // Public → /admin: gate must re-evaluate and hide CTAs.
     await act(async () => {
-      await router.navigate({ to: "/admin/$", params: { _splat: "dashboard" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/admin/$",
+        params: { _splat: "dashboard" },
+      });
     });
     await expectCtas(false);
 
     // /admin → /crm: still a backend route.
     await act(async () => {
-      await router.navigate({ to: "/crm/$", params: { _splat: "leads" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/crm/$",
+        params: { _splat: "leads" },
+      });
     });
     await expectCtas(false);
 
     // /crm → /backoffice: still backend.
     await act(async () => {
-      await router.navigate({ to: "/backoffice/$", params: { _splat: "tools" } });
+      await (router.navigate as (options: unknown) => Promise<void>)({
+        to: "/backoffice/$",
+        params: { _splat: "tools" },
+      });
     });
     await expectCtas(false);
 
     // Backend → public: CTAs must come back.
     await act(async () => {
-      await router.navigate({ to: "/about" });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/about" });
     });
     await expectCtas(true);
   });
@@ -132,7 +145,7 @@ describe("RootComponent backend CTA gate", () => {
 
     // Backend-first → public: CTAs appear.
     await act(async () => {
-      await router.navigate({ to: "/" });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/" });
     });
     await expectCtas(true);
   });
@@ -196,11 +209,11 @@ describe("RootComponent backend CTA gate", () => {
       "/",
       "/about",
       "/about/",
-      "/administration",           // lookalike prefix
+      "/administration", // lookalike prefix
       "/administration/settings",
-      "/crm-info",                  // lookalike prefix
-      "/backoffice-help",           // lookalike prefix
-      "/blog/admin-guide",          // "admin" mid-path, not a backend prefix
+      "/crm-info", // lookalike prefix
+      "/backoffice-help", // lookalike prefix
+      "/blog/admin-guide", // "admin" mid-path, not a backend prefix
     ];
 
     for (const p of backendPaths) {
@@ -253,12 +266,12 @@ describe("RootComponent backend CTA gate", () => {
 
     // Public → backend with a query string.
     await act(async () => {
-      await router.navigate({ to: "/" });
+      await (router.navigate as (options: unknown) => Promise<void>)({ to: "/" });
     });
     await expectCtas(true);
 
     await act(async () => {
-      await router.navigate({
+      await (router.navigate as (options: unknown) => Promise<void>)({
         to: "/crm/$",
         params: { _splat: "leads" },
         search: { filter: "hot" },
@@ -269,7 +282,7 @@ describe("RootComponent backend CTA gate", () => {
     // Mutating just the query string on a backend route must not
     // re-enable the CTAs.
     await act(async () => {
-      await router.navigate({
+      await (router.navigate as (options: unknown) => Promise<void>)({
         to: "/crm/$",
         params: { _splat: "leads" },
         search: { filter: "cold" },
@@ -282,8 +295,16 @@ describe("RootComponent backend CTA gate", () => {
     const rootRoute = createRootRoute({ component: RootShell });
     const routes = [
       createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <div>home</div> }),
-      createRoute({ getParentRoute: () => rootRoute, path: "/admin/$", component: () => <div>admin</div> }),
-      createRoute({ getParentRoute: () => rootRoute, path: "/backoffice/$", component: () => <div>backoffice</div> }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/admin/$",
+        component: () => <div>admin</div>,
+      }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/backoffice/$",
+        component: () => <div>backoffice</div>,
+      }),
     ];
     // Exercise every trailing-slash shape a hosting layer might hand us.
     const initialUrls = ["/admin/", "/admin/orders/", "/backoffice/tools/export/"];
@@ -332,10 +353,26 @@ describe("RootComponent backend CTA gate", () => {
     const rootRoute = createRootRoute({ component: InstrumentedRoot });
     const routes = [
       createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <div>home</div> }),
-      createRoute({ getParentRoute: () => rootRoute, path: "/about", component: () => <div>about</div> }),
-      createRoute({ getParentRoute: () => rootRoute, path: "/admin/$", component: () => <div>admin</div> }),
-      createRoute({ getParentRoute: () => rootRoute, path: "/crm/$", component: () => <div>crm</div> }),
-      createRoute({ getParentRoute: () => rootRoute, path: "/backoffice/$", component: () => <div>backoffice</div> }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/about",
+        component: () => <div>about</div>,
+      }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/admin/$",
+        component: () => <div>admin</div>,
+      }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/crm/$",
+        component: () => <div>crm</div>,
+      }),
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/backoffice/$",
+        component: () => <div>backoffice</div>,
+      }),
     ];
     const router = createRouter({
       routeTree: rootRoute.addChildren(routes),
@@ -364,9 +401,12 @@ describe("RootComponent backend CTA gate", () => {
     const go = async (to: string, splat?: string) => {
       await act(async () => {
         if (splat !== undefined) {
-          await router.navigate({ to: to as "/admin/$", params: { _splat: splat } });
+          await (router.navigate as (options: unknown) => Promise<void>)({
+            to: to as "/admin/$",
+            params: { _splat: splat },
+          });
         } else {
-          await router.navigate({ to });
+          await (router.navigate as (options: unknown) => Promise<void>)({ to });
         }
       });
     };
