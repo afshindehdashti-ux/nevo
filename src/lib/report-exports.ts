@@ -17,14 +17,16 @@ function cellValue<T>(row: T, col: ReportColumn<T>): string | number {
   return typeof raw === "number" ? raw : String(raw);
 }
 
-export function exportToExcel<T>(opts: {
+type ExcelReportOptions<T> = {
   filename: string;
   sheetName?: string;
   columns: ReportColumn<T>[];
   rows: T[];
   meta?: Record<string, string | number>;
-}) {
-  const { filename, sheetName = "Report", columns, rows, meta } = opts;
+};
+
+export function buildExcelWorkbook<T>(opts: ExcelReportOptions<T>): XLSX.WorkBook {
+  const { sheetName = "Report", columns, rows, meta } = opts;
   const wb = XLSX.utils.book_new();
 
   const header = columns.map((c) => c.header);
@@ -42,10 +44,16 @@ export function exportToExcel<T>(opts: {
     wch: Math.max(c.header.length + 2, 14),
   }));
   XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0, 31));
+  return wb;
+}
+
+export function exportToExcel<T>(opts: ExcelReportOptions<T>) {
+  const wb = buildExcelWorkbook(opts);
+  const { filename } = opts;
   XLSX.writeFile(wb, filename.endsWith(".xlsx") ? filename : `${filename}.xlsx`);
 }
 
-export function exportToPDF<T>(opts: {
+type PdfReportOptions<T> = {
   filename: string;
   title: string;
   subtitle?: string;
@@ -53,8 +61,10 @@ export function exportToPDF<T>(opts: {
   rows: T[];
   meta?: Record<string, string | number>;
   orientation?: "portrait" | "landscape";
-}) {
-  const { filename, title, subtitle, columns, rows, meta, orientation = "landscape" } = opts;
+};
+
+export function buildReportPdf<T>(opts: PdfReportOptions<T>): jsPDF {
+  const { title, subtitle, columns, rows, meta, orientation = "landscape" } = opts;
   const doc = new jsPDF({ orientation, unit: "pt", format: "a4" });
 
   doc.setFontSize(16);
@@ -85,12 +95,16 @@ export function exportToPDF<T>(opts: {
     body: rows.map((r) => columns.map((c) => cellValue(r, c))),
     styles: { fontSize: 8, cellPadding: 4, overflow: "linebreak" },
     headStyles: { fillColor: [30, 41, 59], textColor: 255, fontStyle: "bold" },
-    columnStyles: Object.fromEntries(
-      columns.map((c, i) => [i, { halign: c.align ?? "left" }]),
-    ),
+    columnStyles: Object.fromEntries(columns.map((c, i) => [i, { halign: c.align ?? "left" }])),
     margin: { left: 30, right: 30 },
   });
 
+  return doc;
+}
+
+export function exportToPDF<T>(opts: PdfReportOptions<T>) {
+  const doc = buildReportPdf(opts);
+  const { filename } = opts;
   doc.save(filename.endsWith(".pdf") ? filename : `${filename}.pdf`);
 }
 

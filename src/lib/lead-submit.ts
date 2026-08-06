@@ -48,6 +48,35 @@ export interface LeadOptions {
   deliver?: (payload: LeadPayload) => Promise<Response | { ok: boolean; status?: number } | void>;
 }
 
+/**
+ * Deliver a public marketing/inquiry form to the server-side lead endpoint.
+ * The backend owns persistence and email dispatch; clients never write leads
+ * directly with a privileged database key.
+ */
+export function deliverPublicLead(payload: LeadPayload, source: string): Promise<Response> {
+  const value = (field: string) => String(payload[field] ?? "").trim();
+  const reserved = new Set(["name", "email", "phone", "company", "country", "message"]);
+  const details = Object.entries(payload)
+    .filter(([field, raw]) => !reserved.has(field) && String(raw ?? "").trim())
+    .map(([field, raw]) => `${field}: ${String(raw).trim()}`);
+  const message = [value("message"), ...details].filter(Boolean).join("\n").slice(0, 4000);
+
+  return fetch("/api/public/contact-submit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      // Some technical forms collect a company but not a contact name.
+      name: value("name") || value("company") || "Website inquiry",
+      email: value("email"),
+      phone: value("phone") || undefined,
+      company: value("company") || undefined,
+      country: value("country") || undefined,
+      message: message || undefined,
+      source,
+    }),
+  });
+}
+
 const DEFAULT_MESSAGES: Required<LeadMessages> = {
   reviewTitle: "Please review the form",
   required: "{field} is required.",

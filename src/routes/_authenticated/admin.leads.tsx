@@ -117,7 +117,11 @@ function LeadsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("open");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
 
-  const { data: leads = [], isLoading, refetch } = useQuery<Inquiry[]>({
+  const {
+    data: leads = [],
+    isLoading,
+    refetch,
+  } = useQuery<Inquiry[]>({
     queryKey: ["leads"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -175,9 +179,7 @@ function LeadsPage() {
   }, [leads]);
 
   const kpi = useMemo(() => {
-    const open = leads.filter(
-      (l) => !["won", "converted", "lost", "archived"].includes(l.status),
-    );
+    const open = leads.filter((l) => !["won", "converted", "lost", "archived"].includes(l.status));
     const urgent = open.filter((l) => l.priority === "urgent" || l.priority === "high").length;
     const unassigned = open.filter((l) => !l.assigned_to).length;
     const overdue = open.filter(
@@ -199,7 +201,9 @@ function LeadsPage() {
           entity_id: id,
           metadata: { fields: Object.keys(rest) },
           old_values: prev
-            ? Object.fromEntries(Object.keys(rest).map((k) => [k, (prev as Record<string, unknown>)[k] ?? null]))
+            ? Object.fromEntries(
+                Object.keys(rest).map((k) => [k, (prev as Record<string, unknown>)[k] ?? null]),
+              )
             : null,
           new_values: rest as Record<string, unknown>,
         },
@@ -385,9 +389,7 @@ function LeadsPage() {
                         <TableCell>
                           <Select
                             value={l.status}
-                            onValueChange={(v) =>
-                              updateMutation.mutate({ id: l.id, status: v })
-                            }
+                            onValueChange={(v) => updateMutation.mutate({ id: l.id, status: v })}
                           >
                             <SelectTrigger className="h-7 w-[160px] px-2">
                               <StatusChip status={l.status} />
@@ -404,9 +406,7 @@ function LeadsPage() {
                         <TableCell>
                           <Select
                             value={l.priority ?? "normal"}
-                            onValueChange={(v) =>
-                              updateMutation.mutate({ id: l.id, priority: v })
-                            }
+                            onValueChange={(v) => updateMutation.mutate({ id: l.id, priority: v })}
                           >
                             <SelectTrigger className="h-7 w-[110px] px-2">
                               <Badge
@@ -511,9 +511,7 @@ function LeadsPage() {
                         className="block rounded-md border border-border bg-background p-2.5 hover:bg-muted/50 transition-colors"
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-medium truncate">
-                            {l.company || l.name}
-                          </p>
+                          <p className="text-sm font-medium truncate">{l.company || l.name}</p>
                           <Badge
                             variant="outline"
                             className={`text-[9px] px-1 py-0 ${PRIORITY_TONE[l.priority ?? "normal"]}`}
@@ -526,9 +524,7 @@ function LeadsPage() {
                         </p>
                         <div className="flex items-center justify-between mt-1.5 text-[10px] text-muted-foreground">
                           <span>{formatDate(l.created_at)}</span>
-                          <span>
-                            {l.assigned_to ? staffById.get(l.assigned_to) : "Unassigned"}
-                          </span>
+                          <span>{l.assigned_to ? staffById.get(l.assigned_to) : "Unassigned"}</span>
                         </div>
                       </Link>
                     ))}
@@ -543,15 +539,7 @@ function LeadsPage() {
   );
 }
 
-function Kpi({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone?: "warn" | "danger";
-}) {
+function Kpi({ label, value, tone }: { label: string; value: number; tone?: "warn" | "danger" }) {
   const cls =
     tone === "danger"
       ? "text-rose-600 dark:text-rose-400"

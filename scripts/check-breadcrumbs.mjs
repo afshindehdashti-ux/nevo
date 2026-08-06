@@ -29,7 +29,7 @@ import net from "node:net";
 const WARN_ONLY = process.argv.includes("--warn-only");
 const JSON_OUT = process.argv.includes("--json");
 
-const LOCALES = ["en", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"];
+const LOCALES = ["en", "fa", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"];
 
 const SOLUTIONS_ROUTES = [
   "/solutions",

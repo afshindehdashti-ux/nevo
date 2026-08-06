@@ -6,12 +6,7 @@ export type CoreMaterial = "PIR" | "PUR" | "Rock Wool" | "EPS" | "Glass Wool";
 export type JointType = "Hidden Screw" | "Visible Screw" | "Tongue & Groove" | "Cam-Lock";
 export type Coating = "PVDF" | "Polyester" | "Plastisol" | "HDP" | "SMP";
 export type ProfileType =
-  | "Flat"
-  | "Micro Rib"
-  | "Mini Rib"
-  | "Linear"
-  | "Wave"
-  | "Trapezoidal Roof";
+  "Flat" | "Micro Rib" | "Mini Rib" | "Linear" | "Wave" | "Trapezoidal Roof";
 
 export interface Config {
   panelType: PanelType;

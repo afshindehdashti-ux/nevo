@@ -15,9 +15,7 @@ export const getBackendHealth = createServerFn({ method: "GET" })
     });
     if (!isAdmin) throw new Error("Forbidden");
 
-    const { supabaseAdmin } = await import(
-      "@/integrations/supabase/client.server"
-    );
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const startedAt = Date.now();
     const serverTime = new Date().toISOString();
@@ -28,10 +26,7 @@ export const getBackendHealth = createServerFn({ method: "GET" })
     let dbError: string | null = null;
     try {
       const t0 = Date.now();
-      const { error } = await supabaseAdmin
-        .from("email_send_state")
-        .select("id")
-        .limit(1);
+      const { error } = await supabaseAdmin.from("email_send_state").select("id").limit(1);
       dbLatencyMs = Date.now() - t0;
       dbOk = !error;
       if (error) dbError = error.message;
@@ -51,9 +46,7 @@ export const getBackendHealth = createServerFn({ method: "GET" })
     };
     let metricsError: string | null = null;
     try {
-      const { data, error } = await (supabaseAdmin as any).rpc(
-        "get_backend_health_metrics",
-      );
+      const { data, error } = await (supabaseAdmin as any).rpc("get_backend_health_metrics");
       if (error) metricsError = error.message;
       else if (data) {
         queues = { ...queues, ...(data.queues ?? {}) };
@@ -74,9 +67,7 @@ export const getBackendHealth = createServerFn({ method: "GET" })
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: logs, error: logsError } = await supabaseAdmin
       .from("email_send_log")
-      .select(
-        "message_id, status, created_at, template_name, recipient_email, error_message",
-      )
+      .select("message_id, status, created_at, template_name, recipient_email, error_message")
       .gte("created_at", since)
       .order("created_at", { ascending: false })
       .limit(2000);

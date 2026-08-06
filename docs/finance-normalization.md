@@ -13,11 +13,11 @@ package script: `pnpm check:finance-normalization`).
 
 Finance rows come from three tables with three different column sets:
 
-| Table                | Total column   | Paid column     | Balance column   |
-| -------------------- | -------------- | --------------- | ---------------- |
-| `invoices`           | `total`        | `amount_paid`   | `balance`        |
-| `proforma_invoices`  | `grand_total`  | `amount_paid`   | `balance_due`    |
-| `quotations`         | `total`        | —               | —                |
+| Table               | Total column  | Paid column   | Balance column |
+| ------------------- | ------------- | ------------- | -------------- |
+| `invoices`          | `total`       | `amount_paid` | `balance`      |
+| `proforma_invoices` | `grand_total` | `amount_paid` | `balance_due`  |
+| `quotations`        | `total`       | —             | —              |
 
 Reading columns directly means every call site has to remember which
 variant it is looking at, coerce nulls, and re-derive `total − paid` when
@@ -37,14 +37,14 @@ import {
 } from "@/lib/finance-normalization";
 ```
 
-| Helper                     | Reads (in order)                                     | Returns                     | Replaces                                        |
-| -------------------------- | ---------------------------------------------------- | --------------------------- | ----------------------------------------------- |
-| `customerDisplayName(c)`   | `company_name` → `name` → `email`                    | `string` (`"—"` on empty)   | ad-hoc `c.name ?? c.company_name ?? "—"`         |
-| `customerBillingAddress(c)`| `billing_address` → `address`                        | `string \| null`            | direct reads of `billing_address` / `address`   |
-| `customerVatNumber(c)`     | `vat_number` (trimmed)                               | `string \| null`            | direct reads / empty-string checks              |
-| `financeTotalAmount(row)`  | `grand_total` → `total`                              | `number` (0 on missing/NaN) | `Number(row.total)`, `Number(row.grand_total)`  |
-| `financePaidAmount(row)`   | `amount_paid` → `paid_amount`                        | `number` (0 on missing/NaN) | `Number(row.amount_paid ?? 0)`                  |
-| `financeBalanceDue(row)`   | stored `balance_due` → `balance`; else `total − paid`| `number` (never negative)   | `Number(row.balance)`, `total − paid` inline    |
+| Helper                      | Reads (in order)                                      | Returns                     | Replaces                                       |
+| --------------------------- | ----------------------------------------------------- | --------------------------- | ---------------------------------------------- |
+| `customerDisplayName(c)`    | `company_name` → `name` → `email`                     | `string` (`"—"` on empty)   | ad-hoc `c.name ?? c.company_name ?? "—"`       |
+| `customerBillingAddress(c)` | `billing_address` → `address`                         | `string \| null`            | direct reads of `billing_address` / `address`  |
+| `customerVatNumber(c)`      | `vat_number` (trimmed)                                | `string \| null`            | direct reads / empty-string checks             |
+| `financeTotalAmount(row)`   | `grand_total` → `total`                               | `number` (0 on missing/NaN) | `Number(row.total)`, `Number(row.grand_total)` |
+| `financePaidAmount(row)`    | `amount_paid` → `paid_amount`                         | `number` (0 on missing/NaN) | `Number(row.amount_paid ?? 0)`                 |
+| `financeBalanceDue(row)`    | stored `balance_due` → `balance`; else `total − paid` | `number` (never negative)   | `Number(row.balance)`, `total − paid` inline   |
 
 All numeric helpers coerce strings, treat `null` / `undefined` / `""` as 0,
 and `financeBalanceDue` clamps at 0 so partial over-payments never render a
@@ -82,8 +82,8 @@ Any read for UI, PDF, email, or AI summary:
 
 ## Write / schema contracts (direct column names allowed)
 
-Direct column names are required when the code is *writing* the columns or
-*naming* them in a Supabase query builder / generated type. The CI guard
+Direct column names are required when the code is _writing_ the columns or
+_naming_ them in a Supabase query builder / generated type. The CI guard
 allow-lists these on the same line:
 
 - Supabase query builder calls: `.select("total, balance_due, ...")`,

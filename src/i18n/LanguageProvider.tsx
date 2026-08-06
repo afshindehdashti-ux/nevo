@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import i18n, { DEFAULT_LOCALE, LOCALES, SUPPORTED_LOCALES, localeDir, type Locale } from "./config";
 
 interface LanguageContextValue {
@@ -24,15 +24,21 @@ function readInitialLocale(): Locale {
   return DEFAULT_LOCALE;
 }
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Locale>(DEFAULT_LOCALE);
+export function LanguageProvider({
+  children,
+  initialLang,
+}: {
+  children: ReactNode;
+  initialLang?: Locale;
+}) {
+  const [lang, setLangState] = useState<Locale>(initialLang ?? DEFAULT_LOCALE);
   const dir = localeDir(lang);
 
   useEffect(() => {
-    const initial = readInitialLocale();
+    const initial = initialLang ?? readInitialLocale();
     setLangState(initial);
     void i18n.changeLanguage(initial);
-  }, []);
+  }, [initialLang]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -40,7 +46,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     document.documentElement.dir = dir;
   }, [lang, dir]);
 
-  const setLang = (next: Locale) => {
+  const setLang = useCallback((next: Locale) => {
     setLangState(next);
     void i18n.changeLanguage(next);
     if (typeof document !== "undefined") {
@@ -51,7 +57,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         /* ignore */
       }
     }
-  };
+  }, []);
 
   return (
     <LanguageContext.Provider value={{ lang, dir, setLang }}>{children}</LanguageContext.Provider>

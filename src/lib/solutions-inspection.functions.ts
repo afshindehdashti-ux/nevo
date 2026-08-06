@@ -3,7 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "@/integrations/supabase/types";
 
-const LOCALES = ["en", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"];
+const LOCALES = ["en", "fa", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"];
 const PATHS = [
   "/solutions",
   "/solutions/sandwich-panels",

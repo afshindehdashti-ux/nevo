@@ -3,7 +3,11 @@ import { CRM_NAV, type AppRole, type CrmNavItem } from "@/lib/crm-nav";
 const ALL_STAFF: AppRole[] = ["management", "sales", "operations", "finance", "read_only"];
 
 /** Extra rules for paths not represented in CRM_NAV (detail routes, admin-only utilities). */
-type Rule = { match: (path: string) => boolean; allowedRoles?: AppRole[]; requiresSuperAdmin?: boolean };
+type Rule = {
+  match: (path: string) => boolean;
+  allowedRoles?: AppRole[];
+  requiresSuperAdmin?: boolean;
+};
 
 const EXTRA_RULES: Rule[] = [
   // Always-allowed for any signed-in staff/admin

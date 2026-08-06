@@ -42,10 +42,7 @@ const CTA_SELECTORS = [
 async function assertNoCtas(page: Page, when: string) {
   for (const selector of CTA_SELECTORS) {
     const count = await page.locator(selector).count();
-    expect(
-      count,
-      `Expected 0 matches for ${selector} ${when} but found ${count}`,
-    ).toBe(0);
+    expect(count, `Expected 0 matches for ${selector} ${when} but found ${count}`).toBe(0);
   }
 }
 
@@ -110,10 +107,14 @@ test.describe("Backend routes: CTAs are not reachable via keyboard focus", () =>
           if (!el || el === document.body) return { sig: "__body__", matchesCta: false };
           const sig =
             (el.tagName || "") +
-            "#" + (el.id || "") +
-            "." + (el.className?.toString?.() || "") +
-            "@" + (el.getAttribute("aria-label") || "") +
-            "$" + (el.textContent?.slice(0, 40) || "");
+            "#" +
+            (el.id || "") +
+            "." +
+            (el.className?.toString?.() || "") +
+            "@" +
+            (el.getAttribute("aria-label") || "") +
+            "$" +
+            (el.textContent?.slice(0, 40) || "");
           const matchesCta = !!(el.closest(ctaSelector) || el.matches(ctaSelector));
           return { sig, matchesCta };
         }, CTA_SELECTOR_UNION);
@@ -130,4 +131,3 @@ test.describe("Backend routes: CTAs are not reachable via keyboard focus", () =>
     });
   }
 });
-

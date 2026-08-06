@@ -31,17 +31,23 @@ const QuerySchema = z.object({
   entity_id: z.string().max(255).optional(),
   scope: z.string().max(64).optional(),
   user_id: z.string().uuid().optional(),
-  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   search: z.string().max(200).optional(),
   limit: z.coerce.number().int().min(1).max(500).default(100),
 });
 
 function jsonError(status: number, message: string, extra?: Record<string, unknown>) {
-  return new Response(
-    JSON.stringify({ error: message, ...(extra ?? {}) }),
-    { status, headers: { "content-type": "application/json" } },
-  );
+  return new Response(JSON.stringify({ error: message, ...(extra ?? {}) }), {
+    status,
+    headers: { "content-type": "application/json" },
+  });
 }
 
 export const Route = createFileRoute("/api/admin/csv-export-audit")({
@@ -49,9 +55,7 @@ export const Route = createFileRoute("/api/admin/csv-export-audit")({
     handlers: withMethodGuards({
       GET: async ({ request }) => {
         const auth = request.headers.get("authorization") ?? "";
-        const token = auth.toLowerCase().startsWith("bearer ")
-          ? auth.slice(7).trim()
-          : "";
+        const token = auth.toLowerCase().startsWith("bearer ") ? auth.slice(7).trim() : "";
         if (!token) return jsonError(401, "Missing bearer token");
 
         const url = process.env.SUPABASE_URL;
@@ -74,9 +78,7 @@ export const Route = createFileRoute("/api/admin/csv-export-audit")({
         const { data: userRes, error: userErr } = await supabase.auth.getUser();
         if (userErr || !userRes.user) return jsonError(401, "Invalid or expired token");
 
-        const parsed = QuerySchema.safeParse(
-          Object.fromEntries(new URL(request.url).searchParams),
-        );
+        const parsed = QuerySchema.safeParse(Object.fromEntries(new URL(request.url).searchParams));
         if (!parsed.success) {
           return jsonError(400, "Invalid query parameters", {
             issues: parsed.error.issues,

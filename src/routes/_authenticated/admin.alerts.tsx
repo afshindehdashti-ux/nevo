@@ -21,13 +21,7 @@ import {
   type AlertRow,
   type AlertStatus,
 } from "@/lib/alerts.functions";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,10 +53,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export const Route = createFileRoute("/_authenticated/admin/alerts")({
   head: () => ({
-    meta: [
-      { title: "Backend Alerts — NEVO CRM" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Backend Alerts — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   component: AlertsPage,
 });
@@ -126,9 +117,7 @@ function AlertsPage() {
   const counts = data?.counts;
 
   const queueDlqTotal = useMemo(
-    () =>
-      (data?.queues.auth_emails_dlq ?? 0) +
-      (data?.queues.transactional_emails_dlq ?? 0),
+    () => (data?.queues.auth_emails_dlq ?? 0) + (data?.queues.transactional_emails_dlq ?? 0),
     [data],
   );
 
@@ -142,8 +131,7 @@ function AlertsPage() {
             <Bell className="h-6 w-6" /> Backend Alerts
           </h1>
           <p className="text-sm text-muted-foreground">
-            Recent backend failures and dead-letter queue events. Auto-refresh
-            every 30s.
+            Recent backend failures and dead-letter queue events. Auto-refresh every 30s.
           </p>
         </div>
         <Button
@@ -153,9 +141,7 @@ function AlertsPage() {
           disabled={q.isFetching}
           className="gap-2"
         >
-          <RefreshCw
-            className={`h-4 w-4 ${q.isFetching ? "animate-spin" : ""}`}
-          />
+          <RefreshCw className={`h-4 w-4 ${q.isFetching ? "animate-spin" : ""}`} />
           Refresh
         </Button>
       </div>
@@ -178,9 +164,8 @@ function AlertsPage() {
             {queueDlqTotal === 1 ? "" : "s"}
           </AlertTitle>
           <AlertDescription>
-            {data?.queues.auth_emails_dlq ?? 0} auth ·{" "}
-            {data?.queues.transactional_emails_dlq ?? 0} transactional. Retries
-            exhausted for these messages.
+            {data?.queues.auth_emails_dlq ?? 0} auth · {data?.queues.transactional_emails_dlq ?? 0}{" "}
+            transactional. Retries exhausted for these messages.
           </AlertDescription>
         </Alert>
       )}
@@ -234,9 +219,7 @@ function AlertsPage() {
               type="multiple"
               value={statuses}
               onValueChange={(v) =>
-                setStatuses(
-                  v.length ? (v as AlertStatus[]) : [...STATUS_OPTIONS],
-                )
+                setStatuses(v.length ? (v as AlertStatus[]) : [...STATUS_OPTIONS])
               }
               variant="outline"
               size="sm"
@@ -285,9 +268,7 @@ function AlertsPage() {
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Events</CardTitle>
           <CardDescription>
-            {q.isLoading
-              ? "Loading…"
-              : `${rows.length} shown · window ${hours}h`}
+            {q.isLoading ? "Loading…" : `${rows.length} shown · window ${hours}h`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -323,22 +304,13 @@ function AlertsPage() {
                       })}
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        className={`capitalize gap-1 ${statusColor(r.status)}`}
-                      >
+                      <Badge className={`capitalize gap-1 ${statusColor(r.status)}`}>
                         <XCircle className="h-3 w-3" /> {r.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-mono text-xs">
-                      {r.template_name ?? "—"}
-                    </TableCell>
-                    <TableCell className="text-xs">
-                      {r.recipient_email ?? "—"}
-                    </TableCell>
-                    <TableCell
-                      className="text-xs max-w-sm truncate"
-                      title={r.error_message ?? ""}
-                    >
+                    <TableCell className="font-mono text-xs">{r.template_name ?? "—"}</TableCell>
+                    <TableCell className="text-xs">{r.recipient_email ?? "—"}</TableCell>
+                    <TableCell className="text-xs max-w-sm truncate" title={r.error_message ?? ""}>
                       {r.error_message ?? "—"}
                     </TableCell>
                     <TableCell className="text-right">
@@ -365,9 +337,7 @@ function AlertsPage() {
         <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Alert detail</SheetTitle>
-            <SheetDescription className="font-mono text-xs break-all">
-              {openMsg}
-            </SheetDescription>
+            <SheetDescription className="font-mono text-xs break-all">{openMsg}</SheetDescription>
           </SheetHeader>
 
           {detail.isLoading ? (
@@ -382,9 +352,7 @@ function AlertsPage() {
               detail={detail.data}
             />
           ) : (
-            <p className="mt-6 text-sm text-muted-foreground">
-              No history found.
-            </p>
+            <p className="mt-6 text-sm text-muted-foreground">No history found.</p>
           )}
         </SheetContent>
       </Sheet>
@@ -405,23 +373,17 @@ function DetailBody({
       <div className="grid grid-cols-2 gap-3 text-sm">
         <Field label="Status">
           {latest ? (
-            <Badge className={`capitalize ${statusColor(latest.status)}`}>
-              {latest.status}
-            </Badge>
+            <Badge className={`capitalize ${statusColor(latest.status)}`}>{latest.status}</Badge>
           ) : (
             "—"
           )}
         </Field>
         <Field label="Template">
-          <span className="font-mono text-xs">
-            {latest?.template_name ?? "—"}
-          </span>
+          <span className="font-mono text-xs">{latest?.template_name ?? "—"}</span>
         </Field>
         <Field label="Recipient">{latest?.recipient_email ?? "—"}</Field>
         <Field label="Last event">
-          {latest?.created_at
-            ? format(new Date(latest.created_at), "PPpp")
-            : "—"}
+          {latest?.created_at ? format(new Date(latest.created_at), "PPpp") : "—"}
         </Field>
       </div>
 
@@ -442,15 +404,9 @@ function DetailBody({
         </div>
         <ol className="space-y-2">
           {detail.timeline.map((t) => (
-            <li
-              key={t.id}
-              className="border rounded-md p-2 text-xs bg-card space-y-1"
-            >
+            <li key={t.id} className="border rounded-md p-2 text-xs bg-card space-y-1">
               <div className="flex items-center justify-between gap-2">
-                <Badge
-                  className={`capitalize ${statusColor(t.status)}`}
-                  variant="outline"
-                >
+                <Badge className={`capitalize ${statusColor(t.status)}`} variant="outline">
                   {t.status}
                 </Badge>
                 <span className="text-muted-foreground">
@@ -481,32 +437,16 @@ function DetailBody({
   );
 }
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="text-xs uppercase tracking-wider text-muted-foreground">
-        {label}
-      </div>
+      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="mt-1">{children}</div>
     </div>
   );
 }
 
-function MiniStat({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone?: "warn" | "bad";
-}) {
+function MiniStat({ label, value, tone }: { label: string; value: number; tone?: "warn" | "bad" }) {
   const color =
     tone === "bad"
       ? "text-rose-600 dark:text-rose-400"
@@ -516,9 +456,7 @@ function MiniStat({
   return (
     <div className="rounded-md border bg-card p-3">
       <div className={`text-2xl font-semibold ${color}`}>{value}</div>
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-        {label}
-      </div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
     </div>
   );
 }

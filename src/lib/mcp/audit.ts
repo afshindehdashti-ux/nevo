@@ -62,7 +62,9 @@ export function withAudit(def: any): any {
         result = await inner(input, ctx);
         if (result?.isError) {
           status = !ctx.isAuthenticated() ? "unauthorized" : "error";
-          const first = result.content?.find?.((c: { type: string; text?: string }) => c.type === "text");
+          const first = result.content?.find?.(
+            (c: { type: string; text?: string }) => c.type === "text",
+          );
           errorMessage = typeof first?.text === "string" ? first.text.slice(0, 1000) : null;
         }
       }
@@ -79,20 +81,22 @@ export function withAudit(def: any): any {
     // Fire-and-forget audit insert.
     void (async () => {
       try {
-        await adminClient().from("mcp_tool_invocations").insert({
-          request_id: requestId,
-          tool_name: def.name,
-          user_id: userId,
-          user_email: userEmail,
-          client_id: clientId,
-          status,
-          error_message: errorMessage,
-          input_bytes: inputBytes,
-          result_rows: rows,
-          duration_ms: Date.now() - t0,
-          started_at: startedAt.toISOString(),
-          finished_at: new Date().toISOString(),
-        });
+        await adminClient()
+          .from("mcp_tool_invocations")
+          .insert({
+            request_id: requestId,
+            tool_name: def.name,
+            user_id: userId,
+            user_email: userEmail,
+            client_id: clientId,
+            status,
+            error_message: errorMessage,
+            input_bytes: inputBytes,
+            result_rows: rows,
+            duration_ms: Date.now() - t0,
+            started_at: startedAt.toISOString(),
+            finished_at: new Date().toISOString(),
+          });
       } catch (e) {
         console.warn(`[mcp-audit] failed to log ${def.name}:`, e);
       }

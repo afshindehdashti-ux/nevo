@@ -40,10 +40,9 @@ const SubmitInput = z.object({
   details: z.record(z.string(), z.any()).optional(),
 });
 
-
 export const submitApprovalRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => SubmitInput.parse(v))
+  .validator((v) => SubmitInput.parse(v))
   .handler(async ({ context, data }) => {
     const { data: existing } = await context.supabase
       .from("approval_requests")
@@ -77,7 +76,7 @@ const DecideInput = z.object({
 
 export const decideApprovalRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => DecideInput.parse(v))
+  .validator((v) => DecideInput.parse(v))
   .handler(async ({ context, data }) => {
     const { data: row, error } = await context.supabase.rpc("decide_approval_request", {
       _id: data.id,
@@ -99,7 +98,7 @@ const ListInput = z
 
 export const listApprovalRequests = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => ListInput.parse(v ?? {}))
+  .validator((v) => ListInput.parse(v ?? {}))
   .handler(async ({ context, data }) => {
     let q = context.supabase
       .from("approval_requests")
@@ -196,8 +195,8 @@ export const listApprovalRequests = createServerFn({ method: "GET" })
     return list.map((r) => ({
       ...r,
       entity_label: labels.get(key(r.entity_type, r.entity_id)) ?? null,
-      requested_by_name: r.requested_by ? names.get(r.requested_by) ?? null : null,
-      decided_by_name: r.decided_by ? names.get(r.decided_by) ?? null : null,
+      requested_by_name: r.requested_by ? (names.get(r.requested_by) ?? null) : null,
+      decided_by_name: r.decided_by ? (names.get(r.decided_by) ?? null) : null,
     }));
   });
 

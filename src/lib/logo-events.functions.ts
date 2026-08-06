@@ -44,7 +44,7 @@ function normalize(input: unknown): Required<LogoEventFilters> {
 
 export const getLogoEvents = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: LogoEventFilters | undefined) => data ?? {})
+  .validator((data: LogoEventFilters | undefined) => data ?? {})
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await ensureAdmin(supabase, userId);

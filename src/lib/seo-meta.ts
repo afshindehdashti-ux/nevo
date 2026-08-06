@@ -1,7 +1,7 @@
 /**
  * Per-route, per-locale SEO metadata (title + description).
  *
- * Native industrial-engineering register in all 10 locales. Consumed by route
+ * Native industrial-engineering register in all 11 locales. Consumed by route
  * head() via buildSeo() so canonical, og:*, hreflang, and og:image stay
  * consistent — only the human-facing title/description swap per locale.
  *
@@ -9,13 +9,14 @@
  */
 
 import type { LocaleCode } from "./seo";
+import { FA_SEO_META } from "./fa-seo-meta";
 
 export interface LocalizedMeta {
   title: string;
   description: string;
 }
 
-type PerLocale = Record<LocaleCode, LocalizedMeta>;
+type PerLocale = { en: LocalizedMeta } & Partial<Record<LocaleCode, LocalizedMeta>>;
 
 export const SEO_META: Record<string, PerLocale> = {
   "/": {
@@ -555,52 +556,52 @@ export const SEO_META: Record<string, PerLocale> = {
     en: {
       title: "NEVO AI Assistant — Instant Engineering Answers for Sandwich Panels",
       description:
-        "Ask the NEVO AI Assistant about panel specs, factory sizing, PIR vs Rock Wool, cold storage design and production line configuration — 24/7, in 10 languages.",
+        "Ask the NEVO AI Assistant about panel specs, factory sizing, PIR vs Rock Wool, cold storage design and production line configuration — 24/7, in 11 languages.",
     },
     ar: {
       title: "مساعد نيفو الذكي — إجابات هندسية فورية لألواح الساندويتش",
       description:
-        "اسأل مساعد نيفو الذكي عن مواصفات الألواح وحجم المصانع ومقارنة PIR بالصوف الصخري وتصميم التخزين المبرّد وتهيئة خطوط الإنتاج — على مدار الساعة، بعشر لغات.",
+        "اسأل مساعد نيفو الذكي عن مواصفات الألواح وحجم المصانع ومقارنة PIR بالصوف الصخري وتصميم التخزين المبرّد وتهيئة خطوط الإنتاج — على مدار الساعة، بإحدى عشرة لغة.",
     },
     tr: {
       title: "NEVO AI Asistanı — Sandviç Panel Mühendisliğinde Anlık Yanıtlar",
       description:
-        "NEVO AI Asistanı'na panel spesifikasyonları, fabrika boyutlandırma, PIR–Taşyünü karşılaştırması, soğuk depo tasarımı ve hat konfigürasyonunu sorun — 7/24, 10 dilde.",
+        "NEVO AI Asistanı'na panel spesifikasyonları, fabrika boyutlandırma, PIR–Taşyünü karşılaştırması, soğuk depo tasarımı ve hat konfigürasyonunu sorun — 7/24, 11 dilde.",
     },
     ru: {
       title: "AI-ассистент NEVO — Инженерные ответы по сэндвич-панелям",
       description:
-        "Задайте AI-ассистенту NEVO вопросы о характеристиках панелей, размерах завода, PIR vs минвата, холодильных складах и настройке производственных линий — 24/7, на 10 языках.",
+        "Задайте AI-ассистенту NEVO вопросы о характеристиках панелей, размерах завода, PIR vs минвата, холодильных складах и настройке производственных линий — 24/7, на 11 языках.",
     },
     pt: {
       title: "Assistente IA da NEVO — Respostas instantâneas de engenharia",
       description:
-        "Pergunte ao Assistente IA da NEVO sobre painéis, dimensionamento de fábricas, PIR vs lã de rocha, câmaras de frio e configuração de linhas — 24/7, em 10 idiomas.",
+        "Pergunte ao Assistente IA da NEVO sobre painéis, dimensionamento de fábricas, PIR vs lã de rocha, câmaras de frio e configuração de linhas — 24/7, em 11 idiomas.",
     },
     de: {
       title: "NEVO KI-Assistent — Sofort-Engineering-Antworten zu Sandwichpanelen",
       description:
-        "Fragen Sie den NEVO KI-Assistenten zu Panelspezifikationen, Werksauslegung, PIR vs. Steinwolle, Kühllagern und Linienkonfiguration — rund um die Uhr, in 10 Sprachen.",
+        "Fragen Sie den NEVO KI-Assistenten zu Panelspezifikationen, Werksauslegung, PIR vs. Steinwolle, Kühllagern und Linienkonfiguration — rund um die Uhr, in 11 Sprachen.",
     },
     es: {
       title: "Asistente IA de NEVO — Respuestas instantáneas de ingeniería",
       description:
-        "Pregunte al Asistente IA de NEVO sobre paneles, dimensionamiento de fábricas, PIR vs lana de roca, cámaras frigoríficas y configuración de líneas — 24/7, en 10 idiomas.",
+        "Pregunte al Asistente IA de NEVO sobre paneles, dimensionamiento de fábricas, PIR vs lana de roca, cámaras frigoríficas y configuración de líneas — 24/7, en 11 idiomas.",
     },
     fr: {
       title: "Assistant IA NEVO — Réponses d'ingénierie instantanées",
       description:
-        "Interrogez l'assistant IA NEVO sur les panneaux, le dimensionnement d'usine, PIR vs laine de roche, le froid et la configuration des lignes — 24/7, en 10 langues.",
+        "Interrogez l'assistant IA NEVO sur les panneaux, le dimensionnement d'usine, PIR vs laine de roche, le froid et la configuration des lignes — 24/7, en 11 langues.",
     },
     it: {
       title: "Assistente IA NEVO — Risposte ingegneristiche istantanee",
       description:
-        "Chiedi all'assistente IA NEVO di specifiche pannelli, dimensionamento stabilimenti, PIR vs lana di roccia, celle frigo e configurazione linee — 24/7, in 10 lingue.",
+        "Chiedi all'assistente IA NEVO di specifiche pannelli, dimensionamento stabilimenti, PIR vs lana di roccia, celle frigo e configurazione linee — 24/7, in 11 lingue.",
     },
     zh: {
       title: "NEVO AI 助手 — 夹芯板工程问题即时解答",
       description:
-        "向 NEVO AI 助手咨询板材规格、工厂产能、PIR 与岩棉对比、冷库设计与生产线配置,10 种语言全天候在线。",
+        "向 NEVO AI 助手咨询板材规格、工厂产能、PIR 与岩棉对比、冷库设计与生产线配置,11 种语言全天候在线。",
     },
   },
 
@@ -1675,5 +1676,6 @@ export function localizedMeta(path: string, lang: string): LocalizedMeta {
         "Dubai-based industrial engineering. Factory development, sandwich panel production lines, PIR/PUR raw materials, engineering consultancy & finished panels for global markets.",
     };
   }
+  if (lang === "fa") return FA_SEO_META[path] ?? perLocale.en;
   return perLocale[lang as LocaleCode] ?? perLocale.en;
 }

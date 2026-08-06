@@ -18,7 +18,14 @@ USING (
 );
 
 -- 2) Pin search_path on the last plpgsql helper that was missing one.
-ALTER FUNCTION public.tg_touch_updated_at() SET search_path = public;
+-- Some legacy deployments do not have this compatibility helper.
+DO $$
+BEGIN
+  IF to_regprocedure('public.tg_touch_updated_at()') IS NOT NULL THEN
+    ALTER FUNCTION public.tg_touch_updated_at() SET search_path = public;
+  END IF;
+END
+$$;
 
 -- 3) Revoke EXECUTE from PUBLIC (which also covers anon) on every function in
 --    the public schema. Authenticated grants and RLS-helper access remain
@@ -29,14 +36,26 @@ REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA public FROM anon;
 -- 4) Revoke EXECUTE from authenticated on trigger-only SECURITY DEFINER
 --    functions. These return `trigger` and are only ever invoked by the
 --    trigger runtime — no client should be able to call them as RPCs.
-REVOKE EXECUTE ON FUNCTION public.apply_inventory_movement()               FROM authenticated;
-REVOKE EXECUTE ON FUNCTION public.fd_assign_number()                       FROM authenticated;
-REVOKE EXECUTE ON FUNCTION public.fd_recalc_totals()                       FROM authenticated;
-REVOKE EXECUTE ON FUNCTION public.log_proforma_change()                    FROM authenticated;
-REVOKE EXECUTE ON FUNCTION public.orders_assign_number()                   FROM authenticated;
-REVOKE EXECUTE ON FUNCTION public.partner_commissions_assign_number()      FROM authenticated;
-REVOKE EXECUTE ON FUNCTION public.proforma_invoices_assign_number()        FROM authenticated;
-REVOKE EXECUTE ON FUNCTION public.recalc_proforma_totals()                 FROM authenticated;
+DO $$
+DECLARE
+  signature text;
+BEGIN
+  FOREACH signature IN ARRAY ARRAY[
+    'public.apply_inventory_movement()',
+    'public.fd_assign_number()',
+    'public.fd_recalc_totals()',
+    'public.log_proforma_change()',
+    'public.orders_assign_number()',
+    'public.partner_commissions_assign_number()',
+    'public.proforma_invoices_assign_number()',
+    'public.recalc_proforma_totals()'
+  ] LOOP
+    IF to_regprocedure(signature) IS NOT NULL THEN
+      EXECUTE format('REVOKE EXECUTE ON FUNCTION %s FROM authenticated', signature);
+    END IF;
+  END LOOP;
+END
+$$;
 
 -- Keep service_role able to invoke everything (defensive; it already can).
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO service_role;

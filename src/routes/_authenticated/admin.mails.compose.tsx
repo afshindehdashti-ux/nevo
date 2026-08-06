@@ -85,17 +85,30 @@ function ComposePage() {
   }
 
   async function handleSend() {
-    if (recipients.length === 0) { toast.error("Add at least one recipient"); return; }
-    if (isBroadcast && !body.trim()) { toast.error("Message body is required"); return; }
-    if (isBroadcast && !subject.trim()) { toast.error("Subject is required"); return; }
+    if (recipients.length === 0) {
+      toast.error("Add at least one recipient");
+      return;
+    }
+    if (isBroadcast && !body.trim()) {
+      toast.error("Message body is required");
+      return;
+    }
+    if (isBroadcast && !subject.trim()) {
+      toast.error("Subject is required");
+      return;
+    }
 
     const { data: session } = await supabase.auth.getSession();
     const token = session.session?.access_token;
-    if (!token) { toast.error("Not signed in"); return; }
+    if (!token) {
+      toast.error("Not signed in");
+      return;
+    }
 
     setSending(true);
     setProgress({ done: 0, total: recipients.length });
-    let ok = 0, fail = 0;
+    let ok = 0,
+      fail = 0;
 
     for (const r of recipients) {
       const templateData: Record<string, unknown> = isBroadcast
@@ -114,7 +127,10 @@ function ComposePage() {
         });
         const json = await res.json().catch(() => ({}));
         if (res.ok && json.success !== false) ok++;
-        else { fail++; console.error("Send failed", r.email, json); }
+        else {
+          fail++;
+          console.error("Send failed", r.email, json);
+        }
       } catch (e) {
         fail++;
         console.error("Send exception", r.email, e);
@@ -127,7 +143,9 @@ function ComposePage() {
     if (fail === 0) {
       toast.success(`Sent to ${ok} recipient${ok === 1 ? "" : "s"}`);
       setRecipients([]);
-      if (isBroadcast) { setBody(""); }
+      if (isBroadcast) {
+        setBody("");
+      }
     } else {
       toast.error(`Sent ${ok}, failed ${fail}. See console.`);
     }
@@ -140,16 +158,21 @@ function ComposePage() {
         <div className="border border-border rounded-lg p-4 bg-background space-y-3">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Template</Label>
           <Select value={templateName} onValueChange={setTemplateName}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {(templatesQ.data?.templates ?? []).map((t) => (
-                <SelectItem key={t.name} value={t.name}>{t.displayName}</SelectItem>
+                <SelectItem key={t.name} value={t.name}>
+                  {t.displayName}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
           {!isBroadcast && (
             <p className="text-xs text-muted-foreground">
-              Uses the template's default preview data. For custom content, choose "Admin broadcast".
+              Uses the template's default preview data. For custom content, choose "Admin
+              broadcast".
             </p>
           )}
         </div>
@@ -158,19 +181,36 @@ function ComposePage() {
         {isBroadcast && (
           <div className="border border-border rounded-lg p-4 bg-background space-y-3">
             <div>
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground">Subject</Label>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                Subject
+              </Label>
               <Input value={subject} onChange={(e) => setSubject(e.target.value)} />
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground">Greeting (optional)</Label>
-              <Input value={greeting} onChange={(e) => setGreeting(e.target.value)} placeholder="Hi Sara," />
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                Greeting (optional)
+              </Label>
+              <Input
+                value={greeting}
+                onChange={(e) => setGreeting(e.target.value)}
+                placeholder="Hi Sara,"
+              />
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground">Message body</Label>
-              <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={10} placeholder="Write your message… (double line-break for a new paragraph)" />
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                Message body
+              </Label>
+              <Textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                rows={10}
+                placeholder="Write your message… (double line-break for a new paragraph)"
+              />
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground">Signature (optional)</Label>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                Signature (optional)
+              </Label>
               <Input value={signature} onChange={(e) => setSignature(e.target.value)} />
             </div>
           </div>
@@ -180,15 +220,28 @@ function ComposePage() {
       {/* Recipients */}
       <div className="space-y-4">
         <div className="border border-border rounded-lg p-4 bg-background space-y-3">
-          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Recipients ({recipients.length})</Label>
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+            Recipients ({recipients.length})
+          </Label>
 
           <div className="flex gap-2">
-            <Input placeholder="Add email address…" value={manualEmail} onChange={(e) => setManualEmail(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addManual())} />
-            <Button size="icon" variant="outline" onClick={addManual}><Plus className="h-4 w-4" /></Button>
+            <Input
+              placeholder="Add email address…"
+              value={manualEmail}
+              onChange={(e) => setManualEmail(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addManual())}
+            />
+            <Button size="icon" variant="outline" onClick={addManual}>
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
 
           <div>
-            <Input placeholder="Search customers, contacts, leads, partners…" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <Input
+              placeholder="Search customers, contacts, leads, partners…"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
             {debounced.length >= 2 && (
               <div className="mt-2 max-h-64 overflow-y-auto border border-border rounded">
                 {searchQ.isLoading ? (
@@ -200,10 +253,14 @@ function ComposePage() {
                     <button
                       key={i}
                       type="button"
-                      onClick={() => addRecipient({ email: r.email, label: r.label, source: r.source })}
+                      onClick={() =>
+                        addRecipient({ email: r.email, label: r.label, source: r.source })
+                      }
                       className="w-full text-left px-3 py-2 text-xs hover:bg-muted flex items-center gap-2 border-b border-border last:border-0"
                     >
-                      <Badge variant="outline" className="text-[9px]">{r.source}</Badge>
+                      <Badge variant="outline" className="text-[9px]">
+                        {r.source}
+                      </Badge>
                       <div className="flex-1 min-w-0">
                         <div className="truncate font-medium">{r.label}</div>
                         <div className="truncate text-muted-foreground">{r.email}</div>
@@ -218,25 +275,45 @@ function ComposePage() {
           <div className="space-y-1 max-h-64 overflow-y-auto">
             {recipients.length === 0 ? (
               <p className="text-xs text-muted-foreground italic">No recipients yet.</p>
-            ) : recipients.map((r) => (
-              <div key={r.email} className="flex items-center justify-between gap-2 bg-muted/50 px-2 py-1 rounded text-xs">
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-medium">{r.label ?? r.email}</div>
-                  {r.label && <div className="truncate text-muted-foreground">{r.email}</div>}
+            ) : (
+              recipients.map((r) => (
+                <div
+                  key={r.email}
+                  className="flex items-center justify-between gap-2 bg-muted/50 px-2 py-1 rounded text-xs"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-medium">{r.label ?? r.email}</div>
+                    {r.label && <div className="truncate text-muted-foreground">{r.email}</div>}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeRecipient(r.email)}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
                 </div>
-                <button type="button" onClick={() => removeRecipient(r.email)} className="text-muted-foreground hover:text-destructive">
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
-        <Button className="w-full" size="lg" onClick={handleSend} disabled={sending || recipients.length === 0}>
+        <Button
+          className="w-full"
+          size="lg"
+          onClick={handleSend}
+          disabled={sending || recipients.length === 0}
+        >
           {sending ? (
-            <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Sending {progress?.done}/{progress?.total}…</>
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Sending {progress?.done}/{progress?.total}…
+            </>
           ) : (
-            <><Send className="h-4 w-4 mr-2" />Send to {recipients.length} recipient{recipients.length === 1 ? "" : "s"}</>
+            <>
+              <Send className="h-4 w-4 mr-2" />
+              Send to {recipients.length} recipient{recipients.length === 1 ? "" : "s"}
+            </>
           )}
         </Button>
         <p className="text-[10px] text-muted-foreground text-center">

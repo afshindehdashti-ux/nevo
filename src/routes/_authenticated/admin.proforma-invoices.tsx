@@ -97,18 +97,12 @@ function ProformaInvoicesList() {
       if (paymentFilter !== "all" && r.payment_status !== paymentFilter) return false;
       if (!q) return true;
       const cName = customerDisplayName(r.customers as CustomerDisplay | null);
-      return (
-        (r.proforma_number || "").toLowerCase().includes(q) ||
-        cName.toLowerCase().includes(q)
-      );
+      return (r.proforma_number || "").toLowerCase().includes(q) || cName.toLowerCase().includes(q);
     });
     const sign = sortDir === "asc" ? 1 : -1;
     return [...list].sort((a, b) => {
       if (sortKey === "created_at") {
-        return (
-          sign *
-          (new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-        );
+        return sign * (new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
       }
       const av = Number(a[sortKey]) || 0;
       const bv = Number(b[sortKey]) || 0;
@@ -117,7 +111,13 @@ function ProformaInvoicesList() {
   }, [rows, search, paymentFilter, sortKey, sortDir]);
 
   const counts = useMemo(() => {
-    const c: Record<string, number> = { all: rows.length, Unpaid: 0, "Partially Paid": 0, Paid: 0, Overdue: 0 };
+    const c: Record<string, number> = {
+      all: rows.length,
+      Unpaid: 0,
+      "Partially Paid": 0,
+      Paid: 0,
+      Overdue: 0,
+    };
     for (const r of rows) {
       const s = r.payment_status || "Unpaid";
       c[s] = (c[s] || 0) + 1;
@@ -271,17 +271,34 @@ function ProformaInvoicesList() {
               <TableHead>Proforma #</TableHead>
               <TableHead>Customer</TableHead>
               <TableHead>
-                <SortButton label="Issued" active={sortKey === "created_at"} dir={sortDir} onClick={() => toggleSort("created_at")} />
+                <SortButton
+                  label="Issued"
+                  active={sortKey === "created_at"}
+                  dir={sortDir}
+                  onClick={() => toggleSort("created_at")}
+                />
               </TableHead>
               <TableHead>Valid until</TableHead>
               <TableHead>Approved</TableHead>
               <TableHead>Payment</TableHead>
               <TableHead className="text-right">VAT</TableHead>
               <TableHead className="text-right">
-                <SortButton label="Grand total" active={sortKey === "grand_total"} dir={sortDir} onClick={() => toggleSort("grand_total")} align="right" />
+                <SortButton
+                  label="Grand total"
+                  active={sortKey === "grand_total"}
+                  dir={sortDir}
+                  onClick={() => toggleSort("grand_total")}
+                  align="right"
+                />
               </TableHead>
               <TableHead className="text-right">
-                <SortButton label="Balance" active={sortKey === "balance_due"} dir={sortDir} onClick={() => toggleSort("balance_due")} align="right" />
+                <SortButton
+                  label="Balance"
+                  active={sortKey === "balance_due"}
+                  dir={sortDir}
+                  onClick={() => toggleSort("balance_due")}
+                  align="right"
+                />
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -318,9 +335,7 @@ function ProformaInvoicesList() {
                     {r.proforma_number ?? "—"}
                   </Link>
                 </TableCell>
-                <TableCell>
-                  {customerDisplayName(r.customers as CustomerDisplay | null)}
-                </TableCell>
+                <TableCell>{customerDisplayName(r.customers as CustomerDisplay | null)}</TableCell>
                 <TableCell>{formatDate(r.created_at)}</TableCell>
                 <TableCell>{r.valid_until ? formatDate(r.valid_until) : "—"}</TableCell>
                 <TableCell>

@@ -8,21 +8,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import {
-  Tabs, TabsContent, TabsList, TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { listDocAccess, grantDocAccess, revokeDocAccess } from "@/lib/doc-access.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/document-access")({
   head: () => ({
-    meta: [
-      { title: "Document Access — NEVO Admin" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Document Access — NEVO Admin" }, { name: "robots", content: "noindex" }],
   }),
   component: DocumentAccessPage,
 });
@@ -33,8 +32,8 @@ function DocumentAccessPage() {
       <div>
         <h1 className="text-2xl font-semibold">Document Portal Access</h1>
         <p className="text-sm text-muted-foreground">
-          Link signed-in user accounts to a customer or partner so they can access
-          approved documents routed to that portal.
+          Link signed-in user accounts to a customer or partner so they can access approved
+          documents routed to that portal.
         </p>
       </div>
 
@@ -138,7 +137,9 @@ function MappingManager({ kind }: { kind: Kind }) {
               </SelectTrigger>
               <SelectContent>
                 {(parents.data ?? []).map((p) => (
-                  <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -181,9 +182,7 @@ function MappingManager({ kind }: { kind: Kind }) {
                 <p className="text-sm font-medium truncate">
                   {row.full_name ?? row.email ?? row.user_id}
                 </p>
-                {row.email && (
-                  <p className="text-xs text-muted-foreground truncate">{row.email}</p>
-                )}
+                {row.email && <p className="text-xs text-muted-foreground truncate">{row.email}</p>}
               </div>
               <Button
                 size="sm"

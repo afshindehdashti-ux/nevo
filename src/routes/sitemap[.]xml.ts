@@ -50,9 +50,10 @@ const ROUTES: SitemapEntry[] = [
   })),
 ];
 
-const ACTIVE_LOCALES = ["en", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"] as const;
+const ACTIVE_LOCALES = ["en", "fa", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"] as const;
 const HREFLANG: Record<(typeof ACTIVE_LOCALES)[number], string> = {
   en: "en",
+  fa: "fa",
   ar: "ar",
   tr: "tr",
   ru: "ru",

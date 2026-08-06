@@ -209,7 +209,10 @@ for (const r of results) {
     expectedVat ? r.text.includes(`VAT: ${expectedVat}`) : !r.text.includes("VAT:"),
   ]);
 
-  checks.push([`Total = ${money(r.totals.total, ccy)}`, r.text.includes(money(r.totals.total, ccy))]);
+  checks.push([
+    `Total = ${money(r.totals.total, ccy)}`,
+    r.text.includes(money(r.totals.total, ccy)),
+  ]);
   if (r.kind !== "quotation") {
     checks.push([
       `Amount paid = ${money(r.totals.paid, ccy)}`,
@@ -223,13 +226,8 @@ for (const r of results) {
     const expected = Math.max(financeTotalAmount(r.db) - financePaidAmount(r.db), 0);
     const stored = r.db.balance_due ?? r.db.balance;
     const expectFromHelper =
-      stored !== null && stored !== undefined && stored !== ""
-        ? Number(stored)
-        : expected;
-    checks.push([
-      `balance helper = ${expectFromHelper}`,
-      r.totals.balance === expectFromHelper,
-    ]);
+      stored !== null && stored !== undefined && stored !== "" ? Number(stored) : expected;
+    checks.push([`balance helper = ${expectFromHelper}`, r.totals.balance === expectFromHelper]);
   }
 
   for (const [label, ok] of checks) {
@@ -237,7 +235,6 @@ for (const r of results) {
     if (!ok) failed++;
   }
 }
-
 
 // ---------- Positive-branch check: real customer with billing_address ----------
 console.log("\n=== POSITIVE BRANCH: real customer with billing_address ===");
@@ -267,6 +264,7 @@ const posChecks = [
 for (const [l, ok] of posChecks) console.log(`  ${ok ? "✅" : "❌"} ${l}`);
 console.log("\n(No seed row has vat_number populated; VAT rendering covered by unit tests.)");
 
-console.log(`\n${failed === 0 && posChecks.every(([,ok])=>ok) ? "✅ ALL CHECKS PASSED" : `❌ CHECK(S) FAILED`}`);
-process.exit(failed === 0 && posChecks.every(([,ok])=>ok) ? 0 : 1);
-
+console.log(
+  `\n${failed === 0 && posChecks.every(([, ok]) => ok) ? "✅ ALL CHECKS PASSED" : `❌ CHECK(S) FAILED`}`,
+);
+process.exit(failed === 0 && posChecks.every(([, ok]) => ok) ? 0 : 1);

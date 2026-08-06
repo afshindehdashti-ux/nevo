@@ -17,7 +17,12 @@ const WRITE_ROLES = ["super_admin", "management", "sales", "operations", "financ
 const APPROVE_ROLES = ["super_admin", "management"] as const;
 
 async function assertRole(
-  supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> },
+  supabase: {
+    rpc: (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: { message: string } | null }>;
+  },
   userId: string,
   roles: readonly string[],
 ) {
@@ -45,7 +50,7 @@ const CreateInput = z.object({
 
 export const createDocumentRow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => CreateInput.parse(d))
+  .validator((d: unknown) => CreateInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertRole(context.supabase as never, context.userId, WRITE_ROLES);
     const { data: row, error } = await context.supabase
@@ -82,7 +87,7 @@ const AnalyzeInput = z.object({ documentId: z.string().uuid() });
 
 export const analyzeDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => AnalyzeInput.parse(d))
+  .validator((d: unknown) => AnalyzeInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertRole(context.supabase as never, context.userId, WRITE_ROLES);
 
@@ -104,11 +109,7 @@ export const analyzeDocument = createServerFn({ method: "POST" })
     if (fErr || !blob) throw new Error(fErr?.message ?? "Failed to download original file");
     const bytes = new Uint8Array(await blob.arrayBuffer());
 
-    const extraction = await extractDocumentText(
-      bytes,
-      doc.mime_type ?? "",
-      doc.original_filename,
-    );
+    const extraction = await extractDocumentText(bytes, doc.mime_type ?? "", doc.original_filename);
 
     // Optional context lookups
     let customerName: string | null = null;
@@ -208,9 +209,8 @@ export const analyzeDocument = createServerFn({ method: "POST" })
     if (isSensitive && visibility === "public") visibility = "none";
 
     // Apply admin-defined routing rules
-    const { fetchEnabledRules, applyRulesToAnalysis, snapshotFromAnalysis } = await import(
-      "./doc-intel-rules.server"
-    );
+    const { fetchEnabledRules, applyRulesToAnalysis, snapshotFromAnalysis } =
+      await import("./doc-intel-rules.server");
     const rules = await fetchEnabledRules(context.supabase as never);
     const snap = snapshotFromAnalysis(analysis, doc.original_filename);
     const ruleOutcome = applyRulesToAnalysis(
@@ -306,12 +306,12 @@ const ApproveInput = z.object({
 });
 
 function sanitizeSegment(s: string) {
-  return s.replace(/[^A-Za-z0-9._\-\/]+/g, "_").replace(/^\/+|\/+$/g, "");
+  return s.replace(/[^A-Za-z0-9._/-]+/g, "_").replace(/^[/]+|[/]+$/g, "");
 }
 
 export const approveDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => ApproveInput.parse(d))
+  .validator((d: unknown) => ApproveInput.parse(d))
   .handler(async ({ data, context }) => {
     // Reject / send-back allowed for any staff writer; approval restricted to management.
     if (data.action === "approve") {
@@ -480,13 +480,11 @@ const ListInput = z.object({
 
 export const listDocuments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => ListInput.parse(d ?? {}))
+  .validator((d: unknown) => ListInput.parse(d ?? {}))
   .handler(async ({ data, context }) => {
     let q = context.supabase
       .from("doc_intel_documents")
-      .select(
-        "*, customers(name), partners(company_name), projects(project_name)",
-      )
+      .select("*, customers(name), partners(company_name), projects(project_name)")
       .order("created_at", { ascending: false })
       .limit(data.limit);
     if (data.status) q = q.eq("status", data.status);
@@ -508,7 +506,7 @@ export const listDocuments = createServerFn({ method: "POST" })
 
 export const getDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const [{ data: doc }, { data: tags }, { data: versions }, { data: audit }, { data: extract }] =
       await Promise.all([
@@ -537,13 +535,21 @@ export const getDocument = createServerFn({ method: "POST" })
           .maybeSingle(),
       ]);
     if (!doc) throw new Error("Document not found");
-    return { document: doc, tags: tags ?? [], versions: versions ?? [], audit: audit ?? [], extract: extract ?? null };
+    return {
+      document: doc,
+      tags: tags ?? [],
+      versions: versions ?? [],
+      audit: audit ?? [],
+      extract: extract ?? null,
+    };
   });
 
 export const signDocumentUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
-    z.object({ id: z.string().uuid(), which: z.enum(["original", "routed"]).default("routed") }).parse(d),
+  .validator((d: unknown) =>
+    z
+      .object({ id: z.string().uuid(), which: z.enum(["original", "routed"]).default("routed") })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     const { data: doc, error } = await context.supabase
@@ -585,7 +591,7 @@ export const signDocumentUrl = createServerFn({ method: "POST" })
 
 export const requestDocumentAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z.object({ id: z.string().uuid(), note: z.string().max(1000).optional() }).parse(d),
   )
   .handler(async ({ data, context }) => {

@@ -20,8 +20,6 @@ const OPPORTUNITIES_SELECT = buildSelect(
   ],
 );
 
-
-
 export const Route = createFileRoute("/_authenticated/admin/opportunities")({
   head: () => ({
     meta: [{ title: "Opportunities — NEVO CRM" }, { name: "robots", content: "noindex" }],
@@ -93,11 +91,21 @@ function OpportunitiesList() {
                 <tr key={o.id} className="border-t border-border hover:bg-muted/20">
                   <td className="px-3 py-2 font-medium">{o.name}</td>
                   <td className="px-3 py-2 text-muted-foreground">{o.customer?.name ?? "—"}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{o.partner?.company_name ?? "—"}</td>
-                  <td className="px-3 py-2"><Badge variant="outline" className="capitalize">{o.stage}</Badge></td>
-                  <td className="px-3 py-2 text-right tabular-nums">{formatMoney(Number(o.amount ?? 0), o.currency ?? "EUR")}</td>
+                  <td className="px-3 py-2 text-muted-foreground">
+                    {o.partner?.company_name ?? "—"}
+                  </td>
+                  <td className="px-3 py-2">
+                    <Badge variant="outline" className="capitalize">
+                      {o.stage}
+                    </Badge>
+                  </td>
+                  <td className="px-3 py-2 text-right tabular-nums">
+                    {formatMoney(Number(o.amount ?? 0), o.currency ?? "EUR")}
+                  </td>
                   <td className="px-3 py-2 text-right tabular-nums">{o.probability ?? 0}%</td>
-                  <td className="px-3 py-2 text-muted-foreground">{o.expected_close_date ? formatDate(o.expected_close_date) : "—"}</td>
+                  <td className="px-3 py-2 text-muted-foreground">
+                    {o.expected_close_date ? formatDate(o.expected_close_date) : "—"}
+                  </td>
                 </tr>
               ))}
             </tbody>

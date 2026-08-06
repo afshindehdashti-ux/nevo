@@ -52,11 +52,27 @@ function ChangePasswordPage() {
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="pw">New password</Label>
-              <Input id="pw" type="password" autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} required minLength={10} />
+              <Input
+                id="pw"
+                type="password"
+                autoComplete="new-password"
+                value={pw}
+                onChange={(e) => setPw(e.target.value)}
+                required
+                minLength={10}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="pw2">Confirm password</Label>
-              <Input id="pw2" type="password" autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} required minLength={10} />
+              <Input
+                id="pw2"
+                type="password"
+                autoComplete="new-password"
+                value={pw2}
+                onChange={(e) => setPw2(e.target.value)}
+                required
+                minLength={10}
+              />
             </div>
             <Button type="submit" className="w-full" disabled={busy}>
               {busy ? "Updating…" : "Update password"}

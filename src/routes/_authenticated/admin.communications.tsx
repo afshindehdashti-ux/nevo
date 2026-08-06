@@ -134,11 +134,9 @@ function CommunicationsCenter() {
   });
 
   const markDone = useMutation({
-    mutationFn: (id: string) =>
-      updFn({ data: { id, follow_up_done: true } }),
+    mutationFn: (id: string) => updFn({ data: { id, follow_up_done: true } }),
     onSuccess: invalidate,
-    onError: (e: any) =>
-      toast.error("Could not mark done", { description: e?.message }),
+    onError: (e: any) => toast.error("Could not mark done", { description: e?.message }),
   });
 
   const openAttachment = async (path: string) => {
@@ -167,8 +165,8 @@ function CommunicationsCenter() {
         <div>
           <h1 className="text-2xl font-semibold">Communications</h1>
           <p className="text-sm text-muted-foreground">
-            Log emails, WhatsApp, calls and meetings across leads, customers and projects.
-            Attach files and schedule the next follow-up.
+            Log emails, WhatsApp, calls and meetings across leads, customers and projects. Attach
+            files and schedule the next follow-up.
           </p>
         </div>
         <NewCommunicationDialog
@@ -190,7 +188,9 @@ function CommunicationsCenter() {
                 setFilterEntityId("all");
               }}
             >
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All entities</SelectItem>
                 <SelectItem value="customer">Customer</SelectItem>
@@ -206,11 +206,15 @@ function CommunicationsCenter() {
               onValueChange={setFilterEntityId}
               disabled={filterEntityType === "all"}
             >
-              <SelectTrigger><SelectValue placeholder="All" /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="All" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
                 {entityOptions.map((o) => (
-                  <SelectItem key={o.id} value={o.id}>{o.label}</SelectItem>
+                  <SelectItem key={o.id} value={o.id}>
+                    {o.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -218,22 +222,25 @@ function CommunicationsCenter() {
           <div className="space-y-1">
             <Label className="text-xs">Type</Label>
             <Select value={filterKind} onValueChange={(v) => setFilterKind(v as any)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All types</SelectItem>
                 {(Object.keys(KIND_META) as Kind[]).map((k) => (
-                  <SelectItem key={k} value={k}>{KIND_META[k].label}</SelectItem>
+                  <SelectItem key={k} value={k}>
+                    {KIND_META[k].label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Direction</Label>
-            <Select
-              value={filterDirection}
-              onValueChange={(v) => setFilterDirection(v as any)}
-            >
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select value={filterDirection} onValueChange={(v) => setFilterDirection(v as any)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Any</SelectItem>
                 <SelectItem value="internal">Internal</SelectItem>
@@ -268,7 +275,9 @@ function CommunicationsCenter() {
             />
             Only entries with a pending follow-up
           </label>
-          <Button variant="ghost" size="sm" onClick={resetFilters}>Clear filters</Button>
+          <Button variant="ghost" size="sm" onClick={resetFilters}>
+            Clear filters
+          </Button>
         </div>
       </Card>
 
@@ -316,7 +325,9 @@ function CommRow({
       <div className="flex-1 min-w-0 space-y-1">
         <div className="flex items-center gap-2 flex-wrap text-xs">
           <span className="uppercase font-semibold">{meta.label}</span>
-          <Badge variant="secondary" className="text-[10px]">{row.direction}</Badge>
+          <Badge variant="secondary" className="text-[10px]">
+            {row.direction}
+          </Badge>
           {row.entity_label && (
             <Badge variant="outline" className="text-[10px]">
               {row.entity_type}: {row.entity_label}
@@ -326,15 +337,11 @@ function CommRow({
             {formatDistanceToNow(new Date(row.occurred_at), { addSuffix: true })} ·{" "}
             {format(new Date(row.occurred_at), "PPp")}
           </span>
-          {row.contact_name && (
-            <span className="text-muted-foreground">· {row.contact_name}</span>
-          )}
+          {row.contact_name && <span className="text-muted-foreground">· {row.contact_name}</span>}
         </div>
         {row.subject && <div className="text-sm font-medium">{row.subject}</div>}
         {row.body && (
-          <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-            {row.body}
-          </div>
+          <div className="text-sm text-muted-foreground whitespace-pre-wrap">{row.body}</div>
         )}
         {row.attachments && row.attachments.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-1">
@@ -357,19 +364,14 @@ function CommRow({
               row.follow_up_done
                 ? "text-muted-foreground line-through"
                 : followOverdue
-                ? "text-destructive"
-                : "text-amber-600"
+                  ? "text-destructive"
+                  : "text-amber-600"
             }`}
           >
             <CalendarClock className="h-3.5 w-3.5" />
             Follow-up {format(new Date(row.follow_up_at), "PPp")}
             {!row.follow_up_done && (
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-6 px-2"
-                onClick={onMarkDone}
-              >
+              <Button size="sm" variant="ghost" className="h-6 px-2" onClick={onMarkDone}>
                 <Check className="h-3 w-3 mr-1" /> Done
               </Button>
             )}
@@ -410,15 +412,12 @@ function NewCommunicationDialog({
   const [body, setBody] = useState("");
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
-  const [occurredAt, setOccurredAt] = useState<string>(
-    format(new Date(), "yyyy-MM-dd'T'HH:mm"),
-  );
+  const [occurredAt, setOccurredAt] = useState<string>(format(new Date(), "yyyy-MM-dd'T'HH:mm"));
   const [followUp, setFollowUp] = useState<string>("");
   const [attachments, setAttachments] = useState<CommAttachment[]>([]);
   const [uploading, setUploading] = useState(false);
 
-  const opts =
-    entityType === "customer" ? customers : entityType === "lead" ? leads : projects;
+  const opts = entityType === "customer" ? customers : entityType === "lead" ? leads : projects;
 
   const reset = () => {
     setEntityType("customer");
@@ -480,8 +479,7 @@ function NewCommunicationDialog({
       setOpen(false);
       reset();
     },
-    onError: (e: any) =>
-      toast.error("Could not save", { description: e?.message }),
+    onError: (e: any) => toast.error("Could not save", { description: e?.message }),
   });
 
   const canSave = entityId && body.trim().length > 0 && !create.isPending;
@@ -489,7 +487,9 @@ function NewCommunicationDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm"><Plus className="h-4 w-4 mr-1" /> New entry</Button>
+        <Button size="sm">
+          <Plus className="h-4 w-4 mr-1" /> New entry
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
@@ -498,8 +498,16 @@ function NewCommunicationDialog({
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <Label>Related to</Label>
-            <Select value={entityType} onValueChange={(v) => { setEntityType(v as EntityType); setEntityId(""); }}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={entityType}
+              onValueChange={(v) => {
+                setEntityType(v as EntityType);
+                setEntityId("");
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="customer">Customer</SelectItem>
                 <SelectItem value="lead">Lead</SelectItem>
@@ -510,10 +518,14 @@ function NewCommunicationDialog({
           <div className="space-y-1">
             <Label>Record</Label>
             <Select value={entityId} onValueChange={setEntityId}>
-              <SelectTrigger><SelectValue placeholder="Select…" /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Select…" />
+              </SelectTrigger>
               <SelectContent>
                 {opts.map((o) => (
-                  <SelectItem key={o.id} value={o.id}>{o.label}</SelectItem>
+                  <SelectItem key={o.id} value={o.id}>
+                    {o.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -521,10 +533,14 @@ function NewCommunicationDialog({
           <div className="space-y-1">
             <Label>Type</Label>
             <Select value={kind} onValueChange={(v) => setKind(v as Kind)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {(Object.keys(KIND_META) as Kind[]).map((k) => (
-                  <SelectItem key={k} value={k}>{KIND_META[k].label}</SelectItem>
+                  <SelectItem key={k} value={k}>
+                    {KIND_META[k].label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -532,7 +548,9 @@ function NewCommunicationDialog({
           <div className="space-y-1">
             <Label>Direction</Label>
             <Select value={direction} onValueChange={(v) => setDirection(v as Direction)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="internal">Internal note</SelectItem>
                 <SelectItem value="inbound">Inbound (from contact)</SelectItem>
@@ -550,11 +568,19 @@ function NewCommunicationDialog({
           </div>
           <div className="space-y-1">
             <Label>Occurred at</Label>
-            <Input type="datetime-local" value={occurredAt} onChange={(e) => setOccurredAt(e.target.value)} />
+            <Input
+              type="datetime-local"
+              value={occurredAt}
+              onChange={(e) => setOccurredAt(e.target.value)}
+            />
           </div>
           <div className="space-y-1">
             <Label>Next follow-up (optional)</Label>
-            <Input type="datetime-local" value={followUp} onChange={(e) => setFollowUp(e.target.value)} />
+            <Input
+              type="datetime-local"
+              value={followUp}
+              onChange={(e) => setFollowUp(e.target.value)}
+            />
           </div>
           <div className="space-y-1 col-span-2">
             <Label>Subject</Label>
@@ -598,7 +624,9 @@ function NewCommunicationDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
           <Button disabled={!canSave} onClick={() => create.mutate()}>
             {create.isPending ? "Saving…" : "Save entry"}
           </Button>

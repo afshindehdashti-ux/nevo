@@ -82,9 +82,17 @@ function FilesList() {
             <tbody>
               {(data ?? []).map((f: any) => (
                 <tr key={f.id} className="border-t border-border hover:bg-muted/20">
-                  <td className="px-3 py-2 font-medium truncate max-w-[320px]" title={f.file_name}>{f.file_name}</td>
-                  <td className="px-3 py-2"><Badge variant="outline" className="capitalize">{f.kind ?? "—"}</Badge></td>
-                  <td className="px-3 py-2 text-muted-foreground capitalize">{f.entity_type ?? "—"}</td>
+                  <td className="px-3 py-2 font-medium truncate max-w-[320px]" title={f.file_name}>
+                    {f.file_name}
+                  </td>
+                  <td className="px-3 py-2">
+                    <Badge variant="outline" className="capitalize">
+                      {f.kind ?? "—"}
+                    </Badge>
+                  </td>
+                  <td className="px-3 py-2 text-muted-foreground capitalize">
+                    {f.entity_type ?? "—"}
+                  </td>
                   <td className="px-3 py-2 text-muted-foreground">{f.mime_type ?? "—"}</td>
                   <td className="px-3 py-2 text-right tabular-nums">{humanBytes(f.size_bytes)}</td>
                   <td className="px-3 py-2 text-muted-foreground">{formatDate(f.created_at)}</td>

@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { Head } from '@react-email/components'
-import { brand } from './_shared'
+import * as React from "react";
+import { Head } from "@react-email/components";
+import { brand } from "./_shared";
 
 // Dark-mode-aware <Head> for every NEVO email template.
 // - Declares color-scheme so Apple Mail / iOS Mail render in true dark mode
@@ -43,18 +43,15 @@ const darkModeCss = `
   [data-ogsc] .button { color: #0B1220 !important; }
   [data-ogsc] .nevo-logo-light { display: none !important; }
   [data-ogsc] .nevo-logo-dark { display: block !important; }
-`
+`;
 
 export const EmailHead = () => (
   <Head>
     <meta name="color-scheme" content="light dark" />
     <meta name="supported-color-schemes" content="light dark" />
     <meta name="x-apple-brand-color" content={brand.primary} />
-    <style
-      type="text/css"
-      dangerouslySetInnerHTML={{ __html: darkModeCss }}
-    />
+    <style type="text/css" dangerouslySetInnerHTML={{ __html: darkModeCss }} />
   </Head>
-)
+);
 
-export default EmailHead
+export default EmailHead;

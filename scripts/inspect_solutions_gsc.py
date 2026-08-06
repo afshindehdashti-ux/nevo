@@ -13,7 +13,7 @@ Required env (populated once the Google Search Console connector is linked):
 Optional env:
   SITE_URL       Search Console property, default https://nevo-engineering-hub.lovable.app/
   BASE_URL       origin used to build inspected URLs, default = SITE_URL
-  LOCALES        comma-separated override (default: en,ar,tr,ru,pt,de,es,fr,it,zh)
+  LOCALES        comma-separated override (default: en,fa,ar,tr,ru,pt,de,es,fr,it,zh)
   PATHS          comma-separated override
   REPORT_JSON    write machine-readable report to this path
   REPORT_MD      write markdown table (used by $GITHUB_STEP_SUMMARY)
@@ -33,7 +33,7 @@ if not SITE_URL.endswith("/"):
 BASE_URL = os.environ.get("BASE_URL", SITE_URL).rstrip("/")
 
 LOCALES = [s.strip() for s in os.environ.get(
-    "LOCALES", "en,ar,tr,ru,pt,de,es,fr,it,zh").split(",") if s.strip()]
+    "LOCALES", "en,fa,ar,tr,ru,pt,de,es,fr,it,zh").split(",") if s.strip()]
 PATHS = [s.strip() for s in os.environ.get("PATHS", ",".join([
     "/solutions",
     "/solutions/sandwich-panels",

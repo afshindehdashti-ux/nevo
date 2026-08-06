@@ -12,6 +12,8 @@
  * switching to the source code.
  */
 import { useEffect, useState } from "react";
+import { isLogoDebugEnabled } from "@/lib/logo-telemetry-config";
+import { shouldShowLogoTelemetryOverlay } from "./logo-telemetry-overlay-visibility";
 
 const LOG_LINE_EXAMPLES = [
   `[nevo:logo-telemetry] kind=error decision=sampled-in reason=accepted stage=primary-light-png terminal=false correlationId=cid-123 counters.renderLogged=false counters.renderSampled=true counters.errorCount=1 counters.lastErrorStage=primary-light-png counters.msSinceLastError=null limits.renderSampleRate=0.01 limits.errorMaxPerSession=5 limits.errorMinIntervalMs=1000 ts=123456789`,
@@ -75,10 +77,18 @@ export function LogoTelemetryOverlay() {
     return () => window.clearTimeout(id);
   }, []);
 
-  // Dev-only guard — matches attachLogoDebugUtil()'s import.meta.env.DEV check
-  // so the overlay literally isn't rendered on published builds.
-  if (!import.meta.env.DEV) return null;
-  if (!available) return null;
+  // Keep QA controls opt-in even in local development. The debug utility is
+  // attached in every dev build, but the overlay should only appear when a
+  // tester explicitly enables logo debugging.
+  if (
+    !shouldShowLogoTelemetryOverlay({
+      isDev: import.meta.env.DEV,
+      debugEnabled: isLogoDebugEnabled(),
+      available,
+    })
+  ) {
+    return null;
+  }
 
   const label =
     status === "copying"

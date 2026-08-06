@@ -101,9 +101,9 @@ describe("classifyRouteArea", () => {
       "/backoffice-help",
       "/backoffice-portal",
       "/backofficehelp",
-      "/authorize",       // auth lookalike
-      "/authority",       // auth lookalike
-      "/authenticated",   // auth lookalike (the underscore-layout name)
+      "/authorize", // auth lookalike
+      "/authority", // auth lookalike
+      "/authenticated", // auth lookalike (the underscore-layout name)
       // "admin" as a mid-path segment is not a backend route:
       "/blog/admin-guide",
       "/docs/admin",
@@ -168,6 +168,17 @@ function makeRouter(initial: string) {
   });
 }
 
+type TestNavigateOptions = {
+  to: string;
+  params?: Record<string, string>;
+  search?: Record<string, unknown>;
+  replace?: boolean;
+};
+
+function navigateTest(router: ReturnType<typeof makeRouter>, options: TestNavigateOptions) {
+  return router.navigate(options as never);
+}
+
 function Probe() {
   const area = useRouteArea();
   const isBackend = useIsBackend();
@@ -210,27 +221,27 @@ describe("useRouteArea / useIsBackend", () => {
     await expectArea("public");
 
     await act(async () => {
-      await router.navigate({ to: "/admin/$", params: { _splat: "dashboard" } });
+      await navigateTest(router, { to: "/admin/$", params: { _splat: "dashboard" } });
     });
     await expectArea("backend");
 
     await act(async () => {
-      await router.navigate({ to: "/crm/$", params: { _splat: "leads/1" } });
+      await navigateTest(router, { to: "/crm/$", params: { _splat: "leads/1" } });
     });
     await expectArea("backend");
 
     await act(async () => {
-      await router.navigate({ to: "/backoffice/$", params: { _splat: "tools" } });
+      await navigateTest(router, { to: "/backoffice/$", params: { _splat: "tools" } });
     });
     await expectArea("backend");
 
     await act(async () => {
-      await router.navigate({ to: "/auth/$", params: { _splat: "sign-in" } });
+      await navigateTest(router, { to: "/auth/$", params: { _splat: "sign-in" } });
     });
     await expectArea("auth");
 
     await act(async () => {
-      await router.navigate({ to: "/about" });
+      await navigateTest(router, { to: "/about" });
     });
     await expectArea("public");
   });
@@ -244,7 +255,7 @@ describe("useRouteArea / useIsBackend", () => {
     await expectArea("backend");
 
     await act(async () => {
-      await router.navigate({ to: "/administration" });
+      await navigateTest(router, { to: "/administration" });
     });
     await expectArea("public");
   });

@@ -65,6 +65,3 @@ export function buildSelect<T extends TableName>(
   });
   return [...columns, ...embedStrs].join(",");
 }
-
-
-

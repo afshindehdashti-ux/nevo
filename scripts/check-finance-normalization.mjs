@@ -51,27 +51,16 @@ const ALLOW_DIR_PREFIXES = [
 const ALLOW_IDENTIFIERS = new Set(["totals", "computed", "computedTotals"]);
 
 // Fields we forbid as direct dotted reads on finance rows.
-const FIELDS = [
-  "balance",
-  "balance_due",
-  "paid_amount",
-  "amount_paid",
-  "grand_total",
-];
+const FIELDS = ["balance", "balance_due", "paid_amount", "amount_paid", "grand_total"];
 
-const ACCESS_RE = new RegExp(
-  `\\b([A-Za-z_$][\\w$]*)\\.(?:${FIELDS.join("|")})\\b`,
-  "g",
-);
+const ACCESS_RE = new RegExp(`\\b([A-Za-z_$][\\w$]*)\\.(?:${FIELDS.join("|")})\\b`, "g");
 
 // Query-builder calls whose arguments legitimately name columns.
 const QUERY_BUILDER_RE =
   /\.(select|order|eq|neq|gt|gte|lt|lte|in|match|update|insert|upsert|contains|containedBy|filter|is)\s*\(/;
 
 // Property/interface declarations: `field: type` or `field?: type`.
-const DECL_RE = new RegExp(
-  `^\\s*(?:${FIELDS.join("|")})\\s*\\??\\s*:`,
-);
+const DECL_RE = new RegExp(`^\\s*(?:${FIELDS.join("|")})\\s*\\??\\s*:`);
 
 function normalize(p) {
   return p.split("/").join(sep);
@@ -129,15 +118,9 @@ for (const f of files) {
 }
 
 if (issues.length) {
-  console.error(
-    `\n✖ Disallowed direct finance-column reads (${issues.length}).`,
-  );
-  console.error(
-    "  Use financeBalanceDue / financePaidAmount / financeTotalAmount from",
-  );
-  console.error(
-    "  src/lib/finance-normalization.ts, or add `// finance-allow` if the",
-  );
+  console.error(`\n✖ Disallowed direct finance-column reads (${issues.length}).`);
+  console.error("  Use financeBalanceDue / financePaidAmount / financeTotalAmount from");
+  console.error("  src/lib/finance-normalization.ts, or add `// finance-allow` if the");
   console.error("  usage is genuinely a write/schema contract.\n");
   for (const it of issues) {
     console.error(`  ${it.file}:${it.line}: ${it.text}`);

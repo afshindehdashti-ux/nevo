@@ -12,11 +12,7 @@
  *    is flagged in the UI. A missing embedded value is NOT drift.
  */
 
-import {
-  PAYLOAD_MARKER,
-  SHA_LABEL,
-  TIMESTAMP_LABEL,
-} from "@/lib/purge-csv-preamble";
+import { PAYLOAD_MARKER, SHA_LABEL, TIMESTAMP_LABEL } from "@/lib/purge-csv-preamble";
 
 export interface EmbeddedAuditMetadataInput {
   sha256: string;

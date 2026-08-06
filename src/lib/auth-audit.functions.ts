@@ -15,14 +15,10 @@ export const logAdminSignIn = createServerFn({ method: "POST" })
 
     // Best-effort client IP: honor common proxy headers, fall back to socket peer.
     const rawFwd =
-      h?.get("cf-connecting-ip") ||
-      h?.get("x-real-ip") ||
-      h?.get("x-forwarded-for") ||
-      "";
+      h?.get("cf-connecting-ip") || h?.get("x-real-ip") || h?.get("x-forwarded-for") || "";
     const ip = rawFwd.split(",")[0]?.trim() || null;
     const userAgent = h?.get("user-agent") || null;
-    const country =
-      h?.get("cf-ipcountry") || h?.get("x-vercel-ip-country") || null;
+    const country = h?.get("cf-ipcountry") || h?.get("x-vercel-ip-country") || null;
 
     // Update last_login_at on the profile (best-effort).
     await context.supabase
@@ -77,8 +73,7 @@ export const logAdminSignIn = createServerFn({ method: "POST" })
             .eq("id", context.userId)
             .maybeSingle();
           const name =
-            (profile as { full_name?: string | null } | null)?.full_name ??
-            context.userId;
+            (profile as { full_name?: string | null } | null)?.full_name ?? context.userId;
           let dedupMinutes = 24 * 60;
           try {
             const { data: cfg } = await supabaseAdmin.rpc("get_security_alert_settings");

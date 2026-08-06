@@ -1,7 +1,7 @@
 """
 Single source of truth for the Solutions SEO locale/path matrix.
 
-Both `verify_solutions_seo.py` (full 60-page audit) and
+Both `verify_solutions_seo.py` (full 66-page audit) and
 `preflight_solutions_seo.py` (fast smoke test) import from here so their
 diffs remain apples-to-apples: adding a locale or a Solutions path in one
 place automatically feeds both.
@@ -13,10 +13,10 @@ from __future__ import annotations
 # All active site locales. Order matters for hreflang generation in the app
 # — mirror it here so the audit reports pages in the same order the app
 # publishes them.
-LOCALES: list[str] = ["en", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"]
+LOCALES: list[str] = ["en", "fa", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"]
 
 # Every Solutions route the site publishes. The audit fans out to
-# LOCALES × PATHS (currently 10 × 6 = 60 URLs).
+# LOCALES × PATHS (currently 11 × 6 = 66 URLs).
 PATHS: list[str] = [
     "/solutions",
     "/solutions/sandwich-panels",

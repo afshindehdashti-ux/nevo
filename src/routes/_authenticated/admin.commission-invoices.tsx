@@ -19,7 +19,6 @@ const COMMISSIONS_SELECT = buildSelect(
   ],
 );
 
-
 export const Route = createFileRoute("/_authenticated/admin/commission-invoices")({
   head: () => ({
     meta: [{ title: "Commission Invoices — NEVO CRM" }, { name: "robots", content: "noindex" }],
@@ -93,10 +92,20 @@ function CommissionInvoicesList() {
                 <tr key={c.id} className="border-t border-border hover:bg-muted/20">
                   <td className="px-3 py-2 font-medium">{c.partner?.company_name ?? "—"}</td>
                   <td className="px-3 py-2 text-muted-foreground">{c.customer?.name ?? "—"}</td>
-                  <td className="px-3 py-2"><Badge variant="outline" className="capitalize">{c.status ?? "pending"}</Badge></td>
-                  <td className="px-3 py-2 text-right tabular-nums">{formatMoney(Number(c.amount ?? 0), c.currency ?? "EUR")}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{c.earned_at ? formatDate(c.earned_at) : "—"}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{c.paid_at ? formatDate(c.paid_at) : "—"}</td>
+                  <td className="px-3 py-2">
+                    <Badge variant="outline" className="capitalize">
+                      {c.status ?? "pending"}
+                    </Badge>
+                  </td>
+                  <td className="px-3 py-2 text-right tabular-nums">
+                    {formatMoney(Number(c.amount ?? 0), c.currency ?? "EUR")}
+                  </td>
+                  <td className="px-3 py-2 text-muted-foreground">
+                    {c.earned_at ? formatDate(c.earned_at) : "—"}
+                  </td>
+                  <td className="px-3 py-2 text-muted-foreground">
+                    {c.paid_at ? formatDate(c.paid_at) : "—"}
+                  </td>
                 </tr>
               ))}
             </tbody>

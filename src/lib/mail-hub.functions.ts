@@ -28,13 +28,15 @@ export type EmailLogFilters = {
 
 export const listEmailLogs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: EmailLogFilters | undefined) => data ?? {})
+  .validator((data: EmailLogFilters | undefined) => data ?? {})
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await ensureAdmin(supabase, userId);
 
     const now = Date.now();
-    const fromIso = data.from ? new Date(data.from).toISOString() : new Date(now - 7 * 86400_000).toISOString();
+    const fromIso = data.from
+      ? new Date(data.from).toISOString()
+      : new Date(now - 7 * 86400_000).toISOString();
     const toIso = data.to ? new Date(data.to).toISOString() : new Date(now).toISOString();
     const limit = Math.min(Math.max(data.limit ?? 50, 1), 200);
     const offset = Math.max(data.offset ?? 0, 0);
@@ -42,7 +44,9 @@ export const listEmailLogs = createServerFn({ method: "POST" })
     // Pull broad set then dedup in JS by message_id (latest per id).
     let q = supabase
       .from("email_send_log")
-      .select("id, message_id, template_name, recipient_email, status, error_message, metadata, created_at")
+      .select(
+        "id, message_id, template_name, recipient_email, status, error_message, metadata, created_at",
+      )
       .gte("created_at", fromIso)
       .lte("created_at", toIso)
       .order("created_at", { ascending: false })
@@ -54,7 +58,7 @@ export const listEmailLogs = createServerFn({ method: "POST" })
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
 
-    const dedupMap = new Map<string, typeof rows[number]>();
+    const dedupMap = new Map<string, (typeof rows)[number]>();
     for (const r of rows ?? []) {
       const key = r.message_id ?? String(r.id);
       if (!dedupMap.has(key)) dedupMap.set(key, r);
@@ -63,7 +67,9 @@ export const listEmailLogs = createServerFn({ method: "POST" })
 
     if (data.status && data.status !== "all") {
       if (data.status === "failed") {
-        deduped = deduped.filter((r) => r.status === "failed" || r.status === "dlq" || r.status === "bounced");
+        deduped = deduped.filter(
+          (r) => r.status === "failed" || r.status === "dlq" || r.status === "bounced",
+        );
       } else {
         deduped = deduped.filter((r) => r.status === data.status);
       }
@@ -71,14 +77,18 @@ export const listEmailLogs = createServerFn({ method: "POST" })
 
     const total = deduped.length;
     const sent = deduped.filter((r) => r.status === "sent").length;
-    const failed = deduped.filter((r) => r.status === "failed" || r.status === "dlq" || r.status === "bounced").length;
+    const failed = deduped.filter(
+      (r) => r.status === "failed" || r.status === "dlq" || r.status === "bounced",
+    ).length;
     const suppressed = deduped.filter((r) => r.status === "suppressed").length;
     const pending = deduped.filter((r) => r.status === "pending").length;
 
     const page = deduped.slice(offset, offset + limit);
 
     // Distinct templates from the raw window (for filter dropdown)
-    const templates = Array.from(new Set((rows ?? []).map((r) => r.template_name).filter(Boolean))) as string[];
+    const templates = Array.from(
+      new Set((rows ?? []).map((r) => r.template_name).filter(Boolean)),
+    ) as string[];
 
     return {
       rows: page,
@@ -104,7 +114,7 @@ export const listSuppressed = createServerFn({ method: "GET" })
 
 export const removeSuppression = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { email: string }) => d)
+  .validator((d: { email: string }) => d)
   .handler(async ({ data, context }) => {
     await ensureAdmin(context.supabase, context.userId);
     const { error } = await context.supabase
@@ -119,7 +129,7 @@ export const removeSuppression = createServerFn({ method: "POST" })
 
 export const searchRecipients = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { q: string }) => d)
+  .validator((d: { q: string }) => d)
   .handler(async ({ data, context }) => {
     await ensureAdmin(context.supabase, context.userId);
     const q = data.q.trim();
@@ -130,10 +140,26 @@ export const searchRecipients = createServerFn({ method: "POST" })
     const out: R[] = [];
 
     const [customersR, contactsR, leadsR, partnersR] = await Promise.all([
-      context.supabase.from("customers").select("id, name, email").or(`name.ilike.${like},email.ilike.${like}`).limit(10),
-      context.supabase.from("contacts").select("id, full_name, email, customer_id").or(`full_name.ilike.${like},email.ilike.${like}`).limit(10),
-      context.supabase.from("leads").select("id, name, email").or(`name.ilike.${like},email.ilike.${like}`).limit(10),
-      context.supabase.from("partners").select("id, company_name, contact_email").or(`company_name.ilike.${like},contact_email.ilike.${like}`).limit(10),
+      context.supabase
+        .from("customers")
+        .select("id, name, email")
+        .or(`name.ilike.${like},email.ilike.${like}`)
+        .limit(10),
+      context.supabase
+        .from("contacts")
+        .select("id, full_name, email, customer_id")
+        .or(`full_name.ilike.${like},email.ilike.${like}`)
+        .limit(10),
+      context.supabase
+        .from("leads")
+        .select("id, name, email")
+        .or(`name.ilike.${like},email.ilike.${like}`)
+        .limit(10),
+      context.supabase
+        .from("partners")
+        .select("id, company_name, contact_email")
+        .or(`company_name.ilike.${like},contact_email.ilike.${like}`)
+        .limit(10),
     ]);
 
     for (const c of customersR.data ?? []) {
@@ -146,7 +172,12 @@ export const searchRecipients = createServerFn({ method: "POST" })
       if (l.email) out.push({ source: "lead", label: l.name ?? l.email, email: l.email });
     }
     for (const p of partnersR.data ?? []) {
-      if (p.contact_email) out.push({ source: "partner", label: p.company_name ?? p.contact_email, email: p.contact_email });
+      if (p.contact_email)
+        out.push({
+          source: "partner",
+          label: p.company_name ?? p.contact_email,
+          email: p.contact_email,
+        });
     }
     return { results: out };
   });

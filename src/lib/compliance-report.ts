@@ -56,12 +56,9 @@ function readEmbedded(metadata: unknown): {
   embeddedIso?: string;
 } {
   const md = (metadata ?? {}) as Record<string, unknown>;
-  const embeddedSha =
-    typeof md.embedded_sha256 === "string" ? md.embedded_sha256 : undefined;
+  const embeddedSha = typeof md.embedded_sha256 === "string" ? md.embedded_sha256 : undefined;
   const embeddedIso =
-    typeof md.embedded_exported_at_iso === "string"
-      ? md.embedded_exported_at_iso
-      : undefined;
+    typeof md.embedded_exported_at_iso === "string" ? md.embedded_exported_at_iso : undefined;
   return { embeddedSha, embeddedIso };
 }
 
@@ -90,9 +87,7 @@ export function buildComplianceReportCsv(
   for (const r of rows) {
     const { embeddedSha, embeddedIso } = readEmbedded(r.metadata);
     const drift = detectShaDrift(r);
-    const userLabel = r.user_id
-      ? opts.actorMap?.[r.user_id] ?? r.user_id
-      : "System";
+    const userLabel = r.user_id ? (opts.actorMap?.[r.user_id] ?? r.user_id) : "System";
     dataLines.push(
       [
         r.id,

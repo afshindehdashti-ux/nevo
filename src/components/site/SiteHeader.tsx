@@ -51,6 +51,7 @@ import { logClientEvent } from "@/lib/client-monitor";
 import { LOGO_TELEMETRY_CONFIG } from "@/lib/logo-telemetry-config";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 import nevoLogoFullPointer from "@/assets/nevo-logo-full.png.asset.json";
+import { navigationDescription, navigationLabel } from "./site-navigation-i18n";
 
 /**
  * Defensive logo fallback chain.
@@ -432,7 +433,7 @@ export function SiteHeader() {
         <header>
           <div className="container-wide flex h-[72px] items-center justify-between gap-6 px-5 sm:px-6 md:h-20 md:px-6 lg:h-[88px] lg:px-8">
             <Link
-              to="/"
+              to="/$lang/"
               className="relative flex items-center py-2"
               aria-label="NEVO Industrial home"
             >
@@ -775,8 +776,8 @@ function MegaTrigger({
 function PrimaryCTA({ solid }: { solid: boolean }) {
   const { t } = useTranslation();
   return (
-    <a
-      href="/project-inquiry"
+    <Link
+      to="/project-inquiry"
       className={cn(
         "group relative hidden overflow-hidden rounded-lg px-4 py-2.5 text-[13px] font-medium tracking-tight transition-all duration-[220ms] sm:inline-flex sm:items-center sm:gap-1.5",
         solid
@@ -793,7 +794,7 @@ function PrimaryCTA({ solid }: { solid: boolean }) {
         aria-hidden
         className="absolute inset-x-4 bottom-1 h-px origin-left scale-x-0 bg-[color:var(--accent)] transition-transform duration-[260ms] group-hover:scale-x-100"
       />
-    </a>
+    </Link>
   );
 }
 
@@ -840,15 +841,16 @@ function EyebrowRow({ label }: { label: string }) {
 }
 
 function CardsLayout({ group }: { group: MenuGroup }) {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-12 gap-8">
       <div className="col-span-8">
-        <EyebrowRow label="What we do" />
+        <EyebrowRow label={t("nav.solutions")} />
         <ul className="grid grid-cols-2 gap-x-6 gap-y-2">
           {group.items.map((item) => (
             <li key={item.label}>
-              <a
-                href={item.href ?? "/project-inquiry"}
+              <Link
+                to={item.href ?? "/project-inquiry"}
                 className="group flex items-start gap-3 rounded-xl border border-transparent p-3.5 transition-all hover:border-border hover:bg-surface/60"
               >
                 <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-surface text-foreground transition-colors group-hover:border-[color:var(--accent)] group-hover:text-[color:var(--accent)]">
@@ -856,7 +858,7 @@ function CardsLayout({ group }: { group: MenuGroup }) {
                 </span>
                 <span className="min-w-0">
                   <span className="flex items-center gap-1 text-[14px] font-semibold tracking-tight text-foreground">
-                    {item.label}
+                    {navigationLabel(t, item.label)}
                     <ArrowRight
                       className="size-3.5 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
                       strokeWidth={2}
@@ -864,11 +866,11 @@ function CardsLayout({ group }: { group: MenuGroup }) {
                   </span>
                   {item.desc && (
                     <span className="mt-0.5 block text-[12.5px] leading-snug text-muted-foreground">
-                      {item.desc}
+                      {navigationDescription(t, item.desc)}
                     </span>
                   )}
                 </span>
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -879,23 +881,24 @@ function CardsLayout({ group }: { group: MenuGroup }) {
 }
 
 function GridLayout({ group }: { group: MenuGroup }) {
+  const { t } = useTranslation();
   return (
     <div>
-      <EyebrowRow label="Industries we engineer for" />
+      <EyebrowRow label={t("nav.industries")} />
       <ul className="grid grid-cols-4 gap-2">
         {group.items.map((item) => (
           <li key={item.label}>
-            <a
-              href={item.href ?? "/industries"}
+            <Link
+              to={item.href ?? "/industries"}
               className="group flex flex-col items-start gap-3 rounded-xl border border-transparent p-4 transition-all hover:border-border hover:bg-surface/60"
             >
               <span className="grid size-10 place-items-center rounded-lg border border-border bg-surface transition-colors group-hover:border-[color:var(--accent)] group-hover:text-[color:var(--accent)]">
                 {item.icon ? <item.icon className="size-[18px]" strokeWidth={1.6} /> : null}
               </span>
               <span className="text-[13.5px] font-medium tracking-tight text-foreground">
-                {item.label}
+                {navigationLabel(t, item.label)}
               </span>
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
@@ -904,11 +907,12 @@ function GridLayout({ group }: { group: MenuGroup }) {
 }
 
 function ListLayout({ group }: { group: MenuGroup }) {
+  const { t } = useTranslation();
   const hasFeatured = !!group.featured;
   return (
     <div className={cn("grid gap-8", hasFeatured ? "grid-cols-12" : "grid-cols-1")}>
       <div className={hasFeatured ? "col-span-8" : "col-span-12"}>
-        <EyebrowRow label={group.label === "Company" ? "About NEVO" : "Learn & explore"} />
+        <EyebrowRow label={group.label === "Company" ? t("company.about") : t("nav.knowledge")} />
         <ul
           className={cn(
             "grid gap-x-6 gap-y-1",
@@ -917,8 +921,8 @@ function ListLayout({ group }: { group: MenuGroup }) {
         >
           {group.items.map((item) => (
             <li key={item.label}>
-              <a
-                href={item.href ?? "/industries"}
+              <Link
+                to={item.href ?? "/industries"}
                 className="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-surface/70"
               >
                 {item.icon && (
@@ -928,11 +932,11 @@ function ListLayout({ group }: { group: MenuGroup }) {
                 )}
                 <span className="min-w-0 flex-1">
                   <span className="block text-[13.5px] font-medium tracking-tight text-foreground">
-                    {item.label}
+                    {navigationLabel(t, item.label)}
                   </span>
                   {item.desc && (
                     <span className="mt-0.5 block text-[12px] leading-snug text-muted-foreground">
-                      {item.desc}
+                      {navigationDescription(t, item.desc)}
                     </span>
                   )}
                 </span>
@@ -940,7 +944,7 @@ function ListLayout({ group }: { group: MenuGroup }) {
                   className="size-3.5 -translate-x-1 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
                   strokeWidth={2}
                 />
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -951,26 +955,27 @@ function ListLayout({ group }: { group: MenuGroup }) {
 }
 
 function MarketsLayout({ group }: { group: MenuGroup }) {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-12 gap-8">
       <div className="col-span-7">
-        <EyebrowRow label="Delivered worldwide" />
+        <EyebrowRow label={t("brand.worldwide")} />
         <ul className="grid grid-cols-3 gap-x-6 gap-y-1">
           {group.items.map((item) => (
             <li key={item.label}>
-              <a
-                href={item.href ?? "/knowledge-hub"}
+              <Link
+                to={item.href ?? "/knowledge-hub"}
                 className="group flex items-center justify-between rounded-lg px-3 py-2.5 transition-colors hover:bg-surface/70"
               >
                 <span className="inline-flex items-center gap-2 text-[13.5px] font-medium tracking-tight text-foreground">
                   <MapPin className="size-3.5 text-[color:var(--accent)]" strokeWidth={2} />
-                  {item.label}
+                  {navigationLabel(t, item.label)}
                 </span>
                 <ArrowRight
                   className="size-3.5 -translate-x-1 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
                   strokeWidth={2}
                 />
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -983,6 +988,7 @@ function MarketsLayout({ group }: { group: MenuGroup }) {
 }
 
 function MapPreview() {
+  const { t } = useTranslation();
   // Minimal decorative dot-grid map preview.
   const dots = useMemo(() => {
     const arr: { x: number; y: number }[] = [];
@@ -1004,7 +1010,7 @@ function MapPreview() {
     <div className="relative overflow-hidden rounded-xl border border-border bg-[color:var(--surface)] p-4">
       <div className="mb-3 flex items-center justify-between">
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-          Global network
+          {t("home.marketsSection.mapLabel")}
         </span>
         <span className="text-[11px] font-medium text-foreground">8+ markets</span>
       </div>
@@ -1024,9 +1030,10 @@ function MapPreview() {
 }
 
 function FeaturedCard({ featured, tone }: { featured: Featured; tone: "dark" | "light" }) {
+  const { t } = useTranslation();
   return (
-    <a
-      href={featured.href}
+    <Link
+      to={featured.href}
       className={cn(
         "group col-span-4 flex flex-col justify-between overflow-hidden rounded-2xl p-6 transition-all",
         tone === "dark"
@@ -1041,10 +1048,10 @@ function FeaturedCard({ featured, tone }: { featured: Featured; tone: "dark" | "
             tone === "dark" ? "text-white/60" : "text-muted-foreground",
           )}
         >
-          {featured.eyebrow}
+          {navigationLabel(t, featured.eyebrow)}
         </span>
         <h4 className="mt-4 text-[18px] font-semibold leading-snug tracking-tight">
-          {featured.title}
+          {navigationLabel(t, featured.title)}
         </h4>
         <p
           className={cn(
@@ -1052,7 +1059,7 @@ function FeaturedCard({ featured, tone }: { featured: Featured; tone: "dark" | "
             tone === "dark" ? "text-white/70" : "text-muted-foreground",
           )}
         >
-          {featured.desc}
+          {navigationDescription(t, featured.desc)}
         </p>
       </div>
       <div
@@ -1067,13 +1074,13 @@ function FeaturedCard({ featured, tone }: { featured: Featured; tone: "dark" | "
             tone === "dark" ? "bg-[color:var(--accent)]" : "bg-[color:var(--accent)]",
           )}
         />
-        Explore
+        {t("cta.explore")}
         <ArrowUpRight
           className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           strokeWidth={2}
         />
       </div>
-    </a>
+    </Link>
   );
 }
 
@@ -1404,6 +1411,7 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
 
 function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSearch: () => void }) {
   const { t } = useTranslation();
+  const translate = t;
   const whatsappHref = SITE.contact.whatsapp ? WHATSAPP_URL : "/project-inquiry";
   const sections: { label: string; i18nKey: string; items: NavItem[] }[] = [
     { label: "Solutions", i18nKey: "nav.solutions", items: SOLUTIONS.items },
@@ -1437,14 +1445,14 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
               { label: "Sandwich Panels", href: "/solutions/sandwich-panels" },
               { label: "Cold Storage", href: "/industries" },
             ].map((t) => (
-              <a
+              <Link
                 key={t.label}
-                href={t.href}
+                to={t.href}
                 className="rounded-full border border-border px-3 py-1.5 text-[12.5px] font-medium text-foreground"
                 onClick={onClose}
               >
-                {t.label}
-              </a>
+                {navigationLabel(translate, t.label)}
+              </Link>
             ))}
           </div>
         </div>
@@ -1461,8 +1469,8 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
             <ul className="grid gap-0.5 pb-3">
               {section.items.map((item) => (
                 <li key={item.label}>
-                  <a
-                    href={item.href ?? "/knowledge-hub"}
+                  <Link
+                    to={item.href ?? "/knowledge-hub"}
                     className="flex items-center gap-3 rounded-lg px-2 py-3 text-[15px] text-foreground/85"
                     onClick={onClose}
                   >
@@ -1471,9 +1479,9 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
                         <item.icon className="size-[16px]" strokeWidth={1.6} />
                       </span>
                     )}
-                    <span className="min-w-0 flex-1">{item.label}</span>
+                    <span className="min-w-0 flex-1">{navigationLabel(t, item.label)}</span>
                     <ArrowRight className="size-4 text-muted-foreground" strokeWidth={1.75} />
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -1494,8 +1502,8 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
               },
             ].map((t) => (
               <li key={t.label}>
-                <a
-                  href={t.href}
+                <Link
+                  to={t.href}
                   className="flex items-start justify-between gap-3 py-1.5 text-[14px] text-foreground"
                   onClick={onClose}
                 >
@@ -1504,28 +1512,28 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
                     className="mt-0.5 size-4 text-muted-foreground"
                     strokeWidth={1.75}
                   />
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
         </div>
 
         <Button asChild variant="primary" size="lg" className="mt-6 h-14 w-full text-[15px]">
-          <a href="/project-inquiry" onClick={onClose}>
+          <Link to="/project-inquiry" onClick={onClose}>
             {t("cta.startProject")}
             <ArrowUpRight className="!size-4" />
-          </a>
+          </Link>
         </Button>
 
         <LanguageSwitcher variant="mobile" />
 
         <div className="mt-6 flex items-center justify-between text-[12px] text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
-            <MapPin className="size-3.5" strokeWidth={1.75} /> Dubai, UAE
+            <MapPin className="size-3.5" strokeWidth={1.75} /> {t("brand.location")}
           </span>
           <a href={whatsappHref} className="inline-flex items-center gap-1.5" onClick={onClose}>
             <MessageCircle className="size-3.5" strokeWidth={1.75} />{" "}
-            {SITE.contact.whatsapp ? "WhatsApp" : "Engineering Desk"}
+            {SITE.contact.whatsapp ? t("nav.whatsapp") : t("nav.engineeringDesk")}
           </a>
         </div>
       </div>
@@ -1546,9 +1554,9 @@ export function Breadcrumbs({ items }: { items: { label: string; href?: string }
           return (
             <li key={i} className="inline-flex items-center gap-1.5">
               {item.href && !last ? (
-                <a href={item.href} className="hover:text-foreground">
+                <Link to={item.href} className="hover:text-foreground">
                   {item.label}
-                </a>
+                </Link>
               ) : (
                 <span className={cn(last && "text-foreground")}>{item.label}</span>
               )}

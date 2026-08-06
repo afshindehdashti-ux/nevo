@@ -67,7 +67,10 @@ function containsAnyKeyword(keywords: string[], text: string): boolean {
 export async function fetchEnabledRules(supabase: {
   from: (t: string) => {
     select: (s: string) => {
-      eq: (col: string, val: unknown) => {
+      eq: (
+        col: string,
+        val: unknown,
+      ) => {
         order: (
           col: string,
           opts: { ascending: boolean },
@@ -92,7 +95,8 @@ function ruleMatches(rule: RoutingRule, s: RuleInputSnapshot): { ok: boolean; re
     reasons.push(`category=${s.category}`);
   }
   if (rule.match_doc_type_ilike) {
-    if (!ilikeMatches(rule.match_doc_type_ilike, s.document_type)) return { ok: false, reasons: [] };
+    if (!ilikeMatches(rule.match_doc_type_ilike, s.document_type))
+      return { ok: false, reasons: [] };
     reasons.push(`doc_type~${rule.match_doc_type_ilike}`);
   }
   if (rule.match_filename_ilike) {
@@ -142,7 +146,10 @@ export function applyRulesToAnalysis(
     if (!m.ok) continue;
     out.matched.push({ id: r.id, name: r.name, reasons: m.reasons });
     if (r.action_require_approval) out.requires_approval = true;
-    if (r.action_min_confidence != null && (snapshot.ai_confidence ?? 0) < r.action_min_confidence) {
+    if (
+      r.action_min_confidence != null &&
+      (snapshot.ai_confidence ?? 0) < r.action_min_confidence
+    ) {
       out.requires_approval = true;
     }
     if (r.action_set_confidentiality) out.confidentiality = r.action_set_confidentiality;
@@ -157,10 +164,7 @@ export function applyRulesToAnalysis(
 }
 
 /** Convenience wrapper used from analyzeDocument, working directly off AI analysis. */
-export function snapshotFromAnalysis(
-  a: AiAnalysis,
-  originalFilename: string,
-): RuleInputSnapshot {
+export function snapshotFromAnalysis(a: AiAnalysis, originalFilename: string): RuleInputSnapshot {
   return {
     category: a.category,
     document_type: a.document_type,

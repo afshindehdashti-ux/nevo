@@ -37,7 +37,11 @@ function parseColor(input: string): [number, number, number] | null {
   const hex = s.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
   if (hex) {
     let h = hex[1];
-    if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+    if (h.length === 3)
+      h = h
+        .split("")
+        .map((c) => c + c)
+        .join("");
     const n = parseInt(h, 16);
     return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
   }
@@ -79,8 +83,9 @@ function resolveBackground(el: Element): [number, number, number] {
   let cur: Element | null = el;
   while (cur) {
     const style = (cur as HTMLElement).getAttribute("style") ?? "";
-    const bg = /background-color\s*:\s*([^;]+)/i.exec(style)?.[1]
-      ?? /background\s*:\s*([^;]+)/i.exec(style)?.[1];
+    const bg =
+      /background-color\s*:\s*([^;]+)/i.exec(style)?.[1] ??
+      /background\s*:\s*([^;]+)/i.exec(style)?.[1];
     if (bg) {
       const first = bg.trim().split(/\s+/)[0];
       const parsed = parseColor(first);
@@ -137,7 +142,8 @@ export function auditEmailHtml(html: string): A11yReport {
     issues.push({
       severity: "warning",
       rule: "html-has-lang",
-      message: "Missing lang attribute on <html>. Screen readers may not pronounce content correctly.",
+      message:
+        "Missing lang attribute on <html>. Screen readers may not pronounce content correctly.",
     });
   }
 
@@ -149,14 +155,16 @@ export function auditEmailHtml(html: string): A11yReport {
       issues.push({
         severity: "critical",
         rule: "img-alt",
-        message: "Image missing alt attribute. Add alt=\"\" for decorative images or descriptive text otherwise.",
+        message:
+          'Image missing alt attribute. Add alt="" for decorative images or descriptive text otherwise.',
         snippet: img.getAttribute("src") ?? "<img>",
       });
     } else if (alt.trim() === "" && role !== "presentation" && role !== "none") {
       issues.push({
         severity: "info",
         rule: "img-alt-empty",
-        message: "Empty alt is fine for decorative images. Add role=\"presentation\" to make intent explicit.",
+        message:
+          'Empty alt is fine for decorative images. Add role="presentation" to make intent explicit.',
         snippet: img.getAttribute("src") ?? "<img>",
       });
     }

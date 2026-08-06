@@ -4,6 +4,7 @@
  */
 import { OG_IMAGES, OG_DEFAULT } from "./og-images";
 import { SEO_META } from "./seo-meta";
+import { FA_SEO_META } from "./fa-seo-meta";
 
 export const SITE = {
   name: "NEVO Industrial",
@@ -44,6 +45,7 @@ export const WHATSAPP_URL = `https://wa.me/971502426167?text=${encodeURIComponen
 
 export const LOCALES = [
   { code: "en", label: "English", hreflang: "en", status: "active" },
+  { code: "fa", label: "فارسی", hreflang: "fa", status: "active" },
   { code: "ar", label: "العربية", hreflang: "ar", status: "active" },
   { code: "tr", label: "Türkçe", hreflang: "tr", status: "active" },
   { code: "ru", label: "Русский", hreflang: "ru", status: "active" },
@@ -78,7 +80,10 @@ export function buildSeo(input: SeoInput) {
   // caller's title/description. Callers pass an English fallback, and the
   // dictionary swaps in native-register copy for every supported language.
   const perLocale = SEO_META[input.path];
-  const localized = perLocale?.[input.lang as LocaleCode] ?? perLocale?.en;
+  const localized =
+    String(input.lang) === "fa"
+      ? (FA_SEO_META[input.path] ?? perLocale?.en)
+      : (perLocale?.[input.lang as LocaleCode] ?? perLocale?.en);
   const effectiveTitle = localized?.title ?? input.title;
   const effectiveDescription = localized?.description ?? input.description;
 
@@ -99,9 +104,11 @@ export function buildSeo(input: SeoInput) {
       content:
         String(input.lang) === "ar"
           ? "ar_AE"
-          : String(input.lang) === "zh"
-            ? "zh_CN"
-            : `${String(input.lang)}_${String(input.lang).toUpperCase()}`,
+          : String(input.lang) === "fa"
+            ? "fa_IR"
+            : String(input.lang) === "zh"
+              ? "zh_CN"
+              : `${String(input.lang)}_${String(input.lang).toUpperCase()}`,
     },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: fullTitle },
@@ -173,6 +180,7 @@ export const orgJsonLd = () => ({
       areaServed: ["AE", "GCC", "MENA", "EU", "CIS", "LATAM", "APAC", "Africa"],
       availableLanguage: [
         "English",
+        "Persian",
         "Arabic",
         "Turkish",
         "Russian",

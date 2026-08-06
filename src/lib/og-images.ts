@@ -3,7 +3,7 @@
  *
  * Every leaf route resolves to an absolute image URL so social crawlers never
  * fall back to the hosting-injected screenshot. Images are shared across all
- * 10 locales — surrounding og:title/og:description text is already localized.
+ * 11 locales — surrounding og:title/og:description text is already localized.
  *
  * Vite fingerprints these asset imports, so URLs are cache-busted per build.
  */

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from "react";
 import {
   Body,
   Button,
@@ -9,26 +9,26 @@ import {
   Preview,
   Section,
   Text,
-} from '@react-email/components'
-import { brand, styles } from './_shared'
-import { EmailHead } from './EmailHead'
-import { BrandHeader } from './BrandHeader'
-import type { TemplateEntry } from './registry'
+} from "@react-email/components";
+import { brand, styles } from "./_shared";
+import { EmailHead } from "./EmailHead";
+import { BrandHeader } from "./BrandHeader";
+import type { TemplateEntry } from "./registry";
 
 interface WelcomeEmailProps {
-  fullName?: string
-  role?: string
-  loginUrl?: string
-  invitedBy?: string
+  fullName?: string;
+  role?: string;
+  loginUrl?: string;
+  invitedBy?: string;
 }
 
 const roleLabel = (role?: string) => {
-  if (!role) return null
+  if (!role) return null;
   return role
-    .split('_')
+    .split("_")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ')
-}
+    .join(" ");
+};
 
 const WelcomeEmail = ({
   fullName,
@@ -36,8 +36,8 @@ const WelcomeEmail = ({
   loginUrl = `${brand.siteUrl}/admin/login`,
   invitedBy,
 }: WelcomeEmailProps) => {
-  const greeting = fullName ? `Welcome, ${fullName}` : 'Welcome to NEVO Industrial'
-  const label = roleLabel(role)
+  const greeting = fullName ? `Welcome, ${fullName}` : "Welcome to NEVO Industrial";
+  const label = roleLabel(role);
 
   return (
     <Html lang="en" dir="ltr">
@@ -48,20 +48,21 @@ const WelcomeEmail = ({
           <BrandHeader />
 
           <Section style={styles.card} className="card">
-            <Heading style={styles.h1} className="h1">{greeting}</Heading>
+            <Heading style={styles.h1} className="h1">
+              {greeting}
+            </Heading>
             <Text style={styles.text} className="text">
               Your account on the {brand.name} back office has been created
-              {invitedBy ? ` by ${invitedBy}` : ''}
-              {label ? ` with the ${label} role` : ''}. You can now sign in
-              and start collaborating with the team.
+              {invitedBy ? ` by ${invitedBy}` : ""}
+              {label ? ` with the ${label} role` : ""}. You can now sign in and start collaborating
+              with the team.
             </Text>
             <Button style={styles.button} className="button" href={loginUrl}>
               Sign in to the back office
             </Button>
             <Text style={styles.small} className="small">
-              If you haven't set a password yet, use the invitation link that
-              was sent separately to activate your account. Need help? Reach
-              us at{' '}
+              If you haven't set a password yet, use the invitation link that was sent separately to
+              activate your account. Need help? Reach us at{" "}
               <Link href={`mailto:${brand.supportEmail}`} style={styles.link} className="link">
                 {brand.supportEmail}
               </Link>
@@ -82,22 +83,20 @@ const WelcomeEmail = ({
         </Container>
       </Body>
     </Html>
-  )
-}
+  );
+};
 
 export const template = {
   component: WelcomeEmail,
   subject: (data: Record<string, any>) =>
-    data?.fullName
-      ? `Welcome to NEVO Industrial, ${data.fullName}`
-      : 'Welcome to NEVO Industrial',
-  displayName: 'Welcome / New User',
+    data?.fullName ? `Welcome to NEVO Industrial, ${data.fullName}` : "Welcome to NEVO Industrial",
+  displayName: "Welcome / New User",
   previewData: {
-    fullName: 'Jane Doe',
-    role: 'sales',
-    invitedBy: 'Admin',
-    loginUrl: 'https://www.nevoindustrial.com/admin/login',
+    fullName: "Jane Doe",
+    role: "sales",
+    invitedBy: "Admin",
+    loginUrl: "https://www.nevoindustrial.com/admin/login",
   },
-} satisfies TemplateEntry
+} satisfies TemplateEntry;
 
-export default WelcomeEmail
+export default WelcomeEmail;

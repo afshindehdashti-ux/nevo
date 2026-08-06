@@ -21,9 +21,7 @@ describe("customerDisplayName", () => {
 
   it("falls back to name when company_name is missing or blank", () => {
     expect(customerDisplayName({ name: "John Doe" })).toBe("John Doe");
-    expect(customerDisplayName({ company_name: "   ", name: "John Doe" })).toBe(
-      "John Doe",
-    );
+    expect(customerDisplayName({ company_name: "   ", name: "John Doe" })).toBe("John Doe");
   });
 
   it("falls back to email when company and name are blank", () => {
@@ -40,9 +38,7 @@ describe("customerDisplayName", () => {
     expect(customerDisplayName(null)).toBe("—");
     expect(customerDisplayName(undefined)).toBe("—");
     expect(customerDisplayName({})).toBe("—");
-    expect(
-      customerDisplayName({ company_name: "  ", name: "  ", email: "  " }),
-    ).toBe("—");
+    expect(customerDisplayName({ company_name: "  ", name: "  ", email: "  " })).toBe("—");
   });
 
   it("trims surrounding whitespace on the winning field", () => {
@@ -61,9 +57,9 @@ describe("customerBillingAddress", () => {
   });
 
   it("falls back to address when billing_address is blank", () => {
-    expect(
-      customerBillingAddress({ billing_address: "   ", address: "2 Street" }),
-    ).toBe("2 Street");
+    expect(customerBillingAddress({ billing_address: "   ", address: "2 Street" })).toBe(
+      "2 Street",
+    );
     expect(customerBillingAddress({ address: "2 Street" })).toBe("2 Street");
   });
 
@@ -71,9 +67,7 @@ describe("customerBillingAddress", () => {
     expect(customerBillingAddress(null)).toBeNull();
     expect(customerBillingAddress(undefined)).toBeNull();
     expect(customerBillingAddress({})).toBeNull();
-    expect(
-      customerBillingAddress({ billing_address: "", address: "   " }),
-    ).toBeNull();
+    expect(customerBillingAddress({ billing_address: "", address: "   " })).toBeNull();
   });
 });
 
@@ -162,16 +156,12 @@ describe("financeBalanceDue", () => {
   });
 
   it("computes total - paid when no stored balance is provided", () => {
-    expect(
-      financeBalanceDue({ grand_total: 1000, amount_paid: 250 }),
-    ).toBe(750);
+    expect(financeBalanceDue({ grand_total: 1000, amount_paid: 250 })).toBe(750);
     expect(financeBalanceDue({ total: 500, paid_amount: 200 })).toBe(300);
   });
 
   it("never returns a negative balance", () => {
-    expect(
-      financeBalanceDue({ grand_total: 100, amount_paid: 250 }),
-    ).toBe(0);
+    expect(financeBalanceDue({ grand_total: 100, amount_paid: 250 })).toBe(0);
   });
 
   it("treats empty-string stored balance as unset and computes from total/paid", () => {

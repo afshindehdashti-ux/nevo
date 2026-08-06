@@ -34,7 +34,9 @@ function MailHubLayout() {
         </p>
         <nav className="flex gap-1 -mb-px" aria-label="Mail hub sections">
           {TABS.map((t) => {
-            const active = t.exact ? pathname === t.to : pathname === t.to || pathname.startsWith(t.to + "/");
+            const active = t.exact
+              ? pathname === t.to
+              : pathname === t.to || pathname.startsWith(t.to + "/");
             const Icon = t.icon;
             return (
               <Link

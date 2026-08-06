@@ -49,18 +49,13 @@ export function ListErrorState({ resource, error, onRetry, isRetrying }: ListErr
     onRetry();
   };
 
-
   return (
     <Card className="border-destructive/40 bg-destructive/5" role="alert" aria-live="polite">
       <CardContent className="p-4 flex flex-col sm:flex-row sm:items-start gap-3">
         <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" aria-hidden="true" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-destructive">
-            Failed to load {resource}.
-          </p>
-          <p className="text-xs text-muted-foreground mt-1 break-words">
-            {message}
-          </p>
+          <p className="text-sm font-medium text-destructive">Failed to load {resource}.</p>
+          <p className="text-xs text-muted-foreground mt-1 break-words">{message}</p>
           <p className="text-xs text-muted-foreground mt-2">
             No data was changed. You can retry the request below.
           </p>
@@ -73,7 +68,10 @@ export function ListErrorState({ resource, error, onRetry, isRetrying }: ListErr
           disabled={isRetrying}
           className="shrink-0"
         >
-          <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isRetrying ? "animate-spin" : ""}`} aria-hidden="true" />
+          <RefreshCw
+            className={`h-3.5 w-3.5 mr-1.5 ${isRetrying ? "animate-spin" : ""}`}
+            aria-hidden="true"
+          />
           {isRetrying ? "Retrying…" : "Retry"}
         </Button>
       </CardContent>

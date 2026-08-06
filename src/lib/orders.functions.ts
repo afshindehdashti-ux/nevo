@@ -10,7 +10,7 @@ const schema = z.object({
 
 export const sendOrderConfirmation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => schema.parse(raw))
+  .validator((raw: unknown) => schema.parse(raw))
   .handler(async ({ data, context }) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: order, error } = await (context.supabase as any)
@@ -28,14 +28,12 @@ export const sendOrderConfirmation = createServerFn({ method: "POST" })
 
     try {
       const req = getRequest();
-      const authHeader =
-        req?.headers.get("authorization") ?? req?.headers.get("Authorization");
+      const authHeader = req?.headers.get("authorization") ?? req?.headers.get("Authorization");
       const host = req?.headers.get("host");
       const proto = req?.headers.get("x-forwarded-proto") ?? "https";
       if (!authHeader || !host) return { ok: false as const, reason: "no_request_context" };
 
-      const siteUrl =
-        process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
+      const siteUrl = process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
 
       const res = await fetch(`${proto}://${host}/lovable/email/transactional/send`, {
         method: "POST",
@@ -71,7 +69,11 @@ export const sendOrderConfirmation = createServerFn({ method: "POST" })
         entity_id: order.id,
         metadata: { recipient, order_number: order.order_number ?? null },
         old_values: null,
-        new_values: { recipient, order_number: order.order_number ?? null, sent_at: new Date().toISOString() },
+        new_values: {
+          recipient,
+          order_number: order.order_number ?? null,
+          sent_at: new Date().toISOString(),
+        },
       });
       return { ok: true as const };
     } catch (err) {

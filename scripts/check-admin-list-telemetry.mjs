@@ -133,12 +133,7 @@ for (const rel of files) {
     const line = lineOf(src, m.index);
 
     if (!resource) {
-      fail(
-        rel,
-        line,
-        CATEGORIES.MISSING_RESOURCE,
-        `<${tag}> has no \`resource\` prop.`,
-      );
+      fail(rel, line, CATEGORIES.MISSING_RESOURCE, `<${tag}> has no \`resource\` prop.`);
       continue;
     }
     if (resource.kind === "literal") {
@@ -190,9 +185,7 @@ if (violations.length > 0) {
   console.error("═══════════════════════════════════════════════════════════════");
   console.error(" admin-list telemetry drift detected");
   console.error("═══════════════════════════════════════════════════════════════");
-  console.error(
-    ` ${violations.length} violation(s) across ${totalFiles} file(s)`,
-  );
+  console.error(` ${violations.length} violation(s) across ${totalFiles} file(s)`);
   console.error("");
   console.error(" Breakdown by category:");
   for (const [cat, label] of Object.entries(CATEGORY_LABEL)) {
@@ -230,27 +223,20 @@ if (violations.length > 0) {
   console.error("     src/components/admin/list-telemetry.ts first.");
   console.error(" • invalid-reason:");
   console.error("     Use one of the approved reasons above (or omit the prop");
-  console.error("     to default to \"no_records\").");
+  console.error('     to default to "no_records").');
   console.error(" • dynamic-resource:");
   console.error("     Prefer a string literal. If the value is genuinely");
   console.error("     computed, add {/* admin-list-telemetry: dynamic-resource */}");
   console.error("     on the same tag to acknowledge the risk.");
   console.error(" • raw-emit:");
-  console.error("     Render <ListEmptyState resource=\"…\" /> instead of calling");
-  console.error("     logClientEvent(\"admin_list_empty_shown\", …) directly.");
+  console.error('     Render <ListEmptyState resource="…" /> instead of calling');
+  console.error('     logClientEvent("admin_list_empty_shown", …) directly.');
   console.error("");
-  console.error(" See docs/admin-list-states.md → \"admin_list_empty_shown checklist\".");
+  console.error(' See docs/admin-list-states.md → "admin_list_empty_shown checklist".');
   console.error("");
   process.exit(1);
 }
 
-console.log(
-  `✓ admin-list telemetry: ${files.length} files scanned — no drift.`,
-);
-console.log(
-  `  Approved resources (${RESOURCE_LIST.length}): ${RESOURCE_LIST.join(", ")}`,
-);
-console.log(
-  `  Approved reasons   (${REASON_LIST.length}): ${REASON_LIST.join(", ")}`,
-);
-
+console.log(`✓ admin-list telemetry: ${files.length} files scanned — no drift.`);
+console.log(`  Approved resources (${RESOURCE_LIST.length}): ${RESOURCE_LIST.join(", ")}`);
+console.log(`  Approved reasons   (${REASON_LIST.length}): ${REASON_LIST.join(", ")}`);

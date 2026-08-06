@@ -40,8 +40,7 @@ export const PAYMENT_METHODS: PaymentMethod[] = [
   "other",
 ];
 
-const titleize = (s: string) =>
-  s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+const titleize = (s: string) => s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 export const orderStatusLabel = titleize;
 export const invoiceStatusLabel = titleize;

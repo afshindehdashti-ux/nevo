@@ -9,11 +9,15 @@ const FROM_DOMAIN = "notify.nevoindustrial.com";
 function generateToken(): string {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
-  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 /** Keep only JSON-scalar fields so the payload is safely serializable. */
-function flattenScalar(input: Record<string, unknown>): Record<string, string | number | boolean | null> {
+function flattenScalar(
+  input: Record<string, unknown>,
+): Record<string, string | number | boolean | null> {
   const out: Record<string, string | number | boolean | null> = {};
   for (const [k, v] of Object.entries(input)) {
     if (v === null || typeof v === "string" || typeof v === "number" || typeof v === "boolean") {
@@ -81,12 +85,48 @@ export const listEmailPreviews = createServerFn({ method: "GET" })
     const { TEMPLATES } = await import("@/lib/email-templates/registry");
 
     const authTemplates: EmailPreviewMeta[] = [
-      { name: "signup", displayName: "Signup confirmation", category: "auth", subject: "Confirm your email", defaultData: AUTH_SAMPLE_DATA.signup },
-      { name: "invite", displayName: "Invitation", category: "auth", subject: "You've been invited", defaultData: AUTH_SAMPLE_DATA.invite },
-      { name: "magiclink", displayName: "Magic link", category: "auth", subject: "Your login link", defaultData: AUTH_SAMPLE_DATA.magiclink },
-      { name: "recovery", displayName: "Password recovery", category: "auth", subject: "Reset your password", defaultData: AUTH_SAMPLE_DATA.recovery },
-      { name: "email_change", displayName: "Email change", category: "auth", subject: "Confirm your new email", defaultData: AUTH_SAMPLE_DATA.email_change },
-      { name: "reauthentication", displayName: "Reauthentication", category: "auth", subject: "Your verification code", defaultData: AUTH_SAMPLE_DATA.reauthentication },
+      {
+        name: "signup",
+        displayName: "Signup confirmation",
+        category: "auth",
+        subject: "Confirm your email",
+        defaultData: AUTH_SAMPLE_DATA.signup,
+      },
+      {
+        name: "invite",
+        displayName: "Invitation",
+        category: "auth",
+        subject: "You've been invited",
+        defaultData: AUTH_SAMPLE_DATA.invite,
+      },
+      {
+        name: "magiclink",
+        displayName: "Magic link",
+        category: "auth",
+        subject: "Your login link",
+        defaultData: AUTH_SAMPLE_DATA.magiclink,
+      },
+      {
+        name: "recovery",
+        displayName: "Password recovery",
+        category: "auth",
+        subject: "Reset your password",
+        defaultData: AUTH_SAMPLE_DATA.recovery,
+      },
+      {
+        name: "email_change",
+        displayName: "Email change",
+        category: "auth",
+        subject: "Confirm your new email",
+        defaultData: AUTH_SAMPLE_DATA.email_change,
+      },
+      {
+        name: "reauthentication",
+        displayName: "Reauthentication",
+        category: "auth",
+        subject: "Your verification code",
+        defaultData: AUTH_SAMPLE_DATA.reauthentication,
+      },
     ];
 
     const appTemplates: EmailPreviewMeta[] = Object.entries(TEMPLATES).map(([name, entry]) => {
@@ -105,13 +145,14 @@ export const listEmailPreviews = createServerFn({ method: "GET" })
     return [...authTemplates, ...appTemplates];
   });
 
-
-const overridesSchema = z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).optional();
+const overridesSchema = z
+  .record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()]))
+  .optional();
 
 /** Render a single template to HTML using its sample/preview data. */
 export const renderEmailPreview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) =>
+  .validator((data) =>
     z.object({ name: z.string().min(1), overrides: overridesSchema }).parse(data),
   )
   .handler(async ({ data, context }): Promise<{ html: string; subject: string }> => {
@@ -173,12 +214,14 @@ async function assertAdmin(context: { supabase: any; userId: string }) {
 /** Send a real test email of the selected template to a specified address. */
 export const sendTestEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) =>
-    z.object({
-      name: z.string().min(1),
-      recipientEmail: z.string().email(),
-      overrides: overridesSchema,
-    }).parse(data),
+  .validator((data) =>
+    z
+      .object({
+        name: z.string().min(1),
+        recipientEmail: z.string().email(),
+        overrides: overridesSchema,
+      })
+      .parse(data),
   )
   .handler(async ({ data, context }): Promise<{ success: boolean; messageId: string }> => {
     await assertAdmin(context);
@@ -244,7 +287,10 @@ export const sendTestEmail = createServerFn({ method: "POST" })
       unsubscribeToken = generateToken();
       await admin
         .from("email_unsubscribe_tokens")
-        .upsert({ token: unsubscribeToken, email: normalizedEmail }, { onConflict: "email", ignoreDuplicates: true });
+        .upsert(
+          { token: unsubscribeToken, email: normalizedEmail },
+          { onConflict: "email", ignoreDuplicates: true },
+        );
       const { data: stored } = await admin
         .from("email_unsubscribe_tokens")
         .select("token")

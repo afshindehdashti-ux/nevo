@@ -142,10 +142,7 @@ export async function fetchProformaForPdf(proformaId: string) {
   let approver: { full_name: string | null } | null = null;
   let preparer: { full_name: string | null } | null = null;
   if (ids.length > 0) {
-    const { data: profs } = await supabase
-      .from("profiles")
-      .select("id, full_name")
-      .in("id", ids);
+    const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", ids);
     const byId = new Map((profs ?? []).map((p) => [p.id, p.full_name] as const));
     if (raw.approved_by) approver = { full_name: byId.get(raw.approved_by) ?? null };
     if (raw.prepared_by) preparer = { full_name: byId.get(raw.prepared_by) ?? null };
@@ -160,9 +157,7 @@ export async function generateProformaInvoicePdf(
   proformaId: string,
   mode: "download" | "blob" = "download",
 ): Promise<ProformaPdfResult> {
-  const { assertDocumentReadyForPdf } = await import(
-    "./document-pdf-validation.functions"
-  );
+  const { assertDocumentReadyForPdf } = await import("./document-pdf-validation.functions");
   await assertDocumentReadyForPdf({
     data: { kind: "proforma_invoice", id: proformaId },
   });
@@ -232,8 +227,7 @@ export async function generateProformaInvoicePdf(
     doc.text(line, pageW - margin, cursorY + 36 + i * 12, { align: "right" });
   });
 
-  cursorY =
-    Math.max(cursorY + 30 + brandLines.length * 10, cursorY + 36 + meta.length * 12) + 12;
+  cursorY = Math.max(cursorY + 30 + brandLines.length * 10, cursorY + 36 + meta.length * 12) + 12;
   doc.setDrawColor(220);
   doc.line(margin, cursorY, pageW - margin, cursorY);
   cursorY += 14;
@@ -300,7 +294,9 @@ export async function generateProformaInvoicePdf(
   const rows: Array<[string, string, boolean?]> = [
     ["Subtotal", formatMoney(subtotal, pi.currency)],
     ...(discount > 0
-      ? ([["Discount", `− ${formatMoney(discount, pi.currency)}`]] as Array<[string, string, boolean?]>)
+      ? ([["Discount", `− ${formatMoney(discount, pi.currency)}`]] as Array<
+          [string, string, boolean?]
+        >)
       : []),
     [`VAT${pi.vat_rate ? ` (${Number(pi.vat_rate)}%)` : ""}`, formatMoney(vat, pi.currency)],
     ["Grand total", formatMoney(grand, pi.currency), true],
@@ -348,9 +344,7 @@ export async function generateProformaInvoicePdf(
 
   // Terms & conditions — prefer per-proforma terms_conditions
   const termsText =
-    (pi.terms_conditions && pi.terms_conditions.trim()) ||
-    company?.default_terms ||
-    null;
+    (pi.terms_conditions && pi.terms_conditions.trim()) || company?.default_terms || null;
   const blocks: Array<[string, string]> = [];
   if (pi.payment_terms) blocks.push(["PAYMENT TERMS", pi.payment_terms]);
   if (pi.delivery_terms) blocks.push(["DELIVERY TERMS", pi.delivery_terms]);
@@ -387,11 +381,7 @@ export async function generateProformaInvoicePdf(
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(100);
-  doc.text(
-    `Prepared by: ${pi.preparer?.full_name ?? "—"}`,
-    margin,
-    sigY + 12,
-  );
+  doc.text(`Prepared by: ${pi.preparer?.full_name ?? "—"}`, margin, sigY + 12);
   doc.text(
     `Approved by: ${pi.approver?.full_name ?? (pi.approved_by ? "Approved" : "— (pending)")}`,
     margin + colW + 20,
@@ -403,11 +393,7 @@ export async function generateProformaInvoicePdf(
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(140);
-    doc.text(
-      "Proforma invoice — not a tax invoice. No VAT reclaim allowed.",
-      margin,
-      pageH - 20,
-    );
+    doc.text("Proforma invoice — not a tax invoice. No VAT reclaim allowed.", margin, pageH - 20);
     doc.text(`Page ${i} of ${pageCount}`, pageW - margin, pageH - 20, { align: "right" });
   }
 

@@ -7,7 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, Clock, ClipboardPaste, Download } from "lucide-react";
+import {
+  Upload,
+  FileSpreadsheet,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  ClipboardPaste,
+  Download,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
@@ -46,7 +54,10 @@ const IMPORT_TYPES: { value: string; label: string; category: string }[] = [
   { value: "documents", label: "Documents metadata", category: "Documents" },
 ];
 
-const statusTone: Record<JobStatus, { className: string; icon: React.ComponentType<{ className?: string }> }> = {
+const statusTone: Record<
+  JobStatus,
+  { className: string; icon: React.ComponentType<{ className?: string }> }
+> = {
   draft: { className: "text-muted-foreground", icon: Clock },
   validating: { className: "text-amber-600", icon: Clock },
   ready: { className: "text-emerald-600", icon: CheckCircle2 },
@@ -131,7 +142,9 @@ function ImportDataPage() {
         {Object.entries(byCategory).map(([cat, items]) => (
           <Card key={cat}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground uppercase tracking-wide">{cat}</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground uppercase tracking-wide">
+                {cat}
+              </CardTitle>
             </CardHeader>
             <CardContent className="text-sm">
               <ul className="space-y-1.5">
@@ -139,9 +152,15 @@ function ImportDataPage() {
                   const supported = SUPPORTED_IMPORT_TYPES.includes(t.value);
                   return (
                     <li key={t.value} className="flex items-center gap-2">
-                      <FileSpreadsheet className={`h-3.5 w-3.5 ${supported ? "text-emerald-600" : "text-muted-foreground"}`} />
+                      <FileSpreadsheet
+                        className={`h-3.5 w-3.5 ${supported ? "text-emerald-600" : "text-muted-foreground"}`}
+                      />
                       <span>{t.label}</span>
-                      {supported && <Badge variant="outline" className="ml-auto text-[10px] py-0 px-1.5">Ready</Badge>}
+                      {supported && (
+                        <Badge variant="outline" className="ml-auto text-[10px] py-0 px-1.5">
+                          Ready
+                        </Badge>
+                      )}
                     </li>
                   );
                 })}
@@ -203,8 +222,13 @@ function ImportDataPage() {
                   const Icon = tone.icon;
                   return (
                     <tr key={j.id} className="border-t border-border hover:bg-muted/20">
-                      <td className="px-3 py-2 font-medium capitalize">{j.import_type.replace(/_/g, " ")}</td>
-                      <td className="px-3 py-2 text-muted-foreground truncate max-w-[240px]" title={j.file_name}>
+                      <td className="px-3 py-2 font-medium capitalize">
+                        {j.import_type.replace(/_/g, " ")}
+                      </td>
+                      <td
+                        className="px-3 py-2 text-muted-foreground truncate max-w-[240px]"
+                        title={j.file_name}
+                      >
                         {j.file_name}
                       </td>
                       <td className="px-3 py-2">
@@ -214,7 +238,9 @@ function ImportDataPage() {
                         </Badge>
                       </td>
                       <td className="px-3 py-2 text-right tabular-nums">{j.total_rows}</td>
-                      <td className="px-3 py-2 text-right tabular-nums text-emerald-600">{j.success_rows}</td>
+                      <td className="px-3 py-2 text-right tabular-nums text-emerald-600">
+                        {j.success_rows}
+                      </td>
                       <td className="px-3 py-2 text-right tabular-nums text-rose-600">
                         {j.failed_rows > 0 ? j.failed_rows : "—"}
                       </td>
@@ -248,10 +274,12 @@ function ImportDataPage() {
         <CardContent className="p-4 text-sm">
           <p className="font-medium mb-1">Wizard live</p>
           <p className="text-muted-foreground">
-            Upload → column mapping → validation → confirm-and-run is now available for the entity types
-            marked <span className="text-emerald-700 font-medium">Ready</span>. Additional entity types
-            will be enabled as their coercion rules are wired. See{" "}
-            <Link to="/admin" className="text-emerald-600 hover:underline">Dashboard</Link>{" "}
+            Upload → column mapping → validation → confirm-and-run is now available for the entity
+            types marked <span className="text-emerald-700 font-medium">Ready</span>. Additional
+            entity types will be enabled as their coercion rules are wired. See{" "}
+            <Link to="/admin" className="text-emerald-600 hover:underline">
+              Dashboard
+            </Link>{" "}
             for real-time counts.
           </p>
         </CardContent>

@@ -28,11 +28,7 @@ import {
 } from "@/components/ui/table";
 import { ArrowLeft, Plus, Trash2, Save, FileText, Truck } from "lucide-react";
 import { formatMoney, formatDate } from "@/lib/crm-money";
-import {
-  ORDER_STATUSES,
-  orderStatusLabel,
-  orderStatusVariant,
-} from "@/lib/crm-status";
+import { ORDER_STATUSES, orderStatusLabel, orderStatusVariant } from "@/lib/crm-status";
 import { useCanEditOrders, useCanEditInvoices, useCanEditShipments } from "@/lib/crm-permissions";
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
 
@@ -156,10 +152,7 @@ function OrderDetailPage() {
         total: order.total ?? null,
       };
       // Update header
-      const { error: hErr } = await supabase
-        .from("orders")
-        .update(headerPatch)
-        .eq("id", order.id);
+      const { error: hErr } = await supabase.from("orders").update(headerPatch).eq("id", order.id);
       if (hErr) throw hErr;
 
       // Handle line deletes
@@ -181,7 +174,9 @@ function OrderDetailPage() {
           vat_pct: l.vat_pct,
           position: l.position,
           line_total:
-            l.quantity * l.unit_price * (1 - (l.discount_pct || 0) / 100) *
+            l.quantity *
+            l.unit_price *
+            (1 - (l.discount_pct || 0) / 100) *
             (1 + (l.vat_pct || 0) / 100),
         };
         if (l.id) {
@@ -243,15 +238,69 @@ function OrderDetailPage() {
   const createInvoice = useMutation({
     mutationFn: async (type: "proforma" | "commercial") => {
       if (!order) return null;
+
+      if (type === "proforma") {
+        const { data: proforma, error } = await supabase
+          .from("proforma_invoices")
+          .insert({
+            order_id: order.id,
+            customer_id: order.customer_id,
+            currency: order.currency,
+            status: "draft",
+          })
+          .select("id, proforma_number")
+          .single();
+        if (error) throw error;
+
+        const proformaItems = lines
+          .filter((line) => !line._deleted)
+          .map((line) => ({
+            proforma_invoice_id: proforma.id,
+            description: line.description,
+            quantity: line.quantity,
+            unit: line.unit,
+            unit_price: line.unit_price,
+            discount: line.discount_pct,
+            tax_rate: line.vat_pct,
+            sort_order: line.position,
+          }));
+        if (proformaItems.length) {
+          const { error: itemError } = await supabase
+            .from("proforma_invoice_items")
+            .insert(proformaItems);
+          if (itemError) {
+            await supabase.from("proforma_invoices").delete().eq("id", proforma.id);
+            throw itemError;
+          }
+        }
+
+        await logAudit({
+          data: {
+            action: "create_proforma_from_order",
+            entity_type: "order",
+            entity_id: order.id,
+            metadata: { proforma_invoice_id: proforma.id, total: totals.total },
+            old_values: null,
+            new_values: {
+              proforma_invoice_id: proforma.id,
+              total: totals.total,
+              line_count: proformaItems.length,
+            },
+          },
+        }).catch(() => undefined);
+        return { id: proforma.id, destination: "proforma" as const };
+      }
+
       const { data: inv, error } = await supabase
         .from("invoices")
         .insert({
-          type,
+          type: "commercial",
           order_id: order.id,
           customer_id: order.customer_id,
           currency: order.currency,
           subtotal: totals.subtotal,
           vat_amount: totals.vat,
+          tax_total: totals.vat,
           total: totals.total,
           balance: totals.total,
           status: "draft",
@@ -269,32 +318,51 @@ function OrderDetailPage() {
           unit: l.unit,
           unit_price: l.unit_price,
           discount_pct: l.discount_pct,
+          discount: l.discount_pct,
           vat_pct: l.vat_pct,
+          tax_rate: l.vat_pct,
           position: l.position,
+          sort_order: l.position,
           line_total:
-            l.quantity * l.unit_price * (1 - (l.discount_pct || 0) / 100) *
-            (1 + (l.vat_pct || 0) / 100),
+            Math.round(
+              l.quantity *
+                l.unit_price *
+                (1 - (l.discount_pct || 0) / 100) *
+                (1 + (l.vat_pct || 0) / 100) *
+                100,
+            ) / 100,
         }));
       if (linesToCopy.length) {
         const { error: iErr } = await supabase.from("invoice_items").insert(linesToCopy);
-        if (iErr) throw iErr;
+        if (iErr) {
+          await supabase.from("invoices").delete().eq("id", inv.id);
+          throw iErr;
+        }
       }
       await logAudit({
         data: {
           action: "create_invoice_from_order",
           entity_type: "order",
           entity_id: order.id,
-          metadata: { invoice_id: inv.id, invoice_type: type, total: totals.total },
+          metadata: { invoice_id: inv.id, invoice_type: "commercial", total: totals.total },
           old_values: null,
-          new_values: { invoice_id: inv.id, invoice_type: type, total: totals.total, line_count: linesToCopy.length },
+          new_values: {
+            invoice_id: inv.id,
+            invoice_type: "commercial",
+            total: totals.total,
+            line_count: linesToCopy.length,
+          },
         },
       }).catch(() => undefined);
-      return inv;
+      return { id: inv.id, destination: "invoice" as const };
     },
     onSuccess: (inv) => {
       if (!inv) return;
-      toast.success("Invoice created");
-      window.location.href = `/admin/invoices/${inv.id}`;
+      toast.success(inv.destination === "proforma" ? "Proforma created" : "Invoice created");
+      window.location.href =
+        inv.destination === "proforma"
+          ? `/admin/proforma-invoices/${inv.id}`
+          : `/admin/invoices/${inv.id}`;
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
@@ -489,7 +557,9 @@ function OrderDetailPage() {
                 {lines.map((l, idx) => {
                   if (l._deleted) return null;
                   const lt =
-                    l.quantity * l.unit_price * (1 - (l.discount_pct || 0) / 100) *
+                    l.quantity *
+                    l.unit_price *
+                    (1 - (l.discount_pct || 0) / 100) *
                     (1 + (l.vat_pct || 0) / 100);
                   return (
                     <TableRow key={l.id ?? `new-${idx}`}>

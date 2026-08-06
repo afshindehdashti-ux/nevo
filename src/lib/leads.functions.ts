@@ -11,7 +11,7 @@ const ConvertSchema = z.object({
 
 export const convertLeadToCustomer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => ConvertSchema.parse(raw))
+  .validator((raw: unknown) => ConvertSchema.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -73,7 +73,9 @@ export const convertLeadToCustomer = createServerFn({ method: "POST" })
       const { data: proj, error: pErr } = await supabase
         .from("projects")
         .insert({
-          project_name: inq.company ? `${inq.company} — ${inq.application ?? "Project"}` : (inq.application ?? "New project"),
+          project_name: inq.company
+            ? `${inq.company} — ${inq.application ?? "Project"}`
+            : (inq.application ?? "New project"),
           customer_id: customerId,
           country: inq.country,
           project_type: data.project_type ?? inq.application ?? null,
@@ -104,8 +106,16 @@ export const convertLeadToCustomer = createServerFn({ method: "POST" })
         project_id: projectId,
         create_project: data.create_project,
       },
-      old_values: { status: inq.status, converted_customer_id: inq.converted_customer_id ?? null, converted_project_id: inq.converted_project_id ?? null },
-      new_values: { status: "converted", converted_customer_id: customerId, converted_project_id: projectId },
+      old_values: {
+        status: inq.status,
+        converted_customer_id: inq.converted_customer_id ?? null,
+        converted_project_id: inq.converted_project_id ?? null,
+      },
+      new_values: {
+        status: "converted",
+        converted_customer_id: customerId,
+        converted_project_id: projectId,
+      },
     });
 
     return { customer_id: customerId, project_id: projectId };

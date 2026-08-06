@@ -35,10 +35,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_authenticated/admin/ai-assistant/guide-mode")({
   head: () => ({
-    meta: [
-      { title: "Guide Mode — NEVO AI Assistant" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Guide Mode — NEVO AI Assistant" }, { name: "robots", content: "noindex" }],
   }),
   validateSearch: zodValidator(searchSchema),
   component: GuideModePage,
@@ -70,8 +67,7 @@ function GuideModePage() {
   }, [query, category]);
 
   const activeId = search.section || filtered[0]?.id || GUIDE_SECTIONS[0].id;
-  const active: GuideSection =
-    GUIDE_SECTIONS.find((s) => s.id === activeId) ?? GUIDE_SECTIONS[0];
+  const active: GuideSection = GUIDE_SECTIONS.find((s) => s.id === activeId) ?? GUIDE_SECTIONS[0];
 
   function selectSection(id: string) {
     void navigate({ search: { section: id } });
@@ -176,7 +172,9 @@ function GuideModePage() {
       <aside className="flex flex-col border-l border-neutral-200 bg-neutral-50">
         <div className="border-b border-neutral-200 p-4">
           <h3 className="text-sm font-semibold text-neutral-900">Quick help</h3>
-          <p className="text-[11px] text-neutral-500">Ask the assistant or open the related CRM page.</p>
+          <p className="text-[11px] text-neutral-500">
+            Ask the assistant or open the related CRM page.
+          </p>
         </div>
         <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-4">
           <Button asChild className="justify-start bg-emerald-600 hover:bg-emerald-700">

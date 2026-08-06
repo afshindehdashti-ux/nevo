@@ -54,9 +54,16 @@ const RANGES = [
 
 function statusBadge(status: string | null) {
   const s = (status ?? "").toLowerCase();
-  if (s === "sent") return <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-0">Sent</Badge>;
-  if (s === "failed" || s === "dlq" || s === "bounced") return <Badge variant="destructive">Failed</Badge>;
-  if (s === "suppressed") return <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-0">Suppressed</Badge>;
+  if (s === "sent")
+    return (
+      <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-0">Sent</Badge>
+    );
+  if (s === "failed" || s === "dlq" || s === "bounced")
+    return <Badge variant="destructive">Failed</Badge>;
+  if (s === "suppressed")
+    return (
+      <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-0">Suppressed</Badge>
+    );
   if (s === "pending") return <Badge variant="secondary">Pending</Badge>;
   if (s === "complained") return <Badge variant="destructive">Complained</Badge>;
   return <Badge variant="outline">{status ?? "—"}</Badge>;
@@ -128,26 +135,53 @@ function MailLogDashboard() {
               key={r.label}
               size="sm"
               variant={rangeMs === r.ms ? "default" : "outline"}
-              onClick={() => { setRangeMs(r.ms); setOffset(0); }}
+              onClick={() => {
+                setRangeMs(r.ms);
+                setOffset(0);
+              }}
             >
               {r.label}
             </Button>
           ))}
         </div>
         <div>
-          <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Template</Label>
-          <Select value={template} onValueChange={(v) => { setTemplate(v); setOffset(0); }}>
-            <SelectTrigger className="h-8 w-52"><SelectValue /></SelectTrigger>
+          <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Template
+          </Label>
+          <Select
+            value={template}
+            onValueChange={(v) => {
+              setTemplate(v);
+              setOffset(0);
+            }}
+          >
+            <SelectTrigger className="h-8 w-52">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All templates</SelectItem>
-              {templates.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+              {templates.map((t) => (
+                <SelectItem key={t} value={t}>
+                  {t}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
         <div>
-          <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Status</Label>
-          <Select value={status} onValueChange={(v) => { setStatus(v as EmailLogFilters["status"]); setOffset(0); }}>
-            <SelectTrigger className="h-8 w-40"><SelectValue /></SelectTrigger>
+          <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Status
+          </Label>
+          <Select
+            value={status}
+            onValueChange={(v) => {
+              setStatus(v as EmailLogFilters["status"]);
+              setOffset(0);
+            }}
+          >
+            <SelectTrigger className="h-8 w-40">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="sent">Sent</SelectItem>
@@ -158,10 +192,22 @@ function MailLogDashboard() {
           </Select>
         </div>
         <div className="flex-1 min-w-[200px]">
-          <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Recipient</Label>
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search email…" className="h-8" />
+          <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Recipient
+          </Label>
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search email…"
+            className="h-8"
+          />
         </div>
-        <Button variant="outline" size="sm" onClick={() => query.refetch()} disabled={query.isFetching}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => query.refetch()}
+          disabled={query.isFetching}
+        >
           {query.isFetching ? "Refreshing…" : "Refresh"}
         </Button>
       </div>
@@ -180,30 +226,64 @@ function MailLogDashboard() {
           </TableHeader>
           <TableBody>
             {query.isLoading ? (
-              <TableRow><TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-8">Loading…</TableCell></TableRow>
-            ) : query.error ? (
-              <TableRow><TableCell colSpan={5} className="text-center text-sm text-destructive py-8">{(query.error as Error).message}</TableCell></TableRow>
-            ) : rows.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-8">No emails in this range.</TableCell></TableRow>
-            ) : rows.map((r) => (
-              <TableRow key={r.id} onClick={() => setSelected(r)} className="cursor-pointer">
-                <TableCell className="text-xs font-mono">{r.template_name ?? "—"}</TableCell>
-                <TableCell className="text-sm">{r.recipient_email ?? "—"}</TableCell>
-                <TableCell>{statusBadge(r.status)}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">{format(new Date(r.created_at), "MMM d, HH:mm:ss")}</TableCell>
-                <TableCell className="text-xs text-destructive truncate max-w-[300px]">{r.error_message ?? ""}</TableCell>
+              <TableRow>
+                <TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-8">
+                  Loading…
+                </TableCell>
               </TableRow>
-            ))}
+            ) : query.error ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center text-sm text-destructive py-8">
+                  {(query.error as Error).message}
+                </TableCell>
+              </TableRow>
+            ) : rows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-8">
+                  No emails in this range.
+                </TableCell>
+              </TableRow>
+            ) : (
+              rows.map((r) => (
+                <TableRow key={r.id} onClick={() => setSelected(r)} className="cursor-pointer">
+                  <TableCell className="text-xs font-mono">{r.template_name ?? "—"}</TableCell>
+                  <TableCell className="text-sm">{r.recipient_email ?? "—"}</TableCell>
+                  <TableCell>{statusBadge(r.status)}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {format(new Date(r.created_at), "MMM d, HH:mm:ss")}
+                  </TableCell>
+                  <TableCell className="text-xs text-destructive truncate max-w-[300px]">
+                    {r.error_message ?? ""}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
 
       {/* Pagination */}
       <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>Showing {rows.length} of {stats.total}</span>
+        <span>
+          Showing {rows.length} of {stats.total}
+        </span>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - 50))}>Prev</Button>
-          <Button size="sm" variant="outline" disabled={offset + 50 >= stats.total} onClick={() => setOffset(offset + 50)}>Next</Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={offset === 0}
+            onClick={() => setOffset(Math.max(0, offset - 50))}
+          >
+            Prev
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={offset + 50 >= stats.total}
+            onClick={() => setOffset(offset + 50)}
+          >
+            Next
+          </Button>
         </div>
       </div>
 
@@ -212,7 +292,9 @@ function MailLogDashboard() {
         <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Email detail</SheetTitle>
-            <SheetDescription className="text-xs font-mono">{selected?.message_id}</SheetDescription>
+            <SheetDescription className="text-xs font-mono">
+              {selected?.message_id}
+            </SheetDescription>
           </SheetHeader>
           {selected && (
             <div className="mt-4 space-y-3 text-sm">
@@ -222,14 +304,22 @@ function MailLogDashboard() {
               <DetailRow label="Timestamp" value={format(new Date(selected.created_at), "PPpp")} />
               {selected.error_message && (
                 <div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Error</div>
-                  <pre className="text-xs bg-destructive/10 text-destructive p-2 rounded whitespace-pre-wrap">{selected.error_message}</pre>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+                    Error
+                  </div>
+                  <pre className="text-xs bg-destructive/10 text-destructive p-2 rounded whitespace-pre-wrap">
+                    {selected.error_message}
+                  </pre>
                 </div>
               )}
               {!!selected.metadata && (
                 <div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Metadata</div>
-                  <pre className="text-xs bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(selected.metadata as unknown, null, 2)}</pre>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+                    Metadata
+                  </div>
+                  <pre className="text-xs bg-muted p-2 rounded overflow-x-auto">
+                    {JSON.stringify(selected.metadata as unknown, null, 2)}
+                  </pre>
                 </div>
               )}
             </div>
@@ -240,7 +330,15 @@ function MailLogDashboard() {
   );
 }
 
-function StatCard({ label, value, tone }: { label: string; value: number; tone: "default" | "green" | "red" | "amber" | "blue" }) {
+function StatCard({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "default" | "green" | "red" | "amber" | "blue";
+}) {
   const toneClass = {
     default: "border-border",
     green: "border-emerald-200 bg-emerald-50/50",

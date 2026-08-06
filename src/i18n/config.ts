@@ -3,6 +3,7 @@ import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
 import en from "./locales/en.json";
+import fa from "./locales/fa.json";
 import ar from "./locales/ar.json";
 import tr from "./locales/tr.json";
 import ru from "./locales/ru.json";
@@ -13,7 +14,7 @@ import fr from "./locales/fr.json";
 import it from "./locales/it.json";
 import zh from "./locales/zh.json";
 
-export type Locale = "en" | "ar" | "tr" | "ru" | "pt" | "de" | "es" | "fr" | "it" | "zh";
+export type Locale = "en" | "fa" | "ar" | "tr" | "ru" | "pt" | "de" | "es" | "fr" | "it" | "zh";
 
 export const LOCALES: {
   code: Locale;
@@ -24,6 +25,7 @@ export const LOCALES: {
   ogLocale: string;
 }[] = [
   { code: "en", name: "English", nativeName: "English", flag: "🇬🇧", dir: "ltr", ogLocale: "en_US" },
+  { code: "fa", name: "Persian", nativeName: "فارسی", flag: "🇮🇷", dir: "rtl", ogLocale: "fa_IR" },
   { code: "ar", name: "Arabic", nativeName: "العربية", flag: "🇦🇪", dir: "rtl", ogLocale: "ar_AE" },
   { code: "tr", name: "Turkish", nativeName: "Türkçe", flag: "🇹🇷", dir: "ltr", ogLocale: "tr_TR" },
   { code: "ru", name: "Russian", nativeName: "Русский", flag: "🇷🇺", dir: "ltr", ogLocale: "ru_RU" },
@@ -59,6 +61,13 @@ export const LOCALES: {
 export const DEFAULT_LOCALE: Locale = "en";
 export const SUPPORTED_LOCALES = LOCALES.map((l) => l.code);
 
+export function localeFromPathname(pathname: string): Locale | null {
+  const segment = pathname.split("/").filter(Boolean)[0]?.toLowerCase();
+  return segment && (SUPPORTED_LOCALES as readonly string[]).includes(segment)
+    ? (segment as Locale)
+    : null;
+}
+
 export function localeDir(code: string): "ltr" | "rtl" {
   return LOCALES.find((l) => l.code === code)?.dir ?? "ltr";
 }
@@ -70,6 +79,7 @@ if (!i18n.isInitialized) {
     .init({
       resources: {
         en: { translation: en },
+        fa: { translation: fa },
         ar: { translation: ar },
         tr: { translation: tr },
         ru: { translation: ru },

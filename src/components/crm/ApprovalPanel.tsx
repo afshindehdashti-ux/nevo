@@ -47,9 +47,7 @@ export function ApprovalPanel({
   const decideFn = useServerFn(decideApprovalRequest);
   const { data: roles = [] } = useMyRoles();
   const canDecide =
-    roles.includes("super_admin") ||
-    roles.includes("management") ||
-    roles.includes("finance");
+    roles.includes("super_admin") || roles.includes("management") || roles.includes("finance");
 
   const queryKey = ["approvals", "for-entity", entityType, entityId];
   const { data: rows = [], isLoading } = useQuery({
@@ -103,9 +101,7 @@ export function ApprovalPanel({
         ) : pending ? (
           <Badge variant="secondary">Pending review</Badge>
         ) : lastDecided ? (
-          <Badge
-            variant={lastDecided.status === "approved" ? "default" : "destructive"}
-          >
+          <Badge variant={lastDecided.status === "approved" ? "default" : "destructive"}>
             {lastDecided.status}
           </Badge>
         ) : (

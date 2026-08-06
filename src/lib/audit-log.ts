@@ -28,17 +28,19 @@ async function resolveRequestIp(explicit?: string | null): Promise<string | null
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function writeAudit(supabase: any, entry: {
-  user_id: string | null;
-  action: string;
-  entity_type: string;
-  entity_id?: string | null;
-  metadata?: Record<string, unknown> | null;
-  ip_address?: string | null;
-  old_values?: Json | null;
-  new_values?: Json | null;
-}) {
+export async function writeAudit(
+  supabase: any,
+  entry: {
+    user_id: string | null;
+    action: string;
+    entity_type: string;
+    entity_id?: string | null;
+    metadata?: Record<string, unknown> | null;
+    ip_address?: string | null;
+    old_values?: Json | null;
+    new_values?: Json | null;
+  },
+) {
   try {
     const ip = await resolveRequestIp(entry.ip_address);
     await supabase.from("activity_logs").insert({

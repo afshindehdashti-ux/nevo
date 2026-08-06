@@ -58,14 +58,7 @@ type LogRow = {
   created_at: string;
 };
 
-const ACTION_OPTIONS = [
-  "all",
-  "sign_in",
-  "delete",
-  "update",
-  "approve",
-  "create",
-] as const;
+const ACTION_OPTIONS = ["all", "sign_in", "delete", "update", "approve", "create"] as const;
 const ENTITY_OPTIONS = [
   "all",
   "auth",
@@ -77,7 +70,6 @@ const ENTITY_OPTIONS = [
   "user_roles",
   "profiles",
 ] as const;
-
 
 export const Route = createFileRoute("/_authenticated/admin/activity")({
   head: () => ({
@@ -122,7 +114,6 @@ function ActivityPage() {
       return (data ?? []) as LogRow[];
     },
   });
-
 
   const actorIds = useMemo(() => {
     const ids = new Set<string>();
@@ -199,7 +190,18 @@ function ActivityPage() {
   }, [logsQ.data, search, role, rolesQ.data]);
 
   function exportCsv() {
-    const header = ["when", "actor_id", "actor_name", "actor_roles", "action", "entity_type", "entity_id", "ip", "country", "metadata"];
+    const header = [
+      "when",
+      "actor_id",
+      "actor_name",
+      "actor_roles",
+      "action",
+      "entity_type",
+      "entity_id",
+      "ip",
+      "country",
+      "metadata",
+    ];
     const escape = (v: unknown) => {
       const s = v === null || v === undefined ? "" : typeof v === "string" ? v : JSON.stringify(v);
       return `"${s.replace(/"/g, '""')}"`;
@@ -207,18 +209,22 @@ function ActivityPage() {
     const lines = [header.join(",")];
     filteredRows.forEach((r) => {
       const md = r.metadata as { ip?: string | null; country?: string | null };
-      lines.push([
-        format(new Date(r.created_at), "yyyy-MM-dd HH:mm:ss"),
-        r.user_id ?? "",
-        r.user_id ? profilesQ.data?.get(r.user_id) ?? "" : "system",
-        r.user_id ? (rolesQ.data?.get(r.user_id) ?? []).join("|") : "",
-        r.action,
-        r.entity_type ?? "",
-        r.entity_id ?? "",
-        md?.ip ?? "",
-        md?.country ?? "",
-        r.metadata,
-      ].map(escape).join(","));
+      lines.push(
+        [
+          format(new Date(r.created_at), "yyyy-MM-dd HH:mm:ss"),
+          r.user_id ?? "",
+          r.user_id ? (profilesQ.data?.get(r.user_id) ?? "") : "system",
+          r.user_id ? (rolesQ.data?.get(r.user_id) ?? []).join("|") : "",
+          r.action,
+          r.entity_type ?? "",
+          r.entity_id ?? "",
+          md?.ip ?? "",
+          md?.country ?? "",
+          r.metadata,
+        ]
+          .map(escape)
+          .join(","),
+      );
     });
     const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -230,9 +236,7 @@ function ActivityPage() {
   }
 
   if (rolesLoading) {
-    return (
-      <div className="p-6 text-sm text-muted-foreground">Checking permissions…</div>
-    );
+    return <div className="p-6 text-sm text-muted-foreground">Checking permissions…</div>;
   }
 
   if (!isSuperAdmin) {
@@ -278,10 +282,14 @@ function ActivityPage() {
           <div className="space-y-1">
             <Label>Role</Label>
             <Select value={role} onValueChange={setRole}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {ROLE_OPTIONS.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -297,10 +305,14 @@ function ActivityPage() {
           <div className="space-y-1">
             <Label>Actor</Label>
             <Select value={actor} onValueChange={setActor}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {actorOptions.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -308,10 +320,14 @@ function ActivityPage() {
           <div className="space-y-1">
             <Label>Action</Label>
             <Select value={action} onValueChange={setAction}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {ACTION_OPTIONS.map((a) => (
-                  <SelectItem key={a} value={a}>{a === "all" ? "All actions" : a}</SelectItem>
+                  <SelectItem key={a} value={a}>
+                    {a === "all" ? "All actions" : a}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -319,10 +335,14 @@ function ActivityPage() {
           <div className="space-y-1">
             <Label>Record type</Label>
             <Select value={entity} onValueChange={setEntity}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {ENTITY_OPTIONS.map((e) => (
-                  <SelectItem key={e} value={e}>{e === "all" ? "All record types" : e}</SelectItem>
+                  <SelectItem key={e} value={e}>
+                    {e === "all" ? "All record types" : e}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -377,11 +397,11 @@ function ActivityPage() {
                   filteredRows.map((row) => {
                     const ip =
                       row.action === "sign_in"
-                        ? (row.metadata as { ip?: string | null })?.ip ?? null
+                        ? ((row.metadata as { ip?: string | null })?.ip ?? null)
                         : null;
                     const country =
                       row.action === "sign_in"
-                        ? (row.metadata as { country?: string | null })?.country ?? null
+                        ? ((row.metadata as { country?: string | null })?.country ?? null)
                         : null;
                     return (
                       <TableRow key={row.id}>
@@ -389,13 +409,13 @@ function ActivityPage() {
                           {format(new Date(row.created_at), "yyyy-MM-dd HH:mm:ss")}
                         </TableCell>
                         <TableCell>
-                          {row.user_id
-                            ? profilesQ.data?.get(row.user_id) ?? (
-                                <span className="font-mono text-xs">
-                                  {row.user_id.slice(0, 8)}…
-                                </span>
-                              )
-                            : <span className="text-muted-foreground italic">system</span>}
+                          {row.user_id ? (
+                            (profilesQ.data?.get(row.user_id) ?? (
+                              <span className="font-mono text-xs">{row.user_id.slice(0, 8)}…</span>
+                            ))
+                          ) : (
+                            <span className="text-muted-foreground italic">system</span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <ActionBadge action={row.action} />
@@ -424,7 +444,6 @@ function ActivityPage() {
                     );
                   })
                 )}
-
               </TableBody>
             </Table>
           )}
@@ -449,7 +468,7 @@ function ActivityPage() {
               <div className="grid grid-cols-2 gap-3">
                 <MetaField label="Actor">
                   {selected.user_id
-                    ? profilesQ.data?.get(selected.user_id) ?? selected.user_id
+                    ? (profilesQ.data?.get(selected.user_id) ?? selected.user_id)
                     : "system"}
                 </MetaField>
                 <MetaField label="Record ID">{selected.entity_id ?? "—"}</MetaField>
@@ -489,4 +508,3 @@ function ActionBadge({ action }: { action: string }) {
   };
   return <Badge variant={variant[action] ?? "outline"}>{action}</Badge>;
 }
-

@@ -18,10 +18,18 @@ vi.mock("@/lib/client-monitor", () => ({
 
 function makeBuilder(_table: string) {
   const chain: any = {
-    select() { return chain; },
-    order() { return chain; },
-    eq() { return chain; },
-    limit() { return Promise.resolve({ data: [], error: null }); },
+    select() {
+      return chain;
+    },
+    order() {
+      return chain;
+    },
+    eq() {
+      return chain;
+    },
+    limit() {
+      return Promise.resolve({ data: [], error: null });
+    },
     then(onFulfilled: any, onRejected: any) {
       return Promise.resolve({ data: [], error: null }).then(onFulfilled, onRejected);
     },
@@ -97,9 +105,7 @@ describe.each(cases)(
     it("renders the ListEmptyState card with icon, title, and description", async () => {
       await renderRoute(routePath);
 
-      const heading = await waitFor(() =>
-        screen.getByRole("heading", { name: title }),
-      );
+      const heading = await waitFor(() => screen.getByRole("heading", { name: title }));
       expect(heading).toBeTruthy();
 
       // The empty state card is exposed as role=status for a11y.
@@ -113,9 +119,7 @@ describe.each(cases)(
 
     it("does not render the data table or the error card", async () => {
       await renderRoute(routePath);
-      await waitFor(() =>
-        screen.getByRole("heading", { name: title }),
-      );
+      await waitFor(() => screen.getByRole("heading", { name: title }));
 
       expect(document.querySelector("table")).toBeNull();
       // ListErrorState uses role=alert; must be absent in the empty state.
@@ -126,9 +130,7 @@ describe.each(cases)(
 
     it(`emits admin_list_empty_shown for ${resource} once`, async () => {
       await renderRoute(routePath);
-      await waitFor(() =>
-        screen.getByRole("heading", { name: title }),
-      );
+      await waitFor(() => screen.getByRole("heading", { name: title }));
 
       const emptyCalls = logClientEvent.mock.calls.filter(
         ([name]) => name === "admin_list_empty_shown",

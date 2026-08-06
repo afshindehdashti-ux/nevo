@@ -12,9 +12,15 @@ interface AuthorizationDetails {
   scope?: string;
 }
 interface AuthOAuth {
-  getAuthorizationDetails: (id: string) => Promise<{ data: AuthorizationDetails | null; error: { message: string } | null }>;
-  approveAuthorization: (id: string) => Promise<{ data: AuthorizationDetails | null; error: { message: string } | null }>;
-  denyAuthorization: (id: string) => Promise<{ data: AuthorizationDetails | null; error: { message: string } | null }>;
+  getAuthorizationDetails: (
+    id: string,
+  ) => Promise<{ data: AuthorizationDetails | null; error: { message: string } | null }>;
+  approveAuthorization: (
+    id: string,
+  ) => Promise<{ data: AuthorizationDetails | null; error: { message: string } | null }>;
+  denyAuthorization: (
+    id: string,
+  ) => Promise<{ data: AuthorizationDetails | null; error: { message: string } | null }>;
 }
 const authOAuth = (supabase.auth as unknown as { oauth: AuthOAuth }).oauth;
 
@@ -94,8 +100,8 @@ function Consent() {
         <div>
           <h1 className="text-xl font-semibold">Connect {clientName} to NEVO</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {clientName} will be able to call this app's enabled tools while you are signed in.
-            This does not bypass NEVO's permissions or backend policies.
+            {clientName} will be able to call this app's enabled tools while you are signed in. This
+            does not bypass NEVO's permissions or backend policies.
           </p>
         </div>
         {details?.scope && (

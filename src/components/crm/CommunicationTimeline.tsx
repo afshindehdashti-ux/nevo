@@ -18,18 +18,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MessageSquare, Phone, Mail, Calendar, FileText, MessageCircle, Trash2 } from "lucide-react";
+import {
+  MessageSquare,
+  Phone,
+  Mail,
+  Calendar,
+  FileText,
+  MessageCircle,
+  Trash2,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 type EntityType =
-  | "customer"
-  | "lead"
-  | "order"
-  | "invoice"
-  | "quotation"
-  | "project"
-  | "partner"
-  | "shipment";
+  "customer" | "lead" | "order" | "invoice" | "quotation" | "project" | "partner" | "shipment";
 
 const kindIcon = {
   note: MessageSquare,
@@ -100,7 +101,9 @@ export function CommunicationTimeline({
       <div className="space-y-2 rounded border border-border p-3 bg-muted/30">
         <div className="grid grid-cols-2 gap-2">
           <Select value={kind} onValueChange={(v) => setKind(v as typeof kind)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="note">Note</SelectItem>
               <SelectItem value="email">Email</SelectItem>
@@ -111,7 +114,9 @@ export function CommunicationTimeline({
             </SelectContent>
           </Select>
           <Select value={direction} onValueChange={(v) => setDirection(v as typeof direction)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="internal">Internal note</SelectItem>
               <SelectItem value="inbound">Inbound (from contact)</SelectItem>
@@ -154,9 +159,7 @@ export function CommunicationTimeline({
       <div className="space-y-3">
         {isLoading && <div className="text-xs text-muted-foreground">Loading…</div>}
         {!isLoading && rows.length === 0 && (
-          <div className="text-xs text-muted-foreground italic">
-            No communications logged yet.
-          </div>
+          <div className="text-xs text-muted-foreground italic">No communications logged yet.</div>
         )}
         {rows.map((r) => {
           const Icon = kindIcon[r.kind as keyof typeof kindIcon] ?? MessageSquare;

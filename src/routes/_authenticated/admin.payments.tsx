@@ -18,7 +18,9 @@ import { paymentMethodLabel } from "@/lib/crm-status";
 import { customerDisplayName, type CustomerDisplay } from "@/lib/finance-normalization";
 
 export const Route = createFileRoute("/_authenticated/admin/payments")({
-  head: () => ({ meta: [{ title: "Payments — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Payments — NEVO CRM" }, { name: "robots", content: "noindex" }],
+  }),
   component: PaymentsPage,
 });
 
