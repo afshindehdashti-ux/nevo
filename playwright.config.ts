@@ -1,4 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
+import { existsSync } from "node:fs";
+
+const macChromePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const configuredBrowserPath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?.trim();
+const localBrowserPath =
+  configuredBrowserPath ||
+  (process.platform === "darwin" && existsSync(macChromePath) ? macChromePath : undefined);
 
 /**
  * Playwright config for E2E tests that must exercise a real browser page
@@ -18,6 +25,7 @@ export default defineConfig({
   use: {
     baseURL: process.env.E2E_BASE_URL ?? "http://127.0.0.1:4173",
     trace: "retain-on-failure",
+    launchOptions: localBrowserPath ? { executablePath: localBrowserPath } : undefined,
     // A viewport that catches both desktop launcher and mobile CTA.
     viewport: { width: 390, height: 844 },
   },
