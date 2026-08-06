@@ -113,8 +113,7 @@ jobs:
           BASE_URL: ${{ github.event.inputs.base_url || 'https://nevo-engineering-hub.lovable.app' }}
           REPORT_JSON: reports/seo/solutions-seo.json
           REPORT_HTML: reports/seo/solutions-seo.html
-          REPORT_MD: ${{ github.step_summary }}
-        run: python3 scripts/verify_solutions_seo.py --warn-only
+        run: REPORT_MD="$GITHUB_STEP_SUMMARY" python3 scripts/verify_solutions_seo.py --warn-only
 
       # Highlight ONLY new / resolved issues since the previous weekly run.
       - name: Diff against previous run

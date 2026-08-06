@@ -16,17 +16,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
+          version: 11.12.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # Full unit suite. Fails the job on any test failure, which blocks the
       # build via required-status-check on `main`.
       - name: Run vitest
-        run: bun run test -- --reporter=default --reporter=junit --outputFile=reports/vitest/junit.xml
+        run: pnpm test -- --reporter=default --reporter=junit --outputFile=reports/vitest/junit.xml
 
       # Targeted guard: re-run just the logo telemetry sampling / throttling
       # tests as a distinct step so a regression here shows up as its own
@@ -40,7 +44,7 @@ jobs:
       #       VITE_LOGO_RENDER_SAMPLE_RATE, VITE_LOGO_ERROR_MAX_PER_SESSION,
       #       VITE_LOGO_ERROR_MIN_INTERVAL_MS clamp + emission behavior.
       - name: Logo telemetry sampling & throttling guard
-        run: bunx vitest run src/lib/__tests__/logo-telemetry.test.ts src/lib/__tests__/logo-telemetry-env.test.ts
+        run: pnpm exec vitest run src/lib/__tests__/logo-telemetry.test.ts src/lib/__tests__/logo-telemetry-env.test.ts
 
       # Targeted guard: the backend-route CTA gate. Ensures the public
       # AI launcher and sticky mobile CTA never render — and never flash —
@@ -48,7 +52,7 @@ jobs:
       # Regression source: finding ab462d1d ("Marketing chat & mobile CTA
       # leak into admin pages after in-app navigation").
       - name: Backend-route CTA gate guard
-        run: bunx vitest run src/routes/__tests__/root-backend-cta-gate.test.tsx
+        run: pnpm exec vitest run src/routes/__tests__/root-backend-cta-gate.test.tsx
 
       - name: Upload test report
         if: always()

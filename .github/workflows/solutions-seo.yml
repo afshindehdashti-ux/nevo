@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   seo-snapshot:
-    name: Canonical / og / twitter / hreflang (Solutions × 10 locales)
+    name: Canonical / og / twitter / hreflang (Solutions × 11 locales)
     runs-on: ubuntu-latest
     # Default to hard-fail on PRs (a broken dev server is a real regression),
     # but allow overriding via workflow_dispatch input or a repo variable
@@ -27,21 +27,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
+          version: 11.12.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # Boot Vite dev in the background and wait for the port.
       - name: Start Vite dev server
         run: |
-          nohup bun run dev --port 4323 --host 127.0.0.1 > vite.log 2>&1 &
+          nohup pnpm dev --port 4323 --host 127.0.0.1 > vite.log 2>&1 &
           echo $! > vite.pid
           for i in $(seq 1 60); do
             if curl -sf http://127.0.0.1:4323/ -o /dev/null; then
@@ -150,8 +155,7 @@ jobs:
           BASE_URL: http://127.0.0.1:4323
           REPORT_JSON: reports/seo/solutions-seo.json
           REPORT_HTML: reports/seo/solutions-seo.html
-          REPORT_MD: ${{ github.step_summary }}
-        run: python3 scripts/verify_solutions_seo.py
+        run: REPORT_MD="$GITHUB_STEP_SUMMARY" python3 scripts/verify_solutions_seo.py
 
       - name: Stop Vite dev server
         if: always()
@@ -177,7 +181,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           REPORT_JSON: reports/seo/solutions-seo.json
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          RUN_LABEL: ${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.pull_request.number) || format('{0}@{1}', github.ref_name, github.sha) }}
+          RUN_LABEL: "${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.pull_request.number) || format('{0}@{1}', github.ref_name, github.sha) }}"
         run: python3 scripts/notify_solutions_seo.py
 
       - name: Upload SEO snapshot report
