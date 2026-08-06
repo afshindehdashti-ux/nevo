@@ -34,6 +34,13 @@ export function LanguageProvider({
   const [lang, setLangState] = useState<Locale>(initialLang ?? DEFAULT_LOCALE);
   const dir = localeDir(lang);
 
+  // The browser detector can restore a previously selected locale before
+  // React hydrates. Keep the URL locale authoritative for the first render so
+  // server and client markup agree.
+  if (initialLang && lang === initialLang && i18n.resolvedLanguage !== initialLang) {
+    void i18n.changeLanguage(initialLang);
+  }
+
   useEffect(() => {
     const initial = initialLang ?? readInitialLocale();
     setLangState(initial);

@@ -28,8 +28,8 @@ const COLUMNS = [
     links: [
       { label: "Cold Storage", href: "/industries" },
       { label: "Food Processing", href: "/industries" },
-      { label: "Pharmaceutical", href: "/industries" },
       { label: "Clean Rooms", href: "/industries" },
+      { label: "Industrial Buildings", href: "/industries" },
       { label: "Warehousing", href: "/industries" },
       { label: "Modular Buildings", href: "/industries" },
     ],

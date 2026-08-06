@@ -15,7 +15,6 @@ const LABEL_KEYS: Record<string, string> = {
   "Turnkey Factory Development": "solutions.featuredTitle",
   "Cold Storage": "industries.grid.items.0.t",
   "Clean Rooms": "industries.grid.items.1.t",
-  Pharmaceutical: "industries.grid.items.1.t",
   "Food Processing": "industries.grid.items.2.t",
   "Industrial Buildings": "industries.grid.items.3.t",
   Warehousing: "industries.grid.items.4.t",
