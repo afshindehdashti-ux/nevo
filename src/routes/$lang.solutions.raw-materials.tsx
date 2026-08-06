@@ -25,23 +25,23 @@ import {
 
 import hero from "@/assets/raw-materials/hero-production-line.jpg";
 import imgPPGI from "@/assets/raw-materials/ppgi-coil.jpg";
-import imgGI from "@/assets/raw-materials/gi-coil.jpg";
-import imgAluzinc from "@/assets/raw-materials/aluzinc-coil.jpg";
-import imgPrepainted from "@/assets/raw-materials/prepainted-coil.jpg";
+import imgGI from "@/assets/knowledge/12_gi.jpg";
+import imgAluzinc from "@/assets/knowledge/13_aluzinc.jpg";
+import imgPrepainted from "@/assets/knowledge/11_ppgi.jpg";
 import imgPolyolIBC from "@/assets/raw-materials/polyol-ibc.jpg";
 import imgMDIIBC from "@/assets/raw-materials/mdi-ibc.jpg";
 import imgPolyolDrum from "@/assets/raw-materials/polyol-drum.jpg";
 import imgPIRCore from "@/assets/raw-materials/pir-core.jpg";
-import imgPIRPanel from "@/assets/raw-materials/pir-sandwich.jpg";
-import imgRockCore from "@/assets/raw-materials/rock-wool-core.jpg";
-import imgRockPanel from "@/assets/raw-materials/rock-wool-panel.jpg";
-import imgFinished from "@/assets/raw-materials/finished-panels.jpg";
+import imgPIRPanel from "@/assets/knowledge/17_pir_panel.jpg";
+import imgRockCore from "@/assets/knowledge/16_rockwool.jpg";
+import imgRockPanel from "@/assets/knowledge/18_rockwool_panel.jpg";
+import imgFinished from "@/assets/knowledge/20_wall_panel.jpg";
 import imgAdhesive from "@/assets/raw-materials/adhesive-sealants.jpg";
-import imgProdLine from "@/assets/raw-materials/production-line.jpg";
-import imgWhRaw from "@/assets/raw-materials/warehouse-raw.jpg";
-import imgWhCoil from "@/assets/raw-materials/warehouse-coil.jpg";
+import imgProdLine from "@/assets/knowledge/06_production_line.jpg";
+import imgWhRaw from "@/assets/engineering/18-raw.jpg";
+import imgWhCoil from "@/assets/factory-layouts/fl-05-warehouse.jpg";
 import imgWhChem from "@/assets/raw-materials/warehouse-chemical.jpg";
-import imgWhShip from "@/assets/raw-materials/warehouse-shipping.jpg";
+import imgWhShip from "@/assets/factory-layouts/fl-08-truck.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { InquiryCTA } from "@/components/site/InquiryCTA";
