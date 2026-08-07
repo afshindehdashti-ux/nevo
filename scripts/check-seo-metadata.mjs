@@ -15,8 +15,7 @@
  * No external dependencies — uses built-in fetch + child_process.
  */
 
-import { spawn } from "node:child_process";
-import net from "node:net";
+import { isPortOpen, startViteDevServer } from "./lib/vite-dev-server.mjs";
 
 const WARN_ONLY = process.argv.includes("--warn-only");
 const JSON_OUT = process.argv.includes("--json");
@@ -120,49 +119,6 @@ function auditHtml(html, locale, path) {
   return { locale, path, url: `/${locale}${path}`, missing, warnings, title, canonical };
 }
 
-// ------------- Dev server lifecycle -------------
-
-function isPortOpen(port, host = "127.0.0.1") {
-  return new Promise((resolve) => {
-    const socket = net.createConnection({ port, host });
-    socket.once("connect", () => {
-      socket.destroy();
-      resolve(true);
-    });
-    socket.once("error", () => resolve(false));
-  });
-}
-
-async function waitForServer(baseUrl, timeoutMs = 60_000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(baseUrl, { redirect: "manual" });
-      if (res.status < 500) return true;
-    } catch {}
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  return false;
-}
-
-async function startDevServer() {
-  const PORT = 4321;
-  const proc = spawn(
-    "node",
-    ["node_modules/vite/bin/vite.js", "dev", "--port", String(PORT), "--host", "127.0.0.1"],
-    { stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, NODE_ENV: "development" } },
-  );
-  proc.stdout.on("data", () => {});
-  proc.stderr.on("data", () => {});
-  const baseUrl = `http://127.0.0.1:${PORT}`;
-  const ok = await waitForServer(baseUrl);
-  if (!ok) {
-    proc.kill("SIGTERM");
-    throw new Error(`Dev server on ${baseUrl} did not become ready`);
-  }
-  return { baseUrl, proc };
-}
-
 // ------------- Main -------------
 
 async function fetchWithRetry(url, tries = 3) {
@@ -188,7 +144,7 @@ async function run() {
     if (await isPortOpen(8080)) {
       baseUrl = "http://127.0.0.1:8080";
     } else {
-      const started = await startDevServer();
+      const started = await startViteDevServer({ port: 4321 });
       baseUrl = started.baseUrl;
       serverProc = started.proc;
     }

@@ -6,6 +6,12 @@ const configuredBrowserPath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?.t
 const localBrowserPath =
   configuredBrowserPath ||
   (process.platform === "darwin" && existsSync(macChromePath) ? macChromePath : undefined);
+const supabaseUrl =
+  process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "https://ci-placeholder.supabase.co";
+const supabaseKey =
+  process.env.SUPABASE_PUBLISHABLE_KEY ??
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
+  "sb_publishable_ci_placeholder";
 
 /**
  * Playwright config for E2E tests that must exercise a real browser page
@@ -36,9 +42,15 @@ export default defineConfig({
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
-        command: "pnpm dev -- --port 4173 --host 127.0.0.1 --strictPort",
+        command: "pnpm dev --port 4173 --host 127.0.0.1 --strictPort",
         url: "http://127.0.0.1:4173",
         reuseExistingServer: !process.env.CI,
         timeout: 180_000,
+        env: {
+          SUPABASE_URL: supabaseUrl,
+          SUPABASE_PUBLISHABLE_KEY: supabaseKey,
+          VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL ?? supabaseUrl,
+          VITE_SUPABASE_PUBLISHABLE_KEY: process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? supabaseKey,
+        },
       },
 });
