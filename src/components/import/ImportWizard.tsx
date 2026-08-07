@@ -3,11 +3,23 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Upload, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft } from "lucide-react";
 import { IMPORT_SCHEMAS, autoMap, type ImportEntitySchema } from "@/lib/import-schemas";
@@ -16,7 +28,13 @@ import { runImportJob } from "@/lib/import-wizard.functions";
 type Step = "type" | "upload" | "map" | "preview" | "done";
 type Row = Record<string, string | number | boolean | null>;
 
-export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+export function ImportWizard({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
   const qc = useQueryClient();
   const runImport = useServerFn(runImportJob);
 
@@ -27,14 +45,25 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
   const [rows, setRows] = useState<Row[]>([]);
   const [mapping, setMapping] = useState<Record<string, string>>({});
   const [mode, setMode] = useState<"create" | "upsert" | "skip_duplicates">("create");
-  const [result, setResult] = useState<{ success: number; failed: number; skipped: number; total: number } | null>(null);
+  const [result, setResult] = useState<{
+    success: number;
+    failed: number;
+    skipped: number;
+    total: number;
+  } | null>(null);
   const fileInput = useRef<HTMLInputElement | null>(null);
 
   const schema: ImportEntitySchema = IMPORT_SCHEMAS[importType];
 
   const reset = () => {
-    setStep("type"); setImportType("customers"); setFileName(""); setHeaders([]);
-    setRows([]); setMapping({}); setMode("create"); setResult(null);
+    setStep("type");
+    setImportType("customers");
+    setFileName("");
+    setHeaders([]);
+    setRows([]);
+    setMapping({});
+    setMode("create");
+    setResult(null);
     if (fileInput.current) fileInput.current.value = "";
   };
 
@@ -49,10 +78,10 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
         const arr = Array.isArray(parsed)
           ? parsed
           : Array.isArray((parsed as { rows?: unknown[] }).rows)
-          ? (parsed as { rows: unknown[] }).rows
-          : Array.isArray((parsed as { data?: unknown[] }).data)
-          ? (parsed as { data: unknown[] }).data
-          : null;
+            ? (parsed as { rows: unknown[] }).rows
+            : Array.isArray((parsed as { data?: unknown[] }).data)
+              ? (parsed as { data: unknown[] }).data
+              : null;
         if (!arr || arr.length === 0 || typeof arr[0] !== "object") {
           toast.error("JSON must be an array of objects (or { rows: [...] }).");
           return;
@@ -106,9 +135,10 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
   const previewRows = rows.slice(0, 5);
 
   const runMut = useMutation({
-    mutationFn: async () => runImport({
-      data: { import_type: importType, file_name: fileName, mapping, rows, mode },
-    }),
+    mutationFn: async () =>
+      runImport({
+        data: { import_type: importType, file_name: fileName, mapping, rows, mode },
+      }),
     onSuccess: (res) => {
       setResult(res);
       setStep("done");
@@ -120,7 +150,13 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
   });
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) reset(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        onOpenChange(v);
+        if (!v) reset();
+      }}
+    >
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>New import — {schema.label}</DialogTitle>
@@ -130,21 +166,27 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
           <div className="space-y-4">
             <Label>What are you importing?</Label>
             <Select value={importType} onValueChange={setImportType}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {Object.values(IMPORT_SCHEMAS).map((s) => (
-                  <SelectItem key={s.key} value={s.key}>{s.label} ({s.category})</SelectItem>
+                  <SelectItem key={s.key} value={s.key}>
+                    {s.label} ({s.category})
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
               Wizard supports {Object.keys(IMPORT_SCHEMAS).length} entity types. Document imports
               (quotations, proformas, invoices, orders, shipments) group rows sharing a document
-              number into one header with line items and recalculate subtotal / VAT / total from
-              the lines.
+              number into one header with line items and recalculate subtotal / VAT / total from the
+              lines.
             </p>
             <DialogFooter>
-              <Button onClick={() => setStep("upload")}>Next <ArrowRight className="ml-1 h-4 w-4" /></Button>
+              <Button onClick={() => setStep("upload")}>
+                Next <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
             </DialogFooter>
           </div>
         )}
@@ -157,10 +199,14 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
                 ref={fileInput}
                 type="file"
                 accept=".csv,.tsv,.xlsx,.xls,.json,application/json,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) void parseFile(f); }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) void parseFile(f);
+                }}
               />
               <p className="mt-1 text-[11px] text-muted-foreground">
-                Max 5,000 rows per file. XLSX/CSV: first row must be column headers. JSON: array of objects or {"{ rows: [...] }"}.
+                Max 5,000 rows per file. XLSX/CSV: first row must be column headers. JSON: array of
+                objects or {"{ rows: [...] }"}.
               </p>
             </div>
             <div className="rounded-md border border-border bg-muted/30 p-3 text-xs">
@@ -168,7 +214,8 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
               <div className="flex flex-wrap gap-1">
                 {schema.fields.map((f) => (
                   <Badge key={f.key} variant={f.required ? "default" : "outline"}>
-                    {f.label}{f.required ? " *" : ""}
+                    {f.label}
+                    {f.required ? " *" : ""}
                   </Badge>
                 ))}
               </div>
@@ -184,7 +231,8 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
         {step === "map" && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              File: <span className="font-medium text-foreground">{fileName}</span> — {rows.length} rows detected.
+              File: <span className="font-medium text-foreground">{fileName}</span> — {rows.length}{" "}
+              rows detected.
             </p>
             <div className="max-h-[360px] overflow-auto rounded-md border border-border">
               <table className="w-full text-sm">
@@ -199,19 +247,30 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
                     <tr key={f.key} className="border-t border-border">
                       <td className="px-3 py-2">
                         <div className="font-medium">
-                          {f.label}{f.required && <span className="text-rose-600"> *</span>}
+                          {f.label}
+                          {f.required && <span className="text-rose-600"> *</span>}
                         </div>
-                        <div className="text-[11px] text-muted-foreground">{f.key} · {f.type ?? "text"}</div>
+                        <div className="text-[11px] text-muted-foreground">
+                          {f.key} · {f.type ?? "text"}
+                        </div>
                       </td>
                       <td className="px-3 py-2">
                         <Select
                           value={mapping[f.key] ?? "__none__"}
-                          onValueChange={(v) => setMapping((m) => ({ ...m, [f.key]: v === "__none__" ? "" : v }))}
+                          onValueChange={(v) =>
+                            setMapping((m) => ({ ...m, [f.key]: v === "__none__" ? "" : v }))
+                          }
                         >
-                          <SelectTrigger className="h-8"><SelectValue placeholder="— skip —" /></SelectTrigger>
+                          <SelectTrigger className="h-8">
+                            <SelectValue placeholder="— skip —" />
+                          </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="__none__">— skip —</SelectItem>
-                            {headers.map((h) => <SelectItem key={h} value={h}>{h}</SelectItem>)}
+                            {headers.map((h) => (
+                              <SelectItem key={h} value={h}>
+                                {h}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </td>
@@ -222,7 +281,9 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
             </div>
             {validationIssues.length > 0 && (
               <div className="rounded-md border border-rose-500/30 bg-rose-500/5 p-3 text-xs text-rose-700">
-                {validationIssues.map((v) => <div key={v}>• {v}</div>)}
+                {validationIssues.map((v) => (
+                  <div key={v}>• {v}</div>
+                ))}
               </div>
             )}
             <DialogFooter className="flex justify-between">
@@ -241,7 +302,9 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
             <div>
               <Label>Mode</Label>
               <Select value={mode} onValueChange={(v) => setMode(v as typeof mode)}>
-                <SelectTrigger className="h-8 w-64"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-8 w-64">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="create">Create new only</SelectItem>
                   <SelectItem value="skip_duplicates">Skip duplicates on conflict</SelectItem>
@@ -249,31 +312,43 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
               </Select>
             </div>
             <p className="text-sm">
-              Ready to import <span className="font-medium">{rows.length}</span> rows into
-              {" "}<span className="font-medium">{schema.table}</span>.
+              Ready to import <span className="font-medium">{rows.length}</span> rows into{" "}
+              <span className="font-medium">{schema.table}</span>.
               {schema.groupBy && groupCount !== null && (
                 <>
-                  {" "}Rows will be grouped by
-                  {" "}<code className="rounded bg-muted px-1 text-[11px]">{schema.groupBy}</code>
-                  {" "}into <span className="font-medium">{groupCount}</span> parent record
+                  {" "}
+                  Rows will be grouped by{" "}
+                  <code className="rounded bg-muted px-1 text-[11px]">
+                    {schema.groupBy}
+                  </code> into <span className="font-medium">{groupCount}</span> parent record
                   {groupCount === 1 ? "" : "s"} with line items.
                 </>
-              )}
-              {" "}Preview of first 5 source rows:
+              )}{" "}
+              Preview of first 5 source rows:
             </p>
             <div className="max-h-[280px] overflow-auto rounded-md border border-border">
               <table className="w-full text-xs">
                 <thead className="bg-muted/40 uppercase text-muted-foreground">
-                  <tr>{schema.fields.filter((f) => mapping[f.key]).map((f) => (
-                    <th key={f.key} className="text-left px-2 py-1.5">{f.label}</th>
-                  ))}</tr>
+                  <tr>
+                    {schema.fields
+                      .filter((f) => mapping[f.key])
+                      .map((f) => (
+                        <th key={f.key} className="text-left px-2 py-1.5">
+                          {f.label}
+                        </th>
+                      ))}
+                  </tr>
                 </thead>
                 <tbody>
                   {previewRows.map((r, i) => (
                     <tr key={i} className="border-t border-border">
-                      {schema.fields.filter((f) => mapping[f.key]).map((f) => (
-                        <td key={f.key} className="px-2 py-1.5">{String(r[mapping[f.key]] ?? "")}</td>
-                      ))}
+                      {schema.fields
+                        .filter((f) => mapping[f.key])
+                        .map((f) => (
+                          <td key={f.key} className="px-2 py-1.5">
+                            {String(r[mapping[f.key]] ?? "")}
+                          </td>
+                        ))}
                     </tr>
                   ))}
                 </tbody>
@@ -288,7 +363,11 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
                 disabled={runMut.isPending}
                 className="bg-emerald-600 hover:bg-emerald-700"
               >
-                {runMut.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                {runMut.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="mr-2 h-4 w-4" />
+                )}
                 Run import
               </Button>
             </DialogFooter>
@@ -306,15 +385,24 @@ export function ImportWizard({ open, onOpenChange }: { open: boolean; onOpenChan
               <div>
                 <p className="font-medium">Import finished</p>
                 <p className="text-sm text-muted-foreground">
-                  {result.success} imported · {result.failed} failed · {result.skipped} skipped · {result.total} total
+                  {result.success} imported · {result.failed} failed · {result.skipped} skipped ·{" "}
+                  {result.total} total
                 </p>
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Row-level details are saved to the job history below. Failed rows include the exact error message.
+              Row-level details are saved to the job history below. Failed rows include the exact
+              error message.
             </p>
             <DialogFooter>
-              <Button variant="outline" onClick={() => { reset(); }}>Import another file</Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  reset();
+                }}
+              >
+                Import another file
+              </Button>
               <Button onClick={() => onOpenChange(false)}>Close</Button>
             </DialogFooter>
           </div>

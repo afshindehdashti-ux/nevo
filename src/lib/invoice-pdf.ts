@@ -74,10 +74,7 @@ export type InvoiceTotals = {
 
 /** Recompute totals from invoice_items — the PDF's source of truth. */
 export function computeInvoiceTotals(
-  items: Pick<
-    ItemRow,
-    "quantity" | "unit_price" | "discount_pct" | "vat_pct"
-  >[],
+  items: Pick<ItemRow, "quantity" | "unit_price" | "discount_pct" | "vat_pct">[],
   amountPaid = 0,
 ): InvoiceTotals {
   let gross = 0;
@@ -177,9 +174,7 @@ export async function generateInvoicePdf(
   mode: "download" | "blob" = "download",
 ): Promise<InvoicePdfResult> {
   // Server-side gate: refuses to render for incomplete or zero-total docs.
-  const { assertDocumentReadyForPdf } = await import(
-    "./document-pdf-validation.functions"
-  );
+  const { assertDocumentReadyForPdf } = await import("./document-pdf-validation.functions");
   await assertDocumentReadyForPdf({ data: { kind: "invoice", id: invoiceId } });
 
   const [{ invoice, items }, company] = await Promise.all([
@@ -292,9 +287,7 @@ export async function generateInvoicePdf(
   autoTable(doc, {
     startY: cursorY,
     head: [["#", "Description", "Qty", "Unit price", "Disc", "VAT", "Line total"]],
-    body: body.length
-      ? body
-      : [["—", "No line items", "", "", "", "", ""]],
+    body: body.length ? body : [["—", "No line items", "", "", "", "", ""]],
     styles: { fontSize: 9, cellPadding: 6, overflow: "linebreak" },
     headStyles: { fillColor: [15, 23, 42], textColor: 255, halign: "left" },
     columnStyles: {
@@ -402,10 +395,7 @@ export async function generateInvoicePdf(
   }
 
   const filenameBase = isProforma ? "Proforma" : "Invoice";
-  const num = (invoice.invoice_number || invoice.id.slice(0, 8)).replace(
-    /[^A-Za-z0-9._-]/g,
-    "_",
-  );
+  const num = (invoice.invoice_number || invoice.id.slice(0, 8)).replace(/[^A-Za-z0-9._-]/g, "_");
   const filename = `${filenameBase}-${num}.pdf`;
   const blob = doc.output("blob");
   if (mode === "download") doc.save(filename);

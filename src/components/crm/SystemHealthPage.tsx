@@ -102,7 +102,11 @@ const INITIAL_CHECKS: CheckResult[] = [
   { id: "rls", title: "17. Supabase RLS Health", status: "idle" },
   { id: "auth_session", title: "18. Auth Session & JWT Validity", status: "idle" },
   { id: "rls_enforced", title: "19. RLS Enforcement (user_roles owner-only)", status: "idle" },
-  { id: "crm_connectivity", title: "20. CRM Connectivity (leads/opps/contacts/tasks)", status: "idle" },
+  {
+    id: "crm_connectivity",
+    title: "20. CRM Connectivity (leads/opps/contacts/tasks)",
+    status: "idle",
+  },
   { id: "realtime", title: "21. Realtime Channel Connectivity", status: "idle" },
 ];
 
@@ -116,9 +120,20 @@ const CHECK_META: Record<string, { query?: string; endpoints?: string[] }> = {
   db: {
     query: `select count(*) from public.<table> -- for each REQUIRED_TABLES entry`,
     endpoints: [
-      "profiles", "customers", "suppliers", "products", "orders", "quotations",
-      "proforma_invoices", "invoices", "partner_commissions", "payments",
-      "documents", "activity_logs", "company_settings", "document_settings",
+      "profiles",
+      "customers",
+      "suppliers",
+      "products",
+      "orders",
+      "quotations",
+      "proforma_invoices",
+      "invoices",
+      "partner_commissions",
+      "payments",
+      "documents",
+      "activity_logs",
+      "company_settings",
+      "document_settings",
       "import_jobs",
     ],
   },
@@ -139,8 +154,10 @@ const CHECK_META: Record<string, { query?: string; endpoints?: string[] }> = {
     query:
       "insert into public.quotations ...; insert into public.quotation_items ...; select subtotal,vat_amount,total,customer_id,valid_until,quotation_number from public.quotations where id=$1",
     endpoints: [
-      "quotations", "quotation_items",
-      "trigger: trg_quotations_number", "trigger: trg_qitems_recalc",
+      "quotations",
+      "quotation_items",
+      "trigger: trg_quotations_number",
+      "trigger: trg_qitems_recalc",
       "route: /admin/quotations/:id",
     ],
   },
@@ -148,8 +165,10 @@ const CHECK_META: Record<string, { query?: string; endpoints?: string[] }> = {
     query:
       "insert into public.proforma_invoices ...; insert into public.proforma_invoice_items ...; update public.proforma_invoices set amount_paid=$1; delete from public.proforma_invoice_items where id=$1; delete from public.proforma_invoices where id=$1",
     endpoints: [
-      "proforma_invoices", "proforma_invoice_items",
-      "trigger: recalc_proforma_totals", "trigger: proforma_invoices_sync_mirrors",
+      "proforma_invoices",
+      "proforma_invoice_items",
+      "trigger: recalc_proforma_totals",
+      "trigger: proforma_invoices_sync_mirrors",
       "route: /admin/proforma-invoices/:id",
     ],
   },
@@ -168,7 +187,9 @@ const CHECK_META: Record<string, { query?: string; endpoints?: string[] }> = {
   pdf: {
     query: "n/a (client-side jsPDF builders)",
     endpoints: [
-      "src/lib/quotation-pdf.ts", "src/lib/proforma-invoice-pdf.ts", "src/lib/invoice-pdf.ts",
+      "src/lib/quotation-pdf.ts",
+      "src/lib/proforma-invoice-pdf.ts",
+      "src/lib/invoice-pdf.ts",
       "route: /admin/quotations/:id/print",
     ],
   },
@@ -214,7 +235,11 @@ function extractErr(e: unknown): {
     return { errorMessage: typeof e === "string" ? e : String(e) };
   }
   const anyE = e as {
-    code?: string; status?: number; message?: string; hint?: string; details?: string;
+    code?: string;
+    status?: number;
+    message?: string;
+    hint?: string;
+    details?: string;
     error_description?: string;
   };
   const code = anyE.code || (anyE.status ? `HTTP ${anyE.status}` : undefined);
@@ -325,9 +350,7 @@ export function SystemHealthPage() {
       c.errorMessage ? `Error message: ${c.errorMessage}` : null,
       c.errorHint ? `Hint: ${c.errorHint}` : null,
       c.query ? `Failing query:\n${c.query}` : null,
-      c.endpoints && c.endpoints.length
-        ? `Affected endpoints: ${c.endpoints.join(", ")}`
-        : null,
+      c.endpoints && c.endpoints.length ? `Affected endpoints: ${c.endpoints.join(", ")}` : null,
       c.suggestedFix ? `Suggested fix: ${c.suggestedFix}` : null,
     ].filter(Boolean);
     const payload = lines.join("\n");
@@ -373,7 +396,6 @@ export function SystemHealthPage() {
       toast.error("Could not export report");
     }
   };
-
 
   if (rolesLoading) {
     return (
@@ -427,11 +449,7 @@ export function SystemHealthPage() {
     // On fail/warn, auto-attach query + endpoints from CHECK_META so every
     // failure card carries actionable context. Pass the caught error as the
     // third arg to also surface Postgres/PostgREST code/message/hint.
-    const update = (
-      id: string,
-      patch: Partial<CheckResult>,
-      err?: unknown,
-    ) => {
+    const update = (id: string, patch: Partial<CheckResult>, err?: unknown) => {
       if (!inScope(id)) return;
       const enriched: Partial<CheckResult> = { ...patch };
       const isFailure = patch.status === "fail" || patch.status === "warn";
@@ -456,7 +474,6 @@ export function SystemHealthPage() {
       writeCheck(id, enriched);
     };
 
-
     const createdIds: {
       customer?: string;
       supplier?: string;
@@ -476,11 +493,15 @@ export function SystemHealthPage() {
           details: `Signed in as ${data.user.email ?? data.user.id}`,
         });
       } catch (e) {
-        update("auth", {
-          status: "fail",
-          details: (e as Error).message,
-          suggestedFix: "Sign in again at /admin/login.",
-        }, e);
+        update(
+          "auth",
+          {
+            status: "fail",
+            details: (e as Error).message,
+            suggestedFix: "Sign in again at /admin/login.",
+          },
+          e,
+        );
       }
 
       mark("db");
@@ -488,7 +509,9 @@ export function SystemHealthPage() {
       try {
         const missing: string[] = [];
         for (const t of REQUIRED_TABLES) {
-          const { error } = await supabase.from(t as never).select("*", { count: "exact", head: true });
+          const { error } = await supabase
+            .from(t as never)
+            .select("*", { count: "exact", head: true });
           if (error) missing.push(`${t} (${error.message})`);
         }
         if (missing.length === 0) {
@@ -510,7 +533,9 @@ export function SystemHealthPage() {
       mark("crm");
       // 3. CRM Module Health — quick counts on core tables
       try {
-        const { error } = await supabase.from("profiles").select("id", { head: true, count: "exact" });
+        const { error } = await supabase
+          .from("profiles")
+          .select("id", { head: true, count: "exact" });
         if (error) throw error;
         update("crm", { status: "pass", details: "Core CRM tables responded." });
       } catch (e) {
@@ -533,13 +558,20 @@ export function SystemHealthPage() {
           .update({ name: `${testName}-customer-upd` })
           .eq("id", cIns.id);
         if (uErr) throw uErr;
-        update("customer_crud", { status: "pass", details: "Create + update OK. Row will be cleaned up." });
-      } catch (e) {
         update("customer_crud", {
-          status: "fail",
-          details: (e as Error).message,
-          suggestedFix: "Check RLS write policies on public.customers for your role.",
-        }, e);
+          status: "pass",
+          details: "Create + update OK. Row will be cleaned up.",
+        });
+      } catch (e) {
+        update(
+          "customer_crud",
+          {
+            status: "fail",
+            details: (e as Error).message,
+            suggestedFix: "Check RLS write policies on public.customers for your role.",
+          },
+          e,
+        );
       }
 
       mark("supplier_crud");
@@ -554,11 +586,15 @@ export function SystemHealthPage() {
         createdIds.supplier = sIns.id;
         update("supplier_crud", { status: "pass", details: "Create OK. Row will be cleaned up." });
       } catch (e) {
-        update("supplier_crud", {
-          status: "fail",
-          details: (e as Error).message,
-          suggestedFix: "Check RLS write policies on public.suppliers.",
-        }, e);
+        update(
+          "supplier_crud",
+          {
+            status: "fail",
+            details: (e as Error).message,
+            suggestedFix: "Check RLS write policies on public.suppliers.",
+          },
+          e,
+        );
       }
 
       mark("product_crud");
@@ -573,11 +609,15 @@ export function SystemHealthPage() {
         createdIds.product = pIns.id;
         update("product_crud", { status: "pass", details: "Create OK. Row will be cleaned up." });
       } catch (e) {
-        update("product_crud", {
-          status: "fail",
-          details: (e as Error).message,
-          suggestedFix: "Check RLS write policies on public.products.",
-        }, e);
+        update(
+          "product_crud",
+          {
+            status: "fail",
+            details: (e as Error).message,
+            suggestedFix: "Check RLS write policies on public.products.",
+          },
+          e,
+        );
       }
 
       mark("quotation");
@@ -647,18 +687,22 @@ export function SystemHealthPage() {
           details: `Created ${row.quotation_number}: customer OK, valid_until OK, subtotal=${expectedSubtotal}, VAT(${vatRate}%)=${expectedVat}, total=${expectedTotal}. Trigger recompute verified.`,
         });
       } catch (e) {
-        update("quotation", {
-          status: "fail",
-          details: (e as Error).message,
-          suggestedFix: "Verify quotations schema (customer_id, valid_until, subtotal/total) and that trg_qitems_recalc + trg_quotations_number are installed.",
-        }, e);
+        update(
+          "quotation",
+          {
+            status: "fail",
+            details: (e as Error).message,
+            suggestedFix:
+              "Verify quotations schema (customer_id, valid_until, subtotal/total) and that trg_qitems_recalc + trg_quotations_number are installed.",
+          },
+          e,
+        );
       } finally {
         if (quotationId) {
           await supabase.from("quotation_items").delete().eq("quotation_id", quotationId);
           await supabase.from("quotations").delete().eq("id", quotationId);
         }
       }
-
 
       mark("proforma");
       // 8. Proforma Invoice — end-to-end: header + item + recompute check +
@@ -706,9 +750,13 @@ export function SystemHealthPage() {
 
         // New-column persistence on create
         if (created.terms_conditions !== termsText)
-          throw new Error(`terms_conditions not persisted (got ${JSON.stringify(created.terms_conditions)})`);
+          throw new Error(
+            `terms_conditions not persisted (got ${JSON.stringify(created.terms_conditions)})`,
+          );
         if (created.bank_details !== bankText)
-          throw new Error(`bank_details not persisted (got ${JSON.stringify(created.bank_details)})`);
+          throw new Error(
+            `bank_details not persisted (got ${JSON.stringify(created.bank_details)})`,
+          );
         if (created.approved_by !== null)
           throw new Error(`approved_by should be null on create (got ${created.approved_by})`);
         if (created.payment_status !== "Unpaid")
@@ -754,11 +802,16 @@ export function SystemHealthPage() {
 
         // After item insert: totals + Unpaid + new columns still intact.
         let row = await readHeader();
-        if (!near(row.subtotal, expectedSubtotal)) throw new Error(`subtotal ${row.subtotal} ≠ ${expectedSubtotal}`);
-        if (!near(row.vat_amount, expectedVat)) throw new Error(`vat_amount ${row.vat_amount} ≠ ${expectedVat}`);
-        if (!near(row.grand_total, expectedGrand)) throw new Error(`grand_total ${row.grand_total} ≠ ${expectedGrand}`);
-        if (!near(row.balance_due, expectedGrand)) throw new Error(`balance_due ${row.balance_due} ≠ ${expectedGrand}`);
-        if (row.payment_status !== "Unpaid") throw new Error(`payment_status ${row.payment_status} ≠ Unpaid`);
+        if (!near(row.subtotal, expectedSubtotal))
+          throw new Error(`subtotal ${row.subtotal} ≠ ${expectedSubtotal}`);
+        if (!near(row.vat_amount, expectedVat))
+          throw new Error(`vat_amount ${row.vat_amount} ≠ ${expectedVat}`);
+        if (!near(row.grand_total, expectedGrand))
+          throw new Error(`grand_total ${row.grand_total} ≠ ${expectedGrand}`);
+        if (!near(row.balance_due, expectedGrand))
+          throw new Error(`balance_due ${row.balance_due} ≠ ${expectedGrand}`);
+        if (row.payment_status !== "Unpaid")
+          throw new Error(`payment_status ${row.payment_status} ≠ Unpaid`);
         if (row.terms_conditions !== termsText)
           throw new Error(`terms_conditions drifted after item insert`);
         if (row.bank_details !== bankText)
@@ -783,7 +836,9 @@ export function SystemHealthPage() {
         if (p1Err) throw p1Err;
         row = await readHeader();
         if (!near(row.balance_due, expectedGrand - partial))
-          throw new Error(`balance_due after partial ${row.balance_due} ≠ ${expectedGrand - partial}`);
+          throw new Error(
+            `balance_due after partial ${row.balance_due} ≠ ${expectedGrand - partial}`,
+          );
         if (row.payment_status !== "Partially Paid")
           throw new Error(`payment_status after partial ${row.payment_status} ≠ Partially Paid`);
 
@@ -843,20 +898,24 @@ export function SystemHealthPage() {
             `Item cascade + row cleanup isolated (no orphans).`,
         });
       } catch (e) {
-        update("proforma", {
-          status: "fail",
-          details: (e as Error).message,
-          suggestedFix:
-            "Verify proforma_invoices has vat_amount/grand_total/balance_due/payment_status/terms_conditions/bank_details/approved_by columns, that recalc_proforma_totals + proforma_sync_mirrors triggers are installed, and that DELETE on the parent removes proforma_invoice_items (or that items are pre-cleaned).",
-        }, e);
+        update(
+          "proforma",
+          {
+            status: "fail",
+            details: (e as Error).message,
+            suggestedFix:
+              "Verify proforma_invoices has vat_amount/grand_total/balance_due/payment_status/terms_conditions/bank_details/approved_by columns, that recalc_proforma_totals + proforma_sync_mirrors triggers are installed, and that DELETE on the parent removes proforma_invoice_items (or that items are pre-cleaned).",
+          },
+          e,
+        );
       }
-
-
 
       mark("commercial");
       // 9. Commercial Invoice
       try {
-        const { error } = await supabase.from("invoices").select("id", { head: true, count: "exact" });
+        const { error } = await supabase
+          .from("invoices")
+          .select("id", { head: true, count: "exact" });
         if (error) throw error;
         update("commercial", { status: "pass", details: "Invoices table reachable." });
       } catch (e) {
@@ -887,11 +946,15 @@ export function SystemHealthPage() {
           details: "Orders table used for POs is reachable.",
         });
       } catch (e) {
-        update("purchase_order", {
-          status: "warn",
-          details: (e as Error).message,
-          suggestedFix: "Add a dedicated purchase_orders table if needed.",
-        }, e);
+        update(
+          "purchase_order",
+          {
+            status: "warn",
+            details: (e as Error).message,
+            suggestedFix: "Add a dedicated purchase_orders table if needed.",
+          },
+          e,
+        );
       }
 
       mark("pdf");
@@ -909,15 +972,21 @@ export function SystemHealthPage() {
       mark("files");
       // 13. File Upload — check documents table
       try {
-        const { error } = await supabase.from("documents").select("id", { head: true, count: "exact" });
+        const { error } = await supabase
+          .from("documents")
+          .select("id", { head: true, count: "exact" });
         if (error) throw error;
         update("files", { status: "pass", details: "Documents table reachable." });
       } catch (e) {
-        update("files", {
-          status: "warn",
-          details: (e as Error).message,
-          suggestedFix: "Ensure the documents storage bucket and RLS policies exist.",
-        }, e);
+        update(
+          "files",
+          {
+            status: "warn",
+            details: (e as Error).message,
+            suggestedFix: "Ensure the documents storage bucket and RLS policies exist.",
+          },
+          e,
+        );
       }
 
       mark("doc_import");
@@ -969,11 +1038,15 @@ export function SystemHealthPage() {
           details: `has_role() RPC responded: super_admin=${String(data)}.`,
         });
       } catch (e) {
-        update("rls", {
-          status: "warn",
-          details: (e as Error).message,
-          suggestedFix: "Ensure public.has_role(uuid, app_role) exists and is SECURITY DEFINER.",
-        }, e);
+        update(
+          "rls",
+          {
+            status: "warn",
+            details: (e as Error).message,
+            suggestedFix: "Ensure public.has_role(uuid, app_role) exists and is SECURITY DEFINER.",
+          },
+          e,
+        );
       }
 
       mark("auth_session");
@@ -1003,11 +1076,15 @@ export function SystemHealthPage() {
           });
         }
       } catch (e) {
-        update("auth_session", {
-          status: "fail",
-          details: (e as Error).message,
-          suggestedFix: "Re-authenticate at /admin/login.",
-        }, e);
+        update(
+          "auth_session",
+          {
+            status: "fail",
+            details: (e as Error).message,
+            suggestedFix: "Re-authenticate at /admin/login.",
+          },
+          e,
+        );
       }
 
       mark("rls_enforced");
@@ -1016,16 +1093,15 @@ export function SystemHealthPage() {
         const { data: me } = await supabase.auth.getUser();
         const uid = me.user?.id;
         if (!uid) throw new Error("No user id available");
-        const { data: rows, error } = await supabase
-          .from("user_roles")
-          .select("user_id");
+        const { data: rows, error } = await supabase.from("user_roles").select("user_id");
         if (error) throw error;
         const foreign = (rows ?? []).filter((r) => r.user_id !== uid);
         if (foreign.length > 0) {
           update("rls_enforced", {
             status: "fail",
             details: `user_roles returned ${foreign.length} rows belonging to other users — RLS is not scoping to auth.uid().`,
-            suggestedFix: "Review SELECT policy on public.user_roles; it must use auth.uid() = user_id.",
+            suggestedFix:
+              "Review SELECT policy on public.user_roles; it must use auth.uid() = user_id.",
           });
         } else {
           update("rls_enforced", {
@@ -1034,11 +1110,15 @@ export function SystemHealthPage() {
           });
         }
       } catch (e) {
-        update("rls_enforced", {
-          status: "warn",
-          details: (e as Error).message,
-          suggestedFix: "Ensure public.user_roles has SELECT policy scoped to auth.uid().",
-        }, e);
+        update(
+          "rls_enforced",
+          {
+            status: "warn",
+            details: (e as Error).message,
+            suggestedFix: "Ensure public.user_roles has SELECT policy scoped to auth.uid().",
+          },
+          e,
+        );
       }
 
       mark("crm_connectivity");
@@ -1087,7 +1167,12 @@ export function SystemHealthPage() {
             resolve("TIMEOUT");
           }, 4000);
           ch.subscribe((s) => {
-            if (s === "SUBSCRIBED" || s === "CHANNEL_ERROR" || s === "TIMED_OUT" || s === "CLOSED") {
+            if (
+              s === "SUBSCRIBED" ||
+              s === "CHANNEL_ERROR" ||
+              s === "TIMED_OUT" ||
+              s === "CLOSED"
+            ) {
               window.clearTimeout(timeout);
               supabase.removeChannel(ch);
               resolve(s);
@@ -1095,12 +1180,16 @@ export function SystemHealthPage() {
           });
         });
         if (status === "SUBSCRIBED") {
-          update("realtime", { status: "pass", details: "Realtime channel subscribed successfully." });
+          update("realtime", {
+            status: "pass",
+            details: "Realtime channel subscribed successfully.",
+          });
         } else {
           update("realtime", {
             status: "warn",
             details: `Realtime status: ${status}`,
-            suggestedFix: "Realtime is optional; verify Realtime is enabled in the backend if needed.",
+            suggestedFix:
+              "Realtime is optional; verify Realtime is enabled in the backend if needed.",
           });
         }
       } catch (e) {
@@ -1190,7 +1279,6 @@ export function SystemHealthPage() {
           </Button>
         </div>
       </div>
-
 
       <Alert>
         <ShieldCheck className="h-4 w-4" />

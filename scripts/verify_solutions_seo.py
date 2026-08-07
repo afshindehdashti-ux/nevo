@@ -2,7 +2,7 @@
 """
 Solutions SEO snapshot: canonical, og:*, twitter:*, hreflang.
 
-Fetches each Solutions page (default: all 10 locales) from a running server
+Fetches each Solutions page (default: all 11 locales) from a running server
 (SSR HTML, Googlebot UA) and asserts:
   - exactly 1 self-referencing <link rel="canonical">
   - og:url == canonical, og:image absolute (https://)

@@ -66,9 +66,7 @@ export function AdminRouteGuard({ children }: { children: ReactNode }) {
   }
 
   if (!userQ.data) {
-    return (
-      <div className="p-6 text-sm text-muted-foreground">Redirecting to sign in…</div>
-    );
+    return <div className="p-6 text-sm text-muted-foreground">Redirecting to sign in…</div>;
   }
 
   if (stillChecking && timedOut) {
@@ -101,18 +99,13 @@ export function AdminRouteGuard({ children }: { children: ReactNode }) {
   dlog("resolved roles", roles, "path", location.pathname);
 
   if (roles.length === 0) {
-    return (
-      <AccessDenied reason="Your account has no assigned admin role." showSignOut />
-    );
+    return <AccessDenied reason="Your account has no assigned admin role." showSignOut />;
   }
 
   if (!canAccessAdminPath(location.pathname, roles)) {
     const fallback = landingForRoles(roles);
     return (
-      <AccessDenied
-        reason="You don't have permission to view this area."
-        fallback={fallback}
-      />
+      <AccessDenied reason="You don't have permission to view this area." fallback={fallback} />
     );
   }
 

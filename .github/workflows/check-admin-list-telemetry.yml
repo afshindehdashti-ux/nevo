@@ -1,6 +1,7 @@
 name: check-admin-list-telemetry
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "src/**/*.ts"
@@ -17,8 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
-      # No dependencies — the script uses only Node stdlib so we skip
-      # `bun install` to keep this guard cheap and fast.
+          node-version: "22"
+      # No dependencies: the script uses only Node stdlib, so installation is skipped.
       - name: Enforce admin_list_empty_shown contract
         run: node scripts/check-admin-list-telemetry.mjs

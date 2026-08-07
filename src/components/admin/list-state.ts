@@ -41,9 +41,7 @@ export function classifyListState<T>(opts: ClassifyOptions): ListViewState<T> {
   if (data != null && !Array.isArray(data)) {
     return {
       kind: "error",
-      error: new Error(
-        `Unexpected response shape: expected array, got ${typeof data}`,
-      ),
+      error: new Error(`Unexpected response shape: expected array, got ${typeof data}`),
     };
   }
   const rows = (data as T[] | null | undefined) ?? [];

@@ -98,19 +98,16 @@ describe("emitAdminListEmptyShown — runtime validation wrapper", () => {
     expect(result.reason).toBe("invalid_surface");
   });
 
-  it.each([null, undefined, 42, "string", []])(
-    "rejects non-object payload: %s",
-    (candidate) => {
-      const logger = vi.fn();
-      const result = emitAdminListEmptyShown(candidate, logger);
-      expect(result.ok).toBe(false);
-      expect(logger).not.toHaveBeenCalledWith(
-        "admin_list_empty_shown",
-        expect.anything(),
-        expect.anything(),
-      );
-    },
-  );
+  it.each([null, undefined, 42, "string", []])("rejects non-object payload: %s", (candidate) => {
+    const logger = vi.fn();
+    const result = emitAdminListEmptyShown(candidate, logger);
+    expect(result.ok).toBe(false);
+    expect(logger).not.toHaveBeenCalledWith(
+      "admin_list_empty_shown",
+      expect.anything(),
+      expect.anything(),
+    );
+  });
 
   it("never throws when the underlying logger throws", () => {
     const logger = vi.fn(() => {

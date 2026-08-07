@@ -9,7 +9,7 @@
  *   node scripts/build-diagnose.mjs [--mode development] [-- extra vite args]
  */
 import { spawn } from "node:child_process";
-import { relative } from "node:path";
+import { join, relative } from "node:path";
 
 const args = process.argv.slice(2);
 const mode = args.includes("--mode") ? args[args.indexOf("--mode") + 1] : "development";
@@ -19,10 +19,16 @@ const passthrough = args.filter((a, i, arr) => {
   return true;
 });
 
-const viteArgs = ["vite", "build", "--mode", mode, ...passthrough];
-console.log(`\n▶ ${viteArgs.join(" ")}\n`);
+const viteArgs = ["build", "--mode", mode, ...passthrough];
+const viteBin = join(
+  process.cwd(),
+  "node_modules",
+  ".bin",
+  process.platform === "win32" ? "vite.cmd" : "vite",
+);
+console.log(`\n▶ vite ${viteArgs.join(" ")}\n`);
 
-const child = spawn("bunx", viteArgs, {
+const child = spawn(viteBin, viteArgs, {
   stdio: ["inherit", "pipe", "pipe"],
   env: process.env,
 });
@@ -237,9 +243,9 @@ child.on("close", (code) => {
 
   console.error("\n💡 Next steps:");
   console.error("   1. Open the file above and verify the import path exists.");
-  console.error("   2. For missing packages, run: bun add <package>");
+  console.error("   2. For missing packages, run: pnpm add <package>");
   console.error("   3. For missing local files, create the file or fix the path.");
-  console.error("   4. Re-run: bun run build:dev:diagnose\n");
+  console.error("   4. Re-run: pnpm build:dev:diagnose\n");
 
   process.exit(code ?? 1);
 });

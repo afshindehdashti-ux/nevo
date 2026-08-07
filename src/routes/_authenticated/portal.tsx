@@ -19,10 +19,7 @@ import {
   getMyMessageAttachmentUrl,
   markMyMessagesRead,
 } from "@/lib/customer-portal.functions";
-import {
-  financeBalanceDue,
-  financeTotalAmount,
-} from "@/lib/finance-normalization";
+import { financeBalanceDue, financeTotalAmount } from "@/lib/finance-normalization";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -58,7 +55,6 @@ import {
   Image as ImageIcon,
   ExternalLink,
   Search,
-
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/portal")({
@@ -92,12 +88,14 @@ function PortalPage() {
             <div>
               <h1 className="font-semibold">Portal access pending</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Your account isn't yet linked to a NEVO customer profile. Please contact your
-                NEVO account manager to enable portal access.
+                Your account isn't yet linked to a NEVO customer profile. Please contact your NEVO
+                account manager to enable portal access.
               </p>
               <div className="mt-4">
                 <Button asChild variant="outline">
-                  <Link to="/en/contact">Contact NEVO</Link>
+                  <Link to="/$lang/contact" params={{ lang: "en" }}>
+                    Contact NEVO
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -168,11 +166,12 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
   const [composeFiles, setComposeFiles] = useState<File[]>([]);
   const [replyParentId, setReplyParentId] = useState<string | null>(null);
   const [messageSearch, setMessageSearch] = useState("");
-  const [messageKindFilter, setMessageKindFilter] = useState<"all" | "email" | "whatsapp" | "note">("all");
+  const [messageKindFilter, setMessageKindFilter] = useState<"all" | "email" | "whatsapp" | "note">(
+    "all",
+  );
   const [messageReadFilter, setMessageReadFilter] = useState<"all" | "unread" | "read">("all");
   const [messageSort, setMessageSort] = useState<"newest" | "oldest">("newest");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
 
   const sendMessage = useMutation({
     mutationFn: async (opts: { parentId?: string | null }) => {
@@ -223,12 +222,7 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
     },
   });
 
-  const unreadCount = messages.filter(
-    (m) => m.direction === "outbound" && !(m as any).read,
-  ).length;
-
-
-
+  const unreadCount = messages.filter((m) => m.direction === "outbound" && !(m as any).read).length;
 
   const proformas = invoices.filter((i) => i.type === "proforma");
   const commercialInvoices = invoices.filter((i) => i.type !== "proforma");
@@ -236,7 +230,9 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
     ["approved", "active", "in_progress", "delivered"].includes((p.status ?? "").toLowerCase()),
   );
 
-  const openOrders = orders.filter((o) => o.status !== "delivered" && o.status !== "cancelled").length;
+  const openOrders = orders.filter(
+    (o) => o.status !== "delivered" && o.status !== "cancelled",
+  ).length;
   const inTransit = shipments.filter((s) => s.status === "in_transit").length;
   const balanceDue = invoices.reduce((s, i) => s + financeBalanceDue(i), 0);
   const currency = invoices[0]?.currency ?? orders[0]?.currency ?? "USD";
@@ -251,11 +247,15 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
       <header className="border-b border-border bg-background">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
-            <div className="text-xs uppercase tracking-widest text-muted-foreground">Customer Portal</div>
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">
+              Customer Portal
+            </div>
             <h1 className="text-lg font-semibold">{customerName}</h1>
           </div>
           <Button asChild variant="outline" size="sm">
-            <Link to="/en">Back to nevoindustrial.com</Link>
+            <Link to="/$lang" params={{ lang: "en" }}>
+              Back to nevoindustrial.com
+            </Link>
           </Button>
         </div>
       </header>
@@ -279,13 +279,22 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
           }}
         >
           <TabsList className="flex-wrap h-auto">
-            <TabsTrigger value="timeline"><ActivityIcon className="h-3.5 w-3.5 mr-1" />Timeline</TabsTrigger>
-            <TabsTrigger value="projects"><FolderKanban className="h-3.5 w-3.5 mr-1" />Projects</TabsTrigger>
+            <TabsTrigger value="timeline">
+              <ActivityIcon className="h-3.5 w-3.5 mr-1" />
+              Timeline
+            </TabsTrigger>
+            <TabsTrigger value="projects">
+              <FolderKanban className="h-3.5 w-3.5 mr-1" />
+              Projects
+            </TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
             <TabsTrigger value="quotes">Quotations</TabsTrigger>
             <TabsTrigger value="proformas">Proformas</TabsTrigger>
             <TabsTrigger value="invoices">Invoices</TabsTrigger>
-            <TabsTrigger value="payments"><Wallet className="h-3.5 w-3.5 mr-1" />Payments</TabsTrigger>
+            <TabsTrigger value="payments">
+              <Wallet className="h-3.5 w-3.5 mr-1" />
+              Payments
+            </TabsTrigger>
             <TabsTrigger value="shipments">Shipments</TabsTrigger>
             <TabsTrigger value="docs">Documents</TabsTrigger>
             <TabsTrigger value="messages">
@@ -319,7 +328,9 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                           )}
                         </div>
                         <div className="text-xs text-muted-foreground whitespace-nowrap">
-                          <Badge variant="outline" className="mr-2">{e.kind}</Badge>
+                          <Badge variant="outline" className="mr-2">
+                            {e.kind}
+                          </Badge>
                           {new Date(e.at).toLocaleString()}
                         </div>
                       </div>
@@ -356,7 +367,9 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                   o.order_date ?? "—",
                   o.requested_delivery ?? "—",
                   <Badge variant="outline">{o.status}</Badge>,
-                  <span className="tabular-nums">{o.currency} {Number(o.total).toLocaleString()}</span>,
+                  <span className="tabular-nums">
+                    {o.currency} {Number(o.total).toLocaleString()}
+                  </span>,
                 ])}
               />
             </Card>
@@ -372,7 +385,9 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                   q.issue_date,
                   q.valid_until ?? "—",
                   <Badge variant="outline">{q.status}</Badge>,
-                  <span className="tabular-nums">{q.currency} {financeTotalAmount(q).toLocaleString()}</span>,
+                  <span className="tabular-nums">
+                    {q.currency} {financeTotalAmount(q).toLocaleString()}
+                  </span>,
                 ])}
               />
             </Card>
@@ -388,8 +403,12 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                   i.issue_date,
                   i.due_date ?? "—",
                   <Badge variant="outline">{i.status}</Badge>,
-                  <span className="tabular-nums">{i.currency} {financeTotalAmount(i).toLocaleString()}</span>,
-                  <span className="tabular-nums">{i.currency} {financeBalanceDue(i).toLocaleString()}</span>,
+                  <span className="tabular-nums">
+                    {i.currency} {financeTotalAmount(i).toLocaleString()}
+                  </span>,
+                  <span className="tabular-nums">
+                    {i.currency} {financeBalanceDue(i).toLocaleString()}
+                  </span>,
                 ])}
               />
             </Card>
@@ -404,9 +423,23 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                   <span className="font-mono text-xs">{i.invoice_number}</span>,
                   i.issue_date,
                   i.due_date ?? "—",
-                  <Badge variant={i.status === "paid" ? "default" : i.status === "overdue" ? "destructive" : "outline"}>{i.status}</Badge>,
-                  <span className="tabular-nums">{i.currency} {financeTotalAmount(i).toLocaleString()}</span>,
-                  <span className="tabular-nums">{i.currency} {financeBalanceDue(i).toLocaleString()}</span>,
+                  <Badge
+                    variant={
+                      i.status === "paid"
+                        ? "default"
+                        : i.status === "overdue"
+                          ? "destructive"
+                          : "outline"
+                    }
+                  >
+                    {i.status}
+                  </Badge>,
+                  <span className="tabular-nums">
+                    {i.currency} {financeTotalAmount(i).toLocaleString()}
+                  </span>,
+                  <span className="tabular-nums">
+                    {i.currency} {financeBalanceDue(i).toLocaleString()}
+                  </span>,
                 ])}
               />
             </Card>
@@ -422,12 +455,13 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                   <span className="font-mono text-xs">{p.invoice_number ?? "—"}</span>,
                   p.method,
                   p.reference ?? "—",
-                  <span className="tabular-nums font-medium">{p.currency} {Number(p.amount).toLocaleString()}</span>,
+                  <span className="tabular-nums font-medium">
+                    {p.currency} {Number(p.amount).toLocaleString()}
+                  </span>,
                 ])}
               />
             </Card>
           </TabsContent>
-
 
           <TabsContent value="shipments">
             <Card>
@@ -456,11 +490,7 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                   d.kind,
                   d.size_bytes ? `${Math.round(Number(d.size_bytes) / 1024)} KB` : "—",
                   new Date(d.created_at).toLocaleDateString(),
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => download(d.id)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => download(d.id)}>
                     <Download className="h-3.5 w-3.5 mr-1" />
                     Download
                   </Button>,
@@ -625,7 +655,10 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
               const q = messageSearch.trim().toLowerCase();
               const allThreads = groupThreads(messages);
               const filtered = allThreads.filter((thread) => {
-                if (messageKindFilter !== "all" && !thread.some((m) => m.kind === messageKindFilter)) {
+                if (
+                  messageKindFilter !== "all" &&
+                  !thread.some((m) => m.kind === messageKindFilter)
+                ) {
                   return false;
                 }
                 if (messageReadFilter !== "all") {
@@ -669,7 +702,6 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                 );
               }
               return filtered.map((thread) => {
-
                 const head = thread[0];
                 const last = thread[thread.length - 1];
                 const subject = head.subject ?? `${head.kind} conversation`;
@@ -696,7 +728,13 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                             setComposeSubject("");
                             setComposeBody("");
                             setComposeFiles([]);
-                            setComposeKind((head.kind as any) === "whatsapp" ? "whatsapp" : (head.kind as any) === "note" ? "note" : "email");
+                            setComposeKind(
+                              (head.kind as any) === "whatsapp"
+                                ? "whatsapp"
+                                : (head.kind as any) === "note"
+                                  ? "note"
+                                  : "email",
+                            );
                           }
                         }}
                       >
@@ -731,11 +769,16 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                                 <ArrowUpRight className="h-3.5 w-3.5 text-blue-600" />
                               )}
                               <Badge variant="outline">{m.kind}</Badge>
-                              <span className={
-                                "text-muted-foreground " +
-                                (m.direction === "outbound" && !(m as any).read ? "font-semibold text-foreground" : "")
-                              }>
-                                {m.contact_name ?? (m.direction === "inbound" ? "From you" : "From NEVO")}
+                              <span
+                                className={
+                                  "text-muted-foreground " +
+                                  (m.direction === "outbound" && !(m as any).read
+                                    ? "font-semibold text-foreground"
+                                    : "")
+                                }
+                              >
+                                {m.contact_name ??
+                                  (m.direction === "inbound" ? "From you" : "From NEVO")}
                               </span>
                             </div>
                             <span className="text-xs text-muted-foreground">
@@ -747,17 +790,24 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                               {m.body}
                             </div>
                           )}
-                          {Array.isArray((m as any).attachments) && (m as any).attachments.length > 0 && (
-                            <div className="flex flex-col gap-2 mt-2">
-                              {((m as any).attachments as Array<{ name: string; path: string; mime?: string }>).map((a, i) => (
-                                <AttachmentPreview
-                                  key={i}
-                                  attachment={a}
-                                  customerId={customerId}
-                                />
-                              ))}
-                            </div>
-                          )}
+                          {Array.isArray((m as any).attachments) &&
+                            (m as any).attachments.length > 0 && (
+                              <div className="flex flex-col gap-2 mt-2">
+                                {(
+                                  (m as any).attachments as Array<{
+                                    name: string;
+                                    path: string;
+                                    mime?: string;
+                                  }>
+                                ).map((a, i) => (
+                                  <AttachmentPreview
+                                    key={i}
+                                    attachment={a}
+                                    customerId={customerId}
+                                  />
+                                ))}
+                              </div>
+                            )}
                         </div>
                       ))}
                     </div>
@@ -837,11 +887,9 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
                 );
               });
             })()}
-
           </TabsContent>
 
           <TabsContent value="profile">
-
             <Card className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <User className="h-5 w-5 text-muted-foreground" />
@@ -931,7 +979,10 @@ function PortalTable({
       <TableBody>
         {rows.length === 0 && (
           <TableRow>
-            <TableCell colSpan={headers.length} className="text-center text-muted-foreground py-8 text-sm">
+            <TableCell
+              colSpan={headers.length}
+              className="text-center text-muted-foreground py-8 text-sm"
+            >
               {empty}
             </TableCell>
           </TableRow>
@@ -951,7 +1002,11 @@ function PortalTable({
 function guessKind(a: { name: string; mime?: string }): "image" | "pdf" | "other" {
   const mime = (a.mime ?? "").toLowerCase();
   const ext = a.name.toLowerCase().split(".").pop() ?? "";
-  if (mime.startsWith("image/") || ["png", "jpg", "jpeg", "gif", "webp", "avif", "svg", "bmp"].includes(ext)) return "image";
+  if (
+    mime.startsWith("image/") ||
+    ["png", "jpg", "jpeg", "gif", "webp", "avif", "svg", "bmp"].includes(ext)
+  )
+    return "image";
   if (mime === "application/pdf" || ext === "pdf") return "pdf";
   return "other";
 }
@@ -992,7 +1047,9 @@ function AttachmentPreview({
 
   async function openInTab() {
     try {
-      const res = url ? { url } : await urlFn({ data: { customer_id: customerId, path: attachment.path } });
+      const res = url
+        ? { url }
+        : await urlFn({ data: { customer_id: customerId, path: attachment.path } });
       if (res.url) window.open(res.url, "_blank", "noopener");
     } catch (e: any) {
       toast.error(e?.message ?? "Cannot open attachment");
@@ -1028,7 +1085,9 @@ function AttachmentPreview({
       <div className="rounded-md border border-border overflow-hidden bg-background max-w-md">
         {header}
         <div className="p-2">
-          {loading && <div className="text-xs text-muted-foreground py-8 text-center">Loading preview…</div>}
+          {loading && (
+            <div className="text-xs text-muted-foreground py-8 text-center">Loading preview…</div>
+          )}
           {error && <div className="text-xs text-destructive py-4 text-center">{error}</div>}
           {url && (
             <button type="button" onClick={openInTab} className="block w-full">
@@ -1049,10 +1108,16 @@ function AttachmentPreview({
     return (
       <div className="rounded-md border border-border overflow-hidden bg-background max-w-2xl w-full">
         {header}
-        {loading && <div className="text-xs text-muted-foreground py-8 text-center">Loading preview…</div>}
+        {loading && (
+          <div className="text-xs text-muted-foreground py-8 text-center">Loading preview…</div>
+        )}
         {error && <div className="text-xs text-destructive py-4 text-center">{error}</div>}
         {url && (
-          <object data={`${url}#toolbar=0&navpanes=0`} type="application/pdf" className="w-full h-96 bg-muted">
+          <object
+            data={`${url}#toolbar=0&navpanes=0`}
+            type="application/pdf"
+            className="w-full h-96 bg-muted"
+          >
             <div className="p-4 text-xs text-muted-foreground text-center">
               PDF preview isn't supported in this browser.{" "}
               <button type="button" onClick={openInTab} className="underline">

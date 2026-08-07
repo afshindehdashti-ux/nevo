@@ -4,13 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsSuperAdmin } from "@/lib/crm-hooks";
 import { AccessDenied } from "@/components/crm/AccessDenied";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -80,12 +74,7 @@ type LogRow = {
 };
 
 type AlertType =
-  | "sign_in_failed"
-  | "security_alert"
-  | "revoke_session"
-  | "sign_out_all"
-  | "reject"
-  | "delete";
+  "sign_in_failed" | "security_alert" | "revoke_session" | "sign_out_all" | "reject" | "delete";
 
 const ALERT_TYPES: AlertType[] = [
   "sign_in_failed",
@@ -123,10 +112,7 @@ const SEVERITY_COLOR: Record<"high" | "medium" | "low", string> = {
 
 export const Route = createFileRoute("/_authenticated/admin/security-alerts")({
   head: () => ({
-    meta: [
-      { title: "Security Alerts — NEVO CRM" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Security Alerts — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   component: SecurityAlertsPage,
 });
@@ -173,7 +159,10 @@ function SecurityAlertsPage() {
         .select("id,full_name")
         .in("id", actorIds);
       if (error) throw error;
-      return Object.fromEntries((data ?? []).map((p) => [p.id, p.full_name])) as Record<string, string | null>;
+      return Object.fromEntries((data ?? []).map((p) => [p.id, p.full_name])) as Record<
+        string,
+        string | null
+      >;
     },
   });
 
@@ -219,9 +208,7 @@ function SecurityAlertsPage() {
   function exportAlerts(kind: "csv" | "pdf") {
     const rows = filtered.map((r) => {
       const meta = TYPE_META[r.action as AlertType];
-      const actorName = r.user_id
-        ? (actors.data?.[r.user_id] ?? r.user_id)
-        : "system";
+      const actorName = r.user_id ? (actors.data?.[r.user_id] ?? r.user_id) : "system";
       return {
         when: format(new Date(r.created_at), "yyyy-MM-dd HH:mm:ss"),
         type: meta?.label ?? r.action,
@@ -229,26 +216,17 @@ function SecurityAlertsPage() {
         actor: actorName,
         entity_type: r.entity_type ?? "—",
         entity_id: r.entity_id ?? "—",
-        metadata:
-          r.metadata && Object.keys(r.metadata).length
-            ? JSON.stringify(r.metadata)
-            : "",
+        metadata: r.metadata && Object.keys(r.metadata).length ? JSON.stringify(r.metadata) : "",
       };
     });
     if (kind === "csv") {
       downloadCsv("security-alerts", EXPORT_COLUMNS, rows);
     } else {
-      downloadPdf(
-        "security-alerts",
-        `NEVO CRM — Security Alerts (${range})`,
-        EXPORT_COLUMNS,
-        rows,
-      );
+      downloadPdf("security-alerts", `NEVO CRM — Security Alerts (${range})`, EXPORT_COLUMNS, rows);
     }
   }
 
   if (!isSuperAdmin) return <AccessDenied />;
-
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -258,8 +236,8 @@ function SecurityAlertsPage() {
             <ShieldAlert className="h-6 w-6" /> Security Alerts
           </h1>
           <p className="text-sm text-muted-foreground">
-            Recent security events across auth, sessions, approvals and audited
-            deletes. Auto-refresh every 30s.
+            Recent security events across auth, sessions, approvals and audited deletes.
+            Auto-refresh every 30s.
           </p>
         </div>
         <div className="flex gap-2">
@@ -280,12 +258,8 @@ function SecurityAlertsPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => exportAlerts("csv")}>
-                Download CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => exportAlerts("pdf")}>
-                Download PDF
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => exportAlerts("csv")}>Download CSV</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => exportAlerts("pdf")}>Download PDF</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Button
@@ -301,9 +275,12 @@ function SecurityAlertsPage() {
         </div>
       </div>
 
-
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <StatTile label="High severity" value={totalHigh} tone={totalHigh > 0 ? "bad" : undefined} />
+        <StatTile
+          label="High severity"
+          value={totalHigh}
+          tone={totalHigh > 0 ? "bad" : undefined}
+        />
         {ALERT_TYPES.map((t) => (
           <StatTile key={t} label={TYPE_META[t].label} value={counts[t]} />
         ))}
@@ -373,9 +350,7 @@ function SecurityAlertsPage() {
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Events</CardTitle>
           <CardDescription>
-            {q.isLoading
-              ? "Loading…"
-              : `${filtered.length} shown · window ${range} · limit 500`}
+            {q.isLoading ? "Loading…" : `${filtered.length} shown · window ${range} · limit 500`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -407,7 +382,7 @@ function SecurityAlertsPage() {
                   const meta = TYPE_META[r.action as AlertType];
                   const Icon = meta?.Icon ?? Bell;
                   const actorName = r.user_id
-                    ? actors.data?.[r.user_id] ?? r.user_id.slice(0, 8)
+                    ? (actors.data?.[r.user_id] ?? r.user_id.slice(0, 8))
                     : "system";
                   return (
                     <TableRow
@@ -415,7 +390,10 @@ function SecurityAlertsPage() {
                       className="cursor-pointer hover:bg-muted/40"
                       onClick={() => setOpenRow(r)}
                     >
-                      <TableCell className="whitespace-nowrap text-xs text-muted-foreground" title={format(new Date(r.created_at), "PPpp")}>
+                      <TableCell
+                        className="whitespace-nowrap text-xs text-muted-foreground"
+                        title={format(new Date(r.created_at), "PPpp")}
+                      >
                         {formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}
                       </TableCell>
                       <TableCell>
@@ -433,11 +411,21 @@ function SecurityAlertsPage() {
                       <TableCell className="text-xs">
                         <span className="font-mono">{r.entity_type ?? "—"}</span>
                         {r.entity_id ? (
-                          <span className="text-muted-foreground"> · {r.entity_id.slice(0, 8)}</span>
+                          <span className="text-muted-foreground">
+                            {" "}
+                            · {r.entity_id.slice(0, 8)}
+                          </span>
                         ) : null}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); setOpenRow(r); }}>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenRow(r);
+                          }}
+                        >
                           View
                         </Button>
                       </TableCell>
@@ -455,7 +443,9 @@ function SecurityAlertsPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ShieldAlert className="h-5 w-5" />
-              {openRow ? TYPE_META[openRow.action as AlertType]?.label ?? openRow.action : "Event"}
+              {openRow
+                ? (TYPE_META[openRow.action as AlertType]?.label ?? openRow.action)
+                : "Event"}
             </DialogTitle>
             <DialogDescription>
               {openRow ? format(new Date(openRow.created_at), "PPpp") : ""}
@@ -465,21 +455,27 @@ function SecurityAlertsPage() {
             <div className="space-y-4 text-sm">
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Actor">
-                  {openRow.user_id
-                    ? actors.data?.[openRow.user_id] ?? openRow.user_id
-                    : "system"}
+                  {openRow.user_id ? (actors.data?.[openRow.user_id] ?? openRow.user_id) : "system"}
                 </Field>
                 <Field label="Severity">
-                  <Badge className={`capitalize ${SEVERITY_COLOR[TYPE_META[openRow.action as AlertType]?.severity ?? "low"]}`}>
+                  <Badge
+                    className={`capitalize ${SEVERITY_COLOR[TYPE_META[openRow.action as AlertType]?.severity ?? "low"]}`}
+                  >
                     {TYPE_META[openRow.action as AlertType]?.severity ?? "low"}
                   </Badge>
                 </Field>
-                <Field label="Entity type"><span className="font-mono text-xs">{openRow.entity_type ?? "—"}</span></Field>
-                <Field label="Entity id"><span className="font-mono text-xs break-all">{openRow.entity_id ?? "—"}</span></Field>
+                <Field label="Entity type">
+                  <span className="font-mono text-xs">{openRow.entity_type ?? "—"}</span>
+                </Field>
+                <Field label="Entity id">
+                  <span className="font-mono text-xs break-all">{openRow.entity_id ?? "—"}</span>
+                </Field>
               </div>
               {openRow.metadata && Object.keys(openRow.metadata).length > 0 && (
                 <div>
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Metadata</div>
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+                    Metadata
+                  </div>
                   <pre className="text-xs bg-muted rounded-md p-3 overflow-auto max-h-72">
                     {JSON.stringify(openRow.metadata, null, 2)}
                   </pre>
@@ -500,15 +496,7 @@ function SecurityAlertsPage() {
   );
 }
 
-function StatTile({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone?: "bad" | "warn";
-}) {
+function StatTile({ label, value, tone }: { label: string; value: number; tone?: "bad" | "warn" }) {
   const toneClass =
     tone === "bad"
       ? "text-rose-600 dark:text-rose-400"
@@ -518,7 +506,9 @@ function StatTile({
   return (
     <Card>
       <CardContent className="p-3">
-        <div className="text-xs text-muted-foreground truncate" title={label}>{label}</div>
+        <div className="text-xs text-muted-foreground truncate" title={label}>
+          {label}
+        </div>
         <div className={`text-2xl font-semibold tabular-nums ${toneClass}`}>{value}</div>
       </CardContent>
     </Card>

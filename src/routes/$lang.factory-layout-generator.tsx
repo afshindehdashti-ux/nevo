@@ -60,14 +60,7 @@ import {
 } from "@/lib/factory-layout";
 
 type ViewMode =
-  | "top"
-  | "iso"
-  | "material"
-  | "truck"
-  | "operator"
-  | "utility"
-  | "expansion"
-  | "equipment";
+  "top" | "iso" | "material" | "truck" | "operator" | "utility" | "expansion" | "equipment";
 
 const VIEW_MODES: {
   id: ViewMode;
@@ -887,7 +880,7 @@ function FactoryLayoutPage() {
             automation,
             building,
             shift,
-            source: "factory-layout-generator",
+            source: "new-factory",
           }}
           className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-2.5 text-sm font-medium text-black transition hover:bg-emerald-400"
         >

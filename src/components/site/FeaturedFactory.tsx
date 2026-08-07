@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { ArrowRight } from "lucide-react";
-import heroImgAsset from "@/assets/premium/01-aerial-factory.jpg.asset.json";
-const heroImg = heroImgAsset.url;
+import heroImg from "@/assets/project/hero-factory.jpg";
 import { Section, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/site/LocalizedLink";

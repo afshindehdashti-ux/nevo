@@ -21,58 +21,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        id: setup-bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
+          version: 11.13.1
 
-      - name: Compute cache keys
-        id: cache-keys
-        run: |
-          BUN_VERSION="$(bun --version)"
-          echo "bun-version=${BUN_VERSION}" >> "$GITHUB_OUTPUT"
-          LOCK_HASH="${{ hashFiles('bun.lock', 'package.json') }}"
-          echo "primary=${{ runner.os }}-bun-${BUN_VERSION}-${LOCK_HASH}" >> "$GITHUB_OUTPUT"
-          echo "restore=${{ runner.os }}-bun-${BUN_VERSION}-" >> "$GITHUB_OUTPUT"
-
-      - name: Restore Bun cache (global store + node_modules)
-        id: bun-cache
-        uses: actions/cache@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: |
-            ~/.bun/install/cache
-            node_modules
-          key: ${{ steps.cache-keys.outputs.primary }}
-          restore-keys: |
-            ${{ steps.cache-keys.outputs.restore }}
-            ${{ runner.os }}-bun-
+          node-version: "22"
+          cache: pnpm
 
-      - name: Report cache status
+      - name: Report package manager
         run: |
-          echo "Bun version:  ${{ steps.cache-keys.outputs.bun-version }}"
-          echo "Cache key:    ${{ steps.cache-keys.outputs.primary }}"
-          echo "Cache hit:    ${{ steps.bun-cache.outputs.cache-hit }}"
-          echo "Matched key:  ${{ steps.bun-cache.outputs.cache-matched-key }}"
-          if [ -d node_modules ]; then
-            echo "node_modules: present ($(find node_modules -maxdepth 1 -mindepth 1 -type d | wc -l) top-level packages)"
-          else
-            echo "node_modules: missing (will be populated by bun install)"
-          fi
+          PNPM_VERSION="$(pnpm --version)"
+          echo "pnpm version: ${PNPM_VERSION}"
           {
-            echo "### Bun dependency cache"
+            echo "### Dependency setup"
             echo ""
-            echo "- **Bun**: \`${{ steps.cache-keys.outputs.bun-version }}\`"
-            echo "- **Key**: \`${{ steps.cache-keys.outputs.primary }}\`"
-            echo "- **Hit**: \`${{ steps.bun-cache.outputs.cache-hit || 'false' }}\`"
-            echo "- **Matched key**: \`${{ steps.bun-cache.outputs.cache-matched-key || '(none)' }}\`"
+            echo "- **Node.js**: \`$(node --version)\`"
+            echo "- **pnpm**: \`${PNPM_VERSION}\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install dependencies
         run: |
           START=$SECONDS
-          bun install --frozen-lockfile || bun install
-          echo "bun install took $((SECONDS-START))s"
+          pnpm install --frozen-lockfile
+          echo "pnpm install took $((SECONDS-START))s"
           echo "- **Install time**: \`$((SECONDS-START))s\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Prettier format check
@@ -81,7 +56,7 @@ jobs:
           mkdir -p build-logs
           set -o pipefail
           START=$SECONDS
-          bun run format:check 2>&1 | tee build-logs/prettier.log || FORMAT_EXIT=$?
+          pnpm format:check 2>&1 | tee build-logs/prettier.log || FORMAT_EXIT=$?
           echo "- **format check time**: \`$((SECONDS-START))s\` (exit=${FORMAT_EXIT:-0})" >> "$GITHUB_STEP_SUMMARY"
           exit ${FORMAT_EXIT:-0}
 
@@ -94,7 +69,7 @@ jobs:
           # `--pretty false` keeps output diff-clean; the reviewdog-style prefix
           # `file(line,col): error TSxxxx: message` is auto-matched by the
           # GitHub Actions TSC problem matcher, so failures annotate the PR.
-          bun run typecheck --pretty false 2>&1 | tee build-logs/typecheck.log
+          pnpm typecheck --pretty false 2>&1 | tee build-logs/typecheck.log
           echo "- **typecheck time**: \`$((SECONDS-START))s\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: ESLint
@@ -106,10 +81,10 @@ jobs:
           mkdir -p build-logs
           set -o pipefail
           START=$SECONDS
-          bun run lint --format=stylish 2>&1 | tee build-logs/lint.log || LINT_EXIT=$?
+          pnpm exec eslint . --format=stylish 2>&1 | tee build-logs/lint.log || LINT_EXIT=$?
           # Emit `::error/::warning file=…,line=…,col=…::message` per finding so
           # they render inline on the PR "Files changed" tab.
-          bunx eslint . --format=compact 2>/dev/null | awk '
+          pnpm exec eslint . --format=compact 2>/dev/null | awk '
             match($0, /^(.*): line ([0-9]+), col ([0-9]+), (Error|Warning) - (.*)$/, a) {
               lvl = (a[4]=="Error") ? "error" : "warning";
               printf("::%s file=%s,line=%s,col=%s::%s\n", lvl, a[1], a[2], a[3], a[5]);
@@ -125,7 +100,7 @@ jobs:
           mkdir -p build-logs
           set -o pipefail
           START=$SECONDS
-          bun run build:dev:diagnose 2>&1 | tee build-logs/build-dev.log
+          pnpm build:dev:diagnose 2>&1 | tee build-logs/build-dev.log
           echo "- **build:dev time**: \`$((SECONDS-START))s\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Prettier log

@@ -27,9 +27,7 @@ async function assertCanPurge(context: {
   });
   if (error) throw new Error(error.message);
   if (!allowed) {
-    throw new Error(
-      "You do not have permission to export the purge audit log.",
-    );
+    throw new Error("You do not have permission to export the purge audit log.");
   }
 }
 
@@ -45,7 +43,7 @@ const FilteredInput = z.object({
 
 export const listPurgeAuditForExport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => FilteredInput.parse(v))
+  .validator((v) => FilteredInput.parse(v))
   .handler(async ({ context, data }): Promise<PurgeAuditExportResult> => {
     await assertCanPurge(context);
     let q = context.supabase
@@ -55,15 +53,16 @@ export const listPurgeAuditForExport = createServerFn({ method: "POST" })
       .eq("entity_type", "invoice")
       .eq("entity_id", data.invoice_id);
     if (data.user_filter === "__system__") q = q.is("user_id", null);
-    else if (data.user_filter && data.user_filter !== "all")
-      q = q.eq("user_id", data.user_filter);
+    else if (data.user_filter && data.user_filter !== "all") q = q.eq("user_id", data.user_filter);
     if (data.from_date)
       q = q.gte("created_at", new Date(data.from_date + "T00:00:00").toISOString());
     if (data.to_date)
       q = q.lte("created_at", new Date(data.to_date + "T23:59:59.999").toISOString());
-    const { data: rows, error, count } = await q
-      .order(data.sort_column, { ascending: data.sort_ascending })
-      .limit(data.limit);
+    const {
+      data: rows,
+      error,
+      count,
+    } = await q.order(data.sort_column, { ascending: data.sort_ascending }).limit(data.limit);
     if (error) throw new Error(error.message);
     return {
       rows: (rows ?? []) as PurgeAuditRow[],
@@ -78,7 +77,7 @@ const SelectedInput = z.object({
 
 export const listPurgeAuditByIds = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => SelectedInput.parse(v))
+  .validator((v) => SelectedInput.parse(v))
   .handler(async ({ context, data }): Promise<PurgeAuditRow[]> => {
     await assertCanPurge(context);
     const { data: rows, error } = await context.supabase
@@ -124,7 +123,7 @@ export type CsvExportAuditRecord = {
 
 export const recordCsvExportAudit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => RecordExportInput.parse(v))
+  .validator((v) => RecordExportInput.parse(v))
   .handler(async ({ context, data }): Promise<{ id: string }> => {
     await assertCanPurge(context);
     const { data: row, error } = await context.supabase
@@ -167,7 +166,7 @@ export type CsvExportAuditListResult = {
 
 export const listCsvExportAudit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => ListExportInput.parse(v))
+  .validator((v) => ListExportInput.parse(v))
   .handler(async ({ context, data }): Promise<CsvExportAuditListResult> => {
     await assertCanPurge(context);
     let q = context.supabase
@@ -187,20 +186,18 @@ export const listCsvExportAudit = createServerFn({ method: "POST" })
     if (data.search && data.search.trim()) {
       const term = data.search.trim().replace(/[%,]/g, "");
       // Filename, sha256, or entity id contains term (case-insensitive).
-      q = q.or(
-        `filename.ilike.%${term}%,sha256.ilike.%${term}%,entity_id.ilike.%${term}%`,
-      );
+      q = q.or(`filename.ilike.%${term}%,sha256.ilike.%${term}%,entity_id.ilike.%${term}%`);
     }
-    const { data: rows, error, count } = await q
-      .order("created_at", { ascending: false })
-      .limit(data.limit);
+    const {
+      data: rows,
+      error,
+      count,
+    } = await q.order("created_at", { ascending: false }).limit(data.limit);
     if (error) throw new Error(error.message);
     const list = (rows ?? []) as CsvExportAuditRecord[];
 
     // Distinct actor lookup for the filter dropdown.
-    const userIds = Array.from(
-      new Set(list.map((r) => r.user_id).filter((v): v is string => !!v)),
-    );
+    const userIds = Array.from(new Set(list.map((r) => r.user_id).filter((v): v is string => !!v)));
     let actors: Array<{ user_id: string; full_name: string | null }> = [];
     if (userIds.length > 0) {
       const { data: profs } = await context.supabase

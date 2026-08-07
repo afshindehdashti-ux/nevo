@@ -41,7 +41,7 @@ async function callAi(prompt: string, apiKey: string): Promise<string> {
 
 export const generateEntitySummary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => InputSchema.parse(raw))
+  .validator((raw: unknown) => InputSchema.parse(raw))
   .handler(async ({ data, context }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI is not configured.");

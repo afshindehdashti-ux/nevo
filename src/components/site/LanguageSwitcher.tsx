@@ -52,7 +52,7 @@ export function LanguageSwitcher({ variant = "header", onLight = false }: Langua
       <div className="border-t border-border/70 px-5 py-4">
         <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
           <Globe className="size-3.5" strokeWidth={1.75} />
-          Language / اللغة / 语言
+          Language / فارسی / العربية / 语言
         </div>
         <div className="grid grid-cols-2 gap-2">
           {LOCALES.map((l) => {

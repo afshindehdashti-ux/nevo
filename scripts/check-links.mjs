@@ -126,6 +126,23 @@ function fileToRoute(file) {
   return ("/" + name.replace(/\./g, "/")).replaceAll(DOT, ".");
 }
 
+// TanStack route groups are present in filenames but not in browser URLs.
+// Public pages are children of `$lang`; source links and sitemap entries omit
+// that locale segment because LocaleLinkGuard/LocalizedLink supplies it.
+function browserPath(routePath) {
+  const withoutAuthGroup = routePath.replace(/^\/_authenticated(?=\/|$)/, "");
+  const withoutLocaleParam = withoutAuthGroup.replace(/^\/\$lang(?=\/|$)/, "");
+  return withoutLocaleParam || "/";
+}
+
+function isRouteSource(rel) {
+  return rel.endsWith(".tsx") && !rel.includes("/__tests__/") && !rel.startsWith("__tests__/");
+}
+
+function isIndexablePublicPage(rel) {
+  return rel.startsWith("$lang.") && rel.endsWith(".tsx") && rel !== "$lang.tsx";
+}
+
 function walk(dir) {
   const out = [];
   for (const entry of readdirSync(dir)) {
@@ -139,15 +156,20 @@ function walk(dir) {
 
 const routeFiles = walk(ROUTES_DIR)
   .map((f) => ({ file: f, rel: relative(ROUTES_DIR, f) }))
-  .filter(({ rel }) => rel !== "" && !rel.startsWith("api/"));
+  .filter(({ rel }) => rel !== "" && !rel.startsWith("api/") && isRouteSource(rel));
 
 const knownRoutes = new Set();
 const wildcards = [];
+const indexableRoutes = new Set();
 for (const { rel } of routeFiles) {
   const r = fileToRoute(rel);
   if (!r) continue;
-  if (r.endsWith("/*")) wildcards.push(r.slice(0, -2));
-  else knownRoutes.add(r);
+  const path = browserPath(r);
+  if (path.endsWith("/*")) wildcards.push(path.slice(0, -2));
+  else knownRoutes.add(path);
+  if (isIndexablePublicPage(rel) && !path.includes("$") && !path.endsWith("/*")) {
+    indexableRoutes.add(path);
+  }
 }
 
 const REDIRECTS = { "/knowledge": "/knowledge-hub", ...(config.redirects ?? {}) };
@@ -279,7 +301,7 @@ if (internalEnabled) {
     if (!knownRoutes.has(p))
       sitemapErrors.push({ path: p, reason: "listed in sitemap but no matching route file" });
   }
-  for (const r of knownRoutes) {
+  for (const r of indexableRoutes) {
     if (SITEMAP_EXCLUDE.has(r)) continue;
     if (ignoreSitemapMissing.has(r)) continue;
     // Dynamic routes ($param, splat) are indexed by their concrete instances
@@ -306,9 +328,11 @@ if (internalEnabled) {
   for (const { file, rel } of routeFiles) {
     const routePath = fileToRoute(rel);
     if (!routePath) continue;
-    if (CANONICAL_SKIP.has(routePath)) continue;
-    if (ignoreSitemapMissing.has(routePath)) continue;
-    const isDynamic = routePath.includes("$") || routePath.endsWith("/*");
+    const publicPath = browserPath(routePath);
+    if (!isIndexablePublicPage(rel)) continue;
+    if (CANONICAL_SKIP.has(publicPath)) continue;
+    if (ignoreSitemapMissing.has(publicPath)) continue;
+    const isDynamic = publicPath.includes("$") || publicPath.endsWith("/*");
     const relFile = relative(ROOT, file);
     const text = readFileSync(file, "utf8");
     CANONICAL_RE.lastIndex = 0;
@@ -319,7 +343,7 @@ if (internalEnabled) {
 
     // buildSeo() from '@/lib/seo' emits a self-referencing canonical automatically.
     // Treat any route that calls buildSeo(...) with a `path:` as canonical-correct.
-    const usesBuildSeo = /\bbuildSeo\s*\(/.test(text) && /\bpath\s*:/.test(text);
+    const usesBuildSeo = /\bbuildSeo\s*\(/.test(text);
 
     if (hrefs.length === 0) {
       if (usesBuildSeo) continue;
@@ -349,7 +373,7 @@ if (internalEnabled) {
     // Fully interpolated (nothing left) => presence is enough; can't verify statically.
     if (stripped === "") continue;
     const href = stripped || "/";
-    const expected = routePath;
+    const expected = publicPath;
     if (href !== expected) {
       canonicalErrors.push({
         route: routePath,

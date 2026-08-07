@@ -3,6 +3,7 @@ import {
   Outlet,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -25,6 +26,7 @@ import { LogoTelemetryOverlay } from "../components/site/LogoTelemetryOverlay";
 import { Toaster } from "../components/ui/sonner";
 import { orgJsonLd, websiteJsonLd, ldScript, hreflangLinks } from "../lib/seo";
 import { LanguageProvider } from "../i18n/LanguageProvider";
+import { DEFAULT_LOCALE, localeDir, localeFromPathname } from "../i18n/config";
 import "../i18n/config";
 // Dev-only: exposes window.__nevoLogoDebug for validating sampling/throttle configs.
 import "../lib/logo-telemetry-debug";
@@ -234,8 +236,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const lang = localeFromPathname(pathname) ?? DEFAULT_LOCALE;
+
   return (
-    <html lang="en">
+    <html lang={lang} dir={localeDir(lang)}>
       <head>
         <HeadContent />
       </head>
@@ -249,6 +254,8 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const routeLocale = localeFromPathname(pathname) ?? undefined;
   // Shared hook — subscribes to router state so the gate re-evaluates on
   // every client-side navigation. Layout-level components must use this
   // helper (not a local regex) to keep public/backend gating consistent.
@@ -256,7 +263,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
+      <LanguageProvider initialLang={routeLocale}>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         {/* Public marketing chrome — hidden on all admin/CRM/backoffice
@@ -277,4 +284,3 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
-

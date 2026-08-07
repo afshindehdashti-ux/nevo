@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "src/routes/sitemap[.]xml.ts"
+      - "src/routes/sitemap*xml.ts"
       - "src/routeTree.gen.ts"
       - ".github/workflows/submit-sitemap.yml"
       - "scripts/submit_sitemap.py"
@@ -27,7 +27,6 @@ jobs:
       SITE_URL: https://nevo-engineering-hub.lovable.app/
       SITEMAP_URL: https://nevo-engineering-hub.lovable.app/sitemap.xml
       REPORT_JSON: sitemap-report.json
-      REPORT_MD: ${{ github.step_summary }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -45,9 +44,9 @@ jobs:
       - name: Submit sitemap and read status
         run: |
           if [ "${{ github.event.inputs.skip_submit }}" = "true" ]; then
-            python3 scripts/submit_sitemap.py --skip-submit
+            REPORT_MD="$GITHUB_STEP_SUMMARY" python3 scripts/submit_sitemap.py --skip-submit
           else
-            python3 scripts/submit_sitemap.py
+            REPORT_MD="$GITHUB_STEP_SUMMARY" python3 scripts/submit_sitemap.py
           fi
 
       - name: Upload JSON snapshot

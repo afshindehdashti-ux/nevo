@@ -1,10 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import {
-  financeBalanceDue,
-  financeTotalAmount,
-} from "./finance-normalization";
+import { financeBalanceDue, financeTotalAmount } from "./finance-normalization";
 
 /** All server functions that back the NEVO internal AI Assistant. */
 
@@ -55,7 +52,7 @@ export const listChatSessions = createServerFn({ method: "GET" })
 
 export const createChatSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         title: z.string().min(1).max(200).optional(),
@@ -81,7 +78,7 @@ export const createChatSession = createServerFn({ method: "POST" })
 
 export const renameChatSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z.object({ id: z.string().uuid(), title: z.string().min(1).max(200) }).parse(raw),
   )
   .handler(async ({ data, context }) => {
@@ -96,7 +93,7 @@ export const renameChatSession = createServerFn({ method: "POST" })
 
 export const deleteChatSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
+  .validator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("ai_chat_sessions")
@@ -109,7 +106,7 @@ export const deleteChatSession = createServerFn({ method: "POST" })
 
 export const getChatSessionMessages = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => z.object({ session_id: z.string().uuid() }).parse(raw))
+  .validator((raw: unknown) => z.object({ session_id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase
       .from("ai_chat_messages")
@@ -135,7 +132,7 @@ Company: NEVO TRADING AND CONSULTANCY L.L.C - FZ. Website: www.nevoindustrial.co
 
 export const askAssistant = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         session_id: z.string().uuid(),
@@ -277,7 +274,7 @@ export const askAssistant = createServerFn({ method: "POST" })
 
 export const listKnowledgeDocuments = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         category: CATEGORY.optional(),
@@ -307,7 +304,7 @@ export const listKnowledgeDocuments = createServerFn({ method: "GET" })
 
 export const deleteKnowledgeDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
+  .validator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     // Fetch file_url so we can also remove the storage object.
     const { data: doc } = await context.supabase
@@ -318,14 +315,17 @@ export const deleteKnowledgeDocument = createServerFn({ method: "POST" })
     const { error } = await context.supabase.from("ai_documents").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     if (doc?.file_url) {
-      await context.supabase.storage.from("ai-knowledge").remove([doc.file_url]).catch(() => {});
+      await context.supabase.storage
+        .from("ai-knowledge")
+        .remove([doc.file_url])
+        .catch(() => {});
     }
     return { ok: true };
   });
 
 export const ingestKnowledgeDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         title: z.string().min(1).max(200),
@@ -349,9 +349,8 @@ export const ingestKnowledgeDocument = createServerFn({ method: "POST" })
       .parse(raw),
   )
   .handler(async ({ data, context }) => {
-    const { chunkText, embedBatch, extractText, AI_EMBED_BATCH } = await import(
-      "./ai-assistant.server"
-    );
+    const { chunkText, embedBatch, extractText, AI_EMBED_BATCH } =
+      await import("./ai-assistant.server");
     const { supabase, userId } = context;
 
     // Insert the parent doc row in `processing` state.
@@ -450,7 +449,7 @@ const InvoiceFinding = z.object({
 
 export const checkInvoiceIntegrity = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => z.object({ invoice_id: z.string().uuid() }).parse(raw))
+  .validator((raw: unknown) => z.object({ invoice_id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { chatComplete } = await import("./ai-assistant.server");
     const { supabase } = context;
@@ -532,7 +531,7 @@ Check: customer/supplier name, invoice number, issue and due dates, line items (
 
 export const getRecordSummary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         module: z.enum(["customer", "supplier", "order", "invoice", "quotation", "lead"]),
@@ -613,7 +612,7 @@ export const getRecordSummary = createServerFn({ method: "POST" })
 
 export const logAiAction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         action_type: z.string().min(1).max(80),

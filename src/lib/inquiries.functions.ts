@@ -78,7 +78,7 @@ function requestMeta(): { ip: string | null; ua: string | null } {
 // ---------- Server functions ----------
 
 export const submitInquiry = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => InquirySchema.parse(data))
+  .validator((data: unknown) => InquirySchema.parse(data))
   .handler(async ({ data }) => {
     // Honeypot: silently succeed to fool bots.
     if (data.website && data.website.length > 0) {
@@ -108,20 +108,14 @@ export const submitInquiry = createServerFn({ method: "POST" })
       throw new Error("Failed to submit inquiry");
     }
     const inquiryId = (inserted as { id: string } | null)?.id ?? null;
-    const referenceId = inquiryId
-      ? `INQ-${inquiryId.slice(0, 8).toUpperCase()}`
-      : undefined;
+    const referenceId = inquiryId ? `INQ-${inquiryId.slice(0, 8).toUpperCase()}` : undefined;
     const submittedAt = new Date().toISOString();
 
     // Fire confirmation to customer + notification to internal team.
     // Failures are logged but never block the customer response.
     try {
-      const { enqueueTransactionalEmail } = await import(
-        "@/lib/email-enqueue.server"
-      );
-      const { supabaseAdmin } = await import(
-        "@/integrations/supabase/client.server"
-      );
+      const { enqueueTransactionalEmail } = await import("@/lib/email-enqueue.server");
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
       // Resolve team recipient(s): company_settings.email, else fallback.
       let teamRecipient = "info@nevoindustrial.com";
@@ -140,10 +134,7 @@ export const submitInquiry = createServerFn({ method: "POST" })
         console.warn("submitInquiry: company_settings lookup failed", err);
       }
 
-      const siteUrl =
-        process.env.APP_URL ||
-        process.env.SITE_URL ||
-        "https://nevoindustrial.com";
+      const siteUrl = process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
 
       const jobs: Array<Promise<unknown>> = [];
 
@@ -200,11 +191,7 @@ export const submitInquiry = createServerFn({ method: "POST" })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const res = r.value as any;
           if (res && res.ok === false) {
-            console.warn(
-              `submitInquiry: ${label} not queued`,
-              res.reason,
-              res.message,
-            );
+            console.warn(`submitInquiry: ${label} not queued`, res.reason, res.message);
           }
         }
       });
@@ -215,9 +202,8 @@ export const submitInquiry = createServerFn({ method: "POST" })
     return { ok: true as const, referenceId };
   });
 
-
 export const logDownload = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => DownloadSchema.parse(data))
+  .validator((data: unknown) => DownloadSchema.parse(data))
   .handler(async ({ data }) => {
     const meta = requestMeta();
     const supabase = serverClient();

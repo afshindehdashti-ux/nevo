@@ -8,15 +8,22 @@ import {
   runProformaTriggerRecomputeTest,
   runQuotationImportE2e,
 } from "@/lib/erp-qa.functions";
-import {
-  assertLatestProformaPdf,
-  type PdfE2eReport,
-} from "@/lib/proforma-pdf-e2e";
+import { assertLatestProformaPdf, type PdfE2eReport } from "@/lib/proforma-pdf-e2e";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2, XCircle, AlertTriangle, Loader2, Play, FlaskConical, FileCheck2, Calculator, FileInput } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Loader2,
+  Play,
+  FlaskConical,
+  FileCheck2,
+  Calculator,
+  FileInput,
+} from "lucide-react";
 
 type Check = {
   key: string;
@@ -106,9 +113,7 @@ export function ErpFinanceDiagnostic() {
   const [test, setTest] = useState<FinanceReport | null>(null);
   const [pdfReport, setPdfReport] = useState<PdfE2eReport | null>(null);
   const [iso, setIso] = useState<IsoReport | null>(null);
-  const [trig, setTrig] = useState<
-    (IsoReport & { expected: Record<string, number> }) | null
-  >(null);
+  const [trig, setTrig] = useState<(IsoReport & { expected: Record<string, number> }) | null>(null);
   const [quoteImp, setQuoteImp] = useState<IsoReport | null>(null);
   const [qaLoading, setQaLoading] = useState(false);
   const [testLoading, setTestLoading] = useState(false);
@@ -184,8 +189,7 @@ export function ErpFinanceDiagnostic() {
     try {
       const r = (await runTrig()) as IsoReport & { expected: Record<string, number> };
       setTrig(r);
-      if (r.failed > 0)
-        toast.error(`Trigger recompute test: ${r.failed} failing assertion(s)`);
+      if (r.failed > 0) toast.error(`Trigger recompute test: ${r.failed} failing assertion(s)`);
       else toast.success("Trigger recompute test passed (vat_rate, discount_amount, grand_total)");
     } catch (e) {
       toast.error(`Trigger recompute test failed: ${(e as Error).message}`);
@@ -220,14 +224,18 @@ export function ErpFinanceDiagnostic() {
             ERP Finance Diagnostic
           </CardTitle>
           <CardDescription>
-            Live checks against the real database: schema, relations, numbering, storage, and end-to-end
-            workflow. No mock results.
+            Live checks against the real database: schema, relations, numbering, storage, and
+            end-to-end workflow. No mock results.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-2">
             <Button onClick={onRunQa} disabled={qaLoading}>
-              {qaLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
+              {qaLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="mr-2 h-4 w-4" />
+              )}
               Run diagnostic
             </Button>
             <Button variant="secondary" onClick={onRunTest} disabled={testLoading}>
@@ -333,8 +341,8 @@ export function ErpFinanceDiagnostic() {
           <CardHeader>
             <CardTitle>End-to-end Finance Test Steps</CardTitle>
             <CardDescription>
-              Al Noor Construction LLC · draft quotation · 3 line items · totals · edit · PDF · file link ·
-              activity log · cleanup
+              Al Noor Construction LLC · draft quotation · 3 line items · totals · edit · PDF · file
+              link · activity log · cleanup
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -379,8 +387,7 @@ export function ErpFinanceDiagnostic() {
             <CardDescription>
               Real PDF generated ({pdfReport.pageCount} page{pdfReport.pageCount === 1 ? "" : "s"},{" "}
               {(pdfReport.fileSize / 1024).toFixed(1)} KB) and text-extracted with pdfjs. Asserts
-              that VAT rate%, VAT amount, grand total, and the payment status stamp are all
-              present.
+              that VAT rate%, VAT amount, grand total, and the payment status stamp are all present.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -443,9 +450,9 @@ export function ErpFinanceDiagnostic() {
               <StatusBadge status={iso.failed === 0 ? "pass" : "fail"} />
             </CardTitle>
             <CardDescription>
-              Run <code>{iso.runId.slice(0, 8)}</code> · marker <code>{iso.marker}</code> ·
-              creates unique customer + proforma + items, always cleans up, then verifies zero
-              orphaned <code>proforma_invoice_items</code> remain.
+              Run <code>{iso.runId.slice(0, 8)}</code> · marker <code>{iso.marker}</code> · creates
+              unique customer + proforma + items, always cleans up, then verifies zero orphaned{" "}
+              <code>proforma_invoice_items</code> remain.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -488,12 +495,12 @@ export function ErpFinanceDiagnostic() {
               <StatusBadge status={trig.failed === 0 ? "pass" : "fail"} />
             </CardTitle>
             <CardDescription>
-              Inserts two line items with mixed discount % / discount amount / tax rate
-              inputs, then asserts the database triggers recompute
-              <code className="mx-1">vat_rate</code>,
-              <code className="mx-1">discount_amount</code>, and
-              <code className="mx-1">grand_total</code> on the parent proforma.
-              Test data is deleted after every run.
+              Inserts two line items with mixed discount % / discount amount / tax rate inputs, then
+              asserts the database triggers recompute
+              <code className="mx-1">vat_rate</code>,<code className="mx-1">discount_amount</code>,
+              and
+              <code className="mx-1">grand_total</code> on the parent proforma. Test data is deleted
+              after every run.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -545,10 +552,10 @@ export function ErpFinanceDiagnostic() {
             </CardTitle>
             <CardDescription>
               Run <code>{quoteImp.runId.slice(0, 8)}</code> · exercises the real
-              <code className="mx-1">runImportJob</code> server function through three
-              scenarios: happy-path totals, existing-customer reuse (case-insensitive),
-              and validation failures that must not leave partial rows. All test data
-              is cleaned up and orphan-verified afterwards.
+              <code className="mx-1">runImportJob</code> server function through three scenarios:
+              happy-path totals, existing-customer reuse (case-insensitive), and validation failures
+              that must not leave partial rows. All test data is cleaned up and orphan-verified
+              afterwards.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -581,11 +588,6 @@ export function ErpFinanceDiagnostic() {
           </CardContent>
         </Card>
       )}
-
-
-
-
-
 
       {qa && (failedChecks.length > 0 || warnChecks.length > 0) && (
         <Card>
@@ -629,11 +631,21 @@ export function ErpFinanceDiagnostic() {
               <div className="font-medium">Suggested implementation order</div>
               <ol className="list-decimal pl-5 space-y-1 text-muted-foreground">
                 <li>Fix any FAIL rows above (missing tables / RPCs / bucket).</li>
-                <li>Wire the finance server functions into the Quotations / Invoices UI (create, edit, convert).</li>
-                <li>Build the PDF renderer + upload to <code>documents</code> bucket, link into <code>document_files</code>.</li>
+                <li>
+                  Wire the finance server functions into the Quotations / Invoices UI (create, edit,
+                  convert).
+                </li>
+                <li>
+                  Build the PDF renderer + upload to <code>documents</code> bucket, link into{" "}
+                  <code>document_files</code>.
+                </li>
                 <li>Enable the Import Center UI (drag-drop, column mapping, dry-run).</li>
-                <li>Wire email dispatch via existing Resend + record to <code>email_log</code>.</li>
-                <li>Integrate CRM: customer/supplier detail pages surface related finance documents.</li>
+                <li>
+                  Wire email dispatch via existing Resend + record to <code>email_log</code>.
+                </li>
+                <li>
+                  Integrate CRM: customer/supplier detail pages surface related finance documents.
+                </li>
               </ol>
             </div>
           </CardContent>

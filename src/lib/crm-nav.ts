@@ -62,9 +62,7 @@ const FINANCE_ONLY: AppRole[] = ["management", "finance"];
 export const CRM_NAV: CrmNavGroup[] = [
   {
     label: "Overview",
-    items: [
-      { title: "Dashboard", url: "/admin", icon: LayoutDashboard, allowedRoles: ALL_STAFF },
-    ],
+    items: [{ title: "Dashboard", url: "/admin", icon: LayoutDashboard, allowedRoles: ALL_STAFF }],
   },
   {
     label: "Sales & CRM",
@@ -161,7 +159,12 @@ export const CRM_NAV: CrmNavGroup[] = [
   {
     label: "Telemetry",
     items: [
-      { title: "Logo Events", url: "/admin/logo-events", icon: ImageIcon, requiresSuperAdmin: true },
+      {
+        title: "Logo Events",
+        url: "/admin/logo-events",
+        icon: ImageIcon,
+        requiresSuperAdmin: true,
+      },
       {
         title: "Solutions SEO",
         url: "/admin/solutions-seo",
@@ -217,12 +220,32 @@ export const CRM_NAV: CrmNavGroup[] = [
         icon: Upload,
         allowedRoles: ["management", "operations", "finance"],
       },
-      { title: "Backend Health", url: "/admin/backend-health", icon: Activity, requiresSuperAdmin: true },
-      { title: "System Health", url: "/admin/system-health", icon: Activity, allowedRoles: ["management"] },
+      {
+        title: "Backend Health",
+        url: "/admin/backend-health",
+        icon: Activity,
+        requiresSuperAdmin: true,
+      },
+      {
+        title: "System Health",
+        url: "/admin/system-health",
+        icon: Activity,
+        allowedRoles: ["management"],
+      },
       { title: "QA Center", url: "/admin/qa-center", icon: Activity, allowedRoles: ["management"] },
       { title: "Backend Alerts", url: "/admin/alerts", icon: Bell, requiresSuperAdmin: true },
-      { title: "Security Alerts", url: "/admin/security-alerts", icon: ShieldAlert, requiresSuperAdmin: true },
-      { title: "Security Audit", url: "/admin/security-audit", icon: ShieldCheck, requiresSuperAdmin: true },
+      {
+        title: "Security Alerts",
+        url: "/admin/security-alerts",
+        icon: ShieldAlert,
+        requiresSuperAdmin: true,
+      },
+      {
+        title: "Security Audit",
+        url: "/admin/security-audit",
+        icon: ShieldCheck,
+        requiresSuperAdmin: true,
+      },
       { title: "Settings", url: "/admin/settings", icon: Settings, requiresSuperAdmin: true },
     ],
   },

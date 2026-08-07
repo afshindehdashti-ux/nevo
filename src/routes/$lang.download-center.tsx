@@ -35,14 +35,7 @@ import heroImg from "@/assets/downloads/hero-engineering-portrait.png.asset.json
 /* ─────────────────────────────────────────────────────────────── */
 
 type FilterKey =
-  | "all"
-  | "company"
-  | "factory"
-  | "lines"
-  | "materials"
-  | "panels"
-  | "engineering"
-  | "support";
+  "all" | "company" | "factory" | "lines" | "materials" | "panels" | "engineering" | "support";
 
 type Access = "download" | "request";
 

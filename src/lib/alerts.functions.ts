@@ -28,10 +28,7 @@ export type AlertsResponse = {
 
 const ALLOWED: AlertStatus[] = ["dlq", "failed", "bounced", "complained"];
 
-async function assertSuperAdmin(context: {
-  supabase: any;
-  userId: string;
-}) {
+async function assertSuperAdmin(context: { supabase: any; userId: string }) {
   const { data: isAdmin } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "super_admin",
@@ -41,7 +38,7 @@ async function assertSuperAdmin(context: {
 
 export const listAlerts = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
+  .validator(
     (input: {
       hours?: number;
       statuses?: AlertStatus[];
@@ -61,13 +58,9 @@ export const listAlerts = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }): Promise<AlertsResponse> => {
     await assertSuperAdmin(context);
-    const { supabaseAdmin } = await import(
-      "@/integrations/supabase/client.server"
-    );
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const since = new Date(
-      Date.now() - data.hours * 60 * 60 * 1000,
-    ).toISOString();
+    const since = new Date(Date.now() - data.hours * 60 * 60 * 1000).toISOString();
 
     // Fetch a wide window; we need every row per message_id to pick the latest,
     // then filter by status.
@@ -105,8 +98,7 @@ export const listAlerts = createServerFn({ method: "POST" })
       if (row.template_name) templates.add(row.template_name);
       if (!ALLOWED.includes(row.status as AlertStatus)) continue;
       counts.total++;
-      counts[row.status as AlertStatus] =
-        (counts[row.status as AlertStatus] ?? 0) + 1;
+      counts[row.status as AlertStatus] = (counts[row.status as AlertStatus] ?? 0) + 1;
       if (!data.statuses.includes(row.status as AlertStatus)) continue;
       if (data.template && row.template_name !== data.template) continue;
       if (data.search) {
@@ -124,14 +116,11 @@ export const listAlerts = createServerFn({ method: "POST" })
     // Queue DLQ depths
     let queues = { auth_emails_dlq: 0, transactional_emails_dlq: 0 };
     try {
-      const { data: metrics } = await (supabaseAdmin as any).rpc(
-        "get_backend_health_metrics",
-      );
+      const { data: metrics } = await (supabaseAdmin as any).rpc("get_backend_health_metrics");
       if (metrics?.queues) {
         queues = {
           auth_emails_dlq: metrics.queues.auth_emails_dlq ?? 0,
-          transactional_emails_dlq:
-            metrics.queues.transactional_emails_dlq ?? 0,
+          transactional_emails_dlq: metrics.queues.transactional_emails_dlq ?? 0,
         };
       }
     } catch {
@@ -163,15 +152,13 @@ export type AlertDetail = {
 
 export const getAlertDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { messageId: string }) => {
+  .validator((input: { messageId: string }) => {
     if (!input.messageId) throw new Error("messageId required");
     return { messageId: input.messageId.slice(0, 256) };
   })
   .handler(async ({ context, data }): Promise<AlertDetail> => {
     await assertSuperAdmin(context);
-    const { supabaseAdmin } = await import(
-      "@/integrations/supabase/client.server"
-    );
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: rows, error } = await supabaseAdmin
       .from("email_send_log")

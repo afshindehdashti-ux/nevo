@@ -25,10 +25,6 @@ export const Route = createFileRoute("/$lang")({
 function LangLayout() {
   const { lang } = Route.useParams();
   const { lang: current, setLang } = useLanguage();
-  // Ensure the i18n instance is on the right language for this render.
-  if (i18n.language !== lang) {
-    void i18n.changeLanguage(lang);
-  }
   useEffect(() => {
     if (current !== lang) setLang(lang as Locale);
   }, [lang, current, setLang]);

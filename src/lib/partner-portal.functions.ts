@@ -49,7 +49,7 @@ export const getMyPartnerContext = createServerFn({ method: "GET" })
 
 export const getMyPartnerLeads = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => PartnerScoped.parse(v))
+  .validator((v) => PartnerScoped.parse(v))
   .handler(async ({ context, data }) => {
     await assertLinked(context, data.partner_id);
     const { data: rows, error } = await context.supabase
@@ -66,7 +66,7 @@ export const getMyPartnerLeads = createServerFn({ method: "GET" })
 
 export const getMyPartnerCustomers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => PartnerScoped.parse(v))
+  .validator((v) => PartnerScoped.parse(v))
   .handler(async ({ context, data }) => {
     await assertLinked(context, data.partner_id);
     const { data: rows, error } = await context.supabase
@@ -81,12 +81,14 @@ export const getMyPartnerCustomers = createServerFn({ method: "GET" })
 
 export const getMyPartnerDocuments = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => PartnerScoped.parse(v))
+  .validator((v) => PartnerScoped.parse(v))
   .handler(async ({ context, data }) => {
     await assertLinked(context, data.partner_id);
     const { data: rows, error } = await context.supabase
       .from("doc_intel_documents")
-      .select("id, title, category, storage_bucket, storage_path, mime_type, file_size, created_at, status")
+      .select(
+        "id, title, category, storage_bucket, storage_path, mime_type, file_size, created_at, status",
+      )
       .eq("partner_id", data.partner_id)
       .eq("status", "approved")
       .order("created_at", { ascending: false })
@@ -97,7 +99,7 @@ export const getMyPartnerDocuments = createServerFn({ method: "GET" })
 
 export const getMyPartnerDocumentUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ document_id: z.string().uuid() }).parse(v))
+  .validator((v) => z.object({ document_id: z.string().uuid() }).parse(v))
   .handler(async ({ context, data }) => {
     const { data: doc, error } = await context.supabase
       .from("doc_intel_documents")
@@ -127,7 +129,7 @@ export const getMyPartnerDocumentUrl = createServerFn({ method: "POST" })
 
 export const getMyPartnerCommissions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => PartnerScoped.parse(v))
+  .validator((v) => PartnerScoped.parse(v))
   .handler(async ({ context, data }) => {
     await assertLinked(context, data.partner_id);
     const { data: rows, error } = await context.supabase
@@ -144,7 +146,7 @@ export const getMyPartnerCommissions = createServerFn({ method: "GET" })
 
 export const getMyPartnerPerformance = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => PartnerScoped.parse(v))
+  .validator((v) => PartnerScoped.parse(v))
   .handler(async ({ context, data }) => {
     await assertLinked(context, data.partner_id);
 
@@ -176,16 +178,17 @@ export const getMyPartnerPerformance = createServerFn({ method: "GET" })
 
     return {
       leadsTotal: leads.length,
-      leadsNew: leads.filter((l: any) => ["new", "contacted"].includes((l.status ?? "").toLowerCase())).length,
-      leadsConverted: leads.filter((l: any) => (l.status ?? "").toLowerCase() === "converted").length,
+      leadsNew: leads.filter((l: any) =>
+        ["new", "contacted"].includes((l.status ?? "").toLowerCase()),
+      ).length,
+      leadsConverted: leads.filter((l: any) => (l.status ?? "").toLowerCase() === "converted")
+        .length,
       customersTotal: customers.length,
       customersActive: customers.filter((c: any) => c.is_active).length,
       currency,
       commissionPending: sumBy((c) => c.status === "pending" || c.status === "approved"),
       commissionPaid: sumBy((c) => c.status === "paid"),
-      commissionYtd: sumBy(
-        (c) => c.status === "paid" && new Date(c.earned_at) >= ytdStart,
-      ),
+      commissionYtd: sumBy((c) => c.status === "paid" && new Date(c.earned_at) >= ytdStart),
       commissionCount: commissions.length,
     };
   });

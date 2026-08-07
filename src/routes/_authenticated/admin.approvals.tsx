@@ -69,9 +69,7 @@ function ApprovalsPage() {
   const thresholdsFn = useServerFn(getApprovalThresholds);
   const { data: roles = [] } = useMyRoles();
   const canDecide =
-    roles.includes("super_admin") ||
-    roles.includes("management") ||
-    roles.includes("finance");
+    roles.includes("super_admin") || roles.includes("management") || roles.includes("finance");
 
   const [status, setStatus] = useState<ApprovalStatus | "all">("pending");
   const [entityType, setEntityType] = useState<ApprovalEntityType | "all">("all");
@@ -92,9 +90,11 @@ function ApprovalsPage() {
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["approvals"] });
 
-  const [decision, setDecision] = useState<
-    null | { id: string; kind: "approved" | "rejected"; label: string }
-  >(null);
+  const [decision, setDecision] = useState<null | {
+    id: string;
+    kind: "approved" | "rejected";
+    label: string;
+  }>(null);
   const [notes, setNotes] = useState("");
   const decide = useMutation({
     mutationFn: (v: { id: string; decision: "approved" | "rejected"; notes: string }) =>
@@ -116,9 +116,8 @@ function ApprovalsPage() {
             <ShieldAlert className="h-6 w-6 text-primary" /> Approvals
           </h1>
           <p className="text-sm text-muted-foreground">
-            Proformas, invoices, commissions, sensitive documents and large discounts
-            queued for management/finance sign-off. Every decision is written to the
-            activity log.
+            Proformas, invoices, commissions, sensitive documents and large discounts queued for
+            management/finance sign-off. Every decision is written to the activity log.
           </p>
         </div>
         {thresholds && (
@@ -136,11 +135,15 @@ function ApprovalsPage() {
           <div className="space-y-1">
             <Label className="text-xs">Status</Label>
             <Select value={status} onValueChange={(v) => setStatus(v as any)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
                 {APPROVAL_STATUSES.map((s) => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -148,11 +151,15 @@ function ApprovalsPage() {
           <div className="space-y-1">
             <Label className="text-xs">Type</Label>
             <Select value={entityType} onValueChange={(v) => setEntityType(v as any)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All types</SelectItem>
                 {APPROVAL_ENTITY_TYPES.map((t) => (
-                  <SelectItem key={t} value={t}>{ENTITY_LABEL[t]}</SelectItem>
+                  <SelectItem key={t} value={t}>
+                    {ENTITY_LABEL[t]}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -176,10 +183,10 @@ function ApprovalsPage() {
                   r.status === "pending"
                     ? "secondary"
                     : r.status === "approved"
-                    ? "default"
-                    : r.status === "rejected"
-                    ? "destructive"
-                    : "outline"
+                      ? "default"
+                      : r.status === "rejected"
+                        ? "destructive"
+                        : "outline"
                 }
               >
                 {r.status}
@@ -258,7 +265,9 @@ function ApprovalsPage() {
             <Textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} />
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setDecision(null)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setDecision(null)}>
+              Cancel
+            </Button>
             <Button
               variant={decision?.kind === "rejected" ? "destructive" : "default"}
               disabled={!decision || decide.isPending}

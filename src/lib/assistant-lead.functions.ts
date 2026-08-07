@@ -19,7 +19,7 @@ const LeadInput = z.object({
  * chat when a visitor shows buying intent. Creates a project_inquiries row.
  */
 export const submitAssistantLead = createServerFn({ method: "POST" })
-  .inputValidator((v: unknown) => LeadInput.parse(v))
+  .validator((v: unknown) => LeadInput.parse(v))
   .handler(async ({ data }) => {
     const url = process.env.SUPABASE_URL;
     const key = process.env.SUPABASE_PUBLISHABLE_KEY;

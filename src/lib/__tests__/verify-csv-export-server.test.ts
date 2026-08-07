@@ -1,10 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  assembleCsv,
-  buildPreamble,
-  computeSha256Hex,
-  csvEscape,
-} from "../purge-csv-preamble";
+import { assembleCsv, buildPreamble, computeSha256Hex, csvEscape } from "../purge-csv-preamble";
 import {
   shouldOpenAfterVerify,
   verifyCsvExportForAudit,
@@ -45,8 +40,7 @@ function makeSupabaseStub(opts: StubOptions): VerifierSupabaseClient {
             eq() {
               return {
                 async maybeSingle() {
-                  if (opts.rowError)
-                    return { data: null, error: { message: opts.rowError } };
+                  if (opts.rowError) return { data: null, error: { message: opts.rowError } };
                   return { data: opts.row ?? null, error: null };
                 },
               };

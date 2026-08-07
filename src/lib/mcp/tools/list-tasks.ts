@@ -11,8 +11,12 @@ export default withAudit({
     limit: z.number().int().min(1).max(100).optional().describe("Max rows to return (default 25)."),
   },
   annotations: { readOnlyHint: true, openWorldHint: false },
-  handler: async ({ status, limit }: { status?: string; limit?: number }, ctx: import("@lovable.dev/mcp-js").ToolContext) => {
-    if (!ctx.isAuthenticated()) return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
+  handler: async (
+    { status, limit }: { status?: string; limit?: number },
+    ctx: import("@lovable.dev/mcp-js").ToolContext,
+  ) => {
+    if (!ctx.isAuthenticated())
+      return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
     let q = supabaseForUser(ctx)
       .from("tasks")
       .select("id, title, status, priority, due_date, assigned_to, created_at")

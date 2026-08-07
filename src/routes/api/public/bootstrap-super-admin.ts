@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { withMethodGuards } from "@/lib/api-http";
+import { timingSafeEqualText } from "@/lib/api-security";
 import { z } from "zod";
 
 /**
  * Self-disabling bootstrap endpoint for the very first Super Admin.
  *
- * Callable only while there are ZERO super_admin rows in user_roles.
+ * Callable only while there are ZERO super_admin rows in user_roles and a
+ * server-only BOOTSTRAP_SUPER_ADMIN_TOKEN is configured and supplied.
  * Once a Super Admin exists, this endpoint returns 409 forever.
  * After bootstrap, ongoing invites go through the authenticated
  * `inviteTeamMember` server function (Super Admin only).
@@ -19,6 +21,16 @@ export const Route = createFileRoute("/api/public/bootstrap-super-admin")({
   server: {
     handlers: withMethodGuards({
       POST: async ({ request }) => {
+        const bootstrapToken = process.env.BOOTSTRAP_SUPER_ADMIN_TOKEN;
+        if (!bootstrapToken) {
+          return new Response("Bootstrap is disabled. Configure BOOTSTRAP_SUPER_ADMIN_TOKEN.", {
+            status: 503,
+          });
+        }
+        if (!timingSafeEqualText(request.headers.get("x-bootstrap-token") ?? "", bootstrapToken)) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+
         let body: unknown;
         try {
           body = await request.json();
@@ -47,8 +59,7 @@ export const Route = createFileRoute("/api/public/bootstrap-super-admin")({
           });
         }
 
-        const siteUrl =
-          process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
+        const siteUrl = process.env.APP_URL || process.env.SITE_URL || "https://nevoindustrial.com";
 
         // If the auth user already exists, look them up; otherwise invite.
         let userId: string | null = null;
@@ -76,10 +87,9 @@ export const Route = createFileRoute("/api/public/bootstrap-super-admin")({
         }
         if (!userId) return new Response("No user id resolved", { status: 500 });
 
-        await supabaseAdmin.from("profiles").upsert(
-          { id: userId, full_name, is_active: true },
-          { onConflict: "id" },
-        );
+        await supabaseAdmin
+          .from("profiles")
+          .upsert({ id: userId, full_name, is_active: true }, { onConflict: "id" });
 
         const { error: roleErr } = await supabaseAdmin
           .from("user_roles")

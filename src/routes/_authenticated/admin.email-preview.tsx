@@ -15,7 +15,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ExternalLink, AlertCircle, AlertTriangle, CheckCircle2, Info, ShieldCheck } from "lucide-react";
+import {
+  ExternalLink,
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
+  Info,
+  ShieldCheck,
+} from "lucide-react";
 import { auditEmailHtml, type A11yIssue } from "@/lib/email-a11y";
 
 type OverrideValue = string;
@@ -33,10 +40,7 @@ function coerceOverride(defaultValue: unknown, raw: string): string | number | b
 
 export const Route = createFileRoute("/_authenticated/admin/email-preview")({
   head: () => ({
-    meta: [
-      { title: "Email Templates Preview — NEVO CRM" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Email Templates Preview — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
   component: EmailPreviewAdmin,
 });
@@ -64,7 +68,7 @@ function EmailPreviewAdmin() {
     [list.data, current],
   );
 
-  const currentOverrides = current ? overridesByTemplate[current] ?? {} : {};
+  const currentOverrides = current ? (overridesByTemplate[current] ?? {}) : {};
 
   // Build serializable override map: only include keys the user changed,
   // and coerce back to the type of the default value.
@@ -91,8 +95,7 @@ function EmailPreviewAdmin() {
 
   const preview = useQuery({
     queryKey: ["email-preview", current, serializableOverrides],
-    queryFn: () =>
-      renderFn({ data: { name: current!, overrides: serializableOverrides } }),
+    queryFn: () => renderFn({ data: { name: current!, overrides: serializableOverrides } }),
     enabled: !!current,
   });
 
@@ -113,7 +116,6 @@ function EmailPreviewAdmin() {
   );
   const [showA11yDetails, setShowA11yDetails] = useState(false);
 
-
   const grouped = useMemo(() => {
     const auth: EmailPreviewMeta[] = [];
     const app: EmailPreviewMeta[] = [];
@@ -127,9 +129,7 @@ function EmailPreviewAdmin() {
         t.subject.toLowerCase().includes(q)
       );
     };
-    (list.data ?? []).filter(matches).forEach((t) =>
-      (t.category === "auth" ? auth : app).push(t),
-    );
+    (list.data ?? []).filter(matches).forEach((t) => (t.category === "auth" ? auth : app).push(t));
     return { auth, app };
   }, [list.data, search, categoryFilter]);
 
@@ -204,9 +204,7 @@ function EmailPreviewAdmin() {
             </div>
           )}
           {list.error && (
-            <div className="p-2 text-sm text-destructive">
-              {(list.error as Error).message}
-            </div>
+            <div className="p-2 text-sm text-destructive">{(list.error as Error).message}</div>
           )}
           {(["auth", "app"] as const).map((cat) => (
             <div key={cat}>
@@ -250,9 +248,7 @@ function EmailPreviewAdmin() {
               Reset
             </Button>
           </div>
-          {!currentMeta && (
-            <p className="text-xs text-muted-foreground">Select a template.</p>
-          )}
+          {!currentMeta && <p className="text-xs text-muted-foreground">Select a template.</p>}
           {currentMeta && Object.keys(currentMeta.defaultData).length === 0 && (
             <p className="text-xs text-muted-foreground">This template has no editable fields.</p>
           )}
@@ -301,7 +297,6 @@ function EmailPreviewAdmin() {
             })}
         </aside>
 
-
         <section className="border border-border rounded-md bg-background flex flex-col overflow-hidden">
           <div className="border-b border-border px-4 py-3 flex items-center justify-between gap-4">
             <div className="min-w-0">
@@ -329,8 +324,7 @@ function EmailPreviewAdmin() {
                 sendTest.isPending
               }
               onClick={() =>
-                current &&
-                sendTest.mutate({ name: current, recipientEmail: testRecipient })
+                current && sendTest.mutate({ name: current, recipientEmail: testRecipient })
               }
             >
               {sendTest.isPending ? "Sending…" : "Send test email"}
@@ -412,13 +406,9 @@ function EmailPreviewAdmin() {
             </div>
           )}
           <div className="flex-1 bg-muted/40 p-4 flex justify-center overflow-auto">
-            {preview.isFetching && !preview.data && (
-              <Skeleton className="w-full max-w-2xl h-96" />
-            )}
+            {preview.isFetching && !preview.data && <Skeleton className="w-full max-w-2xl h-96" />}
             {preview.error && (
-              <div className="text-sm text-destructive">
-                {(preview.error as Error).message}
-              </div>
+              <div className="text-sm text-destructive">{(preview.error as Error).message}</div>
             )}
             {preview.data && (
               <iframe
@@ -458,9 +448,7 @@ function A11yRow({ issue }: { issue: A11yIssue }) {
     <li className="flex gap-2 items-start">
       <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${tone}`} aria-hidden />
       <div className="min-w-0">
-        <div className="text-xs uppercase tracking-wide text-muted-foreground">
-          {issue.rule}
-        </div>
+        <div className="text-xs uppercase tracking-wide text-muted-foreground">{issue.rule}</div>
         <div>{issue.message}</div>
         {issue.snippet && (
           <div className="mt-0.5 text-xs font-mono text-muted-foreground truncate">

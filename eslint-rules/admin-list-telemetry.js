@@ -32,10 +32,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const TELEMETRY_SRC = resolve(HERE, "../src/components/admin/list-telemetry.ts");
 
 function parseStringTuple(source, exportName) {
-  const re = new RegExp(
-    `export const ${exportName}\\s*=\\s*\\[([\\s\\S]*?)\\]\\s*as const`,
-    "m",
-  );
+  const re = new RegExp(`export const ${exportName}\\s*=\\s*\\[([\\s\\S]*?)\\]\\s*as const`, "m");
   const match = source.match(re);
   if (!match) {
     throw new Error(
@@ -52,11 +49,7 @@ const REASONS = parseStringTuple(telemetrySource, "ADMIN_LIST_EMPTY_REASONS");
 const RESOURCE_SET = new Set(RESOURCES);
 const REASON_SET = new Set(REASONS);
 
-const GUARDED_COMPONENTS = new Set([
-  "AdminListPage",
-  "ListEmptyState",
-  "ListErrorState",
-]);
+const GUARDED_COMPONENTS = new Set(["AdminListPage", "ListEmptyState", "ListErrorState"]);
 
 /** Extract a string-literal value from a JSXAttribute, or null if dynamic. */
 function literalAttrValue(attr) {
@@ -75,9 +68,7 @@ function literalAttrValue(attr) {
 }
 
 function findAttr(node, name) {
-  return node.attributes.find(
-    (a) => a.type === "JSXAttribute" && a.name && a.name.name === name,
-  );
+  return node.attributes.find((a) => a.type === "JSXAttribute" && a.name && a.name.name === name);
 }
 
 const validResourceProp = {
@@ -111,7 +102,6 @@ const validResourceProp = {
         if (node.name.type !== "JSXIdentifier") return;
         const name = node.name.name;
         if (!GUARDED_COMPONENTS.has(name)) return;
-
 
         const attr = findAttr(node, "resource");
         if (!attr) {
@@ -209,8 +199,7 @@ const validEmptyReason = {
         '<ListEmptyState reason="{{value}}"> is not approved and is equidistant from multiple allowed values (nearest ties, distance {{distance}}). Refusing to auto-fix — pick one manually. Allowed: {{allowed}}.',
       unknownAutofixed:
         '<ListEmptyState reason="{{value}}"> is not approved. Auto-fixed to the nearest match "{{suggestion}}" (distance {{distance}}). Allowed: {{allowed}}.',
-      suggestReplace:
-        'Replace with "{{suggestion}}"',
+      suggestReplace: 'Replace with "{{suggestion}}"',
     },
   },
   create(context) {
@@ -310,7 +299,6 @@ function replaceAttrLiteral(fixer, attr, newValue) {
   return null;
 }
 
-
 /** Find a Property in an ObjectExpression whose key is `name`. */
 function findProp(obj, name) {
   if (!obj || obj.type !== "ObjectExpression") return null;
@@ -343,9 +331,9 @@ const noRawEmptyEvent = {
       forbidden:
         'Do not call logClientEvent("admin_list_empty_shown", ...) directly. Render <ListEmptyState resource=... /> and let it emit the event.',
       badResource:
-        'admin_list_empty_shown payload must include a static resource string in ADMIN_LIST_RESOURCES. Allowed: {{allowed}}.',
+        "admin_list_empty_shown payload must include a static resource string in ADMIN_LIST_RESOURCES. Allowed: {{allowed}}.",
       badReason:
-        'admin_list_empty_shown payload must include a static reason string in ADMIN_LIST_EMPTY_REASONS. Allowed: {{allowed}}.',
+        "admin_list_empty_shown payload must include a static reason string in ADMIN_LIST_EMPTY_REASONS. Allowed: {{allowed}}.",
     },
   },
   create(context) {
@@ -494,4 +482,3 @@ export default {
     "no-conflicting-empty-flags": noConflictingEmptyFlags,
   },
 };
-

@@ -55,19 +55,9 @@ function PrecedenceDemo({ state, resource }: PrecedenceDemoProps) {
       </header>
 
       {error ? (
-        <ListErrorState
-          resource={resource}
-          error={error}
-          onRetry={() => {}}
-          isRetrying={false}
-        />
+        <ListErrorState resource={resource} error={error} onRetry={() => {}} isRetrying={false} />
       ) : isLoading ? (
-        <div
-          data-testid="list-skeleton"
-          aria-busy="true"
-          aria-live="polite"
-          className="space-y-2"
-        >
+        <div data-testid="list-skeleton" aria-busy="true" aria-live="polite" className="space-y-2">
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-12 w-full" />

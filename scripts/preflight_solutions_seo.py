@@ -9,7 +9,7 @@ full SEO snapshot.
 
 Env:
   BASE_URL             site to probe (default: http://127.0.0.1:8080)
-  LOCALES              comma-separated locales to sample (default: en,ar,tr)
+  LOCALES              comma-separated locales to sample (default: en,fa,ar)
   TIMEOUT_SECONDS      per-request timeout (default: 20)
   RETRIES              max attempts per URL (default: 3). A probe stops
                        early when the attempt's classified error_kind is not
@@ -4054,4 +4054,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-

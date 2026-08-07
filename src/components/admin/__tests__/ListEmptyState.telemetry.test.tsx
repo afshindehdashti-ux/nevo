@@ -61,9 +61,7 @@ describe("ListEmptyState telemetry", () => {
   });
 
   it("stays silent when no resource is provided", () => {
-    render(
-      <ListEmptyState icon={Target} title="No records" description="…" />,
-    );
+    render(<ListEmptyState icon={Target} title="No records" description="…" />);
     expect(logClientEvent).not.toHaveBeenCalled();
   });
 });

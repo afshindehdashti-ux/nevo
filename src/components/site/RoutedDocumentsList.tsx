@@ -33,7 +33,9 @@ export function RoutedDocumentsList({
     queryFn: async () => {
       let q = supabase
         .from("doc_intel_documents")
-        .select("id, title, summary, category, portal_visibility, file_url, created_at, original_filename")
+        .select(
+          "id, title, summary, category, portal_visibility, file_url, created_at, original_filename",
+        )
         .eq("status", "routed")
         .in("portal_visibility", vis)
         .order("created_at", { ascending: false })
@@ -78,10 +80,7 @@ export function RoutedDocumentsList({
           <p className="text-sm text-muted-foreground">{emptyLabel}</p>
         )}
         {data.map((d) => (
-          <div
-            key={d.id}
-            className="flex items-center justify-between gap-2 border rounded-md p-3"
-          >
+          <div key={d.id} className="flex items-center justify-between gap-2 border rounded-md p-3">
             <div className="min-w-0">
               <p className="text-sm font-medium truncate">{d.title ?? d.original_filename}</p>
               {d.summary && (

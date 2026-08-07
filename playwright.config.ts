@@ -1,4 +1,17 @@
 import { defineConfig, devices } from "@playwright/test";
+import { existsSync } from "node:fs";
+
+const macChromePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const configuredBrowserPath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?.trim();
+const localBrowserPath =
+  configuredBrowserPath ||
+  (process.platform === "darwin" && existsSync(macChromePath) ? macChromePath : undefined);
+const supabaseUrl =
+  process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "https://ci-placeholder.supabase.co";
+const supabaseKey =
+  process.env.SUPABASE_PUBLISHABLE_KEY ??
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
+  "sb_publishable_ci_placeholder";
 
 /**
  * Playwright config for E2E tests that must exercise a real browser page
@@ -12,10 +25,13 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  reporter: process.env.CI ? [["list"], ["junit", { outputFile: "reports/playwright/junit.xml" }]] : "list",
+  reporter: process.env.CI
+    ? [["list"], ["junit", { outputFile: "reports/playwright/junit.xml" }]]
+    : "list",
   use: {
     baseURL: process.env.E2E_BASE_URL ?? "http://127.0.0.1:4173",
     trace: "retain-on-failure",
+    launchOptions: localBrowserPath ? { executablePath: localBrowserPath } : undefined,
     // A viewport that catches both desktop launcher and mobile CTA.
     viewport: { width: 390, height: 844 },
   },
@@ -26,9 +42,15 @@ export default defineConfig({
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
-        command: "bun run build && bun run preview -- --port 4173 --host 127.0.0.1 --strictPort",
+        command: "pnpm dev --port 4173 --host 127.0.0.1 --strictPort",
         url: "http://127.0.0.1:4173",
         reuseExistingServer: !process.env.CI,
         timeout: 180_000,
+        env: {
+          SUPABASE_URL: supabaseUrl,
+          SUPABASE_PUBLISHABLE_KEY: supabaseKey,
+          VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL ?? supabaseUrl,
+          VITE_SUPABASE_PUBLISHABLE_KEY: process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? supabaseKey,
+        },
       },
 });

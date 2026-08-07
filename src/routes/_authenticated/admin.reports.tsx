@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/table";
 import { FileDown, FileSpreadsheet, Loader2 } from "lucide-react";
 import { financeBalanceDue } from "@/lib/finance-normalization";
+import { financePaidAmount, financeTotalAmount } from "@/lib/finance-normalization";
+import { formatLocalDate, nextCalendarDate } from "@/lib/report-date-range";
 import { toast } from "sonner";
 import {
   exportToExcel,
@@ -44,6 +46,7 @@ type ReportKey =
   | "customers"
   | "leads_pipeline"
   | "sales_orders"
+  | "proforma_invoices"
   | "invoices_ar"
   | "payments"
   | "ar_aging";
@@ -61,6 +64,10 @@ const REPORTS: Record<ReportKey, { label: string; description: string }> = {
     label: "Sales Orders",
     description: "Orders by status and date, with totals per customer.",
   },
+  proforma_invoices: {
+    label: "Proforma Invoices",
+    description: "Proforma totals, payment progress, and conversion status.",
+  },
   invoices_ar: {
     label: "Invoices & A/R",
     description: "Issued invoices with paid and outstanding balances.",
@@ -76,7 +83,7 @@ const REPORTS: Record<ReportKey, { label: string; description: string }> = {
 };
 
 function ymd(d: Date) {
-  return d.toISOString().slice(0, 10);
+  return formatLocalDate(d);
 }
 
 function ReportsPage() {
@@ -192,11 +199,7 @@ function ReportsPage() {
 
             <div className="space-y-2">
               <Label>Status</Label>
-              <Select
-                value={status}
-                onValueChange={setStatus}
-                disabled={!statusOptions.length}
-              >
+              <Select value={status} onValueChange={setStatus} disabled={!statusOptions.length}>
                 <SelectTrigger>
                   <SelectValue placeholder="All" />
                 </SelectTrigger>
@@ -260,10 +263,7 @@ function ReportsPage() {
                 <TableHeader>
                   <TableRow>
                     {cfg.columns.map((c) => (
-                      <TableHead
-                        key={c.key}
-                        className={c.align === "right" ? "text-right" : ""}
-                      >
+                      <TableHead key={c.key} className={c.align === "right" ? "text-right" : ""}>
                         {c.header}
                       </TableHead>
                     ))}
@@ -274,11 +274,7 @@ function ReportsPage() {
                     <TableRow key={i}>
                       {cfg.columns.map((c) => {
                         const raw = row[c.key];
-                        const val = c.format
-                          ? c.format(raw, row)
-                          : raw == null
-                            ? ""
-                            : String(raw);
+                        const val = c.format ? c.format(raw, row) : raw == null ? "" : String(raw);
                         return (
                           <TableCell
                             key={c.key}
@@ -430,6 +426,45 @@ function getConfig(report: ReportKey): ReportConfig {
           },
         ],
       };
+    case "proforma_invoices":
+      return {
+        statusOptions: [
+          "draft",
+          "sent",
+          "approved",
+          "accepted",
+          "rejected",
+          "converted_to_invoice",
+          "cancelled",
+        ],
+        columns: [
+          { key: "proforma_number", header: "Proforma #" },
+          { key: "created_at", header: "Created", format: fmtDate },
+          { key: "valid_until", header: "Valid until", format: fmtDate },
+          { key: "customer_name", header: "Customer" },
+          { key: "status", header: "Status" },
+          { key: "payment_status", header: "Payment" },
+          { key: "currency", header: "Ccy" },
+          {
+            key: "total",
+            header: "Total",
+            align: "right",
+            format: (v, r) => fmtMoney(v, String(r.currency ?? "USD")),
+          },
+          {
+            key: "amount_paid",
+            header: "Paid",
+            align: "right",
+            format: (v, r) => fmtMoney(v, String(r.currency ?? "USD")),
+          },
+          {
+            key: "balance",
+            header: "Balance",
+            align: "right",
+            format: (v, r) => fmtMoney(v, String(r.currency ?? "USD")),
+          },
+        ],
+      };
     case "payments":
       return {
         columns: [
@@ -498,16 +533,10 @@ function getConfig(report: ReportKey): ReportConfig {
 
 type Filters = { from: string; to: string; status: string };
 
-async function fetchReport(
-  report: ReportKey,
-  f: Filters,
-): Promise<Record<string, unknown>[]> {
+async function fetchReport(report: ReportKey, f: Filters): Promise<Record<string, unknown>[]> {
   switch (report) {
     case "customers": {
-      const { data, error } = await supabase
-        .from("customers")
-        .select("*")
-        .order("name");
+      const { data, error } = await supabase.from("customers").select("*").order("name");
       if (error) throw error;
       return (data ?? []) as Record<string, unknown>[];
     }
@@ -518,12 +547,14 @@ async function fetchReport(
           "id,created_at,name,email,company,country,application,status,priority,assigned_to,internal_score,next_action_date,budget_range",
         )
         .gte("created_at", f.from)
-        .lte("created_at", f.to + "T23:59:59")
+        .lt("created_at", nextCalendarDate(f.to))
         .order("created_at", { ascending: false });
       if (f.status !== "all") q = q.eq("status", f.status);
       const { data, error } = await q;
       if (error) throw error;
-      const ids = Array.from(new Set((data ?? []).map((r) => r.assigned_to).filter(Boolean))) as string[];
+      const ids = Array.from(
+        new Set((data ?? []).map((r) => r.assigned_to).filter(Boolean)),
+      ) as string[];
       const map = new Map<string, string>();
       if (ids.length) {
         const { data: profs } = await supabase
@@ -549,8 +580,7 @@ async function fetchReport(
       if (error) throw error;
       return (data ?? []).map((r) => ({
         ...r,
-        customer_name:
-          (r as { customer?: { name?: string } | null }).customer?.name ?? "—",
+        customer_name: (r as { customer?: { name?: string } | null }).customer?.name ?? "—",
       }));
     }
     case "invoices_ar": {
@@ -565,8 +595,27 @@ async function fetchReport(
       if (error) throw error;
       return (data ?? []).map((r) => ({
         ...r,
-        customer_name:
-          (r as { customer?: { name?: string } | null }).customer?.name ?? "—",
+        customer_name: (r as { customer?: { name?: string } | null }).customer?.name ?? "—",
+      }));
+    }
+    case "proforma_invoices": {
+      let q = supabase
+        .from("proforma_invoices")
+        .select(
+          "proforma_number,created_at,valid_until,status,payment_status,currency,total,grand_total,amount_paid,balance_due,customer:customers(name)",
+        )
+        .gte("created_at", f.from)
+        .lt("created_at", nextCalendarDate(f.to))
+        .order("created_at", { ascending: false });
+      if (f.status !== "all") q = q.eq("status", f.status);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data ?? []).map((row) => ({
+        ...row,
+        customer_name: (row as { customer?: { name?: string } | null }).customer?.name ?? "—",
+        total: financeTotalAmount(row),
+        amount_paid: financePaidAmount(row),
+        balance: financeBalanceDue(row),
       }));
     }
     case "payments": {
@@ -574,7 +623,7 @@ async function fetchReport(
         .from("payments")
         .select("*, invoice:invoices(invoice_number, customer:customers(name))")
         .gte("received_at", f.from)
-        .lte("received_at", f.to)
+        .lt("received_at", nextCalendarDate(f.to))
         .order("received_at", { ascending: false });
       if (error) throw error;
       return (data ?? []).map((r) => {
@@ -623,18 +672,16 @@ async function fetchReport(
           customer?: { name?: string } | null;
         };
         const key = `${r.customer_id}::${r.currency}`;
-        const b =
-          buckets.get(key) ??
-          {
-            customer_name: r.customer?.name ?? "—",
-            currency: r.currency ?? "USD",
-            current: 0,
-            d1_30: 0,
-            d31_60: 0,
-            d61_90: 0,
-            d90p: 0,
-            total: 0,
-          };
+        const b = buckets.get(key) ?? {
+          customer_name: r.customer?.name ?? "—",
+          currency: r.currency ?? "USD",
+          current: 0,
+          d1_30: 0,
+          d31_60: 0,
+          d61_90: 0,
+          d90p: 0,
+          total: 0,
+        };
         const bal = financeBalanceDue(r);
         const due = r.due_date ? new Date(r.due_date) : null;
         const days = due

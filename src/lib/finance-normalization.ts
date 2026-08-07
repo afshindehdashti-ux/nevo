@@ -20,12 +20,7 @@ export type FinanceBalance = {
 };
 
 export function customerDisplayName(customer: CustomerDisplay | null | undefined) {
-  return (
-    customer?.company_name?.trim() ||
-    customer?.name?.trim() ||
-    customer?.email?.trim() ||
-    "—"
-  );
+  return customer?.company_name?.trim() || customer?.name?.trim() || customer?.email?.trim() || "—";
 }
 
 export function customerBillingAddress(customer: CustomerDisplay | null | undefined) {

@@ -5,12 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -32,10 +27,7 @@ import {
 } from "@/lib/crm-status";
 import { DocumentsPanel } from "@/components/crm/DocumentsPanel";
 import { generateEntitySummary } from "@/lib/ai-summary.functions";
-import {
-  financeBalanceDue,
-  financeTotalAmount,
-} from "@/lib/finance-normalization";
+import { financeBalanceDue, financeTotalAmount } from "@/lib/finance-normalization";
 
 export const Route = createFileRoute("/_authenticated/admin/customers/$id")({
   head: () => ({
@@ -63,8 +55,7 @@ function CustomerDetailPage() {
   });
 
   const summaryMutation = useMutation({
-    mutationFn: async () =>
-      await generateSummary({ data: { entity: "customer" as const, id } }),
+    mutationFn: async () => await generateSummary({ data: { entity: "customer" as const, id } }),
     onSuccess: () => {
       toast.success("AI summary updated");
       qc.invalidateQueries({ queryKey: ["customer", id] });

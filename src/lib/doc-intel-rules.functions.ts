@@ -14,7 +14,10 @@ const READ_ROLES = [
 
 async function assertRole(
   supabase: {
-    rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
+    rpc: (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: { message: string } | null }>;
   },
   userId: string,
   roles: readonly string[],
@@ -68,7 +71,7 @@ export const listRoutingRules = createServerFn({ method: "GET" })
 
 export const upsertRoutingRule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => RuleUpsertSchema.parse(d))
+  .validator((d: unknown) => RuleUpsertSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertRole(context.supabase as never, context.userId, APPROVE_ROLES);
     const payload = {
@@ -112,7 +115,7 @@ export const upsertRoutingRule = createServerFn({ method: "POST" })
 
 export const deleteRoutingRule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertRole(context.supabase as never, context.userId, APPROVE_ROLES);
     const { error } = await context.supabase
@@ -125,9 +128,7 @@ export const deleteRoutingRule = createServerFn({ method: "POST" })
 
 export const toggleRoutingRule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
-    z.object({ id: z.string().uuid(), enabled: z.boolean() }).parse(d),
-  )
+  .validator((d: unknown) => z.object({ id: z.string().uuid(), enabled: z.boolean() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertRole(context.supabase as never, context.userId, APPROVE_ROLES);
     const { error } = await context.supabase
@@ -141,7 +142,7 @@ export const toggleRoutingRule = createServerFn({ method: "POST" })
 /** Re-run all enabled rules against a single already-analyzed document. */
 export const reapplyRulesToDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertRole(context.supabase as never, context.userId, APPROVE_ROLES);
     const { applyRulesToAnalysis, fetchEnabledRules } = await import("./doc-intel-rules.server");
@@ -186,10 +187,9 @@ export const reapplyRulesToDocument = createServerFn({ method: "POST" })
     if (outcome.added_tags.length > 0) {
       await context.supabase
         .from("doc_intel_tags")
-        .upsert(
-          outcome.added_tags.map((tag: string) => ({ document_id: doc.id, tag })) as never,
-          { onConflict: "document_id,tag" as never },
-        );
+        .upsert(outcome.added_tags.map((tag: string) => ({ document_id: doc.id, tag })) as never, {
+          onConflict: "document_id,tag" as never,
+        });
     }
     await context.supabase.from("doc_intel_audit_logs").insert({
       document_id: doc.id,

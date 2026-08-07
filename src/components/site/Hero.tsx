@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import heroDesktopAsset from "@/assets/premium/homepage-hero-desktop.jpg.asset.json";
 import heroMobileAsset from "@/assets/premium/homepage-hero-mobile.jpg.asset.json";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/components/site/LocalizedLink";
 
 const heroDesktop = heroDesktopAsset.url;
 const heroMobile = heroMobileAsset.url;
@@ -61,7 +62,7 @@ function HeroDesktop() {
         <div className="max-w-3xl">
           <div className="eyebrow mb-6 flex items-center gap-2 text-white/70">
             <span className="inline-flex size-1.5 rounded-full bg-accent" />
-            Dubai · Factory Development · Production Lines · Raw Materials
+            {t("brand.location")} · {t("brand.sector")} · {t("brand.worldwide")}
           </div>
 
           <p aria-hidden className="text-display text-balance text-white">
@@ -74,16 +75,16 @@ function HeroDesktop() {
 
           <div className="mt-10 flex flex-row items-center gap-3">
             <Button asChild size="lg">
-              <a href="/project-inquiry">
+              <Link to="/project-inquiry">
                 {t("home.heroCtaPrimary")}
                 <ArrowRight className="!size-4" />
-              </a>
+              </Link>
             </Button>
             <Button asChild size="lg" variant="secondary">
-              <a href="/ai-assistant">
+              <Link to="/ai-assistant">
                 {t("home.heroCtaSecondary")}
                 <ArrowUpRight className="!size-4" />
-              </a>
+              </Link>
             </Button>
           </div>
         </div>
@@ -108,7 +109,7 @@ function HeroDesktop() {
             href="#pathways"
             className="group inline-flex items-center gap-2 self-start font-mono text-[10px] uppercase tracking-widest text-white/60 transition-colors hover:text-white md:self-auto"
           >
-            <span>Explore</span>
+            <span>{t("cta.explore")}</span>
             <ChevronDown className="size-3.5 animate-bounce" />
           </a>
         </div>
@@ -165,16 +166,16 @@ function HeroMobile() {
 
         <div className="flex flex-col gap-3">
           <Button asChild size="lg" className="w-full">
-            <a href="/project-inquiry">
+            <Link to="/project-inquiry">
               {t("home.heroCtaPrimary")}
               <ArrowRight className="!size-4" />
-            </a>
+            </Link>
           </Button>
           <Button asChild size="lg" variant="secondary" className="w-full">
-            <a href="/ai-assistant">
+            <Link to="/ai-assistant">
               {t("home.heroCtaSecondary")}
               <ArrowUpRight className="!size-4" />
-            </a>
+            </Link>
           </Button>
         </div>
       </div>

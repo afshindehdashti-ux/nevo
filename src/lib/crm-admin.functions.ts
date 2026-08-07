@@ -48,7 +48,6 @@ async function sendWelcomeEmail(params: {
   }
 }
 
-
 const inviteSchema = z.object({
   email: z.string().email(),
   fullName: z.string().min(1).max(200),
@@ -70,7 +69,7 @@ async function assertSuperAdmin(ctx: { supabase: SupabaseClient<Database>; userI
 
 export const inviteTeamMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => inviteSchema.parse(raw))
+  .validator((raw: unknown) => inviteSchema.parse(raw))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -134,7 +133,7 @@ export const inviteTeamMember = createServerFn({ method: "POST" })
 
 export const sendPasswordReset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => resetSchema.parse(raw))
+  .validator((raw: unknown) => resetSchema.parse(raw))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

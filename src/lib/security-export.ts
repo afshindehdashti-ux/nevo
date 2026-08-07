@@ -10,11 +10,7 @@ function escapeCsv(v: unknown): string {
   return `"${s.replace(/"/g, '""')}"`;
 }
 
-export function downloadCsv(
-  filenameBase: string,
-  columns: ExportColumn[],
-  rows: ExportRow[],
-) {
+export function downloadCsv(filenameBase: string, columns: ExportColumn[], rows: ExportRow[]) {
   const lines = [columns.map((c) => escapeCsv(c.header)).join(",")];
   for (const r of rows) {
     lines.push(columns.map((c) => escapeCsv(r[c.key])).join(","));

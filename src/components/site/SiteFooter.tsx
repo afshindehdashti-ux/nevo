@@ -4,6 +4,7 @@ import { Mail, MessageCircle, Linkedin, MapPin, ArrowUpRight, Phone } from "luci
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
+import { navigationLabel } from "./site-navigation-i18n";
 
 const COLUMNS = [
   {
@@ -27,8 +28,8 @@ const COLUMNS = [
     links: [
       { label: "Cold Storage", href: "/industries" },
       { label: "Food Processing", href: "/industries" },
-      { label: "Pharmaceutical", href: "/industries" },
       { label: "Clean Rooms", href: "/industries" },
+      { label: "Industrial Buildings", href: "/industries" },
       { label: "Warehousing", href: "/industries" },
       { label: "Modular Buildings", href: "/industries" },
     ],
@@ -139,17 +140,17 @@ export function SiteFooter() {
               </a>
               <div className="flex items-center gap-3 text-primary-foreground/85">
                 <MapPin className="size-4 text-primary-foreground/50" strokeWidth={1.75} />
-                Dubai, United Arab Emirates
+                {t("brand.location")}
               </div>
             </div>
 
-            <a
-              href="/project-inquiry"
+            <Link
+              to="/project-inquiry"
               className="mt-8 inline-flex items-center gap-1.5 rounded-md border border-primary-foreground/25 px-4 py-2.5 text-xs font-medium uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary-foreground/10"
             >
               {t("cta.startProject")}
               <ArrowUpRight className="size-3.5" />
-            </a>
+            </Link>
           </div>
 
           {/* Columns */}
@@ -162,12 +163,12 @@ export function SiteFooter() {
                 <ul className="space-y-2.5">
                   {col.links.map((l) => (
                     <li key={l.label}>
-                      <a
-                        href={l.href}
+                      <Link
+                        to={l.href}
                         className="text-sm text-primary-foreground/75 transition-colors hover:text-primary-foreground"
                       >
-                        {l.label}
-                      </a>
+                        {navigationLabel(t, l.label)}
+                      </Link>
                     </li>
                   ))}
                 </ul>

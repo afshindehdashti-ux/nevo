@@ -1,6 +1,7 @@
 import { withMethodGuards } from "@/lib/api-http";
-import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
+import { assertAllowedOrigin, assertRateLimit, corsHeaders, jsonError } from "@/lib/api-security";
+import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -10,70 +11,68 @@ const contactSchema = z.object({
   country: z.string().trim().max(120).optional().nullable(),
   message: z.string().trim().max(4000).optional().nullable(),
   source: z.string().trim().max(80).optional().nullable(),
-})
+});
 
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'content-type',
-}
-
-export const Route = createFileRoute('/api/public/contact-submit')({
+export const Route = createFileRoute("/api/public/contact-submit")({
   server: {
     handlers: withMethodGuards({
-      OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
+      OPTIONS: async ({ request }) => {
+        const headers = corsHeaders(request);
+        const blocked = assertAllowedOrigin(request, headers);
+        if (blocked) return blocked;
+        return new Response(null, { status: 204, headers });
+      },
       POST: async ({ request }) => {
-        let body: unknown
+        const headers = corsHeaders(request);
+        const blocked = assertAllowedOrigin(request, headers);
+        if (blocked) return blocked;
+        const limited = assertRateLimit(request, "contact-submit", { limit: 8, windowMs: 60_000 });
+        if (limited) return limited;
+        let body: unknown;
         try {
-          body = await request.json()
+          body = await request.json();
         } catch {
-          return Response.json({ error: 'Invalid JSON' }, { status: 400, headers: CORS })
+          return jsonError(400, "invalid_json", undefined, headers);
         }
 
-        const parsed = contactSchema.safeParse(body)
+        const parsed = contactSchema.safeParse(body);
         if (!parsed.success) {
-          return Response.json(
-            { error: 'Validation failed', details: parsed.error.flatten() },
-            { status: 400, headers: CORS },
-          )
+          return jsonError(400, "validation_failed", { details: parsed.error.flatten() }, headers);
         }
-        const data = parsed.data
+        const data = parsed.data;
 
-        const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        // Persist the lead. Failures here are non-fatal for the customer —
-        // we still send the confirmation so the customer knows we got it,
-        // but we log so ops can recover.
-        let leadId: string | null = null
-        const noteParts: string[] = []
-        if (data.message) noteParts.push(data.message)
-        if (data.source) noteParts.push(`[source: ${data.source}]`)
+        // Persist in the CRM's canonical web-inquiry table. The admin Leads
+        // screens intentionally read project_inquiries, not the legacy leads
+        // table, so using that table keeps every public request actionable.
+        let leadId: string | null = null;
         const { data: inserted, error: insertErr } = await supabaseAdmin
-          .from('leads')
+          .from("project_inquiries")
           .insert({
             name: data.name,
             email: data.email,
             phone: data.phone ?? null,
             company: data.company ?? null,
             country: data.country ?? null,
-            notes: noteParts.join('\n\n') || null,
-            source: 'web',
-            status: 'new',
-          } as never)
-          .select('id')
-          .single()
+            message: data.message ?? null,
+            source_page: data.source ?? "website-contact",
+            status: "new",
+          })
+          .select("id")
+          .single();
         if (insertErr) {
-          console.error('contact-submit: lead insert failed', insertErr)
-        } else {
-          leadId = (inserted as { id: string } | null)?.id ?? null
+          console.error("contact-submit: lead insert failed", insertErr);
+          return jsonError(503, "inquiry_store_failed", undefined, headers);
         }
+        leadId = (inserted as { id: string } | null)?.id ?? null;
 
         // Send the confirmation email (fire-and-forget for the customer response)
         try {
-          const { enqueueTransactionalEmail } = await import('@/lib/email-enqueue.server')
-          const referenceId = leadId ? `INQ-${leadId.slice(0, 8).toUpperCase()}` : undefined
+          const { enqueueTransactionalEmail } = await import("@/lib/email-enqueue.server");
+          const referenceId = leadId ? `INQ-${leadId.slice(0, 8).toUpperCase()}` : undefined;
           const result = await enqueueTransactionalEmail({
-            templateName: 'contact-confirmation',
+            templateName: "contact-confirmation",
             recipientEmail: data.email,
             idempotencyKey: leadId
               ? `contact-confirm-${leadId}`
@@ -84,19 +83,16 @@ export const Route = createFileRoute('/api/public/contact-submit')({
               submittedAt: new Date().toISOString(),
               referenceId,
             },
-          })
+          });
           if (!result.ok) {
-            console.warn('contact-submit: confirmation not queued', result.reason)
+            console.warn("contact-submit: confirmation not queued", result.reason);
           }
         } catch (err) {
-          console.error('contact-submit: confirmation email error', err)
+          console.error("contact-submit: confirmation email error", err);
         }
 
-        return Response.json(
-          { ok: true, leadId },
-          { status: 200, headers: CORS },
-        )
+        return Response.json({ ok: true, leadId }, { status: 200, headers });
       },
     }),
   },
-})
+});

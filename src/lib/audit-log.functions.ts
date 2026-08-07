@@ -34,7 +34,7 @@ const Input = z.object({
 
 export const logCrmAction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => Input.parse(v))
+  .validator((v) => Input.parse(v))
   .handler(async ({ context, data }) => {
     await writeAudit(context.supabase, {
       user_id: context.userId,

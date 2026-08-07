@@ -14,8 +14,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 type Emission =
-  | { kind: "render" }
-  | { kind: "error"; stage: string; terminal: boolean; at: number };
+  { kind: "render" } | { kind: "error"; stage: string; terminal: boolean; at: number };
 
 /**
  * Import the telemetry modules fresh so they observe the current

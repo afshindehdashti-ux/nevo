@@ -13,7 +13,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, RefreshCw, Trash2, Mail, MailOpen, Inbox, Settings, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  RefreshCw,
+  Trash2,
+  Mail,
+  MailOpen,
+  Inbox,
+  Settings,
+  AlertCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/mails/inbox")({
@@ -44,7 +53,10 @@ function InboxPage() {
           Configure an IMAP or Gmail mailbox to read incoming messages here.
         </p>
         <Button asChild>
-          <Link to="/admin/mails/settings"><Settings className="h-4 w-4 mr-1.5" />Open Mailbox Settings</Link>
+          <Link to="/admin/mails/settings">
+            <Settings className="h-4 w-4 mr-1.5" />
+            Open Mailbox Settings
+          </Link>
         </Button>
       </div>
     );
@@ -56,9 +68,12 @@ function InboxPage() {
         <AlertCircle className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
         <h2 className="text-lg font-semibold mb-2">Gmail OAuth not linked yet</h2>
         <p className="text-sm text-muted-foreground mb-4">
-          Configure IMAP (with a Gmail App Password) or link the Google Mail connector to read this mailbox.
+          Configure IMAP (with a Gmail App Password) or link the Google Mail connector to read this
+          mailbox.
         </p>
-        <Button asChild variant="outline"><Link to="/admin/mails/settings">Open Settings</Link></Button>
+        <Button asChild variant="outline">
+          <Link to="/admin/mails/settings">Open Settings</Link>
+        </Button>
       </div>
     );
   }
@@ -126,18 +141,31 @@ function ImapInbox() {
             )}
           </div>
           <div className="flex items-center gap-1">
-            <Button size="sm" variant="ghost" onClick={onRefresh} disabled={listQ.isFetching} className="h-7 px-2">
-              {listQ.isFetching ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onRefresh}
+              disabled={listQ.isFetching}
+              className="h-7 px-2"
+            >
+              {listQ.isFetching ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="h-3.5 w-3.5" />
+              )}
             </Button>
             <Button size="sm" variant="ghost" asChild className="h-7 px-2">
-              <Link to="/admin/mails/settings"><Settings className="h-3.5 w-3.5" /></Link>
+              <Link to="/admin/mails/settings">
+                <Settings className="h-3.5 w-3.5" />
+              </Link>
             </Button>
           </div>
         </div>
         <ScrollArea className="flex-1">
           {listQ.isLoading && (
             <div className="p-6 text-center text-xs text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin mx-auto mb-2" />Loading…
+              <Loader2 className="h-4 w-4 animate-spin mx-auto mb-2" />
+              Loading…
             </div>
           )}
           {listQ.error && (
@@ -164,12 +192,16 @@ function ImapInbox() {
                       ) : (
                         <span className="h-1.5 w-1.5 rounded-full bg-transparent shrink-0" />
                       )}
-                      <span className={`truncate ${!m.seen ? "font-semibold" : ""}`}>{fromLabel}</span>
+                      <span className={`truncate ${!m.seen ? "font-semibold" : ""}`}>
+                        {fromLabel}
+                      </span>
                       <span className="ml-auto text-[10px] text-muted-foreground shrink-0">
                         {m.date ? new Date(m.date).toLocaleDateString() : ""}
                       </span>
                     </div>
-                    <div className={`truncate mt-0.5 ${!m.seen ? "font-medium" : "text-muted-foreground"}`}>
+                    <div
+                      className={`truncate mt-0.5 ${!m.seen ? "font-medium" : "text-muted-foreground"}`}
+                    >
                       {m.subject}
                     </div>
                   </button>
@@ -200,10 +232,20 @@ function ImapInbox() {
               <div className="flex items-start justify-between gap-3">
                 <h3 className="text-base font-semibold leading-snug">{detailQ.data.subject}</h3>
                 <div className="flex items-center gap-1 shrink-0">
-                  <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => onToggleSeen(detailQ.data.uid, true)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 px-2"
+                    onClick={() => onToggleSeen(detailQ.data.uid, true)}
+                  >
                     <MailOpen className="h-3.5 w-3.5" />
                   </Button>
-                  <Button size="sm" variant="ghost" className="h-7 px-2 text-destructive" onClick={() => onDelete(detailQ.data.uid)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 px-2 text-destructive"
+                    onClick={() => onDelete(detailQ.data.uid)}
+                  >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
@@ -211,14 +253,19 @@ function ImapInbox() {
               <div className="text-xs text-muted-foreground space-y-0.5">
                 <div>
                   <span className="font-medium text-foreground">From:</span>{" "}
-                  {detailQ.data.from.map((a: any) => a.name ? `${a.name} <${a.address}>` : a.address).join(", ")}
+                  {detailQ.data.from
+                    .map((a: any) => (a.name ? `${a.name} <${a.address}>` : a.address))
+                    .join(", ")}
                 </div>
                 <div>
                   <span className="font-medium text-foreground">To:</span>{" "}
                   {detailQ.data.to.map((a: any) => a.address).join(", ")}
                 </div>
                 {detailQ.data.date && (
-                  <div><span className="font-medium text-foreground">Date:</span> {new Date(detailQ.data.date).toLocaleString()}</div>
+                  <div>
+                    <span className="font-medium text-foreground">Date:</span>{" "}
+                    {new Date(detailQ.data.date).toLocaleString()}
+                  </div>
                 )}
                 {detailQ.data.attachments.length > 0 && (
                   <div className="pt-1">
@@ -237,7 +284,9 @@ function ImapInbox() {
                   <div
                     className="prose prose-sm max-w-none dark:prose-invert"
                     dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(detailQ.data.html, { USE_PROFILES: { html: true } }),
+                      __html: DOMPurify.sanitize(detailQ.data.html, {
+                        USE_PROFILES: { html: true },
+                      }),
                     }}
                   />
                 ) : detailQ.data.text ? (

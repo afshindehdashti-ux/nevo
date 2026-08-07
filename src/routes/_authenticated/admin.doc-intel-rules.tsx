@@ -10,12 +10,27 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
-  Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
 } from "@/components/ui/sheet";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Plus, Pencil, Trash2, ShieldCheck, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -25,12 +40,7 @@ import {
   toggleRoutingRule,
   type RuleUpsertInput,
 } from "@/lib/doc-intel-rules.functions";
-import {
-  DOC_CATEGORIES,
-  DESTINATIONS,
-  CONFIDENTIALITY,
-  VISIBILITY,
-} from "@/lib/doc-intel.schema";
+import { DOC_CATEGORIES, DESTINATIONS, CONFIDENTIALITY, VISIBILITY } from "@/lib/doc-intel.schema";
 
 export const Route = createFileRoute("/_authenticated/admin/doc-intel-rules")({
   head: () => ({
@@ -114,8 +124,8 @@ function RoutingRulesPage() {
         <div>
           <h1 className="text-2xl font-semibold">Document routing rules</h1>
           <p className="text-sm text-muted-foreground max-w-2xl">
-            Override AI classification and routing decisions. Rules apply immediately
-            to every new upload after analysis. Lower priority numbers run first.
+            Override AI classification and routing decisions. Rules apply immediately to every new
+            upload after analysis. Lower priority numbers run first.
           </p>
         </div>
         <Button onClick={() => setOpenDraft({ ...emptyDraft })}>
@@ -214,7 +224,8 @@ function MatchSummary({ rule }: { rule: Rule }) {
   if (rule.match_keywords.length) parts.push(`keywords: ${rule.match_keywords.join(", ")}`);
   if (rule.match_confidentiality.length)
     parts.push(`confidentiality ∈ {${rule.match_confidentiality.join(", ")}}`);
-  if (rule.match_visibility.length) parts.push(`visibility ∈ {${rule.match_visibility.join(", ")}}`);
+  if (rule.match_visibility.length)
+    parts.push(`visibility ∈ {${rule.match_visibility.join(", ")}}`);
   if (parts.length === 0) return <span className="text-muted-foreground">Any document</span>;
   return <span>{parts.join(" · ")}</span>;
 }
@@ -225,10 +236,13 @@ function ActionSummary({ rule }: { rule: Rule }) {
   if (rule.action_block_public) chips.push({ label: "Block public", tone: "warn" });
   if (rule.action_set_confidentiality)
     chips.push({ label: `Confidentiality → ${rule.action_set_confidentiality}` });
-  if (rule.action_set_visibility) chips.push({ label: `Visibility → ${rule.action_set_visibility}` });
-  if (rule.action_set_destination) chips.push({ label: `Destination → ${rule.action_set_destination}` });
+  if (rule.action_set_visibility)
+    chips.push({ label: `Visibility → ${rule.action_set_visibility}` });
+  if (rule.action_set_destination)
+    chips.push({ label: `Destination → ${rule.action_set_destination}` });
   if (rule.action_set_folder_path) chips.push({ label: `Folder → ${rule.action_set_folder_path}` });
-  if (rule.action_add_tags?.length) chips.push({ label: `+tags: ${rule.action_add_tags.join(", ")}` });
+  if (rule.action_add_tags?.length)
+    chips.push({ label: `+tags: ${rule.action_add_tags.join(", ")}` });
   if (rule.action_min_confidence != null)
     chips.push({ label: `Min confidence ${(rule.action_min_confidence * 100).toFixed(0)}%` });
   if (!chips.length) return <span className="text-muted-foreground">No actions</span>;
@@ -240,7 +254,11 @@ function ActionSummary({ rule }: { rule: Rule }) {
           variant={c.tone === "warn" ? "destructive" : "secondary"}
           className="font-normal"
         >
-          {c.tone === "warn" ? <ShieldAlert className="h-3 w-3 mr-1" /> : <ShieldCheck className="h-3 w-3 mr-1" />}
+          {c.tone === "warn" ? (
+            <ShieldAlert className="h-3 w-3 mr-1" />
+          ) : (
+            <ShieldCheck className="h-3 w-3 mr-1" />
+          )}
           {c.label}
         </Badge>
       ))}
@@ -304,10 +322,7 @@ function RuleEditor({
               />
             </div>
             <div className="flex items-end gap-2">
-              <Switch
-                checked={form.enabled}
-                onCheckedChange={(v) => patch({ enabled: v })}
-              />
+              <Switch checked={form.enabled} onCheckedChange={(v) => patch({ enabled: v })} />
               <span className="text-sm">Enabled</span>
             </div>
           </section>
@@ -325,18 +340,14 @@ function RuleEditor({
                 <Label>Document type ILIKE (e.g. %invoice%)</Label>
                 <Input
                   value={form.match_doc_type_ilike ?? ""}
-                  onChange={(e) =>
-                    patch({ match_doc_type_ilike: e.target.value.trim() || null })
-                  }
+                  onChange={(e) => patch({ match_doc_type_ilike: e.target.value.trim() || null })}
                 />
               </div>
               <div>
                 <Label>Filename ILIKE (e.g. %NDA%.pdf)</Label>
                 <Input
                   value={form.match_filename_ilike ?? ""}
-                  onChange={(e) =>
-                    patch({ match_filename_ilike: e.target.value.trim() || null })
-                  }
+                  onChange={(e) => patch({ match_filename_ilike: e.target.value.trim() || null })}
                 />
               </div>
             </div>
@@ -399,9 +410,7 @@ function RuleEditor({
                 <Label>Force folder path</Label>
                 <Input
                   value={form.action_set_folder_path ?? ""}
-                  onChange={(e) =>
-                    patch({ action_set_folder_path: e.target.value.trim() || null })
-                  }
+                  onChange={(e) => patch({ action_set_folder_path: e.target.value.trim() || null })}
                 />
               </div>
             </div>
@@ -422,7 +431,9 @@ function RuleEditor({
                 onChange={(e) =>
                   patch({
                     action_min_confidence:
-                      e.target.value === "" ? null : Math.min(1, Math.max(0, Number(e.target.value))),
+                      e.target.value === ""
+                        ? null
+                        : Math.min(1, Math.max(0, Number(e.target.value))),
                   })
                 }
               />
@@ -436,10 +447,7 @@ function RuleEditor({
             <Button variant="ghost" onClick={onClose}>
               Cancel
             </Button>
-            <Button
-              disabled={saving || !form.name.trim()}
-              onClick={() => onSave(form)}
-            >
+            <Button disabled={saving || !form.name.trim()} onClick={() => onSave(form)}>
               {saving ? "Saving…" : isEdit ? "Save changes" : "Create rule"}
             </Button>
           </div>
@@ -450,8 +458,16 @@ function RuleEditor({
 }
 
 function MultiSelect({
-  label, options, value, onChange,
-}: { label: string; options: string[]; value: string[]; onChange: (v: string[]) => void }) {
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  value: string[];
+  onChange: (v: string[]) => void;
+}) {
   const toggle = (opt: string) =>
     onChange(value.includes(opt) ? value.filter((v) => v !== opt) : [...value, opt]);
   return (
@@ -482,7 +498,10 @@ function MultiSelect({
 }
 
 function NullableSelect({
-  label, options, value, onChange,
+  label,
+  options,
+  value,
+  onChange,
 }: {
   label: string;
   options: string[];
@@ -513,7 +532,10 @@ function NullableSelect({
 }
 
 function TagInput({
-  label, value, onChange, placeholder,
+  label,
+  value,
+  onChange,
+  placeholder,
 }: {
   label: string;
   value: string[];
@@ -531,7 +553,12 @@ function TagInput({
       <Label>{label}</Label>
       <div className="flex flex-wrap gap-1 mt-1 mb-2">
         {value.map((t) => (
-          <Badge key={t} variant="secondary" className="cursor-pointer" onClick={() => onChange(value.filter((v) => v !== t))}>
+          <Badge
+            key={t}
+            variant="secondary"
+            className="cursor-pointer"
+            onClick={() => onChange(value.filter((v) => v !== t))}
+          >
             {t} ×
           </Badge>
         ))}

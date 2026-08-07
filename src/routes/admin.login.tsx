@@ -46,7 +46,10 @@ function AdminLoginPage() {
         if (resetError) throw resetError;
         setInfo("If that email is registered, a reset link has been sent.");
       } else {
-        const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
         if (signInError) throw signInError;
         const to = data.user ? await resolveLandingRoute(data.user.id) : "/admin";
         navigate({ to });

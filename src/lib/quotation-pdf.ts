@@ -21,7 +21,13 @@ type Quotation = {
   total?: number | string | null;
   terms?: string | null;
   notes?: string | null;
-  customers?: (CustomerDisplay & { billing_address?: string | null; vat_number?: string | null; phone?: string | null }) | null;
+  customers?:
+    | (CustomerDisplay & {
+        billing_address?: string | null;
+        vat_number?: string | null;
+        phone?: string | null;
+      })
+    | null;
 };
 
 type Item = {
@@ -181,7 +187,8 @@ export function buildQuotationPdf(
   });
 
   // Totals
-  const afterTable = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 6;
+  const afterTable =
+    (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 6;
   const totalsX = pageWidth - margin - 70;
   doc.setFontSize(9.5);
   doc.setTextColor(0, 0, 0);
@@ -263,15 +270,9 @@ export async function loadSellerSettings(): Promise<Seller | null> {
   return (data as Seller) ?? null;
 }
 
-export async function downloadQuotationPdf(
-  q: Quotation,
-  items: Item[],
-  seller: Seller | null,
-) {
+export async function downloadQuotationPdf(q: Quotation, items: Item[], seller: Seller | null) {
   if (q.id) {
-    const { assertDocumentReadyForPdf } = await import(
-      "./document-pdf-validation.functions"
-    );
+    const { assertDocumentReadyForPdf } = await import("./document-pdf-validation.functions");
     await assertDocumentReadyForPdf({
       data: { kind: "quotation", id: q.id },
     });

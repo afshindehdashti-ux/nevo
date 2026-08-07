@@ -62,20 +62,12 @@ function AskAiLauncherProbe() {
 
   return (
     <>
-      <button
-        type="button"
-        data-testid="ask-ai-launcher"
-        onClick={() => setOpen(true)}
-      >
+      <button type="button" data-testid="ask-ai-launcher" onClick={() => setOpen(true)}>
         Ask AI
       </button>
       {open && (
         <div role="dialog" aria-modal="true" data-testid="ask-ai-drawer">
-          <button
-            type="button"
-            data-testid="ask-ai-close"
-            onClick={() => setOpen(false)}
-          >
+          <button type="button" data-testid="ask-ai-close" onClick={() => setOpen(false)}>
             Close
           </button>
           <span>drawer contents</span>
@@ -94,11 +86,7 @@ function StickyMobileCtaProbe() {
   if (isBackend) return null;
   if (dismissed) return <div data-testid="sticky-cta-dismissed" />;
   return (
-    <button
-      type="button"
-      data-testid="sticky-cta"
-      onClick={() => setDismissed(true)}
-    >
+    <button type="button" data-testid="sticky-cta" onClick={() => setDismissed(true)}>
       WhatsApp
     </button>
   );
@@ -124,16 +112,43 @@ function makeRouter(initial: string) {
   const rootRoute = createRootRoute({ component: RootShell });
   const routes = [
     createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <div>home</div> }),
-    createRoute({ getParentRoute: () => rootRoute, path: "/about", component: () => <div>about</div> }),
-    createRoute({ getParentRoute: () => rootRoute, path: "/admin/$", component: () => <div>admin</div> }),
-    createRoute({ getParentRoute: () => rootRoute, path: "/crm/$", component: () => <div>crm</div> }),
-    createRoute({ getParentRoute: () => rootRoute, path: "/backoffice/$", component: () => <div>backoffice</div> }),
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/about",
+      component: () => <div>about</div>,
+    }),
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/admin/$",
+      component: () => <div>admin</div>,
+    }),
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/crm/$",
+      component: () => <div>crm</div>,
+    }),
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/backoffice/$",
+      component: () => <div>backoffice</div>,
+    }),
   ];
   return createRouter({
     routeTree: rootRoute.addChildren(routes),
     history: createMemoryHistory({ initialEntries: [initial] }),
     defaultPreload: false,
   });
+}
+
+type TestNavigateOptions = {
+  to: string;
+  params?: Record<string, string>;
+  search?: Record<string, unknown>;
+  replace?: boolean;
+};
+
+function navigateTest(router: ReturnType<typeof makeRouter>, options: TestNavigateOptions) {
+  return router.navigate(options as never);
 }
 
 describe("Public marketing chrome — state does not persist across the backend gate", () => {
@@ -152,7 +167,7 @@ describe("Public marketing chrome — state does not persist across the backend 
     // Navigate to /admin. The drawer, launcher, and body-overflow lock
     // must all be gone.
     await act(async () => {
-      await router.navigate({ to: "/admin/$", params: { _splat: "dashboard" } });
+      await navigateTest(router, { to: "/admin/$", params: { _splat: "dashboard" } });
     });
     await waitFor(() => {
       expect(screen.queryByTestId("ask-ai-launcher")).toBeNull();
@@ -163,7 +178,7 @@ describe("Public marketing chrome — state does not persist across the backend 
     // Return to a public page — the drawer must NOT still be open (state
     // reset because the component unmounted, not just hid).
     await act(async () => {
-      await router.navigate({ to: "/about" });
+      await navigateTest(router, { to: "/about" });
     });
     await waitFor(() => {
       expect(screen.getByTestId("ask-ai-launcher")).toBeTruthy();
@@ -190,7 +205,7 @@ describe("Public marketing chrome — state does not persist across the backend 
 
       // Enter backend — CTA must be fully gone.
       await act(async () => {
-        await router.navigate({ to: target, params: { _splat: splat } });
+        await navigateTest(router, { to: target, params: { _splat: splat } });
       });
       await waitFor(() => {
         expect(screen.queryByTestId("sticky-cta")).toBeNull();
@@ -200,7 +215,7 @@ describe("Public marketing chrome — state does not persist across the backend 
       // Back to public — the CTA re-appears in its *initial* (un-dismissed)
       // state because unmounting destroyed the previous instance's state.
       await act(async () => {
-        await router.navigate({ to: "/about" });
+        await navigateTest(router, { to: "/about" });
       });
       await waitFor(() => {
         expect(screen.getByTestId("sticky-cta")).toBeTruthy();
@@ -225,7 +240,7 @@ describe("Public marketing chrome — state does not persist across the backend 
 
     // /crm — both gone, body-overflow reset.
     await act(async () => {
-      await router.navigate({ to: "/crm/$", params: { _splat: "leads" } });
+      await navigateTest(router, { to: "/crm/$", params: { _splat: "leads" } });
     });
     await waitFor(() => {
       expect(screen.queryByTestId("ask-ai-drawer")).toBeNull();
@@ -236,7 +251,7 @@ describe("Public marketing chrome — state does not persist across the backend 
 
     // Public — fresh instances.
     await act(async () => {
-      await router.navigate({ to: "/" });
+      await navigateTest(router, { to: "/" });
     });
     await waitFor(() => {
       expect(screen.getByTestId("ask-ai-launcher")).toBeTruthy();
@@ -247,7 +262,7 @@ describe("Public marketing chrome — state does not persist across the backend 
 
     // /backoffice — gone again; body remains unlocked.
     await act(async () => {
-      await router.navigate({ to: "/backoffice/$", params: { _splat: "tools" } });
+      await navigateTest(router, { to: "/backoffice/$", params: { _splat: "tools" } });
     });
     await waitFor(() => {
       expect(screen.queryByTestId("ask-ai-launcher")).toBeNull();

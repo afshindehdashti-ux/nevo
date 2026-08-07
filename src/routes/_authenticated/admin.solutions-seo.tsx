@@ -49,7 +49,7 @@ function SolutionsSeoAdmin() {
     mutationFn: async () => {
       await supabase.auth.signOut();
     },
-    onSuccess: () => navigate({ to: "/auth" }),
+    onSuccess: () => navigate({ to: "/auth", search: { next: undefined } }),
   });
 
   const merged = useMemo<SolutionsInspectionRow[]>(() => {
@@ -151,7 +151,7 @@ function SolutionsSeoAdmin() {
             {dataQ.isFetching ? "Refreshing…" : "Refresh"}
           </Button>
           <Button onClick={() => runM.mutate()} disabled={runM.isPending}>
-            {runM.isPending ? "Running inspection (60 URLs)…" : "Run inspection"}
+            {runM.isPending ? "Running inspection (66 URLs)…" : "Run inspection"}
           </Button>
           <Button variant="ghost" onClick={() => signOut.mutate()}>
             Sign out

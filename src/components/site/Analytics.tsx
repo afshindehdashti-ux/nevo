@@ -52,7 +52,6 @@ export function Analytics() {
   useEffect(() => {
     if (consent !== "accepted" || isBackend) return;
 
-
     if (IDS.ga4) {
       injectSrc("ga4-src", `https://www.googletagmanager.com/gtag/js?id=${IDS.ga4}`);
       inject(

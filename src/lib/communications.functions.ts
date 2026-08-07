@@ -32,7 +32,7 @@ export type CommAttachment = z.infer<typeof AttachmentSchema>;
 
 export const listCommunications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => EntityInput.parse(v))
+  .validator((v) => EntityInput.parse(v))
   .handler(async ({ context, data }) => {
     const { data: rows, error } = await context.supabase
       .from("communications")
@@ -59,7 +59,7 @@ const CreateInput = EntityInput.extend({
 
 export const createCommunication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => CreateInput.parse(v))
+  .validator((v) => CreateInput.parse(v))
   .handler(async ({ context, data }) => {
     const insertPayload = {
       ...data,
@@ -105,7 +105,7 @@ const UpdateInput = z.object({
 
 export const updateCommunication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => UpdateInput.parse(v))
+  .validator((v) => UpdateInput.parse(v))
   .handler(async ({ context, data }) => {
     const { id, ...patch } = data;
     const { data: prev } = await context.supabase
@@ -113,10 +113,7 @@ export const updateCommunication = createServerFn({ method: "POST" })
       .select("*")
       .eq("id", id)
       .maybeSingle();
-    const { error } = await context.supabase
-      .from("communications")
-      .update(patch)
-      .eq("id", id);
+    const { error } = await context.supabase.from("communications").update(patch).eq("id", id);
     if (error) throw new Error(error.message);
     await writeAudit(context.supabase, {
       user_id: context.userId,
@@ -132,7 +129,7 @@ export const updateCommunication = createServerFn({ method: "POST" })
 
 export const deleteCommunication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
+  .validator((v) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ context, data }) => {
     const { data: prev } = await context.supabase
       .from("communications")
@@ -186,7 +183,7 @@ export type CommunicationRow = {
 
 export const listCommunicationsCenter = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => CenterFilter.parse(v ?? {}))
+  .validator((v) => CenterFilter.parse(v ?? {}))
   .handler(async ({ context, data }) => {
     let q = context.supabase
       .from("communications")
@@ -203,7 +200,9 @@ export const listCommunicationsCenter = createServerFn({ method: "GET" })
     if (data.only_follow_ups) q = q.not("follow_up_at", "is", null).eq("follow_up_done", false);
     if (data.q && data.q.trim()) {
       const needle = `%${data.q.trim()}%`;
-      q = q.or(`subject.ilike.${needle},body.ilike.${needle},contact_name.ilike.${needle},contact_email.ilike.${needle}`);
+      q = q.or(
+        `subject.ilike.${needle},body.ilike.${needle},contact_name.ilike.${needle},contact_email.ilike.${needle}`,
+      );
     }
 
     const { data: rows, error } = await q;
@@ -227,7 +226,8 @@ export const listCommunicationsCenter = createServerFn({ method: "GET" })
           .from("customers")
           .select("id, name, contact_person")
           .in("id", ids);
-        for (const r of data ?? []) labels.set(key(t, r.id), r.name || r.contact_person || "Customer");
+        for (const r of data ?? [])
+          labels.set(key(t, r.id), r.name || r.contact_person || "Customer");
       } else if (t === "lead") {
         const { data } = await context.supabase
           .from("project_inquiries")
@@ -269,7 +269,8 @@ export const listCommunicationsCenter = createServerFn({ method: "GET" })
           .from("shipments")
           .select("id, shipment_number, tracking_no")
           .in("id", ids);
-        for (const r of data ?? []) labels.set(key(t, r.id), r.shipment_number || r.tracking_no || "Shipment");
+        for (const r of data ?? [])
+          labels.set(key(t, r.id), r.shipment_number || r.tracking_no || "Shipment");
       }
     }
 
@@ -340,7 +341,7 @@ export const listCommsProjectsLite = createServerFn({ method: "GET" })
 
 export const getCommAttachmentUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ path: z.string().min(1) }).parse(v))
+  .validator((v) => z.object({ path: z.string().min(1) }).parse(v))
   .handler(async ({ context, data }) => {
     const { data: signed, error } = await context.supabase.storage
       .from("crm-docs")

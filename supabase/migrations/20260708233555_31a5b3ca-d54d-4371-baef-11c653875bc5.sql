@@ -342,10 +342,10 @@ JOIN public.finance_documents fd ON fd.legacy_table='orders' AND fd.legacy_id = 
 WHERE NOT EXISTS (SELECT 1 FROM public.finance_document_items x WHERE x.document_id = fd.id AND x.sort_order = COALESCE(oi.position,0) AND x.description = oi.description);
 
 INSERT INTO public.finance_documents (document_type, document_number, status, customer_id, partner_id, issue_date, due_date, currency, notes, subtotal, grand_total, legacy_table, legacy_id, created_by, updated_by, created_at, updated_at)
-SELECT 'commission_invoice'::finance_document_type, pc.commission_number,
+SELECT 'commission_invoice'::finance_document_type, NULL::text,
   CASE pc.status WHEN 'draft' THEN 'draft' WHEN 'pending' THEN 'pending_approval' WHEN 'approved' THEN 'approved' WHEN 'paid' THEN 'paid' WHEN 'cancelled' THEN 'cancelled' WHEN 'rejected' THEN 'cancelled' ELSE 'draft' END::finance_document_status,
-  pc.customer_id, pc.partner_id, COALESCE(pc.invoice_date, pc.earned_at, pc.created_at::date),
-  pc.due_date, COALESCE(pc.currency,'USD'), pc.notes,
+  pc.customer_id, pc.partner_id, COALESCE(pc.earned_at, pc.created_at::date),
+  NULL::date, COALESCE(pc.currency,'USD'), pc.notes,
   COALESCE(pc.amount,0), COALESCE(pc.amount,0),
   'partner_commissions', pc.id, pc.created_by, pc.updated_by, pc.created_at, pc.updated_at
 FROM public.partner_commissions pc

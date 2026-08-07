@@ -102,8 +102,7 @@ function AdminListRoute() {
         title: "No __REPLACE__ yet",
         // Keep the phrase "will show up here" / "will appear here" so the
         // static telemetry guard recognises this as the shared empty card.
-        description:
-          "__REPLACE__ will show up here as they enter the pipeline.",
+        description: "__REPLACE__ will show up here as they enter the pipeline.",
         // Uncomment ONE of these when applicable — never both:
         // filtersActive: activeFilterCount > 0,
         // expectSeed: import.meta.env.VITE_EXPECT_SEED === "true",
