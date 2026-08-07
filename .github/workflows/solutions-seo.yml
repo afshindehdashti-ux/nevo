@@ -45,11 +45,16 @@ jobs:
 
       # Boot Vite dev in the background and wait for the port.
       - name: Start Vite dev server
+        env:
+          SUPABASE_URL: https://ci-placeholder.supabase.co
+          SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+          VITE_SUPABASE_URL: https://ci-placeholder.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
         run: |
           nohup pnpm dev --port 4323 --host 127.0.0.1 > vite.log 2>&1 &
           echo $! > vite.pid
           for i in $(seq 1 60); do
-            if curl -sf http://127.0.0.1:4323/ -o /dev/null; then
+            if curl -sf http://127.0.0.1:4323/en/solutions -o /dev/null; then
               echo "vite is up"; exit 0
             fi
             sleep 1
@@ -165,7 +170,7 @@ jobs:
       # One-glance index: every failing URL in a single table, appended to the
       # PR run summary AND uploaded as an artifact for offline review.
       - name: Build consolidated failure index
-        if: always() && steps.preflight_gate.outputs.skip != 'true'
+        if: always() && steps.preflight_gate.outputs.skip != 'true' && hashFiles('reports/seo/solutions-seo.json') != ''
         run: |
           python3 scripts/index_solutions_seo.py \
             --input reports/seo/solutions-seo.json \

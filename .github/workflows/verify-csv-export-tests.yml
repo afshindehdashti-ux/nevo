@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -35,7 +37,7 @@ jobs:
         id: detect
         if: github.event_name == 'pull_request'
         run: |
-          git fetch origin ${{ github.base_ref }} --depth=1
+          git fetch origin ${{ github.base_ref }}
           CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
           echo "$CHANGED"
           if echo "$CHANGED" | grep -E '(verify-csv-export|VerifyOpenButton|BlockedVerificationDialog|admin\.exports)' > /dev/null; then
