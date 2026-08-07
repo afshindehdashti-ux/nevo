@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { z } from "zod";
 import { submitInquiry } from "@/lib/inquiries.functions";
 import {
   ArrowRight,
@@ -86,6 +87,17 @@ const TITLE = "Project Inquiry Center — Start Your Industrial Project | NEVO I
 const DESCRIPTION =
   "Submit your factory, production line, raw material or engineering project to NEVO's Dubai engineering team. Multi-step technical intake, NDA on request, engineering proposal in 5–10 working days.";
 const URL_PATH = "/project-inquiry";
+
+const optionalSearchString = z.string().optional().catch(undefined);
+const projectInquirySearchSchema = z.object({
+  source: optionalSearchString,
+  config: optionalSearchString,
+  capacity: optionalSearchString,
+  core: optionalSearchString,
+  automation: optionalSearchString,
+  building: optionalSearchString,
+  shift: optionalSearchString,
+});
 
 // ---------------- Data ----------------
 
@@ -172,6 +184,7 @@ const STEEL_TYPES = ["PPGI", "GI", "Aluzinc", "Prepainted Aluzinc", "Stainless",
 const AUTOMATION_LEVELS = [
   "Manual",
   "Semi-Automatic",
+  "Automatic",
   "Fully Automatic",
   "Smart Factory (MES/SCADA)",
 ];
@@ -469,6 +482,7 @@ const STORAGE_KEY = "nevo:project-inquiry:v1";
 // ---------------- Component ----------------
 
 function ProjectInquiryPage() {
+  const search = Route.useSearch();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>(EMPTY);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
@@ -479,20 +493,40 @@ function ProjectInquiryPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const submitInquiryFn = useServerFn(submitInquiry);
 
-  // Read ?config=<base64 json> to attach calculator/configurator state.
+  // Attach calculator/configurator state from either an encoded payload or
+  // the explicit fields emitted by the factory layout generator.
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    let config: Record<string, unknown> | null = null;
     try {
-      const raw = new URLSearchParams(window.location.search).get("config");
-      if (!raw) return;
-      const json = JSON.parse(
-        decodeURIComponent(escape(atob(raw.replace(/-/g, "+").replace(/_/g, "/")))),
-      );
-      if (json && typeof json === "object") setAttachedConfig(json as Record<string, unknown>);
+      if (search.config) {
+        const json = JSON.parse(
+          decodeURIComponent(escape(atob(search.config.replace(/-/g, "+").replace(/_/g, "/")))),
+        );
+        if (json && typeof json === "object") config = json as Record<string, unknown>;
+      }
     } catch {
       /* ignore malformed config */
     }
-  }, []);
+
+    const layoutConfig = {
+      capacity: search.capacity || undefined,
+      core: search.core || undefined,
+      automation: search.automation || undefined,
+      building: search.building || undefined,
+      shift: search.shift || undefined,
+    };
+    if (Object.values(layoutConfig).some(Boolean)) {
+      config = { ...(config ?? {}), ...layoutConfig };
+    }
+    setAttachedConfig(config);
+  }, [
+    search.automation,
+    search.building,
+    search.capacity,
+    search.config,
+    search.core,
+    search.shift,
+  ]);
 
   // hydrate from localStorage, then apply `?source=<id>` preselect
   useEffect(() => {
@@ -504,15 +538,28 @@ function ProjectInquiryPage() {
       /* noop */
     }
 
-    if (typeof window !== "undefined") {
-      const source = new URLSearchParams(window.location.search).get("source");
-      const validIds = new Set(PROJECT_TYPES.map((t) => t.id));
-      if (source && validIds.has(source) && !hydrated.projectTypes.includes(source)) {
-        hydrated = { ...hydrated, projectTypes: [...hydrated.projectTypes, source] };
-      }
+    const validIds = new Set(PROJECT_TYPES.map((t) => t.id));
+    if (
+      search.source &&
+      validIds.has(search.source) &&
+      !hydrated.projectTypes.includes(search.source)
+    ) {
+      hydrated = { ...hydrated, projectTypes: [...hydrated.projectTypes, search.source] };
+    }
+
+    const automationMap: Record<string, string> = {
+      "Semi Automatic": "Semi-Automatic",
+    };
+    if (search.capacity) hydrated.capacity = `${search.capacity} m²/day`;
+    if (search.core) hydrated.coreType = search.core === "Hybrid" ? "Mixed" : search.core;
+    if (search.automation) {
+      hydrated.automation = automationMap[search.automation] ?? search.automation;
+    }
+    if (search.shift) {
+      hydrated.shifts = search.shift === "3 Shifts" ? "3 Shifts (24/7)" : search.shift;
     }
     setForm(hydrated);
-  }, []);
+  }, [search.automation, search.capacity, search.core, search.shift, search.source]);
 
   // autosave
   useEffect(() => {
@@ -1496,6 +1543,7 @@ const BREADCRUMB_JSONLD = {
 };
 
 export const Route = createFileRoute("/$lang/project-inquiry")({
+  validateSearch: projectInquirySearchSchema,
   component: ProjectInquiryPage,
   head: ({ params }) => {
     const seo = buildSeo({

@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -129,7 +128,7 @@ export const Route = createFileRoute("/_authenticated/admin/exports")({
   head: () => ({
     meta: [{ title: "CSV Export History — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
-  validateSearch: zodValidator(searchSchema),
+  validateSearch: searchSchema,
   component: ExportsHistoryPage,
 });
 

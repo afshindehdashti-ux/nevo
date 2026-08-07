@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { z } from "zod";
-import { zodValidator } from "@tanstack/zod-adapter";
 import {
   GraduationCap,
   Search as SearchIcon,
@@ -37,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/admin/ai-assistant/guide-m
   head: () => ({
     meta: [{ title: "Guide Mode — NEVO AI Assistant" }, { name: "robots", content: "noindex" }],
   }),
-  validateSearch: zodValidator(searchSchema),
+  validateSearch: searchSchema,
   component: GuideModePage,
 });
 

@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -99,22 +98,22 @@ import { ApprovalPanel } from "@/components/crm/ApprovalPanel";
 import { InvoiceAiCheckButton } from "@/components/ai/InvoiceAiCheckButton";
 
 const invoiceDetailSearchSchema = z.object({
-  purgeUser: fallback(z.string(), "all").default("all"),
-  purgeFrom: fallback(z.string(), "").default(""),
-  purgeTo: fallback(z.string(), "").default(""),
-  purgeVersion: fallback(z.string(), "").default(""),
-  purgeMinBytes: fallback(z.string(), "").default(""),
-  purgeMaxBytes: fallback(z.string(), "").default(""),
-  purgePage: fallback(z.number().int(), 0).default(0),
-  purgeSize: fallback(z.number().int(), 25).default(25),
-  purgeSort: fallback(z.string(), "created_at_desc").default("created_at_desc"),
+  purgeUser: z.string().catch("all").default("all"),
+  purgeFrom: z.string().catch("").default(""),
+  purgeTo: z.string().catch("").default(""),
+  purgeVersion: z.string().catch("").default(""),
+  purgeMinBytes: z.string().catch("").default(""),
+  purgeMaxBytes: z.string().catch("").default(""),
+  purgePage: z.number().int().catch(0).default(0),
+  purgeSize: z.number().int().catch(25).default(25),
+  purgeSort: z.string().catch("created_at_desc").default("created_at_desc"),
 });
 
 type InvoiceDetailSearch = z.infer<typeof invoiceDetailSearchSchema>;
 
 export const Route = createFileRoute("/_authenticated/admin/invoices/$id")({
   head: () => ({ meta: [{ title: "Invoice — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
-  validateSearch: zodValidator(invoiceDetailSearchSchema),
+  validateSearch: invoiceDetailSearchSchema,
   component: InvoiceDetailPage,
 });
 
