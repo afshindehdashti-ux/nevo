@@ -189,6 +189,10 @@ export function InvoicesList({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [exporting, setExporting] = useState(false);
   const [rowBusy, setRowBusy] = useState<string | null>(null);
+  const [rowResult, setRowResult] = useState<
+    Record<string, { state: "success" | "error"; message: string }>
+  >({});
+  const [rowAnnounce, setRowAnnounce] = useState("");
   const [pendingAction, setPendingAction] = useState<BulkActionKey | null>(null);
   const [runningAction, setRunningAction] = useState<BulkActionKey | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
