@@ -360,6 +360,12 @@ export function InvoicesList({
     },
   });
 
+  // One shared "results are updating" signal: pending debounced filter input
+  // and background refetches both dim the list the same way.
+  const listBusy = !isLoading && (searchPending || isFetching);
+
+
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return invoices.filter((i) => {
