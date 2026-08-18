@@ -199,7 +199,18 @@ const Sidebar = React.forwardRef<
               } as React.CSSProperties
             }
             side={side}
+            // The sheet is controlled (no SheetTrigger), so Radix has no
+            // trigger to hand focus back to on close. Restore it manually so
+            // keyboard users land back on the toggle instead of <body>.
+            onCloseAutoFocus={(event) => {
+              const trigger = document.querySelector<HTMLElement>('[data-sidebar="trigger"]');
+              if (trigger) {
+                event.preventDefault();
+                trigger.focus();
+              }
+            }}
           >
+
             <SheetHeader className="sr-only">
               <SheetTitle>Sidebar</SheetTitle>
               <SheetDescription>Displays the mobile sidebar.</SheetDescription>
