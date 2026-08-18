@@ -223,7 +223,7 @@ export function KnowledgeHubPreview({
         ) : null}
       </nav>
       {/* Prefetch hub index so following the "Open Knowledge Hub" link is instant. */}
-      <link rel="prefetch" href={hubUrl} />
+      <link rel="prefetch" href={`${localePrefix}/knowledge-hub`} />
     </Section>
   );
 }
