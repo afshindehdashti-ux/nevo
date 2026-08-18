@@ -1,0 +1,6677 @@
+{
+ "generatedBy": "scripts/build-image-manifest.py",
+ "count": 341,
+ "slots": [
+  {
+   "assetPath": "src/assets/ai/collab.jpg",
+   "assetKey": "collab",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 124,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": "NEVO engineering team reviewing a project"
+  },
+  {
+   "assetPath": "src/assets/ai/digital-twin.jpg",
+   "assetKey": "digital-twin",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 103,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/ai/drawings-review.jpg",
+   "assetKey": "drawings-review",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 101,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/ai/eco-engineering-consultancy.jpg",
+   "assetKey": "eco-engineering-consultancy",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 121,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/ai/eco-factory-development.jpg",
+   "assetKey": "eco-factory-development",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 186,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/ai/eco-finished-panels.jpg",
+   "assetKey": "eco-finished-panels",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 223,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/ai/eco-knowledge-hub.jpg",
+   "assetKey": "eco-knowledge-hub",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 121,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/ai/eco-production-lines.jpg",
+   "assetKey": "eco-production-lines",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 183,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/ai/eco-project-inquiry.jpg",
+   "assetKey": "eco-project-inquiry",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 113,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/ai/eco-raw-materials.jpg",
+   "assetKey": "eco-raw-materials",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 136,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/ai/hero-engineer.jpg",
+   "assetKey": "hero-engineer",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 97,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": "NEVO AI Engineer \u2014 engineer reviewing holographic factory model"
+  },
+  {
+   "assetPath": "src/assets/ai/live-consultation.jpg",
+   "assetKey": "live-consultation",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 101,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/ai/technical-proposal.jpg",
+   "assetKey": "technical-proposal",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 98,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/ai/whatsapp-support.jpg",
+   "assetKey": "whatsapp-support",
+   "folder": "assets/ai",
+   "intrinsic": "1024x1024",
+   "kb": 98,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-assistant"
+   ],
+   "components": [
+    "src/routes/$lang.ai-assistant.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/configurator/context-cleanroom.jpg",
+   "assetKey": "context-cleanroom",
+   "folder": "assets/configurator",
+   "intrinsic": "1024x1024",
+   "kb": 81,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/product-configurator"
+   ],
+   "components": [
+    "src/routes/$lang.product-configurator.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/configurator/context-coldroom.jpg",
+   "assetKey": "context-coldroom",
+   "folder": "assets/configurator",
+   "intrinsic": "1024x1024",
+   "kb": 67,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/product-configurator"
+   ],
+   "components": [
+    "src/routes/$lang.product-configurator.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/configurator/context-fire.jpg",
+   "assetKey": "context-fire",
+   "folder": "assets/configurator",
+   "intrinsic": "1024x1024",
+   "kb": 151,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/product-configurator"
+   ],
+   "components": [
+    "src/routes/$lang.product-configurator.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/configurator/context-roof.jpg",
+   "assetKey": "context-roof",
+   "folder": "assets/configurator",
+   "intrinsic": "1024x1024",
+   "kb": 93,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/product-configurator"
+   ],
+   "components": [
+    "src/routes/$lang.product-configurator.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/configurator/context-wall.jpg",
+   "assetKey": "context-wall",
+   "folder": "assets/configurator",
+   "intrinsic": "1024x1024",
+   "kb": 91,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/product-configurator"
+   ],
+   "components": [
+    "src/routes/$lang.product-configurator.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/configurator/hero-configurator.jpg",
+   "assetKey": "hero-configurator",
+   "folder": "assets/configurator",
+   "intrinsic": "1536x1024",
+   "kb": 117,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/product-configurator"
+   ],
+   "components": [
+    "src/routes/$lang.product-configurator.tsx"
+   ],
+   "alt": "NEVO sandwich panel \u2014 engineering render"
+  },
+  {
+   "assetPath": "src/assets/corporate/careers-hero.jpg",
+   "assetKey": "careers-hero",
+   "folder": "assets/corporate",
+   "intrinsic": "1920x1088",
+   "kb": 217,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/careers"
+   ],
+   "components": [
+    "src/routes/$lang.careers.tsx"
+   ],
+   "alt": "NEVO engineering team"
+  },
+  {
+   "assetPath": "src/assets/corporate/contact-hero.jpg",
+   "assetKey": "contact-hero",
+   "folder": "assets/corporate",
+   "intrinsic": "1920x1088",
+   "kb": 249,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/contact"
+   ],
+   "components": [
+    "src/routes/$lang.contact.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/corporate/investor-hero.jpg",
+   "assetKey": "investor-hero",
+   "folder": "assets/corporate",
+   "intrinsic": "1920x1088",
+   "kb": 164,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/investors"
+   ],
+   "components": [
+    "src/routes/$lang.investors.tsx"
+   ],
+   "alt": "Executive boardroom Dubai"
+  },
+  {
+   "assetPath": "src/assets/corporate/sustainability-hero.jpg",
+   "assetKey": "sustainability-hero",
+   "folder": "assets/corporate",
+   "intrinsic": "1920x1088",
+   "kb": 287,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/sustainability"
+   ],
+   "components": [
+    "src/routes/$lang.sustainability.tsx"
+   ],
+   "alt": "Solar-panel factory rooftop at golden hour"
+  },
+  {
+   "assetPath": "src/assets/downloads/hero-engineering-portrait.png.asset.json",
+   "assetKey": "hero-engineering-portrait.png.asset",
+   "folder": "assets/downloads",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/download-center"
+   ],
+   "components": [
+    "src/routes/$lang.download-center.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/01-hero.jpg",
+   "assetKey": "01-hero",
+   "folder": "assets/engineering",
+   "intrinsic": "1920x1088",
+   "kb": 318,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": "NEVO continuous sandwich panel production line"
+  },
+  {
+   "assetPath": "src/assets/engineering/02-factory.jpg",
+   "assetKey": "02-factory",
+   "folder": "assets/engineering",
+   "intrinsic": "1600x1072",
+   "kb": 211,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": "Factory engineering overview \u2014 3D rendered production plant"
+  },
+  {
+   "assetPath": "src/assets/engineering/03-team.jpg",
+   "assetKey": "03-team",
+   "folder": "assets/engineering",
+   "intrinsic": "1600x1072",
+   "kb": 129,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": "NEVO engineering team reviewing factory plans"
+  },
+  {
+   "assetPath": "src/assets/engineering/04-3d.jpg",
+   "assetKey": "04-3d",
+   "folder": "assets/engineering",
+   "intrinsic": "1600x1067",
+   "kb": 155,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": "NEVO engineer working on a 3D factory model"
+  },
+  {
+   "assetPath": "src/assets/engineering/05-layout.jpg",
+   "assetKey": "05-layout",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 93,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/06-flow.jpg",
+   "assetKey": "06-flow",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 235,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/07-process.jpg",
+   "assetKey": "07-process",
+   "folder": "assets/engineering",
+   "intrinsic": "1600x1067",
+   "kb": 197,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/08-equip.jpg",
+   "assetKey": "08-equip",
+   "folder": "assets/engineering",
+   "intrinsic": "1600x1067",
+   "kb": 209,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/09-utility.jpg",
+   "assetKey": "09-utility",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 174,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/10-electrical.jpg",
+   "assetKey": "10-electrical",
+   "folder": "assets/engineering",
+   "intrinsic": "1600x1067",
+   "kb": 215,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": "NEVO electrical control cabinet and HMI"
+  },
+  {
+   "assetPath": "src/assets/engineering/11-construction.jpg",
+   "assetKey": "11-construction",
+   "folder": "assets/engineering",
+   "intrinsic": "1600x1067",
+   "kb": 181,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/12-installation.jpg",
+   "assetKey": "12-installation",
+   "folder": "assets/engineering",
+   "intrinsic": "1600x1067",
+   "kb": 229,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/13-commissioning.jpg",
+   "assetKey": "13-commissioning",
+   "folder": "assets/engineering",
+   "intrinsic": "1600x1067",
+   "kb": 228,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/14-training.jpg",
+   "assetKey": "14-training",
+   "folder": "assets/engineering",
+   "intrinsic": "1600x1067",
+   "kb": 212,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/15-optimization.jpg",
+   "assetKey": "15-optimization",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 132,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": "OEE and production optimization dashboard"
+  },
+  {
+   "assetPath": "src/assets/engineering/16-qc.jpg",
+   "assetKey": "16-qc",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 111,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": "NEVO quality control lab technician"
+  },
+  {
+   "assetPath": "src/assets/engineering/17-finished.jpg",
+   "assetKey": "17-finished",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 215,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": "NEVO finished sandwich panels stacked and packaged"
+  },
+  {
+   "assetPath": "src/assets/engineering/18-raw.jpg",
+   "assetKey": "18-raw",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 154,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": "NEVO raw materials \u2014 steel coils and chemical IBCs"
+  },
+  {
+   "assetPath": "src/assets/engineering/19-pid.jpg",
+   "assetKey": "19-pid",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 135,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/20-general.jpg",
+   "assetKey": "20-general",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 144,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/21-structural.jpg",
+   "assetKey": "21-structural",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 258,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/22-capacity.jpg",
+   "assetKey": "22-capacity",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 89,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/23-roi.jpg",
+   "assetKey": "23-roi",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 119,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/24-timeline.jpg",
+   "assetKey": "24-timeline",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 133,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/engineering/25-materials.jpg",
+   "assetKey": "25-materials",
+   "folder": "assets/engineering",
+   "intrinsic": "1024x1024",
+   "kb": 105,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/engineering-consultancy"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.engineering-consultancy.tsx"
+   ],
+   "alt": "NEVO raw materials and chemical systems lineup"
+  },
+  {
+   "assetPath": "src/assets/estimator/est-eq1.png.asset.json",
+   "assetKey": "est-eq1.png.asset",
+   "folder": "assets/estimator",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-project-estimator"
+   ],
+   "components": [
+    "src/routes/$lang.ai-project-estimator.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/estimator/est-eq2.png.asset.json",
+   "assetKey": "est-eq2.png.asset",
+   "folder": "assets/estimator",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-project-estimator"
+   ],
+   "components": [
+    "src/routes/$lang.ai-project-estimator.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/estimator/est-eq3.png.asset.json",
+   "assetKey": "est-eq3.png.asset",
+   "folder": "assets/estimator",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-project-estimator"
+   ],
+   "components": [
+    "src/routes/$lang.ai-project-estimator.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/estimator/est-eq4.png.asset.json",
+   "assetKey": "est-eq4.png.asset",
+   "folder": "assets/estimator",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-project-estimator"
+   ],
+   "components": [
+    "src/routes/$lang.ai-project-estimator.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/estimator/est-eq5.png.asset.json",
+   "assetKey": "est-eq5.png.asset",
+   "folder": "assets/estimator",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-project-estimator"
+   ],
+   "components": [
+    "src/routes/$lang.ai-project-estimator.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/estimator/est-layout.png.asset.json",
+   "assetKey": "est-layout.png.asset",
+   "folder": "assets/estimator",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-project-estimator"
+   ],
+   "components": [
+    "src/routes/$lang.ai-project-estimator.tsx"
+   ],
+   "alt": "Factory Layout"
+  },
+  {
+   "assetPath": "src/assets/estimator/est-panel-hero.png.asset.json",
+   "assetKey": "est-panel-hero.png.asset",
+   "folder": "assets/estimator",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/ai-project-estimator"
+   ],
+   "components": [
+    "src/routes/$lang.ai-project-estimator.tsx"
+   ],
+   "alt": "Panel cross-section"
+  },
+  {
+   "assetPath": "src/assets/estimator/est-report.png.asset.json",
+   "assetKey": "est-report.png.asset",
+   "folder": "assets/estimator",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/ai-project-estimator"
+   ],
+   "components": [
+    "src/routes/$lang.ai-project-estimator.tsx"
+   ],
+   "alt": "Report Preview"
+  },
+  {
+   "assetPath": "src/assets/factory-layouts/fl-01-master.jpg",
+   "assetKey": "fl-01-master",
+   "folder": "assets/factory-layouts",
+   "intrinsic": "1024x1024",
+   "kb": 204,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/factory-layouts"
+   ],
+   "components": [
+    "src/routes/$lang.factory-layouts.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/factory-layouts/fl-02-3d.jpg",
+   "assetKey": "fl-02-3d",
+   "folder": "assets/factory-layouts",
+   "intrinsic": "1024x1024",
+   "kb": 178,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/factory-layouts"
+   ],
+   "components": [
+    "src/routes/$lang.factory-layouts.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/factory-layouts/fl-03-production-flow.jpg",
+   "assetKey": "fl-03-production-flow",
+   "folder": "assets/factory-layouts",
+   "intrinsic": "1024x1024",
+   "kb": 177,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/factory-layouts"
+   ],
+   "components": [
+    "src/routes/$lang.factory-layouts.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/factory-layouts/fl-04-material-flow.jpg",
+   "assetKey": "fl-04-material-flow",
+   "folder": "assets/factory-layouts",
+   "intrinsic": "1024x1024",
+   "kb": 116,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/factory-layouts"
+   ],
+   "components": [
+    "src/routes/$lang.factory-layouts.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/factory-layouts/fl-05-warehouse.jpg",
+   "assetKey": "fl-05-warehouse",
+   "folder": "assets/factory-layouts",
+   "intrinsic": "1024x1024",
+   "kb": 190,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/factory-layouts"
+   ],
+   "components": [
+    "src/routes/$lang.factory-layouts.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/factory-layouts/fl-06-utility.jpg",
+   "assetKey": "fl-06-utility",
+   "folder": "assets/factory-layouts",
+   "intrinsic": "1024x1024",
+   "kb": 167,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/factory-layouts"
+   ],
+   "components": [
+    "src/routes/$lang.factory-layouts.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/factory-layouts/fl-07-office.jpg",
+   "assetKey": "fl-07-office",
+   "folder": "assets/factory-layouts",
+   "intrinsic": "1024x1024",
+   "kb": 150,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/factory-layouts"
+   ],
+   "components": [
+    "src/routes/$lang.factory-layouts.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/factory-layouts/fl-08-truck.jpg",
+   "assetKey": "fl-08-truck",
+   "folder": "assets/factory-layouts",
+   "intrinsic": "1024x1024",
+   "kb": 142,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/factory-layouts"
+   ],
+   "components": [
+    "src/routes/$lang.factory-layouts.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/factory-layouts/fl-09-expansion.jpg",
+   "assetKey": "fl-09-expansion",
+   "folder": "assets/factory-layouts",
+   "intrinsic": "1024x1024",
+   "kb": 199,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/factory-layouts"
+   ],
+   "components": [
+    "src/routes/$lang.factory-layouts.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/factory-layouts/fl-10-completed.jpg",
+   "assetKey": "fl-10-completed",
+   "folder": "assets/factory-layouts",
+   "intrinsic": "1024x1024",
+   "kb": 152,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/factory-layouts"
+   ],
+   "components": [
+    "src/routes/$lang.factory-layouts.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-01.jpg",
+   "assetKey": "tile-01",
+   "folder": "assets/industries",
+   "intrinsic": "1264x848",
+   "kb": 129,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-02.jpg",
+   "assetKey": "tile-02",
+   "folder": "assets/industries",
+   "intrinsic": "1264x848",
+   "kb": 104,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-03.jpg",
+   "assetKey": "tile-03",
+   "folder": "assets/industries",
+   "intrinsic": "1264x848",
+   "kb": 125,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-04.jpg",
+   "assetKey": "tile-04",
+   "folder": "assets/industries",
+   "intrinsic": "1264x848",
+   "kb": 188,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-05.jpg",
+   "assetKey": "tile-05",
+   "folder": "assets/industries",
+   "intrinsic": "1264x848",
+   "kb": 190,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-06.jpg",
+   "assetKey": "tile-06",
+   "folder": "assets/industries",
+   "intrinsic": "1264x848",
+   "kb": 167,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-07.jpg",
+   "assetKey": "tile-07",
+   "folder": "assets/industries",
+   "intrinsic": "1600x1067",
+   "kb": 195,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-08.jpg",
+   "assetKey": "tile-08",
+   "folder": "assets/industries",
+   "intrinsic": "1600x1067",
+   "kb": 200,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-09.jpg",
+   "assetKey": "tile-09",
+   "folder": "assets/industries",
+   "intrinsic": "1600x1067",
+   "kb": 261,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-10.jpg",
+   "assetKey": "tile-10",
+   "folder": "assets/industries",
+   "intrinsic": "1600x1024",
+   "kb": 145,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-11.jpg",
+   "assetKey": "tile-11",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 228,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-12.jpg",
+   "assetKey": "tile-12",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 142,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-13.jpg",
+   "assetKey": "tile-13",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 157,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-14.jpg",
+   "assetKey": "tile-14",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 125,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-15.jpg",
+   "assetKey": "tile-15",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 126,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-16.jpg",
+   "assetKey": "tile-16",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 160,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-17.jpg",
+   "assetKey": "tile-17",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 160,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-18.jpg",
+   "assetKey": "tile-18",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 98,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-19.jpg",
+   "assetKey": "tile-19",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 72,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-20.jpg",
+   "assetKey": "tile-20",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 60,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-21.jpg",
+   "assetKey": "tile-21",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 100,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-22.jpg",
+   "assetKey": "tile-22",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 110,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/industries/tile-23.jpg",
+   "assetKey": "tile-23",
+   "folder": "assets/industries",
+   "intrinsic": "1024x1024",
+   "kb": 76,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/industries"
+   ],
+   "components": [
+    "src/routes/$lang.industries.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/installation/inst-01-machine-installation.jpg",
+   "assetKey": "inst-01-machine-installation",
+   "folder": "assets/installation",
+   "intrinsic": "1024x1024",
+   "kb": 176,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/installation-commissioning"
+   ],
+   "components": [
+    "src/routes/$lang.installation-commissioning.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/installation/inst-02-mechanical-alignment.jpg",
+   "assetKey": "inst-02-mechanical-alignment",
+   "folder": "assets/installation",
+   "intrinsic": "1024x1024",
+   "kb": 107,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/installation-commissioning"
+   ],
+   "components": [
+    "src/routes/$lang.installation-commissioning.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/installation/inst-03-electrical-installation.jpg",
+   "assetKey": "inst-03-electrical-installation",
+   "folder": "assets/installation",
+   "intrinsic": "1024x1024",
+   "kb": 134,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/installation-commissioning"
+   ],
+   "components": [
+    "src/routes/$lang.installation-commissioning.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/installation/inst-04-plc-scada.jpg",
+   "assetKey": "inst-04-plc-scada",
+   "folder": "assets/installation",
+   "intrinsic": "1024x1024",
+   "kb": 88,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/installation-commissioning"
+   ],
+   "components": [
+    "src/routes/$lang.installation-commissioning.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/installation/inst-05-first-panel.jpg",
+   "assetKey": "inst-05-first-panel",
+   "folder": "assets/installation",
+   "intrinsic": "1024x1024",
+   "kb": 147,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/installation-commissioning"
+   ],
+   "components": [
+    "src/routes/$lang.installation-commissioning.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/installation/inst-06-fat.jpg",
+   "assetKey": "inst-06-fat",
+   "folder": "assets/installation",
+   "intrinsic": "1024x1024",
+   "kb": 172,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/installation-commissioning"
+   ],
+   "components": [
+    "src/routes/$lang.installation-commissioning.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/installation/inst-07-sat.jpg",
+   "assetKey": "inst-07-sat",
+   "folder": "assets/installation",
+   "intrinsic": "1024x1024",
+   "kb": 131,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/installation-commissioning"
+   ],
+   "components": [
+    "src/routes/$lang.installation-commissioning.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/installation/inst-08-training.jpg",
+   "assetKey": "inst-08-training",
+   "folder": "assets/installation",
+   "intrinsic": "1024x1024",
+   "kb": 137,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/installation-commissioning"
+   ],
+   "components": [
+    "src/routes/$lang.installation-commissioning.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/installation/inst-09-remote-support.jpg",
+   "assetKey": "inst-09-remote-support",
+   "folder": "assets/installation",
+   "intrinsic": "1024x1024",
+   "kb": 108,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/installation-commissioning"
+   ],
+   "components": [
+    "src/routes/$lang.installation-commissioning.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/installation/inst-10-aftersales.jpg",
+   "assetKey": "inst-10-aftersales",
+   "folder": "assets/installation",
+   "intrinsic": "1024x1024",
+   "kb": 163,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/installation-commissioning"
+   ],
+   "components": [
+    "src/routes/$lang.installation-commissioning.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/01_blueprint.jpg",
+   "assetKey": "01_blueprint",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 245,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts",
+    "src/routes/$lang.knowledge-hub.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/02_cad.jpg",
+   "assetKey": "02_cad",
+   "folder": "assets/knowledge",
+   "intrinsic": "1024x1024",
+   "kb": 86,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about"
+   ],
+   "components": [
+    "src/routes/$lang.about.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/03_3d_factory.jpg",
+   "assetKey": "03_3d_factory",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 443,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts",
+    "src/routes/$lang.about.tsx",
+    "src/routes/$lang.knowledge-hub.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/04_meeting.jpg",
+   "assetKey": "04_meeting",
+   "folder": "assets/knowledge",
+   "intrinsic": "1024x1024",
+   "kb": 152,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about"
+   ],
+   "components": [
+    "src/routes/$lang.about.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/05_calculations.jpg",
+   "assetKey": "05_calculations",
+   "folder": "assets/knowledge",
+   "intrinsic": "1024x1024",
+   "kb": 107,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about"
+   ],
+   "components": [
+    "src/routes/$lang.about.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/06_production_line.jpg",
+   "assetKey": "06_production_line",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 263,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts",
+    "src/routes/$lang.about.tsx",
+    "src/routes/$lang.knowledge-hub.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/07_laminator.jpg",
+   "assetKey": "07_laminator",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 208,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts",
+    "src/routes/$lang.about.tsx",
+    "src/routes/$lang.knowledge-hub.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/10_stacking.jpg",
+   "assetKey": "10_stacking",
+   "folder": "assets/knowledge",
+   "intrinsic": "1024x1024",
+   "kb": 194,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about"
+   ],
+   "components": [
+    "src/routes/$lang.about.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/11_ppgi.jpg",
+   "assetKey": "11_ppgi",
+   "folder": "assets/knowledge",
+   "intrinsic": "1024x1024",
+   "kb": 81,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about"
+   ],
+   "components": [
+    "src/routes/$lang.about.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/14_polyol.jpg",
+   "assetKey": "14_polyol",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 247,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/16_rockwool.jpg",
+   "assetKey": "16_rockwool",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 416,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/17_pir_panel.jpg",
+   "assetKey": "17_pir_panel",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 118,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts",
+    "src/routes/$lang.about.tsx",
+    "src/routes/$lang.knowledge-hub.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/21_coldroom_panel.jpg",
+   "assetKey": "21_coldroom_panel",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 284,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts",
+    "src/routes/$lang.knowledge-hub.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/23_cleanroom.jpg",
+   "assetKey": "23_cleanroom",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 193,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/26_industrial_bldg.jpg",
+   "assetKey": "26_industrial_bldg",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 172,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/28_fire_rating.jpg",
+   "assetKey": "28_fire_rating",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 259,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts",
+    "src/routes/$lang.knowledge-hub.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/30_flow_diagram.jpg",
+   "assetKey": "30_flow_diagram",
+   "folder": "assets/knowledge",
+   "intrinsic": "1024x1024",
+   "kb": 229,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about"
+   ],
+   "components": [
+    "src/routes/$lang.about.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/31_material_flow.jpg",
+   "assetKey": "31_material_flow",
+   "folder": "assets/knowledge",
+   "intrinsic": "1024x1024",
+   "kb": 171,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about"
+   ],
+   "components": [
+    "src/routes/$lang.about.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/33_layout.jpg",
+   "assetKey": "33_layout",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 388,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts",
+    "src/routes/$lang.about.tsx",
+    "src/routes/$lang.knowledge-hub.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/36_investment_report.jpg",
+   "assetKey": "36_investment_report",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 144,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/about",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/knowledge-articles.ts",
+    "src/lib/og-article-covers.ts",
+    "src/routes/$lang.about.tsx",
+    "src/routes/$lang.knowledge-hub.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/38_factory_guide.jpg",
+   "assetKey": "38_factory_guide",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 226,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/knowledge-hub"
+   ],
+   "components": [
+    "src/routes/$lang.knowledge-hub.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/40_material_guide.jpg",
+   "assetKey": "40_material_guide",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1280",
+   "kb": 338,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/knowledge-hub"
+   ],
+   "components": [
+    "src/routes/$lang.knowledge-hub.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/knowledge/hub-hero.jpg",
+   "assetKey": "hub-hero",
+   "folder": "assets/knowledge",
+   "intrinsic": "1920x1088",
+   "kb": 223,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/knowledge-hub"
+   ],
+   "components": [
+    "src/routes/$lang.knowledge-hub.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/machinery/01-decoiler.jpg",
+   "assetKey": "01-decoiler",
+   "folder": "assets/machinery",
+   "intrinsic": "1600x1072",
+   "kb": 242,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/production-lines"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.production-lines.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/machinery/02-roll-former.jpg",
+   "assetKey": "02-roll-former",
+   "folder": "assets/machinery",
+   "intrinsic": "1600x1072",
+   "kb": 214,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/production-lines"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.production-lines.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/machinery/03-foam-injection.jpg",
+   "assetKey": "03-foam-injection",
+   "folder": "assets/machinery",
+   "intrinsic": "1600x1072",
+   "kb": 172,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/production-lines"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.production-lines.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/machinery/04-double-belt-laminator.jpg",
+   "assetKey": "04-double-belt-laminator",
+   "folder": "assets/machinery",
+   "intrinsic": "1600x1072",
+   "kb": 210,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/production-lines"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.production-lines.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/machinery/05-flying-saw.jpg",
+   "assetKey": "05-flying-saw",
+   "folder": "assets/machinery",
+   "intrinsic": "1600x1072",
+   "kb": 177,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/production-lines"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.production-lines.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/machinery/06-cooling-section.jpg",
+   "assetKey": "06-cooling-section",
+   "folder": "assets/machinery",
+   "intrinsic": "1600x1072",
+   "kb": 236,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/production-lines"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.production-lines.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/machinery/07-stacking-system.jpg",
+   "assetKey": "07-stacking-system",
+   "folder": "assets/machinery",
+   "intrinsic": "1600x1072",
+   "kb": 302,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/production-lines"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.production-lines.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/machinery/08-packaging-line.jpg",
+   "assetKey": "08-packaging-line",
+   "folder": "assets/machinery",
+   "intrinsic": "1600x1072",
+   "kb": 262,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/production-lines"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.production-lines.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/machinery/09-control-system.jpg",
+   "assetKey": "09-control-system",
+   "folder": "assets/machinery",
+   "intrinsic": "1600x1072",
+   "kb": 182,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/production-lines"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.production-lines.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/machinery/10-air-compressor.jpg",
+   "assetKey": "10-air-compressor",
+   "folder": "assets/machinery",
+   "intrinsic": "1600x1072",
+   "kb": 237,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/production-lines"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.production-lines.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/nevo-logo-dark.png",
+   "assetKey": "nevo-logo-dark",
+   "folder": "assets",
+   "intrinsic": "1376x768",
+   "kb": 150,
+   "slot": "Brand logo",
+   "required": "SVG or 1024px PNG, transparent",
+   "routes": [
+    "(root layout)"
+   ],
+   "components": [
+    "src/routes/__root.tsx"
+   ],
+   "alt": "NEVO Industrial"
+  },
+  {
+   "assetPath": "src/assets/nevo-logo-full.png.asset.json",
+   "assetKey": "nevo-logo-full.png.asset",
+   "folder": "assets",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Brand logo",
+   "required": "SVG or 1024px PNG, transparent",
+   "routes": [
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability"
+   ],
+   "components": [
+    "src/components/site/SiteHeader.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/nevo-logo-light.png",
+   "assetKey": "nevo-logo-light",
+   "folder": "assets",
+   "intrinsic": "1376x768",
+   "kb": 96,
+   "slot": "Brand logo",
+   "required": "SVG or 1024px PNG, transparent",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/admin"
+   ],
+   "components": [
+    "src/components/crm/CrmSidebar.tsx",
+    "src/components/site/SiteFooter.tsx",
+    "src/components/site/SiteHeader.tsx",
+    "src/routes/__root.tsx"
+   ],
+   "alt": "NEVO"
+  },
+  {
+   "assetPath": "src/assets/og/ai-collab.jpg",
+   "assetKey": "ai-collab",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 130,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/ai-digital-twin.jpg",
+   "assetKey": "ai-digital-twin",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 94,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/ai-hero-engineer.jpg",
+   "assetKey": "ai-hero-engineer",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 95,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/ai-technical-proposal.jpg",
+   "assetKey": "ai-technical-proposal",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 102,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/careers-hero.jpg",
+   "assetKey": "careers-hero",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 120,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/configurator-hero.jpg",
+   "assetKey": "configurator-hero",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 75,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/contact-hero.jpg",
+   "assetKey": "contact-hero",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 127,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/eco-consultancy.jpg",
+   "assetKey": "eco-consultancy",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 124,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/eco-factory-dev.jpg",
+   "assetKey": "eco-factory-dev",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 155,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/eco-finished-panels.jpg",
+   "assetKey": "eco-finished-panels",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 214,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/eco-production-lines.jpg",
+   "assetKey": "eco-production-lines",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 179,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/eco-raw-materials.jpg",
+   "assetKey": "eco-raw-materials",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 126,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/engineering-hero.jpg",
+   "assetKey": "engineering-hero",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 174,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/engineering-philosophy.jpg",
+   "assetKey": "engineering-philosophy",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 192,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/factory-hero.jpg",
+   "assetKey": "factory-hero",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 122,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/factory-layout-master.jpg",
+   "assetKey": "factory-layout-master",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 140,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/hero-nevo-line.jpg",
+   "assetKey": "hero-nevo-line",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 171,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/hero-production-line.jpg",
+   "assetKey": "hero-production-line",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 100,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/industries-tile.jpg",
+   "assetKey": "industries-tile",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 93,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/installation-hero.jpg",
+   "assetKey": "installation-hero",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 152,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/investor-hero.jpg",
+   "assetKey": "investor-hero",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 91,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge-cross-section.jpg",
+   "assetKey": "knowledge-cross-section",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 96,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge-datasheet.jpg",
+   "assetKey": "knowledge-datasheet",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 99,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge-fire-rating.jpg",
+   "assetKey": "knowledge-fire-rating",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 129,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge-hub-hero.jpg",
+   "assetKey": "knowledge-hub-hero",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 124,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge-investment.jpg",
+   "assetKey": "knowledge-investment",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 69,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge-pir-vs-pur.jpg",
+   "assetKey": "knowledge-pir-vs-pur",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 150,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/01_blueprint.jpg",
+   "assetKey": "01_blueprint",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 120,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/03_3d_factory.jpg",
+   "assetKey": "03_3d_factory",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 214,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/06_production_line.jpg",
+   "assetKey": "06_production_line",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 132,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/07_laminator.jpg",
+   "assetKey": "07_laminator",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 104,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/14_polyol.jpg",
+   "assetKey": "14_polyol",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 127,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/16_rockwool.jpg",
+   "assetKey": "16_rockwool",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 189,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/17_pir_panel.jpg",
+   "assetKey": "17_pir_panel",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 50,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/21_coldroom_panel.jpg",
+   "assetKey": "21_coldroom_panel",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 124,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/23_cleanroom.jpg",
+   "assetKey": "23_cleanroom",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 97,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/26_industrial_bldg.jpg",
+   "assetKey": "26_industrial_bldg",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 81,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/28_fire_rating.jpg",
+   "assetKey": "28_fire_rating",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 129,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/33_layout.jpg",
+   "assetKey": "33_layout",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 170,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/knowledge/36_investment_report.jpg",
+   "assetKey": "36_investment_report",
+   "folder": "assets/og/knowledge",
+   "intrinsic": "1200x630",
+   "kb": 69,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "/$lang/knowledge-hub/$slug"
+   ],
+   "components": [
+    "src/lib/og-article-covers.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/panels-tile.jpg",
+   "assetKey": "panels-tile",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 79,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/project-blueprint.jpg",
+   "assetKey": "project-blueprint",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 132,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/og/sustainability-hero.jpg",
+   "assetKey": "sustainability-hero",
+   "folder": "assets/og",
+   "intrinsic": "1200x630",
+   "kb": 149,
+   "slot": "Social / OG card",
+   "required": "1200x630 (1.91:1)",
+   "routes": [
+    "(root layout)",
+    "/$lang",
+    "/$lang/about",
+    "/$lang/ai-assistant",
+    "/$lang/ai-project-estimator",
+    "/$lang/careers",
+    "/$lang/contact",
+    "/$lang/customer-portal",
+    "/$lang/download-center",
+    "/$lang/engineering-tools",
+    "/$lang/factory-layout-generator",
+    "/$lang/factory-layouts",
+    "/$lang/industries",
+    "/$lang/installation-commissioning",
+    "/$lang/investment-calculator",
+    "/$lang/investors",
+    "/$lang/knowledge-hub",
+    "/$lang/knowledge-hub/$slug",
+    "/$lang/panel-thickness-calculator",
+    "/$lang/partner-portal",
+    "/$lang/pir-vs-rock-wool",
+    "/$lang/privacy",
+    "/$lang/product-configurator",
+    "/$lang/project-inquiry",
+    "/$lang/quality",
+    "/$lang/research-innovation",
+    "/$lang/solutions",
+    "/$lang/solutions/engineering-consultancy",
+    "/$lang/solutions/factory-development",
+    "/$lang/solutions/production-lines",
+    "/$lang/solutions/raw-materials",
+    "/$lang/solutions/sandwich-panels",
+    "/$lang/sustainability",
+    "/sitemap[/]xml",
+    "/sitemaps/$slug"
+   ],
+   "components": [
+    "src/lib/og-images.ts"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-01.jpg",
+   "assetKey": "tile-01",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 103,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": "NEVO PIR sandwich panel \u2014 premium engineered wall panel"
+  },
+  {
+   "assetPath": "src/assets/panels/tile-02.jpg",
+   "assetKey": "tile-02",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 88,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-03.jpg",
+   "assetKey": "tile-03",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 81,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-04.jpg",
+   "assetKey": "tile-04",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 130,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-05.jpg",
+   "assetKey": "tile-05",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 205,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-06.jpg",
+   "assetKey": "tile-06",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 144,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-07.jpg",
+   "assetKey": "tile-07",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 116,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-08.jpg",
+   "assetKey": "tile-08",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 162,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-09.jpg",
+   "assetKey": "tile-09",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 114,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-10.jpg",
+   "assetKey": "tile-10",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 85,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-11.jpg",
+   "assetKey": "tile-11",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 82,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-12.jpg",
+   "assetKey": "tile-12",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 73,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-13.jpg",
+   "assetKey": "tile-13",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 199,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-14.jpg",
+   "assetKey": "tile-14",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 115,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-15.jpg",
+   "assetKey": "tile-15",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 142,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-16.jpg",
+   "assetKey": "tile-16",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 157,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-17.jpg",
+   "assetKey": "tile-17",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 136,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-18.jpg",
+   "assetKey": "tile-18",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 141,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-19.jpg",
+   "assetKey": "tile-19",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 152,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-20.jpg",
+   "assetKey": "tile-20",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 128,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-21.jpg",
+   "assetKey": "tile-21",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 101,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-22.jpg",
+   "assetKey": "tile-22",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 85,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-23.jpg",
+   "assetKey": "tile-23",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 68,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-24.jpg",
+   "assetKey": "tile-24",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 147,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-25.jpg",
+   "assetKey": "tile-25",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 133,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-26.jpg",
+   "assetKey": "tile-26",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 209,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": "Why NEVO Panels"
+  },
+  {
+   "assetPath": "src/assets/panels/tile-27.jpg",
+   "assetKey": "tile-27",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 111,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/panels/tile-28.jpg",
+   "assetKey": "tile-28",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 117,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": "NEVO panel connection systems"
+  },
+  {
+   "assetPath": "src/assets/panels/tile-29.jpg",
+   "assetKey": "tile-29",
+   "folder": "assets/panels",
+   "intrinsic": "1280x960",
+   "kb": 233,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/sandwich-panels"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.sandwich-panels.tsx"
+   ],
+   "alt": "Sustainability \u2014 NEVO panels"
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-01.png.asset.json",
+   "assetKey": "partner-01.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-02.png.asset.json",
+   "assetKey": "partner-02.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-03.png.asset.json",
+   "assetKey": "partner-03.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-04.png.asset.json",
+   "assetKey": "partner-04.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-05.png.asset.json",
+   "assetKey": "partner-05.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-06.png.asset.json",
+   "assetKey": "partner-06.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-07.png.asset.json",
+   "assetKey": "partner-07.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-08.png.asset.json",
+   "assetKey": "partner-08.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-09.png.asset.json",
+   "assetKey": "partner-09.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-10.png.asset.json",
+   "assetKey": "partner-10.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-11.png.asset.json",
+   "assetKey": "partner-11.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-12.png.asset.json",
+   "assetKey": "partner-12.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-13.png.asset.json",
+   "assetKey": "partner-13.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-14.png.asset.json",
+   "assetKey": "partner-14.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-15.png.asset.json",
+   "assetKey": "partner-15.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-16.png.asset.json",
+   "assetKey": "partner-16.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-17.png.asset.json",
+   "assetKey": "partner-17.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-18.png.asset.json",
+   "assetKey": "partner-18.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-19.png.asset.json",
+   "assetKey": "partner-19.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-20.png.asset.json",
+   "assetKey": "partner-20.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/partner-portal/partner-21.png.asset.json",
+   "assetKey": "partner-21.png.asset",
+   "folder": "assets/partner-portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/partner-portal"
+   ],
+   "components": [
+    "src/routes/$lang.partner-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/app-clean-room.png",
+   "assetKey": "app-clean-room",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "127x161",
+   "kb": 27,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/app-cold-steel-coil.png",
+   "assetKey": "app-cold-steel-coil",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "126x161",
+   "kb": 26,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/app-commercial-building.png",
+   "assetKey": "app-commercial-building",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "122x161",
+   "kb": 31,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/app-industrial-building.png",
+   "assetKey": "app-industrial-building",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "127x161",
+   "kb": 27,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/app-warehouse.png",
+   "assetKey": "app-warehouse",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "127x161",
+   "kb": 32,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/core-pir.png",
+   "assetKey": "core-pir",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "146x149",
+   "kb": 32,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/core-rockwool.png",
+   "assetKey": "core-rockwool",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "161x149",
+   "kb": 34,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/cross-pir.png",
+   "assetKey": "cross-pir",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "266x215",
+   "kb": 76,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/cross-rockwool.png",
+   "assetKey": "cross-rockwool",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "268x215",
+   "kb": 74,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/fire-pir.png",
+   "assetKey": "fire-pir",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "199x205",
+   "kb": 56,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/fire-rockwool.png",
+   "assetKey": "fire-rockwool",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "200x205",
+   "kb": 59,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/mechanical.png",
+   "assetKey": "mechanical",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "292x169",
+   "kb": 59,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/ppgi-coil.png",
+   "assetKey": "ppgi-coil",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "230x169",
+   "kb": 49,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/thermal-pir.png",
+   "assetKey": "thermal-pir",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "238x205",
+   "kb": 63,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/pir-vs-rockwool/thermal-rockwool.png",
+   "assetKey": "thermal-rockwool",
+   "folder": "assets/pir-vs-rockwool",
+   "intrinsic": "231x205",
+   "kb": 64,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/pir-vs-rock-wool"
+   ],
+   "components": [
+    "src/routes/$lang.pir-vs-rock-wool.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-01.png.asset.json",
+   "assetKey": "portal-01.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": "NEVO customer portal"
+  },
+  {
+   "assetPath": "src/assets/portal/portal-02.png.asset.json",
+   "assetKey": "portal-02.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": "Project overview"
+  },
+  {
+   "assetPath": "src/assets/portal/portal-03.png.asset.json",
+   "assetKey": "portal-03.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": "Timeline"
+  },
+  {
+   "assetPath": "src/assets/portal/portal-04.png.asset.json",
+   "assetKey": "portal-04.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": "Shipping tracker"
+  },
+  {
+   "assetPath": "src/assets/portal/portal-05.png.asset.json",
+   "assetKey": "portal-05.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": "Engineering support"
+  },
+  {
+   "assetPath": "src/assets/portal/portal-06.png.asset.json",
+   "assetKey": "portal-06.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-07.png.asset.json",
+   "assetKey": "portal-07.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-08.png.asset.json",
+   "assetKey": "portal-08.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-09.png.asset.json",
+   "assetKey": "portal-09.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-10.png.asset.json",
+   "assetKey": "portal-10.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-11.png.asset.json",
+   "assetKey": "portal-11.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-12.png.asset.json",
+   "assetKey": "portal-12.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-13.png.asset.json",
+   "assetKey": "portal-13.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-14.png.asset.json",
+   "assetKey": "portal-14.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-15.png.asset.json",
+   "assetKey": "portal-15.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-16.png.asset.json",
+   "assetKey": "portal-16.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-17.png.asset.json",
+   "assetKey": "portal-17.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-18.png.asset.json",
+   "assetKey": "portal-18.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-19.png.asset.json",
+   "assetKey": "portal-19.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-20.png.asset.json",
+   "assetKey": "portal-20.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/portal/portal-21.png.asset.json",
+   "assetKey": "portal-21.png.asset",
+   "folder": "assets/portal",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/customer-portal"
+   ],
+   "components": [
+    "src/routes/$lang.customer-portal.tsx"
+   ],
+   "alt": "Engineering assistance"
+  },
+  {
+   "assetPath": "src/assets/premium/01-aerial-factory.jpg.asset.json",
+   "assetKey": "01-aerial-factory.jpg.asset",
+   "folder": "assets/premium",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang"
+   ],
+   "components": [
+    "src/components/site/FeaturedFactory.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/premium/04-warehouse-racking.jpg.asset.json",
+   "assetKey": "04-warehouse-racking.jpg.asset",
+   "folder": "assets/premium",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/factory-development"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.factory-development.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/premium/12-engineer-bim.jpg.asset.json",
+   "assetKey": "12-engineer-bim.jpg.asset",
+   "folder": "assets/premium",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/factory-development"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.factory-development.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/premium/18-boardroom.jpg.asset.json",
+   "assetKey": "18-boardroom.jpg.asset",
+   "folder": "assets/premium",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/factory-development"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.factory-development.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/premium/22-site-survey.jpg.asset.json",
+   "assetKey": "22-site-survey.jpg.asset",
+   "folder": "assets/premium",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/factory-development"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.factory-development.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/premium/23-commissioning.jpg.asset.json",
+   "assetKey": "23-commissioning.jpg.asset",
+   "folder": "assets/premium",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/factory-development"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.factory-development.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/premium/24-masterplan.jpg.asset.json",
+   "assetKey": "24-masterplan.jpg.asset",
+   "folder": "assets/premium",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/factory-development"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.factory-development.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/premium/25-prodline-hero.jpg.asset.json",
+   "assetKey": "25-prodline-hero.jpg.asset",
+   "folder": "assets/premium",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/solutions/production-lines"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.production-lines.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/premium/26-prodline-detail.jpg.asset.json",
+   "assetKey": "26-prodline-detail.jpg.asset",
+   "folder": "assets/premium",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/production-lines"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.production-lines.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/premium/homepage-hero-desktop.jpg.asset.json",
+   "assetKey": "homepage-hero-desktop.jpg.asset",
+   "folder": "assets/premium",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang"
+   ],
+   "components": [
+    "src/components/site/Hero.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/premium/homepage-hero-mobile.jpg.asset.json",
+   "assetKey": "homepage-hero-mobile.jpg.asset",
+   "folder": "assets/premium",
+   "intrinsic": "CDN pointer",
+   "kb": 0,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang"
+   ],
+   "components": [
+    "src/components/site/Hero.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/dubai.jpg",
+   "assetKey": "dubai",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 124,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": "NEVO Industrial \u2014 Dubai headquarters"
+  },
+  {
+   "assetPath": "src/assets/project/hero-factory.jpg",
+   "assetKey": "hero-factory",
+   "folder": "assets/project",
+   "intrinsic": "1920x1088",
+   "kb": 232,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": "NEVO engineering \u2014 3D factory render"
+  },
+  {
+   "assetPath": "src/assets/project/tile-01.jpg",
+   "assetKey": "tile-01",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 123,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-02.jpg",
+   "assetKey": "tile-02",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 128,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-03.jpg",
+   "assetKey": "tile-03",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 156,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-04.jpg",
+   "assetKey": "tile-04",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 169,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-05.jpg",
+   "assetKey": "tile-05",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 103,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-06.jpg",
+   "assetKey": "tile-06",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 94,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-07.jpg",
+   "assetKey": "tile-07",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 124,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-08.jpg",
+   "assetKey": "tile-08",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 155,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-09.jpg",
+   "assetKey": "tile-09",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 138,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-10.jpg",
+   "assetKey": "tile-10",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 117,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-11.jpg",
+   "assetKey": "tile-11",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 153,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-12.jpg",
+   "assetKey": "tile-12",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 111,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-13.jpg",
+   "assetKey": "tile-13",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 208,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-14.jpg",
+   "assetKey": "tile-14",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 144,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-15.jpg",
+   "assetKey": "tile-15",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 153,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-16.jpg",
+   "assetKey": "tile-16",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 112,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-17.jpg",
+   "assetKey": "tile-17",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 177,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-18.jpg",
+   "assetKey": "tile-18",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 122,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-19.jpg",
+   "assetKey": "tile-19",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 151,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-20.jpg",
+   "assetKey": "tile-20",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 94,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-21.jpg",
+   "assetKey": "tile-21",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 149,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/project/tile-22.jpg",
+   "assetKey": "tile-22",
+   "folder": "assets/project",
+   "intrinsic": "1280x960",
+   "kb": 92,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/project-inquiry"
+   ],
+   "components": [
+    "src/routes/$lang.project-inquiry.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/quality/qa-01-lab.jpg",
+   "assetKey": "qa-01-lab",
+   "folder": "assets/quality",
+   "intrinsic": "1600x1067",
+   "kb": 140,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/quality"
+   ],
+   "components": [
+    "src/routes/$lang.quality.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/quality/qa-02-thickness.jpg",
+   "assetKey": "qa-02-thickness",
+   "folder": "assets/quality",
+   "intrinsic": "1600x1067",
+   "kb": 74,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/quality"
+   ],
+   "components": [
+    "src/routes/$lang.quality.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/quality/qa-03-fire.jpg",
+   "assetKey": "qa-03-fire",
+   "folder": "assets/quality",
+   "intrinsic": "1600x1067",
+   "kb": 117,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/quality"
+   ],
+   "components": [
+    "src/routes/$lang.quality.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/quality/qa-04-thermal.jpg",
+   "assetKey": "qa-04-thermal",
+   "folder": "assets/quality",
+   "intrinsic": "1600x1067",
+   "kb": 92,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/quality"
+   ],
+   "components": [
+    "src/routes/$lang.quality.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/quality/qa-05-adhesion.jpg",
+   "assetKey": "qa-05-adhesion",
+   "folder": "assets/quality",
+   "intrinsic": "1600x1067",
+   "kb": 188,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/quality"
+   ],
+   "components": [
+    "src/routes/$lang.quality.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/quality/qa-06-dimensional.jpg",
+   "assetKey": "qa-06-dimensional",
+   "folder": "assets/quality",
+   "intrinsic": "1600x1067",
+   "kb": 176,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/quality"
+   ],
+   "components": [
+    "src/routes/$lang.quality.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/quality/qa-07-density.jpg",
+   "assetKey": "qa-07-density",
+   "folder": "assets/quality",
+   "intrinsic": "1600x1067",
+   "kb": 87,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/quality"
+   ],
+   "components": [
+    "src/routes/$lang.quality.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/quality/qa-08-iso.jpg",
+   "assetKey": "qa-08-iso",
+   "folder": "assets/quality",
+   "intrinsic": "1600x1067",
+   "kb": 175,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/quality"
+   ],
+   "components": [
+    "src/routes/$lang.quality.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/quality/qa-09-audit.jpg",
+   "assetKey": "qa-09-audit",
+   "folder": "assets/quality",
+   "intrinsic": "1600x1067",
+   "kb": 216,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/quality"
+   ],
+   "components": [
+    "src/routes/$lang.quality.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/quality/qa-10-shipment.jpg",
+   "assetKey": "qa-10-shipment",
+   "folder": "assets/quality",
+   "intrinsic": "1600x1067",
+   "kb": 214,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/quality"
+   ],
+   "components": [
+    "src/routes/$lang.quality.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/adhesive-sealants.jpg",
+   "assetKey": "adhesive-sealants",
+   "folder": "assets/raw-materials",
+   "intrinsic": "1600x1200",
+   "kb": 159,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/aluzinc-coil.jpg",
+   "assetKey": "aluzinc-coil",
+   "folder": "assets/raw-materials",
+   "intrinsic": "196x237",
+   "kb": 13,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/finished-panels.jpg",
+   "assetKey": "finished-panels",
+   "folder": "assets/raw-materials",
+   "intrinsic": "341x352",
+   "kb": 33,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/gi-coil.jpg",
+   "assetKey": "gi-coil",
+   "folder": "assets/raw-materials",
+   "intrinsic": "196x237",
+   "kb": 11,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/hero-production-line.jpg",
+   "assetKey": "hero-production-line",
+   "folder": "assets/raw-materials",
+   "intrinsic": "1920x1088",
+   "kb": 234,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": "NEVO continuous double-belt laminator producing a PIR sandwich panel"
+  },
+  {
+   "assetPath": "src/assets/raw-materials/mdi-ibc.jpg",
+   "assetKey": "mdi-ibc",
+   "folder": "assets/raw-materials",
+   "intrinsic": "1600x1200",
+   "kb": 245,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/pir-core.jpg",
+   "assetKey": "pir-core",
+   "folder": "assets/raw-materials",
+   "intrinsic": "1600x1200",
+   "kb": 183,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/pir-sandwich.jpg",
+   "assetKey": "pir-sandwich",
+   "folder": "assets/raw-materials",
+   "intrinsic": "512x410",
+   "kb": 53,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/polyol-drum.jpg",
+   "assetKey": "polyol-drum",
+   "folder": "assets/raw-materials",
+   "intrinsic": "1600x1200",
+   "kb": 303,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/polyol-ibc.jpg",
+   "assetKey": "polyol-ibc",
+   "folder": "assets/raw-materials",
+   "intrinsic": "1600x1200",
+   "kb": 214,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/ppgi-coil.jpg",
+   "assetKey": "ppgi-coil",
+   "folder": "assets/raw-materials",
+   "intrinsic": "1600x1200",
+   "kb": 259,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/prepainted-coil.jpg",
+   "assetKey": "prepainted-coil",
+   "folder": "assets/raw-materials",
+   "intrinsic": "202x237",
+   "kb": 11,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/production-line.jpg",
+   "assetKey": "production-line",
+   "folder": "assets/raw-materials",
+   "intrinsic": "512x398",
+   "kb": 58,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/rock-wool-core.jpg",
+   "assetKey": "rock-wool-core",
+   "folder": "assets/raw-materials",
+   "intrinsic": "248x175",
+   "kb": 12,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/rock-wool-panel.jpg",
+   "assetKey": "rock-wool-panel",
+   "folder": "assets/raw-materials",
+   "intrinsic": "250x175",
+   "kb": 13,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/warehouse-chemical.jpg",
+   "assetKey": "warehouse-chemical",
+   "folder": "assets/raw-materials",
+   "intrinsic": "1600x1200",
+   "kb": 282,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/warehouse-coil.jpg",
+   "assetKey": "warehouse-coil",
+   "folder": "assets/raw-materials",
+   "intrinsic": "250x170",
+   "kb": 14,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/warehouse-raw.jpg",
+   "assetKey": "warehouse-raw",
+   "folder": "assets/raw-materials",
+   "intrinsic": "246x170",
+   "kb": 13,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/raw-materials/warehouse-shipping.jpg",
+   "assetKey": "warehouse-shipping",
+   "folder": "assets/raw-materials",
+   "intrinsic": "250x170",
+   "kb": 11,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/solutions/raw-materials"
+   ],
+   "components": [
+    "src/routes/$lang.solutions.raw-materials.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/research/ri-01-rd-lab.jpg",
+   "assetKey": "ri-01-rd-lab",
+   "folder": "assets/research",
+   "intrinsic": "1024x1024",
+   "kb": 153,
+   "slot": "Card / section cover",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/research-innovation"
+   ],
+   "components": [
+    "src/routes/$lang.research-innovation.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/research/ri-02-material-science.jpg",
+   "assetKey": "ri-02-material-science",
+   "folder": "assets/research",
+   "intrinsic": "1024x1024",
+   "kb": 130,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/research-innovation"
+   ],
+   "components": [
+    "src/routes/$lang.research-innovation.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/research/ri-03-pir-foam.jpg",
+   "assetKey": "ri-03-pir-foam",
+   "folder": "assets/research",
+   "intrinsic": "1024x1024",
+   "kb": 149,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/research-innovation"
+   ],
+   "components": [
+    "src/routes/$lang.research-innovation.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/research/ri-04-fire.jpg",
+   "assetKey": "ri-04-fire",
+   "folder": "assets/research",
+   "intrinsic": "1024x1024",
+   "kb": 150,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/research-innovation"
+   ],
+   "components": [
+    "src/routes/$lang.research-innovation.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/research/ri-05-thermal.jpg",
+   "assetKey": "ri-05-thermal",
+   "folder": "assets/research",
+   "intrinsic": "1024x1024",
+   "kb": 125,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/research-innovation"
+   ],
+   "components": [
+    "src/routes/$lang.research-innovation.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/research/ri-06-digital-twin.jpg",
+   "assetKey": "ri-06-digital-twin",
+   "folder": "assets/research",
+   "intrinsic": "1024x1024",
+   "kb": 139,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/research-innovation"
+   ],
+   "components": [
+    "src/routes/$lang.research-innovation.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/research/ri-07-prototype-line.jpg",
+   "assetKey": "ri-07-prototype-line",
+   "folder": "assets/research",
+   "intrinsic": "1024x1024",
+   "kb": 150,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/research-innovation"
+   ],
+   "components": [
+    "src/routes/$lang.research-innovation.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/research/ri-08-ai-analytics.jpg",
+   "assetKey": "ri-08-ai-analytics",
+   "folder": "assets/research",
+   "intrinsic": "1024x1024",
+   "kb": 117,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/research-innovation"
+   ],
+   "components": [
+    "src/routes/$lang.research-innovation.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/research/ri-09-collaboration.jpg",
+   "assetKey": "ri-09-collaboration",
+   "folder": "assets/research",
+   "intrinsic": "1024x1024",
+   "kb": 133,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/research-innovation"
+   ],
+   "components": [
+    "src/routes/$lang.research-innovation.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/research/ri-10-future-lab.jpg",
+   "assetKey": "ri-10-future-lab",
+   "folder": "assets/research",
+   "intrinsic": "1024x1024",
+   "kb": 112,
+   "slot": "Inline illustration / card",
+   "required": "1600x900 (16:9)",
+   "routes": [
+    "/$lang/research-innovation"
+   ],
+   "components": [
+    "src/routes/$lang.research-innovation.tsx"
+   ],
+   "alt": ""
+  },
+  {
+   "assetPath": "src/assets/tools/hero-cockpit.jpg",
+   "assetKey": "hero-cockpit",
+   "folder": "assets/tools",
+   "intrinsic": "1920x1088",
+   "kb": 149,
+   "slot": "Full-bleed hero",
+   "required": "2400x1200 (2:1), safe centre crop",
+   "routes": [
+    "/$lang/engineering-tools"
+   ],
+   "components": [
+    "src/routes/$lang.engineering-tools.tsx"
+   ],
+   "alt": ""
+  }
+ ]
+}

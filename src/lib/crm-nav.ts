@@ -126,6 +126,13 @@ export const CRM_NAV: CrmNavGroup[] = [
       },
       { title: "Files", url: "/admin/files", icon: FolderOpen, allowedRoles: ALL_STAFF },
       {
+        title: "Image Library",
+        url: "/admin/images",
+        icon: ImageIcon,
+        allowedRoles: ["management"],
+      },
+
+      {
         title: "Document Intelligence",
         url: "/admin/document-intelligence",
         icon: Brain,

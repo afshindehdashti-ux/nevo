@@ -99,6 +99,18 @@ os.makedirs("/dev-server/docs",exist_ok=True)
 with open("/dev-server/docs/image-manifest.csv","w",newline="") as f:
     w=csv.DictWriter(f,fieldnames=["asset","intrinsic","kb","slot","required","routes","components","alt","code"])
     w.writeheader(); w.writerows(rows)
+# Machine-readable slot catalogue consumed by the admin image manager UI.
+slots=[{"assetPath":r["asset"],
+        "assetKey":os.path.splitext(os.path.basename(r["asset"]))[0],
+        "folder":os.path.dirname(r["asset"]).replace("src/assets","assets"),
+        "intrinsic":r["intrinsic"],"kb":r["kb"],"slot":r["slot"],"required":r["required"],
+        "routes":[x for x in r["routes"].split("; ") if x],
+        "components":[x for x in r["components"].split("; ") if x],
+        "alt":r["alt"]} for r in rows]
+os.makedirs("/dev-server/src/data",exist_ok=True)
+json.dump({"generatedBy":"scripts/build-image-manifest.py","count":len(slots),"slots":slots},
+          open("/dev-server/src/data/image-slots.json","w"),indent=1)
+
 groups={}
 for r in rows:
     g=os.path.dirname(r["asset"]).replace("src/assets","assets") or "assets"

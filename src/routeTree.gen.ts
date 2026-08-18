@@ -89,6 +89,7 @@ import { Route as AuthenticatedAdminLogoEventsRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
 import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authenticated/admin.invoices'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
+import { Route as AuthenticatedAdminImagesRouteImport } from './routes/_authenticated/admin.images'
 import { Route as AuthenticatedAdminFilesRouteImport } from './routes/_authenticated/admin.files'
 import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin.exports'
 import { Route as AuthenticatedAdminEmailPreviewRouteImport } from './routes/_authenticated/admin.email-preview'
@@ -119,6 +120,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicSiteImageSplatRouteImport } from './routes/api/public/site-image.$'
 import { Route as ApiPublicAlertsSignInFailedRouteImport } from './routes/api/public/alerts/sign-in-failed'
 import { Route as ApiPublicAlertsEmailDlqRouteImport } from './routes/api/public/alerts/email-dlq'
 import { Route as AuthenticatedAdminUsersInviteRouteImport } from './routes/_authenticated/admin.users.invite'
@@ -567,6 +569,12 @@ const AuthenticatedAdminImportRoute =
     path: '/import',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminImagesRoute =
+  AuthenticatedAdminImagesRouteImport.update({
+    id: '/images',
+    path: '/images',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminFilesRoute = AuthenticatedAdminFilesRouteImport.update({
   id: '/files',
   path: '/files',
@@ -740,6 +748,11 @@ const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSiteImageSplatRoute = ApiPublicSiteImageSplatRouteImport.update({
+  id: '/api/public/site-image/$',
+  path: '/api/public/site-image/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicAlertsSignInFailedRoute =
@@ -932,6 +945,7 @@ export interface FileRoutesByFullPath {
   '/admin/email-preview': typeof AuthenticatedAdminEmailPreviewRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
+  '/admin/images': typeof AuthenticatedAdminImagesRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -983,6 +997,7 @@ export interface FileRoutesByFullPath {
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/api/public/alerts/email-dlq': typeof ApiPublicAlertsEmailDlqRoute
   '/api/public/alerts/sign-in-failed': typeof ApiPublicAlertsSignInFailedRoute
+  '/api/public/site-image/$': typeof ApiPublicSiteImageSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1061,6 +1076,7 @@ export interface FileRoutesByTo {
   '/admin/email-preview': typeof AuthenticatedAdminEmailPreviewRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
+  '/admin/images': typeof AuthenticatedAdminImagesRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -1111,6 +1127,7 @@ export interface FileRoutesByTo {
   '/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/api/public/alerts/email-dlq': typeof ApiPublicAlertsEmailDlqRoute
   '/api/public/alerts/sign-in-failed': typeof ApiPublicAlertsSignInFailedRoute
+  '/api/public/site-image/$': typeof ApiPublicSiteImageSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1193,6 +1210,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/email-preview': typeof AuthenticatedAdminEmailPreviewRoute
   '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/_authenticated/admin/files': typeof AuthenticatedAdminFilesRoute
+  '/_authenticated/admin/images': typeof AuthenticatedAdminImagesRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -1244,6 +1262,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/users/invite': typeof AuthenticatedAdminUsersInviteRoute
   '/api/public/alerts/email-dlq': typeof ApiPublicAlertsEmailDlqRoute
   '/api/public/alerts/sign-in-failed': typeof ApiPublicAlertsSignInFailedRoute
+  '/api/public/site-image/$': typeof ApiPublicSiteImageSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1326,6 +1345,7 @@ export interface FileRouteTypes {
     | '/admin/email-preview'
     | '/admin/exports'
     | '/admin/files'
+    | '/admin/images'
     | '/admin/import'
     | '/admin/invoices'
     | '/admin/leads'
@@ -1377,6 +1397,7 @@ export interface FileRouteTypes {
     | '/admin/users/invite'
     | '/api/public/alerts/email-dlq'
     | '/api/public/alerts/sign-in-failed'
+    | '/api/public/site-image/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1455,6 +1476,7 @@ export interface FileRouteTypes {
     | '/admin/email-preview'
     | '/admin/exports'
     | '/admin/files'
+    | '/admin/images'
     | '/admin/import'
     | '/admin/invoices'
     | '/admin/leads'
@@ -1505,6 +1527,7 @@ export interface FileRouteTypes {
     | '/admin/users/invite'
     | '/api/public/alerts/email-dlq'
     | '/api/public/alerts/sign-in-failed'
+    | '/api/public/site-image/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1586,6 +1609,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/email-preview'
     | '/_authenticated/admin/exports'
     | '/_authenticated/admin/files'
+    | '/_authenticated/admin/images'
     | '/_authenticated/admin/import'
     | '/_authenticated/admin/invoices'
     | '/_authenticated/admin/leads'
@@ -1637,6 +1661,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users/invite'
     | '/api/public/alerts/email-dlq'
     | '/api/public/alerts/sign-in-failed'
+    | '/api/public/site-image/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1679,6 +1704,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicAlertsEmailDlqRoute: typeof ApiPublicAlertsEmailDlqRoute
   ApiPublicAlertsSignInFailedRoute: typeof ApiPublicAlertsSignInFailedRoute
+  ApiPublicSiteImageSplatRoute: typeof ApiPublicSiteImageSplatRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -2249,6 +2275,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminImportRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/images': {
+      id: '/_authenticated/admin/images'
+      path: '/images'
+      fullPath: '/admin/images'
+      preLoaderRoute: typeof AuthenticatedAdminImagesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/files': {
       id: '/_authenticated/admin/files'
       path: '/files'
@@ -2457,6 +2490,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/auth/preview'
       fullPath: '/lovable/email/auth/preview'
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/site-image/$': {
+      id: '/api/public/site-image/$'
+      path: '/api/public/site-image/$'
+      fullPath: '/api/public/site-image/$'
+      preLoaderRoute: typeof ApiPublicSiteImageSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/alerts/sign-in-failed': {
@@ -2787,6 +2827,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminEmailPreviewRoute: typeof AuthenticatedAdminEmailPreviewRoute
   AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
   AuthenticatedAdminFilesRoute: typeof AuthenticatedAdminFilesRoute
+  AuthenticatedAdminImagesRoute: typeof AuthenticatedAdminImagesRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRouteWithChildren
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -2837,6 +2878,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminEmailPreviewRoute: AuthenticatedAdminEmailPreviewRoute,
   AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
   AuthenticatedAdminFilesRoute: AuthenticatedAdminFilesRoute,
+  AuthenticatedAdminImagesRoute: AuthenticatedAdminImagesRoute,
   AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
   AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRouteWithChildren,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRouteWithChildren,
@@ -3005,6 +3047,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicAlertsEmailDlqRoute: ApiPublicAlertsEmailDlqRoute,
   ApiPublicAlertsSignInFailedRoute: ApiPublicAlertsSignInFailedRoute,
+  ApiPublicSiteImageSplatRoute: ApiPublicSiteImageSplatRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
