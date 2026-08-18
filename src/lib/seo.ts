@@ -94,19 +94,17 @@ export function buildSeo(input: SeoInput) {
     { property: "og:type", content: input.type ?? "website" },
     { property: "og:url", content: absolutePath },
     { property: "og:site_name", content: SITE.name },
-    {
-      property: "og:locale",
-      content:
-        String(input.lang) === "ar"
-          ? "ar_AE"
-          : String(input.lang) === "zh"
-            ? "zh_CN"
-            : `${String(input.lang)}_${String(input.lang).toUpperCase()}`,
-    },
+    { property: "og:locale", content: ogLocaleFor(input.lang) },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: fullTitle },
     { name: "twitter:description", content: effectiveDescription },
   ];
+
+  // og:locale:alternate for every other supported language, so crawlers can
+  // discover the localized variants of the same page.
+  for (const l of LOCALES.filter((l) => l.status === "active" && l.code !== input.lang)) {
+    meta.push({ property: "og:locale:alternate", content: ogLocaleFor(l.code) });
+  }
 
   // Resolve OG image: explicit input.image wins, otherwise per-route mapping,
   // otherwise site-wide brand default. Guarantees every leaf route emits a
@@ -118,10 +116,13 @@ export function buildSeo(input: SeoInput) {
     : `${SITE.url}${resolvedImage}`;
   meta.push({ property: "og:image", content: absoluteImage });
   meta.push({ property: "og:image:secure_url", content: absoluteImage });
-  meta.push({ property: "og:image:width", content: "1200" });
-  meta.push({ property: "og:image:height", content: "630" });
+  meta.push({ property: "og:image:type", content: "image/jpeg" });
+  meta.push({ property: "og:image:width", content: String(OG_IMAGE_WIDTH) });
+  meta.push({ property: "og:image:height", content: String(OG_IMAGE_HEIGHT) });
   meta.push({ property: "og:image:alt", content: fullTitle });
   meta.push({ name: "twitter:image", content: absoluteImage });
+  meta.push({ name: "twitter:image:alt", content: fullTitle });
+
 
   if (input.keywords?.length) {
     meta.push({ name: "keywords", content: input.keywords.join(", ") });
