@@ -1323,8 +1323,30 @@ export function InvoicesList({
 
       {/* Mobile: stacked cards — no horizontal scrolling, tap targets stay usable */}
 
-      <div className="md:hidden divide-y">
-        {paged.map((i) => (
+      <div className="md:hidden divide-y" data-testid={listBusy ? "list-updating" : undefined}>
+        {listBusy
+          ? Array.from({ length: skeletonRowCount }).map((_, idx) => (
+              <div key={`sk-${idx}`} className="p-3" data-testid="row-skeleton">
+                <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3">
+                  <Skeleton className="mt-1 size-4 shrink-0 rounded-sm" />
+                  <div className="min-w-0 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3.5 w-24" />
+                  </div>
+                  <Skeleton className="h-5 w-16 shrink-0 rounded-full" />
+                </div>
+                <div className="mt-2 grid grid-cols-1 gap-x-3 gap-y-1 pl-7 min-[360px]:grid-cols-2">
+                  {Array.from({ length: 4 }).map((__, j) => (
+                    <Skeleton key={j} className="h-3.5 w-full" />
+                  ))}
+                </div>
+                <div className="mt-2 flex gap-2 pl-7">
+                  <Skeleton className="h-8 w-16" />
+                  <Skeleton className="h-8 w-16" />
+                </div>
+              </div>
+            ))
+          : paged.map((i) => (
           <div
             key={i.id}
             className={`p-3 ${selected.has(i.id) ? "bg-muted/50" : ""}`}
