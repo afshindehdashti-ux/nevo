@@ -1619,7 +1619,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/01_blueprint.jpg",
+   "assetPath": "src/assets/knowledge/01-blueprint.jpg",
    "assetKey": "01_blueprint",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -1645,7 +1645,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/02_cad.jpg",
+   "assetPath": "src/assets/knowledge/02-cad.jpg",
    "assetKey": "02_cad",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
@@ -1661,7 +1661,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/03_3d_factory.jpg",
+   "assetPath": "src/assets/knowledge/03-3d-factory.jpg",
    "assetKey": "03_3d_factory",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -1689,7 +1689,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/04_meeting.jpg",
+   "assetPath": "src/assets/knowledge/04-meeting.jpg",
    "assetKey": "04_meeting",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
@@ -1705,7 +1705,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/05_calculations.jpg",
+   "assetPath": "src/assets/knowledge/05-calculations.jpg",
    "assetKey": "05_calculations",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
@@ -1721,7 +1721,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/06_production_line.jpg",
+   "assetPath": "src/assets/knowledge/06-production-line.jpg",
    "assetKey": "06_production_line",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -1749,7 +1749,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/07_laminator.jpg",
+   "assetPath": "src/assets/knowledge/07-laminator.jpg",
    "assetKey": "07_laminator",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -1777,7 +1777,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/10_stacking.jpg",
+   "assetPath": "src/assets/knowledge/10-stacking.jpg",
    "assetKey": "10_stacking",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
@@ -1793,7 +1793,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/11_ppgi.jpg",
+   "assetPath": "src/assets/knowledge/11-ppgi.jpg",
    "assetKey": "11_ppgi",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
@@ -1809,7 +1809,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/14_polyol.jpg",
+   "assetPath": "src/assets/knowledge/14-polyol.jpg",
    "assetKey": "14_polyol",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -1834,7 +1834,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/16_rockwool.jpg",
+   "assetPath": "src/assets/knowledge/16-rockwool.jpg",
    "assetKey": "16_rockwool",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -1859,7 +1859,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/17_pir_panel.jpg",
+   "assetPath": "src/assets/knowledge/17-pir-panel.jpg",
    "assetKey": "17_pir_panel",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -1887,7 +1887,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/21_coldroom_panel.jpg",
+   "assetPath": "src/assets/knowledge/21-coldroom-panel.jpg",
    "assetKey": "21_coldroom_panel",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -1913,7 +1913,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/23_cleanroom.jpg",
+   "assetPath": "src/assets/knowledge/23-cleanroom.jpg",
    "assetKey": "23_cleanroom",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -1938,7 +1938,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/26_industrial_bldg.jpg",
+   "assetPath": "src/assets/knowledge/26-industrial-bldg.jpg",
    "assetKey": "26_industrial_bldg",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -1963,7 +1963,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/28_fire_rating.jpg",
+   "assetPath": "src/assets/knowledge/28-fire-rating.jpg",
    "assetKey": "28_fire_rating",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -1989,7 +1989,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/30_flow_diagram.jpg",
+   "assetPath": "src/assets/knowledge/30-flow-diagram.jpg",
    "assetKey": "30_flow_diagram",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
@@ -2005,7 +2005,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/31_material_flow.jpg",
+   "assetPath": "src/assets/knowledge/31-material-flow.jpg",
    "assetKey": "31_material_flow",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
@@ -2021,7 +2021,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/33_layout.jpg",
+   "assetPath": "src/assets/knowledge/33-layout.jpg",
    "assetKey": "33_layout",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -2049,7 +2049,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/36_investment_report.jpg",
+   "assetPath": "src/assets/knowledge/36-investment-report.jpg",
    "assetKey": "36_investment_report",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -2077,7 +2077,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/38_factory_guide.jpg",
+   "assetPath": "src/assets/knowledge/38-factory-guide.jpg",
    "assetKey": "38_factory_guide",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -2093,7 +2093,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/knowledge/40_material_guide.jpg",
+   "assetPath": "src/assets/knowledge/40-material-guide.jpg",
    "assetKey": "40_material_guide",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
@@ -3740,7 +3740,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/01_blueprint.jpg",
+   "assetPath": "src/assets/og/knowledge/01-blueprint.jpg",
    "assetKey": "01_blueprint",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
@@ -3756,7 +3756,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/03_3d_factory.jpg",
+   "assetPath": "src/assets/og/knowledge/03-3d-factory.jpg",
    "assetKey": "03_3d_factory",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
@@ -3772,7 +3772,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/06_production_line.jpg",
+   "assetPath": "src/assets/og/knowledge/06-production-line.jpg",
    "assetKey": "06_production_line",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
@@ -3788,7 +3788,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/07_laminator.jpg",
+   "assetPath": "src/assets/og/knowledge/07-laminator.jpg",
    "assetKey": "07_laminator",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
@@ -3804,7 +3804,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/14_polyol.jpg",
+   "assetPath": "src/assets/og/knowledge/14-polyol.jpg",
    "assetKey": "14_polyol",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
@@ -3820,7 +3820,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/16_rockwool.jpg",
+   "assetPath": "src/assets/og/knowledge/16-rockwool.jpg",
    "assetKey": "16_rockwool",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
@@ -3836,7 +3836,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/17_pir_panel.jpg",
+   "assetPath": "src/assets/og/knowledge/17-pir-panel.jpg",
    "assetKey": "17_pir_panel",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
@@ -3852,7 +3852,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/21_coldroom_panel.jpg",
+   "assetPath": "src/assets/og/knowledge/21-coldroom-panel.jpg",
    "assetKey": "21_coldroom_panel",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
@@ -3868,7 +3868,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/23_cleanroom.jpg",
+   "assetPath": "src/assets/og/knowledge/23-cleanroom.jpg",
    "assetKey": "23_cleanroom",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
@@ -3884,7 +3884,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/26_industrial_bldg.jpg",
+   "assetPath": "src/assets/og/knowledge/26-industrial-bldg.jpg",
    "assetKey": "26_industrial_bldg",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
@@ -3900,7 +3900,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/28_fire_rating.jpg",
+   "assetPath": "src/assets/og/knowledge/28-fire-rating.jpg",
    "assetKey": "28_fire_rating",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
@@ -3916,7 +3916,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/33_layout.jpg",
+   "assetPath": "src/assets/og/knowledge/33-layout.jpg",
    "assetKey": "33_layout",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
@@ -3932,7 +3932,7 @@
    "alt": ""
   },
   {
-   "assetPath": "src/assets/og/knowledge/36_investment_report.jpg",
+   "assetPath": "src/assets/og/knowledge/36-investment-report.jpg",
    "assetKey": "36_investment_report",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",

@@ -26,19 +26,19 @@ import {
   Mail,
 } from "lucide-react";
 
-import k02 from "@/assets/knowledge/02_cad.jpg";
-import k03 from "@/assets/knowledge/03_3d_factory.jpg";
-import k04 from "@/assets/knowledge/04_meeting.jpg";
-import k05 from "@/assets/knowledge/05_calculations.jpg";
-import k06 from "@/assets/knowledge/06_production_line.jpg";
-import k07 from "@/assets/knowledge/07_laminator.jpg";
-import k10 from "@/assets/knowledge/10_stacking.jpg";
-import k11 from "@/assets/knowledge/11_ppgi.jpg";
-import k17 from "@/assets/knowledge/17_pir_panel.jpg";
-import k30 from "@/assets/knowledge/30_flow_diagram.jpg";
-import k31 from "@/assets/knowledge/31_material_flow.jpg";
-import k33 from "@/assets/knowledge/33_layout.jpg";
-import k36 from "@/assets/knowledge/36_investment_report.jpg";
+import k02 from "@/assets/knowledge/02-cad.jpg";
+import k03 from "@/assets/knowledge/03-3d-factory.jpg";
+import k04 from "@/assets/knowledge/04-meeting.jpg";
+import k05 from "@/assets/knowledge/05-calculations.jpg";
+import k06 from "@/assets/knowledge/06-production-line.jpg";
+import k07 from "@/assets/knowledge/07-laminator.jpg";
+import k10 from "@/assets/knowledge/10-stacking.jpg";
+import k11 from "@/assets/knowledge/11-ppgi.jpg";
+import k17 from "@/assets/knowledge/17-pir-panel.jpg";
+import k30 from "@/assets/knowledge/30-flow-diagram.jpg";
+import k31 from "@/assets/knowledge/31-material-flow.jpg";
+import k33 from "@/assets/knowledge/33-layout.jpg";
+import k36 from "@/assets/knowledge/36-investment-report.jpg";
 
 import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { WhyNevo as SharedWhyNevo } from "@/components/site/WhyNevo";

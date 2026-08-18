@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "asset": "src/assets/hero-production-line.jpg",
+  "slot": "",
+  "routes": [],
+  "required_size": "",
+  "caption": "",
+  "alt": "",
+  "credit": "",
+  "source": "",
+  "source_url": "",
+  "license": "",
+  "license_id": "",
+  "capture_date": "",
+  "location": "",
+  "restrictions": "",
+  "ai_generated": false,
+  "status": "pending-sourcing",
+  "provenance_attestation": {
+    "verified_by": "",
+    "verified_on": "",
+    "method": ""
+  }
+}
