@@ -349,14 +349,17 @@ export function InvoicesList({
     const ids = Array.from(selected);
     if (ids.length === 0) return;
     setExporting(true);
+    setProgress({ done: 0, total: ids.length });
     const t = toast.loading(`Generating ${ids.length} PDF${ids.length > 1 ? "s" : ""}…`);
     try {
       if (ids.length === 1) {
         await generateInvoicePdf(ids[0], "download");
+        setProgress({ done: 1, total: 1 });
         toast.success("PDF downloaded", { id: t });
       } else {
         const zip = new JSZip();
         let ok = 0;
+        let index = 0;
         for (const id of ids) {
           try {
             const res = await generateInvoicePdf(id, "blob");
@@ -366,6 +369,8 @@ export function InvoicesList({
           } catch (e) {
             console.error("PDF failed", id, e);
           }
+          index++;
+          setProgress({ done: index, total: ids.length });
         }
         if (ok === 0) throw new Error("All PDFs failed to generate");
         const blob = await zip.generateAsync({ type: "blob" });
@@ -385,8 +390,57 @@ export function InvoicesList({
       toast.error(msg, { id: t });
     } finally {
       setExporting(false);
+      setProgress(null);
     }
   };
+
+  const handleBulkStatus = async (action: BulkActionKey) => {
+    const status = BULK_STATUS[action];
+    const ids = Array.from(selected);
+    if (!status || ids.length === 0) return;
+    const copy = BULK_COPY[action];
+    const t = toast.loading(`Updating ${ids.length} invoice${ids.length > 1 ? "s" : ""}…`);
+    try {
+      const before = invoices
+        .filter((i) => selected.has(i.id))
+        .map((i) => ({ id: i.id, status: i.status }));
+      const { error } = await supabase.from("invoices").update({ status }).in("id", ids);
+      if (error) throw error;
+
+      const { data: auth } = await supabase.auth.getUser();
+      await writeAudit(supabase, {
+        user_id: auth?.user?.id ?? null,
+        action: `invoice.bulk_${action}`,
+        entity_type: "invoices",
+        entity_id: null,
+        metadata: { count: ids.length, ids, type },
+        old_values: before,
+        new_values: ids.map((id) => ({ id, status })),
+      });
+
+      setSelected(new Set());
+      await refetch();
+      toast.success(`${copy.label} — ${ids.length} invoice${ids.length > 1 ? "s" : ""} updated`, {
+        id: t,
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Bulk update failed", { id: t });
+    }
+  };
+
+  const runBulkAction = async (action: BulkActionKey) => {
+    setRunningAction(action);
+    try {
+      if (action === "export") await handleBulkExport();
+      else await handleBulkStatus(action);
+    } finally {
+      setRunningAction(null);
+      setPendingAction(null);
+    }
+  };
+
+  const busy = runningAction !== null || exporting;
+
 
   const downloadOne = async (id: string) => {
     setRowBusy(id);
