@@ -699,6 +699,33 @@ export function InvoicesList({
                 Clear selection
               </Button>
             </div>
+            {exportFailures.length > 0 ? (
+              <div
+                role="alert"
+                className="w-full rounded-md border border-destructive/40 bg-destructive/5 p-2 text-xs"
+              >
+                <p className="font-medium text-destructive">
+                  {exportFailures.length} PDF{exportFailures.length > 1 ? "s" : ""} failed to
+                  generate
+                </p>
+                <ul className="mt-1 max-h-24 space-y-0.5 overflow-y-auto text-muted-foreground">
+                  {exportFailures.map((f) => (
+                    <li key={f.name}>
+                      <span className="font-medium text-foreground">{f.name}</span> — {f.message}
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-2"
+                  disabled={busy}
+                  onClick={() => setPendingAction("export")}
+                >
+                  Retry export
+                </Button>
+              </div>
+            ) : null}
           </div>
         )}
       </TooltipProvider>
