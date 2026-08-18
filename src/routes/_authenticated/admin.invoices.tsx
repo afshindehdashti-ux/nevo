@@ -172,7 +172,7 @@ export function InvoicesList({
         />
       }
     >
-      <div className="p-3 border-b flex gap-2 items-center">
+      <div className="p-3 border-b flex flex-wrap gap-2 items-center">
         <Label className="text-xs text-muted-foreground">Status</Label>
         <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as InvoiceStatus | "all")}>
           <SelectTrigger className="w-52 h-8">
