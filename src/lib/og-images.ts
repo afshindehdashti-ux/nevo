@@ -9,48 +9,48 @@
  */
 
 // Home / brand
-import heroNevoLine from "@/assets/hero-nevo-line.jpg";
-import heroProductionLine from "@/assets/hero-production-line.jpg";
-import engineeringPhilosophy from "@/assets/engineering-philosophy.jpg";
+import heroNevoLine from "@/assets/og/hero-nevo-line.jpg";
+import heroProductionLine from "@/assets/og/hero-production-line.jpg";
+import engineeringPhilosophy from "@/assets/og/engineering-philosophy.jpg";
 
 // Solutions
-import ecoFactoryDev from "@/assets/ai/eco-factory-development.jpg";
-import ecoProductionLines from "@/assets/ai/eco-production-lines.jpg";
-import ecoRawMaterials from "@/assets/ai/eco-raw-materials.jpg";
-import ecoConsultancy from "@/assets/ai/eco-engineering-consultancy.jpg";
-import ecoFinishedPanels from "@/assets/ai/eco-finished-panels.jpg";
+import ecoFactoryDev from "@/assets/og/eco-factory-dev.jpg";
+import ecoProductionLines from "@/assets/og/eco-production-lines.jpg";
+import ecoRawMaterials from "@/assets/og/eco-raw-materials.jpg";
+import ecoConsultancy from "@/assets/og/eco-consultancy.jpg";
+import ecoFinishedPanels from "@/assets/og/eco-finished-panels.jpg";
 
 // Industries / panels / factory
-import industriesTile from "@/assets/industries/tile-01.jpg";
-import panelsTile from "@/assets/panels/tile-01.jpg";
-import factoryLayoutMaster from "@/assets/factory-layouts/fl-01-master.jpg";
+import industriesTile from "@/assets/og/industries-tile.jpg";
+import panelsTile from "@/assets/og/panels-tile.jpg";
+import factoryLayoutMaster from "@/assets/og/factory-layout-master.jpg";
 
 // Corporate
-import careersHero from "@/assets/corporate/careers-hero.jpg";
-import contactHero from "@/assets/corporate/contact-hero.jpg";
-import investorHero from "@/assets/corporate/investor-hero.jpg";
-import sustainabilityHero from "@/assets/corporate/sustainability-hero.jpg";
+import careersHero from "@/assets/og/careers-hero.jpg";
+import contactHero from "@/assets/og/contact-hero.jpg";
+import investorHero from "@/assets/og/investor-hero.jpg";
+import sustainabilityHero from "@/assets/og/sustainability-hero.jpg";
 
 // Tools / configurators
-import configuratorHero from "@/assets/configurator/hero-configurator.jpg";
-import projectBlueprint from "@/assets/project/hero-blueprint.jpg";
-import factoryHero from "@/assets/project/hero-factory.jpg";
-import engineeringHero from "@/assets/engineering/01-hero.jpg";
-import installationHero from "@/assets/installation/inst-01-machine-installation.jpg";
+import configuratorHero from "@/assets/og/configurator-hero.jpg";
+import projectBlueprint from "@/assets/og/project-blueprint.jpg";
+import factoryHero from "@/assets/og/factory-hero.jpg";
+import engineeringHero from "@/assets/og/engineering-hero.jpg";
+import installationHero from "@/assets/og/installation-hero.jpg";
 
 // Knowledge / reference
-import knowledgeHubHero from "@/assets/knowledge/hub-hero.jpg";
-import knowledgeCrossSection from "@/assets/knowledge/27_cross_section.jpg";
-import knowledgePirVsPur from "@/assets/knowledge/29_pir_vs_pur.jpg";
-import knowledgeFireRating from "@/assets/knowledge/28_fire_rating.jpg";
-import knowledgeInvestment from "@/assets/knowledge/36_investment_report.jpg";
-import knowledgeDatasheet from "@/assets/knowledge/32_datasheet.jpg";
+import knowledgeHubHero from "@/assets/og/knowledge-hub-hero.jpg";
+import knowledgeCrossSection from "@/assets/og/knowledge-cross-section.jpg";
+import knowledgePirVsPur from "@/assets/og/knowledge-pir-vs-pur.jpg";
+import knowledgeFireRating from "@/assets/og/knowledge-fire-rating.jpg";
+import knowledgeInvestment from "@/assets/og/knowledge-investment.jpg";
+import knowledgeDatasheet from "@/assets/og/knowledge-datasheet.jpg";
 
 // AI / research
-import aiHeroEngineer from "@/assets/ai/hero-engineer.jpg";
-import aiTechnicalProposal from "@/assets/ai/technical-proposal.jpg";
-import aiCollab from "@/assets/ai/collab.jpg";
-import aiDigitalTwin from "@/assets/ai/digital-twin.jpg";
+import aiHeroEngineer from "@/assets/og/ai-hero-engineer.jpg";
+import aiTechnicalProposal from "@/assets/og/ai-technical-proposal.jpg";
+import aiCollab from "@/assets/og/ai-collab.jpg";
+import aiDigitalTwin from "@/assets/og/ai-digital-twin.jpg";
 
 /** Site-wide brand fallback (used when a specific route isn't mapped). */
 export const OG_DEFAULT: string = heroNevoLine;
@@ -117,7 +117,7 @@ export function ogImageFor(path: string): string {
  */
 export function ogImageMeta(path: string, alt?: string): Array<Record<string, string>> {
   const rel = OG_IMAGES[path] ?? OG_DEFAULT;
-  const abs = rel.startsWith("http") ? rel : `https://nevoindustrial.com${rel}`;
+  const abs = rel.startsWith("http") ? rel : `${SITE_URL}${rel}`;
   return [
     { property: "og:image", content: abs },
     { property: "og:image:secure_url", content: abs },
