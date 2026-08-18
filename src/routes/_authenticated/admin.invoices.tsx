@@ -36,6 +36,7 @@ import {
   Check,
   FileDown,
   FileText,
+  Info,
   Loader2,
   RefreshCw,
   SearchX,
@@ -717,48 +718,73 @@ export function InvoicesList({
 
           <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 sm:ml-auto">
             <Tooltip>
-              {/* span keeps the tooltip reachable while the button is disabled */}
+              {/*
+                The export button stays focusable and keeps its tooltip when
+                unavailable (aria-disabled instead of disabled), so keyboard
+                users can read why it can't be used yet.
+              */}
               <TooltipTrigger asChild>
-                <span tabIndex={selected.size === 0 ? 0 : -1} className="inline-flex rounded-md">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setPendingAction("export")}
-                    disabled={selected.size === 0 || busy}
-                  >
-                    {exporting ? (
-                      <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <FileDown className="mr-1 h-3.5 w-3.5" />
-                    )}
-                    Export PDF{selected.size > 1 ? "s" : ""}
-                  </Button>
-                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  aria-disabled={selected.size === 0 || busy}
+                  onClick={() => {
+                    if (selected.size === 0 || busy) return;
+                    setPendingAction("export");
+                  }}
+                  className={
+                    selected.size === 0 || busy
+                      ? "pointer-events-auto opacity-50"
+                      : undefined
+                  }
+                >
+                  {exporting ? (
+                    <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <FileDown className="mr-1 h-3.5 w-3.5" aria-hidden="true" />
+                  )}
+                  Export PDF{selected.size > 1 ? "s" : ""}
+                </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" collisionPadding={12}>
+              <TooltipContent side="bottom" collisionPadding={12} role="tooltip">
                 {selected.size === 0
                   ? "Select one or more invoices to export them as PDF."
                   : `Download ${selected.size} invoice PDF${selected.size > 1 ? "s (zipped)" : ""}.`}
               </TooltipContent>
             </Tooltip>
+            <p className="min-w-0 text-xs text-muted-foreground">
+              Create from an{" "}
+              <Link
+                to="/admin/orders"
+                className="rounded-sm text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              >
+                order
+              </Link>
+              .
+            </p>
             <Tooltip>
               <TooltipTrigger asChild>
-                <p className="min-w-0 text-xs text-muted-foreground">
-                  Create from an{" "}
-                  <Link
-                    to="/admin/orders"
-                    className="rounded-sm text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-                  >
-                    order
-                  </Link>
-                  .
-                </p>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="size-8"
+                  aria-label="Why invoices are created from an order"
+                >
+                  <Info className="size-4" aria-hidden="true" />
+                </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" collisionPadding={12} className="max-w-[260px]">
+              <TooltipContent
+                side="bottom"
+                collisionPadding={12}
+                className="max-w-[260px]"
+                role="tooltip"
+              >
                 Invoices are generated from a confirmed order so totals and line items stay in sync.
               </TooltipContent>
             </Tooltip>
           </div>
+
         </div>
 
         {selected.size > 0 && (
@@ -829,7 +855,7 @@ export function InvoicesList({
             ) : null}
           </div>
         )}
-      </TooltipProvider>
+      
 
       <AlertDialog
         open={pendingAction !== null}
@@ -1231,7 +1257,7 @@ export function InvoicesList({
           </div>
         </>
       )}
-
+      </TooltipProvider>
     </MasterListShell>
   );
 }
