@@ -42,7 +42,7 @@ import {
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
-import { writeAudit } from "@/lib/audit-log";
+
 import {
   AlertDialog,
   AlertDialogAction,
