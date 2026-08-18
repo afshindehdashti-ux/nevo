@@ -855,7 +855,7 @@ export function InvoicesList({
             ) : null}
           </div>
         )}
-      </TooltipProvider>
+      
 
       <AlertDialog
         open={pendingAction !== null}
