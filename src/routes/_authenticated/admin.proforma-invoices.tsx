@@ -250,7 +250,7 @@ function ProformaInvoicesList() {
           </Button>
           <p className="text-xs text-muted-foreground">
             Create from a{" "}
-            <Link to="/admin/quotations" className="text-primary hover:underline">
+            <Link to="/admin/quotations" className="text-accent hover:underline">
               quotation
             </Link>
             .
@@ -313,7 +313,7 @@ function ProformaInvoicesList() {
                   <Link
                     to="/admin/proforma-invoices/$id"
                     params={{ id: r.id }}
-                    className="text-primary hover:underline font-medium"
+                    className="text-accent hover:underline font-medium"
                   >
                     {r.proforma_number ?? "—"}
                   </Link>

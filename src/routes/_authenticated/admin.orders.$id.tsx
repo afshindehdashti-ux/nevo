@@ -392,7 +392,7 @@ function OrderDetailPage() {
                 <Link
                   to="/admin/customers/$id"
                   params={{ id: cust.id }}
-                  className="text-primary hover:underline"
+                  className="text-accent hover:underline"
                 >
                   {cust.name}
                 </Link>

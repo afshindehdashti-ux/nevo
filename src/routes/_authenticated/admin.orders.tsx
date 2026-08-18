@@ -194,7 +194,7 @@ function OrdersPage() {
                     <Link
                       to="/admin/orders/$id"
                       params={{ id: o.id }}
-                      className="text-primary hover:underline font-medium"
+                      className="text-accent hover:underline font-medium"
                     >
                       {o.order_number || o.id.slice(0, 8)}
                     </Link>

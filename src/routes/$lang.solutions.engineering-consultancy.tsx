@@ -385,7 +385,7 @@ function Hero() {
               asChild
               variant="primary"
               size="lg"
-              className="bg-white text-primary hover:bg-white/90"
+              className="bg-white text-accent hover:bg-white/90"
             >
               <a href="/project-inquiry">
                 Book Engineering Consultation
@@ -1365,7 +1365,7 @@ function FinalCTA() {
               asChild
               variant="primary"
               size="lg"
-              className="bg-white text-primary hover:bg-white/90"
+              className="bg-white text-accent hover:bg-white/90"
             >
               <a href="/project-inquiry">
                 Book Engineering Consultation

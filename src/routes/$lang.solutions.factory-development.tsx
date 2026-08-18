@@ -356,7 +356,7 @@ function PageHero() {
               materials, utilities, commissioning and ramp-up — before procurement begins.
             </p>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-              <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
+              <Button asChild size="lg" className="bg-white text-accent hover:bg-white/90">
                 <a href="/project-inquiry">
                   Start Factory Inquiry <ArrowRight className="!size-4" />
                 </a>
@@ -603,7 +603,7 @@ function FinalCTA() {
           </p>
         </div>
         <div className="flex flex-col gap-3 lg:col-span-4">
-          <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
+          <Button asChild size="lg" className="bg-white text-accent hover:bg-white/90">
             <a href="/project-inquiry">
               Open Project Inquiry <ArrowRight className="!size-4" />
             </a>

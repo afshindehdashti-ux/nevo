@@ -346,7 +346,7 @@ function Hero() {
             wool cores, adhesives and finished panels.
           </p>
           <div className="mt-10 flex flex-row items-center gap-3">
-            <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
+            <Button asChild size="lg" className="bg-white text-accent hover:bg-white/90">
               <a href="/project-inquiry">
                 Request Material Quotation
                 <ArrowRight className="!size-4" />
@@ -1147,7 +1147,7 @@ function FinalCTA() {
           specification behind your next panel.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
+          <Button asChild size="lg" className="bg-white text-accent hover:bg-white/90">
             <a href="/project-inquiry">
               Request Material Quotation
               <ArrowRight className="!size-4" />

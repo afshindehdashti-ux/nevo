@@ -253,7 +253,7 @@ function ActivityPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <ScrollText className="h-6 w-6 text-primary" />
+          <ScrollText className="h-6 w-6 text-accent" />
           <div>
             <h1 className="text-2xl font-semibold">Activity Log</h1>
             <p className="text-sm text-muted-foreground">

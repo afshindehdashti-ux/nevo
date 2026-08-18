@@ -369,7 +369,7 @@ function PageHero() {
               transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1], delay: 0.3 }}
               className="mt-10 flex flex-col gap-3 sm:flex-row"
             >
-              <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
+              <Button asChild size="lg" className="bg-white text-accent hover:bg-white/90">
                 <a href="/project-inquiry">
                   Request a Production Line Proposal
                   <ArrowRight className="!size-4" />
@@ -1325,7 +1325,7 @@ function FinalCTA() {
           <span className="text-primary-foreground/55">production line.</span>
         </h2>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
+          <Button asChild size="lg" className="bg-white text-accent hover:bg-white/90">
             <a href="/project-inquiry">
               Request Technical Proposal
               <ArrowRight className="!size-4" />

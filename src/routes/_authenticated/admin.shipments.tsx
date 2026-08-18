@@ -99,7 +99,7 @@ function ShipmentsPage() {
         </Select>
         <p className="text-xs text-muted-foreground ml-auto">
           Create from an{" "}
-          <Link to="/admin/orders" className="text-primary hover:underline">
+          <Link to="/admin/orders" className="text-accent hover:underline">
             order
           </Link>
           .
@@ -144,7 +144,7 @@ function ShipmentsPage() {
                     <Link
                       to="/admin/shipments/$id"
                       params={{ id: s.id }}
-                      className="text-primary hover:underline font-medium"
+                      className="text-accent hover:underline font-medium"
                     >
                       {s.shipment_number || s.id.slice(0, 8)}
                     </Link>
@@ -153,7 +153,7 @@ function ShipmentsPage() {
                     <Link
                       to="/admin/orders/$id"
                       params={{ id: s.order_id }}
-                      className="text-primary hover:underline"
+                      className="text-accent hover:underline"
                     >
                       {ord?.order_number || s.order_id.slice(0, 8)}
                     </Link>

@@ -172,7 +172,7 @@ export function InvoicesList({
         />
       }
     >
-      <div className="p-3 border-b flex gap-2 items-center">
+      <div className="p-3 border-b flex flex-wrap gap-2 items-center">
         <Label className="text-xs text-muted-foreground">Status</Label>
         <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as InvoiceStatus | "all")}>
           <SelectTrigger className="w-52 h-8">
@@ -200,8 +200,8 @@ export function InvoicesList({
             {exporting ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <FileDown className="h-3.5 w-3.5 mr-1" />}
             Export PDF{selected.size > 1 ? "s" : ""}
           </Button>
-          <p className="text-xs text-muted-foreground">
-            Create from an <Link to="/admin/orders" className="text-primary hover:underline">order</Link>.
+          <p className="text-xs text-muted-foreground whitespace-nowrap">
+            Create from an <Link to="/admin/orders" className="text-accent hover:underline">order</Link>.
           </p>
         </div>
       </div>
@@ -255,7 +255,7 @@ export function InvoicesList({
                   <Link
                     to="/admin/invoices/$id"
                     params={{ id: i.id }}
-                    className="text-primary hover:underline font-medium"
+                    className="text-accent hover:underline font-medium"
                   >
                     {i.invoice_number}
                   </Link>

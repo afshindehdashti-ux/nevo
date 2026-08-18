@@ -23,7 +23,7 @@ export function AdminPlaceholder({
       <Card className="border-dashed">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Construction className="h-5 w-5 text-primary" />
+            <Construction className="h-5 w-5 text-accent" />
             Module coming next
           </CardTitle>
         </CardHeader>

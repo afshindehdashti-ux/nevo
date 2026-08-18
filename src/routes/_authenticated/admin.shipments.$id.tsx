@@ -142,7 +142,7 @@ function ShipmentDetailPage() {
                 <Link
                   to="/admin/orders/$id"
                   params={{ id: ord.id }}
-                  className="text-primary hover:underline"
+                  className="text-accent hover:underline"
                 >
                   {ord.order_number || ord.id.slice(0, 8)}
                 </Link>
@@ -155,7 +155,7 @@ function ShipmentDetailPage() {
                   <Link
                     to="/admin/customers/$id"
                     params={{ id: ord.customers.id }}
-                    className="text-primary hover:underline"
+                    className="text-accent hover:underline"
                   >
                     {ord.customers.name}
                   </Link>
