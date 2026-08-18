@@ -193,6 +193,7 @@ export function InvoicesList({
     Record<string, { state: "success" | "error"; message: string }>
   >({});
   const [rowAnnounce, setRowAnnounce] = useState("");
+  const [exportFailures, setExportFailures] = useState<{ name: string; message: string }[]>([]);
   const [pendingAction, setPendingAction] = useState<BulkActionKey | null>(null);
   const [runningAction, setRunningAction] = useState<BulkActionKey | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
