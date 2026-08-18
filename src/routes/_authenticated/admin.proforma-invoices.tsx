@@ -70,13 +70,159 @@ function paymentStatusVariant(s: string | null | undefined) {
 type SortKey = "created_at" | "balance_due" | "grand_total";
 type SortDir = "asc" | "desc";
 
+const PROFORMA_DEFAULTS = {
+  search: "",
+  paymentFilter: "all" as PaymentStatus | "all",
+  sortKey: "created_at" as SortKey,
+  sortDir: "desc" as SortDir,
+};
+const PROFORMA_STORAGE_KEY = "nevo.admin.proforma-invoices.prefs";
+
+function sanitizeProformaPrefs(
+  stored: Partial<typeof PROFORMA_DEFAULTS>,
+): Partial<typeof PROFORMA_DEFAULTS> {
+  const clean: Partial<typeof PROFORMA_DEFAULTS> = {};
+  if (typeof stored.search === "string") clean.search = stored.search.slice(0, 200);
+  if (
+    stored.paymentFilter === "all" ||
+    (typeof stored.paymentFilter === "string" &&
+      PAYMENT_STATUSES.includes(stored.paymentFilter as PaymentStatus))
+  ) {
+    clean.paymentFilter = stored.paymentFilter as PaymentStatus | "all";
+  }
+  if (
+    stored.sortKey === "created_at" ||
+    stored.sortKey === "balance_due" ||
+    stored.sortKey === "grand_total"
+  ) {
+    clean.sortKey = stored.sortKey;
+  }
+  if (stored.sortDir === "asc" || stored.sortDir === "desc") clean.sortDir = stored.sortDir;
+  return clean;
+}
+
+function toProformaSearch(p: typeof PROFORMA_DEFAULTS) {
+  return { q: p.search, payment: p.paymentFilter, sort: p.sortKey, dir: p.sortDir };
+}
+
 function ProformaInvoicesList() {
-  const [search, setSearch] = useState("");
-  const [paymentFilter, setPaymentFilter] = useState<PaymentStatus | "all">("all");
-  const [sortKey, setSortKey] = useState<SortKey>("created_at");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const navigate = useNavigate();
+  const urlSearch = Route.useSearch();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [exporting, setExporting] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const prefs = useMemo(
+    () => ({
+      ...PROFORMA_DEFAULTS,
+      ...sanitizeProformaPrefs({
+        search: urlSearch.q,
+        paymentFilter: urlSearch.payment as PaymentStatus | "all",
+        sortKey: urlSearch.sort as SortKey,
+        sortDir: urlSearch.dir as SortDir,
+      }),
+    }),
+    [urlSearch],
+  );
+  const { search, paymentFilter, sortKey, sortDir } = prefs;
+
+  const setPrefs = useCallback(
+    (
+      patch:
+        | Partial<typeof PROFORMA_DEFAULTS>
+        | ((c: typeof PROFORMA_DEFAULTS) => Partial<typeof PROFORMA_DEFAULTS>),
+    ) => {
+      const next = { ...prefs, ...(typeof patch === "function" ? patch(prefs) : patch) };
+      void navigate({
+        to: "/admin/proforma-invoices",
+        search: toProformaSearch(next),
+        replace: true,
+      });
+    },
+    [navigate, prefs],
+  );
+
+  // Restore the last used prefs only when the URL carries no explicit state,
+  // so a shared link always wins over whatever this browser had stored.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (["q", "payment", "sort", "dir"].some((k) => params.has(k))) return;
+    let restored: Partial<typeof PROFORMA_DEFAULTS> | null = null;
+    try {
+      const raw = window.localStorage.getItem(PROFORMA_STORAGE_KEY);
+      const parsed: unknown = raw ? JSON.parse(raw) : null;
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        restored = sanitizeProformaPrefs(parsed as Partial<typeof PROFORMA_DEFAULTS>);
+      }
+    } catch {
+      restored = null;
+    }
+    if (restored && Object.keys(restored).length > 0) {
+      void navigate({
+        to: "/admin/proforma-invoices",
+        search: toProformaSearch({ ...PROFORMA_DEFAULTS, ...restored }),
+        replace: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(PROFORMA_STORAGE_KEY, JSON.stringify(prefs));
+    } catch {
+      // storage unavailable
+    }
+  }, [prefs]);
+
+  const setPaymentFilter = (v: PaymentStatus | "all") => setPrefs({ paymentFilter: v });
+  const setSortKey = (v: SortKey) => setPrefs({ sortKey: v });
+  const setSortDir = (v: SortDir | ((d: SortDir) => SortDir)) =>
+    setPrefs((c) => ({ sortDir: typeof v === "function" ? v(c.sortDir) : v }));
+
+  // Debounced search: the input stays responsive while the URL updates lazily.
+  const [searchInput, setSearchInput] = useState(search);
+  const searchInputRef = useRef(searchInput);
+  searchInputRef.current = searchInput;
+  useEffect(() => {
+    if (search !== searchInputRef.current) setSearchInput(search);
+  }, [search]);
+  useEffect(() => {
+    if (searchInput === search) return;
+    const t = window.setTimeout(() => setPrefs({ search: searchInput }), 300);
+    return () => window.clearTimeout(t);
+  }, [searchInput, search, setPrefs]);
+
+  const filtersDirty =
+    searchInput !== PROFORMA_DEFAULTS.search ||
+    (Object.keys(PROFORMA_DEFAULTS) as (keyof typeof PROFORMA_DEFAULTS)[]).some(
+      (k) => prefs[k] !== PROFORMA_DEFAULTS[k],
+    );
+
+  const handleResetFilters = () => {
+    try {
+      window.localStorage.removeItem(PROFORMA_STORAGE_KEY);
+    } catch {
+      // storage unavailable
+    }
+    setSearchInput(PROFORMA_DEFAULTS.search);
+    void navigate({
+      to: "/admin/proforma-invoices",
+      search: toProformaSearch(PROFORMA_DEFAULTS),
+      replace: true,
+    });
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+      toast.success("Link copied — it opens with these filters applied.");
+    } catch {
+      toast.error("Couldn't copy the link. Copy it from the address bar instead.");
+    }
+  };
 
   const { data: rows = [], isLoading } = useQuery({
     queryKey: ["proforma_invoices", "list"],
