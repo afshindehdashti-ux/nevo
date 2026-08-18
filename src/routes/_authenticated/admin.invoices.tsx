@@ -344,6 +344,18 @@ export function InvoicesList({
 
   const searchPending = searchInput.trim() !== search.trim();
 
+  // "Reset filters" clears the persisted prefs and returns the URL to defaults.
+  const filtersDirty =
+    searchInput !== INVOICE_LIST_DEFAULTS.search ||
+    (Object.keys(INVOICE_LIST_DEFAULTS) as (keyof typeof INVOICE_LIST_DEFAULTS)[]).some(
+      (k) => prefs[k] !== INVOICE_LIST_DEFAULTS[k],
+    );
+
+  const handleResetFilters = useCallback(() => {
+    setSearchInput(INVOICE_LIST_DEFAULTS.search);
+    resetPrefs();
+  }, [resetPrefs]);
+
   const setStatusFilter = (v: InvoiceStatus | "all") => setPrefs({ statusFilter: v });
   const setPageSize = (v: number) => setPrefs({ pageSize: v });
   const setPage = (v: number | ((n: number) => number)) =>
