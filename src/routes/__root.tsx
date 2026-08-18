@@ -22,6 +22,8 @@ import { ClientMonitor } from "../components/site/ClientMonitor";
 import { MaintenanceBanner } from "../components/site/MaintenanceBanner";
 import { CookieConsent } from "../components/site/CookieConsent";
 import { StickyMobileCTA } from "../components/site/StickyMobileCTA";
+import { ImageOverrideProvider } from "../components/site/ImageOverrideProvider";
+
 import { Toaster } from "../components/ui/sonner";
 import { orgJsonLd, websiteJsonLd, ldScript } from "../lib/seo";
 import { LanguageProvider } from "../i18n/LanguageProvider";
