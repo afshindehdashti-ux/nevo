@@ -64,7 +64,7 @@ import sys
 from pathlib import Path
 
 from PIL import Image, ImageChops
-from playwright.async_api import Route, async_playwright
+from playwright.async_api import async_playwright
 
 ROOT = Path(__file__).resolve().parents[2]
 BASELINES = ROOT / "tests" / "visual" / "baselines" / "admin-layout-overlays"
@@ -276,19 +276,6 @@ async def restore_session(context, page, session: dict) -> None:
 # --------------------------------------------------------------------------- #
 # capture
 # --------------------------------------------------------------------------- #
-async def stub_rest(page) -> None:
-    """Empty-but-valid REST responses so dashboard widgets settle instantly."""
-
-    async def handler(route: Route) -> None:
-        await route.fulfill(
-            status=200,
-            headers={"content-type": "application/json", "content-range": "0-0/0"},
-            body="[]",
-        )
-
-    await page.route("**/rest/v1/**", handler)
-
-
 async def prepare_state(page, state: str) -> None:
     trigger = page.locator('[data-sidebar="trigger"]').first
     if state == "sheet":
@@ -312,10 +299,12 @@ async def capture(context, vp: dict, state: str) -> tuple[str, Path | None, list
     page = await context.new_page()
     await page.set_viewport_size({"width": vp["width"], "height": vp["height"]})
     await page.emulate_media(color_scheme="dark", reduced_motion="reduce")
-    await stub_rest(page)
 
     await page.goto(f"{BASE_URL}{ROUTE}", wait_until="domcontentloaded")
     await page.wait_for_selector('[data-sidebar="trigger"]', timeout=20_000)
+    # The nav groups render once the profile/permission query resolves; without
+    # this wait the shell would be captured mid-hydration and drift.
+    await page.wait_for_selector('[data-sidebar="menu"] a', timeout=20_000)
     await page.add_style_tag(content=DISABLE_MOTION_CSS)
     await page.add_style_tag(content=MASK_PROFILE_CSS)
     await prepare_state(page, state)
