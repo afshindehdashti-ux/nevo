@@ -42,7 +42,7 @@ import {
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
-import { writeAudit } from "@/lib/audit-log";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -420,7 +420,8 @@ export function InvoicesList({
       if (error) throw error;
 
       const { data: auth } = await supabase.auth.getUser();
-      await writeAudit(supabase, {
+      // Audit trail — never block the mutation if the log write fails.
+      const { error: auditError } = await supabase.from("activity_logs").insert({
         user_id: auth?.user?.id ?? null,
         action: `invoice.bulk_${action}`,
         entity_type: "invoices",
@@ -429,6 +430,8 @@ export function InvoicesList({
         old_values: before,
         new_values: ids.map((id) => ({ id, status })),
       });
+      if (auditError) console.warn("activity_logs insert failed", auditError);
+
 
       setSelected(new Set());
       await refetch();
