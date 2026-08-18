@@ -1257,7 +1257,7 @@ export function InvoicesList({
           </div>
         </>
       )}
-
+      </TooltipProvider>
     </MasterListShell>
   );
 }
