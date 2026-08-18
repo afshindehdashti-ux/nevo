@@ -152,6 +152,20 @@ export function InvoicesList({
     }
   };
 
+  const downloadOne = async (id: string) => {
+    setRowBusy(id);
+    const t = toast.loading("Generating PDF…");
+    try {
+      await generateInvoicePdf(id, "download");
+      toast.success("PDF downloaded", { id: t });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Export failed", { id: t });
+    } finally {
+      setRowBusy(null);
+    }
+  };
+
+
 
   return (
     <MasterListShell
