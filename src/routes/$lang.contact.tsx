@@ -338,9 +338,9 @@ function ContactPage() {
                 <Icon className="h-8 w-8 text-emerald-600" />
                 <h3 className="mt-6 text-xl font-semibold">{c.t}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{c.d}</p>
-                <div className="mt-6 flex items-center justify-between text-sm font-medium text-emerald-700">
+                <div className="mt-6 flex items-center justify-between text-sm font-medium text-emerald-700 dark:text-emerald-400">
                   <span>{value}</span>
-                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
                 </div>
               </a>
             );
