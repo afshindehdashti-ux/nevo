@@ -69,3 +69,20 @@ Rules:
 - `npm run check:images:strict` shows the full target state (baseline ignored).
 
 Progress is simply the shrinking length of `pending_replacement`.
+
+## Admin replacement workflow (no code changes)
+
+**Admin → Workspace → Image Library** (`/admin/images`) lists every slot from the
+manifest with its page, slot type and required dimensions.
+
+1. Filter by area or status ("Not yet replaced" shows what still needs sourcing).
+2. Click **Upload**, choose the licensed file — dimensions are checked against the
+   slot's requirement — and record source, licence type, licence ID and credit.
+3. **Publish to slot**: the file lands in the private `site-images` bucket, is
+   registered as an active override, and is served through
+   `/api/public/site-image/<path>`. Every page using that slot swaps immediately.
+4. **Revert** restores the built-in image and deletes the upload.
+
+Only admins can upload or revert; visitors can only read active replacements.
+Licence metadata captured here is the same set the provenance sidecars require,
+so a replaced slot can be retired from the baseline once its file is committed.
