@@ -309,7 +309,30 @@ export function InvoicesList({
     }
   }, [hydrated, prefs, storageKey]);
 
-  const setSearch = (v: string) => setPrefs({ search: v });
+  const setSearch = useCallback((v: string) => setPrefs({ search: v }), [setPrefs]);
+
+  // Typing shouldn't push a URL update (and a full re-filter) on every
+  // keystroke. The input stays instant while the committed value — the one the
+  // list, the URL and storage use — lands 300ms after the user stops typing.
+  const [searchInput, setSearchInput] = useState(search);
+  const searchInputRef = useRef(searchInput);
+  searchInputRef.current = searchInput;
+
+  // External resets (clear filters, back/forward, stored prefs) win over the
+  // local draft whenever they don't match what the user is currently typing.
+  useEffect(() => {
+    if (search !== searchInputRef.current) setSearchInput(search);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  useEffect(() => {
+    if (searchInput === search) return;
+    const t = window.setTimeout(() => setSearch(searchInput), 300);
+    return () => window.clearTimeout(t);
+  }, [searchInput, search, setSearch]);
+
+  const searchPending = searchInput.trim() !== search.trim();
+
   const setStatusFilter = (v: InvoiceStatus | "all") => setPrefs({ statusFilter: v });
   const setPageSize = (v: number) => setPrefs({ pageSize: v });
   const setPage = (v: number | ((n: number) => number)) =>
