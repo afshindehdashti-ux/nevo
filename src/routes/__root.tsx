@@ -3,6 +3,7 @@ import {
   Outlet,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -24,6 +25,12 @@ import { StickyMobileCTA } from "../components/site/StickyMobileCTA";
 import { Toaster } from "../components/ui/sonner";
 import { orgJsonLd, websiteJsonLd, ldScript, hreflangLinks } from "../lib/seo";
 import { LanguageProvider } from "../i18n/LanguageProvider";
+import {
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+  localeDir,
+  type Locale,
+} from "../i18n/config";
 import "../i18n/config";
 // Dev-only: exposes window.__nevoLogoDebug for validating sampling/throttle configs.
 import "../lib/logo-telemetry-debug";
@@ -233,8 +240,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  // Derive the document language/direction from the URL locale segment so SSR
+  // markup already matches what the client renders (no hydration mismatch and
+  // correct RTL on the very first paint for /ar/*).
+  const pathname = useRouterState({ select: (s: { location: { pathname: string } }) => s.location.pathname });
+  const seg = pathname.split("/").filter(Boolean)[0]?.toLowerCase();
+  const lang = (SUPPORTED_LOCALES as readonly string[]).includes(seg ?? "")
+    ? (seg as Locale)
+    : DEFAULT_LOCALE;
+
   return (
-    <html lang="en">
+    <html lang={lang} dir={localeDir(lang)}>
       <head>
         <HeadContent />
       </head>
