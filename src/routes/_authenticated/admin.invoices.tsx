@@ -28,7 +28,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  ArrowDown,
+  ArrowUp,
+  Columns3,
   ChevronDown,
+
   ChevronLeft,
   ChevronRight,
   ChevronUp,
