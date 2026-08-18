@@ -271,7 +271,7 @@ export function InvoicesList({
                   Create from an{" "}
                   <Link
                     to="/admin/orders"
-                    className="rounded-sm text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    className="rounded-sm text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                   >
                     order
                   </Link>
@@ -352,7 +352,7 @@ export function InvoicesList({
                 <Link
                   to="/admin/invoices/$id"
                   params={{ id: i.id }}
-                  className="block break-all font-medium leading-tight text-accent hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="block break-all font-medium leading-tight text-accent hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                 >
                   {i.invoice_number}
                 </Link>
@@ -448,7 +448,7 @@ export function InvoicesList({
                   <Link
                     to="/admin/invoices/$id"
                     params={{ id: i.id }}
-                    className="text-accent hover:underline font-medium rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    className="text-accent hover:underline font-medium rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                   >
                     {i.invoice_number}
                   </Link>
