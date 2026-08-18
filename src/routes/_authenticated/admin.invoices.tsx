@@ -114,7 +114,17 @@ const SORT_KEYS: SortKey[] = [
   "total",
   "balance",
 ];
+const SORT_LABELS: Record<SortKey, string> = {
+  invoice_number: "Invoice #",
+  customer: "Customer",
+  issue_date: "Issue date",
+  due_date: "Due date",
+  status: "Status",
+  total: "Total",
+  balance: "Balance",
+};
 const PAGE_SIZES = [10, 25, 50, 100];
+
 
 const INVOICE_LIST_DEFAULTS = {
   search: "",
