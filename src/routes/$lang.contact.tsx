@@ -152,6 +152,7 @@ function ContactPage() {
     <>
       <AnnouncementBar />
       <SiteHeader />
+      <main id="main">
 
       <section className="relative isolate overflow-hidden bg-[#0a0d0c] text-white">
         <img
@@ -256,6 +257,7 @@ function ContactPage() {
               <a
                 key={o.code}
                 href={`#office-${o.code}`}
+                aria-label={`${o.city} · ${o.role}`}
                 className="group absolute -translate-x-1/2 -translate-y-1/2"
                 style={{ left: o.x, top: o.y }}
               >
@@ -263,7 +265,7 @@ function ContactPage() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-white/80" />
                 </span>
-                <span className="pointer-events-none absolute left-4 top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded bg-black/70 px-2 py-1 text-[10px] font-medium text-white opacity-0 backdrop-blur transition group-hover:opacity-100 md:block">
+                <span className="pointer-events-none absolute start-4 top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded bg-black/70 px-2 py-1 text-[10px] font-medium text-white opacity-0 backdrop-blur transition group-hover:opacity-100 md:block">
                   {o.city} · {o.role}
                 </span>
               </a>
@@ -294,24 +296,24 @@ function ContactPage() {
                   <Building2 className="h-5 w-5" />
                 </span>
               </div>
-              <dl className="mt-6 space-y-3 text-sm">
-                <div className="flex gap-3">
+              <ul className="mt-6 space-y-3 text-sm">
+                <li className="flex gap-3">
                   <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
                   <span>{o.address}</span>
-                </div>
-                <div className="flex gap-3">
+                </li>
+                <li className="flex gap-3">
                   <Phone className="mt-0.5 h-4 w-4 text-muted-foreground" />
                   <span>{SITE.contact.phone}</span>
-                </div>
-                <div className="flex gap-3">
+                </li>
+                <li className="flex gap-3">
                   <Mail className="mt-0.5 h-4 w-4 text-muted-foreground" />
                   <span>{o.email}</span>
-                </div>
-                <div className="flex gap-3">
+                </li>
+                <li className="flex gap-3">
                   <Clock className="mt-0.5 h-4 w-4 text-muted-foreground" />
                   <span>{o.hours}</span>
-                </div>
-              </dl>
+                </li>
+              </ul>
             </motion.article>
           ))}
         </div>
@@ -336,9 +338,9 @@ function ContactPage() {
                 <Icon className="h-8 w-8 text-emerald-600" />
                 <h3 className="mt-6 text-xl font-semibold">{c.t}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{c.d}</p>
-                <div className="mt-6 flex items-center justify-between text-sm font-medium text-emerald-700">
+                <div className="mt-6 flex items-center justify-between text-sm font-medium text-emerald-700 dark:text-emerald-400">
                   <span>{value}</span>
-                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
                 </div>
               </a>
             );
@@ -395,6 +397,7 @@ function ContactPage() {
               </div>
               <select
                 name="interest"
+                aria-label={t("contact.callback.interestPlaceholder")}
                 defaultValue=""
                 className="rounded-md border border-input bg-background px-4 py-3 text-sm"
               >
@@ -415,7 +418,7 @@ function ContactPage() {
               <Button type="submit" size="lg" disabled={busy}>
                 {busy ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                    <Loader2 className="me-2 h-4 w-4 animate-spin" />{" "}
                     {t("contact.callback.sending")}
                   </>
                 ) : (
@@ -439,6 +442,8 @@ function ContactPage() {
           <MessageCircle className="h-4 w-4" /> {t("contact.callback.whatsapp")}
         </a>
       </div>
+
+      </main>
 
       <SiteFooter />
     </>

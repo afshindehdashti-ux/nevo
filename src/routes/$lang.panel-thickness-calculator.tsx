@@ -1652,7 +1652,7 @@ function PanelThicknessPage() {
         {hasErrors ? (
           <span
             aria-disabled="true"
-            className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/40"
+            className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/60"
           >
             <ArrowRight className="size-4" />
             Request Engineering Recommendation
@@ -1795,7 +1795,7 @@ function PanelThicknessPage() {
           {hasErrors ? (
             <span
               aria-disabled="true"
-              className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white/40"
+              className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white/60"
             >
               Request Recommendation <ArrowRight className="size-4" />
             </span>
@@ -1832,7 +1832,7 @@ function PanelThicknessPage() {
           </Link>
         </div>
 
-        <p className="mt-6 text-xs text-white/40">
+        <p className="mt-6 text-xs text-white/60">
           This calculator provides conceptual guidance only. Final sandwich panel thickness must be
           verified by project-specific engineering, local regulations, fire requirements and thermal
           performance calculations.
@@ -2053,7 +2053,7 @@ function CrossSectionControls({
         <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
           Adjust cross-section
         </h3>
-        <p className="text-[10px] text-white/40">Use ← → or Home/End to step</p>
+        <p className="text-[10px] text-white/60">Use ← → or Home/End to step</p>
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <Stepper<Thickness>

@@ -106,7 +106,7 @@ export function AIChat({
 
           {messages.length <= 1 && (
             <div className="mt-2">
-              <div className="mb-2 text-[11px] uppercase tracking-[0.14em] text-white/40">
+              <div className="mb-2 text-[11px] uppercase tracking-[0.14em] text-white/60">
                 Suggested questions
               </div>
               <div className="grid gap-2 sm:grid-cols-2">
@@ -146,7 +146,7 @@ export function AIChat({
             }}
             placeholder="Ask an engineering question…"
             rows={1}
-            className="max-h-40 min-h-[40px] flex-1 resize-none bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none"
+            className="max-h-40 min-h-[40px] flex-1 resize-none bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/60 focus:outline-none"
           />
           <button
             type="submit"

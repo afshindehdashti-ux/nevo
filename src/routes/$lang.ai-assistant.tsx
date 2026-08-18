@@ -396,7 +396,7 @@ function AIAssistantPage() {
                     <a.icon className="h-4 w-4 text-[color:var(--color-accent)]" />
                     {a.label}
                   </span>
-                  <ArrowRight className="h-4 w-4 text-white/40 transition group-hover:translate-x-0.5 group-hover:text-[color:var(--color-accent)]" />
+                  <ArrowRight className="h-4 w-4 text-white/60 transition group-hover:translate-x-0.5 group-hover:text-[color:var(--color-accent)]" />
                 </Link>
               ))}
             </div>

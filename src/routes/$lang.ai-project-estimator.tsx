@@ -731,7 +731,7 @@ function ResultsHeader({ panel, auto, capacity, country }: ResultsHeaderProps) {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-right text-[11px] text-white/40">
+          <div className="text-right text-[11px] text-white/60">
             Project ID
             <br />
             <span className="font-mono text-xs text-white/80">{id}</span>
@@ -925,7 +925,7 @@ function BarBiChart({ inflows, outflows, labels }: BarBiChartProps) {
               title={`Outflow ${outflows[i]}M`}
             />
           </div>
-          <div className="text-[9px] text-white/40">{labels[i]}</div>
+          <div className="text-[9px] text-white/60">{labels[i]}</div>
         </div>
       ))}
     </div>
@@ -957,7 +957,7 @@ function LineChart({ values, labels, suffix, showZero }: LineChartProps) {
           <circle key={i} cx={i * step} cy={y(v)} r="2.5" fill="#10b981" />
         ))}
       </svg>
-      <div className="flex justify-between text-[9px] text-white/40">
+      <div className="flex justify-between text-[9px] text-white/60">
         {labels.map((l: string) => (
           <span key={l}>{l}</span>
         ))}
@@ -978,7 +978,7 @@ function BarChartMini({ values, labels }: BarChartMiniProps) {
           />
         ))}
       </div>
-      <div className="mt-1 flex justify-between text-[9px] text-white/40">
+      <div className="mt-1 flex justify-between text-[9px] text-white/60">
         {labels.map((l: string) => (
           <span key={l}>{l}</span>
         ))}
