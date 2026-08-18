@@ -25,6 +25,8 @@ import { StickyMobileCTA } from "../components/site/StickyMobileCTA";
 import { Toaster } from "../components/ui/sonner";
 import { orgJsonLd, websiteJsonLd, ldScript } from "../lib/seo";
 import { LanguageProvider } from "../i18n/LanguageProvider";
+import { DevOverlays } from "@/components/dev/DevOverlays";
+
 import {
   SUPPORTED_LOCALES,
   DEFAULT_LOCALE,
@@ -285,7 +287,12 @@ function RootComponent() {
           </>
         )}
         <ClientMonitor />
+        {/* Dev-only overlays. Off by default — including local authenticated
+            testing — unless explicitly enabled via VITE_DEV_OVERLAYS or
+            localStorage["nevo:dev-overlays"]. See src/lib/dev-flags.ts. */}
+        <DevOverlays />
         <Toaster position="top-right" richColors closeButton />
+
       </LanguageProvider>
     </QueryClientProvider>
   );
