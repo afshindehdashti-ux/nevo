@@ -921,20 +921,37 @@ export function InvoicesList({
                   {formatMoney(financeBalanceDue(i), i.currency)}
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8"
-                    onClick={() => downloadOne(i.id)}
-                    disabled={rowBusy === i.id}
-                    aria-label={`Download PDF for ${i.invoice_number ?? i.id}`}
-                  >
-                    {rowBusy === i.id ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <FileDown className="h-3.5 w-3.5" />
-                    )}
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8"
+                        onClick={() => downloadOne(i.id, i.invoice_number)}
+                        disabled={rowBusy === i.id}
+                        aria-label={
+                          rowBusy === i.id
+                            ? `Generating PDF for ${i.invoice_number ?? i.id}`
+                            : `Download PDF for ${i.invoice_number ?? i.id}`
+                        }
+                      >
+                        {rowBusy === i.id ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : rowResult[i.id]?.state === "success" ? (
+                          <Check className="h-3.5 w-3.5 text-emerald-500" />
+                        ) : rowResult[i.id]?.state === "error" ? (
+                          <TriangleAlert className="h-3.5 w-3.5 text-destructive" />
+                        ) : (
+                          <FileDown className="h-3.5 w-3.5" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {rowBusy === i.id
+                        ? "Generating PDF…"
+                        : (rowResult[i.id]?.message ?? "Download PDF")}
+                    </TooltipContent>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
