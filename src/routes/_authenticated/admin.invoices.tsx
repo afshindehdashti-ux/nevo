@@ -42,6 +42,18 @@ import {
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
+import { writeAudit } from "@/lib/audit-log";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 import {
   Select,
   SelectContent,
@@ -120,7 +132,53 @@ function sanitizeInvoiceListPrefs(
   return clean;
 }
 
+type BulkActionKey = "export" | "issue" | "paid" | "void";
+
+const BULK_STATUS: Partial<Record<BulkActionKey, InvoiceStatus>> = {
+  issue: "issued",
+  paid: "paid",
+  void: "void",
+};
+
+const BULK_COPY: Record<
+  BulkActionKey,
+  { label: string; title: string; body: (n: number) => string; confirm: string; destructive?: boolean }
+> = {
+  export: {
+    label: "Export PDFs",
+    title: "Export selected invoices?",
+    body: (n) =>
+      n === 1
+        ? "One PDF will be generated and downloaded."
+        : `${n} PDFs will be generated and downloaded together as a single ZIP file.`,
+    confirm: "Export",
+  },
+  issue: {
+    label: "Mark as issued",
+    title: "Mark selected invoices as issued?",
+    body: (n) =>
+      `${n} invoice${n > 1 ? "s" : ""} will move to the “Issued” status. Issued invoices count towards receivables.`,
+    confirm: "Mark as issued",
+  },
+  paid: {
+    label: "Mark as paid",
+    title: "Mark selected invoices as paid?",
+    body: (n) =>
+      `${n} invoice${n > 1 ? "s" : ""} will be marked fully paid. Do this only after the payments are reconciled.`,
+    confirm: "Mark as paid",
+  },
+  void: {
+    label: "Void",
+    title: "Void selected invoices?",
+    body: (n) =>
+      `${n} invoice${n > 1 ? "s" : ""} will be voided. Voided invoices stay in the archive for audit but no longer count towards revenue or receivables.`,
+    confirm: "Void invoices",
+    destructive: true,
+  },
+};
+
 export function InvoicesList({
+
   type,
   title,
 }: {
@@ -130,6 +188,10 @@ export function InvoicesList({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [exporting, setExporting] = useState(false);
   const [rowBusy, setRowBusy] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<BulkActionKey | null>(null);
+  const [runningAction, setRunningAction] = useState<BulkActionKey | null>(null);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+
 
   // Search, status filter, sorting and pagination survive a page refresh.
   const { prefs, setPrefs, resetPrefs, hydrated } = usePersistedListPrefs(
@@ -299,14 +361,17 @@ export function InvoicesList({
     const ids = Array.from(selected);
     if (ids.length === 0) return;
     setExporting(true);
+    setProgress({ done: 0, total: ids.length });
     const t = toast.loading(`Generating ${ids.length} PDF${ids.length > 1 ? "s" : ""}…`);
     try {
       if (ids.length === 1) {
         await generateInvoicePdf(ids[0], "download");
+        setProgress({ done: 1, total: 1 });
         toast.success("PDF downloaded", { id: t });
       } else {
         const zip = new JSZip();
         let ok = 0;
+        let index = 0;
         for (const id of ids) {
           try {
             const res = await generateInvoicePdf(id, "blob");
@@ -316,6 +381,8 @@ export function InvoicesList({
           } catch (e) {
             console.error("PDF failed", id, e);
           }
+          index++;
+          setProgress({ done: index, total: ids.length });
         }
         if (ok === 0) throw new Error("All PDFs failed to generate");
         const blob = await zip.generateAsync({ type: "blob" });
@@ -335,8 +402,57 @@ export function InvoicesList({
       toast.error(msg, { id: t });
     } finally {
       setExporting(false);
+      setProgress(null);
     }
   };
+
+  const handleBulkStatus = async (action: BulkActionKey) => {
+    const status = BULK_STATUS[action];
+    const ids = Array.from(selected);
+    if (!status || ids.length === 0) return;
+    const copy = BULK_COPY[action];
+    const t = toast.loading(`Updating ${ids.length} invoice${ids.length > 1 ? "s" : ""}…`);
+    try {
+      const before = invoices
+        .filter((i) => selected.has(i.id))
+        .map((i) => ({ id: i.id, status: i.status }));
+      const { error } = await supabase.from("invoices").update({ status }).in("id", ids);
+      if (error) throw error;
+
+      const { data: auth } = await supabase.auth.getUser();
+      await writeAudit(supabase, {
+        user_id: auth?.user?.id ?? null,
+        action: `invoice.bulk_${action}`,
+        entity_type: "invoices",
+        entity_id: null,
+        metadata: { count: ids.length, ids, type },
+        old_values: before,
+        new_values: ids.map((id) => ({ id, status })),
+      });
+
+      setSelected(new Set());
+      await refetch();
+      toast.success(`${copy.label} — ${ids.length} invoice${ids.length > 1 ? "s" : ""} updated`, {
+        id: t,
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Bulk update failed", { id: t });
+    }
+  };
+
+  const runBulkAction = async (action: BulkActionKey) => {
+    setRunningAction(action);
+    try {
+      if (action === "export") await handleBulkExport();
+      else await handleBulkStatus(action);
+    } finally {
+      setRunningAction(null);
+      setPendingAction(null);
+    }
+  };
+
+  const busy = runningAction !== null || exporting;
+
 
   const downloadOne = async (id: string) => {
     setRowBusy(id);
@@ -397,9 +513,6 @@ export function InvoicesList({
           </div>
 
           <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 sm:ml-auto">
-            {selected.size > 0 && (
-              <span className="text-xs text-muted-foreground">{selected.size} selected</span>
-            )}
             <Tooltip>
               {/* span keeps the tooltip reachable while the button is disabled */}
               <TooltipTrigger asChild>
@@ -407,8 +520,8 @@ export function InvoicesList({
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={handleBulkExport}
-                    disabled={selected.size === 0 || exporting}
+                    onClick={() => setPendingAction("export")}
+                    disabled={selected.size === 0 || busy}
                   >
                     {exporting ? (
                       <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
@@ -444,7 +557,92 @@ export function InvoicesList({
             </Tooltip>
           </div>
         </div>
+
+        {selected.size > 0 && (
+          <div
+            data-testid="bulk-action-bar"
+            role="region"
+            aria-label="Bulk actions"
+            className="flex flex-col gap-2 border-b bg-muted/40 p-3 sm:flex-row sm:flex-wrap sm:items-center"
+          >
+            <p className="text-sm font-medium" aria-live="polite">
+              {selected.size} selected
+              {progress ? (
+                <span className="ml-2 text-xs font-normal text-muted-foreground">
+                  Processing {progress.done} of {progress.total}…
+                </span>
+              ) : null}
+            </p>
+            <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+              {(["export", "issue", "paid", "void"] as BulkActionKey[]).map((action) => (
+                <Button
+                  key={action}
+                  size="sm"
+                  variant={BULK_COPY[action].destructive ? "destructive" : "outline"}
+                  onClick={() => setPendingAction(action)}
+                  disabled={busy}
+                >
+                  {runningAction === action ? (
+                    <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  ) : null}
+                  {runningAction === action ? "Processing…" : BULK_COPY[action].label}
+                </Button>
+              ))}
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setSelected(new Set())}
+                disabled={busy}
+              >
+                Clear selection
+              </Button>
+            </div>
+          </div>
+        )}
       </TooltipProvider>
+
+      <AlertDialog
+        open={pendingAction !== null}
+        onOpenChange={(open) => {
+          if (!open && !busy) setPendingAction(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingAction ? BULK_COPY[pendingAction].title : ""}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingAction ? BULK_COPY[pendingAction].body(selected.size) : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={busy}
+              className={
+                pendingAction && BULK_COPY[pendingAction].destructive
+                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  : undefined
+              }
+              onClick={(e) => {
+                e.preventDefault();
+                if (pendingAction) void runBulkAction(pendingAction);
+              }}
+            >
+              {busy ? (
+                <>
+                  <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  Processing…
+                </>
+              ) : (
+                (pendingAction && BULK_COPY[pendingAction].confirm) || "Confirm"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {isError ? (
         <div className="p-4 md:p-6" data-testid="list-error-state">
           <Card className="border-destructive/40">
