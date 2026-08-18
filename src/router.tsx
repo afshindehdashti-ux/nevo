@@ -10,9 +10,9 @@ export const getRouter = () => {
       queries: {
         staleTime: 30_000,
         gcTime: 5 * 60_000,
-        // Cached data is painted immediately; a background refresh only runs
-        // when the entry is actually stale.
-        refetchOnMount: false,
+        // Cached data paints immediately; a background refresh only runs when
+        // the entry is actually stale (or was explicitly invalidated).
+        refetchOnMount: true,
         refetchOnWindowFocus: false,
         refetchOnReconnect: true,
         retry: 1,
