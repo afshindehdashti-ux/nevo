@@ -38,16 +38,16 @@ export function AIAssistantLauncher() {
         onClick={() => setOpen(true)}
         aria-label={t("home.aiLauncher.askEngineer")}
         className={cn(
-          "group fixed bottom-5 right-5 z-40 inline-flex items-center gap-2.5 rounded-full",
+          "group fixed bottom-5 end-5 z-40 inline-flex items-center gap-2.5 rounded-full",
           "border border-white/10 bg-[#0B0F14]/95 py-3 pl-3 pr-4 text-sm text-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] backdrop-blur",
           "transition hover:border-[color:var(--color-accent)]/50 hover:shadow-[0_25px_70px_-15px_rgba(16,185,129,0.35)]",
-          "sm:bottom-6 sm:right-6",
+          "sm:bottom-6 sm:end-6",
           open && "pointer-events-none opacity-0",
         )}
       >
         <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-accent)]/15 ring-1 ring-[color:var(--color-accent)]/40">
           <Sparkles className="h-4 w-4 text-[color:var(--color-accent)]" />
-          <span className="absolute -bottom-0 -right-0 h-2 w-2 rounded-full bg-[color:var(--color-accent)] ring-2 ring-[#0B0F14]" />
+          <span className="absolute -bottom-0 -end-0 h-2 w-2 rounded-full bg-[color:var(--color-accent)] ring-2 ring-[#0B0F14]" />
         </span>
         <span className="hidden sm:inline font-medium tracking-tight">
           {t("home.aiLauncher.askEngineer")}
@@ -73,15 +73,15 @@ export function AIAssistantLauncher() {
         />
         <aside
           className={cn(
-            "absolute inset-y-0 right-0 flex h-full w-full flex-col overflow-hidden border-l border-white/10 bg-[#0B0F14] shadow-2xl transition-transform duration-300",
+            "absolute inset-y-0 end-0 flex h-full w-full flex-col overflow-hidden border-s border-white/10 bg-[#0B0F14] shadow-2xl transition-transform duration-300",
             "sm:w-[440px] md:w-[520px] lg:w-[560px]",
-            open ? "translate-x-0" : "translate-x-full",
+            open ? "translate-x-0" : "translate-x-full rtl:-translate-x-full",
           )}
         >
           <button
             onClick={() => setOpen(false)}
             aria-label={t("home.aiLauncher.close")}
-            className="absolute right-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/70 transition hover:bg-white/[0.1] hover:text-white"
+            className="absolute end-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/70 transition hover:bg-white/[0.1] hover:text-white"
           >
             <X className="h-4 w-4" />
           </button>

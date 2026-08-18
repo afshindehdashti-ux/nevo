@@ -331,7 +331,7 @@ function KnowledgeHub() {
   }, [query, cat, level, tab]);
 
   return (
-    <div className="min-h-screen bg-[#05070a] text-white">
+    <main id="main" className="min-h-screen bg-[#05070a] text-white">
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-white/5">
         <div className="absolute inset-0">
@@ -819,6 +819,6 @@ function KnowledgeHub() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
