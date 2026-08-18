@@ -462,14 +462,36 @@ export function InvoicesList({
   const busy = runningAction !== null || exporting;
 
 
-  const downloadOne = async (id: string) => {
+  const setResult = (id: string, state: "success" | "error", message: string) => {
+    setRowResult((prev) => ({ ...prev, [id]: { state, message } }));
+    setRowAnnounce(message);
+    window.setTimeout(() => {
+      setRowResult((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }, 5000);
+  };
+
+  const downloadOne = async (id: string, label?: string | null) => {
+    const name = label ?? "invoice";
     setRowBusy(id);
-    const t = toast.loading("Generating PDF…");
+    setRowResult((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    setRowAnnounce(`Generating PDF for ${name}…`);
+    const t = toast.loading(`Generating PDF for ${name}…`);
     try {
       await generateInvoicePdf(id, "download");
-      toast.success("PDF downloaded", { id: t });
+      toast.success(`PDF downloaded for ${name}`, { id: t });
+      setResult(id, "success", `PDF downloaded for ${name}`);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Export failed", { id: t });
+      const message = e instanceof Error ? e.message : "Export failed";
+      toast.error(message, { id: t });
+      setResult(id, "error", `PDF failed for ${name}: ${message}`);
     } finally {
       setRowBusy(null);
     }
