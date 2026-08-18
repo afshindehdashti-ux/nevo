@@ -379,6 +379,16 @@ export function InvoicesList({
       if (error) throw error;
       return data;
     },
+    // The key holds the full, unfiltered list — search/status/sort/paging are
+    // applied client-side, so debounced URL state never changes the key and
+    // never triggers a refetch. Keeping it fresh for a minute means
+    // back/forward navigation repaints from cache instantly.
+    staleTime: 60_000,
+    gcTime: 10 * 60_000,
+    refetchOnWindowFocus: false,
+    // Show the previous list while a background refresh runs instead of
+    // dropping to a full-page loading state.
+    placeholderData: (prev) => prev,
   });
 
   // Changing any filter invalidates the results the in-flight request would
