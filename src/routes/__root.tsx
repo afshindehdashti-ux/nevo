@@ -23,7 +23,7 @@ import { MaintenanceBanner } from "../components/site/MaintenanceBanner";
 import { CookieConsent } from "../components/site/CookieConsent";
 import { StickyMobileCTA } from "../components/site/StickyMobileCTA";
 import { Toaster } from "../components/ui/sonner";
-import { orgJsonLd, websiteJsonLd, ldScript, hreflangLinks } from "../lib/seo";
+import { orgJsonLd, websiteJsonLd, ldScript } from "../lib/seo";
 import { LanguageProvider } from "../i18n/LanguageProvider";
 import {
   SUPPORTED_LOCALES,
@@ -229,7 +229,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap",
       },
-      ...hreflangLinks("/"),
     ],
     scripts: [ldScript(orgJsonLd()), ldScript(websiteJsonLd())],
   }),
