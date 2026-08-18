@@ -746,6 +746,18 @@ export function InvoicesList({
             </Select>
           </div>
 
+          <p
+            aria-live="polite"
+            className={`flex items-center gap-1.5 text-xs text-muted-foreground transition-opacity ${
+              listBusy ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+            {listBusy ? "Updating results…" : ""}
+          </p>
+
+
+
           <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 sm:ml-auto">
             <Tooltip>
               {/*
