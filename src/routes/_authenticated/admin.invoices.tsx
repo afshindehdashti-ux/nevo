@@ -96,6 +96,37 @@ export function InvoicesList({
     });
   }, [invoices, search, statusFilter]);
 
+  const sorted = useMemo(() => {
+    const dir = sortDir === "asc" ? 1 : -1;
+    const value = (i: (typeof filtered)[number]) => {
+      switch (sortKey) {
+        case "invoice_number":
+          return (i.invoice_number || "").toLowerCase();
+        case "customer":
+          return customerDisplayName(i.customers as CustomerDisplay | null).toLowerCase();
+        case "issue_date":
+          return i.issue_date ? new Date(i.issue_date).getTime() : 0;
+        case "due_date":
+          return i.due_date ? new Date(i.due_date).getTime() : 0;
+        case "status":
+          return invoiceStatusLabel(i.status).toLowerCase();
+        case "total":
+          return financeTotalAmount(i);
+        case "balance":
+          return financeBalanceDue(i);
+        default:
+          return 0;
+      }
+    };
+    return [...filtered].sort((a, b) => {
+      const va = value(a);
+      const vb = value(b);
+      if (typeof va === "number" && typeof vb === "number") return (va - vb) * dir;
+      return String(va).localeCompare(String(vb)) * dir;
+    });
+  }, [filtered, sortKey, sortDir]);
+
+
   const filteredIds = useMemo(() => filtered.map((i) => i.id), [filtered]);
   const allSelected = filteredIds.length > 0 && filteredIds.every((id) => selected.has(id));
   const someSelected = filteredIds.some((id) => selected.has(id));
