@@ -309,7 +309,30 @@ export function InvoicesList({
     }
   }, [hydrated, prefs, storageKey]);
 
-  const setSearch = (v: string) => setPrefs({ search: v });
+  const setSearch = useCallback((v: string) => setPrefs({ search: v }), [setPrefs]);
+
+  // Typing shouldn't push a URL update (and a full re-filter) on every
+  // keystroke. The input stays instant while the committed value — the one the
+  // list, the URL and storage use — lands 300ms after the user stops typing.
+  const [searchInput, setSearchInput] = useState(search);
+  const searchInputRef = useRef(searchInput);
+  searchInputRef.current = searchInput;
+
+  // External resets (clear filters, back/forward, stored prefs) win over the
+  // local draft whenever they don't match what the user is currently typing.
+  useEffect(() => {
+    if (search !== searchInputRef.current) setSearchInput(search);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  useEffect(() => {
+    if (searchInput === search) return;
+    const t = window.setTimeout(() => setSearch(searchInput), 300);
+    return () => window.clearTimeout(t);
+  }, [searchInput, search, setSearch]);
+
+  const searchPending = searchInput.trim() !== search.trim();
+
   const setStatusFilter = (v: InvoiceStatus | "all") => setPrefs({ statusFilter: v });
   const setPageSize = (v: number) => setPrefs({ pageSize: v });
   const setPage = (v: number | ((n: number) => number)) =>
@@ -336,6 +359,12 @@ export function InvoicesList({
       return data;
     },
   });
+
+  // One shared "results are updating" signal: pending debounced filter input
+  // and background refetches both dim the list the same way.
+  const listBusy = !isLoading && (searchPending || isFetching);
+
+
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -682,8 +711,9 @@ export function InvoicesList({
           : "Commercial invoices with payment tracking."
       }
       count={invoices.length}
-      search={search}
-      onSearchChange={setSearch}
+      search={searchInput}
+      onSearchChange={setSearchInput}
+
       canCreate={false}
       onCreate={() => {}}
       headerExtra={
@@ -715,6 +745,18 @@ export function InvoicesList({
               </SelectContent>
             </Select>
           </div>
+
+          <p
+            aria-live="polite"
+            className={`flex items-center gap-1.5 text-xs text-muted-foreground transition-opacity ${
+              listBusy ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+            {listBusy ? "Updating results…" : ""}
+          </p>
+
+
 
           <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 sm:ml-auto">
             <Tooltip>
@@ -992,8 +1034,10 @@ export function InvoicesList({
                 <Button
                   variant="outline"
                   onClick={() => {
+                    setSearchInput("");
                     setSearch("");
                     setStatusFilter("all");
+
                   }}
                 >
                   Clear filters
@@ -1003,7 +1047,15 @@ export function InvoicesList({
           )}
         </div>
       ) : (
-        <>
+        <div
+          aria-busy={listBusy}
+          className={
+            listBusy
+              ? "pointer-events-none opacity-60 transition-opacity duration-200"
+              : "transition-opacity duration-200"
+          }
+        >
+
       {/* Mobile: stacked cards — no horizontal scrolling, tap targets stay usable */}
       <div className="md:hidden divide-y">
         {paged.map((i) => (
@@ -1255,7 +1307,8 @@ export function InvoicesList({
               </Button>
             </div>
           </div>
-        </>
+        </div>
+
       )}
       </TooltipProvider>
     </MasterListShell>
