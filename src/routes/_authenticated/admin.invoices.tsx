@@ -705,8 +705,9 @@ export function InvoicesList({
           : "Commercial invoices with payment tracking."
       }
       count={invoices.length}
-      search={search}
-      onSearchChange={setSearch}
+      search={searchInput}
+      onSearchChange={setSearchInput}
+
       canCreate={false}
       onCreate={() => {}}
       headerExtra={
