@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
+import { ORG_REF, WEBSITE_ID } from "@/lib/seo";
 import { motion } from "motion/react";
 import {
   ArrowRight,

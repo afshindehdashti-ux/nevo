@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
+import { ORG_REF, WEBSITE_ID } from "@/lib/seo";
 import { useRef, useState } from "react";
 import { motion } from "motion/react";
 import { submitLeadForm } from "@/lib/lead-submit";
@@ -211,9 +212,11 @@ export const Route = createFileRoute("/$lang/solutions/production-lines")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Service",
+            "@id": `${canonical}#service`,
+            isPartOf: { "@id": WEBSITE_ID },
             name: "Sandwich Panel Production Lines",
             serviceType: "Production line engineering & supply",
-            provider: { "@type": "Organization", name: SITE.name, url: SITE.url },
+            provider: ORG_REF,
             areaServed: ["AE", "SA", "TR", "IQ", "KE", "CM", "RU", "EU", "LATAM"],
             url: canonical,
             description: DESCRIPTION,
