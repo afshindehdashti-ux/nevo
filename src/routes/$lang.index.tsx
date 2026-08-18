@@ -24,39 +24,31 @@ const DESCRIPTION =
 export const Route = createFileRoute("/$lang/")({
   head: ({ params }) => {
     const seo = buildSeo({ title: TITLE, description: DESCRIPTION, path: "/", lang: params.lang });
+    const lang = String(params.lang);
     return {
       ...seo,
       scripts: [
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            name: "NEVO Industrial",
-            url: SITE.url,
-            description: DESCRIPTION,
-            address: {
-              "@type": "PostalAddress",
-              addressLocality: "Dubai",
-              addressCountry: "AE",
-            },
-            areaServed: [
-              "Saudi Arabia",
-              "Oman",
-              "United Arab Emirates",
-              "Turkey",
-              "Iraq",
-              "Kenya",
-              "Cameroon",
-              "Russia",
-            ],
-          }),
-        },
+        ldScript(orgJsonLd()),
+        ldScript(localBusinessJsonLd(lang)),
+        ldScript(websiteJsonLd(lang)),
+        ldScript({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": `${SITE.url}/${lang}#webpage`,
+          url: `${SITE.url}/${lang}`,
+          name: TITLE,
+          description: DESCRIPTION,
+          inLanguage: lang,
+          isPartOf: { "@id": WEBSITE_ID },
+          about: { "@id": ORG_ID },
+          primaryImageOfPage: LOGO_URL,
+        }),
       ],
     };
   },
   component: Index,
 });
+
 
 function Index() {
   return (
