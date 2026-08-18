@@ -72,7 +72,6 @@ export const LOCALE_ALIASES: Record<string, string> = {
   "fr-be": "fr",
   "fr-ca": "fr",
   "it-it": "it",
-  zh: "zh",
   "zh-cn": "zh",
   "zh-hans": "zh",
   "zh-hant": "zh",
