@@ -114,7 +114,6 @@ export const Route = createFileRoute("/$lang/customer-portal")({
       description:
         "Secure customer portal for NEVO Industrial clients — monitor factory builds, production lines and panel projects with live tracking, documents, quality and analytics.",
       path: "/customer-portal",
-      image: p01.url,
       keywords: [
         "customer portal",
         "project dashboard",

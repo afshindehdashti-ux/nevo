@@ -108,7 +108,6 @@ export const Route = createFileRoute("/$lang/partner-portal")({
       description:
         "NEVO Industrial Global Partner Portal — a premium workspace for distributors, EPCs, consultants and international sales partners. Leads, products, marketing, training, analytics and AI sales tools in one place.",
       path: "/partner-portal",
-      image: p01.url,
       keywords: [
         "partner portal",
         "distributor portal",

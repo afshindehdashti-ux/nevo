@@ -56,7 +56,6 @@ export const Route = createFileRoute("/$lang/knowledge-hub")({
         "The world's most comprehensive sandwich panel knowledge hub — technical articles, engineering guides, courses, videos, FAQs and downloads on PIR, PUR, rock wool panels, cold rooms, clean rooms, factory design and production.",
       path: "/knowledge-hub",
       lang: params.lang,
-      image: heroImg,
     });
     return {
       ...seo,
