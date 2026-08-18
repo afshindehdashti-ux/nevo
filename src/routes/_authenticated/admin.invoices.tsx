@@ -903,6 +903,74 @@ export function InvoicesList({
             Reset filters
           </Button>
 
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 shrink-0"
+                title="Show, hide and reorder table columns — the layout is remembered on this device"
+              >
+                <Columns3 className="mr-1.5 size-3.5" aria-hidden="true" />
+                Columns
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-72 p-2">
+              <div className="flex items-center justify-between px-1 pb-2">
+                <p className="text-xs font-medium text-muted-foreground">Table columns</p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-xs"
+                  onClick={columns.reset}
+                  disabled={!columns.dirty}
+                >
+                  Reset
+                </Button>
+              </div>
+              <ul className="space-y-0.5">
+                {columns.order.map((c, index) => (
+                  <li key={c} className="flex items-center gap-2 rounded-sm px-1 py-1 hover:bg-muted/60">
+                    <Checkbox
+                      id={`invoice-col-${c}`}
+                      checked={columns.isVisible(c)}
+                      onCheckedChange={(v) => columns.toggle(c, v === true)}
+                      disabled={columns.isVisible(c) && columns.visibleOrder.length === 1}
+                      aria-label={`Show ${SORT_LABELS[c]} column`}
+                    />
+                    <Label htmlFor={`invoice-col-${c}`} className="min-w-0 flex-1 truncate text-sm font-normal">
+                      {SORT_LABELS[c]}
+                    </Label>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6"
+                      onClick={() => columns.move(c, -1)}
+                      disabled={index === 0}
+                      aria-label={`Move ${SORT_LABELS[c]} left`}
+                    >
+                      <ArrowUp className="size-3.5" aria-hidden="true" />
+                    </Button>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6"
+                      onClick={() => columns.move(c, 1)}
+                      disabled={index === columns.order.length - 1}
+                      aria-label={`Move ${SORT_LABELS[c]} right`}
+                    >
+                      <ArrowDown className="size-3.5" aria-hidden="true" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </PopoverContent>
+          </Popover>
+
+
           <p
             aria-live="polite"
             className={`flex items-center gap-1.5 text-xs text-muted-foreground transition-opacity ${
