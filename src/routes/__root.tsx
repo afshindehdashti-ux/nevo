@@ -287,6 +287,10 @@ function RootComponent() {
           </>
         )}
         <ClientMonitor />
+        {/* Applies admin-uploaded photo replacements (Admin > Image library)
+            to every rendered <img> without touching component code. */}
+        <ImageOverrideProvider />
+
         {/* Dev-only overlays. Off by default — including local authenticated
             testing — unless explicitly enabled via VITE_DEV_OVERLAYS or
             localStorage["nevo:dev-overlays"]. See src/lib/dev-flags.ts. */}
