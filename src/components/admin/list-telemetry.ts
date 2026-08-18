@@ -25,6 +25,8 @@ export const ADMIN_LIST_RESOURCES = [
   "opportunities",
   "commission_invoices",
   "purchase_orders",
+  "invoices",
+  "proforma_invoices",
 ] as const;
 
 export type AdminListResource = (typeof ADMIN_LIST_RESOURCES)[number];
