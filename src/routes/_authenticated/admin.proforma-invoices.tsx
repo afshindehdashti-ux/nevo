@@ -350,8 +350,8 @@ function ProformaInvoicesList() {
       title="Proforma Invoices"
       description="Proforma invoices sent before shipment."
       count={rows.length}
-      search={search}
-      onSearchChange={setSearch}
+      search={searchInput}
+      onSearchChange={setSearchInput}
       canCreate={false}
       onCreate={() => {}}
       headerExtra={<GuideMeButton sectionId="proforma-invoice" />}
