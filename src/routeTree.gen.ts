@@ -89,6 +89,7 @@ import { Route as AuthenticatedAdminLogoEventsRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
 import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authenticated/admin.invoices'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
+import { Route as AuthenticatedAdminImagesRouteImport } from './routes/_authenticated/admin.images'
 import { Route as AuthenticatedAdminFilesRouteImport } from './routes/_authenticated/admin.files'
 import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin.exports'
 import { Route as AuthenticatedAdminEmailPreviewRouteImport } from './routes/_authenticated/admin.email-preview'
@@ -568,6 +569,12 @@ const AuthenticatedAdminImportRoute =
     path: '/import',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminImagesRoute =
+  AuthenticatedAdminImagesRouteImport.update({
+    id: '/images',
+    path: '/images',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminFilesRoute = AuthenticatedAdminFilesRouteImport.update({
   id: '/files',
   path: '/files',
@@ -938,6 +945,7 @@ export interface FileRoutesByFullPath {
   '/admin/email-preview': typeof AuthenticatedAdminEmailPreviewRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
+  '/admin/images': typeof AuthenticatedAdminImagesRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -1068,6 +1076,7 @@ export interface FileRoutesByTo {
   '/admin/email-preview': typeof AuthenticatedAdminEmailPreviewRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/admin/files': typeof AuthenticatedAdminFilesRoute
+  '/admin/images': typeof AuthenticatedAdminImagesRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -1201,6 +1210,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/email-preview': typeof AuthenticatedAdminEmailPreviewRoute
   '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/_authenticated/admin/files': typeof AuthenticatedAdminFilesRoute
+  '/_authenticated/admin/images': typeof AuthenticatedAdminImagesRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRouteWithChildren
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -1335,6 +1345,7 @@ export interface FileRouteTypes {
     | '/admin/email-preview'
     | '/admin/exports'
     | '/admin/files'
+    | '/admin/images'
     | '/admin/import'
     | '/admin/invoices'
     | '/admin/leads'
@@ -1465,6 +1476,7 @@ export interface FileRouteTypes {
     | '/admin/email-preview'
     | '/admin/exports'
     | '/admin/files'
+    | '/admin/images'
     | '/admin/import'
     | '/admin/invoices'
     | '/admin/leads'
@@ -1597,6 +1609,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/email-preview'
     | '/_authenticated/admin/exports'
     | '/_authenticated/admin/files'
+    | '/_authenticated/admin/images'
     | '/_authenticated/admin/import'
     | '/_authenticated/admin/invoices'
     | '/_authenticated/admin/leads'
@@ -2262,6 +2275,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminImportRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/images': {
+      id: '/_authenticated/admin/images'
+      path: '/images'
+      fullPath: '/admin/images'
+      preLoaderRoute: typeof AuthenticatedAdminImagesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/files': {
       id: '/_authenticated/admin/files'
       path: '/files'
@@ -2807,6 +2827,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminEmailPreviewRoute: typeof AuthenticatedAdminEmailPreviewRoute
   AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
   AuthenticatedAdminFilesRoute: typeof AuthenticatedAdminFilesRoute
+  AuthenticatedAdminImagesRoute: typeof AuthenticatedAdminImagesRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminInvoicesRoute: typeof AuthenticatedAdminInvoicesRouteWithChildren
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -2857,6 +2878,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminEmailPreviewRoute: AuthenticatedAdminEmailPreviewRoute,
   AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
   AuthenticatedAdminFilesRoute: AuthenticatedAdminFilesRoute,
+  AuthenticatedAdminImagesRoute: AuthenticatedAdminImagesRoute,
   AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
   AuthenticatedAdminInvoicesRoute: AuthenticatedAdminInvoicesRouteWithChildren,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRouteWithChildren,
