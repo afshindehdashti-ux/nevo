@@ -306,6 +306,18 @@ async def capture(context, vp: dict, state: str) -> tuple[str, Path | None, list
     # this wait the shell would be captured mid-hydration and drift.
     await page.add_style_tag(content=DISABLE_MOTION_CSS)
     await page.add_style_tag(content=MASK_PROFILE_CSS)
+    if os.environ.get("VISUAL_INJECT_OVERLAY") == "1":
+        # Harness self-test: paint a rogue full-width bottom bar over the
+        # sidebar footer. Every assertion below must catch it.
+        await page.evaluate(
+            """() => {
+              const el = document.createElement('div');
+              el.className = 'rogue-dev-overlay';
+              el.style.cssText =
+                'position:fixed;left:0;right:0;bottom:0;height:80px;z-index:9999;background:#f0f';
+              document.body.appendChild(el);
+            }"""
+        )
     await prepare_state(page, state)
     # Nav groups render once the profile/permission query resolves (and, on
     # mobile, only after the sheet mounts); without this wait the shell would
