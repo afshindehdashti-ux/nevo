@@ -334,14 +334,50 @@ export const serviceJsonLd = (s: {
   description: string;
   path: string;
   areaServed?: string[];
+  serviceType?: string;
+  category?: string[];
 }) => ({
   "@context": "https://schema.org",
   "@type": "Service",
+  "@id": `${s.path}#service`,
   name: s.name,
   description: s.description,
-  provider: { "@type": "Organization", name: SITE.name },
+  ...(s.serviceType ? { serviceType: s.serviceType } : {}),
+  ...(s.category?.length ? { category: s.category } : {}),
+  provider: ORG_REF,
   areaServed: s.areaServed ?? ["Worldwide"],
   url: s.path,
+  isPartOf: { "@id": WEBSITE_ID },
+});
+
+/**
+ * Solutions hub catalog — lists NEVO's core service offerings as an
+ * OfferCatalog attached to the Organization so Google can map the
+ * offerings to the entity rather than to isolated pages.
+ */
+export const solutionsCatalogJsonLd = (input: {
+  lang: string;
+  items: { name: string; description: string; path: string }[];
+}) => ({
+  "@context": "https://schema.org",
+  "@type": "OfferCatalog",
+  "@id": `${SITE.url}/${input.lang}/solutions#catalog`,
+  name: "NEVO Industrial — Solutions",
+  url: `${SITE.url}/${input.lang}/solutions`,
+  provider: ORG_REF,
+  numberOfItems: input.items.length,
+  itemListElement: input.items.map((it, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    item: {
+      "@type": "Service",
+      "@id": `${SITE.url}/${input.lang}${it.path}#service`,
+      name: it.name,
+      description: it.description,
+      url: `${SITE.url}/${input.lang}${it.path}`,
+      provider: ORG_REF,
+    },
+  })),
 });
 
 export const productJsonLd = (p: {
@@ -356,7 +392,9 @@ export const productJsonLd = (p: {
   description: p.description,
   image: p.image,
   brand: { "@type": "Brand", name: p.brand ?? SITE.name },
+  manufacturer: ORG_REF,
 });
+
 
 export const articleJsonLd = (a: {
   title: string;
