@@ -1029,7 +1029,15 @@ export function InvoicesList({
           )}
         </div>
       ) : (
-        <>
+        <div
+          aria-busy={listBusy}
+          className={
+            listBusy
+              ? "pointer-events-none opacity-60 transition-opacity duration-200"
+              : "transition-opacity duration-200"
+          }
+        >
+
       {/* Mobile: stacked cards — no horizontal scrolling, tap targets stay usable */}
       <div className="md:hidden divide-y">
         {paged.map((i) => (
