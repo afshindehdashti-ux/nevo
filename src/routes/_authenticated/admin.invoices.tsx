@@ -887,12 +887,13 @@ export function InvoicesList({
             variant="outline"
             className="h-8 shrink-0"
             onClick={handleResetFilters}
-            disabled={!filtersDirty}
-            title="Clear saved search, status, sort, rows per page and page"
+            disabled={!filtersDirty && !isFetching}
+            title="Clear search, status, sort, rows per page and page, then reload the list"
           >
             <RotateCcw className="mr-1.5 size-3.5" aria-hidden="true" />
-            Reset filters
+            Clear all filters
           </Button>
+
 
           <Popover>
             <PopoverTrigger asChild>
