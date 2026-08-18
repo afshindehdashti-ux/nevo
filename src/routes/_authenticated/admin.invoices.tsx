@@ -130,6 +130,10 @@ export function InvoicesList({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [exporting, setExporting] = useState(false);
   const [rowBusy, setRowBusy] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<BulkActionKey | null>(null);
+  const [runningAction, setRunningAction] = useState<BulkActionKey | null>(null);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+
 
   // Search, status filter, sorting and pagination survive a page refresh.
   const { prefs, setPrefs, resetPrefs, hydrated } = usePersistedListPrefs(
