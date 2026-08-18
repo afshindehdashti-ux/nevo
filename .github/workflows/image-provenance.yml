@@ -1,0 +1,47 @@
+name: Image provenance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/assets/**"
+      - "src/**/*.tsx"
+      - "scripts/check-image-provenance.py"
+      - "docs/image-provenance-baseline.json"
+      - ".github/workflows/image-provenance.yml"
+  pull_request:
+    paths:
+      - "src/assets/**"
+      - "src/**/*.tsx"
+      - "scripts/check-image-provenance.py"
+      - "docs/image-provenance-baseline.json"
+  workflow_dispatch:
+
+jobs:
+  provenance:
+    name: Validate image provenance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install --no-cache-dir Pillow
+
+      - name: Validate provenance (C2PA / AI detection / EXIF / licence)
+        run: python scripts/check-image-provenance.py
+
+      - name: Full report (informational)
+        if: always()
+        run: python scripts/check-image-provenance.py --json > image-provenance-report.json || true
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-provenance-report
+          path: image-provenance-report.json
+          if-no-files-found: ignore
