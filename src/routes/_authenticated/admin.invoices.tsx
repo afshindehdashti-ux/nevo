@@ -37,6 +37,7 @@ import {
   FileDown,
   FileText,
   Info,
+  Link2,
   Loader2,
   RefreshCw,
   RotateCcw,
