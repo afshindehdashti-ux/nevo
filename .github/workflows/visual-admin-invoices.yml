@@ -1,0 +1,71 @@
+name: Visual — /admin/invoices (themes × breakpoints)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/routes/_authenticated/admin.invoices.tsx"
+      - "src/components/crm/MasterListShell.tsx"
+      - "src/components/admin/ListEmptyState.tsx"
+      - "src/components/ui/**"
+      - "src/styles.css"
+      - "scripts/visual/admin-invoices-visual.py"
+      - "tests/visual/baselines/admin-invoices/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    name: Playwright visual (invoices)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          bun install --frozen-lockfile
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+
+      # The screen is behind admin auth: the job needs a session JSON produced
+      # by `lovable auth-session --json`, stored as a repository secret.
+      - name: Check for admin session secret
+        id: session
+        env:
+          SESSION_JSON: ${{ secrets.ADMIN_VISUAL_SESSION_JSON }}
+        run: |
+          if [ -z "$SESSION_JSON" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::ADMIN_VISUAL_SESSION_JSON not set — skipping the authenticated visual run."
+          else
+            mkdir -p "$HOME/.cache/lovable-auth"
+            printf '%s' "$SESSION_JSON" > "$HOME/.cache/lovable-auth/session.json"
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Start dev server
+        if: steps.session.outputs.available == 'true'
+        run: |
+          bun run dev --port 8080 --host 127.0.0.1 &
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:8080/ && break; sleep 2; done
+
+      - name: Run visual regression
+        if: steps.session.outputs.available == 'true'
+        run: bun run test:visual:admin-invoices
+
+      - name: Upload diffs
+        if: always() && steps.session.outputs.available == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-invoices-visual-diffs
+          path: tests/visual/diffs/admin-invoices/
+          if-no-files-found: ignore
