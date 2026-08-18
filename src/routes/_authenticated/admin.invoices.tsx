@@ -817,16 +817,31 @@ export function InvoicesList({
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => downloadOne(i.id)}
+                onClick={() => downloadOne(i.id, i.invoice_number)}
                 disabled={rowBusy === i.id}
               >
                 {rowBusy === i.id ? (
                   <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                ) : rowResult[i.id]?.state === "success" ? (
+                  <Check className="mr-1 h-3.5 w-3.5 text-emerald-500" />
+                ) : rowResult[i.id]?.state === "error" ? (
+                  <TriangleAlert className="mr-1 h-3.5 w-3.5 text-destructive" />
                 ) : (
                   <FileDown className="mr-1 h-3.5 w-3.5" />
                 )}
-                PDF
+                {rowBusy === i.id ? "Generating…" : "PDF"}
               </Button>
+              {rowResult[i.id] ? (
+                <p
+                  className={
+                    rowResult[i.id]!.state === "error"
+                      ? "self-center text-xs text-destructive"
+                      : "self-center text-xs text-emerald-600 dark:text-emerald-400"
+                  }
+                >
+                  {rowResult[i.id]!.state === "error" ? "Download failed" : "Downloaded"}
+                </p>
+              ) : null}
             </div>
           </div>
         ))}
