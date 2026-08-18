@@ -513,9 +513,6 @@ export function InvoicesList({
           </div>
 
           <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 sm:ml-auto">
-            {selected.size > 0 && (
-              <span className="text-xs text-muted-foreground">{selected.size} selected</span>
-            )}
             <Tooltip>
               {/* span keeps the tooltip reachable while the button is disabled */}
               <TooltipTrigger asChild>
@@ -523,8 +520,8 @@ export function InvoicesList({
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={handleBulkExport}
-                    disabled={selected.size === 0 || exporting}
+                    onClick={() => setPendingAction("export")}
+                    disabled={selected.size === 0 || busy}
                   >
                     {exporting ? (
                       <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
@@ -560,7 +557,92 @@ export function InvoicesList({
             </Tooltip>
           </div>
         </div>
+
+        {selected.size > 0 && (
+          <div
+            data-testid="bulk-action-bar"
+            role="region"
+            aria-label="Bulk actions"
+            className="flex flex-col gap-2 border-b bg-muted/40 p-3 sm:flex-row sm:flex-wrap sm:items-center"
+          >
+            <p className="text-sm font-medium" aria-live="polite">
+              {selected.size} selected
+              {progress ? (
+                <span className="ml-2 text-xs font-normal text-muted-foreground">
+                  Processing {progress.done} of {progress.total}…
+                </span>
+              ) : null}
+            </p>
+            <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+              {(["export", "issue", "paid", "void"] as BulkActionKey[]).map((action) => (
+                <Button
+                  key={action}
+                  size="sm"
+                  variant={BULK_COPY[action].destructive ? "destructive" : "outline"}
+                  onClick={() => setPendingAction(action)}
+                  disabled={busy}
+                >
+                  {runningAction === action ? (
+                    <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  ) : null}
+                  {runningAction === action ? "Processing…" : BULK_COPY[action].label}
+                </Button>
+              ))}
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setSelected(new Set())}
+                disabled={busy}
+              >
+                Clear selection
+              </Button>
+            </div>
+          </div>
+        )}
       </TooltipProvider>
+
+      <AlertDialog
+        open={pendingAction !== null}
+        onOpenChange={(open) => {
+          if (!open && !busy) setPendingAction(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingAction ? BULK_COPY[pendingAction].title : ""}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingAction ? BULK_COPY[pendingAction].body(selected.size) : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={busy}
+              className={
+                pendingAction && BULK_COPY[pendingAction].destructive
+                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  : undefined
+              }
+              onClick={(e) => {
+                e.preventDefault();
+                if (pendingAction) void runBulkAction(pendingAction);
+              }}
+            >
+              {busy ? (
+                <>
+                  <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  Processing…
+                </>
+              ) : (
+                (pendingAction && BULK_COPY[pendingAction].confirm) || "Confirm"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {isError ? (
         <div className="p-4 md:p-6" data-testid="list-error-state">
           <Card className="border-destructive/40">
