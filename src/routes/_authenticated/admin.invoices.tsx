@@ -58,6 +58,7 @@ export function InvoicesList({
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | "all">("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [exporting, setExporting] = useState(false);
+  const [rowBusy, setRowBusy] = useState<string | null>(null);
 
   const { data: invoices = [], isLoading } = useQuery({
     queryKey: ["invoices", type],
