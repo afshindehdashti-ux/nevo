@@ -16,7 +16,9 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FileDown, Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ListEmptyState } from "@/components/admin/ListEmptyState";
+import { FileDown, FileText, Loader2, SearchX } from "lucide-react";
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
@@ -109,6 +111,7 @@ export function InvoicesList({
   };
 
   const label = type === "proforma" ? "Proforma" : "Commercial";
+  const emptyResource = type === "proforma" ? "proforma_invoices" : "invoices";
 
   const handleBulkExport = async () => {
     const ids = Array.from(selected);
@@ -222,18 +225,57 @@ export function InvoicesList({
           </p>
         </div>
       </div>
+      {isLoading ? (
+        <div
+          data-testid="list-skeleton"
+          aria-busy="true"
+          aria-live="polite"
+          className="space-y-2 p-4"
+        >
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full" />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="p-4 md:p-6">
+          {invoices.length === 0 ? (
+            <ListEmptyState
+              icon={FileText}
+              resource={emptyResource}
+              reason="no_records"
+              title={`No ${label.toLowerCase()} invoices yet`}
+              description={`${label} invoices will show up here once you create one from a confirmed order.`}
+              action={
+                <Button variant="outline" asChild>
+                  <Link to="/admin/orders">Go to orders</Link>
+                </Button>
+              }
+            />
+          ) : (
+            <ListEmptyState
+              icon={SearchX}
+              resource={emptyResource}
+              reason="filtered_out"
+              title="No invoices match your filters"
+              description="No invoices match the current search and status filter. Clear them to see the full list again."
+              action={
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearch("");
+                    setStatusFilter("all");
+                  }}
+                >
+                  Clear filters
+                </Button>
+              }
+            />
+          )}
+        </div>
+      ) : (
+        <>
       {/* Mobile: stacked cards — no horizontal scrolling, tap targets stay usable */}
       <div className="md:hidden divide-y">
-        {isLoading && (
-          <p className="py-8 text-center text-sm text-muted-foreground">Loading…</p>
-        )}
-        {!isLoading && filtered.length === 0 && (
-          <p className="py-10 text-center text-sm text-muted-foreground">
-            {invoices.length === 0
-              ? `No ${type === "proforma" ? "proforma " : ""}invoices yet.`
-              : "No matches."}
-          </p>
-        )}
         {filtered.map((i) => (
           <div
             key={i.id}
@@ -333,22 +375,6 @@ export function InvoicesList({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading && (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
-                  Loading…
-                </TableCell>
-              </TableRow>
-            )}
-            {!isLoading && filtered.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center py-10 text-muted-foreground">
-                  {invoices.length === 0
-                    ? `No ${type === "proforma" ? "proforma " : ""}invoices yet.`
-                    : "No matches."}
-                </TableCell>
-              </TableRow>
-            )}
             {filtered.map((i) => (
               <TableRow key={i.id} data-state={selected.has(i.id) ? "selected" : undefined}>
                 <TableCell>
@@ -405,6 +431,8 @@ export function InvoicesList({
           </TableBody>
         </Table>
       </div>
+        </>
+      )}
 
     </MasterListShell>
   );
