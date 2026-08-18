@@ -1191,7 +1191,7 @@ export function InvoicesList({
               </p>
               <Button
                 variant="outline"
-                onClick={() => void refetch()}
+                onClick={handleRefresh}
                 disabled={isFetching}
                 className="mt-2"
               >
