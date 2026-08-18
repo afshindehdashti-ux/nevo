@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
+import { ORG_REF, WEBSITE_ID } from "@/lib/seo";
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -245,9 +246,11 @@ export const Route = createFileRoute("/$lang/solutions/engineering-consultancy")
     const serviceLd = {
       "@context": "https://schema.org",
       "@type": "Service",
+            "@id": `${canonical}#service`,
+            isPartOf: { "@id": WEBSITE_ID },
       name: "Sandwich Panel Engineering Consultancy",
       serviceType: "Industrial engineering consultancy",
-      provider: { "@type": "Organization", name: SITE.name, url: SITE.url },
+      provider: ORG_REF,
       areaServed: ["AE", "SA", "OM", "QA", "KW", "TR", "IQ", "KE", "CM", "RU", "EU"],
       url: canonical,
       description: DESCRIPTION,

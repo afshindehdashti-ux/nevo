@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
+import { ORG_REF, WEBSITE_ID } from "@/lib/seo";
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -210,9 +211,11 @@ export const Route = createFileRoute("/$lang/solutions/factory-development")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Service",
+            "@id": `${canonical}#service`,
+            isPartOf: { "@id": WEBSITE_ID },
             name: "Turnkey Sandwich Panel Factory Development",
             serviceType: "Turnkey industrial factory development",
-            provider: { "@type": "Organization", name: SITE.name, url: SITE.url },
+            provider: ORG_REF,
             areaServed: ["AE", "SA", "OM", "QA", "KW", "TR", "IQ", "KE", "CM", "RU"],
             url: canonical,
             description: DESCRIPTION,

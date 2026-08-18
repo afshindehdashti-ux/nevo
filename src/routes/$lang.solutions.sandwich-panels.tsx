@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
+import { ORG_REF, WEBSITE_ID } from "@/lib/seo";
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -228,11 +229,15 @@ export const Route = createFileRoute("/$lang/solutions/sandwich-panels")({
     const productLd = {
       "@context": "https://schema.org",
       "@type": "Product",
+      "@id": `${canonical}#product`,
       name: "NEVO Sandwich Panels — PIR, PUR & Rock Wool",
       brand: { "@type": "Brand", name: SITE.name },
+      manufacturer: ORG_REF,
+      isPartOf: { "@id": WEBSITE_ID },
       category: "Insulated sandwich panels",
       description: DESCRIPTION,
       url: canonical,
+
       additionalProperty: [
         { "@type": "PropertyValue", name: "Cores", value: "PIR, PUR, Rock wool, EPS" },
         { "@type": "PropertyValue", name: "Standards", value: "EN 14509, EN 13501-1" },

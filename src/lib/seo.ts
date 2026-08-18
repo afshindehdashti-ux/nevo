@@ -156,14 +156,46 @@ export function buildSeo(input: SeoInput) {
 
 /* -------------------- JSON-LD builders -------------------- */
 
+/**
+ * Stable @id nodes so every page's graph references the SAME entities
+ * instead of re-declaring anonymous duplicates. Google merges nodes by @id.
+ */
+export const ORG_ID = `${SITE.url}/#organization`;
+export const LOCAL_BUSINESS_ID = `${SITE.url}/#dubai-hq`;
+export const WEBSITE_ID = `${SITE.url}/#website`;
+
+/** Absolute brand logo (schema.org requires an absolute, crawlable URL). */
+export const LOGO_URL = `${SITE.url}/icon-512.png`;
+
+/** Lightweight reference to the Organization node — use as provider/brand/publisher. */
+export const ORG_REF = { "@type": "Organization", "@id": ORG_ID, name: SITE.name, url: SITE.url };
+
+/** Postal address node for the Dubai head office. */
+export const postalAddressJsonLd = () => ({
+  "@type": "PostalAddress",
+  streetAddress: SITE.contact.address.streetAddress,
+  addressLocality: SITE.contact.address.addressLocality,
+  addressRegion: "Dubai",
+  addressCountry: SITE.contact.address.addressCountry,
+});
+
 export const orgJsonLd = () => ({
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": ORG_ID,
   name: SITE.name,
+  alternateName: "NEVO",
   legalName: SITE.legalName,
+  identifier: SITE.tradeLicense,
   url: SITE.url,
-  logo: SITE.logo,
+  logo: { "@type": "ImageObject", url: LOGO_URL, width: 512, height: 512 },
+  image: LOGO_URL,
+  description: SITE.defaultDescription,
+  email: SITE.contact.email,
+  telephone: SITE.contact.phone,
   sameAs: SITE.sameAs,
+  foundingLocation: { "@type": "Place", name: "Dubai, United Arab Emirates" },
+  areaServed: ["AE", "GCC", "MENA", "EU", "CIS", "LATAM", "APAC", "Africa"],
   contactPoint: [
     {
       "@type": "ContactPoint",
@@ -184,6 +216,12 @@ export const orgJsonLd = () => ({
         "Chinese",
       ],
     },
+    {
+      "@type": "ContactPoint",
+      contactType: "technical support",
+      email: SITE.contact.engineeringEmail,
+      availableLanguage: ["English", "Arabic", "Turkish"],
+    },
   ],
   knowsAbout: [
     "Sandwich panels",
@@ -200,24 +238,60 @@ export const orgJsonLd = () => ({
     "PPGI",
     "Galvanized steel coils",
   ],
-  address: {
-    "@type": "PostalAddress",
-    ...SITE.contact.address,
-  },
+  address: postalAddressJsonLd(),
+  subOrganization: [{ "@type": "LocalBusiness", "@id": LOCAL_BUSINESS_ID }],
 });
 
-export const websiteJsonLd = () => ({
+/**
+ * Dubai head office as a LocalBusiness node, linked back to the
+ * Organization via parentOrganization/@id.
+ */
+export const localBusinessJsonLd = (lang: string = "en") => ({
+  "@context": "https://schema.org",
+  "@type": ["LocalBusiness", "ProfessionalService"],
+  "@id": LOCAL_BUSINESS_ID,
+  name: `${SITE.name} — Dubai Head Office`,
+  legalName: SITE.legalName,
+  parentOrganization: { "@id": ORG_ID },
+  url: `${SITE.url}/${lang}/contact`,
+  image: LOGO_URL,
+  logo: LOGO_URL,
+  description:
+    "NEVO Industrial head office in Dubai — engineering consultancy, factory development, production lines and PIR/PUR raw materials for the sandwich panel industry.",
+  email: SITE.contact.email,
+  telephone: SITE.contact.phone,
+  address: postalAddressJsonLd(),
+  geo: { "@type": "GeoCoordinates", latitude: 25.1573, longitude: 55.3021 },
+  hasMap: "https://www.google.com/maps/search/?api=1&query=Meydan+Grandstand+Dubai",
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      opens: "09:00",
+      closes: "18:00",
+    },
+  ],
+  currenciesAccepted: "AED, USD, EUR",
+  areaServed: ["AE", "GCC", "MENA", "EU", "CIS", "LATAM", "APAC", "Africa"],
+  priceRange: "$$$",
+  sameAs: SITE.sameAs,
+});
+
+export const websiteJsonLd = (lang: string = "en") => ({
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": WEBSITE_ID,
   name: SITE.name,
   url: SITE.url,
+  publisher: { "@id": ORG_ID },
   inLanguage: LOCALES.map((l) => l.hreflang),
   potentialAction: {
     "@type": "SearchAction",
-    target: `${SITE.url}/knowledge?q={search_term_string}`,
+    target: `${SITE.url}/${lang}/knowledge-hub?q={search_term_string}`,
     "query-input": "required name=search_term_string",
   },
 });
+
 
 /** Build hreflang <link rel="alternate"> entries for a given canonical path (without a locale prefix, e.g. "/about"). */
 export const hreflangLinks = (path: string) => {
@@ -260,14 +334,50 @@ export const serviceJsonLd = (s: {
   description: string;
   path: string;
   areaServed?: string[];
+  serviceType?: string;
+  category?: string[];
 }) => ({
   "@context": "https://schema.org",
   "@type": "Service",
+  "@id": `${s.path}#service`,
   name: s.name,
   description: s.description,
-  provider: { "@type": "Organization", name: SITE.name },
+  ...(s.serviceType ? { serviceType: s.serviceType } : {}),
+  ...(s.category?.length ? { category: s.category } : {}),
+  provider: ORG_REF,
   areaServed: s.areaServed ?? ["Worldwide"],
   url: s.path,
+  isPartOf: { "@id": WEBSITE_ID },
+});
+
+/**
+ * Solutions hub catalog — lists NEVO's core service offerings as an
+ * OfferCatalog attached to the Organization so Google can map the
+ * offerings to the entity rather than to isolated pages.
+ */
+export const solutionsCatalogJsonLd = (input: {
+  lang: string;
+  items: { name: string; description: string; path: string }[];
+}) => ({
+  "@context": "https://schema.org",
+  "@type": "OfferCatalog",
+  "@id": `${SITE.url}/${input.lang}/solutions#catalog`,
+  name: "NEVO Industrial — Solutions",
+  url: `${SITE.url}/${input.lang}/solutions`,
+  provider: ORG_REF,
+  numberOfItems: input.items.length,
+  itemListElement: input.items.map((it, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    item: {
+      "@type": "Service",
+      "@id": `${SITE.url}/${input.lang}${it.path}#service`,
+      name: it.name,
+      description: it.description,
+      url: `${SITE.url}/${input.lang}${it.path}`,
+      provider: ORG_REF,
+    },
+  })),
 });
 
 export const productJsonLd = (p: {
@@ -282,7 +392,9 @@ export const productJsonLd = (p: {
   description: p.description,
   image: p.image,
   brand: { "@type": "Brand", name: p.brand ?? SITE.name },
+  manufacturer: ORG_REF,
 });
+
 
 export const articleJsonLd = (a: {
   title: string;

@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
-import { SITE, buildSeo } from "@/lib/seo";
+import { SITE, buildSeo, ldScript, solutionsCatalogJsonLd, ORG_ID, WEBSITE_ID } from "@/lib/seo";
 import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE =
@@ -122,10 +122,62 @@ export const Route = createFileRoute("/$lang/solutions/")({
         "industrial engineering Dubai",
       ],
     });
+    const lang = String(params.lang);
     return {
       ...seo,
-      scripts: [{ type: "application/ld+json", children: JSON.stringify(crumbsLd) }],
+      scripts: [
+        ldScript(crumbsLd),
+        ldScript({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "@id": `${canonical}#webpage`,
+          url: canonical,
+          name: TITLE,
+          description: DESCRIPTION,
+          inLanguage: lang,
+          isPartOf: { "@id": WEBSITE_ID },
+          about: { "@id": ORG_ID },
+        }),
+        ldScript(
+          solutionsCatalogJsonLd({
+            lang,
+            items: [
+              {
+                name: "Sandwich Panel Factory Development",
+                description:
+                  "Turnkey sandwich panel factory development — feasibility, layout, equipment selection, installation and commissioning.",
+                path: "/solutions/factory-development",
+              },
+              {
+                name: "Sandwich Panel Production Lines",
+                description:
+                  "Continuous PIR/PUR laminators, discontinuous presses, rock wool lamella and EPS lines with roll forming and automation.",
+                path: "/solutions/production-lines",
+              },
+              {
+                name: "Engineering Consultancy",
+                description:
+                  "Independent engineering consultancy for panel formulations, process optimisation, certification and factory audits.",
+                path: "/solutions/engineering-consultancy",
+              },
+              {
+                name: "Raw Materials Supply",
+                description:
+                  "PIR/PUR chemical systems, PPGI and galvanized steel coils, facers and adhesives supplied to panel manufacturers worldwide.",
+                path: "/solutions/raw-materials",
+              },
+              {
+                name: "Finished Sandwich Panels",
+                description:
+                  "PIR, PUR, rock wool and EPS sandwich panels for cold storage, clean rooms and industrial building envelopes.",
+                path: "/solutions/sandwich-panels",
+              },
+            ],
+          }),
+        ),
+      ],
     };
+
   },
   component: SolutionsIndex,
 });

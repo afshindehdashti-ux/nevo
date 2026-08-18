@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE, buildSeo, downloadsItemListJsonLd, ldScript } from "@/lib/seo";
+import { ORG_REF, WEBSITE_ID } from "@/lib/seo";
 import { motion } from "motion/react";
 import { useRef, useState } from "react";
 import { submitLeadForm } from "@/lib/lead-submit";
@@ -205,9 +206,11 @@ export const Route = createFileRoute("/$lang/solutions/raw-materials")({
     const serviceLd = {
       "@context": "https://schema.org",
       "@type": "Service",
+            "@id": `${canonical}#service`,
+            isPartOf: { "@id": WEBSITE_ID },
       name: "Sandwich Panel Raw Material Supply",
       serviceType: "Industrial raw material sourcing & supply",
-      provider: { "@type": "Organization", name: SITE.name, url: SITE.url },
+      provider: ORG_REF,
       areaServed: ["AE", "SA", "OM", "TR", "IQ", "KE", "CM", "RU", "EU"],
       url: canonical,
       description: DESCRIPTION,
