@@ -352,7 +352,7 @@ export function InvoicesList({
                 <Link
                   to="/admin/invoices/$id"
                   params={{ id: i.id }}
-                  className="block truncate font-medium text-accent hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="block break-all font-medium leading-tight text-accent hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   {i.invoice_number}
                 </Link>
@@ -364,7 +364,7 @@ export function InvoicesList({
                 {invoiceStatusLabel(i.status)}
               </Badge>
             </div>
-            <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 pl-7 text-xs">
+            <dl className="mt-2 grid grid-cols-1 gap-x-3 gap-y-1 pl-7 text-xs min-[360px]:grid-cols-2">
               <div className="flex min-w-0 justify-between gap-2">
                 <dt className="text-muted-foreground">Date</dt>
                 <dd className="whitespace-nowrap">{formatDate(i.issue_date)}</dd>
