@@ -959,6 +959,9 @@ export function InvoicesList({
           </TableBody>
         </Table>
       </div>
+      <div aria-live="polite" role="status" className="sr-only">
+        {rowAnnounce}
+      </div>
           <div className="flex flex-col gap-3 border-t p-3 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-2">
               <Label htmlFor="invoice-page-size" className="shrink-0 text-xs text-muted-foreground">
