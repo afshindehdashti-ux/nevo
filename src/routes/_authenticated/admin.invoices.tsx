@@ -24,7 +24,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ChevronLeft, ChevronRight, FileDown, FileText, Loader2, SearchX } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ChevronsUpDown,
+  FileDown,
+  FileText,
+  Loader2,
+  SearchX,
+} from "lucide-react";
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
@@ -55,6 +65,15 @@ export const Route = createFileRoute("/_authenticated/admin/invoices")({
 });
 
 
+type SortKey =
+  | "invoice_number"
+  | "customer"
+  | "issue_date"
+  | "due_date"
+  | "status"
+  | "total"
+  | "balance";
+
 export function InvoicesList({
   type,
   title,
@@ -69,6 +88,8 @@ export function InvoicesList({
   const [rowBusy, setRowBusy] = useState<string | null>(null);
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);
+  const [sortKey, setSortKey] = useState<SortKey>("issue_date");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
   const { data: invoices = [], isLoading } = useQuery({
     queryKey: ["invoices", type],
@@ -96,6 +117,37 @@ export function InvoicesList({
     });
   }, [invoices, search, statusFilter]);
 
+  const sorted = useMemo(() => {
+    const dir = sortDir === "asc" ? 1 : -1;
+    const value = (i: (typeof filtered)[number]) => {
+      switch (sortKey) {
+        case "invoice_number":
+          return (i.invoice_number || "").toLowerCase();
+        case "customer":
+          return customerDisplayName(i.customers as CustomerDisplay | null).toLowerCase();
+        case "issue_date":
+          return i.issue_date ? new Date(i.issue_date).getTime() : 0;
+        case "due_date":
+          return i.due_date ? new Date(i.due_date).getTime() : 0;
+        case "status":
+          return invoiceStatusLabel(i.status).toLowerCase();
+        case "total":
+          return financeTotalAmount(i);
+        case "balance":
+          return financeBalanceDue(i);
+        default:
+          return 0;
+      }
+    };
+    return [...filtered].sort((a, b) => {
+      const va = value(a);
+      const vb = value(b);
+      if (typeof va === "number" && typeof vb === "number") return (va - vb) * dir;
+      return String(va).localeCompare(String(vb)) * dir;
+    });
+  }, [filtered, sortKey, sortDir]);
+
+
   const filteredIds = useMemo(() => filtered.map((i) => i.id), [filtered]);
   const allSelected = filteredIds.length > 0 && filteredIds.every((id) => selected.has(id));
   const someSelected = filteredIds.some((id) => selected.has(id));
@@ -104,15 +156,50 @@ export function InvoicesList({
   const currentPage = Math.min(page, pageCount);
   const pageStart = (currentPage - 1) * pageSize;
   const paged = useMemo(
-    () => filtered.slice(pageStart, pageStart + pageSize),
-    [filtered, pageStart, pageSize],
+    () => sorted.slice(pageStart, pageStart + pageSize),
+    [sorted, pageStart, pageSize],
   );
 
   // Filters change the result set — jump back to the first page so the user
   // never lands on an out-of-range (visually empty) page.
   useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, pageSize]);
+  }, [search, statusFilter, pageSize, sortKey, sortDir]);
+
+  const toggleSort = (key: SortKey) => {
+    if (key === sortKey) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir(key === "issue_date" || key === "due_date" ? "desc" : "asc");
+    }
+  };
+
+  const sortProps = (key: SortKey) =>
+    ({
+      "aria-sort": (sortKey === key
+        ? sortDir === "asc"
+          ? "ascending"
+          : "descending"
+        : "none") as "ascending" | "descending" | "none",
+    });
+
+  const SortButton = ({ column, label, align }: { column: SortKey; label: string; align?: "right" }) => {
+    const active = sortKey === column;
+    const Icon = !active ? ChevronsUpDown : sortDir === "asc" ? ChevronUp : ChevronDown;
+    return (
+      <button
+        type="button"
+        onClick={() => toggleSort(column)}
+        className={`-mx-1 inline-flex w-full items-center gap-1 rounded-sm px-1 py-0.5 font-medium transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
+          align === "right" ? "justify-end" : "justify-start"
+        } ${active ? "text-foreground" : ""}`}
+      >
+        <span className="whitespace-nowrap">{label}</span>
+        <Icon className={`h-3.5 w-3.5 shrink-0 ${active ? "opacity-100" : "opacity-50"}`} aria-hidden="true" />
+      </button>
+    );
+  };
 
   const toggleAll = (checked: boolean) => {
     setSelected((prev) => {
@@ -411,7 +498,7 @@ export function InvoicesList({
       </div>
 
       {/* Desktop / tablet: full table */}
-      <div className="hidden w-full overflow-x-auto md:block">
+      <div className="hidden w-full md:block">
         <Table className="min-w-[880px]">
           <TableHeader>
             <TableRow>
@@ -422,13 +509,27 @@ export function InvoicesList({
                   aria-label="Select all"
                 />
               </TableHead>
-              <TableHead className="whitespace-nowrap">Invoice #</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead className="whitespace-nowrap">Date</TableHead>
-              <TableHead className="whitespace-nowrap">Due</TableHead>
-              <TableHead className="whitespace-nowrap">Status</TableHead>
-              <TableHead className="whitespace-nowrap text-right">Total</TableHead>
-              <TableHead className="whitespace-nowrap text-right">Balance</TableHead>
+              <TableHead className="whitespace-nowrap" {...sortProps("invoice_number")}>
+                <SortButton column="invoice_number" label="Invoice #" />
+              </TableHead>
+              <TableHead {...sortProps("customer")}>
+                <SortButton column="customer" label="Customer" />
+              </TableHead>
+              <TableHead className="whitespace-nowrap" {...sortProps("issue_date")}>
+                <SortButton column="issue_date" label="Date" />
+              </TableHead>
+              <TableHead className="whitespace-nowrap" {...sortProps("due_date")}>
+                <SortButton column="due_date" label="Due" />
+              </TableHead>
+              <TableHead className="whitespace-nowrap" {...sortProps("status")}>
+                <SortButton column="status" label="Status" />
+              </TableHead>
+              <TableHead className="whitespace-nowrap text-right" {...sortProps("total")}>
+                <SortButton column="total" label="Total" align="right" />
+              </TableHead>
+              <TableHead className="whitespace-nowrap text-right" {...sortProps("balance")}>
+                <SortButton column="balance" label="Balance" align="right" />
+              </TableHead>
               <TableHead className="w-10 text-right">
                 <span className="sr-only">Actions</span>
               </TableHead>
