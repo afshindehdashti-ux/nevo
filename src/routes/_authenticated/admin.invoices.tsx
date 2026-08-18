@@ -210,13 +210,91 @@ export function InvoicesList({
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
 
-  // Search, status filter, sorting and pagination survive a page refresh.
-  const { prefs, setPrefs, resetPrefs, hydrated } = usePersistedListPrefs(
-    `nevo.admin.invoices.${type}.prefs`,
-    INVOICE_LIST_DEFAULTS,
-    sanitizeInvoiceListPrefs,
+  // Search, status filter, sorting and pagination live in the URL so the view
+  // survives a refresh and can be shared. localStorage keeps the last used
+  // prefs as the starting point when the URL carries no params.
+  const storageKey = `nevo.admin.invoices.${type}.prefs`;
+  const navigate = useNavigate();
+  const urlSearch = Route.useSearch();
+  const [hydrated, setHydrated] = useState(false);
+
+  const prefs = useMemo(
+    () => ({
+      ...INVOICE_LIST_DEFAULTS,
+      ...sanitizeInvoiceListPrefs({
+        search: urlSearch.q,
+        statusFilter: urlSearch.status as InvoiceStatus | "all",
+        pageSize: urlSearch.size,
+        page: urlSearch.page,
+        sortKey: urlSearch.sort as SortKey,
+        sortDir: urlSearch.dir as SortDir,
+      }),
+    }),
+    [urlSearch],
   );
   const { search, statusFilter, pageSize, page, sortKey, sortDir } = prefs;
+
+  const setPrefs = useCallback(
+    (patch: Partial<typeof INVOICE_LIST_DEFAULTS> | ((c: typeof INVOICE_LIST_DEFAULTS) => Partial<typeof INVOICE_LIST_DEFAULTS>)) => {
+      const next = { ...prefs, ...(typeof patch === "function" ? patch(prefs) : patch) };
+      void navigate({
+        to: "/admin/invoices",
+        search: toInvoiceSearch(next),
+        replace: true,
+      });
+    },
+    [navigate, prefs],
+  );
+
+  const resetPrefs = useCallback(() => {
+    try {
+      window.localStorage.removeItem(storageKey);
+    } catch {
+      // storage unavailable
+    }
+    void navigate({
+      to: "/admin/invoices",
+      search: toInvoiceSearch(INVOICE_LIST_DEFAULTS),
+      replace: true,
+    });
+  }, [navigate, storageKey]);
+
+  // Restore stored prefs once, only when the URL carries no explicit state.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlHasState = ["q", "status", "page", "size", "sort", "dir"].some((k) => params.has(k));
+    if (!urlHasState) {
+      let restored: Partial<typeof INVOICE_LIST_DEFAULTS> | null = null;
+      try {
+        const raw = window.localStorage.getItem(storageKey);
+        const parsed: unknown = raw ? JSON.parse(raw) : null;
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          restored = sanitizeInvoiceListPrefs(parsed as Partial<typeof INVOICE_LIST_DEFAULTS>);
+        }
+      } catch {
+        restored = null;
+      }
+      if (restored && Object.keys(restored).length > 0) {
+        void navigate({
+          to: "/admin/invoices",
+          search: toInvoiceSearch({ ...INVOICE_LIST_DEFAULTS, ...restored }),
+          replace: true,
+        });
+      }
+    }
+    setHydrated(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey]);
+
+  // Mirror the URL state into storage so the next visit starts where we left off.
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify(prefs));
+    } catch {
+      // storage unavailable
+    }
+  }, [hydrated, prefs, storageKey]);
 
   const setSearch = (v: string) => setPrefs({ search: v });
   const setStatusFilter = (v: InvoiceStatus | "all") => setPrefs({ statusFilter: v });
