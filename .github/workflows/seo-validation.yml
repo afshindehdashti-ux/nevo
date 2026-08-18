@@ -1,0 +1,44 @@
+name: SEO Validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  seo-validation:
+    name: hreflang / canonical / robots / sitemap / single-H1 (10 locales)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Boots Vite dev on 127.0.0.1:4322, crawls every /{locale}{route} across
+      # all 10 locales, and fails the job (exit 1) when any page has a missing,
+      # duplicated or non-self-referencing canonical, an incomplete hreflang set
+      # (all locales + x-default), a noindex robots meta, zero or multiple <h1>,
+      # or when /robots.txt or /sitemap.xml is unreachable, blanket-disallowing,
+      # or missing an audited URL.
+      - name: Validate SEO rules across all locales
+        run: bun run check:seo:validate
+
+      - name: Upload SEO validation report
+        if: always()
+        run: bun run check:seo:validate:json > seo-validation-report.json || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: seo-validation-report
+          path: seo-validation-report.json
+          if-no-files-found: ignore
