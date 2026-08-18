@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
-import { SITE, buildSeo } from "@/lib/seo";
+import { SITE, buildSeo, ldScript, solutionsCatalogJsonLd, ORG_ID, WEBSITE_ID } from "@/lib/seo";
 import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE =
