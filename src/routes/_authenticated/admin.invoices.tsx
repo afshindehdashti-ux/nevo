@@ -103,26 +103,11 @@ export const Route = createFileRoute("/_authenticated/admin/invoices")({
 });
 
 
-type SortKey =
-  | "invoice_number"
-  | "customer"
-  | "issue_date"
-  | "due_date"
-  | "status"
-  | "total"
-  | "balance";
+type SortKey = InvoiceSortKey;
 
-type SortDir = "asc" | "desc";
+type SortDir = InvoiceSortDir;
 
-const SORT_KEYS: SortKey[] = [
-  "invoice_number",
-  "customer",
-  "issue_date",
-  "due_date",
-  "status",
-  "total",
-  "balance",
-];
+const SORT_KEYS = INVOICE_SORT_KEYS;
 const SORT_LABELS: Record<SortKey, string> = {
   invoice_number: "Invoice #",
   customer: "Customer",
@@ -132,49 +117,8 @@ const SORT_LABELS: Record<SortKey, string> = {
   total: "Total",
   balance: "Balance",
 };
-const PAGE_SIZES = [10, 25, 50, 100];
+const PAGE_SIZES = INVOICE_PAGE_SIZES;
 
-
-const INVOICE_LIST_DEFAULTS = {
-  search: "",
-  statusFilter: "all" as InvoiceStatus | "all",
-  pageSize: 25,
-  page: 1,
-  sortKey: "issue_date" as SortKey,
-  sortDir: "desc" as SortDir,
-};
-
-/** Drops anything stored that no longer matches the current UI contract. */
-function sanitizeInvoiceListPrefs(
-  stored: Partial<typeof INVOICE_LIST_DEFAULTS>,
-): Partial<typeof INVOICE_LIST_DEFAULTS> {
-  const clean: Partial<typeof INVOICE_LIST_DEFAULTS> = {};
-  if (typeof stored.search === "string") clean.search = stored.search.slice(0, 200);
-  if (typeof stored.statusFilter === "string") clean.statusFilter = stored.statusFilter as InvoiceStatus | "all";
-  if (typeof stored.pageSize === "number" && PAGE_SIZES.includes(stored.pageSize)) {
-    clean.pageSize = stored.pageSize;
-  }
-  if (typeof stored.page === "number" && Number.isFinite(stored.page) && stored.page >= 1) {
-    clean.page = Math.floor(stored.page);
-  }
-  if (typeof stored.sortKey === "string" && SORT_KEYS.includes(stored.sortKey as SortKey)) {
-    clean.sortKey = stored.sortKey as SortKey;
-  }
-  if (stored.sortDir === "asc" || stored.sortDir === "desc") clean.sortDir = stored.sortDir;
-  return clean;
-}
-
-/** Maps the internal prefs object onto the URL search-param shape. */
-function toInvoiceSearch(p: typeof INVOICE_LIST_DEFAULTS) {
-  return {
-    q: p.search,
-    status: p.statusFilter,
-    page: p.page,
-    size: p.pageSize,
-    sort: p.sortKey,
-    dir: p.sortDir,
-  };
-}
 
 type BulkActionKey = "export" | "issue" | "paid" | "void";
 
