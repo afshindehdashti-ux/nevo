@@ -118,11 +118,10 @@ export function buildSeo(input: SeoInput) {
     { name: "twitter:description", content: effectiveDescription },
   ];
 
-  // og:locale:alternate for every other supported language, so crawlers can
-  // discover the localized variants of the same page.
-  for (const l of LOCALES.filter((l) => l.status === "active" && l.code !== input.lang)) {
-    meta.push({ property: "og:locale:alternate", content: ogLocaleFor(l.code) });
-  }
+  // NOTE: no og:locale:alternate — the router dedupes meta by property, so
+  // repeated entries collapse to a single (misleading) tag. Localized variants
+  // are advertised through the hreflang <link rel="alternate"> set below.
+
 
   // Resolve OG image: explicit input.image wins, otherwise per-route mapping,
   // otherwise site-wide brand default. Guarantees every leaf route emits a
