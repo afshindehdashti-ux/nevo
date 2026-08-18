@@ -200,7 +200,7 @@ export function InvoicesList({
             {exporting ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <FileDown className="h-3.5 w-3.5 mr-1" />}
             Export PDF{selected.size > 1 ? "s" : ""}
           </Button>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground whitespace-nowrap">
             Create from an <Link to="/admin/orders" className="text-accent hover:underline">order</Link>.
           </p>
         </div>
