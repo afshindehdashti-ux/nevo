@@ -282,7 +282,14 @@ async def capture(context, theme: str, vp: dict) -> tuple[Path, list[str]]:
     await page.goto(f"{BASE_URL}{ROUTE}", wait_until="domcontentloaded")
     await page.wait_for_selector("main h1", timeout=15_000)
     # Wait for the fixture rows to paint (first invoice number is unique).
-    await page.wait_for_selector(f'text={INVOICE_FIXTURE[0]["invoice_number"]}', timeout=15_000)
+    # Both the mobile card list and the desktop table render the same invoice
+    # number, with the other branch hidden — wait for a *visible* occurrence.
+    await page.wait_for_function(
+        """(needle) => [...document.querySelectorAll('main a')].some(
+             (a) => a.textContent.trim() === needle && a.getClientRects().length > 0)""",
+        arg=INVOICE_FIXTURE[0]["invoice_number"],
+        timeout=15_000,
+    )
     await page.add_style_tag(content=DISABLE_MOTION_CSS)
     await page.evaluate(
         "(cls) => document.documentElement.classList.toggle('dark', cls)", theme == "dark"
