@@ -351,6 +351,20 @@ export function InvoicesList({
       (k) => prefs[k] !== INVOICE_LIST_DEFAULTS[k],
     );
 
+  // "Copy link" shares the current view: every filter, sort and page lives in
+  // the URL, so the recipient lands on exactly the same list.
+  const [linkCopied, setLinkCopied] = useState(false);
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setLinkCopied(true);
+      window.setTimeout(() => setLinkCopied(false), 2000);
+      toast.success("Link copied — it opens with these filters applied.");
+    } catch {
+      toast.error("Couldn't copy the link. Copy it from the address bar instead.");
+    }
+  };
+
   const handleResetFilters = useCallback(() => {
     setSearchInput(INVOICE_LIST_DEFAULTS.search);
     resetPrefs();
