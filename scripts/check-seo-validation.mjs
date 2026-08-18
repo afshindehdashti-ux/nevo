@@ -290,32 +290,81 @@ async function auditRobotsTxt(baseUrl) {
   return { errors, warnings, sitemapUrls, text };
 }
 
+async function fetchXml(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return { xml: await res.text(), ctype: res.headers.get("content-type") ?? "" };
+}
+
 async function auditSitemap(baseUrl) {
   const errors = [];
   const warnings = [];
   const locs = new Set();
-  let res;
+  const children = [];
+
+  let root;
   try {
-    res = await fetch(`${baseUrl}/sitemap.xml`);
+    root = await fetchXml(`${baseUrl}/sitemap.xml`);
   } catch (e) {
-    return { errors: [`sitemap.xml: fetch failed (${e?.message ?? e})`], warnings, locs };
+    return { errors: [`sitemap.xml: ${e?.message ?? e}`], warnings, locs, children };
   }
-  if (!res.ok) return { errors: [`sitemap.xml: HTTP ${res.status}`], warnings, locs };
+  if (!/xml/i.test(root.ctype)) {
+    warnings.push(`sitemap.xml: unexpected Content-Type "${root.ctype}"`);
+  }
 
-  const xml = await res.text();
-  const ctype = res.headers.get("content-type") ?? "";
-  if (!/xml/i.test(ctype)) warnings.push(`sitemap.xml: unexpected Content-Type "${ctype}"`);
-  if (!/<urlset\b/i.test(xml) && !/<sitemapindex\b/i.test(xml)) {
+  const isIndex = /<sitemapindex\b/i.test(root.xml);
+  if (!isIndex && !/<urlset\b/i.test(root.xml)) {
     errors.push("sitemap.xml: missing <urlset>/<sitemapindex> root");
-    return { errors, warnings, locs, xml };
+    return { errors, warnings, locs, children };
   }
 
-  for (const m of xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)) {
-    locs.add(normalizeUrl(m[1]));
-  }
-  if (locs.size === 0) errors.push("sitemap.xml: contains no <loc> entries");
+  const collectLocs = (xml, into) => {
+    for (const m of xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)) into.add(normalizeUrl(m[1]));
+  };
 
-  return { errors, warnings, locs, xml };
+  if (isIndex) {
+    const childUrls = new Set();
+    collectLocs(root.xml, childUrls);
+    if (childUrls.size === 0) errors.push("sitemap.xml: index lists no child sitemaps");
+    for (const child of childUrls) {
+      const path = (() => {
+        try {
+          return new URL(child).pathname;
+        } catch {
+          return child;
+        }
+      })();
+      children.push(path);
+      try {
+        const { xml, ctype } = await fetchXml(`${baseUrl}${path}`);
+        if (!/xml/i.test(ctype)) warnings.push(`${path}: unexpected Content-Type "${ctype}"`);
+        if (!/<urlset\b/i.test(xml)) {
+          errors.push(`${path}: child sitemap missing <urlset> root`);
+          continue;
+        }
+        const before = locs.size;
+        collectLocs(xml, locs);
+        if (locs.size === before) warnings.push(`${path}: child sitemap has no new <loc> entries`);
+        // hreflang alternates inside the child must cover every locale + x-default.
+        const langs = new Set(
+          [...xml.matchAll(/hreflang\s*=\s*["']([^"']+)["']/gi)].map((m) => m[1].toLowerCase()),
+        );
+        const missingAlts = LOCALES.map((l) => HREFLANG[l]).filter((h) => !langs.has(h));
+        if (missingAlts.length) {
+          errors.push(`${path}: hreflang alternates missing ${missingAlts.join(", ")}`);
+        }
+        if (!langs.has("x-default")) errors.push(`${path}: hreflang alternates missing x-default`);
+      } catch (e) {
+        errors.push(`${path}: ${e?.message ?? e}`);
+      }
+    }
+  } else {
+    collectLocs(root.xml, locs);
+  }
+
+  if (locs.size === 0) errors.push("sitemap: contains no <loc> entries");
+
+  return { errors, warnings, locs, children };
 }
 
 // ------------- Dev server lifecycle -------------
@@ -471,6 +520,7 @@ async function run() {
             siteErrors,
             siteWarnings,
             sitemapEntries: sitemap.locs.size,
+            sitemapChildren: sitemap.children,
             results,
           },
           null,
@@ -483,7 +533,9 @@ async function run() {
       );
       console.log(
         `  robots.txt: ${robots.errors.length ? "FAIL" : "ok"}   sitemap.xml: ${
-          sitemap.errors.length ? "FAIL" : `ok (${sitemap.locs.size} URLs)`
+          sitemap.errors.length
+            ? "FAIL"
+            : `ok (${sitemap.children.length} child sitemaps, ${sitemap.locs.size} URLs)`
         }\n`,
       );
       for (const e of siteErrors) console.log(`  ✗ ${e}`);
