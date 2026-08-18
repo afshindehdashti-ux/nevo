@@ -42,6 +42,18 @@ import {
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
+import { writeAudit } from "@/lib/audit-log";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 import {
   Select,
   SelectContent,
