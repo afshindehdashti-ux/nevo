@@ -62,14 +62,14 @@
   },
   "industries": {
     "meta": {
-      "title": "Industries We Engineer For — Cold Storage, Clean Rooms, Food, Logistics | NEVO Industrial",
-      "description": "Engineering-led sandwich panel and factory solutions for 12+ industries: cold storage, clean rooms, food & pharma, industrial, warehouses, commercial, agriculture, modular, data centers, retail, sports and transport. NEVO Industrial, Dubai."
+      "title": "Industries que nous concevons — Chambres froides, salles blanches, agroalimentaire, logistique | NEVO Industrial",
+      "description": "Solutions d'ingénierie en panneaux sandwich et usines pour plus de 12 secteurs : chambres froides, salles blanches, agroalimentaire & pharma, industrie, entrepôts, commerce, agriculture, modulaire, data centers, retail, sport et transport. NEVO Industrial, Dubaï."
     },
     "hero": {
       "eyebrow": "Secteurs",
       "titleA": "Secteurs pour lesquels",
       "titleB": "nous concevons.",
-      "lede": "Complete engineering, premium materials, production technologies and sandwich panel solutions — tailored for every industry we serve.",
+      "lede": "Ingénierie complète, matériaux premium, technologies de production et solutions en panneaux sandwich — adaptées à chaque secteur que nous servons.",
       "ctaExplore": "Explorer les secteurs",
       "ctaTalk": "Parler à un spécialiste sectoriel",
       "stats": [
@@ -93,8 +93,8 @@
     },
     "overview": {
       "eyebrow": "Vue d'ensemble sectorielle",
-      "title": "Every industry demands its own engineering brief.",
-      "lede": "A cold store is not a bakery. A pharma suite is not a hangar. NEVO engineers the envelope, the panel and the factory around the industry it serves — not the other way around.",
+      "title": "Chaque secteur impose son propre cahier des charges d'ingénierie.",
+      "lede": "Une chambre froide n'est pas une boulangerie. Une unité pharmaceutique n'est pas un hangar. NEVO conçoit l'enveloppe, le panneau et l'usine autour du secteur qu'ils servent — jamais l'inverse.",
       "items": [
         {
           "t": "Different insulation",
@@ -250,8 +250,8 @@
     },
     "applications": {
       "eyebrow": "Exemples d'application",
-      "title": "Where our engineering shows up in production.",
-      "lede": "Every application below has its own building physics — different vapour, temperature, hygiene and fire brief. Engineering is what makes each work.",
+      "title": "Là où notre ingénierie s'exprime dans la production.",
+      "lede": "Chaque application ci-dessous répond à sa propre physique du bâtiment — vapeur, température, hygiène et exigences feu différentes. C'est l'ingénierie qui fait la différence.",
       "items": [
         {
           "t": "Refrigerated Warehouses",
@@ -281,8 +281,8 @@
     },
     "panels": {
       "eyebrow": "Solutions de panneaux",
-      "title": "The right panel for the right industry.",
-      "lede": "Five engineered panel families cover every industry NEVO serves — matched to fire, thermal, hygiene and structural briefs.",
+      "title": "Le bon panneau pour le bon secteur.",
+      "lede": "Cinq familles de panneaux techniques couvrent tous les secteurs desservis par NEVO — adaptées aux exigences feu, thermiques, hygiéniques et structurelles.",
       "all": "Tous les systèmes de panneaux",
       "items": [
         {
@@ -344,8 +344,8 @@
     },
     "whyChoose": {
       "eyebrow": "Pourquoi NEVO",
-      "title": "Engineering-led. Industry-specific. Global.",
-      "lede": "NEVO combines industry engineering, premium materials and disciplined project delivery — one accountable partner from feasibility to long-term support.",
+      "title": "Ingénierie de pointe. Spécifique au secteur. Mondiale.",
+      "lede": "NEVO combine ingénierie sectorielle, matériaux premium et rigueur de gestion de projet — un seul partenaire responsable, de la faisabilité au support à long terme.",
       "items": [
         "Industry-specific engineering expertise",
         "Optimised technical solutions",
@@ -359,8 +359,8 @@
     },
     "caseStudies": {
       "eyebrow": "Études de cas",
-      "title": "Engineered projects across industries.",
-      "note": "Project photography and full case studies coming to the Knowledge Hub soon.",
+      "title": "Des projets conçus pour chaque secteur.",
+      "note": "Photos de projets et études de cas complètes bientôt disponibles dans le Knowledge Hub.",
       "items": [
         {
           "t": "Cold Storage — 25,000 m²",
@@ -396,7 +396,7 @@
     },
     "downloads": {
       "eyebrow": "Téléchargements",
-      "title": "Industry-specific technical guides.",
+      "title": "Guides techniques spécifiques à chaque secteur.",
       "request": "Demander le téléchargement",
       "items": [
         {
@@ -440,7 +440,7 @@
     "consultation": {
       "eyebrow": "Consultation sectorielle",
       "title": "Parler à un spécialiste.",
-      "lede": "Share your project brief and a NEVO industry engineer will reply within one business day with an engineered technical proposal.",
+      "lede": "Partagez le cahier des charges de votre projet et un ingénieur sectoriel NEVO vous répondra sous un jour ouvré avec une proposition technique détaillée.",
       "bullets": [
         "Industry-specific engineering advice",
         "Sustainable material recommendations",
@@ -448,26 +448,26 @@
       ],
       "company": "Société",
       "industry": "Secteur",
-      "industryPh": "Cold storage / Pharma / …",
+      "industryPh": "Chambre froide / Pharma / …",
       "country": "Pays",
       "projectType": "Type de projet",
-      "projectTypePh": "New build / Extension",
+      "projectTypePh": "Nouvelle construction / Extension",
       "size": "Surface (m²)",
-      "sizePh": "e.g. 8,000",
+      "sizePh": "ex. 8 000",
       "panel": "Type de panneau",
-      "panelPh": "PIR / Rock Wool / Clean Room",
+      "panelPh": "PIR / Laine de roche / Salle blanche",
       "fire": "Exigence de résistance au feu",
       "firePh": "EI 30 / 60 / 120",
       "timeline": "Calendrier",
-      "timelinePh": "Q3 2026",
+      "timelinePh": "T3 2026",
       "message": "Message",
       "submit": "Envoyer la demande",
-      "successMsg": "Thank you. A NEVO industry specialist will reply within one business day."
+      "successMsg": "Merci. Un spécialiste sectoriel NEVO vous répondra sous un jour ouvré."
     },
     "cta": {
       "eyebrow": "Prêt à concevoir",
       "title": "Chaque secteur mérite une solution d'ingénierie.",
-      "lede": "Whether you're building a cold storage warehouse, food factory, pharmaceutical facility or industrial plant, NEVO delivers engineering-driven solutions built for long-term performance.",
+      "lede": "Que vous construisiez un entrepôt frigorifique, une usine agroalimentaire, un site pharmaceutique ou une installation industrielle, NEVO propose des solutions d'ingénierie conçues pour une performance durable.",
       "primary": "Réserver une consultation",
       "secondary": "Demander une proposition technique"
     }
@@ -760,8 +760,8 @@
       "worldwideLabel": "Support d'ingénierie",
       "multiple": "Multiples",
       "multipleLabel": "Partenaires d'approvisionnement internationaux",
-      "yearsValue": "Experience",
-      "projectsValue": "Delivery"
+      "yearsValue": "Expérience",
+      "projectsValue": "Livraison"
     },
     "testimonials": {
       "eyebrow": "Voix du secteur",
@@ -930,18 +930,18 @@
   },
   "about": {
     "meta": {
-      "title": "About NEVO Industrial — Engineering the Future of Sandwich Panel Manufacturing | Dubai",
-      "description": "NEVO Industrial is a Dubai-based engineering and industrial solutions company. We integrate engineering, factory development, production technologies, raw materials and sandwich panel supply into one complete industrial partner."
+      "title": "À propos de NEVO Industrial — Concevoir l'avenir de la fabrication de panneaux sandwich | Dubaï",
+      "description": "NEVO Industrial est une société d'ingénierie et de solutions industrielles basée à Dubaï. Nous intégrons ingénierie, développement d'usines, technologies de production, matières premières et fourniture de panneaux sandwich en un seul partenaire industriel complet."
     },
     "hero": {
       "eyebrow": "À propos de NEVO Industrial",
       "titleA": "Ingénierie du futur.",
       "titleB": "Construire l'excellence industrielle.",
-      "lede": "NEVO Industrial is a Dubai-based engineering and industrial solutions company specialising in sandwich panel factories, production technologies, raw materials and complete industrial project development.",
+      "lede": "NEVO Industrial est une société d'ingénierie et de solutions industrielles basée à Dubaï, spécialisée dans les usines de panneaux sandwich, les technologies de production, les matières premières et le développement complet de projets industriels.",
       "ctaProject": "Démarrer votre projet",
       "ctaTeam": "Rencontrer notre équipe d'ingénieurs",
       "stats": {
-        "hqK": "Dubai",
+        "hqK": "Dubaï",
         "hqV": "Siège mondial",
         "ctK": "8+",
         "ctV": "Pays desservis",
@@ -954,10 +954,10 @@
     "story": {
       "eyebrow": "Notre histoire",
       "title": "Une société d'ingénierie créée pour combler l'écart entre la conception et l'industrie.",
-      "p1": "NEVO Industrial was founded on a straightforward observation: the sandwich panel industry is served by machinery suppliers, chemistry traders and panel producers — but rarely by engineers who understand all three.",
-      "p2": "Investors were forced to stitch together a factory from disconnected vendors, each optimising their own scope. The result was long commissioning cycles, inconsistent quality and factories that never reached their nameplate capacity.",
-      "p3": "NEVO was created to bridge engineering, industrial supply and project execution under one brand. From feasibility to commissioning — and long after — a single engineering-led partner owns the outcome.",
-      "p4": "Headquartered in Dubai and operating across eight countries, we work with ambitious industrialists building the next generation of production capacity for cold chain, food, pharma, logistics and heavy industry."
+      "p1": "NEVO Industrial est né d'un constat simple : l'industrie du panneau sandwich est servie par des fournisseurs de machines, des négociants en chimie et des fabricants de panneaux — mais rarement par des ingénieurs qui maîtrisent les trois à la fois.",
+      "p2": "Les investisseurs devaient assembler une usine à partir de fournisseurs disparates, chacun optimisant son propre périmètre. Résultat : des cycles de mise en service longs, une qualité irrégulière et des usines qui n'atteignaient jamais leur capacité nominale.",
+      "p3": "NEVO a été créé pour réunir ingénierie, fourniture industrielle et exécution de projet sous une seule marque. De la faisabilité à la mise en service — et bien au-delà — un seul partenaire, guidé par l'ingénierie, reste responsable du résultat.",
+      "p4": "Basés à Dubaï et présents dans huit pays, nous accompagnons des industriels ambitieux qui bâtissent la prochaine génération de capacités de production pour la chaîne du froid, l'agroalimentaire, la pharma, la logistique et l'industrie lourde."
     },
     "mission": {
       "eyebrow": "Notre mission",
@@ -994,8 +994,8 @@
       "eyebrow": "Notre vision",
       "titleA": "Construire le partenaire d'ingénierie",
       "titleB": "le plus fiable au monde.",
-      "p1": "To become the reference engineering partner for the global sandwich panel industry — combining deep technical expertise, curated technology, and a network of premium suppliers into one integrated offer.",
-      "p2": "We measure our vision in factories commissioned, engineers trained, and long-term partnerships built — not in units shipped.",
+      "p1": "Devenir le partenaire d'ingénierie de référence pour l'industrie mondiale du panneau sandwich — en combinant une expertise technique pointue, une technologie sélectionnée et un réseau de fournisseurs premium au sein d'une offre intégrée.",
+      "p2": "Nous mesurons notre vision au nombre d'usines mises en service, d'ingénieurs formés et de partenariats durables construits — pas au nombre d'unités livrées.",
       "labels": [
         "Engineering",
         "Technology",
@@ -1008,7 +1008,7 @@
     "whatWeDo": {
       "eyebrow": "Ce que nous faisons",
       "title": "Huit disciplines. Un partenaire d'ingénierie intégré.",
-      "lede": "Every service listed below is owned end-to-end by NEVO — never subcontracted, never resold without engineering.",
+      "lede": "Chaque service listé ci-dessous est piloté de bout en bout par NEVO — jamais sous-traité, jamais revendu sans ingénierie.",
       "items": [
         {
           "t": "Développement d'usine",
@@ -1061,7 +1061,7 @@
     },
     "why": {
       "eyebrow": "Pourquoi NEVO",
-      "title": "Eight reasons industrialists choose us.",
+      "title": "Huit raisons pour lesquelles les industriels nous choisissent.",
       "items": [
         {
           "t": "Engineering Before Products",
@@ -1101,7 +1101,7 @@
       "eyebrow": "Présence mondiale",
       "titleA": "Siège à Dubaï.",
       "titleB": "Global par conception.",
-      "lede": "NEVO delivers engineering, materials and production technologies across the Middle East, Africa, CIS and beyond — with a curated partner network that follows every project.",
+      "lede": "NEVO déploie ingénierie, matériaux et technologies de production au Moyen-Orient, en Afrique, dans la CEI et au-delà — avec un réseau de partenaires sélectionnés qui accompagne chaque projet.",
       "serving": "Plus de 8 pays desservis",
       "countries": [
         {
@@ -1144,7 +1144,7 @@
     },
     "values": {
       "eyebrow": "Nos valeurs",
-      "title": "The principles we hire, engineer and partner by.",
+      "title": "Les principes qui guident notre recrutement, notre ingénierie et nos partenariats.",
       "items": [
         "Integrity",
         "Engineering Precision",
@@ -1158,7 +1158,7 @@
     },
     "difference": {
       "eyebrow": "Notre différence",
-      "title": "What NEVO is — and what NEVO is not.",
+      "title": "Ce que NEVO est — et ce que NEVO n'est pas.",
       "notLabel": "NEVO N'EST PAS",
       "notItems": [
         "Only a machinery supplier.",
@@ -1166,11 +1166,11 @@
         "Only a sandwich panel supplier."
       ],
       "isLabel": "NEVO EST",
-      "isText": "An engineering-led industrial partner that integrates engineering, technology, industrial supply and project execution into one complete solution — for the entire lifecycle of a sandwich panel factory."
+      "isText": "Un partenaire industriel guidé par l'ingénierie, qui intègre ingénierie, technologie, fourniture industrielle et exécution de projet en une solution complète — sur tout le cycle de vie d'une usine de panneaux sandwich."
     },
     "process": {
       "eyebrow": "Notre processus",
-      "title": "From first conversation to long-term optimization.",
+      "title": "De la première conversation à l'optimisation à long terme.",
       "stepLabel": "Étape",
       "items": [
         {
@@ -1209,8 +1209,8 @@
     },
     "commitment": {
       "eyebrow": "Notre engagement",
-      "title": "The promise behind every NEVO partnership.",
-      "lede": "A relationship with NEVO is designed for the full lifecycle of your factory — not the duration of a single purchase order.",
+      "title": "La promesse derrière chaque partenariat NEVO.",
+      "lede": "Une relation avec NEVO est pensée pour tout le cycle de vie de votre usine — pas pour la durée d'un simple bon de commande.",
       "items": [
         "Transparent communication.",
         "Engineering-first thinking.",
@@ -1224,21 +1224,21 @@
       "eyebrow": "Construisons",
       "titleA": "Construisons ensemble",
       "titleB": "quelque chose d'exceptionnel.",
-      "lede": "Bring your factory ambition, cold-chain project, or panel programme to a team that engineers the outcome — not just the equipment.",
+      "lede": "Confiez votre ambition d'usine, votre projet de chaîne du froid ou votre programme de panneaux à une équipe qui conçoit le résultat — pas seulement l'équipement.",
       "primary": "Parler à un ingénieur",
       "secondary": "Demander une consultation"
     }
   },
   "contact": {
     "meta": {
-      "title": "Global Offices & Contact — NEVO Industrial | Dubai · Germany · Turkey · Oman",
-      "description": "Reach NEVO Industrial engineering teams worldwide. Dubai HQ, Germany, Turkey and Oman offices. Engineering hotline, international sales, project department, WhatsApp and booked meetings."
+      "title": "Bureaux mondiaux & contact — NEVO Industrial | Dubaï · Allemagne · Turquie · Oman",
+      "description": "Contactez les équipes d'ingénierie de NEVO Industrial dans le monde entier. Siège à Dubaï, bureaux en Allemagne, Turquie et Oman. Ligne d'ingénierie, ventes internationales, service projet, WhatsApp et rendez-vous programmés."
     },
     "hero": {
       "eyebrow": "Présence mondiale",
       "titleA": "Ingénierie mondiale.",
       "titleB": "Présence locale.",
-      "lede": "From our Dubai headquarters to European engineering hubs and GCC project offices, NEVO delivers industrial engineering with senior expertise wherever your project lives.",
+      "lede": "De notre siège à Dubaï aux pôles d'ingénierie européens et aux bureaux projet du Golfe, NEVO déploie une ingénierie industrielle avec une expertise senior partout où votre projet se trouve.",
       "ctaOffices": "Explorer les bureaux",
       "ctaCallback": "Demander un rappel",
       "statOffices": "Bureaux",
@@ -1248,7 +1248,7 @@
     "offices": {
       "eyebrow": "Carte interactive",
       "title": "Où NEVO opère",
-      "lede": "Click any office to see contact details and local engineering capability.",
+      "lede": "Cliquez sur un bureau pour voir ses coordonnées et ses capacités d'ingénierie locales.",
       "list": [
         {
           "city": "Dubai",
@@ -1290,7 +1290,7 @@
     "cards": {
       "eyebrow": "Canaux directs",
       "title": "Parlez rapidement à la bonne équipe",
-      "lede": "Every enquiry is routed to a senior engineer or account director within one business day.",
+      "lede": "Chaque demande est transmise à un ingénieur senior ou un directeur de compte sous un jour ouvré.",
       "items": [
         {
           "t": "Hotline ingénierie",
@@ -1320,10 +1320,10 @@
       ]
     },
     "callback": {
-      "mapTitle": "NEVO Dubai HQ",
+      "mapTitle": "Siège NEVO Dubaï",
       "eyebrow": "Demande de rappel",
       "title": "Parler à un ingénieur senior",
-      "lede": "Share a few details and we'll call within one business day.",
+      "lede": "Partagez quelques informations et nous vous rappellerons sous un jour ouvré.",
       "name": "Nom complet",
       "company": "Société",
       "email": "E-mail",
@@ -1333,7 +1333,7 @@
       "interest2": "Panneaux sandwich",
       "interest3": "Lignes de production",
       "interest4": "Conseil en ingénierie",
-      "message": "Project brief (capacity, location, timeline)",
+      "message": "Cahier des charges du projet (capacité, localisation, calendrier)",
       "submit": "Demande de rappel",
       "sending": "Envoi…",
       "successTitle": "Rappel demandé",

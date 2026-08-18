@@ -62,14 +62,14 @@
   },
   "industries": {
     "meta": {
-      "title": "Industries We Engineer For — Cold Storage, Clean Rooms, Food, Logistics | NEVO Industrial",
-      "description": "Engineering-led sandwich panel and factory solutions for 12+ industries: cold storage, clean rooms, food & pharma, industrial, warehouses, commercial, agriculture, modular, data centers, retail, sports and transport. NEVO Industrial, Dubai."
+      "title": "我们服务的行业 — 冷库、洁净室、食品、物流 | NEVO Industrial",
+      "description": "面向12+行业的工程主导夹芯板与工厂解决方案:冷库、洁净室、食品与制药、工业、仓储、商业、农业、模块化建筑、数据中心、零售、体育及交通运输。NEVO Industrial,迪拜。"
     },
     "hero": {
       "eyebrow": "行业",
       "titleA": "我们服务的",
       "titleB": "行业。",
-      "lede": "Complete engineering, premium materials, production technologies and sandwich panel solutions — tailored for every industry we serve.",
+      "lede": "完整的工程设计、优质原材料、生产技术与夹芯板解决方案 —— 针对我们服务的每一个行业量身定制。",
       "ctaExplore": "探索行业",
       "ctaTalk": "与行业专家沟通",
       "stats": [
@@ -93,8 +93,8 @@
     },
     "overview": {
       "eyebrow": "行业概览",
-      "title": "Every industry demands its own engineering brief.",
-      "lede": "A cold store is not a bakery. A pharma suite is not a hangar. NEVO engineers the envelope, the panel and the factory around the industry it serves — not the other way around.",
+      "title": "每一个行业都有其独特的工程要求。",
+      "lede": "冷库不同于面包房,制药车间不同于机库。NEVO 围绕所服务的行业来设计围护结构、板材与工厂 —— 而不是反其道而行之。",
       "items": [
         {
           "t": "Different insulation",
@@ -250,8 +250,8 @@
     },
     "applications": {
       "eyebrow": "应用示例",
-      "title": "Where our engineering shows up in production.",
-      "lede": "Every application below has its own building physics — different vapour, temperature, hygiene and fire brief. Engineering is what makes each work.",
+      "title": "我们的工程能力体现在每一个生产场景中。",
+      "lede": "以下每一种应用都有其独特的建筑物理要求 —— 不同的防潮、温控、卫生与防火标准。工程能力正是让每一项应用得以实现的关键。",
       "items": [
         {
           "t": "Refrigerated Warehouses",
@@ -281,8 +281,8 @@
     },
     "panels": {
       "eyebrow": "板材解决方案",
-      "title": "The right panel for the right industry.",
-      "lede": "Five engineered panel families cover every industry NEVO serves — matched to fire, thermal, hygiene and structural briefs.",
+      "title": "为每个行业匹配合适的板材。",
+      "lede": "五大工程化板材系列覆盖 NEVO 服务的所有行业 —— 精准匹配防火、隔热、卫生与结构要求。",
       "all": "全部板材系统",
       "items": [
         {
@@ -344,8 +344,8 @@
     },
     "whyChoose": {
       "eyebrow": "为什么选择 NEVO",
-      "title": "Engineering-led. Industry-specific. Global.",
-      "lede": "NEVO combines industry engineering, premium materials and disciplined project delivery — one accountable partner from feasibility to long-term support.",
+      "title": "工程主导。行业专属。全球服务。",
+      "lede": "NEVO 将行业工程能力、优质原材料与严谨的项目执行相结合 —— 从可行性研究到长期支持,由一个值得信赖的合作伙伴全程负责。",
       "items": [
         "Industry-specific engineering expertise",
         "Optimised technical solutions",
@@ -359,8 +359,8 @@
     },
     "caseStudies": {
       "eyebrow": "案例",
-      "title": "Engineered projects across industries.",
-      "note": "Project photography and full case studies coming to the Knowledge Hub soon.",
+      "title": "跨行业的工程项目实践。",
+      "note": "项目实景图片与完整案例研究即将在知识中心上线。",
       "items": [
         {
           "t": "Cold Storage — 25,000 m²",
@@ -396,7 +396,7 @@
     },
     "downloads": {
       "eyebrow": "下载",
-      "title": "Industry-specific technical guides.",
+      "title": "行业专属技术指南。",
       "request": "申请下载",
       "items": [
         {
@@ -427,7 +427,7 @@
     },
     "faq": {
       "eyebrow": "常见问题",
-      "title": "Industry-specific engineering answers.",
+      "title": "行业专属工程问答。",
       "links": {
         "production": "生产线",
         "consultancy": "工程咨询",
@@ -440,7 +440,7 @@
     "consultation": {
       "eyebrow": "行业咨询",
       "title": "与行业专家交流。",
-      "lede": "Share your project brief and a NEVO industry engineer will reply within one business day with an engineered technical proposal.",
+      "lede": "分享您的项目需求,NEVO 行业工程师将在一个工作日内回复,提供工程化技术方案。",
       "bullets": [
         "Industry-specific engineering advice",
         "Sustainable material recommendations",
@@ -448,26 +448,26 @@
       ],
       "company": "公司",
       "industry": "行业",
-      "industryPh": "Cold storage / Pharma / …",
+      "industryPh": "冷库 / 制药 / ……",
       "country": "国家",
       "projectType": "项目类型",
-      "projectTypePh": "New build / Extension",
+      "projectTypePh": "新建项目 / 扩建项目",
       "size": "建筑面积（平方米）",
-      "sizePh": "e.g. 8,000",
+      "sizePh": "例如:8,000",
       "panel": "板材类型",
-      "panelPh": "PIR / Rock Wool / Clean Room",
+      "panelPh": "PIR / 岩棉 / 洁净室板",
       "fire": "防火等级要求",
       "firePh": "EI 30 / 60 / 120",
       "timeline": "时间计划",
-      "timelinePh": "Q3 2026",
+      "timelinePh": "2026年第三季度",
       "message": "留言",
       "submit": "提交询价",
-      "successMsg": "Thank you. A NEVO industry specialist will reply within one business day."
+      "successMsg": "感谢您的提交。NEVO 行业专家将在一个工作日内回复。"
     },
     "cta": {
       "eyebrow": "准备启动工程",
       "title": "每个行业都值得拥有工程化解决方案。",
-      "lede": "Whether you're building a cold storage warehouse, food factory, pharmaceutical facility or industrial plant, NEVO delivers engineering-driven solutions built for long-term performance.",
+      "lede": "无论您在建设冷库仓储、食品工厂、制药设施还是工业厂房,NEVO 都能提供以工程为驱动、注重长期性能的解决方案。",
       "primary": "预约工程咨询",
       "secondary": "申请技术方案"
     }
@@ -760,8 +760,8 @@
       "worldwideLabel": "工程支持",
       "multiple": "多家",
       "multipleLabel": "国际供应合作伙伴",
-      "yearsValue": "Experience",
-      "projectsValue": "Delivery"
+      "yearsValue": "行业经验",
+      "projectsValue": "交付能力"
     },
     "testimonials": {
       "eyebrow": "行业声音",
@@ -930,18 +930,18 @@
   },
   "about": {
     "meta": {
-      "title": "About NEVO Industrial — Engineering the Future of Sandwich Panel Manufacturing | Dubai",
-      "description": "NEVO Industrial is a Dubai-based engineering and industrial solutions company. We integrate engineering, factory development, production technologies, raw materials and sandwich panel supply into one complete industrial partner."
+      "title": "关于 NEVO Industrial —— 引领夹芯板制造的工程未来 | 迪拜",
+      "description": "NEVO Industrial 是一家总部位于迪拜的工程与工业解决方案公司。我们将工程设计、工厂建设、生产技术、原材料与夹芯板供应整合为一体化的工业合作伙伴服务。"
     },
     "hero": {
       "eyebrow": "关于 NEVO Industrial",
       "titleA": "工程铸就未来。",
       "titleB": "打造工业卓越。",
-      "lede": "NEVO Industrial is a Dubai-based engineering and industrial solutions company specialising in sandwich panel factories, production technologies, raw materials and complete industrial project development.",
+      "lede": "NEVO Industrial 是一家总部位于迪拜的工程与工业解决方案公司,专注于夹芯板工厂建设、生产技术、原材料以及完整的工业项目开发。",
       "ctaProject": "启动您的项目",
       "ctaTeam": "了解我们的工程团队",
       "stats": {
-        "hqK": "Dubai",
+        "hqK": "迪拜",
         "hqV": "全球总部",
         "ctK": "8+",
         "ctV": "服务国家",
@@ -953,11 +953,11 @@
     },
     "story": {
       "eyebrow": "我们的故事",
-      "title": "An engineering company built to close the gap between design and industry.",
-      "p1": "NEVO Industrial was founded on a straightforward observation: the sandwich panel industry is served by machinery suppliers, chemistry traders and panel producers — but rarely by engineers who understand all three.",
-      "p2": "Investors were forced to stitch together a factory from disconnected vendors, each optimising their own scope. The result was long commissioning cycles, inconsistent quality and factories that never reached their nameplate capacity.",
-      "p3": "NEVO was created to bridge engineering, industrial supply and project execution under one brand. From feasibility to commissioning — and long after — a single engineering-led partner owns the outcome.",
-      "p4": "Headquartered in Dubai and operating across eight countries, we work with ambitious industrialists building the next generation of production capacity for cold chain, food, pharma, logistics and heavy industry."
+      "title": "一家致力于弥合设计与行业之间差距的工程公司。",
+      "p1": "NEVO Industrial 的成立源于一个简单的洞察:夹芯板行业长期由设备供应商、化工原料商和板材生产商各自为营地服务 —— 却鲜有真正理解这三者的工程团队。",
+      "p2": "投资者往往被迫从互不衔接的供应商处拼凑起一座工厂,而每家供应商只优化自身的范围。结果就是漫长的调试周期、参差不齐的质量,以及始终无法达到设计产能的工厂。",
+      "p3": "NEVO 应运而生,旨在将工程设计、工业供应与项目执行整合于同一品牌之下。从可行性研究到调试投产 —— 乃至之后的运营期,始终由一个工程主导的合作伙伴全程负责成果。",
+      "p4": "我们总部位于迪拜,业务遍及八个国家,与致力于打造下一代冷链、食品、制药、物流及重工业生产能力的雄心勃勃的实业家们携手合作。"
     },
     "mission": {
       "eyebrow": "我们的使命",
@@ -994,8 +994,8 @@
       "eyebrow": "我们的愿景",
       "titleA": "打造全球最值得信赖的",
       "titleB": "工程合作伙伴。",
-      "p1": "To become the reference engineering partner for the global sandwich panel industry — combining deep technical expertise, curated technology, and a network of premium suppliers into one integrated offer.",
-      "p2": "We measure our vision in factories commissioned, engineers trained, and long-term partnerships built — not in units shipped.",
+      "p1": "成为全球夹芯板行业的标杆工程合作伙伴 —— 将深厚的技术专长、精选的先进技术与优质供应商网络整合为一体化服务。",
+      "p2": "我们以投产的工厂数量、培养的工程师人数以及建立的长期合作关系来衡量愿景的实现 —— 而非以出货量来衡量。",
       "labels": [
         "Engineering",
         "Technology",
@@ -1007,8 +1007,8 @@
     },
     "whatWeDo": {
       "eyebrow": "我们的业务",
-      "title": "Eight disciplines. One integrated engineering partner.",
-      "lede": "Every service listed below is owned end-to-end by NEVO — never subcontracted, never resold without engineering.",
+      "title": "八大专业领域,一个一体化工程合作伙伴。",
+      "lede": "以下每一项服务均由 NEVO 全程自主完成 —— 从不外包分包,亦从不在缺乏工程支持的情况下转售。",
       "items": [
         {
           "t": "工厂开发",
@@ -1046,7 +1046,7 @@
     },
     "approach": {
       "eyebrow": "我们的方法",
-      "title": "Nine engineering steps, one continuous partnership.",
+      "title": "九个工程步骤,一段持续的合作关系。",
       "steps": [
         "理解",
         "工程",
@@ -1061,7 +1061,7 @@
     },
     "why": {
       "eyebrow": "为什么选择 NEVO",
-      "title": "Eight reasons industrialists choose us.",
+      "title": "实业家选择我们的八大理由。",
       "items": [
         {
           "t": "Engineering Before Products",
@@ -1101,7 +1101,7 @@
       "eyebrow": "全球布局",
       "titleA": "总部位于迪拜。",
       "titleB": "生而全球化。",
-      "lede": "NEVO delivers engineering, materials and production technologies across the Middle East, Africa, CIS and beyond — with a curated partner network that follows every project.",
+      "lede": "NEVO 在中东、非洲、独联体地区及更广范围内提供工程、原材料与生产技术服务 —— 并配有伴随每个项目始终的精选合作伙伴网络。",
       "serving": "服务超过 8 个国家",
       "countries": [
         {
@@ -1144,7 +1144,7 @@
     },
     "values": {
       "eyebrow": "我们的价值观",
-      "title": "The principles we hire, engineer and partner by.",
+      "title": "我们招聘、设计与合作所遵循的原则。",
       "items": [
         "Integrity",
         "Engineering Precision",
@@ -1158,7 +1158,7 @@
     },
     "difference": {
       "eyebrow": "我们的差异",
-      "title": "What NEVO is — and what NEVO is not.",
+      "title": "NEVO 是什么 —— 又不是什么。",
       "notLabel": "NEVO 不是",
       "notItems": [
         "Only a machinery supplier.",
@@ -1166,11 +1166,11 @@
         "Only a sandwich panel supplier."
       ],
       "isLabel": "NEVO 是",
-      "isText": "An engineering-led industrial partner that integrates engineering, technology, industrial supply and project execution into one complete solution — for the entire lifecycle of a sandwich panel factory."
+      "isText": "一家工程主导的工业合作伙伴,将工程设计、技术、工业供应与项目执行整合为一体化解决方案 —— 贯穿夹芯板工厂的整个生命周期。"
     },
     "process": {
       "eyebrow": "我们的流程",
-      "title": "From first conversation to long-term optimization.",
+      "title": "从初次沟通到长期优化。",
       "stepLabel": "步骤",
       "items": [
         {
@@ -1209,8 +1209,8 @@
     },
     "commitment": {
       "eyebrow": "我们的承诺",
-      "title": "The promise behind every NEVO partnership.",
-      "lede": "A relationship with NEVO is designed for the full lifecycle of your factory — not the duration of a single purchase order.",
+      "title": "每一次 NEVO 合作背后的承诺。",
+      "lede": "与 NEVO 的合作关系着眼于您工厂的完整生命周期 —— 而不仅仅是一次采购订单的周期。",
       "items": [
         "Transparent communication.",
         "Engineering-first thinking.",
@@ -1224,21 +1224,21 @@
       "eyebrow": "共同建造",
       "titleA": "让我们共同建造",
       "titleB": "非凡的成果。",
-      "lede": "Bring your factory ambition, cold-chain project, or panel programme to a team that engineers the outcome — not just the equipment.",
+      "lede": "无论是工厂建设愿景、冷链项目,还是板材供应计划,都交给一支以工程实现成果为导向的团队 —— 而不仅仅是提供设备。",
       "primary": "与工程师交流",
       "secondary": "申请咨询"
     }
   },
   "contact": {
     "meta": {
-      "title": "Global Offices & Contact — NEVO Industrial | Dubai · Germany · Turkey · Oman",
-      "description": "Reach NEVO Industrial engineering teams worldwide. Dubai HQ, Germany, Turkey and Oman offices. Engineering hotline, international sales, project department, WhatsApp and booked meetings."
+      "title": "全球办事处与联系方式 — NEVO Industrial | 迪拜 · 德国 · 土耳其 · 阿曼",
+      "description": "联系 NEVO Industrial 全球工程团队。迪拜总部、德国、土耳其及阿曼办事处。工程热线、国际销售、项目部门、WhatsApp 及预约会面。"
     },
     "hero": {
       "eyebrow": "全球布局",
       "titleA": "全球工程。",
       "titleB": "本地服务。",
-      "lede": "From our Dubai headquarters to European engineering hubs and GCC project offices, NEVO delivers industrial engineering with senior expertise wherever your project lives.",
+      "lede": "从迪拜总部到欧洲工程中心,再到海合会地区的项目办事处,无论您的项目位于何处,NEVO 都能提供资深专业的工业工程服务。",
       "ctaOffices": "查看办公室",
       "ctaCallback": "申请回电",
       "statOffices": "办公室",
@@ -1248,7 +1248,7 @@
     "offices": {
       "eyebrow": "交互地图",
       "title": "NEVO 全球布局",
-      "lede": "Click any office to see contact details and local engineering capability.",
+      "lede": "点击任一办事处,查看联系方式及当地工程能力。",
       "list": [
         {
           "city": "Dubai",
@@ -1290,7 +1290,7 @@
     "cards": {
       "eyebrow": "直接联系方式",
       "title": "快速联系合适的团队",
-      "lede": "Every enquiry is routed to a senior engineer or account director within one business day.",
+      "lede": "每一项咨询都会在一个工作日内转交至资深工程师或客户总监处理。",
       "items": [
         {
           "t": "工程热线",
@@ -1320,10 +1320,10 @@
       ]
     },
     "callback": {
-      "mapTitle": "NEVO Dubai HQ",
+      "mapTitle": "NEVO 迪拜总部",
       "eyebrow": "申请回电",
       "title": "与资深工程师沟通",
-      "lede": "Share a few details and we'll call within one business day.",
+      "lede": "留下您的相关信息,我们将在一个工作日内回电。",
       "name": "姓名",
       "company": "公司",
       "email": "邮箱",
@@ -1333,7 +1333,7 @@
       "interest2": "夹芯板",
       "interest3": "生产线",
       "interest4": "工程咨询",
-      "message": "Project brief (capacity, location, timeline)",
+      "message": "项目简介(产能、地点、时间安排)",
       "submit": "申请回电",
       "sending": "发送中…",
       "successTitle": "已收到回电请求",
