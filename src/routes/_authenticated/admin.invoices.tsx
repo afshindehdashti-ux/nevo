@@ -218,7 +218,7 @@ export function InvoicesList({
             Export PDF{selected.size > 1 ? "s" : ""}
           </Button>
           <p className="text-xs text-muted-foreground whitespace-nowrap">
-            Create from an <Link to="/admin/orders" className="text-accent hover:underline">order</Link>.
+            Create from an <Link to="/admin/orders" className="text-accent hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">order</Link>.
           </p>
         </div>
       </div>
@@ -250,7 +250,7 @@ export function InvoicesList({
                 <Link
                   to="/admin/invoices/$id"
                   params={{ id: i.id }}
-                  className="block truncate font-medium text-accent hover:underline"
+                  className="block truncate font-medium text-accent hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   {i.invoice_number}
                 </Link>
@@ -362,7 +362,7 @@ export function InvoicesList({
                   <Link
                     to="/admin/invoices/$id"
                     params={{ id: i.id }}
-                    className="text-accent hover:underline font-medium"
+                    className="text-accent hover:underline font-medium rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
                     {i.invoice_number}
                   </Link>
