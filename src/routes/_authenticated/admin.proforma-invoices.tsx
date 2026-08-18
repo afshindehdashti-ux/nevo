@@ -389,6 +389,27 @@ function ProformaInvoicesList() {
             ))}
           </SelectContent>
         </Select>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-8"
+          onClick={handleCopyLink}
+          title="Copy a link that reopens this view with the current filters and sorting"
+        >
+          <Link2 className="mr-1.5 size-3.5" aria-hidden="true" />
+          {copied ? "Link copied" : "Copy link"}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-8"
+          onClick={handleResetFilters}
+          disabled={!filtersDirty}
+          title="Clear saved search, payment filter and sorting"
+        >
+          <RotateCcw className="mr-1.5 size-3.5" aria-hidden="true" />
+          Reset filters
+        </Button>
         <div className="ml-auto flex items-center gap-2">
           {selected.size > 0 && (
             <span className="text-xs text-muted-foreground">{selected.size} selected</span>
