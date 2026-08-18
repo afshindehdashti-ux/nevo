@@ -1228,7 +1228,7 @@ export function InvoicesList({
             <Skeleton key={i} className="h-12 w-full" />
           ))}
         </div>
-      ) : filtered.length === 0 ? (
+      ) : filtered.length === 0 && !listBusy ? (
         <div className="p-4 md:p-6">
           {invoices.length === 0 ? (
             <ListEmptyState
