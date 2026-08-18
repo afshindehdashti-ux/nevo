@@ -144,7 +144,7 @@ CONTRAST_PROBES = [
     ("invoice link", 'main a[href*="/admin/invoices/"]', False),
     ("status badge", "main [data-slot='badge'], main .inline-flex.rounded-full", False),
     ("money cell", "main .tabular-nums", False),
-    ("pagination label", "main :text('Rows')", False),
+    ("secondary label", "main th, main dt", False),
 ]
 MIN_RATIO_NORMAL = 4.5
 MIN_RATIO_LARGE = 3.0
