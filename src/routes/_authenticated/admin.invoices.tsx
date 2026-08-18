@@ -1459,7 +1459,29 @@ export function InvoicesList({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paged.map((i) => (
+            {listBusy
+              ? Array.from({ length: skeletonRowCount }).map((_, idx) => (
+                  <TableRow key={`sk-${idx}`} data-testid="row-skeleton">
+                    <TableCell>
+                      <Skeleton className="size-4 rounded-sm" />
+                    </TableCell>
+                    {columns.visibleOrder.map((c) => (
+                      <TableCell key={c} className={COLUMN_DEFS[c].cellClass}>
+                        <Skeleton
+                          className={
+                            COLUMN_DEFS[c].align === "right"
+                              ? "ml-auto h-4 w-20"
+                              : "h-4 w-24"
+                          }
+                        />
+                      </TableCell>
+                    ))}
+                    <TableCell className="text-right">
+                      <Skeleton className="ml-auto size-8 rounded-md" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              : paged.map((i) => (
               <TableRow key={i.id} data-state={selected.has(i.id) ? "selected" : undefined}>
                 <TableCell>
                   <Checkbox
