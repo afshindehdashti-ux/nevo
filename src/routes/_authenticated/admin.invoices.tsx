@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MasterListShell } from "@/components/crm/MasterListShell";
@@ -28,7 +28,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  ArrowDown,
+  ArrowUp,
+  Columns3,
   ChevronDown,
+
   ChevronLeft,
   ChevronRight,
   ChevronUp,
@@ -47,6 +51,9 @@ import {
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
+import { useTableColumnLayout } from "@/lib/use-table-columns";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 
 import {
   AlertDialog,
@@ -239,6 +246,14 @@ export function InvoicesList({
   // survives a refresh and can be shared. localStorage keeps the last used
   // prefs as the starting point when the URL carries no params.
   const storageKey = `nevo.admin.invoices.${type}.prefs`;
+
+  // Column visibility and ordering are a layout choice rather than a filter, so
+  // they stay in localStorage only (never the URL) and survive a refresh.
+  const columns = useTableColumnLayout<SortKey>(
+    `nevo.admin.invoices.${type}.columns`,
+    SORT_KEYS,
+  );
+
   const navigate = useNavigate();
   const urlSearch = Route.useSearch();
   const [hydrated, setHydrated] = useState(false);
@@ -527,6 +542,72 @@ export function InvoicesList({
         <Icon className={`h-3.5 w-3.5 shrink-0 ${active ? "opacity-100" : "opacity-50"}`} aria-hidden="true" />
       </button>
     );
+  };
+
+  type InvoiceRow = (typeof invoices)[number];
+
+  const COLUMN_DEFS: Record<
+    SortKey,
+    {
+      shortLabel: string;
+      align?: "right";
+      headClass?: string;
+      cellClass?: string;
+      cell: (i: InvoiceRow) => ReactNode;
+    }
+  > = {
+    invoice_number: {
+      shortLabel: "Invoice #",
+      headClass: "whitespace-nowrap",
+      cellClass: "whitespace-nowrap",
+      cell: (i) => (
+        <Link
+          to="/admin/invoices/$id"
+          params={{ id: i.id }}
+          className="text-accent hover:underline font-medium rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+        >
+          {i.invoice_number}
+        </Link>
+      ),
+    },
+    customer: {
+      shortLabel: "Customer",
+      cellClass: "max-w-[240px] truncate",
+      cell: (i) => customerDisplayName(i.customers as CustomerDisplay | null),
+    },
+    issue_date: {
+      shortLabel: "Date",
+      headClass: "whitespace-nowrap",
+      cellClass: "whitespace-nowrap",
+      cell: (i) => formatDate(i.issue_date),
+    },
+    due_date: {
+      shortLabel: "Due",
+      headClass: "whitespace-nowrap",
+      cellClass: "whitespace-nowrap",
+      cell: (i) => formatDate(i.due_date),
+    },
+    status: {
+      shortLabel: "Status",
+      headClass: "whitespace-nowrap",
+      cell: (i) => (
+        <Badge variant={invoiceStatusVariant(i.status)}>{invoiceStatusLabel(i.status)}</Badge>
+      ),
+    },
+    total: {
+      shortLabel: "Total",
+      align: "right",
+      headClass: "whitespace-nowrap text-right",
+      cellClass: "whitespace-nowrap text-right tabular-nums",
+      cell: (i) => formatMoney(financeTotalAmount(i), i.currency),
+    },
+    balance: {
+      shortLabel: "Balance",
+      align: "right",
+      headClass: "whitespace-nowrap text-right",
+      cellClass: "whitespace-nowrap text-right tabular-nums",
+      cell: (i) => formatMoney(financeBalanceDue(i), i.currency),
+    },
   };
 
 
@@ -825,6 +906,74 @@ export function InvoicesList({
             <RotateCcw className="mr-1.5 size-3.5" aria-hidden="true" />
             Reset filters
           </Button>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 shrink-0"
+                title="Show, hide and reorder table columns — the layout is remembered on this device"
+              >
+                <Columns3 className="mr-1.5 size-3.5" aria-hidden="true" />
+                Columns
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-72 p-2">
+              <div className="flex items-center justify-between px-1 pb-2">
+                <p className="text-xs font-medium text-muted-foreground">Table columns</p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-xs"
+                  onClick={columns.reset}
+                  disabled={!columns.dirty}
+                >
+                  Reset
+                </Button>
+              </div>
+              <ul className="space-y-0.5">
+                {columns.order.map((c, index) => (
+                  <li key={c} className="flex items-center gap-2 rounded-sm px-1 py-1 hover:bg-muted/60">
+                    <Checkbox
+                      id={`invoice-col-${c}`}
+                      checked={columns.isVisible(c)}
+                      onCheckedChange={(v) => columns.toggle(c, v === true)}
+                      disabled={columns.isVisible(c) && columns.visibleOrder.length === 1}
+                      aria-label={`Show ${SORT_LABELS[c]} column`}
+                    />
+                    <Label htmlFor={`invoice-col-${c}`} className="min-w-0 flex-1 truncate text-sm font-normal">
+                      {SORT_LABELS[c]}
+                    </Label>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6"
+                      onClick={() => columns.move(c, -1)}
+                      disabled={index === 0}
+                      aria-label={`Move ${SORT_LABELS[c]} left`}
+                    >
+                      <ArrowUp className="size-3.5" aria-hidden="true" />
+                    </Button>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6"
+                      onClick={() => columns.move(c, 1)}
+                      disabled={index === columns.order.length - 1}
+                      aria-label={`Move ${SORT_LABELS[c]} right`}
+                    >
+                      <ArrowDown className="size-3.5" aria-hidden="true" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </PopoverContent>
+          </Popover>
+
 
           <p
             aria-live="polite"
@@ -1285,27 +1434,12 @@ export function InvoicesList({
                   aria-label="Select all"
                 />
               </TableHead>
-              <TableHead className="whitespace-nowrap" {...sortProps("invoice_number")}>
-                <SortButton column="invoice_number" label="Invoice #" />
-              </TableHead>
-              <TableHead {...sortProps("customer")}>
-                <SortButton column="customer" label="Customer" />
-              </TableHead>
-              <TableHead className="whitespace-nowrap" {...sortProps("issue_date")}>
-                <SortButton column="issue_date" label="Date" />
-              </TableHead>
-              <TableHead className="whitespace-nowrap" {...sortProps("due_date")}>
-                <SortButton column="due_date" label="Due" />
-              </TableHead>
-              <TableHead className="whitespace-nowrap" {...sortProps("status")}>
-                <SortButton column="status" label="Status" />
-              </TableHead>
-              <TableHead className="whitespace-nowrap text-right" {...sortProps("total")}>
-                <SortButton column="total" label="Total" align="right" />
-              </TableHead>
-              <TableHead className="whitespace-nowrap text-right" {...sortProps("balance")}>
-                <SortButton column="balance" label="Balance" align="right" />
-              </TableHead>
+              {columns.visibleOrder.map((c) => (
+                <TableHead key={c} className={COLUMN_DEFS[c].headClass} {...sortProps(c)}>
+                  <SortButton column={c} label={COLUMN_DEFS[c].shortLabel} align={COLUMN_DEFS[c].align} />
+                </TableHead>
+              ))}
+
               <TableHead className="w-10 text-right">
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -1321,31 +1455,12 @@ export function InvoicesList({
                     aria-label={`Select ${i.invoice_number ?? i.id}`}
                   />
                 </TableCell>
-                <TableCell className="whitespace-nowrap">
-                  <Link
-                    to="/admin/invoices/$id"
-                    params={{ id: i.id }}
-                    className="text-accent hover:underline font-medium rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-                  >
-                    {i.invoice_number}
-                  </Link>
-                </TableCell>
-                <TableCell className="max-w-[240px] truncate">
-                  {customerDisplayName(i.customers as CustomerDisplay | null)}
-                </TableCell>
-                <TableCell className="whitespace-nowrap">{formatDate(i.issue_date)}</TableCell>
-                <TableCell className="whitespace-nowrap">{formatDate(i.due_date)}</TableCell>
-                <TableCell>
-                  <Badge variant={invoiceStatusVariant(i.status)}>
-                    {invoiceStatusLabel(i.status)}
-                  </Badge>
-                </TableCell>
-                <TableCell className="whitespace-nowrap text-right tabular-nums">
-                  {formatMoney(financeTotalAmount(i), i.currency)}
-                </TableCell>
-                <TableCell className="whitespace-nowrap text-right tabular-nums">
-                  {formatMoney(financeBalanceDue(i), i.currency)}
-                </TableCell>
+                {columns.visibleOrder.map((c) => (
+                  <TableCell key={c} className={COLUMN_DEFS[c].cellClass}>
+                    {COLUMN_DEFS[c].cell(i)}
+                  </TableCell>
+                ))}
+
                 <TableCell className="text-right">
                   <Tooltip>
                     <TooltipTrigger asChild>
