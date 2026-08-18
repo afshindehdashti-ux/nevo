@@ -1321,31 +1321,12 @@ export function InvoicesList({
                     aria-label={`Select ${i.invoice_number ?? i.id}`}
                   />
                 </TableCell>
-                <TableCell className="whitespace-nowrap">
-                  <Link
-                    to="/admin/invoices/$id"
-                    params={{ id: i.id }}
-                    className="text-accent hover:underline font-medium rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-                  >
-                    {i.invoice_number}
-                  </Link>
-                </TableCell>
-                <TableCell className="max-w-[240px] truncate">
-                  {customerDisplayName(i.customers as CustomerDisplay | null)}
-                </TableCell>
-                <TableCell className="whitespace-nowrap">{formatDate(i.issue_date)}</TableCell>
-                <TableCell className="whitespace-nowrap">{formatDate(i.due_date)}</TableCell>
-                <TableCell>
-                  <Badge variant={invoiceStatusVariant(i.status)}>
-                    {invoiceStatusLabel(i.status)}
-                  </Badge>
-                </TableCell>
-                <TableCell className="whitespace-nowrap text-right tabular-nums">
-                  {formatMoney(financeTotalAmount(i), i.currency)}
-                </TableCell>
-                <TableCell className="whitespace-nowrap text-right tabular-nums">
-                  {formatMoney(financeBalanceDue(i), i.currency)}
-                </TableCell>
+                {columns.visibleOrder.map((c) => (
+                  <TableCell key={c} className={COLUMN_DEFS[c].cellClass}>
+                    {COLUMN_DEFS[c].cell(i)}
+                  </TableCell>
+                ))}
+
                 <TableCell className="text-right">
                   <Tooltip>
                     <TooltipTrigger asChild>
