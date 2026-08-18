@@ -53,7 +53,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { GridBoard, BoardCell, SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
-import { ogImageMeta } from "@/lib/og-images";
+import { } from "@/lib/og-images";
 import {
   Accordion,
   AccordionContent,

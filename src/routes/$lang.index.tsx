@@ -26,7 +26,7 @@ import {
   LOGO_URL,
 } from "@/lib/seo";
 
-import { ogImageMeta } from "@/lib/og-images";
+import { } from "@/lib/og-images";
 
 const TITLE = "NEVO Industrial — Sandwich Panel Engineering, Factory Development & Raw Materials";
 const DESCRIPTION =

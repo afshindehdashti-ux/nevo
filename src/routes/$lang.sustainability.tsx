@@ -23,7 +23,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
-import { ogImageMeta } from "@/lib/og-images";
+import { } from "@/lib/og-images";
 
 const TITLE = "Sustainability & ESG — Engineering a Sustainable Future | NEVO Industrial";
 const DESCRIPTION =
