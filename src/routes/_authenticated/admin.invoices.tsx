@@ -362,45 +362,116 @@ export function InvoicesList({
   const label = type === "proforma" ? "Proforma" : "Commercial";
   const emptyResource = type === "proforma" ? "proforma_invoices" : "invoices";
 
-  const handleBulkExport = async () => {
-    const ids = Array.from(selected);
-    if (ids.length === 0) return;
-    setExporting(true);
-    setProgress({ done: 0, total: ids.length });
-    const t = toast.loading(`Generating ${ids.length} PDF${ids.length > 1 ? "s" : ""}…`);
+  // Pre-flight validation of the current selection. Rows that can never
+  // produce a usable PDF are excluded up-front instead of failing mid-run.
+  const exportPlan = useMemo(() => {
+    const rows = invoices.filter((i) => selected.has(i.id));
+    const ready: typeof rows = [];
+    const blocked: { id: string; name: string; reason: string }[] = [];
+    for (const i of rows) {
+      const name = i.invoice_number || i.id.slice(0, 8);
+      const reasons: string[] = [];
+      if (!i.customers) reasons.push("no customer linked");
+      if (!i.issue_date) reasons.push("missing issue date");
+      if (!i.currency) reasons.push("missing currency");
+      if (reasons.length > 0) blocked.push({ id: i.id, name, reason: reasons.join(", ") });
+      else ready.push(i);
+    }
+    return { ready, blocked, total: rows.length };
+  }, [invoices, selected]);
+
+  const triggerDownload = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    // Revoke only after the browser has picked the download up.
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  };
+
+  // One retry per document — most failures are transient fetch/render hiccups.
+  const renderPdfBlob = async (id: string) => {
     try {
-      if (ids.length === 1) {
-        await generateInvoicePdf(ids[0], "download");
-        setProgress({ done: 1, total: 1 });
-        toast.success("PDF downloaded", { id: t });
+      return await generateInvoicePdf(id, "blob");
+    } catch {
+      return await generateInvoicePdf(id, "blob");
+    }
+  };
+
+  const handleBulkExport = async () => {
+    const rows = exportPlan.ready;
+    if (rows.length === 0) {
+      toast.error("None of the selected invoices are ready for export");
+      return;
+    }
+    setExporting(true);
+    setExportFailures([]);
+    setProgress({ done: 0, total: rows.length });
+    const t = toast.loading(`Generating ${rows.length} PDF${rows.length > 1 ? "s" : ""}…`);
+    try {
+      const failures: { name: string; message: string }[] = [];
+      const files: { filename: string; blob: Blob }[] = [];
+      let index = 0;
+      for (const row of rows) {
+        const name = row.invoice_number || row.id.slice(0, 8);
+        try {
+          const res = await renderPdfBlob(row.id);
+          files.push({ filename: res.filename, blob: res.blob });
+          URL.revokeObjectURL(res.url);
+        } catch (e) {
+          console.error("PDF failed", row.id, e);
+          failures.push({ name, message: e instanceof Error ? e.message : "Generation failed" });
+        }
+        index++;
+        setProgress({ done: index, total: rows.length });
+      }
+
+      if (files.length === 0) throw new Error("No PDFs could be generated");
+
+      if (files.length === 1) {
+        triggerDownload(files[0].blob, files[0].filename);
       } else {
         const zip = new JSZip();
-        let ok = 0;
-        let index = 0;
-        for (const id of ids) {
-          try {
-            const res = await generateInvoicePdf(id, "blob");
-            zip.file(res.filename, res.blob);
-            URL.revokeObjectURL(res.url);
-            ok++;
-          } catch (e) {
-            console.error("PDF failed", id, e);
+        const used = new Set<string>();
+        for (const f of files) {
+          // Guard against duplicate filenames silently overwriting entries.
+          let filename = f.filename;
+          let n = 2;
+          while (used.has(filename)) {
+            filename = f.filename.replace(/(\.pdf)?$/i, `-${n}.pdf`);
+            n++;
           }
-          index++;
-          setProgress({ done: index, total: ids.length });
+          used.add(filename);
+          zip.file(filename, f.blob);
         }
-        if (ok === 0) throw new Error("All PDFs failed to generate");
-        const blob = await zip.generateAsync({ type: "blob" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
         const stamp = new Date().toISOString().slice(0, 10);
-        a.download = `${label}-Invoices-${stamp}.zip`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        toast.success(`Exported ${ok} of ${ids.length} PDFs`, { id: t });
+        try {
+          const blob = await zip.generateAsync({ type: "blob" });
+          triggerDownload(blob, `${label}-Invoices-${stamp}.zip`);
+        } catch (zipError) {
+          // ZIP packaging failed — fall back to individual downloads.
+          console.error("ZIP packaging failed", zipError);
+          for (const f of files) triggerDownload(f.blob, f.filename);
+        }
+      }
+
+      setExportFailures(failures);
+      if (failures.length === 0) {
+        toast.success(
+          files.length === 1
+            ? "PDF downloaded"
+            : `Downloaded ${files.length} PDFs as a ZIP`,
+          { id: t },
+        );
+        setSelected(new Set());
+      } else {
+        toast.warning(`Exported ${files.length} of ${rows.length} — ${failures.length} failed`, {
+          id: t,
+        });
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Export failed";
