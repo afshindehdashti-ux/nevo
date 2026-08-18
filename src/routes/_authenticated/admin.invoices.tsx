@@ -222,7 +222,94 @@ export function InvoicesList({
           </p>
         </div>
       </div>
-      <div className="w-full overflow-x-auto">
+      {/* Mobile: stacked cards — no horizontal scrolling, tap targets stay usable */}
+      <div className="md:hidden divide-y">
+        {isLoading && (
+          <p className="py-8 text-center text-sm text-muted-foreground">Loading…</p>
+        )}
+        {!isLoading && filtered.length === 0 && (
+          <p className="py-10 text-center text-sm text-muted-foreground">
+            {invoices.length === 0
+              ? `No ${type === "proforma" ? "proforma " : ""}invoices yet.`
+              : "No matches."}
+          </p>
+        )}
+        {filtered.map((i) => (
+          <div
+            key={i.id}
+            className={`p-3 ${selected.has(i.id) ? "bg-muted/50" : ""}`}
+          >
+            <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3">
+              <Checkbox
+                className="mt-1 shrink-0"
+                checked={selected.has(i.id)}
+                onCheckedChange={(v) => toggleOne(i.id, v === true)}
+                aria-label={`Select ${i.invoice_number ?? i.id}`}
+              />
+              <div className="min-w-0">
+                <Link
+                  to="/admin/invoices/$id"
+                  params={{ id: i.id }}
+                  className="block truncate font-medium text-accent hover:underline"
+                >
+                  {i.invoice_number}
+                </Link>
+                <p className="truncate text-sm text-muted-foreground">
+                  {customerDisplayName(i.customers as CustomerDisplay | null)}
+                </p>
+              </div>
+              <Badge variant={invoiceStatusVariant(i.status)} className="shrink-0">
+                {invoiceStatusLabel(i.status)}
+              </Badge>
+            </div>
+            <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 pl-7 text-xs">
+              <div className="flex min-w-0 justify-between gap-2">
+                <dt className="text-muted-foreground">Date</dt>
+                <dd className="whitespace-nowrap">{formatDate(i.issue_date)}</dd>
+              </div>
+              <div className="flex min-w-0 justify-between gap-2">
+                <dt className="text-muted-foreground">Due</dt>
+                <dd className="whitespace-nowrap">{formatDate(i.due_date)}</dd>
+              </div>
+              <div className="flex min-w-0 justify-between gap-2">
+                <dt className="text-muted-foreground">Total</dt>
+                <dd className="whitespace-nowrap tabular-nums">
+                  {formatMoney(financeTotalAmount(i), i.currency)}
+                </dd>
+              </div>
+              <div className="flex min-w-0 justify-between gap-2">
+                <dt className="text-muted-foreground">Balance</dt>
+                <dd className="whitespace-nowrap tabular-nums">
+                  {formatMoney(financeBalanceDue(i), i.currency)}
+                </dd>
+              </div>
+            </dl>
+            <div className="mt-2 flex flex-wrap gap-2 pl-7">
+              <Button size="sm" variant="outline" asChild>
+                <Link to="/admin/invoices/$id" params={{ id: i.id }}>
+                  Open
+                </Link>
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => downloadOne(i.id)}
+                disabled={rowBusy === i.id}
+              >
+                {rowBusy === i.id ? (
+                  <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <FileDown className="mr-1 h-3.5 w-3.5" />
+                )}
+                PDF
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop / tablet: full table */}
+      <div className="hidden w-full overflow-x-auto md:block">
         <Table className="min-w-[880px]">
           <TableHeader>
             <TableRow>
@@ -240,19 +327,22 @@ export function InvoicesList({
               <TableHead className="whitespace-nowrap">Status</TableHead>
               <TableHead className="whitespace-nowrap text-right">Total</TableHead>
               <TableHead className="whitespace-nowrap text-right">Balance</TableHead>
+              <TableHead className="w-10 text-right">
+                <span className="sr-only">Actions</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                   Loading…
                 </TableCell>
               </TableRow>
             )}
             {!isLoading && filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={9} className="text-center py-10 text-muted-foreground">
                   {invoices.length === 0
                     ? `No ${type === "proforma" ? "proforma " : ""}invoices yet.`
                     : "No matches."}
@@ -293,12 +383,29 @@ export function InvoicesList({
                 <TableCell className="whitespace-nowrap text-right tabular-nums">
                   {formatMoney(financeBalanceDue(i), i.currency)}
                 </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8"
+                    onClick={() => downloadOne(i.id)}
+                    disabled={rowBusy === i.id}
+                    aria-label={`Download PDF for ${i.invoice_number ?? i.id}`}
+                  >
+                    {rowBusy === i.id ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <FileDown className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
 
           </TableBody>
         </Table>
       </div>
+
     </MasterListShell>
   );
 }
