@@ -45,7 +45,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { } from "@/lib/og-images";
 
 const TITLE = "Factory Development — Turnkey Sandwich Panel Factory Engineering | NEVO Industrial";
 const DESCRIPTION =

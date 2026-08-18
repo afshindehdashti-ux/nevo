@@ -21,7 +21,6 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
-import { } from "@/lib/og-images";
 
 const TITLE = "Investor Relations — Building Long-Term Industrial Growth | NEVO Industrial";
 const DESCRIPTION =

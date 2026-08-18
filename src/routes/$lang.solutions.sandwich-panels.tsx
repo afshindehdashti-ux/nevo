@@ -64,7 +64,6 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
-import { } from "@/lib/og-images";
 import {
   Accordion,
   AccordionContent,

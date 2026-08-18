@@ -9,7 +9,6 @@ import { Section, SectionHeader, Eyebrow } from "@/components/site/primitives";
 import { SurfaceCard } from "@/components/site/cards";
 import { Button } from "@/components/ui/button";
 import { SITE, buildSeo, ldScript, solutionsCatalogJsonLd, ORG_ID, WEBSITE_ID } from "@/lib/seo";
-import { } from "@/lib/og-images";
 
 const TITLE =
   "Solutions — Factory Development, Production Lines, Consultancy & Raw Materials | NEVO Industrial";

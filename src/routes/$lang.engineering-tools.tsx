@@ -34,7 +34,6 @@ import {
 import { Button } from "@/components/ui/button";
 import heroCockpit from "@/assets/tools/hero-cockpit.jpg";
 import { SITE, buildSeo } from "@/lib/seo";
-import { } from "@/lib/og-images";
 
 export const Route = createFileRoute("/$lang/engineering-tools")({
   component: EngineeringToolsCenter,
