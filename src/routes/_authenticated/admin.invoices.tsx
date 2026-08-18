@@ -1432,7 +1432,7 @@ export function InvoicesList({
               ) : null}
             </div>
           </div>
-        ))}
+            ))}
       </div>
 
       {/* Desktop / tablet: full table */}
