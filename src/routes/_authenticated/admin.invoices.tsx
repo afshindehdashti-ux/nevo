@@ -498,7 +498,7 @@ export function InvoicesList({
       </div>
 
       {/* Desktop / tablet: full table */}
-      <div className="hidden w-full overflow-x-auto md:block">
+      <div className="hidden w-full md:block">
         <Table className="min-w-[880px]">
           <TableHeader>
             <TableRow>
