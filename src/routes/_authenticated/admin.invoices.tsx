@@ -114,7 +114,17 @@ const SORT_KEYS: SortKey[] = [
   "total",
   "balance",
 ];
+const SORT_LABELS: Record<SortKey, string> = {
+  invoice_number: "Invoice #",
+  customer: "Customer",
+  issue_date: "Issue date",
+  due_date: "Due date",
+  status: "Status",
+  total: "Total",
+  balance: "Balance",
+};
 const PAGE_SIZES = [10, 25, 50, 100];
+
 
 const INVOICE_LIST_DEFAULTS = {
   search: "",
@@ -438,12 +448,17 @@ export function InvoicesList({
     setPage(1);
   }, [filterSignature, hydrated]);
 
+  const defaultDirFor = (key: SortKey): SortDir =>
+    key === "issue_date" || key === "due_date" || key === "total" || key === "balance"
+      ? "desc"
+      : "asc";
+
   const toggleSort = (key: SortKey) => {
     if (key === sortKey) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
       setSortKey(key);
-      setSortDir(key === "issue_date" || key === "due_date" ? "desc" : "asc");
+      setSortDir(defaultDirFor(key));
     }
   };
 
@@ -456,13 +471,26 @@ export function InvoicesList({
         : "none") as "ascending" | "descending" | "none",
     });
 
+  // Screen-reader confirmation of the applied sort, announced on change only.
+  const sortAnnouncement = `Sorted by ${SORT_LABELS[sortKey]}, ${
+    sortDir === "asc" ? "ascending" : "descending"
+  }`;
+
   const SortButton = ({ column, label, align }: { column: SortKey; label: string; align?: "right" }) => {
     const active = sortKey === column;
     const Icon = !active ? ChevronsUpDown : sortDir === "asc" ? ChevronUp : ChevronDown;
+    const nextDir: SortDir = active ? (sortDir === "asc" ? "desc" : "asc") : defaultDirFor(column);
+    const hint = active
+      ? `Sorted by ${label} ${sortDir === "asc" ? "ascending" : "descending"}. Activate to sort ${
+          nextDir === "asc" ? "ascending" : "descending"
+        }.`
+      : `Sort by ${label} ${nextDir === "asc" ? "ascending" : "descending"}`;
     return (
       <button
         type="button"
         onClick={() => toggleSort(column)}
+        aria-label={hint}
+        title={hint}
         className={`-mx-1 inline-flex w-full items-center gap-1 rounded-sm px-1 py-0.5 font-medium transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
           align === "right" ? "justify-end" : "justify-start"
         } ${active ? "text-foreground" : ""}`}
@@ -472,6 +500,7 @@ export function InvoicesList({
       </button>
     );
   };
+
 
   const toggleAll = (checked: boolean) => {
     setSelected((prev) => {
@@ -1055,8 +1084,54 @@ export function InvoicesList({
               : "transition-opacity duration-200"
           }
         >
+          <p aria-live="polite" className="sr-only">
+            {sortAnnouncement}
+          </p>
+
+          {/* Mobile has no column headers — expose the same sort keys as controls */}
+          <div className="flex items-center gap-2 border-b p-3 md:hidden">
+            <Label htmlFor="invoice-sort-mobile" className="shrink-0 text-xs text-muted-foreground">
+              Sort by
+            </Label>
+            <Select
+              value={sortKey}
+              onValueChange={(v) => {
+                setSortKey(v as SortKey);
+                setSortDir(defaultDirFor(v as SortKey));
+              }}
+            >
+              <SelectTrigger id="invoice-sort-mobile" className="h-8 min-w-0 flex-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {SORT_KEYS.map((k) => (
+                  <SelectItem key={k} value={k}>
+                    {SORT_LABELS[k]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8 shrink-0 gap-1"
+              onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+              aria-label={`Sort direction: ${
+                sortDir === "asc" ? "ascending" : "descending"
+              }. Activate to sort ${sortDir === "asc" ? "descending" : "ascending"}.`}
+            >
+              {sortDir === "asc" ? (
+                <ChevronUp className="size-4" aria-hidden="true" />
+              ) : (
+                <ChevronDown className="size-4" aria-hidden="true" />
+              )}
+              <span className="text-xs">{sortDir === "asc" ? "Asc" : "Desc"}</span>
+            </Button>
+          </div>
 
       {/* Mobile: stacked cards — no horizontal scrolling, tap targets stay usable */}
+
       <div className="md:hidden divide-y">
         {paged.map((i) => (
           <div
