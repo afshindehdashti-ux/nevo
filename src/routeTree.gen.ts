@@ -22,6 +22,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
+import { Route as SitemapsSlugRouteImport } from './routes/sitemaps.$slug'
 import { Route as KnowledgeSplatRouteImport } from './routes/knowledge.$'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
@@ -202,6 +203,11 @@ const LangIndexRoute = LangIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => LangRoute,
+} as any)
+const SitemapsSlugRoute = SitemapsSlugRouteImport.update({
+  id: '/sitemaps/$slug',
+  path: '/sitemaps/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const KnowledgeSplatRoute = KnowledgeSplatRouteImport.update({
   id: '/knowledge/$',
@@ -900,6 +906,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
+  '/sitemaps/$slug': typeof SitemapsSlugRoute
   '/$lang/': typeof LangIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/$lang/knowledge-hub/$slug': typeof LangKnowledgeHubSlugRoute
@@ -1028,6 +1035,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
+  '/sitemaps/$slug': typeof SitemapsSlugRoute
   '/$lang': typeof LangIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
   '/$lang/knowledge-hub/$slug': typeof LangKnowledgeHubSlugRoute
@@ -1159,6 +1167,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/knowledge/$': typeof KnowledgeSplatRoute
+  '/sitemaps/$slug': typeof SitemapsSlugRoute
   '/$lang/': typeof LangIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/$lang/knowledge-hub/$slug': typeof LangKnowledgeHubSlugRoute
@@ -1291,6 +1300,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/knowledge/$'
+    | '/sitemaps/$slug'
     | '/$lang/'
     | '/knowledge/'
     | '/$lang/knowledge-hub/$slug'
@@ -1419,6 +1429,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/knowledge/$'
+    | '/sitemaps/$slug'
     | '/$lang'
     | '/knowledge'
     | '/$lang/knowledge-hub/$slug'
@@ -1549,6 +1560,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/knowledge/$'
+    | '/sitemaps/$slug'
     | '/$lang/'
     | '/knowledge/'
     | '/$lang/knowledge-hub/$slug'
@@ -1654,6 +1666,7 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   KnowledgeSplatRoute: typeof KnowledgeSplatRoute
+  SitemapsSlugRoute: typeof SitemapsSlugRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1766,6 +1779,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$lang/'
       preLoaderRoute: typeof LangIndexRouteImport
       parentRoute: typeof LangRoute
+    }
+    '/sitemaps/$slug': {
+      id: '/sitemaps/$slug'
+      path: '/sitemaps/$slug'
+      fullPath: '/sitemaps/$slug'
+      preLoaderRoute: typeof SitemapsSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/knowledge/$': {
       id: '/knowledge/$'
@@ -2972,6 +2992,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   KnowledgeSplatRoute: KnowledgeSplatRoute,
+  SitemapsSlugRoute: SitemapsSlugRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
