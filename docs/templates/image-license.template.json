@@ -1,0 +1,16 @@
+{
+  "source": "REQUIRED — provider or photographer (e.g. Getty Images, Adobe Stock, in-house shoot)",
+  "source_url": "Link to the asset page, contract or shoot folder",
+  "license": "REQUIRED — licence type, e.g. 'Royalty-free, commercial + editorial'",
+  "license_id": "REQUIRED — order/asset/contract ID proving the licence",
+  "credit": "REQUIRED — attribution string to display where the licence requires it",
+  "capture_date": "YYYY-MM-DD",
+  "location": "Optional — where the photograph was taken",
+  "restrictions": "Optional — model/property release limits, territory or term limits",
+  "ai_generated": false,
+  "provenance_attestation": {
+    "verified_by": "email of the person who verified the licence",
+    "verified_on": "YYYY-MM-DD",
+    "method": "how it was verified, e.g. 'invoice + provider licence certificate on file'"
+  }
+}
