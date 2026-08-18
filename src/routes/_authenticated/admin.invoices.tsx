@@ -352,7 +352,7 @@ export function InvoicesList({
                 <Link
                   to="/admin/invoices/$id"
                   params={{ id: i.id }}
-                  className="block truncate font-medium text-accent hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="block break-all font-medium leading-tight text-accent hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   {i.invoice_number}
                 </Link>
