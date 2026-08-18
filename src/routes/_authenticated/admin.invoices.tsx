@@ -86,6 +86,15 @@ import {
   invoiceStatusVariant,
   type InvoiceStatus,
 } from "@/lib/crm-status";
+import {
+  INVOICE_LIST_DEFAULTS,
+  INVOICE_PAGE_SIZES,
+  INVOICE_SORT_KEYS,
+  sanitizeInvoiceListPrefs,
+  toInvoiceSearch,
+  type InvoiceSortDir,
+  type InvoiceSortKey,
+} from "@/lib/invoice-list-prefs";
 
 const invoiceSearchSchema = z.object({
   q: fallback(z.string(), "").default(""),
