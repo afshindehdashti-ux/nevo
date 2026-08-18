@@ -172,22 +172,24 @@ export function InvoicesList({
         />
       }
     >
-      <div className="p-3 border-b flex flex-wrap gap-2 items-center">
-        <Label className="text-xs text-muted-foreground">Status</Label>
-        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as InvoiceStatus | "all")}>
-          <SelectTrigger className="w-52 h-8">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            {INVOICE_STATUSES.map((s) => (
-              <SelectItem key={s} value={s}>
-                {invoiceStatusLabel(s)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="ml-auto flex items-center gap-2">
+      <div className="p-3 border-b flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="flex min-w-0 items-center gap-2">
+          <Label className="shrink-0 text-xs text-muted-foreground">Status</Label>
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as InvoiceStatus | "all")}>
+            <SelectTrigger className="h-8 w-full min-w-0 sm:w-52">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              {INVOICE_STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {invoiceStatusLabel(s)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:ml-auto">
           {selected.size > 0 && (
             <span className="text-xs text-muted-foreground">{selected.size} selected</span>
           )}
@@ -205,8 +207,8 @@ export function InvoicesList({
           </p>
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <Table>
+      <div className="w-full overflow-x-auto">
+        <Table className="min-w-[880px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">
@@ -216,13 +218,13 @@ export function InvoicesList({
                   aria-label="Select all"
                 />
               </TableHead>
-              <TableHead>Invoice #</TableHead>
+              <TableHead className="whitespace-nowrap">Invoice #</TableHead>
               <TableHead>Customer</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Due</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-              <TableHead className="text-right">Balance</TableHead>
+              <TableHead className="whitespace-nowrap">Date</TableHead>
+              <TableHead className="whitespace-nowrap">Due</TableHead>
+              <TableHead className="whitespace-nowrap">Status</TableHead>
+              <TableHead className="whitespace-nowrap text-right">Total</TableHead>
+              <TableHead className="whitespace-nowrap text-right">Balance</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -251,7 +253,7 @@ export function InvoicesList({
                     aria-label={`Select ${i.invoice_number ?? i.id}`}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className="whitespace-nowrap">
                   <Link
                     to="/admin/invoices/$id"
                     params={{ id: i.id }}
@@ -260,16 +262,22 @@ export function InvoicesList({
                     {i.invoice_number}
                   </Link>
                 </TableCell>
-                <TableCell>{customerDisplayName(i.customers as CustomerDisplay | null)}</TableCell>
-                <TableCell>{formatDate(i.issue_date)}</TableCell>
-                <TableCell>{formatDate(i.due_date)}</TableCell>
+                <TableCell className="max-w-[240px] truncate">
+                  {customerDisplayName(i.customers as CustomerDisplay | null)}
+                </TableCell>
+                <TableCell className="whitespace-nowrap">{formatDate(i.issue_date)}</TableCell>
+                <TableCell className="whitespace-nowrap">{formatDate(i.due_date)}</TableCell>
                 <TableCell>
                   <Badge variant={invoiceStatusVariant(i.status)}>
                     {invoiceStatusLabel(i.status)}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right">{formatMoney(financeTotalAmount(i), i.currency)}</TableCell>
-                <TableCell className="text-right">{formatMoney(financeBalanceDue(i), i.currency)}</TableCell>
+                <TableCell className="whitespace-nowrap text-right tabular-nums">
+                  {formatMoney(financeTotalAmount(i), i.currency)}
+                </TableCell>
+                <TableCell className="whitespace-nowrap text-right tabular-nums">
+                  {formatMoney(financeBalanceDue(i), i.currency)}
+                </TableCell>
               </TableRow>
             ))}
 
