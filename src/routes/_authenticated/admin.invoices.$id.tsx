@@ -165,9 +165,9 @@ function PurgeAuditSkeleton({ rows = 5 }: { rows?: number }) {
 }
 
 function InvoiceDetailPage() {
-  const { id } = useParams({ from: "/_authenticated/admin/invoices/$id" });
+  const { id } = Route.useParams();
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/_authenticated/admin/invoices/$id" });
+  const navigate = useNavigate() as (opts: any) => any;
   const qc = useQueryClient();
   const canEdit = useCanEditInvoices();
   const canPay = useCanEditPayments();
@@ -1620,7 +1620,7 @@ function InvoiceDetailPage() {
       }
       if (res?.invoice_id) {
         qc.invalidateQueries({ queryKey: ["invoices"] });
-        navigate({ to: "/_authenticated/admin/invoices/$id", params: { id: res.invoice_id } });
+        navigate({ to: "/admin/invoices/$id", params: { id: res.invoice_id } });
       }
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Convert failed"),

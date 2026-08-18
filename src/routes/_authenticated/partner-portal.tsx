@@ -73,7 +73,7 @@ function PartnerPortalPage() {
               </p>
               <div className="mt-4">
                 <Button asChild variant="outline">
-                  <Link to="/en/contact">Contact NEVO</Link>
+                  <Link to={"/en/contact" as any}>Contact NEVO</Link>
                 </Button>
               </div>
             </div>
@@ -134,7 +134,7 @@ function PartnerContent({ partnerId, partnerName }: { partnerId: string; partner
             <h1 className="text-lg font-semibold">{partnerName}</h1>
           </div>
           <Button asChild variant="outline" size="sm">
-            <Link to="/en">Back to nevoindustrial.com</Link>
+            <Link to={"/en" as any}>Back to nevoindustrial.com</Link>
           </Button>
         </div>
       </header>
