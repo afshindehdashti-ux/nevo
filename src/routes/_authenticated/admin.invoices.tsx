@@ -39,6 +39,7 @@ import {
   Info,
   Loader2,
   RefreshCw,
+  RotateCcw,
   SearchX,
   TriangleAlert,
 } from "lucide-react";
