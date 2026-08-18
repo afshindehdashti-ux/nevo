@@ -161,7 +161,7 @@ export const template = {
     total: 12500,
     requestedDelivery: '2026-08-15',
     notes: '2 x insulated panel line',
-    portalUrl: 'https://www.nevoindustrial.com/portal',
+    portalUrl: 'https://nevoindustrial.com/portal',
   },
 } satisfies TemplateEntry
 

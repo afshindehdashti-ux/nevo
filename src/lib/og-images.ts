@@ -112,7 +112,7 @@ export function ogImageFor(path: string): string {
 }
 
 /** Canonical site origin used to absolutize OG image URLs. */
-export const OG_SITE_URL = "https://www.nevoindustrial.com";
+export const OG_SITE_URL = "https://nevoindustrial.com";
 
 /** All OG images are pre-cropped derivatives at exactly 1200x630. */
 export const OG_IMAGE_WIDTH = 1200;

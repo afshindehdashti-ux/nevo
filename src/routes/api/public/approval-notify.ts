@@ -8,7 +8,7 @@ import { TEMPLATES } from '@/lib/email-templates/registry'
 const SITE_NAME = 'nevo-industrial-hub'
 const SENDER_DOMAIN = 'notify.nevoindustrial.com'
 const FROM_DOMAIN = 'notify.nevoindustrial.com'
-const APP_URL = 'https://www.nevoindustrial.com'
+const APP_URL = 'https://nevoindustrial.com'
 const TEMPLATE_NAME = 'approval-notification'
 
 const ENTITY_TYPE_LABEL: Record<string, string> = {

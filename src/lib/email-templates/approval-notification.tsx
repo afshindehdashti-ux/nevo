@@ -159,7 +159,7 @@ export const template = {
     entityLabel: 'PRO-2026-00042 · EUR 25,000',
     reason: 'Total EUR 25000 meets approval threshold 10000',
     requesterName: 'Sara Ahmed',
-    approvalUrl: 'https://www.nevoindustrial.com/admin/approvals',
+    approvalUrl: 'https://nevoindustrial.com/admin/approvals',
   },
 } satisfies TemplateEntry
 

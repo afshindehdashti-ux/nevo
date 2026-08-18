@@ -96,7 +96,7 @@ export const template = {
     fullName: 'Jane Doe',
     role: 'sales',
     invitedBy: 'Admin',
-    loginUrl: 'https://www.nevoindustrial.com/admin/login',
+    loginUrl: 'https://nevoindustrial.com/admin/login',
   },
 } satisfies TemplateEntry
 

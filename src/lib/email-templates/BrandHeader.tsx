@@ -6,11 +6,11 @@ import { brand, styles } from './_shared'
 // Email clients cannot resolve Vite-bundled assets, so we point at the
 // published domain's /__l5e/ asset endpoint.
 export const NEVO_LOGO_URL =
-  'https://www.nevoindustrial.com/__l5e/assets-v1/83decdbb-1d90-454a-9a8f-8646397e6317/nevo-logo-full.png'
+  'https://nevoindustrial.com/__l5e/assets-v1/83decdbb-1d90-454a-9a8f-8646397e6317/nevo-logo-full.png'
 
 // White wordmark used in dark-mode email clients (swapped via CSS below).
 export const NEVO_LOGO_URL_DARK =
-  'https://www.nevoindustrial.com/__l5e/assets-v1/9bf9fd57-e679-4467-81ff-f4ae246e8d1d/nevo-logo-white.png'
+  'https://nevoindustrial.com/__l5e/assets-v1/9bf9fd57-e679-4467-81ff-f4ae246e8d1d/nevo-logo-white.png'
 
 const logoStyleLight = {
   display: 'block',

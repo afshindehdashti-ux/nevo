@@ -31,7 +31,7 @@ function flattenScalar(input: Record<string, unknown>): Record<string, string | 
  * the admin preview matches what test-sends produce.
  */
 const SAMPLE_EMAIL = "user@example.test";
-const SAMPLE_URL = "https://www.nevoindustrial.com";
+const SAMPLE_URL = "https://nevoindustrial.com";
 
 const AUTH_SAMPLE_DATA: Record<string, Record<string, string>> = {
   signup: {

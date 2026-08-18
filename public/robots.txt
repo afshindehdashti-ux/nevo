@@ -58,4 +58,4 @@ Allow: /
 User-agent: cohere-ai
 Allow: /
 
-Sitemap: https://www.nevoindustrial.com/sitemap.xml
+Sitemap: https://nevoindustrial.com/sitemap.xml
