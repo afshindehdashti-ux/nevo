@@ -30,6 +30,20 @@ const JSON_OUT = process.argv.includes("--json");
 
 const LOCALES = ["en", "ar", "tr", "ru", "pt", "de", "es", "fr", "it", "zh"];
 
+// Locale path segment → advertised hreflang code (mirrors LOCALES in src/lib/seo.ts).
+const HREFLANG = {
+  en: "en",
+  ar: "ar",
+  tr: "tr",
+  ru: "ru",
+  pt: "pt",
+  de: "de",
+  es: "es",
+  fr: "fr",
+  it: "it",
+  zh: "zh-hans",
+};
+
 // Locale-agnostic paths (leading slash, "" = locale home).
 const ROUTES = [
   "",
@@ -172,11 +186,11 @@ function auditHtml(html, locale, path, ctx) {
   if (alternates.length === 0) {
     errors.push("hreflang: no alternate links emitted");
   } else {
-    const missing = LOCALES.filter((l) => !byLang.has(l));
+    const missing = LOCALES.filter((l) => !byLang.has(HREFLANG[l]));
     if (missing.length) errors.push(`hreflang: missing locales ${missing.join(", ")}`);
     if (!byLang.has("x-default")) errors.push("hreflang: missing x-default");
 
-    const self = byLang.get(locale);
+    const self = byLang.get(HREFLANG[locale]);
     if (self) {
       const selfPath = (() => {
         try {
@@ -186,7 +200,9 @@ function auditHtml(html, locale, path, ctx) {
         }
       })();
       if (selfPath !== (expectedPath || "/")) {
-        errors.push(`hreflang: self entry "${locale}" points to ${selfPath} (expected ${expectedPath})`);
+        errors.push(
+          `hreflang: self entry "${HREFLANG[locale]}" points to ${selfPath} (expected ${expectedPath})`,
+        );
       }
     }
 
@@ -196,11 +212,12 @@ function auditHtml(html, locale, path, ctx) {
         continue;
       }
       if (!/^https?:\/\//i.test(href)) errors.push(`hreflang: "${lang}" href not absolute (${href})`);
-      if (lang !== "x-default" && LOCALES.includes(lang)) {
+      const localeForLang = LOCALES.find((l) => HREFLANG[l] === lang);
+      if (localeForLang) {
         try {
           const p = new URL(href).pathname;
-          if (!p.startsWith(`/${lang}`)) {
-            errors.push(`hreflang: "${lang}" href not under /${lang} (${p})`);
+          if (!p.startsWith(`/${localeForLang}`)) {
+            errors.push(`hreflang: "${lang}" href not under /${localeForLang} (${p})`);
           }
         } catch {
           /* absolute check above already reported */
