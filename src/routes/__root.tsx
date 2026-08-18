@@ -21,7 +21,6 @@ import { ClientMonitor } from "../components/site/ClientMonitor";
 import { MaintenanceBanner } from "../components/site/MaintenanceBanner";
 import { CookieConsent } from "../components/site/CookieConsent";
 import { StickyMobileCTA } from "../components/site/StickyMobileCTA";
-import { LogoTelemetryOverlay } from "../components/site/LogoTelemetryOverlay";
 import { Toaster } from "../components/ui/sonner";
 import { orgJsonLd, websiteJsonLd, ldScript, hreflangLinks } from "../lib/seo";
 import { LanguageProvider } from "../i18n/LanguageProvider";
@@ -272,7 +271,6 @@ function RootComponent() {
         )}
         <ClientMonitor />
         <Toaster position="top-right" richColors closeButton />
-        <LogoTelemetryOverlay />
       </LanguageProvider>
     </QueryClientProvider>
   );
