@@ -172,22 +172,24 @@ export function InvoicesList({
         />
       }
     >
-      <div className="p-3 border-b flex flex-wrap gap-2 items-center">
-        <Label className="text-xs text-muted-foreground">Status</Label>
-        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as InvoiceStatus | "all")}>
-          <SelectTrigger className="w-52 h-8">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            {INVOICE_STATUSES.map((s) => (
-              <SelectItem key={s} value={s}>
-                {invoiceStatusLabel(s)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="ml-auto flex items-center gap-2">
+      <div className="p-3 border-b flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="flex min-w-0 items-center gap-2">
+          <Label className="shrink-0 text-xs text-muted-foreground">Status</Label>
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as InvoiceStatus | "all")}>
+            <SelectTrigger className="h-8 w-full min-w-0 sm:w-52">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              {INVOICE_STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {invoiceStatusLabel(s)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:ml-auto">
           {selected.size > 0 && (
             <span className="text-xs text-muted-foreground">{selected.size} selected</span>
           )}
