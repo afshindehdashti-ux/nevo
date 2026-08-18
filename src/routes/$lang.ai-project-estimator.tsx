@@ -91,7 +91,6 @@ export const Route = createFileRoute("/$lang/ai-project-estimator")({
       description:
         "Get instant AI-powered feasibility for your sandwich panel factory. Estimate investment, utilities, capacity, ROI, IRR and payback in seconds — trained on 1,500+ NEVO Industrial projects.",
       path: "/ai-project-estimator",
-      image: panelHero.url,
       keywords: [
         "sandwich panel factory",
         "project estimator",

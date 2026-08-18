@@ -4,7 +4,7 @@
 export const brand = {
   name: 'NEVO Industrial',
   tagline: 'Sandwich Panel & Turnkey Factory Solutions',
-  siteUrl: 'https://www.nevoindustrial.com',
+  siteUrl: 'https://nevoindustrial.com',
   supportEmail: 'info@nevoindustrial.com',
   primary: '#0F172A', // charcoal / near-black
   accent: '#059669', // emerald 600 — matches --accent

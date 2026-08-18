@@ -80,7 +80,6 @@ import tile21 from "@/assets/project/tile-21.jpg"; // technical drawings
 import tile22 from "@/assets/project/tile-22.jpg"; // data sheets
 import dubaiImg from "@/assets/project/dubai.jpg";
 import { SITE, WHATSAPP_URL, buildSeo } from "@/lib/seo";
-import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE = "Project Inquiry Center — Start Your Industrial Project | NEVO Industrial";
 const DESCRIPTION =

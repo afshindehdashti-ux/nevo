@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SITE, buildSeo } from "@/lib/seo";
+import { ogCoverFor } from "@/lib/og-article-covers";
 import { ARTICLES, ARTICLES_BY_SLUG, type Article } from "@/lib/knowledge-articles";
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
@@ -79,7 +80,7 @@ export const Route = createFileRoute("/$lang/knowledge-hub/$slug")({
       description: a.excerpt,
       path,
       lang: params.lang,
-      image: a.cover,
+      image: ogCoverFor(a.cover),
       type: "article",
     });
     return {
@@ -98,7 +99,7 @@ export const Route = createFileRoute("/$lang/knowledge-hub/$slug")({
             "@type": "Article",
             headline: a.title,
             description: a.excerpt,
-            image: a.cover,
+            image: a.cover.startsWith("http") ? a.cover : `${SITE.url}${a.cover}`,
             // Person when the byline is an individual (first + last name);
             // Organization for group/desk/team bylines like "NEVO Engineering Desk".
             author: /\b(Desk|Team|Group|Editors|Editorial|Industrial|Engineering Desk)\b/i.test(

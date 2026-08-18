@@ -36,7 +36,6 @@ import techProposal from "@/assets/ai/technical-proposal.jpg";
 import whatsappSupport from "@/assets/ai/whatsapp-support.jpg";
 import collab from "@/assets/ai/collab.jpg";
 import { SITE, buildSeo } from "@/lib/seo";
-import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE = "NEVO AI Engineer — AI Engineering Assistant for the Sandwich Panel Industry";
 const DESCRIPTION =

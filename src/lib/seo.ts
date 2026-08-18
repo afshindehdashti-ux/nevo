@@ -2,7 +2,7 @@
  * NEVO SEO helpers — centralized metadata + JSON-LD builders.
  * Use buildSeo() in every route's head() for consistent titles/OG/canonical.
  */
-import { OG_IMAGES, OG_DEFAULT } from "./og-images";
+import { OG_IMAGES, OG_DEFAULT, OG_IMAGE_WIDTH, OG_IMAGE_HEIGHT } from "./og-images";
 import { SEO_META } from "./seo-meta";
 
 export const SITE = {
@@ -12,7 +12,7 @@ export const SITE = {
   titleSuffix: "NEVO Industrial",
   defaultDescription:
     "Dubai-based engineering consultancy for sandwich panel factory development, production lines, and PIR/PUR raw materials worldwide.",
-  url: "https://www.nevoindustrial.com",
+  url: "https://nevoindustrial.com",
   logo: "/favicon.ico",
   sameAs: [
     "https://www.linkedin.com/company/nevo-industrial",
@@ -57,6 +57,24 @@ export const LOCALES = [
 
 export type LocaleCode = (typeof LOCALES)[number]["code"];
 
+/** Map a locale code to a valid Open Graph locale (language_TERRITORY). */
+const OG_LOCALE_MAP: Record<string, string> = {
+  en: "en_US",
+  ar: "ar_AE",
+  tr: "tr_TR",
+  ru: "ru_RU",
+  pt: "pt_PT",
+  de: "de_DE",
+  es: "es_ES",
+  fr: "fr_FR",
+  it: "it_IT",
+  zh: "zh_CN",
+};
+
+export function ogLocaleFor(lang: string): string {
+  return OG_LOCALE_MAP[String(lang)] ?? "en_US";
+}
+
 export interface SeoInput {
   title: string;
   description: string;
@@ -94,19 +112,16 @@ export function buildSeo(input: SeoInput) {
     { property: "og:type", content: input.type ?? "website" },
     { property: "og:url", content: absolutePath },
     { property: "og:site_name", content: SITE.name },
-    {
-      property: "og:locale",
-      content:
-        String(input.lang) === "ar"
-          ? "ar_AE"
-          : String(input.lang) === "zh"
-            ? "zh_CN"
-            : `${String(input.lang)}_${String(input.lang).toUpperCase()}`,
-    },
+    { property: "og:locale", content: ogLocaleFor(input.lang) },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: fullTitle },
     { name: "twitter:description", content: effectiveDescription },
   ];
+
+  // NOTE: no og:locale:alternate — the router dedupes meta by property, so
+  // repeated entries collapse to a single (misleading) tag. Localized variants
+  // are advertised through the hreflang <link rel="alternate"> set below.
+
 
   // Resolve OG image: explicit input.image wins, otherwise per-route mapping,
   // otherwise site-wide brand default. Guarantees every leaf route emits a
@@ -118,10 +133,13 @@ export function buildSeo(input: SeoInput) {
     : `${SITE.url}${resolvedImage}`;
   meta.push({ property: "og:image", content: absoluteImage });
   meta.push({ property: "og:image:secure_url", content: absoluteImage });
-  meta.push({ property: "og:image:width", content: "1200" });
-  meta.push({ property: "og:image:height", content: "630" });
+  meta.push({ property: "og:image:type", content: "image/jpeg" });
+  meta.push({ property: "og:image:width", content: String(OG_IMAGE_WIDTH) });
+  meta.push({ property: "og:image:height", content: String(OG_IMAGE_HEIGHT) });
   meta.push({ property: "og:image:alt", content: fullTitle });
   meta.push({ name: "twitter:image", content: absoluteImage });
+  meta.push({ name: "twitter:image:alt", content: fullTitle });
+
 
   if (input.keywords?.length) {
     meta.push({ name: "keywords", content: input.keywords.join(", ") });

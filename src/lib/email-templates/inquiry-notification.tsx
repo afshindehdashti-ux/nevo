@@ -157,7 +157,7 @@ export const template = {
     sourcePage: '/en/project-inquiry',
     referenceId: 'INQ-ABCD1234',
     submittedAt: new Date().toISOString(),
-    adminUrl: 'https://www.nevoindustrial.com/admin/leads',
+    adminUrl: 'https://nevoindustrial.com/admin/leads',
   },
 } satisfies TemplateEntry
 

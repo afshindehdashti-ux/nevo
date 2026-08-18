@@ -178,7 +178,7 @@ export const template = {
     total: 12500,
     issueDate: '2026-07-07',
     dueDate: '2026-07-21',
-    downloadUrl: 'https://www.nevoindustrial.com/download/example',
+    downloadUrl: 'https://nevoindustrial.com/download/example',
     expiresInHours: 168,
     senderName: 'Sales Team',
   },
