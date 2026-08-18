@@ -461,6 +461,9 @@ export function InvoicesList({
     () => sorted.slice(pageStart, pageStart + pageSize),
     [sorted, pageStart, pageSize],
   );
+  // Keep the table height stable while a debounced refetch is in flight by
+  // swapping rows for the same number of skeleton rows.
+  const skeletonRowCount = Math.max(1, Math.min(paged.length || 5, pageSize));
 
   // Filters change the result set — jump back to the first page so the user
   // never lands on an out-of-range (visually empty) page.
