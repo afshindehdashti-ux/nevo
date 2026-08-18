@@ -165,12 +165,27 @@ CONTRAST_JS = """
 (selector) => {
   const el = document.querySelector(selector);
   if (!el) return null;
-  const parse = (c) => {
-    const m = c.match(/rgba?\\(([^)]+)\\)/);
-    if (!m) return null;
-    const p = m[1].split(/[,\\s/]+/).filter(Boolean).map(Number);
-    return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+
+  // Tailwind v4 serializes computed colors as oklch()/oklab(); parse any CSS
+  // color by letting the canvas convert it to sRGB bytes.
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 1;
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  const toRgba = (css) => {
+    ctx.globalCompositeOperation = 'copy';
+    ctx.fillStyle = 'rgba(0,0,0,0)';
+    ctx.fillRect(0, 0, 1, 1);
+    ctx.fillStyle = css;
+    ctx.fillRect(0, 0, 1, 1);
+    const d = ctx.getImageData(0, 0, 1, 1).data;
+    return { r: d[0], g: d[1], b: d[2], a: d[3] / 255 };
   };
+  const over = (fg, bg) => ({
+    r: fg.r * fg.a + bg.r * (1 - fg.a),
+    g: fg.g * fg.a + bg.g * (1 - fg.a),
+    b: fg.b * fg.a + bg.b * (1 - fg.a),
+    a: 1,
+  });
   const lum = ({ r, g, b }) => {
     const f = (v) => {
       v /= 255;
@@ -178,27 +193,29 @@ CONTRAST_JS = """
     };
     return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
   };
-  const cs = getComputedStyle(el);
-  const fg = parse(cs.color);
-  let node = el, bg = null;
-  while (node && node !== document.documentElement.parentNode) {
-    const c = parse(getComputedStyle(node).backgroundColor);
-    if (c && c.a > 0.95) { bg = c; break; }
-    node = node.parentElement;
+
+  // Walk up collecting backgrounds until an opaque one, then composite down
+  // so translucent overlays (bg-muted/50 rows, badges) are accounted for.
+  const layers = [];
+  for (let n = el; n; n = n.parentElement) {
+    const c = toRgba(getComputedStyle(n).backgroundColor);
+    if (c.a === 0) continue;
+    layers.push(c);
+    if (c.a >= 0.999) break;
   }
-  if (!fg || !bg) return null;
-  // Flatten a translucent foreground over the resolved background.
-  const flat = {
-    r: fg.r * fg.a + bg.r * (1 - fg.a),
-    g: fg.g * fg.a + bg.g * (1 - fg.a),
-    b: fg.b * fg.a + bg.b * (1 - fg.a),
-  };
-  const l1 = lum(flat), l2 = lum(bg);
+  if (layers.length === 0) return null;
+  let bg = layers[layers.length - 1];
+  if (bg.a < 0.999) bg = over(bg, { r: 255, g: 255, b: 255, a: 1 });
+  for (let i = layers.length - 2; i >= 0; i--) bg = over(layers[i], bg);
+
+  const cs = getComputedStyle(el);
+  const fg = over(toRgba(cs.color), bg);
+  const l1 = lum(fg), l2 = lum(bg);
   const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
   return {
     ratio: Math.round(ratio * 100) / 100,
     color: cs.color,
-    background: `rgb(${bg.r}, ${bg.g}, ${bg.b})`,
+    background: `rgb(${Math.round(bg.r)}, ${Math.round(bg.g)}, ${Math.round(bg.b)})`,
     fontSize: parseFloat(cs.fontSize),
     fontWeight: cs.fontWeight,
     text: (el.textContent || "").trim().slice(0, 40),
