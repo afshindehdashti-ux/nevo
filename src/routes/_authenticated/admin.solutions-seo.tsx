@@ -49,7 +49,7 @@ function SolutionsSeoAdmin() {
     mutationFn: async () => {
       await supabase.auth.signOut();
     },
-    onSuccess: () => navigate({ to: "/auth" }),
+    onSuccess: () => navigate({ to: "/auth" } as any),
   });
 
   const merged = useMemo<SolutionsInspectionRow[]>(() => {

@@ -113,7 +113,7 @@ function SessionStatusPage() {
 
   async function handleSignOut() {
     await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
+    navigate({ to: "/auth", replace: true } as any);
   }
 
   return (

@@ -97,7 +97,7 @@ function PortalPage() {
               </p>
               <div className="mt-4">
                 <Button asChild variant="outline">
-                  <Link to="/en/contact">Contact NEVO</Link>
+                  <Link to={"/en/contact" as any}>Contact NEVO</Link>
                 </Button>
               </div>
             </div>
@@ -255,7 +255,7 @@ function PortalContent({ customerId, customerName }: { customerId: string; custo
             <h1 className="text-lg font-semibold">{customerName}</h1>
           </div>
           <Button asChild variant="outline" size="sm">
-            <Link to="/en">Back to nevoindustrial.com</Link>
+            <Link to={"/en" as any}>Back to nevoindustrial.com</Link>
           </Button>
         </div>
       </header>
