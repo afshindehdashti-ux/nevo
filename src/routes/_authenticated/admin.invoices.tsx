@@ -438,12 +438,17 @@ export function InvoicesList({
     setPage(1);
   }, [filterSignature, hydrated]);
 
+  const defaultDirFor = (key: SortKey): SortDir =>
+    key === "issue_date" || key === "due_date" || key === "total" || key === "balance"
+      ? "desc"
+      : "asc";
+
   const toggleSort = (key: SortKey) => {
     if (key === sortKey) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
       setSortKey(key);
-      setSortDir(key === "issue_date" || key === "due_date" ? "desc" : "asc");
+      setSortDir(defaultDirFor(key));
     }
   };
 
@@ -456,13 +461,26 @@ export function InvoicesList({
         : "none") as "ascending" | "descending" | "none",
     });
 
+  // Screen-reader confirmation of the applied sort, announced on change only.
+  const sortAnnouncement = `Sorted by ${SORT_LABELS[sortKey]}, ${
+    sortDir === "asc" ? "ascending" : "descending"
+  }`;
+
   const SortButton = ({ column, label, align }: { column: SortKey; label: string; align?: "right" }) => {
     const active = sortKey === column;
     const Icon = !active ? ChevronsUpDown : sortDir === "asc" ? ChevronUp : ChevronDown;
+    const nextDir: SortDir = active ? (sortDir === "asc" ? "desc" : "asc") : defaultDirFor(column);
+    const hint = active
+      ? `Sorted by ${label} ${sortDir === "asc" ? "ascending" : "descending"}. Activate to sort ${
+          nextDir === "asc" ? "ascending" : "descending"
+        }.`
+      : `Sort by ${label} ${nextDir === "asc" ? "ascending" : "descending"}`;
     return (
       <button
         type="button"
         onClick={() => toggleSort(column)}
+        aria-label={hint}
+        title={hint}
         className={`-mx-1 inline-flex w-full items-center gap-1 rounded-sm px-1 py-0.5 font-medium transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
           align === "right" ? "justify-end" : "justify-start"
         } ${active ? "text-foreground" : ""}`}
@@ -472,6 +490,7 @@ export function InvoicesList({
       </button>
     );
   };
+
 
   const toggleAll = (checked: boolean) => {
     setSelected((prev) => {
