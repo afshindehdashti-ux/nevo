@@ -14,7 +14,18 @@ import { Testimonials } from "@/components/site/Testimonials";
 import { CTABanner } from "@/components/site/CTABanner";
 import { ContactSection } from "@/components/site/ContactSection";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { SITE, buildSeo } from "@/lib/seo";
+import {
+  SITE,
+  buildSeo,
+  ldScript,
+  orgJsonLd,
+  localBusinessJsonLd,
+  websiteJsonLd,
+  ORG_ID,
+  WEBSITE_ID,
+  LOGO_URL,
+} from "@/lib/seo";
+
 import { ogImageMeta } from "@/lib/og-images";
 
 const TITLE = "NEVO Industrial — Sandwich Panel Engineering, Factory Development & Raw Materials";
