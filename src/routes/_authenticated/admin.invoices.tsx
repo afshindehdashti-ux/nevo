@@ -1084,8 +1084,54 @@ export function InvoicesList({
               : "transition-opacity duration-200"
           }
         >
+          <p aria-live="polite" className="sr-only">
+            {sortAnnouncement}
+          </p>
+
+          {/* Mobile has no column headers — expose the same sort keys as controls */}
+          <div className="flex items-center gap-2 border-b p-3 md:hidden">
+            <Label htmlFor="invoice-sort-mobile" className="shrink-0 text-xs text-muted-foreground">
+              Sort by
+            </Label>
+            <Select
+              value={sortKey}
+              onValueChange={(v) => {
+                setSortKey(v as SortKey);
+                setSortDir(defaultDirFor(v as SortKey));
+              }}
+            >
+              <SelectTrigger id="invoice-sort-mobile" className="h-8 min-w-0 flex-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {SORT_KEYS.map((k) => (
+                  <SelectItem key={k} value={k}>
+                    {SORT_LABELS[k]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8 shrink-0 gap-1"
+              onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+              aria-label={`Sort direction: ${
+                sortDir === "asc" ? "ascending" : "descending"
+              }. Activate to sort ${sortDir === "asc" ? "descending" : "ascending"}.`}
+            >
+              {sortDir === "asc" ? (
+                <ChevronUp className="size-4" aria-hidden="true" />
+              ) : (
+                <ChevronDown className="size-4" aria-hidden="true" />
+              )}
+              <span className="text-xs">{sortDir === "asc" ? "Asc" : "Desc"}</span>
+            </Button>
+          </div>
 
       {/* Mobile: stacked cards — no horizontal scrolling, tap targets stay usable */}
+
       <div className="md:hidden divide-y">
         {paged.map((i) => (
           <div
