@@ -806,6 +806,17 @@ export function InvoicesList({
             size="sm"
             variant="outline"
             className="h-8 shrink-0"
+            onClick={handleCopyLink}
+            title="Copy a link that reopens this view with the current filters, sorting and page"
+          >
+            <Link2 className="mr-1.5 size-3.5" aria-hidden="true" />
+            {linkCopied ? "Link copied" : "Copy link"}
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 shrink-0"
             onClick={handleResetFilters}
             disabled={!filtersDirty}
             title="Clear saved search, status, sort, rows per page and page"
