@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MasterListShell } from "@/components/crm/MasterListShell";
@@ -18,7 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ListEmptyState } from "@/components/admin/ListEmptyState";
-import { FileDown, FileText, Loader2, SearchX } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ChevronLeft, ChevronRight, FileDown, FileText, Loader2, SearchX } from "lucide-react";
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
@@ -61,6 +67,8 @@ export function InvoicesList({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [exporting, setExporting] = useState(false);
   const [rowBusy, setRowBusy] = useState<string | null>(null);
+  const [pageSize, setPageSize] = useState(25);
+  const [page, setPage] = useState(1);
 
   const { data: invoices = [], isLoading } = useQuery({
     queryKey: ["invoices", type],
@@ -91,6 +99,20 @@ export function InvoicesList({
   const filteredIds = useMemo(() => filtered.map((i) => i.id), [filtered]);
   const allSelected = filteredIds.length > 0 && filteredIds.every((id) => selected.has(id));
   const someSelected = filteredIds.some((id) => selected.has(id));
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, pageCount);
+  const pageStart = (currentPage - 1) * pageSize;
+  const paged = useMemo(
+    () => filtered.slice(pageStart, pageStart + pageSize),
+    [filtered, pageStart, pageSize],
+  );
+
+  // Filters change the result set — jump back to the first page so the user
+  // never lands on an out-of-range (visually empty) page.
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter, pageSize]);
 
   const toggleAll = (checked: boolean) => {
     setSelected((prev) => {
@@ -190,41 +212,79 @@ export function InvoicesList({
         />
       }
     >
-      <div className="p-3 border-b flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-        <div className="flex min-w-0 items-center gap-2">
-          <Label className="shrink-0 text-xs text-muted-foreground">Status</Label>
-          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as InvoiceStatus | "all")}>
-            <SelectTrigger className="h-8 w-full min-w-0 sm:w-52">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              {INVOICE_STATUSES.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {invoiceStatusLabel(s)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <TooltipProvider delayDuration={200}>
+        <div className="flex flex-col gap-3 border-b p-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="flex min-w-0 items-center gap-2">
+            <Label htmlFor="invoice-status-filter" className="shrink-0 text-xs text-muted-foreground">
+              Status
+            </Label>
+            <Select
+              value={statusFilter}
+              onValueChange={(v) => setStatusFilter(v as InvoiceStatus | "all")}
+            >
+              <SelectTrigger id="invoice-status-filter" className="h-8 w-full min-w-0 sm:w-52">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper" className="max-h-72">
+                <SelectItem value="all">All statuses</SelectItem>
+                {INVOICE_STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {invoiceStatusLabel(s)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 sm:ml-auto">
+            {selected.size > 0 && (
+              <span className="text-xs text-muted-foreground">{selected.size} selected</span>
+            )}
+            <Tooltip>
+              {/* span keeps the tooltip reachable while the button is disabled */}
+              <TooltipTrigger asChild>
+                <span tabIndex={selected.size === 0 ? 0 : -1} className="inline-flex rounded-md">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleBulkExport}
+                    disabled={selected.size === 0 || exporting}
+                  >
+                    {exporting ? (
+                      <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <FileDown className="mr-1 h-3.5 w-3.5" />
+                    )}
+                    Export PDF{selected.size > 1 ? "s" : ""}
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" collisionPadding={12}>
+                {selected.size === 0
+                  ? "Select one or more invoices to export them as PDF."
+                  : `Download ${selected.size} invoice PDF${selected.size > 1 ? "s (zipped)" : ""}.`}
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p className="min-w-0 text-xs text-muted-foreground">
+                  Create from an{" "}
+                  <Link
+                    to="/admin/orders"
+                    className="rounded-sm text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    order
+                  </Link>
+                  .
+                </p>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" collisionPadding={12} className="max-w-[260px]">
+                Invoices are generated from a confirmed order so totals and line items stay in sync.
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:ml-auto">
-          {selected.size > 0 && (
-            <span className="text-xs text-muted-foreground">{selected.size} selected</span>
-          )}
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleBulkExport}
-            disabled={selected.size === 0 || exporting}
-          >
-            {exporting ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <FileDown className="h-3.5 w-3.5 mr-1" />}
-            Export PDF{selected.size > 1 ? "s" : ""}
-          </Button>
-          <p className="text-xs text-muted-foreground whitespace-nowrap">
-            Create from an <Link to="/admin/orders" className="text-accent hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">order</Link>.
-          </p>
-        </div>
-      </div>
+      </TooltipProvider>
       {isLoading ? (
         <div
           data-testid="list-skeleton"
@@ -276,7 +336,7 @@ export function InvoicesList({
         <>
       {/* Mobile: stacked cards — no horizontal scrolling, tap targets stay usable */}
       <div className="md:hidden divide-y">
-        {filtered.map((i) => (
+        {paged.map((i) => (
           <div
             key={i.id}
             className={`p-3 ${selected.has(i.id) ? "bg-muted/50" : ""}`}
@@ -375,7 +435,7 @@ export function InvoicesList({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map((i) => (
+            {paged.map((i) => (
               <TableRow key={i.id} data-state={selected.has(i.id) ? "selected" : undefined}>
                 <TableCell>
                   <Checkbox
@@ -431,6 +491,51 @@ export function InvoicesList({
           </TableBody>
         </Table>
       </div>
+          <div className="flex flex-col gap-3 border-t p-3 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-2">
+              <Label htmlFor="invoice-page-size" className="shrink-0 text-xs text-muted-foreground">
+                Rows
+              </Label>
+              <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+                <SelectTrigger id="invoice-page-size" className="h-8 w-[84px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper" side="top" collisionPadding={12}>
+                  {[10, 25, 50, 100].map((n) => (
+                    <SelectItem key={n} value={String(n)}>
+                      {n}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <span className="tabular-nums">
+                {pageStart + 1}–{Math.min(pageStart + pageSize, filtered.length)} of {filtered.length}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="tabular-nums">
+                Page {currentPage} of {pageCount}
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPage((n) => Math.max(1, n - 1))}
+                disabled={currentPage <= 1}
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPage((n) => Math.min(pageCount, n + 1))}
+                disabled={currentPage >= pageCount}
+                aria-label="Next page"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </>
       )}
 
