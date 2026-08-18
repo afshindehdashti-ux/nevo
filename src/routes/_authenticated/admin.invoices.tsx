@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { usePersistedListPrefs } from "@/hooks/use-persisted-list-prefs";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MasterListShell } from "@/components/crm/MasterListShell";
@@ -77,6 +78,48 @@ type SortKey =
   | "total"
   | "balance";
 
+type SortDir = "asc" | "desc";
+
+const SORT_KEYS: SortKey[] = [
+  "invoice_number",
+  "customer",
+  "issue_date",
+  "due_date",
+  "status",
+  "total",
+  "balance",
+];
+const PAGE_SIZES = [10, 25, 50, 100];
+
+const INVOICE_LIST_DEFAULTS = {
+  search: "",
+  statusFilter: "all" as InvoiceStatus | "all",
+  pageSize: 25,
+  page: 1,
+  sortKey: "issue_date" as SortKey,
+  sortDir: "desc" as SortDir,
+};
+
+/** Drops anything stored that no longer matches the current UI contract. */
+function sanitizeInvoiceListPrefs(
+  stored: Partial<typeof INVOICE_LIST_DEFAULTS>,
+): Partial<typeof INVOICE_LIST_DEFAULTS> {
+  const clean: Partial<typeof INVOICE_LIST_DEFAULTS> = {};
+  if (typeof stored.search === "string") clean.search = stored.search.slice(0, 200);
+  if (typeof stored.statusFilter === "string") clean.statusFilter = stored.statusFilter as InvoiceStatus | "all";
+  if (typeof stored.pageSize === "number" && PAGE_SIZES.includes(stored.pageSize)) {
+    clean.pageSize = stored.pageSize;
+  }
+  if (typeof stored.page === "number" && Number.isFinite(stored.page) && stored.page >= 1) {
+    clean.page = Math.floor(stored.page);
+  }
+  if (typeof stored.sortKey === "string" && SORT_KEYS.includes(stored.sortKey as SortKey)) {
+    clean.sortKey = stored.sortKey as SortKey;
+  }
+  if (stored.sortDir === "asc" || stored.sortDir === "desc") clean.sortDir = stored.sortDir;
+  return clean;
+}
+
 export function InvoicesList({
   type,
   title,
@@ -84,15 +127,26 @@ export function InvoicesList({
   type: "commercial" | "proforma";
   title: string;
 }) {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<InvoiceStatus | "all">("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [exporting, setExporting] = useState(false);
   const [rowBusy, setRowBusy] = useState<string | null>(null);
-  const [pageSize, setPageSize] = useState(25);
-  const [page, setPage] = useState(1);
-  const [sortKey, setSortKey] = useState<SortKey>("issue_date");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
+  // Search, status filter, sorting and pagination survive a page refresh.
+  const { prefs, setPrefs, resetPrefs, hydrated } = usePersistedListPrefs(
+    `nevo.admin.invoices.${type}.prefs`,
+    INVOICE_LIST_DEFAULTS,
+    sanitizeInvoiceListPrefs,
+  );
+  const { search, statusFilter, pageSize, page, sortKey, sortDir } = prefs;
+
+  const setSearch = (v: string) => setPrefs({ search: v });
+  const setStatusFilter = (v: InvoiceStatus | "all") => setPrefs({ statusFilter: v });
+  const setPageSize = (v: number) => setPrefs({ pageSize: v });
+  const setPage = (v: number | ((n: number) => number)) =>
+    setPrefs((c) => ({ page: typeof v === "function" ? v(c.page) : v }));
+  const setSortKey = (v: SortKey) => setPrefs({ sortKey: v });
+  const setSortDir = (v: SortDir | ((d: SortDir) => SortDir)) =>
+    setPrefs((c) => ({ sortDir: typeof v === "function" ? v(c.sortDir) : v }));
 
   const {
     data: invoices = [],
@@ -171,9 +225,19 @@ export function InvoicesList({
 
   // Filters change the result set — jump back to the first page so the user
   // never lands on an out-of-range (visually empty) page.
+  const filterSignature = `${search}|${statusFilter}|${pageSize}|${sortKey}|${sortDir}`;
+  const lastFilterSignature = useRef<string | null>(null);
   useEffect(() => {
+    if (!hydrated) return;
+    // First pass after restoring stored prefs must keep the stored page.
+    if (lastFilterSignature.current === null) {
+      lastFilterSignature.current = filterSignature;
+      return;
+    }
+    if (lastFilterSignature.current === filterSignature) return;
+    lastFilterSignature.current = filterSignature;
     setPage(1);
-  }, [search, statusFilter, pageSize, sortKey, sortDir]);
+  }, [filterSignature, hydrated]);
 
   const toggleSort = (key: SortKey) => {
     if (key === sortKey) {
