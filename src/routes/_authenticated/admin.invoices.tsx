@@ -47,6 +47,9 @@ import {
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
+import { useTableColumnLayout } from "@/lib/use-table-columns";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 
 import {
   AlertDialog,
