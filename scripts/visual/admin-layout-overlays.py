@@ -86,13 +86,19 @@ BREAKPOINTS = [
     {"name": "wide", "width": 1536, "height": 960, "states": ["expanded", "collapsed"]},
 ]
 
-# Regions that must stay clickable. (label, selector, required)
+# Regions that must stay clickable, per sidebar state. The mobile sheet
+# deliberately covers the app header and its own trigger behind the scrim, so
+# those two regions are only asserted in the desktop states.
+# (label, selector, required, states)
+ALL_STATES = ("sheet", "expanded", "collapsed")
+DESKTOP_STATES = ("expanded", "collapsed")
 HIT_REGIONS = [
-    ("sidebar footer", '[data-sidebar="footer"]', True),
-    ("sidebar header", '[data-sidebar="header"]', True),
-    ("sidebar trigger", '[data-sidebar="trigger"]', True),
-    ("first menu button", '[data-sidebar="menu-button"]', True),
-    ("app header", "header.sticky", True),
+    ("sidebar footer", '[data-sidebar="footer"]', True, ALL_STATES),
+    ("sidebar header", '[data-sidebar="header"]', True, ALL_STATES),
+    ("first nav link", '[data-sidebar="menu"] a', True, ALL_STATES),
+    ("last nav link", '[data-sidebar="menu"] a:last-of-type', True, ALL_STATES),
+    ("sidebar trigger", '[data-sidebar="trigger"]', True, DESKTOP_STATES),
+    ("app header", "header.sticky", True, DESKTOP_STATES),
 ]
 
 # Public marketing chrome — must never exist on an admin route. Keep in sync
@@ -116,6 +122,7 @@ ALLOWED_OVERLAYS = {
     "sidebar-rail",  # drag rail
     "app-header",  # sticky admin header
     "toaster",  # sonner region (top-right, non-blocking)
+  "ai-assist-launcher",  # admin-only AI Assist FAB (bottom-right, z-40)
 }
 
 DISABLE_MOTION_CSS = """
@@ -157,6 +164,7 @@ INSPECT_JS = r"""
     if (sb === 'sidebar' || el.querySelector(':scope > [data-sidebar="sidebar"]'))
       return 'sidebar-container';
     if (el.tagName === 'HEADER') return 'app-header';
+    if (el.getAttribute('aria-label') === 'Open AI Assistant') return 'ai-assist-launcher';
     if (el.closest('[data-sonner-toaster]') || el.hasAttribute('data-sonner-toaster'))
       return 'toaster';
     return null;
@@ -318,7 +326,12 @@ async def capture(context, vp: dict, state: str) -> tuple[str, Path | None, list
         if count:
             failures.append(f"{case}: public chrome leaked into admin — {selector} x{count}")
 
-    info = await page.evaluate(INSPECT_JS, HIT_REGIONS)
+    regions = [
+        [label, selector, required]
+        for label, selector, required, states in HIT_REGIONS
+        if state in states
+    ]
+    info = await page.evaluate(INSPECT_JS, regions)
 
     if not info["sidebar"]:
         failures.append(f"{case}: no sidebar element found — shell markup changed")
@@ -328,7 +341,7 @@ async def capture(context, vp: dict, state: str) -> tuple[str, Path | None, list
     # --- occlusion ----------------------------------------------------------
     for hit in info["hits"]:
         if hit.get("missing") or hit.get("hidden"):
-            if hit["required"] and state != "collapsed":
+            if hit["required"]:
                 failures.append(
                     f"{case}: required region {hit['label']!r} ({hit['selector']}) "
                     f"{'missing from DOM' if hit.get('missing') else 'has zero size'}"
