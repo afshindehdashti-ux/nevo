@@ -43,6 +43,8 @@
     "test:visual:admin-invoices": "python3 scripts/visual/admin-invoices-visual.py",
     "test:visual:admin-invoices:update": "UPDATE_BASELINES=1 python3 scripts/visual/admin-invoices-visual.py",
     "test:visual:admin-list:update": "python3 scripts/visual/admin-list-layout.py --update",
+    "test:visual:admin-layout": "python3 scripts/visual/admin-layout-overlays.py",
+    "test:visual:admin-layout:update": "UPDATE_BASELINES=1 python3 scripts/visual/admin-layout-overlays.py",
     "check:admin-list-telemetry": "node scripts/check-admin-list-telemetry.mjs",
     "test:e2e:logo-fallback": "node scripts/e2e/header-logo-fallback.mjs",
     "test:e2e:homepage-contact": "python3 scripts/e2e/homepage_contact_submit.py",
