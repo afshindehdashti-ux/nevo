@@ -2,7 +2,7 @@
  * NEVO SEO helpers — centralized metadata + JSON-LD builders.
  * Use buildSeo() in every route's head() for consistent titles/OG/canonical.
  */
-import { OG_IMAGES, OG_DEFAULT } from "./og-images";
+import { OG_IMAGES, OG_DEFAULT, OG_IMAGE_WIDTH, OG_IMAGE_HEIGHT } from "./og-images";
 import { SEO_META } from "./seo-meta";
 
 export const SITE = {
@@ -56,6 +56,24 @@ export const LOCALES = [
 ] as const;
 
 export type LocaleCode = (typeof LOCALES)[number]["code"];
+
+/** Map a locale code to a valid Open Graph locale (language_TERRITORY). */
+const OG_LOCALE_MAP: Record<string, string> = {
+  en: "en_US",
+  ar: "ar_AE",
+  tr: "tr_TR",
+  ru: "ru_RU",
+  pt: "pt_PT",
+  de: "de_DE",
+  es: "es_ES",
+  fr: "fr_FR",
+  it: "it_IT",
+  zh: "zh_CN",
+};
+
+export function ogLocaleFor(lang: string): string {
+  return OG_LOCALE_MAP[String(lang)] ?? "en_US";
+}
 
 export interface SeoInput {
   title: string;
