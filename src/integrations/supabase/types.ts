@@ -1851,6 +1851,66 @@ export type Database = {
         }
         Relationships: []
       }
+      image_slot_overrides: {
+        Row: {
+          asset_key: string
+          asset_path: string
+          byte_size: number | null
+          content_type: string | null
+          created_at: string
+          height: number | null
+          id: string
+          is_active: boolean
+          license_credit: string | null
+          license_id: string | null
+          license_source: string | null
+          license_type: string | null
+          notes: string | null
+          storage_path: string
+          updated_at: string
+          uploaded_by: string | null
+          width: number | null
+        }
+        Insert: {
+          asset_key: string
+          asset_path: string
+          byte_size?: number | null
+          content_type?: string | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          is_active?: boolean
+          license_credit?: string | null
+          license_id?: string | null
+          license_source?: string | null
+          license_type?: string | null
+          notes?: string | null
+          storage_path: string
+          updated_at?: string
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Update: {
+          asset_key?: string
+          asset_path?: string
+          byte_size?: number | null
+          content_type?: string | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          is_active?: boolean
+          license_credit?: string | null
+          license_id?: string | null
+          license_source?: string | null
+          license_type?: string | null
+          notes?: string | null
+          storage_path?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Relationships: []
+      }
       import_job_rows: {
         Row: {
           created_at: string
