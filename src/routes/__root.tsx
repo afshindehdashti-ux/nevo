@@ -25,6 +25,8 @@ import { StickyMobileCTA } from "../components/site/StickyMobileCTA";
 import { Toaster } from "../components/ui/sonner";
 import { orgJsonLd, websiteJsonLd, ldScript } from "../lib/seo";
 import { LanguageProvider } from "../i18n/LanguageProvider";
+import { DevOverlays } from "@/components/dev/DevOverlays";
+
 import {
   SUPPORTED_LOCALES,
   DEFAULT_LOCALE,
