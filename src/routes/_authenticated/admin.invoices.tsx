@@ -1016,8 +1016,10 @@ export function InvoicesList({
                 <Button
                   variant="outline"
                   onClick={() => {
+                    setSearchInput("");
                     setSearch("");
                     setStatusFilter("all");
+
                   }}
                 >
                   Clear filters
