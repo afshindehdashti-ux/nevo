@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { submitLeadForm } from "@/lib/lead-submit";
 import { getPhoneExample } from "@/lib/phone-validation";
 import { SITE, WHATSAPP_URL, buildSeo } from "@/lib/seo";
+import { ldScript, localBusinessJsonLd, ORG_ID } from "@/lib/seo";
 import { localizedMeta } from "@/lib/seo-meta";
 
 const URL_PATH = "/contact";
@@ -454,18 +455,6 @@ function ContactPage() {
 // engines can surface each location individually in local results.
 const OFFICE_SCHEMAS = [
   {
-    name: "NEVO Industrial — Dubai (Global HQ)",
-    email: "solutions@nevoindustrial.com",
-    telephone: SITE.contact.phone,
-    address: {
-      streetAddress: "Business Bay",
-      addressLocality: "Dubai",
-      addressCountry: "AE",
-    },
-    openingHours: "Su-Th 08:30-18:00",
-    areaServed: ["AE", "GCC", "MENA"],
-  },
-  {
     name: "NEVO Industrial — Düsseldorf (European Engineering Hub)",
     email: "europe@nevoindustrial.com",
     address: {
@@ -500,27 +489,29 @@ const OFFICE_SCHEMAS = [
   },
 ] as const;
 
-const contactScripts = OFFICE_SCHEMAS.map((o) => ({
-  type: "application/ld+json",
-  children: JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    name: o.name,
-    parentOrganization: { "@type": "Organization", name: SITE.name, url: SITE.url },
-    url: `${SITE.url}/contact`,
-    email: o.email,
-    ...("telephone" in o && o.telephone ? { telephone: o.telephone } : {}),
-    address: { "@type": "PostalAddress", ...o.address },
-    openingHours: o.openingHours,
-    areaServed: o.areaServed,
-  }),
-}));
+const buildContactScripts = (lang: string) => [
+  ldScript(localBusinessJsonLd(lang)),
+  ...OFFICE_SCHEMAS.map((o) =>
+    ldScript({
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      name: o.name,
+      parentOrganization: { "@id": ORG_ID },
+      url: `${SITE.url}/${lang}/contact`,
+      email: o.email,
+      ...("telephone" in o && o.telephone ? { telephone: o.telephone } : {}),
+      address: { "@type": "PostalAddress", ...o.address },
+      openingHours: o.openingHours,
+      areaServed: o.areaServed,
+    }),
+  ),
+];
 
 export const Route = createFileRoute("/$lang/contact")({
   head: ({ params }) => {
     const { title, description } = localizedMeta(URL_PATH, params.lang);
     const seo = buildSeo({ title, description, path: URL_PATH, lang: params.lang });
-    return { ...seo, scripts: contactScripts };
+    return { ...seo, scripts: buildContactScripts(String(params.lang)) };
   },
   component: ContactPage,
 });
