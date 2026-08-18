@@ -76,8 +76,18 @@ import {
   type InvoiceStatus,
 } from "@/lib/crm-status";
 
+const invoiceSearchSchema = z.object({
+  q: fallback(z.string(), "").default(""),
+  status: fallback(z.string(), "all").default("all"),
+  page: fallback(z.number().int(), 1).default(1),
+  size: fallback(z.number().int(), 25).default(25),
+  sort: fallback(z.string(), "issue_date").default("issue_date"),
+  dir: fallback(z.string(), "desc").default("desc"),
+});
+
 export const Route = createFileRoute("/_authenticated/admin/invoices")({
   head: () => ({ meta: [{ title: "Invoices — NEVO CRM" }, { name: "robots", content: "noindex" }] }),
+  validateSearch: zodValidator(invoiceSearchSchema),
   component: () => <InvoicesList type="commercial" title="Invoices" />,
 });
 
