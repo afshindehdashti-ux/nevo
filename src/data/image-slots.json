@@ -1620,7 +1620,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/01-blueprint.jpg",
-   "assetKey": "01_blueprint",
+   "assetKey": "01-blueprint",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 245,
@@ -1646,7 +1646,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/02-cad.jpg",
-   "assetKey": "02_cad",
+   "assetKey": "02-cad",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
    "kb": 86,
@@ -1662,7 +1662,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/03-3d-factory.jpg",
-   "assetKey": "03_3d_factory",
+   "assetKey": "03-3d-factory",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 443,
@@ -1690,7 +1690,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/04-meeting.jpg",
-   "assetKey": "04_meeting",
+   "assetKey": "04-meeting",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
    "kb": 152,
@@ -1706,7 +1706,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/05-calculations.jpg",
-   "assetKey": "05_calculations",
+   "assetKey": "05-calculations",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
    "kb": 107,
@@ -1722,7 +1722,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/06-production-line.jpg",
-   "assetKey": "06_production_line",
+   "assetKey": "06-production-line",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 263,
@@ -1750,7 +1750,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/07-laminator.jpg",
-   "assetKey": "07_laminator",
+   "assetKey": "07-laminator",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 208,
@@ -1778,7 +1778,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/10-stacking.jpg",
-   "assetKey": "10_stacking",
+   "assetKey": "10-stacking",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
    "kb": 194,
@@ -1794,7 +1794,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/11-ppgi.jpg",
-   "assetKey": "11_ppgi",
+   "assetKey": "11-ppgi",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
    "kb": 81,
@@ -1810,7 +1810,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/14-polyol.jpg",
-   "assetKey": "14_polyol",
+   "assetKey": "14-polyol",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 247,
@@ -1835,7 +1835,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/16-rockwool.jpg",
-   "assetKey": "16_rockwool",
+   "assetKey": "16-rockwool",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 416,
@@ -1860,7 +1860,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/17-pir-panel.jpg",
-   "assetKey": "17_pir_panel",
+   "assetKey": "17-pir-panel",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 118,
@@ -1888,7 +1888,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/21-coldroom-panel.jpg",
-   "assetKey": "21_coldroom_panel",
+   "assetKey": "21-coldroom-panel",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 284,
@@ -1914,7 +1914,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/23-cleanroom.jpg",
-   "assetKey": "23_cleanroom",
+   "assetKey": "23-cleanroom",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 193,
@@ -1939,7 +1939,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/26-industrial-bldg.jpg",
-   "assetKey": "26_industrial_bldg",
+   "assetKey": "26-industrial-bldg",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 172,
@@ -1964,7 +1964,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/28-fire-rating.jpg",
-   "assetKey": "28_fire_rating",
+   "assetKey": "28-fire-rating",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 259,
@@ -1990,7 +1990,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/30-flow-diagram.jpg",
-   "assetKey": "30_flow_diagram",
+   "assetKey": "30-flow-diagram",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
    "kb": 229,
@@ -2006,7 +2006,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/31-material-flow.jpg",
-   "assetKey": "31_material_flow",
+   "assetKey": "31-material-flow",
    "folder": "assets/knowledge",
    "intrinsic": "1024x1024",
    "kb": 171,
@@ -2022,7 +2022,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/33-layout.jpg",
-   "assetKey": "33_layout",
+   "assetKey": "33-layout",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 388,
@@ -2050,7 +2050,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/36-investment-report.jpg",
-   "assetKey": "36_investment_report",
+   "assetKey": "36-investment-report",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 144,
@@ -2078,7 +2078,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/38-factory-guide.jpg",
-   "assetKey": "38_factory_guide",
+   "assetKey": "38-factory-guide",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 226,
@@ -2094,7 +2094,7 @@
   },
   {
    "assetPath": "src/assets/knowledge/40-material-guide.jpg",
-   "assetKey": "40_material_guide",
+   "assetKey": "40-material-guide",
    "folder": "assets/knowledge",
    "intrinsic": "1920x1280",
    "kb": 338,
@@ -3741,7 +3741,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/01-blueprint.jpg",
-   "assetKey": "01_blueprint",
+   "assetKey": "01-blueprint",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 120,
@@ -3757,7 +3757,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/03-3d-factory.jpg",
-   "assetKey": "03_3d_factory",
+   "assetKey": "03-3d-factory",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 214,
@@ -3773,7 +3773,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/06-production-line.jpg",
-   "assetKey": "06_production_line",
+   "assetKey": "06-production-line",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 132,
@@ -3789,7 +3789,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/07-laminator.jpg",
-   "assetKey": "07_laminator",
+   "assetKey": "07-laminator",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 104,
@@ -3805,7 +3805,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/14-polyol.jpg",
-   "assetKey": "14_polyol",
+   "assetKey": "14-polyol",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 127,
@@ -3821,7 +3821,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/16-rockwool.jpg",
-   "assetKey": "16_rockwool",
+   "assetKey": "16-rockwool",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 189,
@@ -3837,7 +3837,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/17-pir-panel.jpg",
-   "assetKey": "17_pir_panel",
+   "assetKey": "17-pir-panel",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 50,
@@ -3853,7 +3853,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/21-coldroom-panel.jpg",
-   "assetKey": "21_coldroom_panel",
+   "assetKey": "21-coldroom-panel",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 124,
@@ -3869,7 +3869,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/23-cleanroom.jpg",
-   "assetKey": "23_cleanroom",
+   "assetKey": "23-cleanroom",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 97,
@@ -3885,7 +3885,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/26-industrial-bldg.jpg",
-   "assetKey": "26_industrial_bldg",
+   "assetKey": "26-industrial-bldg",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 81,
@@ -3901,7 +3901,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/28-fire-rating.jpg",
-   "assetKey": "28_fire_rating",
+   "assetKey": "28-fire-rating",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 129,
@@ -3917,7 +3917,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/33-layout.jpg",
-   "assetKey": "33_layout",
+   "assetKey": "33-layout",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 170,
@@ -3933,7 +3933,7 @@
   },
   {
    "assetPath": "src/assets/og/knowledge/36-investment-report.jpg",
-   "assetKey": "36_investment_report",
+   "assetKey": "36-investment-report",
    "folder": "assets/og/knowledge",
    "intrinsic": "1200x630",
    "kb": 69,
