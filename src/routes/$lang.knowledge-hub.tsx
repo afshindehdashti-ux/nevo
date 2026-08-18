@@ -35,17 +35,17 @@ import { SITE, buildSeo } from "@/lib/seo";
 import { ARTICLES, type Category } from "@/lib/knowledge-articles";
 
 // Reuse existing knowledge photography for cards outside the article list
-import k01 from "@/assets/knowledge/01_blueprint.jpg";
-import k03 from "@/assets/knowledge/03_3d_factory.jpg";
-import k06 from "@/assets/knowledge/06_production_line.jpg";
-import k07 from "@/assets/knowledge/07_laminator.jpg";
-import k17 from "@/assets/knowledge/17_pir_panel.jpg";
-import k21 from "@/assets/knowledge/21_coldroom_panel.jpg";
-import k28 from "@/assets/knowledge/28_fire_rating.jpg";
-import k33 from "@/assets/knowledge/33_layout.jpg";
-import k36 from "@/assets/knowledge/36_investment_report.jpg";
-import k38 from "@/assets/knowledge/38_factory_guide.jpg";
-import k40 from "@/assets/knowledge/40_material_guide.jpg";
+import k01 from "@/assets/knowledge/01-blueprint.jpg";
+import k03 from "@/assets/knowledge/03-3d-factory.jpg";
+import k06 from "@/assets/knowledge/06-production-line.jpg";
+import k07 from "@/assets/knowledge/07-laminator.jpg";
+import k17 from "@/assets/knowledge/17-pir-panel.jpg";
+import k21 from "@/assets/knowledge/21-coldroom-panel.jpg";
+import k28 from "@/assets/knowledge/28-fire-rating.jpg";
+import k33 from "@/assets/knowledge/33-layout.jpg";
+import k36 from "@/assets/knowledge/36-investment-report.jpg";
+import k38 from "@/assets/knowledge/38-factory-guide.jpg";
+import k40 from "@/assets/knowledge/40-material-guide.jpg";
 
 export const Route = createFileRoute("/$lang/knowledge-hub")({
   component: KnowledgeHub,

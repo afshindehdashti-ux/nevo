@@ -1,17 +1,17 @@
 // Shared knowledge-article registry — used by /knowledge-hub and /knowledge-hub/$slug
-import k01 from "@/assets/knowledge/01_blueprint.jpg";
-import k03 from "@/assets/knowledge/03_3d_factory.jpg";
-import k06 from "@/assets/knowledge/06_production_line.jpg";
-import k07 from "@/assets/knowledge/07_laminator.jpg";
-import k14 from "@/assets/knowledge/14_polyol.jpg";
-import k16 from "@/assets/knowledge/16_rockwool.jpg";
-import k17 from "@/assets/knowledge/17_pir_panel.jpg";
-import k21 from "@/assets/knowledge/21_coldroom_panel.jpg";
-import k23 from "@/assets/knowledge/23_cleanroom.jpg";
-import k26 from "@/assets/knowledge/26_industrial_bldg.jpg";
-import k28 from "@/assets/knowledge/28_fire_rating.jpg";
-import k33 from "@/assets/knowledge/33_layout.jpg";
-import k36 from "@/assets/knowledge/36_investment_report.jpg";
+import k01 from "@/assets/knowledge/01-blueprint.jpg";
+import k03 from "@/assets/knowledge/03-3d-factory.jpg";
+import k06 from "@/assets/knowledge/06-production-line.jpg";
+import k07 from "@/assets/knowledge/07-laminator.jpg";
+import k14 from "@/assets/knowledge/14-polyol.jpg";
+import k16 from "@/assets/knowledge/16-rockwool.jpg";
+import k17 from "@/assets/knowledge/17-pir-panel.jpg";
+import k21 from "@/assets/knowledge/21-coldroom-panel.jpg";
+import k23 from "@/assets/knowledge/23-cleanroom.jpg";
+import k26 from "@/assets/knowledge/26-industrial-bldg.jpg";
+import k28 from "@/assets/knowledge/28-fire-rating.jpg";
+import k33 from "@/assets/knowledge/33-layout.jpg";
+import k36 from "@/assets/knowledge/36-investment-report.jpg";
 
 export type Category =
   | "PIR"

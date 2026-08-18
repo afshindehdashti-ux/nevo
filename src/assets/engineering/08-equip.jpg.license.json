@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "asset": "src/assets/engineering/08-equip.jpg",
+  "slot": "Inline illustration / card",
+  "routes": [
+    "/$lang/solutions/engineering-consultancy"
+  ],
+  "required_size": "1600x900 (16:9)",
+  "caption": "",
+  "alt": "",
+  "credit": "",
+  "source": "",
+  "source_url": "",
+  "license": "",
+  "license_id": "",
+  "capture_date": "",
+  "location": "",
+  "restrictions": "",
+  "ai_generated": true,
+  "status": "pending-sourcing",
+  "provenance_attestation": {
+    "verified_by": "",
+    "verified_on": "",
+    "method": ""
+  }
+}
