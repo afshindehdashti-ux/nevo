@@ -33,10 +33,20 @@ import { formatDate, formatMoney } from "@/lib/crm-money";
 import { financeTotalAmount, financeBalanceDue } from "@/lib/finance-normalization";
 import { customerDisplayName, type CustomerDisplay } from "@/lib/finance-normalization";
 
+// Filters + sorting live in the URL so a proforma view can be shared or
+// bookmarked; localStorage only supplies the starting point when the URL is bare.
+const proformaSearchSchema = z.object({
+  q: fallback(z.string(), "").default(""),
+  payment: fallback(z.string(), "all").default("all"),
+  sort: fallback(z.string(), "created_at").default("created_at"),
+  dir: fallback(z.string(), "desc").default("desc"),
+});
+
 export const Route = createFileRoute("/_authenticated/admin/proforma-invoices")({
   head: () => ({
     meta: [{ title: "Proforma Invoices — NEVO CRM" }, { name: "robots", content: "noindex" }],
   }),
+  validateSearch: zodValidator(proformaSearchSchema),
   component: ProformaInvoicesList,
 });
 
