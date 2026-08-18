@@ -120,7 +120,53 @@ function sanitizeInvoiceListPrefs(
   return clean;
 }
 
+type BulkActionKey = "export" | "issue" | "paid" | "void";
+
+const BULK_STATUS: Partial<Record<BulkActionKey, InvoiceStatus>> = {
+  issue: "issued",
+  paid: "paid",
+  void: "void",
+};
+
+const BULK_COPY: Record<
+  BulkActionKey,
+  { label: string; title: string; body: (n: number) => string; confirm: string; destructive?: boolean }
+> = {
+  export: {
+    label: "Export PDFs",
+    title: "Export selected invoices?",
+    body: (n) =>
+      n === 1
+        ? "One PDF will be generated and downloaded."
+        : `${n} PDFs will be generated and downloaded together as a single ZIP file.`,
+    confirm: "Export",
+  },
+  issue: {
+    label: "Mark as issued",
+    title: "Mark selected invoices as issued?",
+    body: (n) =>
+      `${n} invoice${n > 1 ? "s" : ""} will move to the “Issued” status. Issued invoices count towards receivables.`,
+    confirm: "Mark as issued",
+  },
+  paid: {
+    label: "Mark as paid",
+    title: "Mark selected invoices as paid?",
+    body: (n) =>
+      `${n} invoice${n > 1 ? "s" : ""} will be marked fully paid. Do this only after the payments are reconciled.`,
+    confirm: "Mark as paid",
+  },
+  void: {
+    label: "Void",
+    title: "Void selected invoices?",
+    body: (n) =>
+      `${n} invoice${n > 1 ? "s" : ""} will be voided. Voided invoices stay in the archive for audit but no longer count towards revenue or receivables.`,
+    confirm: "Void invoices",
+    destructive: true,
+  },
+};
+
 export function InvoicesList({
+
   type,
   title,
 }: {
