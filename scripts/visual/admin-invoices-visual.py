@@ -148,6 +148,8 @@ CONTRAST_PROBES = [
 ]
 MIN_RATIO_NORMAL = 4.5
 MIN_RATIO_LARGE = 3.0
+# Guard against every probe silently failing to match after a markup change.
+MIN_RESOLVED_PROBES = 4
 
 DISABLE_MOTION_CSS = """
   *, *::before, *::after {
@@ -309,10 +311,12 @@ async def capture(context, theme: str, vp: dict) -> tuple[Path, list[str]]:
         )
 
     # --- contrast -----------------------------------------------------------
+    resolved_probes = 0
     for label, selector, is_large in CONTRAST_PROBES:
         info = await page.evaluate(CONTRAST_JS, selector)
         if not info:
             continue  # probe not rendered at this breakpoint (e.g. table-only cell)
+        resolved_probes += 1
         large = is_large or info["fontSize"] >= 24 or (
             info["fontSize"] >= 18.66 and int(float(info["fontWeight"])) >= 700
         )
@@ -322,6 +326,13 @@ async def capture(context, theme: str, vp: dict) -> tuple[Path, list[str]]:
                 f"{case}: {label} contrast {info['ratio']}:1 < {minimum}:1 "
                 f"({info['color']} on {info['background']}, text={info['text']!r})"
             )
+
+    # Selector rot would silently disable the contrast gate — require a floor.
+    if resolved_probes < MIN_RESOLVED_PROBES:
+        failures.append(
+            f"{case}: only {resolved_probes}/{len(CONTRAST_PROBES)} contrast probes "
+            f"resolved (expected >= {MIN_RESOLVED_PROBES}) — selectors likely stale"
+        )
 
     # --- pixels -------------------------------------------------------------
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
