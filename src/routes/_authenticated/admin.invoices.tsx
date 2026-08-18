@@ -715,13 +715,35 @@ export function InvoicesList({
               {pendingAction ? BULK_COPY[pendingAction].title : ""}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {pendingAction ? BULK_COPY[pendingAction].body(selected.size) : ""}
+              {pendingAction === "export"
+                ? exportPlan.ready.length === 0
+                  ? "None of the selected invoices can be exported yet — each is missing a customer, issue date, or currency."
+                  : exportPlan.ready.length === 1
+                    ? "1 invoice is ready. One PDF will be generated and downloaded."
+                    : `${exportPlan.ready.length} invoices are ready. Their PDFs will be generated and downloaded together as a single ZIP file.`
+                : pendingAction
+                  ? BULK_COPY[pendingAction].body(selected.size)
+                  : ""}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {pendingAction === "export" && exportPlan.blocked.length > 0 ? (
+            <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-xs">
+              <p className="font-medium text-destructive">
+                {exportPlan.blocked.length} of {exportPlan.total} selected will be skipped
+              </p>
+              <ul className="mt-1 max-h-32 space-y-0.5 overflow-y-auto text-muted-foreground">
+                {exportPlan.blocked.map((b) => (
+                  <li key={b.id}>
+                    <span className="font-medium text-foreground">{b.name}</span> — {b.reason}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              disabled={busy}
+              disabled={busy || (pendingAction === "export" && exportPlan.ready.length === 0)}
               className={
                 pendingAction && BULK_COPY[pendingAction].destructive
                   ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
