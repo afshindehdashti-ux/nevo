@@ -1285,27 +1285,12 @@ export function InvoicesList({
                   aria-label="Select all"
                 />
               </TableHead>
-              <TableHead className="whitespace-nowrap" {...sortProps("invoice_number")}>
-                <SortButton column="invoice_number" label="Invoice #" />
-              </TableHead>
-              <TableHead {...sortProps("customer")}>
-                <SortButton column="customer" label="Customer" />
-              </TableHead>
-              <TableHead className="whitespace-nowrap" {...sortProps("issue_date")}>
-                <SortButton column="issue_date" label="Date" />
-              </TableHead>
-              <TableHead className="whitespace-nowrap" {...sortProps("due_date")}>
-                <SortButton column="due_date" label="Due" />
-              </TableHead>
-              <TableHead className="whitespace-nowrap" {...sortProps("status")}>
-                <SortButton column="status" label="Status" />
-              </TableHead>
-              <TableHead className="whitespace-nowrap text-right" {...sortProps("total")}>
-                <SortButton column="total" label="Total" align="right" />
-              </TableHead>
-              <TableHead className="whitespace-nowrap text-right" {...sortProps("balance")}>
-                <SortButton column="balance" label="Balance" align="right" />
-              </TableHead>
+              {columns.visibleOrder.map((c) => (
+                <TableHead key={c} className={COLUMN_DEFS[c].headClass} {...sortProps(c)}>
+                  <SortButton column={c} label={COLUMN_DEFS[c].shortLabel} align={COLUMN_DEFS[c].align} />
+                </TableHead>
+              ))}
+
               <TableHead className="w-10 text-right">
                 <span className="sr-only">Actions</span>
               </TableHead>
