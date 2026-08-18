@@ -1728,7 +1728,7 @@ function InvoiceDetailPage() {
                 <Link
                   to="/admin/customers/$id"
                   params={{ id: cust.id }}
-                  className="text-primary hover:underline"
+                  className="text-accent hover:underline"
                 >
                   {customerDisplayName(cust)}
                 </Link>

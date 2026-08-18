@@ -201,7 +201,7 @@ export function InvoicesList({
             Export PDF{selected.size > 1 ? "s" : ""}
           </Button>
           <p className="text-xs text-muted-foreground">
-            Create from an <Link to="/admin/orders" className="text-primary hover:underline">order</Link>.
+            Create from an <Link to="/admin/orders" className="text-accent hover:underline">order</Link>.
           </p>
         </div>
       </div>
@@ -255,7 +255,7 @@ export function InvoicesList({
                   <Link
                     to="/admin/invoices/$id"
                     params={{ id: i.id }}
-                    className="text-primary hover:underline font-medium"
+                    className="text-accent hover:underline font-medium"
                   >
                     {i.invoice_number}
                   </Link>

@@ -179,7 +179,7 @@ function CustomerDetailPage() {
           <Card className="border-primary/30">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-base flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
+                <Sparkles className="h-4 w-4 text-accent" />
                 AI summary
               </CardTitle>
               <Button
@@ -258,7 +258,7 @@ function CustomerDetailPage() {
                         <Link
                           to="/admin/orders/$id"
                           params={{ id: o.id }}
-                          className="text-primary hover:underline"
+                          className="text-accent hover:underline"
                         >
                           {o.order_number || o.id.slice(0, 8)}
                         </Link>
@@ -308,7 +308,7 @@ function CustomerDetailPage() {
                         <Link
                           to="/admin/invoices/$id"
                           params={{ id: i.id }}
-                          className="text-primary hover:underline"
+                          className="text-accent hover:underline"
                         >
                           {i.invoice_number}
                         </Link>
@@ -361,7 +361,7 @@ function CustomerDetailPage() {
                         <Link
                           to="/admin/shipments/$id"
                           params={{ id: s.id }}
-                          className="text-primary hover:underline"
+                          className="text-accent hover:underline"
                         >
                           {s.shipment_number || s.id.slice(0, 8)}
                         </Link>

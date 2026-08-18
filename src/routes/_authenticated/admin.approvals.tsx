@@ -113,7 +113,7 @@ function ApprovalsPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold flex items-center gap-2">
-            <ShieldAlert className="h-6 w-6 text-primary" /> Approvals
+            <ShieldAlert className="h-6 w-6 text-accent" /> Approvals
           </h1>
           <p className="text-sm text-muted-foreground">
             Proformas, invoices, commissions, sensitive documents and large discounts

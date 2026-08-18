@@ -164,7 +164,7 @@ export function CommunicationTimeline({
             <div key={r.id} className="flex gap-3 border-b border-border pb-3 last:border-0">
               <div className="mt-1">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                  <Icon className="h-4 w-4 text-primary" />
+                  <Icon className="h-4 w-4 text-accent" />
                 </div>
               </div>
               <div className="flex-1 min-w-0">

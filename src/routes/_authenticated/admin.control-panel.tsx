@@ -159,7 +159,7 @@ function ControlPanel() {
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <div className="flex items-center gap-2 text-primary text-xs uppercase tracking-widest font-semibold">
+          <div className="flex items-center gap-2 text-accent text-xs uppercase tracking-widest font-semibold">
             <ShieldCheck className="h-4 w-4" /> Super Admin
           </div>
           <h1 className="text-2xl font-semibold tracking-tight mt-1">Control Panel</h1>

@@ -150,7 +150,7 @@ function InviteUserPage() {
             </Link>
           </Button>
           <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-            <UserPlus className="h-5 w-5 text-primary" />
+            <UserPlus className="h-5 w-5 text-accent" />
             Invite team member
           </h1>
           <p className="text-sm text-muted-foreground">

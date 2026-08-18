@@ -366,7 +366,7 @@ function LeadsPage() {
                           <Link
                             to="/admin/leads/$id"
                             params={{ id: l.id }}
-                            className="text-primary hover:underline font-medium"
+                            className="text-accent hover:underline font-medium"
                           >
                             {l.name}
                           </Link>

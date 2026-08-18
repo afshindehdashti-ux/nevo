@@ -551,7 +551,7 @@ function ExportsHistoryPage() {
                     key={p.id}
                     className={`inline-flex items-center gap-1 rounded-full border pl-2 pr-1 py-0.5 text-xs ${
                       activePresetId === p.id
-                        ? "border-primary bg-primary/10 text-primary"
+                        ? "border-primary bg-primary/10 text-accent"
                         : "border-border bg-background"
                     }`}
                   >

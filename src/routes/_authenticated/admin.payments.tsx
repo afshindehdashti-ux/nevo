@@ -71,7 +71,7 @@ function PaymentsPage() {
       <div className="p-3 border-b flex justify-between items-center text-sm">
         <span className="text-muted-foreground">
           Record payments from an{" "}
-          <Link to="/admin/invoices" className="text-primary hover:underline">
+          <Link to="/admin/invoices" className="text-accent hover:underline">
             invoice
           </Link>
           .
@@ -119,7 +119,7 @@ function PaymentsPage() {
                     <Link
                       to="/admin/invoices/$id"
                       params={{ id: p.invoice_id }}
-                      className="text-primary hover:underline"
+                      className="text-accent hover:underline"
                     >
                       {inv?.invoice_number || p.invoice_id.slice(0, 8)}
                     </Link>

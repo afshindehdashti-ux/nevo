@@ -95,7 +95,7 @@ function DocIntelPage() {
       <header className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
-            <Brain className="h-5 w-5 text-primary" />
+            <Brain className="h-5 w-5 text-accent" />
             NEVO Document Intelligence Assistant
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
@@ -757,7 +757,7 @@ function DocumentDrawer({ id, onClose }: { id: string | null; onClose: () => voi
       <SheetContent className="sm:max-w-3xl w-full overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            <Brain className="h-4 w-4 text-primary" />
+            <Brain className="h-4 w-4 text-accent" />
             AI Review
           </SheetTitle>
         </SheetHeader>
@@ -1080,7 +1080,7 @@ function AiSuggestionsPanel({
     <div className={`rounded-md border p-3 space-y-3 text-xs ${toneClass}`}>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Brain className="h-4 w-4 text-primary" />
+          <Brain className="h-4 w-4 text-accent" />
           <span className="font-medium">AI review panel</span>
         </div>
         <span className="font-medium">
@@ -1204,7 +1204,7 @@ function SuggestField({
           type="button"
           onClick={onApply}
           disabled={!value}
-          className="text-primary text-[10px] hover:underline disabled:opacity-40"
+          className="text-accent text-[10px] hover:underline disabled:opacity-40"
         >
           Apply
         </button>

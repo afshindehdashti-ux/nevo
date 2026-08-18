@@ -77,7 +77,7 @@ function AdminLoginPage() {
         onSubmit={onSubmit}
         className="w-full max-w-sm space-y-4 border border-border rounded-lg p-6 bg-card shadow-sm"
       >
-        <div className="flex items-center gap-2 text-primary">
+        <div className="flex items-center gap-2 text-accent">
           <ShieldCheck className="h-5 w-5" />
           <span className="text-xs uppercase tracking-widest font-semibold">NEVO Back Office</span>
         </div>

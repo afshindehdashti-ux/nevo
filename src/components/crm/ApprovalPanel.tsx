@@ -96,7 +96,7 @@ export function ApprovalPanel({
   return (
     <div className="rounded border border-border bg-muted/30 p-3 text-sm">
       <div className="flex items-center gap-2">
-        <ShieldAlert className="h-4 w-4 text-primary" />
+        <ShieldAlert className="h-4 w-4 text-accent" />
         <span className="font-medium">Approval</span>
         {isLoading ? (
           <span className="text-xs text-muted-foreground">Loading…</span>

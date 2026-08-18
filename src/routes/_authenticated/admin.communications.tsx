@@ -311,7 +311,7 @@ function CommRow({
   return (
     <div className="flex gap-4 p-4">
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
-        <Icon className="h-4 w-4 text-primary" />
+        <Icon className="h-4 w-4 text-accent" />
       </div>
       <div className="flex-1 min-w-0 space-y-1">
         <div className="flex items-center gap-2 flex-wrap text-xs">

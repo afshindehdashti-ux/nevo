@@ -600,7 +600,7 @@ function ProductConfiguratorPage() {
             <Button
               onClick={addComparison}
               disabled={comparisons.length >= 3}
-              className="bg-accent text-primary hover:bg-accent/90"
+              className="bg-accent text-accent hover:bg-accent/90"
             >
               <Plus className="mr-1 size-4" /> Add Current Config
             </Button>
