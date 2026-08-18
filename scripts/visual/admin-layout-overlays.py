@@ -304,10 +304,14 @@ async def capture(context, vp: dict, state: str) -> tuple[str, Path | None, list
     await page.wait_for_selector('[data-sidebar="trigger"]', timeout=20_000)
     # The nav groups render once the profile/permission query resolves; without
     # this wait the shell would be captured mid-hydration and drift.
-    await page.wait_for_selector('[data-sidebar="menu"] a', timeout=20_000)
     await page.add_style_tag(content=DISABLE_MOTION_CSS)
     await page.add_style_tag(content=MASK_PROFILE_CSS)
     await prepare_state(page, state)
+    # Nav groups render once the profile/permission query resolves (and, on
+    # mobile, only after the sheet mounts); without this wait the shell would
+    # be captured mid-hydration and the baseline would drift.
+    await page.wait_for_selector('[data-sidebar="menu"] a', timeout=20_000)
+    await page.wait_for_timeout(300)
 
     # --- leaked public chrome ----------------------------------------------
     for selector in LEAK_SELECTORS:
