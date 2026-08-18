@@ -382,7 +382,7 @@ function PirVsRockWoolPage() {
             <Chip tone="graphite">14 min read</Chip>
           </div>
           <h1 className="max-w-4xl text-5xl font-semibold leading-[1.05] tracking-tight text-white md:text-7xl">
-            PIR <span className="text-white/40">vs</span>{" "}
+            PIR <span className="text-white/60">vs</span>{" "}
             <span className="text-emerald-400">Rock Wool</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-white/60">
@@ -519,7 +519,7 @@ function PirVsRockWoolPage() {
                   <r.icon className="h-4 w-4 text-emerald-300/80" />
                   <div>
                     <div className="text-white">{r.label}</div>
-                    {r.note && <div className="text-[11px] text-white/40">{r.note}</div>}
+                    {r.note && <div className="text-[11px] text-white/60">{r.note}</div>}
                   </div>
                 </div>
                 <div
@@ -534,7 +534,7 @@ function PirVsRockWoolPage() {
                 </div>
                 <div className="col-span-1 text-right">
                   {r.winner === "TIE" ? (
-                    <span className="font-mono text-[11px] text-white/40">TIE</span>
+                    <span className="font-mono text-[11px] text-white/60">TIE</span>
                   ) : (
                     <Chip>{r.winner === "PIR" ? "PIR" : "Rock Wool"}</Chip>
                   )}
@@ -610,7 +610,7 @@ function PirVsRockWoolPage() {
                   </div>
                 ))}
               </div>
-              <div className="flex flex-wrap items-center gap-3 border-t border-white/10 bg-black/40 px-4 py-3 font-mono text-[10px] uppercase tracking-widest text-white/40">
+              <div className="flex flex-wrap items-center gap-3 border-t border-white/10 bg-black/40 px-4 py-3 font-mono text-[10px] uppercase tracking-widest text-white/60">
                 <span className="inline-flex items-center gap-1">
                   <RotateCw className="h-3 w-3" /> Rotate
                 </span>
@@ -635,7 +635,7 @@ function PirVsRockWoolPage() {
                   </div>
                   <div className="font-mono text-2xl font-semibold text-white">
                     {selectedThickness}
-                    <span className="text-sm text-white/40"> mm</span>
+                    <span className="text-sm text-white/60"> mm</span>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -669,7 +669,7 @@ function PirVsRockWoolPage() {
                     <Bar value={currentU.rw} max={0.9} tone="graphite" />
                   </div>
                 </div>
-                <p className="mt-5 font-mono text-[10px] uppercase tracking-widest text-white/40">
+                <p className="mt-5 font-mono text-[10px] uppercase tracking-widest text-white/60">
                   Lower U-value = Better insulation
                 </p>
               </div>
@@ -790,7 +790,7 @@ function PirVsRockWoolPage() {
               <div className="grid grid-cols-6 gap-4">
                 {Object.entries(WEIGHTS).map(([thk, v]) => (
                   <div key={thk} className="text-center">
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-white/60">
                       {thk}mm
                     </div>
                     <div className="mt-3 flex h-40 items-end justify-center gap-2">
@@ -812,7 +812,7 @@ function PirVsRockWoolPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-4 text-center font-mono text-[10px] uppercase tracking-widest text-white/40">
+              <div className="mt-4 text-center font-mono text-[10px] uppercase tracking-widest text-white/60">
                 kg/m² · PIR (green) vs Rock Wool (grey)
               </div>
             </div>
@@ -848,7 +848,7 @@ function PirVsRockWoolPage() {
                   </div>
                 </div>
               ))}
-              <p className="pt-2 font-mono text-[10px] uppercase tracking-widest text-white/40">
+              <p className="pt-2 font-mono text-[10px] uppercase tracking-widest text-white/60">
                 Higher dB = Better sound insulation
               </p>
             </div>
@@ -1100,11 +1100,11 @@ function PirVsRockWoolPage() {
                     <d.icon className="h-4 w-4 text-emerald-300/80" />
                     <span className="text-sm font-medium text-white">{d.title}</span>
                   </div>
-                  <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-white/40">
+                  <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-white/60">
                     {d.size}
                   </div>
                 </div>
-                <Download className="h-4 w-4 text-white/40 transition group-hover:text-emerald-300" />
+                <Download className="h-4 w-4 text-white/60 transition group-hover:text-emerald-300" />
               </button>
             ))}
           </div>
@@ -1123,7 +1123,7 @@ function PirVsRockWoolPage() {
               >
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-6">
                   <span className="text-base font-medium text-white">{f.q}</span>
-                  <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-white/40 transition group-open:rotate-90" />
+                  <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-white/60 transition group-open:rotate-90" />
                 </summary>
                 <p className="mt-4 text-sm leading-relaxed text-white/70">{f.a}</p>
               </details>

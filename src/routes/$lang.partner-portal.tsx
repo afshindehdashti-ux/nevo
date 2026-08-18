@@ -455,10 +455,10 @@ function PartnerPortalPage() {
               {/* Top bar */}
               <div className="mb-6 flex flex-wrap items-center gap-3">
                 <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
-                  <Search className="h-4 w-4 text-white/40" />
+                  <Search className="h-4 w-4 text-white/60" />
                   <input
                     placeholder="Search leads, products, documents…"
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-white/40"
+                    className="w-full bg-transparent text-sm outline-none placeholder:text-white/60"
                   />
                 </div>
                 <button className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/5">
@@ -635,7 +635,7 @@ function LoginGate({
             <div>
               <label className="text-xs text-white/60">Partner ID</label>
               <div className="mt-1 flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
-                <BadgeCheck className="h-4 w-4 text-white/40" />
+                <BadgeCheck className="h-4 w-4 text-white/60" />
                 <input
                   required
                   defaultValue="NVP-24801"
@@ -646,7 +646,7 @@ function LoginGate({
             <div>
               <label className="text-xs text-white/60">Email</label>
               <div className="mt-1 flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
-                <Mail className="h-4 w-4 text-white/40" />
+                <Mail className="h-4 w-4 text-white/60" />
                 <input
                   required
                   type="email"
@@ -658,7 +658,7 @@ function LoginGate({
             <div>
               <label className="text-xs text-white/60">Password</label>
               <div className="mt-1 flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
-                <Lock className="h-4 w-4 text-white/40" />
+                <Lock className="h-4 w-4 text-white/60" />
                 <input
                   required
                   type={showPw ? "text" : "password"}
@@ -668,7 +668,7 @@ function LoginGate({
                 <button
                   type="button"
                   onClick={() => setShowPw(!showPw)}
-                  className="text-white/40 hover:text-white"
+                  className="text-white/60 hover:text-white"
                 >
                   {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -756,7 +756,7 @@ function Dashboard() {
                 <span className={`h-2.5 w-2.5 rounded-full ${col as string}`} />
                 <span className="flex-1 text-white/80">{l}</span>
                 <span className="text-white/60">{c}</span>
-                <span className="text-white/40">({p})</span>
+                <span className="text-white/60">({p})</span>
               </li>
             ))}
           </ul>
@@ -783,7 +783,7 @@ function Dashboard() {
                 <div className="flex-1">
                   <div className="text-white/90">{t}</div>
                 </div>
-                <div className="text-xs text-white/40">{d}</div>
+                <div className="text-xs text-white/60">{d}</div>
               </li>
             ))}
           </ul>
@@ -805,7 +805,7 @@ function Dashboard() {
                 <div className="flex-1">
                   <div className="text-white/90">{a.t}</div>
                 </div>
-                <div className="text-xs text-white/40">{a.d}</div>
+                <div className="text-xs text-white/60">{a.d}</div>
               </li>
             ))}
           </ul>
@@ -882,7 +882,7 @@ function SalesChart() {
           <circle key={i} cx={i * step} cy={h - (v / max) * (h - 20)} r="2.5" fill="#10b981" />
         ))}
       </svg>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 grid grid-cols-12 text-[10px] text-white/40">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 grid grid-cols-12 text-[10px] text-white/60">
         {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(
           (m) => (
             <div key={m} className="text-center">
@@ -922,16 +922,16 @@ function LeadsPanel({
       <Card className="p-5">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
-            <Search className="h-4 w-4 text-white/40" />
+            <Search className="h-4 w-4 text-white/60" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search company or country…"
-              className="w-full bg-transparent text-sm outline-none placeholder:text-white/40"
+              className="w-full bg-transparent text-sm outline-none placeholder:text-white/60"
             />
           </div>
           <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-2 py-1">
-            <Filter className="ml-1 h-3.5 w-3.5 text-white/40" />
+            <Filter className="ml-1 h-3.5 w-3.5 text-white/60" />
             {stages.map((s) => (
               <button
                 key={s}
@@ -981,7 +981,7 @@ function LeadsPanel({
         <textarea
           rows={3}
           placeholder="Add a note for the selected lead…"
-          className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm outline-none placeholder:text-white/40"
+          className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm outline-none placeholder:text-white/60"
         />
       </Card>
     </div>
@@ -1101,7 +1101,7 @@ function MarketingCenter() {
                       <Icon className="h-4 w-4 text-emerald-300" />
                       {m.title}
                     </span>
-                    <span className="text-[11px] text-white/40">{m.type}</span>
+                    <span className="text-[11px] text-white/60">{m.type}</span>
                   </button>
                 );
               })}
@@ -1285,7 +1285,7 @@ function CommunicationCenter() {
               className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-4 py-3"
             >
               <span className="text-white/90">{t}</span>
-              <span className="text-xs text-white/40">{d}</span>
+              <span className="text-xs text-white/60">{d}</span>
             </li>
           ))}
         </ul>
@@ -1327,7 +1327,7 @@ function AnalyticsPanel() {
               </div>
             ))}
           </div>
-          <div className="mt-2 flex justify-between text-[10px] text-white/40">
+          <div className="mt-2 flex justify-between text-[10px] text-white/60">
             {["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"].map((m, i) => (
               <span key={i}>{m}</span>
             ))}
@@ -1395,7 +1395,7 @@ function AiAssistant() {
                       <div className="font-medium text-white">{t.title}</div>
                       <div className="text-xs text-white/50">{t.desc}</div>
                     </div>
-                    <ArrowRight className="h-4 w-4 text-white/40" />
+                    <ArrowRight className="h-4 w-4 text-white/60" />
                   </button>
                 );
               })}
@@ -1409,7 +1409,7 @@ function AiAssistant() {
           <Sparkles className="h-4 w-4 text-emerald-300" />
           <input
             placeholder="e.g. Draft a proposal for 5,000 m² cold storage panels in Riyadh"
-            className="w-full bg-transparent text-sm outline-none placeholder:text-white/40"
+            className="w-full bg-transparent text-sm outline-none placeholder:text-white/60"
           />
           <button className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-black hover:bg-emerald-400">
             Generate

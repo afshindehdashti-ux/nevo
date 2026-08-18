@@ -158,7 +158,7 @@ function ArticlePage() {
         <div className="relative mx-auto max-w-4xl px-6 pt-24 pb-14">
           <nav
             aria-label="Breadcrumb"
-            className="text-[11px] font-mono uppercase tracking-widest text-white/40 mb-6 flex flex-wrap gap-2 items-center"
+            className="text-[11px] font-mono uppercase tracking-widest text-white/60 mb-6 flex flex-wrap gap-2 items-center"
           >
             <Link to="/" className="hover:text-emerald-400">
               Home
@@ -304,7 +304,7 @@ function ArticlePage() {
                   <h3 className="text-base font-semibold tracking-tight group-hover:text-emerald-300 transition leading-snug">
                     {r.title}
                   </h3>
-                  <div className="mt-4 flex items-center justify-between text-xs text-white/40">
+                  <div className="mt-4 flex items-center justify-between text-xs text-white/60">
                     <span className="inline-flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5" /> {r.readMin} min
                     </span>

@@ -435,7 +435,7 @@ function DownloadCenterPage() {
           {/* Search + filters */}
           <div className="mt-10 flex flex-col gap-4">
             <div className="relative max-w-xl">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -497,7 +497,7 @@ function DownloadCenterPage() {
                   </ul>
 
                   <div className="mt-6 flex items-center justify-between">
-                    <span className="text-xs text-white/40 font-mono uppercase tracking-widest">
+                    <span className="text-xs text-white/60 font-mono uppercase tracking-widest">
                       {c.items.length} resources
                     </span>
                     <button

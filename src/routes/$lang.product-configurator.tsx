@@ -1384,7 +1384,7 @@ function StepAccessories({ cfg, onToggle }: { cfg: Config; onToggle: (a: string)
                 {active ? (
                   <Check className="size-4 text-accent" />
                 ) : (
-                  <Plus className="size-4 text-white/40" />
+                  <Plus className="size-4 text-white/60" />
                 )}
               </button>
             );
@@ -1532,7 +1532,7 @@ function SliderField({
         onChange={(e) => onChange(+e.target.value)}
         className="mt-3 w-full accent-[hsl(var(--accent))]"
       />
-      <div className="mt-1 flex justify-between text-[10px] text-white/40">
+      <div className="mt-1 flex justify-between text-[10px] text-white/60">
         <span>{min}</span>
         <span>{max}</span>
       </div>

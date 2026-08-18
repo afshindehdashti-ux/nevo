@@ -360,7 +360,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 type="email"
                 placeholder="you@company.com"
                 defaultValue="engineer@client.com"
-                className="w-full bg-transparent text-sm outline-none placeholder:text-white/40"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-white/60"
               />
             </div>
 
@@ -374,7 +374,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 type={show ? "text" : "password"}
                 placeholder="••••••••"
                 defaultValue="demo-password"
-                className="w-full bg-transparent text-sm outline-none placeholder:text-white/40"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-white/60"
               />
               <button
                 type="button"
@@ -512,7 +512,7 @@ function PortalShell({ onLogout }: { onLogout: () => void }) {
               <Search className="h-4 w-4 text-white/50" />
               <input
                 placeholder="Search projects, documents, drawings…"
-                className="w-full bg-transparent text-sm outline-none placeholder:text-white/40"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-white/60"
               />
             </div>
             <button className="relative rounded-xl border border-white/10 bg-black/40 p-2 hover:bg-white/5">
@@ -766,7 +766,7 @@ function DashboardSection() {
                     {m.loc}
                   </div>
                 </div>
-                <ChevronRight className="h-4 w-4 text-white/40" />
+                <ChevronRight className="h-4 w-4 text-white/60" />
               </li>
             ))}
           </ol>
@@ -922,7 +922,7 @@ function TimelineSection() {
                         ? "border-emerald-400/50 bg-emerald-500/20 text-emerald-300"
                         : s.active
                           ? "border-emerald-400 bg-emerald-500 text-black"
-                          : "border-white/15 bg-black/40 text-white/40"
+                          : "border-white/15 bg-black/40 text-white/60"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -1363,7 +1363,7 @@ function QualitySection() {
                   <div className="truncate">{v.t}</div>
                   <div className="text-xs text-white/50">{v.d}</div>
                 </div>
-                <ChevronRight className="h-4 w-4 text-white/40" />
+                <ChevronRight className="h-4 w-4 text-white/60" />
               </li>
             ))}
           </ul>

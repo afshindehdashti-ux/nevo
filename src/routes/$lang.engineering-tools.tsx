@@ -326,7 +326,7 @@ function EngineeringToolsCenter() {
         <div className="relative mx-auto max-w-7xl px-6 pt-28 pb-24">
           <nav
             aria-label="Breadcrumb"
-            className="text-[11px] font-mono uppercase tracking-widest text-white/40 mb-6 flex gap-2 items-center"
+            className="text-[11px] font-mono uppercase tracking-widest text-white/60 mb-6 flex gap-2 items-center"
           >
             <Link to="/" className="hover:text-emerald-400">
               Home
@@ -396,12 +396,12 @@ function EngineeringToolsCenter() {
       <section className="sticky top-16 z-30 border-b border-white/5 bg-[#05070a]/85 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-6 py-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search 20 engineering tools — thickness, U-value, ROI, layout…"
-              className="w-full rounded-lg border border-white/10 bg-white/[0.03] pl-10 pr-4 py-3 text-sm placeholder:text-white/40 focus:outline-none focus:border-emerald-500/50"
+              className="w-full rounded-lg border border-white/10 bg-white/[0.03] pl-10 pr-4 py-3 text-sm placeholder:text-white/60 focus:outline-none focus:border-emerald-500/50"
             />
           </div>
           <div className="flex flex-wrap gap-1">
@@ -434,7 +434,7 @@ function EngineeringToolsCenter() {
                 Choose a tool — get an answer in seconds
               </h2>
             </div>
-            <span className="text-xs font-mono text-white/40">{filtered.length} tools</span>
+            <span className="text-xs font-mono text-white/60">{filtered.length} tools</span>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -457,7 +457,7 @@ function EngineeringToolsCenter() {
                     <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-white/40">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-white/60">
                       {t.category}
                     </span>
                   </div>
@@ -467,7 +467,7 @@ function EngineeringToolsCenter() {
                   <p className="mt-2 text-sm text-white/60 leading-relaxed">{t.desc}</p>
                   <div className="mt-5 flex items-center justify-between">
                     {t.metric ? (
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-white/40">
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-white/60">
                         {t.metric}
                       </span>
                     ) : (
@@ -664,7 +664,7 @@ function MiniToolModal({ tool, onClose }: { tool: Tool; onClose: () => void }) {
             <tool.icon className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-[10px] font-mono uppercase tracking-widest text-white/40">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-white/60">
               {tool.category}
             </div>
             <h3 className="text-xl font-semibold tracking-tight">{tool.title}</h3>

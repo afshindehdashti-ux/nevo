@@ -489,7 +489,7 @@ function ZoneDrawer({ zone, onClose }: { zone: Zone | null; onClose: () => void 
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg p-1 text-white/40 hover:bg-white/10 hover:text-white"
+              className="rounded-lg p-1 text-white/60 hover:bg-white/10 hover:text-white"
               aria-label="Close details"
             >
               <X className="h-4 w-4" />
@@ -667,7 +667,7 @@ function FactoryLayoutPage() {
         <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-emerald-300/80">
           Technical Data
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">Live</span>
+        <span className="font-mono text-[10px] uppercase tracking-widest text-white/60">Live</span>
       </div>
       <dl className="divide-y divide-white/5 text-sm">
         {[
@@ -814,7 +814,7 @@ function FactoryLayoutPage() {
               aria-pressed={!hidden}
               className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] transition ${
                 hidden
-                  ? "border-white/10 bg-white/[0.02] text-white/40 line-through"
+                  ? "border-white/10 bg-white/[0.02] text-white/60 line-through"
                   : "border-white/15 bg-white/5 text-white hover:border-emerald-400/50"
               }`}
             >
@@ -827,7 +827,7 @@ function FactoryLayoutPage() {
           );
         })}
       </div>
-      <div className="border-t border-white/5 px-4 py-2 font-mono text-[10px] text-white/40">
+      <div className="border-t border-white/5 px-4 py-2 font-mono text-[10px] text-white/60">
         Each toggle is React state → filters <code>layout.zones</code> → SVG re-renders with a
         spring animation.
       </div>
@@ -840,7 +840,7 @@ function FactoryLayoutPage() {
         <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/60">
           Equipment List — {equipment.length} items
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-white/60">
           Auto-generated
         </span>
       </div>

@@ -33,7 +33,7 @@ export function WhyNevo() {
             >
               <div className="mb-6 flex items-center justify-between">
                 <p.icon className="size-5 text-accent" strokeWidth={1.5} />
-                <span className="font-mono text-[10px] tracking-widest text-white/40">
+                <span className="font-mono text-[10px] tracking-widest text-white/60">
                   {String(i + 1).padStart(2, "0")}
                 </span>
               </div>

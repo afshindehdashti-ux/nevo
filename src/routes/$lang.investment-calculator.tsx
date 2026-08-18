@@ -360,7 +360,7 @@ function KpiCell({
       >
         {value}
       </span>
-      {hint ? <span className="text-[10px] text-white/40">{hint}</span> : null}
+      {hint ? <span className="text-[10px] text-white/60">{hint}</span> : null}
     </div>
   );
 }
@@ -618,7 +618,7 @@ function InvestmentCalculatorPage() {
                       </Chip>
                     ))}
                   </div>
-                  <div className="mt-1 text-[10px] text-white/40">m² / day</div>
+                  <div className="mt-1 text-[10px] text-white/60">m² / day</div>
                 </Field>
 
                 <Field label="Panel Type">
@@ -821,7 +821,7 @@ function InvestmentCalculatorPage() {
                             </span>
                             <span className="tabular-nums text-white">
                               {fmtCompact(b.value, i.currency)}{" "}
-                              <span className="text-white/40">{pct}%</span>
+                              <span className="text-white/60">{pct}%</span>
                             </span>
                           </li>
                         );

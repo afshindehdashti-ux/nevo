@@ -350,7 +350,7 @@ function KnowledgeHub() {
         <div className="relative mx-auto max-w-7xl px-6 pt-28 pb-24">
           <nav
             aria-label="Breadcrumb"
-            className="text-[11px] font-mono uppercase tracking-widest text-white/40 mb-6 flex gap-2 items-center"
+            className="text-[11px] font-mono uppercase tracking-widest text-white/60 mb-6 flex gap-2 items-center"
           >
             <Link to="/" className="hover:text-emerald-400">
               Home
@@ -372,12 +372,12 @@ function KnowledgeHub() {
 
           {/* Live search */}
           <div className="mt-10 max-w-2xl relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search articles, guides, FAQs — PIR, cold room, ROI, factory layout…"
-              className="w-full rounded-2xl border border-white/10 bg-white/[0.04] pl-12 pr-4 py-4 text-base placeholder:text-white/40 focus:outline-none focus:border-emerald-500/50"
+              className="w-full rounded-2xl border border-white/10 bg-white/[0.04] pl-12 pr-4 py-4 text-base placeholder:text-white/60 focus:outline-none focus:border-emerald-500/50"
             />
           </div>
 
@@ -420,7 +420,7 @@ function KnowledgeHub() {
                     <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <span className="text-[10px] font-mono text-white/40">{s.count}</span>
+                    <span className="text-[10px] font-mono text-white/60">{s.count}</span>
                   </div>
                   <div className="mt-4 font-medium group-hover:text-emerald-300 transition">
                     {s.name}
@@ -488,7 +488,7 @@ function KnowledgeHub() {
                 {l}
               </button>
             ))}
-            <span className="ml-auto text-xs font-mono text-white/40 self-center">
+            <span className="ml-auto text-xs font-mono text-white/60 self-center">
               {filtered.length} results
             </span>
           </div>
@@ -520,7 +520,7 @@ function KnowledgeHub() {
                   )}
                 </div>
                 <div className="p-5">
-                  <div className="text-[10px] font-mono uppercase tracking-widest text-white/40">
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-white/60">
                     {a.section} · {a.level}
                   </div>
                   <h3 className="mt-2 text-lg font-semibold tracking-tight group-hover:text-emerald-300 transition leading-snug">
@@ -530,7 +530,7 @@ function KnowledgeHub() {
                     {a.excerpt}
                   </p>
                   <div className="mt-5 flex items-center justify-between text-xs">
-                    <span className="inline-flex items-center gap-1 text-white/40">
+                    <span className="inline-flex items-center gap-1 text-white/60">
                       <Clock className="h-3.5 w-3.5" /> {a.readMin} min read
                     </span>
                     <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">
@@ -632,9 +632,9 @@ function KnowledgeHub() {
                       <div className="text-sm font-medium truncate group-hover:text-emerald-300 transition">
                         {v.title}
                       </div>
-                      <div className="text-[11px] text-white/40 mt-1">{v.min} min</div>
+                      <div className="text-[11px] text-white/60 mt-1">{v.min} min</div>
                     </div>
-                    <ArrowRight className="h-4 w-4 text-white/40 group-hover:text-emerald-400 transition" />
+                    <ArrowRight className="h-4 w-4 text-white/60 group-hover:text-emerald-400 transition" />
                   </Link>
                 ))}
               </div>
@@ -663,9 +663,9 @@ function KnowledgeHub() {
                       <div className="text-sm font-medium truncate group-hover:text-emerald-300 transition">
                         {d.title}
                       </div>
-                      <div className="text-[11px] text-white/40 mt-1">PDF · {d.size}</div>
+                      <div className="text-[11px] text-white/60 mt-1">PDF · {d.size}</div>
                     </div>
-                    <Download className="h-4 w-4 text-white/40 group-hover:text-emerald-400 transition" />
+                    <Download className="h-4 w-4 text-white/60 group-hover:text-emerald-400 transition" />
                   </Link>
                 ))}
                 <Link
@@ -814,7 +814,7 @@ function KnowledgeHub() {
               </a>
             </Button>
           </div>
-          <div className="mt-6 text-xs text-white/40 inline-flex items-center gap-2 justify-center">
+          <div className="mt-6 text-xs text-white/60 inline-flex items-center gap-2 justify-center">
             <Mail className="h-3.5 w-3.5" /> engineers@nevo-industrial.com
           </div>
         </div>
