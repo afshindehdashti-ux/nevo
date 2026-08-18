@@ -39,6 +39,7 @@ import {
   Info,
   Loader2,
   RefreshCw,
+  RotateCcw,
   SearchX,
   TriangleAlert,
 } from "lucide-react";
@@ -342,6 +343,18 @@ export function InvoicesList({
   }, [searchInput, search, setSearch]);
 
   const searchPending = searchInput.trim() !== search.trim();
+
+  // "Reset filters" clears the persisted prefs and returns the URL to defaults.
+  const filtersDirty =
+    searchInput !== INVOICE_LIST_DEFAULTS.search ||
+    (Object.keys(INVOICE_LIST_DEFAULTS) as (keyof typeof INVOICE_LIST_DEFAULTS)[]).some(
+      (k) => prefs[k] !== INVOICE_LIST_DEFAULTS[k],
+    );
+
+  const handleResetFilters = useCallback(() => {
+    setSearchInput(INVOICE_LIST_DEFAULTS.search);
+    resetPrefs();
+  }, [resetPrefs]);
 
   const setStatusFilter = (v: InvoiceStatus | "all") => setPrefs({ statusFilter: v });
   const setPageSize = (v: number) => setPrefs({ pageSize: v });
@@ -774,6 +787,18 @@ export function InvoicesList({
               </SelectContent>
             </Select>
           </div>
+
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 shrink-0"
+            onClick={handleResetFilters}
+            disabled={!filtersDirty}
+            title="Clear saved search, status, sort, rows per page and page"
+          >
+            <RotateCcw className="mr-1.5 size-3.5" aria-hidden="true" />
+            Reset filters
+          </Button>
 
           <p
             aria-live="polite"
