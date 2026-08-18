@@ -13,8 +13,17 @@ const LanguageContext = createContext<LanguageContextValue>({
   setLang: () => {},
 });
 
+/** Locale encoded in the URL (/es/solutions) always wins over stored preferences. */
+function readUrlLocale(): Locale | null {
+  if (typeof window === "undefined") return null;
+  const seg = window.location.pathname.split("/").filter(Boolean)[0]?.toLowerCase();
+  return seg && (SUPPORTED_LOCALES as string[]).includes(seg) ? (seg as Locale) : null;
+}
+
 function readInitialLocale(): Locale {
   if (typeof window === "undefined") return DEFAULT_LOCALE;
+  const fromUrl = readUrlLocale();
+  if (fromUrl) return fromUrl;
   const stored =
     document.cookie.match(/(?:^|;\s*)NEVO_LANG=([a-zA-Z-]+)/)?.[1] ??
     window.localStorage.getItem("NEVO_LANG");
@@ -25,13 +34,16 @@ function readInitialLocale(): Locale {
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Locale>(DEFAULT_LOCALE);
+  // Lazy init: on the client the URL locale (or stored preference on
+  // non-prefixed paths) is known synchronously, so the very first render is
+  // already in the right language and direction.
+  const [lang, setLangState] = useState<Locale>(() => readInitialLocale());
   const dir = localeDir(lang);
 
   useEffect(() => {
     const initial = readInitialLocale();
-    setLangState(initial);
-    void i18n.changeLanguage(initial);
+    setLangState((prev) => (prev === initial ? prev : initial));
+    if (i18n.language !== initial) void i18n.changeLanguage(initial);
   }, []);
 
   useEffect(() => {

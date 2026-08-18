@@ -1,5 +1,6 @@
 import { Link } from "@/components/site/LocalizedLink";
 import { useTranslation } from "react-i18next";
+import { localizeNavLabel } from "@/i18n/nav-labels";
 import { Mail, MessageCircle, Linkedin, MapPin, ArrowUpRight, Phone } from "lucide-react";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 import { SITE, WHATSAPP_URL } from "@/lib/seo";
@@ -166,7 +167,7 @@ export function SiteFooter() {
                         href={l.href}
                         className="text-sm text-primary-foreground/75 transition-colors hover:text-primary-foreground"
                       >
-                        {l.label}
+                        {localizeNavLabel(t, l.label)}
                       </a>
                     </li>
                   ))}

@@ -3,6 +3,7 @@ import { Link } from "@/components/site/LocalizedLink";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { localizeNavLabel } from "@/i18n/nav-labels";
 import {
   Menu,
   X,
@@ -840,13 +841,14 @@ function EyebrowRow({ label }: { label: string }) {
 }
 
 function CardsLayout({ group }: { group: MenuGroup }) {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-12 gap-8">
       <div className="col-span-8">
         <EyebrowRow label="What we do" />
         <ul className="grid grid-cols-2 gap-x-6 gap-y-2">
           {group.items.map((item) => (
-            <li key={item.label}>
+            <li key={localizeNavLabel(t, item.label)}>
               <a
                 href={item.href ?? "/project-inquiry"}
                 className="group flex items-start gap-3 rounded-xl border border-transparent p-3.5 transition-all hover:border-border hover:bg-surface/60"
@@ -856,7 +858,7 @@ function CardsLayout({ group }: { group: MenuGroup }) {
                 </span>
                 <span className="min-w-0">
                   <span className="flex items-center gap-1 text-[14px] font-semibold tracking-tight text-foreground">
-                    {item.label}
+                    {localizeNavLabel(t, item.label)}
                     <ArrowRight
                       className="size-3.5 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
                       strokeWidth={2}
@@ -864,7 +866,7 @@ function CardsLayout({ group }: { group: MenuGroup }) {
                   </span>
                   {item.desc && (
                     <span className="mt-0.5 block text-[12.5px] leading-snug text-muted-foreground">
-                      {item.desc}
+                      {localizeNavLabel(t, item.desc)}
                     </span>
                   )}
                 </span>
@@ -879,12 +881,13 @@ function CardsLayout({ group }: { group: MenuGroup }) {
 }
 
 function GridLayout({ group }: { group: MenuGroup }) {
+  const { t } = useTranslation();
   return (
     <div>
       <EyebrowRow label="Industries we engineer for" />
       <ul className="grid grid-cols-4 gap-2">
         {group.items.map((item) => (
-          <li key={item.label}>
+          <li key={localizeNavLabel(t, item.label)}>
             <a
               href={item.href ?? "/industries"}
               className="group flex flex-col items-start gap-3 rounded-xl border border-transparent p-4 transition-all hover:border-border hover:bg-surface/60"
@@ -893,7 +896,7 @@ function GridLayout({ group }: { group: MenuGroup }) {
                 {item.icon ? <item.icon className="size-[18px]" strokeWidth={1.6} /> : null}
               </span>
               <span className="text-[13.5px] font-medium tracking-tight text-foreground">
-                {item.label}
+                {localizeNavLabel(t, item.label)}
               </span>
             </a>
           </li>
@@ -904,6 +907,7 @@ function GridLayout({ group }: { group: MenuGroup }) {
 }
 
 function ListLayout({ group }: { group: MenuGroup }) {
+  const { t } = useTranslation();
   const hasFeatured = !!group.featured;
   return (
     <div className={cn("grid gap-8", hasFeatured ? "grid-cols-12" : "grid-cols-1")}>
@@ -916,7 +920,7 @@ function ListLayout({ group }: { group: MenuGroup }) {
           )}
         >
           {group.items.map((item) => (
-            <li key={item.label}>
+            <li key={localizeNavLabel(t, item.label)}>
               <a
                 href={item.href ?? "/industries"}
                 className="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-surface/70"
@@ -928,11 +932,11 @@ function ListLayout({ group }: { group: MenuGroup }) {
                 )}
                 <span className="min-w-0 flex-1">
                   <span className="block text-[13.5px] font-medium tracking-tight text-foreground">
-                    {item.label}
+                    {localizeNavLabel(t, item.label)}
                   </span>
                   {item.desc && (
                     <span className="mt-0.5 block text-[12px] leading-snug text-muted-foreground">
-                      {item.desc}
+                      {localizeNavLabel(t, item.desc)}
                     </span>
                   )}
                 </span>
@@ -951,20 +955,21 @@ function ListLayout({ group }: { group: MenuGroup }) {
 }
 
 function MarketsLayout({ group }: { group: MenuGroup }) {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-12 gap-8">
       <div className="col-span-7">
         <EyebrowRow label="Delivered worldwide" />
         <ul className="grid grid-cols-3 gap-x-6 gap-y-1">
           {group.items.map((item) => (
-            <li key={item.label}>
+            <li key={localizeNavLabel(t, item.label)}>
               <a
                 href={item.href ?? "/knowledge-hub"}
                 className="group flex items-center justify-between rounded-lg px-3 py-2.5 transition-colors hover:bg-surface/70"
               >
                 <span className="inline-flex items-center gap-2 text-[13.5px] font-medium tracking-tight text-foreground">
                   <MapPin className="size-3.5 text-[color:var(--accent)]" strokeWidth={2} />
-                  {item.label}
+                  {localizeNavLabel(t, item.label)}
                 </span>
                 <ArrowRight
                   className="size-3.5 -translate-x-1 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
@@ -1024,6 +1029,7 @@ function MapPreview() {
 }
 
 function FeaturedCard({ featured, tone }: { featured: Featured; tone: "dark" | "light" }) {
+  const { t } = useTranslation();
   return (
     <a
       href={featured.href}
@@ -1041,10 +1047,10 @@ function FeaturedCard({ featured, tone }: { featured: Featured; tone: "dark" | "
             tone === "dark" ? "text-white/60" : "text-muted-foreground",
           )}
         >
-          {featured.eyebrow}
+          {localizeNavLabel(t, featured.eyebrow)}
         </span>
         <h4 className="mt-4 text-[18px] font-semibold leading-snug tracking-tight">
-          {featured.title}
+          {localizeNavLabel(t, featured.title)}
         </h4>
         <p
           className={cn(
@@ -1052,7 +1058,7 @@ function FeaturedCard({ featured, tone }: { featured: Featured; tone: "dark" | "
             tone === "dark" ? "text-white/70" : "text-muted-foreground",
           )}
         >
-          {featured.desc}
+          {localizeNavLabel(t, featured.desc)}
         </p>
       </div>
       <div
@@ -1436,14 +1442,14 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
               { label: "Production Lines", href: "/solutions/production-lines" },
               { label: "Sandwich Panels", href: "/solutions/sandwich-panels" },
               { label: "Cold Storage", href: "/industries" },
-            ].map((t) => (
+            ].map((chip) => (
               <a
-                key={t.label}
-                href={t.href}
+                key={chip.label}
+                href={chip.href}
                 className="rounded-full border border-border px-3 py-1.5 text-[12.5px] font-medium text-foreground"
                 onClick={onClose}
               >
-                {t.label}
+                {localizeNavLabel(t, chip.label)}
               </a>
             ))}
           </div>
@@ -1460,7 +1466,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
             </summary>
             <ul className="grid gap-0.5 pb-3">
               {section.items.map((item) => (
-                <li key={item.label}>
+                <li key={localizeNavLabel(t, item.label)}>
                   <a
                     href={item.href ?? "/knowledge-hub"}
                     className="flex items-center gap-3 rounded-lg px-2 py-3 text-[15px] text-foreground/85"
@@ -1471,7 +1477,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
                         <item.icon className="size-[16px]" strokeWidth={1.6} />
                       </span>
                     )}
-                    <span className="min-w-0 flex-1">{item.label}</span>
+                    <span className="min-w-0 flex-1">{localizeNavLabel(t, item.label)}</span>
                     <ArrowRight className="size-4 text-muted-foreground" strokeWidth={1.75} />
                   </a>
                 </li>
@@ -1538,6 +1544,7 @@ function MobileMenu({ onClose, onOpenSearch }: { onClose: () => void; onOpenSear
    ───────────────────────────────────────────────────────────── */
 
 export function Breadcrumbs({ items }: { items: { label: string; href?: string }[] }) {
+  const { t } = useTranslation();
   return (
     <nav aria-label="Breadcrumb" className="border-b border-border bg-surface/40">
       <ol className="container-wide flex flex-wrap items-center gap-1.5 px-6 py-3 text-[12.5px] text-muted-foreground lg:px-8">
@@ -1547,10 +1554,10 @@ export function Breadcrumbs({ items }: { items: { label: string; href?: string }
             <li key={i} className="inline-flex items-center gap-1.5">
               {item.href && !last ? (
                 <a href={item.href} className="hover:text-foreground">
-                  {item.label}
+                  {localizeNavLabel(t, item.label)}
                 </a>
               ) : (
-                <span className={cn(last && "text-foreground")}>{item.label}</span>
+                <span className={cn(last && "text-foreground")}>{localizeNavLabel(t, item.label)}</span>
               )}
               {!last && <ChevronRight className="size-3 opacity-60" strokeWidth={2} />}
             </li>
