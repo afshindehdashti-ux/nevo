@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MasterListShell } from "@/components/crm/MasterListShell";
 import { GuideMeButton } from "@/components/ai/GuideMeButton";
@@ -347,6 +347,9 @@ export function InvoicesList({
   const setSortDir = (v: SortDir | ((d: SortDir) => SortDir)) =>
     setPrefs((c) => ({ sortDir: typeof v === "function" ? v(c.sortDir) : v }));
 
+  const queryClient = useQueryClient();
+  const invoicesQueryKey = useMemo(() => ["invoices", type] as const, [type]);
+
   const {
     data: invoices = [],
     isLoading,
@@ -354,21 +357,44 @@ export function InvoicesList({
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: ["invoices", type],
-    queryFn: async () => {
+    queryKey: invoicesQueryKey,
+    queryFn: async ({ signal }) => {
+      // Hand React Query's abort signal to the request so a fetch that is no
+      // longer needed (filter changed again, refetch retriggered, list
+      // unmounted) is cancelled instead of racing the newer one.
       const { data, error } = await supabase
         .from("invoices")
         .select("*, customers(name, company_name, email)")
         .eq("type", type)
-        .order("issue_date", { ascending: false });
+        .order("issue_date", { ascending: false })
+        .abortSignal(signal);
       if (error) throw error;
       return data;
     },
   });
 
+  // Changing any filter invalidates the results the in-flight request would
+  // paint, so cancel it. An outdated response can no longer land after a newer
+  // filter change, and the abort above stops the wasted network work.
+  const cancelInFlightFetch = useCallback(() => {
+    void queryClient.cancelQueries({ queryKey: invoicesQueryKey, exact: true });
+  }, [queryClient, invoicesQueryKey]);
+
+  useEffect(() => {
+    cancelInFlightFetch();
+  }, [search, statusFilter, sortKey, sortDir, pageSize, page, cancelInFlightFetch]);
+
+  // Manual refresh: drop whatever is in flight first so the two requests can't
+  // resolve out of order.
+  const handleRefresh = useCallback(() => {
+    cancelInFlightFetch();
+    void refetch({ cancelRefetch: true });
+  }, [cancelInFlightFetch, refetch]);
+
   // One shared "results are updating" signal: pending debounced filter input
   // and background refetches both dim the list the same way.
   const listBusy = !isLoading && (searchPending || isFetching);
+
 
 
 
@@ -1165,7 +1191,7 @@ export function InvoicesList({
               </p>
               <Button
                 variant="outline"
-                onClick={() => void refetch()}
+                onClick={handleRefresh}
                 disabled={isFetching}
                 className="mt-2"
               >
