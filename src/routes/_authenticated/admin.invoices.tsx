@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
 import { ListEmptyState } from "@/components/admin/ListEmptyState";
 import {
   Tooltip,
@@ -33,7 +34,9 @@ import {
   FileDown,
   FileText,
   Loader2,
+  RefreshCw,
   SearchX,
+  TriangleAlert,
 } from "lucide-react";
 import { toast } from "sonner";
 import JSZip from "jszip";
@@ -91,7 +94,13 @@ export function InvoicesList({
   const [sortKey, setSortKey] = useState<SortKey>("issue_date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-  const { data: invoices = [], isLoading } = useQuery({
+  const {
+    data: invoices = [],
+    isLoading,
+    isError,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ["invoices", type],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -372,7 +381,41 @@ export function InvoicesList({
           </div>
         </div>
       </TooltipProvider>
-      {isLoading ? (
+      {isError ? (
+        <div className="p-4 md:p-6" data-testid="list-error-state">
+          <Card className="border-destructive/40">
+            <CardContent
+              role="alert"
+              aria-live="assertive"
+              className="flex flex-col items-center gap-3 px-6 py-12 text-center"
+            >
+              <span className="grid size-12 place-items-center rounded-full bg-destructive/10 text-destructive">
+                <TriangleAlert className="size-6" aria-hidden="true" />
+              </span>
+              <h3 className="text-base font-semibold text-foreground">
+                We couldn't load your {label.toLowerCase()} invoices
+              </h3>
+              <p className="max-w-md text-sm text-muted-foreground">
+                Something went wrong while reaching the server. Your data is safe — check
+                your connection and try again.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => void refetch()}
+                disabled={isFetching}
+                className="mt-2"
+              >
+                {isFetching ? (
+                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <RefreshCw className="size-4" aria-hidden="true" />
+                )}
+                {isFetching ? "Retrying…" : "Try again"}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      ) : isLoading ? (
         <div
           data-testid="list-skeleton"
           aria-busy="true"
