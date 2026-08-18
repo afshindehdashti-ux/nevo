@@ -144,6 +144,18 @@ function sanitizeInvoiceListPrefs(
   return clean;
 }
 
+/** Maps the internal prefs object onto the URL search-param shape. */
+function toInvoiceSearch(p: typeof INVOICE_LIST_DEFAULTS) {
+  return {
+    q: p.search,
+    status: p.statusFilter,
+    page: p.page,
+    size: p.pageSize,
+    sort: p.sortKey,
+    dir: p.sortDir,
+  };
+}
+
 type BulkActionKey = "export" | "issue" | "paid" | "void";
 
 const BULK_STATUS: Partial<Record<BulkActionKey, InvoiceStatus>> = {
