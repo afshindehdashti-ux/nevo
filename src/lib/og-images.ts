@@ -111,19 +111,29 @@ export function ogImageFor(path: string): string {
   return OG_IMAGES[path] ?? OG_DEFAULT;
 }
 
+/** Canonical site origin used to absolutize OG image URLs. */
+export const OG_SITE_URL = "https://www.nevoindustrial.com";
+
+/** All OG images are pre-cropped derivatives at exactly 1200x630. */
+export const OG_IMAGE_WIDTH = 1200;
+export const OG_IMAGE_HEIGHT = 630;
+
 /**
  * Build the OG/Twitter image meta entries for a route (spread into a route's meta array).
  * Use in routes that construct their head() config manually rather than via buildSeo().
  */
 export function ogImageMeta(path: string, alt?: string): Array<Record<string, string>> {
   const rel = OG_IMAGES[path] ?? OG_DEFAULT;
-  const abs = rel.startsWith("http") ? rel : `${SITE_URL}${rel}`;
+  const abs = rel.startsWith("http") ? rel : `${OG_SITE_URL}${rel}`;
   return [
     { property: "og:image", content: abs },
     { property: "og:image:secure_url", content: abs },
-    { property: "og:image:width", content: "1200" },
-    { property: "og:image:height", content: "630" },
+    { property: "og:image:type", content: "image/jpeg" },
+    { property: "og:image:width", content: String(OG_IMAGE_WIDTH) },
+    { property: "og:image:height", content: String(OG_IMAGE_HEIGHT) },
     { property: "og:image:alt", content: alt ?? "NEVO Industrial" },
     { name: "twitter:image", content: abs },
+    { name: "twitter:image:alt", content: alt ?? "NEVO Industrial" },
   ];
 }
+
