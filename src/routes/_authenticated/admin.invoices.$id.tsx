@@ -165,9 +165,9 @@ function PurgeAuditSkeleton({ rows = 5 }: { rows?: number }) {
 }
 
 function InvoiceDetailPage() {
-  const { id } = useParams({ from: "/_authenticated/admin/invoices/$id" });
+  const { id } = useParams({ from: "/admin/invoices/$id" });
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/_authenticated/admin/invoices/$id" });
+  const navigate = useNavigate({ from: "/admin/invoices/$id" });
   const qc = useQueryClient();
   const canEdit = useCanEditInvoices();
   const canPay = useCanEditPayments();
