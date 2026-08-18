@@ -46,6 +46,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
+  --color-control-border: var(--control-border);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
@@ -117,6 +118,9 @@
 
   --border: oklch(1 0 0 / 8%); /* hairline white */
   --border-strong: oklch(1 0 0 / 20%);
+  /* Boundary of interactive controls (checkbox, radio, input, select).
+     Kept at >=3:1 against the app/card surfaces per WCAG 1.4.11. */
+  --control-border: oklch(1 0 0 / 45%);
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.72 0.155 158); /* green focus ring */
 }
@@ -144,6 +148,9 @@
   --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(1 0 0 / 8%);
   --border-strong: oklch(1 0 0 / 20%);
+  /* Boundary of interactive controls (checkbox, radio, input, select).
+     Kept at >=3:1 against the app/card surfaces per WCAG 1.4.11. */
+  --control-border: oklch(1 0 0 / 45%);
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.72 0.155 158);
 }
