@@ -32,6 +32,7 @@ import {
   ChevronRight,
   ChevronUp,
   ChevronsUpDown,
+  Check,
   FileDown,
   FileText,
   Loader2,
@@ -188,6 +189,10 @@ export function InvoicesList({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [exporting, setExporting] = useState(false);
   const [rowBusy, setRowBusy] = useState<string | null>(null);
+  const [rowResult, setRowResult] = useState<
+    Record<string, { state: "success" | "error"; message: string }>
+  >({});
+  const [rowAnnounce, setRowAnnounce] = useState("");
   const [pendingAction, setPendingAction] = useState<BulkActionKey | null>(null);
   const [runningAction, setRunningAction] = useState<BulkActionKey | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
@@ -457,14 +462,36 @@ export function InvoicesList({
   const busy = runningAction !== null || exporting;
 
 
-  const downloadOne = async (id: string) => {
+  const setResult = (id: string, state: "success" | "error", message: string) => {
+    setRowResult((prev) => ({ ...prev, [id]: { state, message } }));
+    setRowAnnounce(message);
+    window.setTimeout(() => {
+      setRowResult((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }, 5000);
+  };
+
+  const downloadOne = async (id: string, label?: string | null) => {
+    const name = label ?? "invoice";
     setRowBusy(id);
-    const t = toast.loading("Generating PDF…");
+    setRowResult((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    setRowAnnounce(`Generating PDF for ${name}…`);
+    const t = toast.loading(`Generating PDF for ${name}…`);
     try {
       await generateInvoicePdf(id, "download");
-      toast.success("PDF downloaded", { id: t });
+      toast.success(`PDF downloaded for ${name}`, { id: t });
+      setResult(id, "success", `PDF downloaded for ${name}`);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Export failed", { id: t });
+      const message = e instanceof Error ? e.message : "Export failed";
+      toast.error(message, { id: t });
+      setResult(id, "error", `PDF failed for ${name}: ${message}`);
     } finally {
       setRowBusy(null);
     }
@@ -790,16 +817,31 @@ export function InvoicesList({
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => downloadOne(i.id)}
+                onClick={() => downloadOne(i.id, i.invoice_number)}
                 disabled={rowBusy === i.id}
               >
                 {rowBusy === i.id ? (
                   <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                ) : rowResult[i.id]?.state === "success" ? (
+                  <Check className="mr-1 h-3.5 w-3.5 text-emerald-500" />
+                ) : rowResult[i.id]?.state === "error" ? (
+                  <TriangleAlert className="mr-1 h-3.5 w-3.5 text-destructive" />
                 ) : (
                   <FileDown className="mr-1 h-3.5 w-3.5" />
                 )}
-                PDF
+                {rowBusy === i.id ? "Generating…" : "PDF"}
               </Button>
+              {rowResult[i.id] ? (
+                <p
+                  className={
+                    rowResult[i.id]!.state === "error"
+                      ? "self-center text-xs text-destructive"
+                      : "self-center text-xs text-emerald-600 dark:text-emerald-400"
+                  }
+                >
+                  {rowResult[i.id]!.state === "error" ? "Download failed" : "Downloaded"}
+                </p>
+              ) : null}
             </div>
           </div>
         ))}
@@ -879,26 +921,46 @@ export function InvoicesList({
                   {formatMoney(financeBalanceDue(i), i.currency)}
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8"
-                    onClick={() => downloadOne(i.id)}
-                    disabled={rowBusy === i.id}
-                    aria-label={`Download PDF for ${i.invoice_number ?? i.id}`}
-                  >
-                    {rowBusy === i.id ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <FileDown className="h-3.5 w-3.5" />
-                    )}
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8"
+                        onClick={() => downloadOne(i.id, i.invoice_number)}
+                        disabled={rowBusy === i.id}
+                        aria-label={
+                          rowBusy === i.id
+                            ? `Generating PDF for ${i.invoice_number ?? i.id}`
+                            : `Download PDF for ${i.invoice_number ?? i.id}`
+                        }
+                      >
+                        {rowBusy === i.id ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : rowResult[i.id]?.state === "success" ? (
+                          <Check className="h-3.5 w-3.5 text-emerald-500" />
+                        ) : rowResult[i.id]?.state === "error" ? (
+                          <TriangleAlert className="h-3.5 w-3.5 text-destructive" />
+                        ) : (
+                          <FileDown className="h-3.5 w-3.5" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {rowBusy === i.id
+                        ? "Generating PDF…"
+                        : (rowResult[i.id]?.message ?? "Download PDF")}
+                    </TooltipContent>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
 
           </TableBody>
         </Table>
+      </div>
+      <div aria-live="polite" role="status" className="sr-only">
+        {rowAnnounce}
       </div>
           <div className="flex flex-col gap-3 border-t p-3 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-2">
