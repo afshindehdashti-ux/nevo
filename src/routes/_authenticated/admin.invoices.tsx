@@ -239,6 +239,14 @@ export function InvoicesList({
   // survives a refresh and can be shared. localStorage keeps the last used
   // prefs as the starting point when the URL carries no params.
   const storageKey = `nevo.admin.invoices.${type}.prefs`;
+
+  // Column visibility and ordering are a layout choice rather than a filter, so
+  // they stay in localStorage only (never the URL) and survive a refresh.
+  const columns = useTableColumnLayout<SortKey>(
+    `nevo.admin.invoices.${type}.columns`,
+    SORT_KEYS,
+  );
+
   const navigate = useNavigate();
   const urlSearch = Route.useSearch();
   const [hydrated, setHydrated] = useState(false);
