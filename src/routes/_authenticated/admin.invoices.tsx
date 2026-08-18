@@ -461,6 +461,9 @@ export function InvoicesList({
     () => sorted.slice(pageStart, pageStart + pageSize),
     [sorted, pageStart, pageSize],
   );
+  // Keep the table height stable while a debounced refetch is in flight by
+  // swapping rows for the same number of skeleton rows.
+  const skeletonRowCount = Math.max(1, Math.min(paged.length || 5, pageSize));
 
   // Filters change the result set — jump back to the first page so the user
   // never lands on an out-of-range (visually empty) page.
@@ -1225,7 +1228,7 @@ export function InvoicesList({
             <Skeleton key={i} className="h-12 w-full" />
           ))}
         </div>
-      ) : filtered.length === 0 ? (
+      ) : filtered.length === 0 && !listBusy ? (
         <div className="p-4 md:p-6">
           {invoices.length === 0 ? (
             <ListEmptyState
@@ -1320,8 +1323,30 @@ export function InvoicesList({
 
       {/* Mobile: stacked cards — no horizontal scrolling, tap targets stay usable */}
 
-      <div className="md:hidden divide-y">
-        {paged.map((i) => (
+      <div className="md:hidden divide-y" data-testid={listBusy ? "list-updating" : undefined}>
+        {listBusy
+          ? Array.from({ length: skeletonRowCount }).map((_, idx) => (
+              <div key={`sk-${idx}`} className="p-3" data-testid="row-skeleton">
+                <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3">
+                  <Skeleton className="mt-1 size-4 shrink-0 rounded-sm" />
+                  <div className="min-w-0 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3.5 w-24" />
+                  </div>
+                  <Skeleton className="h-5 w-16 shrink-0 rounded-full" />
+                </div>
+                <div className="mt-2 grid grid-cols-1 gap-x-3 gap-y-1 pl-7 min-[360px]:grid-cols-2">
+                  {Array.from({ length: 4 }).map((__, j) => (
+                    <Skeleton key={j} className="h-3.5 w-full" />
+                  ))}
+                </div>
+                <div className="mt-2 flex gap-2 pl-7">
+                  <Skeleton className="h-8 w-16" />
+                  <Skeleton className="h-8 w-16" />
+                </div>
+              </div>
+            ))
+          : paged.map((i) => (
           <div
             key={i.id}
             className={`p-3 ${selected.has(i.id) ? "bg-muted/50" : ""}`}
@@ -1407,7 +1432,7 @@ export function InvoicesList({
               ) : null}
             </div>
           </div>
-        ))}
+            ))}
       </div>
 
       {/* Desktop / tablet: full table */}
@@ -1434,7 +1459,29 @@ export function InvoicesList({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paged.map((i) => (
+            {listBusy
+              ? Array.from({ length: skeletonRowCount }).map((_, idx) => (
+                  <TableRow key={`sk-${idx}`} data-testid="row-skeleton">
+                    <TableCell>
+                      <Skeleton className="size-4 rounded-sm" />
+                    </TableCell>
+                    {columns.visibleOrder.map((c) => (
+                      <TableCell key={c} className={COLUMN_DEFS[c].cellClass}>
+                        <Skeleton
+                          className={
+                            COLUMN_DEFS[c].align === "right"
+                              ? "ml-auto h-4 w-20"
+                              : "h-4 w-24"
+                          }
+                        />
+                      </TableCell>
+                    ))}
+                    <TableCell className="text-right">
+                      <Skeleton className="ml-auto size-8 rounded-md" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              : paged.map((i) => (
               <TableRow key={i.id} data-state={selected.has(i.id) ? "selected" : undefined}>
                 <TableCell>
                   <Checkbox
