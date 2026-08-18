@@ -334,9 +334,17 @@ export function InvoicesList({
     }
   };
 
+  // One click puts every filter, sort and pagination choice back to its default,
+  // forgets the saved prefs, drops the selection and pulls a fresh list.
   const handleResetFilters = useCallback(() => {
     setSearchInput(INVOICE_LIST_DEFAULTS.search);
+    setSelected(new Set());
     resetPrefs();
+    handleRefresh();
+    setRowAnnounce("Filters cleared. Showing all invoices.");
+    toast.success("Filters cleared — showing all invoices.");
+    // handleRefresh is declared below; it is only called after render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetPrefs]);
 
   const setStatusFilter = (v: InvoiceStatus | "all") => setPrefs({ statusFilter: v });
