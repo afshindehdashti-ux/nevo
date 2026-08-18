@@ -529,6 +529,72 @@ export function InvoicesList({
     );
   };
 
+  type InvoiceRow = (typeof invoices)[number];
+
+  const COLUMN_DEFS: Record<
+    SortKey,
+    {
+      shortLabel: string;
+      align?: "right";
+      headClass?: string;
+      cellClass?: string;
+      cell: (i: InvoiceRow) => ReactNode;
+    }
+  > = {
+    invoice_number: {
+      shortLabel: "Invoice #",
+      headClass: "whitespace-nowrap",
+      cellClass: "whitespace-nowrap",
+      cell: (i) => (
+        <Link
+          to="/admin/invoices/$id"
+          params={{ id: i.id }}
+          className="text-accent hover:underline font-medium rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+        >
+          {i.invoice_number}
+        </Link>
+      ),
+    },
+    customer: {
+      shortLabel: "Customer",
+      cellClass: "max-w-[240px] truncate",
+      cell: (i) => customerDisplayName(i.customers as CustomerDisplay | null),
+    },
+    issue_date: {
+      shortLabel: "Date",
+      headClass: "whitespace-nowrap",
+      cellClass: "whitespace-nowrap",
+      cell: (i) => formatDate(i.issue_date),
+    },
+    due_date: {
+      shortLabel: "Due",
+      headClass: "whitespace-nowrap",
+      cellClass: "whitespace-nowrap",
+      cell: (i) => formatDate(i.due_date),
+    },
+    status: {
+      shortLabel: "Status",
+      headClass: "whitespace-nowrap",
+      cell: (i) => (
+        <Badge variant={invoiceStatusVariant(i.status)}>{invoiceStatusLabel(i.status)}</Badge>
+      ),
+    },
+    total: {
+      shortLabel: "Total",
+      align: "right",
+      headClass: "whitespace-nowrap text-right",
+      cellClass: "whitespace-nowrap text-right tabular-nums",
+      cell: (i) => formatMoney(financeTotalAmount(i), i.currency),
+    },
+    balance: {
+      shortLabel: "Balance",
+      align: "right",
+      headClass: "whitespace-nowrap text-right",
+      cellClass: "whitespace-nowrap text-right tabular-nums",
+      cell: (i) => formatMoney(financeBalanceDue(i), i.currency),
+    },
+  };
+
 
   const toggleAll = (checked: boolean) => {
     setSelected((prev) => {
