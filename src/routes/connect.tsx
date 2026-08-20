@@ -450,6 +450,24 @@ function ConnectCard() {
               onContextMenu={(e) => {
                 if (longPressed.current) e.preventDefault();
               }}
+              onFocus={() => setQrFocused(true)}
+              onBlur={() => setQrFocused(false)}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter" && e.key !== " " && e.key !== "Spacebar") return;
+                if (!CONNECT_URL) {
+                  e.preventDefault();
+                  toast.error("Link unavailable", { description: CONNECT_URL_ERROR ?? undefined });
+                  return;
+                }
+                if (e.key === "Enter") return; // native activation opens the link
+                // Space mirrors the touch long-press: copy instead of navigate.
+                e.preventDefault();
+                void copyLink();
+              }}
+              onKeyUp={(e) => {
+                // Prevent the browser's default click synthesis on Space release.
+                if (e.key === " " || e.key === "Spacebar") e.preventDefault();
+              }}
               onClick={(e) => {
                 if (!CONNECT_URL) {
                   e.preventDefault();
