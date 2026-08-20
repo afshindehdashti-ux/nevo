@@ -308,20 +308,36 @@ function ConnectCard() {
             </h2>
 
             <a
-              href={CONNECT_URL}
-              onPointerDown={startPress}
+              href={CONNECT_URL || undefined}
+              onPointerDown={CONNECT_URL ? startPress : undefined}
               onPointerUp={clearPress}
               onPointerLeave={clearPress}
               onPointerCancel={clearPress}
               onContextMenu={(e) => {
                 if (longPressed.current) e.preventDefault();
               }}
-              onClick={handleQrClick}
-              aria-label="Open the digital business card at www.nevoindustrial.com/connect in this tab. Press and hold to copy the link instead."
-              className={`group mx-auto mt-5 block w-fit max-w-full select-none rounded-2xl border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.2)] active:translate-y-0 active:scale-[0.99] focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${
-                pressing ? "border-accent scale-[0.99]" : "border-border"
-              }`}
+              onClick={(e) => {
+                if (!CONNECT_URL) {
+                  e.preventDefault();
+                  toast.error("Link unavailable", { description: CONNECT_URL_ERROR ?? undefined });
+                  return;
+                }
+                handleQrClick(e);
+              }}
+              aria-disabled={CONNECT_URL ? undefined : true}
+              aria-describedby={CONNECT_URL ? undefined : "qr-error"}
+              aria-label={
+                CONNECT_URL
+                  ? `Open the digital business card at ${CONNECT_URL_DISPLAY} in this tab. Press and hold to copy the link instead.`
+                  : "Opening the digital business card is unavailable because the link is invalid"
+              }
+              className={`group mx-auto mt-5 block w-fit max-w-full select-none rounded-2xl border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none ${
+                CONNECT_URL
+                  ? "hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.2)] active:translate-y-0 active:scale-[0.99] motion-reduce:hover:translate-y-0"
+                  : "cursor-not-allowed opacity-55"
+              } ${pressing ? "border-accent scale-[0.99]" : "border-border"}`}
             >
+
 
               <div className="rounded-xl bg-white p-3">
                 <QRCodeSVG
