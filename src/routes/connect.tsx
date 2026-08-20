@@ -71,8 +71,43 @@ const CONTACTS = [
 
 const CONNECT_URL = "https://www.nevoindustrial.com/connect";
 
+const ACTION_FEEDBACK: Record<string, string> = {
+  whatsapp: "Opening WhatsApp…",
+  email: "Opening your email app…",
+  website: "Opening website…",
+};
+
 function ConnectCard() {
   const [copied, setCopied] = useState(false);
+  const [activeKey, setActiveKey] = useState<string | null>(null);
+  const lockRef = useRef(false);
+  const resetTimer = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (resetTimer.current) window.clearTimeout(resetTimer.current);
+    },
+    [],
+  );
+
+  const handleContactClick = useCallback(
+    (key: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+      // Ignore a rapid second click while the first action is still opening.
+      if (lockRef.current) {
+        e.preventDefault();
+        return;
+      }
+      lockRef.current = true;
+      setActiveKey(key);
+      if (resetTimer.current) window.clearTimeout(resetTimer.current);
+      resetTimer.current = window.setTimeout(() => {
+        lockRef.current = false;
+        setActiveKey(null);
+      }, 1600);
+    },
+    [],
+  );
+
   const copyLink = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(CONNECT_URL);
