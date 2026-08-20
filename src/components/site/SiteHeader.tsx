@@ -381,6 +381,40 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelClose = useCallback(() => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  }, []);
+
+  const openMenu = useCallback(
+    (label: string | null) => {
+      cancelClose();
+      setActiveMenu(label);
+    },
+    [cancelClose],
+  );
+
+  // Delay closing so the pointer can travel from the trigger into the panel.
+  const scheduleClose = useCallback(() => {
+    cancelClose();
+    closeTimer.current = setTimeout(() => setActiveMenu(null), 220);
+  }, [cancelClose]);
+
+  useEffect(() => cancelClose, [cancelClose]);
+
+  useEffect(() => {
+    if (!activeMenu) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setActiveMenu(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activeMenu]);
+
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
