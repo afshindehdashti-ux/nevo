@@ -228,6 +228,22 @@ function ConnectCard() {
       toast.error("Link unavailable", { description: CONNECT_URL_ERROR ?? undefined });
       return;
     }
+    const savePng = (png: string) => {
+      const a = document.createElement("a");
+      a.href = png;
+      a.download = "nevo-arsalan-manesh-qr.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast.success("QR code downloaded", { description: "nevo-arsalan-manesh-qr.png" });
+    };
+
+    const cachedPng = QR_PNG_CACHE.get(CONNECT_URL);
+    if (cachedPng) {
+      savePng(cachedPng);
+      return;
+    }
+
     const svg = document.querySelector("#nevo-qr-frame svg");
     if (!svg) {
       toast.error("Couldn't prepare the QR code", { description: "Please reload the page and try again." });
