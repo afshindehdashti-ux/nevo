@@ -3,6 +3,7 @@ import { ArrowRight, Check, ChevronRight, Copy, Globe, Loader2, Mail, MapPin } f
 import { QRCodeSVG } from "qrcode.react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
 
@@ -70,7 +71,29 @@ const CONTACTS = [
   },
 ] as const;
 
-const CONNECT_URL = "https://www.nevoindustrial.com/connect";
+const RAW_CONNECT_URL = "https://www.nevoindustrial.com/connect";
+
+const connectUrlSchema = z
+  .string()
+  .trim()
+  .min(1, { message: "The card link is missing." })
+  .max(2048, { message: "The card link is too long." })
+  .transform((v) => (/^https?:\/\//i.test(v) ? v : `https://${v}`))
+  .refine((v) => {
+    try {
+      const u = new URL(v);
+      return u.protocol === "https:" && Boolean(u.hostname) && u.hostname.includes(".");
+    } catch {
+      return false;
+    }
+  }, { message: "The card link is not a valid secure address." });
+
+const parsedConnectUrl = connectUrlSchema.safeParse(RAW_CONNECT_URL);
+const CONNECT_URL = parsedConnectUrl.success ? parsedConnectUrl.data : "";
+const CONNECT_URL_ERROR = parsedConnectUrl.success
+  ? null
+  : (parsedConnectUrl.error.issues[0]?.message ?? "The card link is unavailable.");
+const CONNECT_URL_DISPLAY = CONNECT_URL.replace(/^https:\/\//, "");
 
 const ACTION_FEEDBACK: Record<string, string> = {
   whatsapp: "Opening WhatsApp…",
@@ -110,10 +133,14 @@ function ConnectCard() {
   );
 
   const copyLink = useCallback(async () => {
+    if (!CONNECT_URL) {
+      toast.error("Link unavailable", { description: CONNECT_URL_ERROR ?? undefined });
+      return;
+    }
     try {
       await navigator.clipboard.writeText(CONNECT_URL);
       setCopied(true);
-      toast.success("Link copied", { description: CONNECT_URL.replace("https://", "") });
+      toast.success("Link copied", { description: CONNECT_URL_DISPLAY });
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
@@ -281,24 +308,40 @@ function ConnectCard() {
             </h2>
 
             <a
-              href={CONNECT_URL}
-              onPointerDown={startPress}
+              href={CONNECT_URL || undefined}
+              onPointerDown={CONNECT_URL ? startPress : undefined}
               onPointerUp={clearPress}
               onPointerLeave={clearPress}
               onPointerCancel={clearPress}
               onContextMenu={(e) => {
                 if (longPressed.current) e.preventDefault();
               }}
-              onClick={handleQrClick}
-              aria-label="Open the digital business card at www.nevoindustrial.com/connect in this tab. Press and hold to copy the link instead."
-              className={`group mx-auto mt-5 block w-fit max-w-full select-none rounded-2xl border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.2)] active:translate-y-0 active:scale-[0.99] focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${
-                pressing ? "border-accent scale-[0.99]" : "border-border"
-              }`}
+              onClick={(e) => {
+                if (!CONNECT_URL) {
+                  e.preventDefault();
+                  toast.error("Link unavailable", { description: CONNECT_URL_ERROR ?? undefined });
+                  return;
+                }
+                handleQrClick(e);
+              }}
+              aria-disabled={CONNECT_URL ? undefined : true}
+              aria-describedby={CONNECT_URL ? undefined : "qr-error"}
+              aria-label={
+                CONNECT_URL
+                  ? `Open the digital business card at ${CONNECT_URL_DISPLAY} in this tab. Press and hold to copy the link instead.`
+                  : "Opening the digital business card is unavailable because the link is invalid"
+              }
+              className={`group mx-auto mt-5 block w-fit max-w-full select-none rounded-2xl border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none ${
+                CONNECT_URL
+                  ? "hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.2)] active:translate-y-0 active:scale-[0.99] motion-reduce:hover:translate-y-0"
+                  : "cursor-not-allowed opacity-55"
+              } ${pressing ? "border-accent scale-[0.99]" : "border-border"}`}
             >
+
 
               <div className="rounded-xl bg-white p-3">
                 <QRCodeSVG
-                  value={CONNECT_URL}
+                  value={CONNECT_URL || "about:blank"}
                   size={168}
                   level="M"
                   marginSize={0}
@@ -313,28 +356,46 @@ function ConnectCard() {
                 aria-hidden="true"
                 className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors duration-200 group-hover:text-accent group-focus-visible:text-accent"
               >
-                {pressing ? "Hold to copy…" : "Tap to open · hold to copy"}
+                {!CONNECT_URL
+                  ? "Link unavailable"
+                  : pressing
+                    ? "Hold to copy…"
+                    : "Tap to open · hold to copy"}
                 {pressing ? <Copy className="h-3.5 w-3.5" /> : <ArrowRight className="h-3.5 w-3.5" />}
               </span>
             </a>
 
+            {CONNECT_URL_ERROR && (
+              <p
+                id="qr-error"
+                role="alert"
+                className="mx-auto mt-4 max-w-full rounded-lg bg-neutral-50 px-3 py-2 text-center text-sm font-medium text-[oklch(0.45_0.17_25)]"
+              >
+                {CONNECT_URL_ERROR}
+              </p>
+            )}
 
             <div className="mx-auto mt-4 grid max-w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg bg-neutral-50 px-3 py-2">
               <input
                 type="text"
                 readOnly
                 dir="ltr"
-                value={CONNECT_URL.replace("https://", "")}
+                value={CONNECT_URL_DISPLAY || "Link unavailable"}
                 aria-label="Digital business card link"
+                aria-invalid={CONNECT_URL ? undefined : true}
+                aria-describedby={CONNECT_URL ? undefined : "qr-error"}
                 onFocus={(e) => e.currentTarget.select()}
                 onClick={(e) => e.currentTarget.select()}
-                className="min-w-0 select-all truncate rounded-md bg-transparent px-1 py-2 text-sm font-medium text-black outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+                className={`min-w-0 select-all truncate rounded-md bg-transparent px-1 py-2 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] ${
+                  CONNECT_URL ? "text-black" : "text-muted-foreground"
+                }`}
               />
               <button
                 type="button"
                 onClick={copyLink}
+                disabled={!CONNECT_URL}
                 aria-label="Copy link to this digital business card"
-                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-md bg-black px-3.5 text-xs font-semibold uppercase tracking-wider text-white outline-none transition-colors hover:bg-accent hover:text-white focus-visible:bg-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-md bg-black px-3.5 text-xs font-semibold uppercase tracking-wider text-white outline-none transition-colors hover:bg-accent hover:text-white focus-visible:bg-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-black"
               >
                 {copied ? (
                   <Check className="h-4 w-4" aria-hidden="true" />
