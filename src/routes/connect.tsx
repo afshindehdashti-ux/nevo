@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronRight, Globe, Mail, MapPin } from "lucide-react";
+import nevoLogoLight from "@/assets/nevo-logo-light.png";
+
 
 export const Route = createFileRoute("/connect")({
   head: () => ({
@@ -64,80 +66,91 @@ const CONTACTS = [
 
 function ConnectCard() {
   return (
-    <main className="min-h-screen bg-white flex flex-col">
-      <div className="flex-1 w-full max-w-md mx-auto px-6 pt-12 pb-10 flex flex-col">
-        {/* Logo */}
-        <div className="text-center">
-          <div className="text-4xl sm:text-5xl font-extrabold tracking-tight text-black leading-none">
-            NE<span className="text-accent">V</span>O
+    <main className="min-h-screen bg-neutral-100 flex flex-col items-center">
+      <div className="w-full max-w-md flex-1 bg-white shadow-[0_2px_40px_rgba(0,0,0,0.06)] flex flex-col">
+        {/* Brand header */}
+        <header className="bg-black px-8 pt-10 pb-8 text-center">
+          <img
+            src={nevoLogoLight}
+            alt="NEVO Industrial"
+            className="mx-auto h-10 w-auto"
+            decoding="async"
+          />
+          <div className="mx-auto mt-6 h-px w-16 bg-accent" />
+          <p className="mt-5 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-white/60">
+            Digital Business Card
+          </p>
+        </header>
+
+        <div className="flex-1 px-7 pt-9 pb-10">
+          {/* Person */}
+          <div className="text-center">
+            <h1 className="text-[1.6rem] sm:text-3xl font-bold tracking-tight text-black">
+              Arsalan Manesh
+            </h1>
+            <p className="mt-2 text-sm font-semibold uppercase tracking-[0.14em] text-accent">
+              International Business Director
+            </p>
           </div>
-          <div className="mt-2 text-[0.7rem] sm:text-xs font-semibold text-accent tracking-[0.42em] pl-[0.42em]">
-            INDUSTRIAL
+
+          {/* Company */}
+          <div className="mt-7 rounded-lg bg-neutral-50 px-5 py-4 text-center">
+            <p className="text-[0.8rem] font-bold leading-snug text-black">
+              NEVO TRADING AND CONSULTANCY L.L.C – FZ
+            </p>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              Strategic Trading &amp; Consultancy Solutions
+            </p>
           </div>
-          <div className="mx-auto mt-6 h-px w-24 bg-accent" />
+
+          {/* Contact options */}
+          <nav aria-label="Contact options" className="mt-8 space-y-3">
+            {CONTACTS.map((c) => (
+              <a
+                key={c.key}
+                href={c.href}
+                {...(c.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className="group flex items-center gap-4 rounded-xl border border-border bg-white px-4 py-4 min-h-[74px] transition-all hover:border-accent hover:shadow-[0_4px_18px_rgba(0,0,0,0.07)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span className="shrink-0 grid h-12 w-12 place-items-center rounded-lg bg-black text-accent transition-colors group-hover:bg-accent group-hover:text-black">
+                  {c.key === "whatsapp" && <WhatsAppIcon className="h-6 w-6" />}
+                  {c.key === "email" && <Mail className="h-[22px] w-[22px]" strokeWidth={1.8} />}
+                  {c.key === "website" && <Globe className="h-[22px] w-[22px]" strokeWidth={1.8} />}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    {c.label}
+                  </span>
+                  <span className="mt-0.5 block truncate text-sm font-semibold text-black">
+                    {c.value}
+                  </span>
+                </span>
+                <ChevronRight
+                  className="h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-accent"
+                  aria-hidden="true"
+                />
+              </a>
+            ))}
+          </nav>
+
+          {/* Location */}
+          <div className="mt-8 border-t border-border pt-6">
+            <p className="flex items-center justify-center gap-2 text-sm text-black">
+              <MapPin className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+              Meydan Freezone, Dubai, UAE
+            </p>
+          </div>
         </div>
 
-        {/* Person */}
-        <div className="mt-8 text-center">
-          <h1 className="text-2xl sm:text-3xl font-bold text-black tracking-tight">
-            Arsalan Manesh
-          </h1>
-          <p className="mt-1.5 text-sm sm:text-base font-medium text-accent">
-            International Business Director
+        {/* Footer */}
+        <footer className="bg-black">
+          <div className="h-1 w-full bg-accent" />
+          <p className="px-6 py-6 text-center text-xs leading-relaxed text-white/60">
+            © 2025 NEVO INDUSTRIAL. All rights reserved.
           </p>
-        </div>
-
-        {/* Company */}
-        <div className="mt-6 text-center">
-          <p className="text-sm font-bold text-black leading-snug">
-            NEVO TRADING AND CONSULTANCY L.L.C – FZ
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Strategic Trading &amp; Consultancy Solutions
-          </p>
-        </div>
-
-        {/* Contact options */}
-        <nav aria-label="Contact options" className="mt-9 space-y-3">
-          {CONTACTS.map((c) => (
-            <a
-              key={c.key}
-              href={c.href}
-              {...(c.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-              className="flex items-center gap-4 rounded-xl border border-border bg-white px-4 py-4 min-h-[72px] transition-colors hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <span className="shrink-0 grid h-12 w-12 place-items-center rounded-lg bg-black text-accent">
-                {c.key === "whatsapp" && <WhatsAppIcon className="h-7 w-7" />}
-                {c.key === "email" && <Mail className="h-6 w-6" strokeWidth={1.8} />}
-                {c.key === "website" && <Globe className="h-6 w-6" strokeWidth={1.8} />}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-bold text-black">{c.label}</span>
-                <span className="block truncate text-xs text-muted-foreground">{c.value}</span>
-              </span>
-              <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
-            </a>
-          ))}
-        </nav>
-
-        {/* Location */}
-        <div className="mt-8 border-t border-border pt-6">
-          <p className="flex items-center justify-center gap-2 text-sm text-black">
-            <MapPin className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
-            Meydan Freezone, Dubai, UAE
-          </p>
-        </div>
+        </footer>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-black">
-        <div className="h-1 w-full bg-accent" />
-        <p className="px-6 py-6 text-center text-xs leading-relaxed text-white/70">
-          © 2025 NEVO INDUSTRIAL.
-          <br />
-          All rights reserved.
-        </p>
-      </footer>
     </main>
   );
 }
+
