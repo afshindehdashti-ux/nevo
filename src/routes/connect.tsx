@@ -48,6 +48,7 @@ const CONTACTS = [
     href: "https://wa.me/971502426167",
     label: "WhatsApp",
     value: "+971 50 242 6167",
+    a11y: "Chat with Arsalan Manesh on WhatsApp at +971 50 242 6167",
     external: true,
   },
   {
@@ -55,6 +56,7 @@ const CONTACTS = [
     href: "mailto:arsalan@nevoindustrial.com",
     label: "Email",
     value: "arsalan@nevoindustrial.com",
+    a11y: "Send an email to arsalan@nevoindustrial.com",
     external: false,
   },
   {
@@ -62,6 +64,7 @@ const CONTACTS = [
     href: "https://www.nevoindustrial.com/en",
     label: "Website",
     value: "www.nevoindustrial.com",
+    a11y: "Visit the NEVO Industrial website at www.nevoindustrial.com",
     external: true,
   },
 ] as const;
