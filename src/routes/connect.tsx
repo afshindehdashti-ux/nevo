@@ -313,8 +313,8 @@ function ConnectCard() {
                 aria-hidden="true"
                 className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors duration-200 group-hover:text-accent group-focus-visible:text-accent"
               >
-                Tap to open
-                <ArrowRight className="h-3.5 w-3.5" />
+                {pressing ? "Hold to copy…" : "Tap to open · hold to copy"}
+                {pressing ? <Copy className="h-3.5 w-3.5" /> : <ArrowRight className="h-3.5 w-3.5" />}
               </span>
             </a>
 
