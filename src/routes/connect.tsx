@@ -479,9 +479,10 @@ function ConnectCard() {
               }}
               aria-disabled={CONNECT_URL ? undefined : true}
               aria-describedby={CONNECT_URL ? undefined : "qr-error"}
+              aria-keyshortcuts={CONNECT_URL ? "Enter Space" : undefined}
               aria-label={
                 CONNECT_URL
-                  ? `Open the digital business card at ${CONNECT_URL_DISPLAY} in this tab. Press and hold to copy the link instead.`
+                  ? `Open the digital business card at ${CONNECT_URL_DISPLAY} in this tab. Press Enter to open, or press Space (or press and hold) to copy the link instead.`
                   : "Opening the digital business card is unavailable because the link is invalid"
               }
               className={`group mx-auto mt-5 block w-fit max-w-full select-none rounded-2xl border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none ${
