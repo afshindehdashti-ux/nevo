@@ -84,11 +84,11 @@ function ConnectCard() {
     <main className="min-h-screen bg-neutral-100 flex flex-col items-center">
       <div className="w-full max-w-md flex-1 bg-white shadow-[0_2px_40px_rgba(0,0,0,0.06)] flex flex-col">
         {/* Brand header */}
-        <header className="bg-black px-8 pt-10 pb-8 text-center">
+        <header className="bg-black px-5 pt-9 pb-7 text-center sm:px-8 sm:pt-10 sm:pb-8">
           <img
             src={nevoLogoLight}
             alt="NEVO Industrial"
-            className="mx-auto h-10 w-auto"
+            className="mx-auto h-8 w-auto max-w-[70%] object-contain sm:h-10"
             decoding="async"
           />
           <div className="mx-auto mt-6 h-px w-16 bg-accent" />
