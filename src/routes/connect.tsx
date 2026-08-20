@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronRight, Globe, Mail, MapPin } from "lucide-react";
-import nevoLogoDark from "@/assets/nevo-logo-dark.png";
+import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
 
 export const Route = createFileRoute("/connect")({
@@ -71,10 +71,9 @@ function ConnectCard() {
         {/* Brand header */}
         <header className="bg-black px-8 pt-10 pb-8 text-center">
           <img
-            src={nevoLogoDark}
+            src={nevoLogoLight}
             alt="NEVO Industrial"
-            className="mx-auto h-9 w-auto invert brightness-0 dark:invert-0"
-            style={{ filter: "brightness(0) invert(1)" }}
+            className="mx-auto h-10 w-auto"
             decoding="async"
           />
           <div className="mx-auto mt-6 h-px w-16 bg-accent" />
