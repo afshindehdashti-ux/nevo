@@ -166,7 +166,7 @@ function ConnectCard() {
           <section aria-labelledby="qr-heading" className="mt-8 border-t border-border pt-8">
             <h2
               id="qr-heading"
-              className="text-center text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground"
+              className="text-center text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground"
             >
               Scan to connect
             </h2>
@@ -186,24 +186,25 @@ function ConnectCard() {
               </div>
             </div>
 
-            <div className="mx-auto mt-4 grid max-w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg bg-neutral-50 px-3 py-2.5">
-              <span className="min-w-0 truncate text-xs font-medium text-black" dir="ltr">
+            <div className="mx-auto mt-4 grid max-w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg bg-neutral-50 px-3 py-2">
+              <span className="min-w-0 truncate text-sm font-medium text-black" dir="ltr">
                 {CONNECT_URL.replace("https://", "")}
               </span>
               <button
                 type="button"
                 onClick={copyLink}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-black px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-accent hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label="Copy link to this digital business card"
+                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-md bg-black px-3.5 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-accent hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 {copied ? (
-                  <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                  <Check className="h-4 w-4" aria-hidden="true" />
                 ) : (
-                  <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+                  <Copy className="h-4 w-4" aria-hidden="true" />
                 )}
                 {copied ? "Copied" : "Copy"}
               </button>
             </div>
-            <p aria-live="polite" className="sr-only">
+            <p aria-live="polite" role="status" className="sr-only">
               {copied ? "Link copied to clipboard" : ""}
             </p>
           </section>
@@ -220,11 +221,12 @@ function ConnectCard() {
 
         {/* Footer */}
         <footer className="bg-black">
-          <div className="h-1 w-full bg-accent" />
-          <p className="px-6 py-6 text-center text-xs leading-relaxed text-white/60">
+          <div className="h-1 w-full bg-[oklch(0.72_0.155_158)]" />
+          <p className="px-6 py-6 text-center text-xs leading-relaxed text-white/85">
             © 2025 NEVO INDUSTRIAL. All rights reserved.
           </p>
         </footer>
+
       </div>
     </main>
   );
