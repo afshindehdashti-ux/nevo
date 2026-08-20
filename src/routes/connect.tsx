@@ -339,19 +339,8 @@ function ConnectCard() {
             >
 
 
-              <div className="rounded-xl bg-white p-3">
-                <QRCodeSVG
-                  value={CONNECT_URL || "about:blank"}
-                  size={168}
-                  level="M"
-                  marginSize={0}
-                  bgColor="#ffffff"
-                  fgColor="#000000"
-                  className="h-[168px] w-[168px] max-w-full"
-                  aria-hidden="true"
-                  focusable="false"
-                />
-              </div>
+              <QrImage value={CONNECT_URL} />
+
               <span
                 aria-hidden="true"
                 className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors duration-200 group-hover:text-accent group-focus-visible:text-accent"
