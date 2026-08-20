@@ -222,6 +222,7 @@ function ConnectCard() {
   }, []);
 
   const [downloading, setDownloading] = useState(false);
+  const [qrFocused, setQrFocused] = useState(false);
 
   const downloadQr = useCallback(async () => {
     if (!CONNECT_URL) {
