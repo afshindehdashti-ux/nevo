@@ -667,13 +667,15 @@ export function SiteHeader() {
               "pointer-events-none absolute inset-x-0 top-full hidden lg:block",
               activeMenu ? "pointer-events-auto" : "",
             )}
+            onMouseEnter={cancelClose}
+            onMouseLeave={scheduleClose}
           >
             {NAV.map((group) => (
               <MegaPanel
                 key={group.label}
                 group={group}
                 open={activeMenu === group.label}
-                onClose={() => setActiveMenu(null)}
+                onClose={scheduleClose}
               />
             ))}
           </div>
