@@ -101,7 +101,58 @@ const ACTION_FEEDBACK: Record<string, string> = {
   website: "Opening website…",
 };
 
+const QrImage = memo(function QrImage({ value }: { value: string }) {
+  // Only this block re-renders/regenerates when the destination changes.
+  const [generating, setGenerating] = useState(Boolean(value));
+
+  useEffect(() => {
+    if (!value) {
+      setGenerating(false);
+      return;
+    }
+    setGenerating(true);
+    const id = window.setTimeout(() => setGenerating(false), 120);
+    return () => window.clearTimeout(id);
+  }, [value]);
+
+  const qr = useMemo(
+    () => (
+      <QRCodeSVG
+        value={value || "about:blank"}
+        size={168}
+        level="M"
+        marginSize={0}
+        bgColor="#ffffff"
+        fgColor="#000000"
+        className="h-[168px] w-[168px] max-w-full"
+        aria-hidden="true"
+        focusable="false"
+      />
+    ),
+    [value],
+  );
+
+  return (
+    <div className="relative rounded-xl bg-white p-3" aria-busy={generating || undefined}>
+      <div className={generating ? "opacity-40 transition-opacity duration-200" : "transition-opacity duration-200"}>
+        {qr}
+      </div>
+      {generating && (
+        <span
+          role="status"
+          aria-live="polite"
+          className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-xs font-medium text-muted-foreground"
+        >
+          <Loader2 className="h-5 w-5 animate-spin text-accent motion-reduce:animate-none" aria-hidden="true" />
+          Generating QR code…
+        </span>
+      )}
+    </div>
+  );
+});
+
 function ConnectCard() {
+
   const [copied, setCopied] = useState(false);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const lockRef = useRef(false);
