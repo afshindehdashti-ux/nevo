@@ -130,7 +130,7 @@ function ConnectCard() {
                 href={c.href}
                 aria-label={`${c.label}: ${c.value}${c.external ? " (opens in a new tab)" : ""}`}
                 {...(c.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                className="group relative flex items-center gap-3 min-[400px]:gap-4 overflow-hidden rounded-xl border border-border bg-white px-3 min-[400px]:px-4 py-4 min-h-[78px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_10px_24px_-8px_rgba(0,0,0,0.18)] active:translate-y-0 active:scale-[0.985] active:shadow-[0_1px_2px_rgba(0,0,0,0.06)] active:duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                className="group relative flex items-center gap-2.5 min-[360px]:gap-3 min-[400px]:gap-4 overflow-hidden rounded-xl border border-border bg-white px-2.5 min-[360px]:px-3 min-[400px]:px-4 py-4 min-h-[78px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_10px_24px_-8px_rgba(0,0,0,0.18)] active:translate-y-0 active:scale-[0.985] active:shadow-[0_1px_2px_rgba(0,0,0,0.06)] active:duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
               >
                 <span
                   aria-hidden="true"
@@ -148,7 +148,7 @@ function ConnectCard() {
                   <span className="block text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors duration-200 group-hover:text-black">
                     {c.label}
                   </span>
-                  <span className="mt-1 block truncate text-[0.82rem] font-semibold leading-tight tracking-tight text-black min-[400px]:text-[0.95rem] min-[400px]:tracking-normal" dir="ltr">
+                  <span className="mt-1 block truncate text-xs min-[360px]:text-[0.82rem] font-semibold leading-tight tracking-tight text-black min-[400px]:text-[0.95rem] min-[400px]:tracking-normal" dir="ltr">
                     {c.value}
                   </span>
                 </span>
