@@ -130,7 +130,7 @@ function ConnectCard() {
                 href={c.href}
                 aria-label={`${c.label}: ${c.value}${c.external ? " (opens in a new tab)" : ""}`}
                 {...(c.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                className="group relative flex items-center gap-4 overflow-hidden rounded-xl border border-border bg-white px-4 py-4 min-h-[78px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_10px_24px_-8px_rgba(0,0,0,0.18)] active:translate-y-0 active:scale-[0.985] active:shadow-[0_1px_2px_rgba(0,0,0,0.06)] active:duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                className="group relative flex items-center gap-3 min-[400px]:gap-4 overflow-hidden rounded-xl border border-border bg-white px-3 min-[400px]:px-4 py-4 min-h-[78px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_10px_24px_-8px_rgba(0,0,0,0.18)] active:translate-y-0 active:scale-[0.985] active:shadow-[0_1px_2px_rgba(0,0,0,0.06)] active:duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
               >
                 <span
                   aria-hidden="true"
@@ -138,7 +138,7 @@ function ConnectCard() {
                 />
                 <span
                   aria-hidden="true"
-                  className="shrink-0 grid h-12 w-12 place-items-center rounded-lg bg-black text-[oklch(0.78_0.15_158)] transition-colors duration-200 group-hover:bg-accent group-hover:text-white group-active:bg-accent group-active:text-white"
+                  className="shrink-0 grid h-11 w-11 min-[400px]:h-12 min-[400px]:w-12 place-items-center rounded-lg bg-black text-[oklch(0.78_0.15_158)] transition-colors duration-200 group-hover:bg-accent group-hover:text-white group-active:bg-accent group-active:text-white"
                 >
                   {c.key === "whatsapp" && <WhatsAppIcon className="h-6 w-6" />}
                   {c.key === "email" && <Mail className="h-[22px] w-[22px]" strokeWidth={1.8} />}
