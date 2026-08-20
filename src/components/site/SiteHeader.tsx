@@ -593,13 +593,13 @@ export function SiteHeader() {
             <nav
               className="hidden items-center gap-0.5 lg:flex"
               aria-label="Primary"
-              onMouseLeave={() => setActiveMenu(null)}
+              onMouseEnter={cancelClose}
             >
               <TopLink
                 label={t("nav.home")}
                 href="/"
                 onLight={!solid}
-                onEnter={() => setActiveMenu(null)}
+                onEnter={() => openMenu(null)}
               />
               {NAV.map((group) => (
                 <MegaTrigger
@@ -608,7 +608,7 @@ export function SiteHeader() {
                   displayLabel={t(NAV_KEY[group.label] ?? group.label, group.label)}
                   onLight={!solid}
                   active={activeMenu === group.label}
-                  onEnter={() => setActiveMenu(group.label)}
+                  onEnter={() => openMenu(group.label)}
                 />
               ))}
             </nav>
