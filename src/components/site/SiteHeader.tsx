@@ -460,7 +460,8 @@ export function SiteHeader() {
             ? "border-b border-border bg-background/90 shadow-[0_1px_0_0_rgba(0,0,0,0.4),0_8px_28px_-18px_rgba(0,0,0,0.6)] backdrop-blur-xl"
             : "border-b border-transparent bg-transparent",
         )}
-        onMouseLeave={() => setActiveMenu(null)}
+        onMouseEnter={cancelClose}
+        onMouseLeave={scheduleClose}
       >
         <UtilityBar solid={solid} />
 
