@@ -222,6 +222,7 @@ function ConnectCard() {
   }, []);
 
   const [downloading, setDownloading] = useState(false);
+  const [qrFocused, setQrFocused] = useState(false);
 
   const downloadQr = useCallback(async () => {
     if (!CONNECT_URL) {
@@ -450,6 +451,24 @@ function ConnectCard() {
               onContextMenu={(e) => {
                 if (longPressed.current) e.preventDefault();
               }}
+              onFocus={() => setQrFocused(true)}
+              onBlur={() => setQrFocused(false)}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter" && e.key !== " " && e.key !== "Spacebar") return;
+                if (!CONNECT_URL) {
+                  e.preventDefault();
+                  toast.error("Link unavailable", { description: CONNECT_URL_ERROR ?? undefined });
+                  return;
+                }
+                if (e.key === "Enter") return; // native activation opens the link
+                // Space mirrors the touch long-press: copy instead of navigate.
+                e.preventDefault();
+                void copyLink();
+              }}
+              onKeyUp={(e) => {
+                // Prevent the browser's default click synthesis on Space release.
+                if (e.key === " " || e.key === "Spacebar") e.preventDefault();
+              }}
               onClick={(e) => {
                 if (!CONNECT_URL) {
                   e.preventDefault();
@@ -460,9 +479,10 @@ function ConnectCard() {
               }}
               aria-disabled={CONNECT_URL ? undefined : true}
               aria-describedby={CONNECT_URL ? undefined : "qr-error"}
+              aria-keyshortcuts={CONNECT_URL ? "Enter Space" : undefined}
               aria-label={
                 CONNECT_URL
-                  ? `Open the digital business card at ${CONNECT_URL_DISPLAY} in this tab. Press and hold to copy the link instead.`
+                  ? `Open the digital business card at ${CONNECT_URL_DISPLAY} in this tab. Press Enter to open, or press Space (or press and hold) to copy the link instead.`
                   : "Opening the digital business card is unavailable because the link is invalid"
               }
               className={`group mx-auto mt-5 block w-fit max-w-full select-none rounded-2xl border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none ${
@@ -483,7 +503,9 @@ function ConnectCard() {
                   ? "Link unavailable"
                   : pressing
                     ? "Hold to copy…"
-                    : "Tap to open · hold to copy"}
+                    : qrFocused
+                      ? "Enter to open · Space to copy"
+                      : "Tap to open · hold to copy"}
                 {pressing ? <Copy className="h-3.5 w-3.5" /> : <ArrowRight className="h-3.5 w-3.5" />}
               </span>
             </a>
