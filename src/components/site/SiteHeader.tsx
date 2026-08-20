@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { useLanguage } from "@/i18n/LanguageProvider";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { localizeNavLabel } from "@/i18n/nav-labels";
 import {
