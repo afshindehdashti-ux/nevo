@@ -70,7 +70,29 @@ const CONTACTS = [
   },
 ] as const;
 
-const CONNECT_URL = "https://www.nevoindustrial.com/connect";
+const RAW_CONNECT_URL = "https://www.nevoindustrial.com/connect";
+
+const connectUrlSchema = z
+  .string()
+  .trim()
+  .min(1, { message: "The card link is missing." })
+  .max(2048, { message: "The card link is too long." })
+  .transform((v) => (/^https?:\/\//i.test(v) ? v : `https://${v}`))
+  .refine((v) => {
+    try {
+      const u = new URL(v);
+      return u.protocol === "https:" && Boolean(u.hostname) && u.hostname.includes(".");
+    } catch {
+      return false;
+    }
+  }, { message: "The card link is not a valid secure address." });
+
+const parsedConnectUrl = connectUrlSchema.safeParse(RAW_CONNECT_URL);
+const CONNECT_URL = parsedConnectUrl.success ? parsedConnectUrl.data : "";
+const CONNECT_URL_ERROR = parsedConnectUrl.success
+  ? null
+  : (parsedConnectUrl.error.issues[0]?.message ?? "The card link is unavailable.");
+const CONNECT_URL_DISPLAY = CONNECT_URL.replace(/^https:\/\//, "");
 
 const ACTION_FEEDBACK: Record<string, string> = {
   whatsapp: "Opening WhatsApp…",
