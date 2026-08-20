@@ -503,7 +503,9 @@ function ConnectCard() {
                   ? "Link unavailable"
                   : pressing
                     ? "Hold to copy…"
-                    : "Tap to open · hold to copy"}
+                    : qrFocused
+                      ? "Enter to open · Space to copy"
+                      : "Tap to open · hold to copy"}
                 {pressing ? <Copy className="h-3.5 w-3.5" /> : <ArrowRight className="h-3.5 w-3.5" />}
               </span>
             </a>
