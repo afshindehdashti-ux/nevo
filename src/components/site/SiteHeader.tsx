@@ -851,11 +851,14 @@ function MegaPanel({
   return (
     <div
       className={cn(
-        "border-b border-border bg-background shadow-[0_20px_40px_-24px_rgba(0,0,0,0.6)] transition-all duration-[220ms] ease-[var(--ease-out-quart)]",
-        open ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
+        "absolute inset-x-0 top-0 border-b border-border bg-background shadow-[0_20px_40px_-24px_rgba(0,0,0,0.6)] transition-all duration-[220ms] ease-[var(--ease-out-quart)]",
+        open
+          ? "translate-y-0 opacity-100"
+          : "pointer-events-none invisible -translate-y-1 opacity-0",
       )}
       onMouseLeave={onClose}
     >
+
       <div className="container-wide px-6 py-10 lg:px-8">
         {group.layout === "cards" && <CardsLayout group={group} />}
         {group.layout === "grid" && <GridLayout group={group} />}
