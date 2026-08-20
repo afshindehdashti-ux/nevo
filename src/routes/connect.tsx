@@ -126,44 +126,49 @@ function ConnectCard() {
           </div>
 
           {/* Contact options */}
-          <nav aria-label="Contact options" className="mt-8 space-y-3.5">
-            {CONTACTS.map((c) => (
-              <a
-                key={c.key}
-                href={c.href}
-                aria-label={`${c.label}: ${c.value}${c.external ? " (opens in a new tab)" : ""}`}
-                {...(c.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                className="group relative flex items-center gap-2.5 min-[360px]:gap-3 min-[400px]:gap-4 overflow-hidden rounded-xl border border-border bg-white px-2.5 min-[360px]:px-3 min-[400px]:px-4 py-4 min-h-[78px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_10px_24px_-8px_rgba(0,0,0,0.18)] active:translate-y-0 active:scale-[0.985] active:shadow-[0_1px_2px_rgba(0,0,0,0.06)] active:duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
-              >
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-y-0 left-0 w-[3px] origin-top scale-y-0 bg-accent transition-transform duration-200 ease-out group-hover:scale-y-100 group-active:scale-y-100"
-                />
-                <span
-                  aria-hidden="true"
-                  className="shrink-0 grid h-11 w-11 min-[400px]:h-12 min-[400px]:w-12 place-items-center rounded-lg bg-black text-[oklch(0.78_0.15_158)] transition-colors duration-200 group-hover:bg-accent group-hover:text-white group-active:bg-accent group-active:text-white"
-                >
-                  {c.key === "whatsapp" && <WhatsAppIcon className="h-6 w-6" />}
-                  {c.key === "email" && <Mail className="h-[22px] w-[22px]" strokeWidth={1.8} />}
-                  {c.key === "website" && <Globe className="h-[22px] w-[22px]" strokeWidth={1.8} />}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors duration-200 group-hover:text-black">
-                    {c.label}
-                  </span>
-                  <span className="mt-1 block truncate text-xs min-[360px]:text-[0.82rem] font-semibold leading-tight tracking-tight text-black min-[400px]:text-[0.95rem] min-[400px]:tracking-normal" dir="ltr">
-                    {c.value}
-                  </span>
-                </span>
-                <ChevronRight
-                  className="hidden min-[360px]:block h-5 w-5 shrink-0 text-muted-foreground transition-[transform,color] duration-200 group-hover:translate-x-1 group-hover:text-accent group-active:translate-x-0.5"
-                  aria-hidden="true"
-                />
-              </a>
-
-            ))}
-
+          <nav aria-labelledby="contact-heading" className="mt-8">
+            <h2 id="contact-heading" className="sr-only">
+              Contact Arsalan Manesh
+            </h2>
+            <ul className="space-y-3.5">
+              {CONTACTS.map((c) => (
+                <li key={c.key}>
+                  <a
+                    href={c.href}
+                    aria-label={`${c.a11y}${c.external ? " (opens in a new tab)" : ""}`}
+                    {...(c.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className="group relative flex items-center gap-2.5 min-[360px]:gap-3 min-[400px]:gap-4 overflow-hidden rounded-xl border border-border bg-white px-2.5 min-[360px]:px-3 min-[400px]:px-4 py-4 min-h-[78px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_10px_24px_-8px_rgba(0,0,0,0.18)] active:translate-y-0 active:scale-[0.985] active:shadow-[0_1px_2px_rgba(0,0,0,0.06)] active:duration-75 focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-y-0 left-0 w-[3px] origin-top scale-y-0 bg-accent transition-transform duration-200 ease-out group-hover:scale-y-100 group-active:scale-y-100 group-focus-visible:scale-y-100"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="shrink-0 grid h-11 w-11 min-[400px]:h-12 min-[400px]:w-12 place-items-center rounded-lg bg-black text-[oklch(0.78_0.15_158)] transition-colors duration-200 group-hover:bg-accent group-hover:text-white group-active:bg-accent group-active:text-white group-focus-visible:bg-accent group-focus-visible:text-white"
+                    >
+                      {c.key === "whatsapp" && <WhatsAppIcon className="h-6 w-6" />}
+                      {c.key === "email" && <Mail className="h-[22px] w-[22px]" strokeWidth={1.8} />}
+                      {c.key === "website" && <Globe className="h-[22px] w-[22px]" strokeWidth={1.8} />}
+                    </span>
+                    <span className="min-w-0 flex-1" aria-hidden="true">
+                      <span className="block text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors duration-200 group-hover:text-black">
+                        {c.label}
+                      </span>
+                      <span className="mt-1 block truncate text-xs min-[360px]:text-[0.82rem] font-semibold leading-tight tracking-tight text-black min-[400px]:text-[0.95rem] min-[400px]:tracking-normal" dir="ltr">
+                        {c.value}
+                      </span>
+                    </span>
+                    <ChevronRight
+                      className="hidden min-[360px]:block h-5 w-5 shrink-0 text-muted-foreground transition-[transform,color] duration-200 group-hover:translate-x-1 group-hover:text-accent group-active:translate-x-0.5 group-focus-visible:translate-x-1 group-focus-visible:text-accent"
+                      aria-hidden="true"
+                    />
+                  </a>
+                </li>
+              ))}
+            </ul>
           </nav>
+
 
           {/* QR code */}
           <section aria-labelledby="qr-heading" className="mt-8 border-t border-border pt-8">
