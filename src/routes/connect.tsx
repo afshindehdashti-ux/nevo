@@ -173,12 +173,38 @@ const QrImage = memo(function QrImage({ value }: { value: string }) {
   );
 });
 
+/** Toast body that carries its own live-region semantics for screen readers. */
+function ToastBody({
+  title,
+  description,
+  tone,
+}: {
+  title: string;
+  description?: string;
+  tone: "status" | "alert";
+}) {
+  return (
+    <div
+      role={tone}
+      aria-live={tone === "alert" ? "assertive" : "polite"}
+      aria-atomic="true"
+      className="flex flex-col gap-0.5"
+    >
+      <span className="font-medium">{title}</span>
+      {description ? <span className="text-sm opacity-80">{description}</span> : null}
+    </div>
+  );
+}
+
 function ConnectCard() {
 
   const [copied, setCopied] = useState(false);
+  const [announcement, setAnnouncement] = useState("");
+  const [errorAnnouncement, setErrorAnnouncement] = useState("");
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const lockRef = useRef(false);
   const resetTimer = useRef<number | null>(null);
+
 
   useEffect(
     () => () => {
