@@ -153,7 +153,7 @@ function ConnectCard() {
                   </span>
                 </span>
                 <ChevronRight
-                  className="h-5 w-5 shrink-0 text-muted-foreground transition-[transform,color] duration-200 group-hover:translate-x-1 group-hover:text-accent group-active:translate-x-0.5"
+                  className="hidden min-[360px]:block h-5 w-5 shrink-0 text-muted-foreground transition-[transform,color] duration-200 group-hover:translate-x-1 group-hover:text-accent group-active:translate-x-0.5"
                   aria-hidden="true"
                 />
               </a>
