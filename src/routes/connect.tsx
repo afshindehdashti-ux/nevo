@@ -233,19 +233,34 @@ function ConnectCard() {
 
   const copyLink = useCallback(async () => {
     if (!CONNECT_URL) {
-      toast.error("Link unavailable", { description: CONNECT_URL_ERROR ?? undefined });
+      setAnnouncement("");
+      setErrorAnnouncement(`Link unavailable. ${CONNECT_URL_ERROR ?? ""}`.trim());
+      toast.error(
+        <ToastBody tone="alert" title="Link unavailable" description={CONNECT_URL_ERROR ?? undefined} />,
+      );
       return;
     }
     try {
       await navigator.clipboard.writeText(CONNECT_URL);
       setCopied(true);
-      toast.success("Link copied", { description: CONNECT_URL_DISPLAY });
+      setErrorAnnouncement("");
+      setAnnouncement(`Link copied to clipboard: ${CONNECT_URL_DISPLAY}`);
+      toast.success(<ToastBody tone="status" title="Link copied" description={CONNECT_URL_DISPLAY} />);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
-      toast.error("Couldn't copy the link", { description: "Select the address and copy it manually." });
+      setAnnouncement("");
+      setErrorAnnouncement("Couldn't copy the link. Select the address and copy it manually.");
+      toast.error(
+        <ToastBody
+          tone="alert"
+          title="Couldn't copy the link"
+          description="Select the address and copy it manually."
+        />,
+      );
     }
   }, []);
+
 
   const [downloading, setDownloading] = useState(false);
   const [qrFocused, setQrFocused] = useState(false);
