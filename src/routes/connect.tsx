@@ -81,7 +81,9 @@ function ConnectCard() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-neutral-100 flex flex-col items-center">
+    <main
+      className="min-h-dvh bg-neutral-100 flex flex-col items-center [--accent:oklch(0.45_0.13_158)] [--border:oklch(0.88_0.004_260)] [--muted-foreground:oklch(0.43_0.012_260)] [--ring:oklch(0.45_0.13_158)]"
+    >
       <div className="w-full max-w-md flex-1 bg-white shadow-[0_2px_40px_rgba(0,0,0,0.06)] flex flex-col">
         {/* Brand header */}
         <header className="bg-black px-5 pt-9 pb-7 text-center sm:px-8 sm:pt-10 sm:pb-8">
@@ -91,11 +93,12 @@ function ConnectCard() {
             className="mx-auto h-8 w-auto max-w-[70%] object-contain sm:h-10"
             decoding="async"
           />
-          <div className="mx-auto mt-6 h-px w-16 bg-accent" />
-          <p className="mt-5 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-white/60">
+          <div className="mx-auto mt-6 h-px w-16 bg-[oklch(0.72_0.155_158)]" />
+          <p className="mt-5 text-xs font-semibold uppercase tracking-[0.3em] text-white/85">
             Digital Business Card
           </p>
         </header>
+
 
         <div className="flex-1 px-7 pt-9 pb-10">
           {/* Person */}
@@ -110,12 +113,13 @@ function ConnectCard() {
 
           {/* Company */}
           <div className="mt-7 rounded-lg bg-neutral-50 px-5 py-4 text-center">
-            <p className="text-[0.8rem] font-bold leading-snug text-black">
+            <p className="text-sm font-bold leading-snug text-black">
               NEVO TRADING AND CONSULTANCY L.L.C – FZ
             </p>
-            <p className="mt-1.5 text-xs text-muted-foreground">
+            <p className="mt-1.5 text-[0.8125rem] text-muted-foreground">
               Strategic Trading &amp; Consultancy Solutions
             </p>
+
           </div>
 
           {/* Contact options */}
@@ -124,6 +128,7 @@ function ConnectCard() {
               <a
                 key={c.key}
                 href={c.href}
+                aria-label={`${c.label}: ${c.value}${c.external ? " (opens in a new tab)" : ""}`}
                 {...(c.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 className="group relative flex items-center gap-4 overflow-hidden rounded-xl border border-border bg-white px-4 py-4 min-h-[78px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_10px_24px_-8px_rgba(0,0,0,0.18)] active:translate-y-0 active:scale-[0.985] active:shadow-[0_1px_2px_rgba(0,0,0,0.06)] active:duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
               >
@@ -131,16 +136,19 @@ function ConnectCard() {
                   aria-hidden="true"
                   className="absolute inset-y-0 left-0 w-[3px] origin-top scale-y-0 bg-accent transition-transform duration-200 ease-out group-hover:scale-y-100 group-active:scale-y-100"
                 />
-                <span className="shrink-0 grid h-12 w-12 place-items-center rounded-lg bg-black text-accent transition-colors duration-200 group-hover:bg-accent group-hover:text-black group-active:bg-accent group-active:text-black">
+                <span
+                  aria-hidden="true"
+                  className="shrink-0 grid h-12 w-12 place-items-center rounded-lg bg-black text-[oklch(0.78_0.15_158)] transition-colors duration-200 group-hover:bg-accent group-hover:text-white group-active:bg-accent group-active:text-white"
+                >
                   {c.key === "whatsapp" && <WhatsAppIcon className="h-6 w-6" />}
                   {c.key === "email" && <Mail className="h-[22px] w-[22px]" strokeWidth={1.8} />}
                   {c.key === "website" && <Globe className="h-[22px] w-[22px]" strokeWidth={1.8} />}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition-colors duration-200 group-hover:text-black">
+                  <span className="block text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors duration-200 group-hover:text-black">
                     {c.label}
                   </span>
-                  <span className="mt-1 block truncate text-[0.95rem] font-semibold leading-tight text-black">
+                  <span className="mt-1 block truncate text-[0.95rem] font-semibold leading-tight text-black" dir="ltr">
                     {c.value}
                   </span>
                 </span>
@@ -149,6 +157,7 @@ function ConnectCard() {
                   aria-hidden="true"
                 />
               </a>
+
             ))}
 
           </nav>
@@ -157,7 +166,7 @@ function ConnectCard() {
           <section aria-labelledby="qr-heading" className="mt-8 border-t border-border pt-8">
             <h2
               id="qr-heading"
-              className="text-center text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground"
+              className="text-center text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground"
             >
               Scan to connect
             </h2>
@@ -177,24 +186,25 @@ function ConnectCard() {
               </div>
             </div>
 
-            <div className="mx-auto mt-4 grid max-w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg bg-neutral-50 px-3 py-2.5">
-              <span className="min-w-0 truncate text-xs font-medium text-black" dir="ltr">
+            <div className="mx-auto mt-4 grid max-w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg bg-neutral-50 px-3 py-2">
+              <span className="min-w-0 truncate text-sm font-medium text-black" dir="ltr">
                 {CONNECT_URL.replace("https://", "")}
               </span>
               <button
                 type="button"
                 onClick={copyLink}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-black px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-accent hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label="Copy link to this digital business card"
+                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-md bg-black px-3.5 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-accent hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 {copied ? (
-                  <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                  <Check className="h-4 w-4" aria-hidden="true" />
                 ) : (
-                  <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+                  <Copy className="h-4 w-4" aria-hidden="true" />
                 )}
                 {copied ? "Copied" : "Copy"}
               </button>
             </div>
-            <p aria-live="polite" className="sr-only">
+            <p aria-live="polite" role="status" className="sr-only">
               {copied ? "Link copied to clipboard" : ""}
             </p>
           </section>
@@ -211,11 +221,12 @@ function ConnectCard() {
 
         {/* Footer */}
         <footer className="bg-black">
-          <div className="h-1 w-full bg-accent" />
-          <p className="px-6 py-6 text-center text-xs leading-relaxed text-white/60">
+          <div className="h-1 w-full bg-[oklch(0.72_0.155_158)]" />
+          <p className="px-6 py-6 text-center text-xs leading-relaxed text-white/85">
             © 2025 NEVO INDUSTRIAL. All rights reserved.
           </p>
         </footer>
+
       </div>
     </main>
   );
