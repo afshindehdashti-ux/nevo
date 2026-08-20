@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, ChevronRight, Copy, Globe, Loader2, Mail, MapPin } from "lucide-react";
+import { Check, ChevronRight, Copy, ExternalLink, Globe, Loader2, Mail, MapPin } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
@@ -241,7 +241,13 @@ function ConnectCard() {
               Scan to connect
             </h2>
 
-            <div className="mx-auto mt-5 w-fit max-w-full rounded-2xl border border-border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)]">
+            <a
+              href={CONNECT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open www.nevoindustrial.com/connect (opens in a new tab)"
+              className="group mx-auto mt-5 block w-fit max-w-full rounded-2xl border border-border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.2)] active:translate-y-0 active:scale-[0.99] focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+            >
               <div className="rounded-xl bg-white p-3">
                 <QRCodeSVG
                   value={CONNECT_URL}
@@ -256,12 +262,26 @@ function ConnectCard() {
                   title="QR code linking to nevoindustrial.com/connect"
                 />
               </div>
-            </div>
+              <span
+                aria-hidden="true"
+                className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors duration-200 group-hover:text-accent group-focus-visible:text-accent"
+              >
+                Tap to open
+                <ExternalLink className="h-3.5 w-3.5" />
+              </span>
+            </a>
 
             <div className="mx-auto mt-4 grid max-w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg bg-neutral-50 px-3 py-2">
-              <span className="min-w-0 truncate text-sm font-medium text-black" dir="ltr">
-                {CONNECT_URL.replace("https://", "")}
-              </span>
+              <input
+                type="text"
+                readOnly
+                dir="ltr"
+                value={CONNECT_URL.replace("https://", "")}
+                aria-label="Digital business card link"
+                onFocus={(e) => e.currentTarget.select()}
+                onClick={(e) => e.currentTarget.select()}
+                className="min-w-0 select-all truncate rounded-md bg-transparent px-1 py-2 text-sm font-medium text-black outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              />
               <button
                 type="button"
                 onClick={copyLink}
@@ -276,6 +296,7 @@ function ConnectCard() {
                 {copied ? "Copied" : "Copy"}
               </button>
             </div>
+
             <p aria-live="polite" role="status" className="sr-only">
               {copied ? "Link copied to clipboard" : ""}
             </p>
