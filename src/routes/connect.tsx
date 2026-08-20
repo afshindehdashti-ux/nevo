@@ -113,12 +113,13 @@ function ConnectCard() {
 
           {/* Company */}
           <div className="mt-7 rounded-lg bg-neutral-50 px-5 py-4 text-center">
-            <p className="text-[0.8rem] font-bold leading-snug text-black">
+            <p className="text-sm font-bold leading-snug text-black">
               NEVO TRADING AND CONSULTANCY L.L.C – FZ
             </p>
-            <p className="mt-1.5 text-xs text-muted-foreground">
+            <p className="mt-1.5 text-[0.8125rem] text-muted-foreground">
               Strategic Trading &amp; Consultancy Solutions
             </p>
+
           </div>
 
           {/* Contact options */}
