@@ -496,6 +496,22 @@ function ConnectCard() {
               </button>
             </div>
 
+            <button
+              type="button"
+              onClick={downloadQr}
+              disabled={!CONNECT_URL || downloading}
+              aria-label="Download this QR code as a PNG image"
+              className="mx-auto mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-border bg-white px-4 text-xs font-semibold uppercase tracking-wider text-black outline-none transition-colors hover:border-accent hover:text-accent focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {downloading ? (
+                <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+              ) : (
+                <Download className="h-4 w-4" aria-hidden="true" />
+              )}
+              {downloading ? "Preparing PNG…" : "Download QR (PNG)"}
+            </button>
+
+
             <p aria-live="polite" role="status" className="sr-only">
               {copied ? "Link copied to clipboard" : ""}
             </p>
