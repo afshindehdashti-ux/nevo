@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, ChevronRight, Copy, ExternalLink, Globe, Loader2, Mail, MapPin } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Copy, Globe, Loader2, Mail, MapPin } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -246,9 +246,7 @@ function ConnectCard() {
 
             <a
               href={CONNECT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open www.nevoindustrial.com/connect (opens in a new tab)"
+              aria-label="Open the digital business card at www.nevoindustrial.com/connect in this tab"
               className="group mx-auto mt-5 block w-fit max-w-full rounded-2xl border border-border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.2)] active:translate-y-0 active:scale-[0.99] focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none motion-reduce:hover:translate-y-0"
             >
               <div className="rounded-xl bg-white p-3">
@@ -260,9 +258,8 @@ function ConnectCard() {
                   bgColor="#ffffff"
                   fgColor="#000000"
                   className="h-[168px] w-[168px] max-w-full"
-                  role="img"
-                  aria-label="QR code linking to www.nevoindustrial.com/connect"
-                  title="QR code linking to nevoindustrial.com/connect"
+                  aria-hidden="true"
+                  focusable="false"
                 />
               </div>
               <span
@@ -270,9 +267,10 @@ function ConnectCard() {
                 className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors duration-200 group-hover:text-accent group-focus-visible:text-accent"
               >
                 Tap to open
-                <ExternalLink className="h-3.5 w-3.5" />
+                <ArrowRight className="h-3.5 w-3.5" />
               </span>
             </a>
+
 
             <div className="mx-auto mt-4 grid max-w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg bg-neutral-50 px-3 py-2">
               <input
