@@ -133,10 +133,14 @@ function ConnectCard() {
   );
 
   const copyLink = useCallback(async () => {
+    if (!CONNECT_URL) {
+      toast.error("Link unavailable", { description: CONNECT_URL_ERROR ?? undefined });
+      return;
+    }
     try {
       await navigator.clipboard.writeText(CONNECT_URL);
       setCopied(true);
-      toast.success("Link copied", { description: CONNECT_URL.replace("https://", "") });
+      toast.success("Link copied", { description: CONNECT_URL_DISPLAY });
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
