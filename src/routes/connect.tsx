@@ -608,9 +608,13 @@ function ConnectCard() {
             </button>
 
 
-            <p aria-live="polite" role="status" className="sr-only">
-              {copied ? "Link copied to clipboard" : ""}
+            <p aria-live="polite" aria-atomic="true" role="status" className="sr-only">
+              {announcement || (copied ? "Link copied to clipboard" : "")}
             </p>
+            <p aria-live="assertive" aria-atomic="true" role="alert" className="sr-only">
+              {errorAnnouncement}
+            </p>
+
           </section>
 
           {/* Location */}
