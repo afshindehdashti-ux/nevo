@@ -189,6 +189,8 @@ function ConnectCard() {
                   bgColor="#ffffff"
                   fgColor="#000000"
                   className="h-[168px] w-[168px] max-w-full"
+                  role="img"
+                  aria-label="QR code linking to www.nevoindustrial.com/connect"
                   title="QR code linking to nevoindustrial.com/connect"
                 />
               </div>
@@ -202,7 +204,7 @@ function ConnectCard() {
                 type="button"
                 onClick={copyLink}
                 aria-label="Copy link to this digital business card"
-                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-md bg-black px-3.5 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-accent hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-md bg-black px-3.5 text-xs font-semibold uppercase tracking-wider text-white outline-none transition-colors hover:bg-accent hover:text-white focus-visible:bg-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
               >
                 {copied ? (
                   <Check className="h-4 w-4" aria-hidden="true" />
