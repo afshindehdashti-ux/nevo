@@ -282,9 +282,20 @@ function ConnectCard() {
 
             <a
               href={CONNECT_URL}
-              aria-label="Open the digital business card at www.nevoindustrial.com/connect in this tab"
-              className="group mx-auto mt-5 block w-fit max-w-full rounded-2xl border border-border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.2)] active:translate-y-0 active:scale-[0.99] focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+              onPointerDown={startPress}
+              onPointerUp={clearPress}
+              onPointerLeave={clearPress}
+              onPointerCancel={clearPress}
+              onContextMenu={(e) => {
+                if (longPressed.current) e.preventDefault();
+              }}
+              onClick={handleQrClick}
+              aria-label="Open the digital business card at www.nevoindustrial.com/connect in this tab. Press and hold to copy the link instead."
+              className={`group mx-auto mt-5 block w-fit max-w-full select-none rounded-2xl border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.2)] active:translate-y-0 active:scale-[0.99] focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${
+                pressing ? "border-accent scale-[0.99]" : "border-border"
+              }`}
             >
+
               <div className="rounded-xl bg-white p-3">
                 <QRCodeSVG
                   value={CONNECT_URL}
