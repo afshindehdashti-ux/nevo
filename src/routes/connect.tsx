@@ -173,12 +173,38 @@ const QrImage = memo(function QrImage({ value }: { value: string }) {
   );
 });
 
+/** Toast body that carries its own live-region semantics for screen readers. */
+function ToastBody({
+  title,
+  description,
+  tone,
+}: {
+  title: string;
+  description?: string;
+  tone: "status" | "alert";
+}) {
+  return (
+    <div
+      role={tone}
+      aria-live={tone === "alert" ? "assertive" : "polite"}
+      aria-atomic="true"
+      className="flex flex-col gap-0.5"
+    >
+      <span className="font-medium">{title}</span>
+      {description ? <span className="text-sm opacity-80">{description}</span> : null}
+    </div>
+  );
+}
+
 function ConnectCard() {
 
   const [copied, setCopied] = useState(false);
+  const [announcement, setAnnouncement] = useState("");
+  const [errorAnnouncement, setErrorAnnouncement] = useState("");
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const lockRef = useRef(false);
   const resetTimer = useRef<number | null>(null);
+
 
   useEffect(
     () => () => {
@@ -207,19 +233,34 @@ function ConnectCard() {
 
   const copyLink = useCallback(async () => {
     if (!CONNECT_URL) {
-      toast.error("Link unavailable", { description: CONNECT_URL_ERROR ?? undefined });
+      setAnnouncement("");
+      setErrorAnnouncement(`Link unavailable. ${CONNECT_URL_ERROR ?? ""}`.trim());
+      toast.error(
+        <ToastBody tone="alert" title="Link unavailable" description={CONNECT_URL_ERROR ?? undefined} />,
+      );
       return;
     }
     try {
       await navigator.clipboard.writeText(CONNECT_URL);
       setCopied(true);
-      toast.success("Link copied", { description: CONNECT_URL_DISPLAY });
+      setErrorAnnouncement("");
+      setAnnouncement(`Link copied to clipboard: ${CONNECT_URL_DISPLAY}`);
+      toast.success(<ToastBody tone="status" title="Link copied" description={CONNECT_URL_DISPLAY} />);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
-      toast.error("Couldn't copy the link", { description: "Select the address and copy it manually." });
+      setAnnouncement("");
+      setErrorAnnouncement("Couldn't copy the link. Select the address and copy it manually.");
+      toast.error(
+        <ToastBody
+          tone="alert"
+          title="Couldn't copy the link"
+          description="Select the address and copy it manually."
+        />,
+      );
     }
   }, []);
+
 
   const [downloading, setDownloading] = useState(false);
   const [qrFocused, setQrFocused] = useState(false);
@@ -567,9 +608,13 @@ function ConnectCard() {
             </button>
 
 
-            <p aria-live="polite" role="status" className="sr-only">
-              {copied ? "Link copied to clipboard" : ""}
+            <p aria-live="polite" aria-atomic="true" role="status" className="sr-only">
+              {announcement || (copied ? "Link copied to clipboard" : "")}
             </p>
+            <p aria-live="assertive" aria-atomic="true" role="alert" className="sr-only">
+              {errorAnnouncement}
+            </p>
+
           </section>
 
           {/* Location */}
