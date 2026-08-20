@@ -15,6 +15,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as CrmRouteImport } from './routes/crm'
+import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as BackofficeRouteImport } from './routes/backoffice'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LangRouteImport } from './routes/$lang'
@@ -170,6 +171,11 @@ const McpRoute = McpRouteImport.update({
 const CrmRoute = CrmRouteImport.update({
   id: '/crm',
   path: '/crm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectRoute = ConnectRouteImport.update({
+  id: '/connect',
+  path: '/connect',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BackofficeRoute = BackofficeRouteImport.update({
@@ -880,6 +886,7 @@ export interface FileRoutesByFullPath {
   '/$lang': typeof LangRouteWithChildren
   '/auth': typeof AuthRoute
   '/backoffice': typeof BackofficeRoute
+  '/connect': typeof ConnectRoute
   '/crm': typeof CrmRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -1012,6 +1019,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/backoffice': typeof BackofficeRoute
+  '/connect': typeof ConnectRoute
   '/crm': typeof CrmRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -1145,6 +1153,7 @@ export interface FileRoutesById {
   '/$lang': typeof LangRouteWithChildren
   '/auth': typeof AuthRoute
   '/backoffice': typeof BackofficeRoute
+  '/connect': typeof ConnectRoute
   '/crm': typeof CrmRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -1280,6 +1289,7 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/auth'
     | '/backoffice'
+    | '/connect'
     | '/crm'
     | '/mcp'
     | '/reset-password'
@@ -1412,6 +1422,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/backoffice'
+    | '/connect'
     | '/crm'
     | '/mcp'
     | '/reset-password'
@@ -1544,6 +1555,7 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/auth'
     | '/backoffice'
+    | '/connect'
     | '/crm'
     | '/mcp'
     | '/reset-password'
@@ -1679,6 +1691,7 @@ export interface RootRouteChildren {
   LangRoute: typeof LangRouteWithChildren
   AuthRoute: typeof AuthRoute
   BackofficeRoute: typeof BackofficeRoute
+  ConnectRoute: typeof ConnectRoute
   CrmRoute: typeof CrmRoute
   McpRoute: typeof McpRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -1755,6 +1768,13 @@ declare module '@tanstack/react-router' {
       path: '/crm'
       fullPath: '/crm'
       preLoaderRoute: typeof CrmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connect': {
+      id: '/connect'
+      path: '/connect'
+      fullPath: '/connect'
+      preLoaderRoute: typeof ConnectRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/backoffice': {
@@ -3021,6 +3041,7 @@ const rootRouteChildren: RootRouteChildren = {
   LangRoute: LangRouteWithChildren,
   AuthRoute: AuthRoute,
   BackofficeRoute: BackofficeRoute,
+  ConnectRoute: ConnectRoute,
   CrmRoute: CrmRoute,
   McpRoute: McpRoute,
   ResetPasswordRoute: ResetPasswordRoute,
