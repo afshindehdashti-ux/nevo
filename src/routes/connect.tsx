@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Check, ChevronRight, Copy, Globe, Mail, MapPin } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
 
