@@ -121,6 +121,42 @@ function ConnectCard() {
     }
   }, []);
 
+  // Long-press on the QR: copy the destination without leaving the page.
+  const pressTimer = useRef<number | null>(null);
+  const longPressed = useRef(false);
+  const [pressing, setPressing] = useState(false);
+
+  const clearPress = useCallback(() => {
+    if (pressTimer.current) window.clearTimeout(pressTimer.current);
+    pressTimer.current = null;
+    setPressing(false);
+  }, []);
+
+  useEffect(() => clearPress, [clearPress]);
+
+  const startPress = useCallback(() => {
+    longPressed.current = false;
+    setPressing(true);
+    if (pressTimer.current) window.clearTimeout(pressTimer.current);
+    pressTimer.current = window.setTimeout(() => {
+      longPressed.current = true;
+      setPressing(false);
+      void copyLink();
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(15);
+    }, 500);
+  }, [copyLink]);
+
+  const handleQrClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      // A long-press already copied the link — don't also navigate.
+      if (longPressed.current) {
+        e.preventDefault();
+        longPressed.current = false;
+      }
+    },
+    [],
+  );
+
   return (
     <main
       className="min-h-dvh bg-neutral-100 flex flex-col items-center [--accent:oklch(0.45_0.13_158)] [--border:oklch(0.88_0.004_260)] [--muted-foreground:oklch(0.43_0.012_260)] [--ring:oklch(0.45_0.13_158)]"
@@ -246,9 +282,20 @@ function ConnectCard() {
 
             <a
               href={CONNECT_URL}
-              aria-label="Open the digital business card at www.nevoindustrial.com/connect in this tab"
-              className="group mx-auto mt-5 block w-fit max-w-full rounded-2xl border border-border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.2)] active:translate-y-0 active:scale-[0.99] focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+              onPointerDown={startPress}
+              onPointerUp={clearPress}
+              onPointerLeave={clearPress}
+              onPointerCancel={clearPress}
+              onContextMenu={(e) => {
+                if (longPressed.current) e.preventDefault();
+              }}
+              onClick={handleQrClick}
+              aria-label="Open the digital business card at www.nevoindustrial.com/connect in this tab. Press and hold to copy the link instead."
+              className={`group mx-auto mt-5 block w-fit max-w-full select-none rounded-2xl border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.2)] active:translate-y-0 active:scale-[0.99] focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${
+                pressing ? "border-accent scale-[0.99]" : "border-border"
+              }`}
             >
+
               <div className="rounded-xl bg-white p-3">
                 <QRCodeSVG
                   value={CONNECT_URL}
@@ -266,8 +313,8 @@ function ConnectCard() {
                 aria-hidden="true"
                 className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors duration-200 group-hover:text-accent group-focus-visible:text-accent"
               >
-                Tap to open
-                <ArrowRight className="h-3.5 w-3.5" />
+                {pressing ? "Hold to copy…" : "Tap to open · hold to copy"}
+                {pressing ? <Copy className="h-3.5 w-3.5" /> : <ArrowRight className="h-3.5 w-3.5" />}
               </span>
             </a>
 
