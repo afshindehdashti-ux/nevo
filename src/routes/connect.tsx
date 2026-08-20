@@ -101,36 +101,58 @@ const ACTION_FEEDBACK: Record<string, string> = {
   website: "Opening website…",
 };
 
+// Cache rendered QR markup per destination so returning to a previously shown
+// destination paints instantly instead of re-running the generate state.
+const QR_CACHE = new Map<string, React.ReactElement>();
+const QR_CACHE_LIMIT = 12;
+
+function getCachedQr(value: string) {
+  const key = value || "about:blank";
+  const hit = QR_CACHE.get(key);
+  if (hit) {
+    // Refresh recency (simple LRU).
+    QR_CACHE.delete(key);
+    QR_CACHE.set(key, hit);
+    return { element: hit, cached: true };
+  }
+  const element = (
+    <QRCodeSVG
+      value={key}
+      size={168}
+      level="M"
+      marginSize={0}
+      bgColor="#ffffff"
+      fgColor="#000000"
+      className="h-[168px] w-[168px] max-w-full"
+      aria-hidden="true"
+      focusable="false"
+    />
+  );
+  QR_CACHE.set(key, element);
+  if (QR_CACHE.size > QR_CACHE_LIMIT) {
+    const oldest = QR_CACHE.keys().next().value;
+    if (oldest !== undefined) QR_CACHE.delete(oldest);
+  }
+  return { element, cached: false };
+}
+
+// Cache exported PNGs per destination so repeat downloads are instant.
+const QR_PNG_CACHE = new Map<string, string>();
+
 const QrImage = memo(function QrImage({ value }: { value: string }) {
   // Only this block re-renders/regenerates when the destination changes.
-  const [generating, setGenerating] = useState(Boolean(value));
+  const { element: qr, cached } = useMemo(() => getCachedQr(value), [value]);
+  const [generating, setGenerating] = useState(Boolean(value) && !cached);
 
   useEffect(() => {
-    if (!value) {
+    if (!value || cached) {
       setGenerating(false);
       return;
     }
     setGenerating(true);
     const id = window.setTimeout(() => setGenerating(false), 120);
     return () => window.clearTimeout(id);
-  }, [value]);
-
-  const qr = useMemo(
-    () => (
-      <QRCodeSVG
-        value={value || "about:blank"}
-        size={168}
-        level="M"
-        marginSize={0}
-        bgColor="#ffffff"
-        fgColor="#000000"
-        className="h-[168px] w-[168px] max-w-full"
-        aria-hidden="true"
-        focusable="false"
-      />
-    ),
-    [value],
-  );
+  }, [value, cached]);
 
   return (
     <div id="nevo-qr-frame" className="relative rounded-xl bg-white p-3" aria-busy={generating || undefined}>
@@ -206,6 +228,22 @@ function ConnectCard() {
       toast.error("Link unavailable", { description: CONNECT_URL_ERROR ?? undefined });
       return;
     }
+    const savePng = (png: string) => {
+      const a = document.createElement("a");
+      a.href = png;
+      a.download = "nevo-arsalan-manesh-qr.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast.success("QR code downloaded", { description: "nevo-arsalan-manesh-qr.png" });
+    };
+
+    const cachedPng = QR_PNG_CACHE.get(CONNECT_URL);
+    if (cachedPng) {
+      savePng(cachedPng);
+      return;
+    }
+
     const svg = document.querySelector("#nevo-qr-frame svg");
     if (!svg) {
       toast.error("Couldn't prepare the QR code", { description: "Please reload the page and try again." });
@@ -235,13 +273,8 @@ function ConnectCard() {
       ctx.drawImage(img, PAD, PAD, SIZE, SIZE);
       URL.revokeObjectURL(url);
       const png = canvas.toDataURL("image/png");
-      const a = document.createElement("a");
-      a.href = png;
-      a.download = "nevo-arsalan-manesh-qr.png";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      toast.success("QR code downloaded", { description: "nevo-arsalan-manesh-qr.png" });
+      QR_PNG_CACHE.set(CONNECT_URL, png);
+      savePng(png);
     } catch {
       toast.error("Couldn't download the QR code", { description: "Try taking a screenshot instead." });
     } finally {
