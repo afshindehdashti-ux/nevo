@@ -199,6 +199,56 @@ function ConnectCard() {
     }
   }, []);
 
+  const [downloading, setDownloading] = useState(false);
+
+  const downloadQr = useCallback(async () => {
+    if (!CONNECT_URL) {
+      toast.error("Link unavailable", { description: CONNECT_URL_ERROR ?? undefined });
+      return;
+    }
+    const svg = document.querySelector("#nevo-qr-frame svg");
+    if (!svg) {
+      toast.error("Couldn't prepare the QR code", { description: "Please reload the page and try again." });
+      return;
+    }
+    setDownloading(true);
+    try {
+      const SIZE = 1024;
+      const PAD = 64;
+      const source = new XMLSerializer().serializeToString(svg);
+      const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error("decode failed"));
+        img.src = url;
+      });
+      const canvas = document.createElement("canvas");
+      canvas.width = SIZE + PAD * 2;
+      canvas.height = SIZE + PAD * 2;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("no canvas context");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, PAD, PAD, SIZE, SIZE);
+      URL.revokeObjectURL(url);
+      const png = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = png;
+      a.download = "nevo-arsalan-manesh-qr.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast.success("QR code downloaded", { description: "nevo-arsalan-manesh-qr.png" });
+    } catch {
+      toast.error("Couldn't download the QR code", { description: "Try taking a screenshot instead." });
+    } finally {
+      setDownloading(false);
+    }
+  }, []);
+
   // Long-press on the QR: copy the destination without leaving the page.
   const pressTimer = useRef<number | null>(null);
   const longPressed = useRef(false);
