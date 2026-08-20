@@ -39,8 +39,8 @@ export function shouldOpenAfterVerify(result: VerifyResult): boolean {
  */
 export interface VerifierSupabaseClient {
   rpc(
-    fn: "has_any_role",
-    params: { _user_id: string; _roles: AppRole[] },
+    fn: "current_user_has_any_role",
+    params: { _roles: AppRole[] },
   ): Promise<{ data: boolean | null; error: { message: string } | null }>;
   from(table: "csv_export_audit"): {
     select(cols: string): {
@@ -77,10 +77,7 @@ export async function verifyCsvExportForAudit(
   userId: string,
   data: VerifyInput,
 ): Promise<ServerVerifyResponse> {
-  const { data: allowed, error: roleErr } = await supabase.rpc("has_any_role", {
-    _user_id: userId,
-    _roles: ALLOWED_ROLES,
-  });
+  const { data: allowed, error: roleErr } = await supabase.rpc("current_user_has_any_role", { _roles: ALLOWED_ROLES });
   if (roleErr) throw new Error(roleErr.message);
   if (!allowed) throw new Error("Not authorised to verify CSV exports.");
 

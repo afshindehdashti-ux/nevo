@@ -4323,6 +4323,15 @@ export type Database = {
         Args: { _proforma_id: string }
         Returns: string
       }
+      current_user_has_any_role: {
+        Args: { _roles: Database["public"]["Enums"]["app_role"][] }
+        Returns: boolean
+      }
+      current_user_has_role: {
+        Args: { _role: Database["public"]["Enums"]["app_role"] }
+        Returns: boolean
+      }
+      current_user_is_staff: { Args: never; Returns: boolean }
       decide_approval_request: {
         Args: { _decision: string; _id: string; _notes?: string }
         Returns: {

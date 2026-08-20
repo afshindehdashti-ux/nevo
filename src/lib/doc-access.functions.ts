@@ -6,10 +6,7 @@ const KindEnum = z.enum(["customer", "partner"]);
 
 async function assertStaff(context: { supabase: unknown; userId: string }) {
   const client = context.supabase as { rpc: (fn: string, args: unknown) => Promise<{ data: unknown; error: unknown }> };
-  const { data, error } = await client.rpc("has_any_role", {
-    _user_id: context.userId,
-    _roles: ["super_admin", "management", "sales", "operations"],
-  });
+  const { data, error } = await client.rpc("current_user_has_any_role", { _roles: ["super_admin", "management", "sales", "operations"] });
   if (error) throw new Error((error as { message: string }).message);
   if (!data) throw new Error("Forbidden");
 }

@@ -60,10 +60,7 @@ const resetSchema = z.object({ email: z.string().email() });
 
 async function assertSuperAdmin(ctx: { supabase: SupabaseClient<Database>; userId: string }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (ctx.supabase as any).rpc("has_role", {
-    _user_id: ctx.userId,
-    _role: "super_admin" as AppRole,
-  });
+  const { data, error } = await (ctx.supabase as any).rpc("current_user_has_role", { _role: "super_admin" as AppRole });
   if (error) throw new Error("Permission check failed");
   if (!data) throw new Error("Forbidden: super admin only");
 }

@@ -5,7 +5,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
 
 async function ensureSuperAdmin(supabase: SupabaseClient<Database>, userId: string) {
-  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "super_admin" });
+  const { data, error } = await supabase.rpc("current_user_has_role", { _role: "super_admin" });
   if (error) throw new Error("Role check failed: " + error.message);
   if (!data) throw new Error("Forbidden: super_admin role required");
 }

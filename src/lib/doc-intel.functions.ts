@@ -21,10 +21,7 @@ async function assertRole(
   userId: string,
   roles: readonly string[],
 ) {
-  const { data, error } = await supabase.rpc("has_any_role", {
-    _user_id: userId,
-    _roles: roles as unknown as string[],
-  });
+  const { data, error } = await supabase.rpc("current_user_has_any_role", { _roles: roles as unknown as string[] });
   if (error) throw new Error(error.message);
   if (!data) throw new Error("Forbidden");
 }
@@ -560,10 +557,7 @@ export const signDocumentUrl = createServerFn({ method: "POST" })
     );
     if (sensitive && doc.status !== "approved") {
       const isUploader = doc.uploaded_by === context.userId;
-      const { data: canApprove } = await context.supabase.rpc("has_any_role", {
-        _user_id: context.userId,
-        _roles: ["super_admin", "management", "finance"],
-      });
+      const { data: canApprove } = await context.supabase.rpc("current_user_has_any_role", { _roles: ["super_admin", "management", "finance"] });
       if (!isUploader && !canApprove) {
         throw new Error("Document is pending approval — access locked");
       }
