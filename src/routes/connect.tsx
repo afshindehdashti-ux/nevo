@@ -128,7 +128,7 @@ function ConnectCard() {
           <img
             src={nevoLogoLight}
             alt="NEVO Industrial"
-            className="mx-auto h-8 w-auto max-w-[70%] object-contain sm:h-10"
+            className="mx-auto h-14 w-auto max-w-[88%] object-contain [filter:contrast(1.12)_saturate(1.08)_drop-shadow(0_1px_2px_rgba(0,0,0,0.35))] sm:h-[4.5rem]"
             decoding="async"
           />
           <div className="mx-auto mt-6 h-px w-16 bg-[oklch(0.72_0.155_158)]" />
