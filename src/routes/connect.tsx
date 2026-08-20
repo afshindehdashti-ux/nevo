@@ -341,7 +341,7 @@ function ConnectCard() {
 
               <div className="rounded-xl bg-white p-3">
                 <QRCodeSVG
-                  value={CONNECT_URL}
+                  value={CONNECT_URL || "about:blank"}
                   size={168}
                   level="M"
                   marginSize={0}
@@ -356,28 +356,46 @@ function ConnectCard() {
                 aria-hidden="true"
                 className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors duration-200 group-hover:text-accent group-focus-visible:text-accent"
               >
-                {pressing ? "Hold to copy…" : "Tap to open · hold to copy"}
+                {!CONNECT_URL
+                  ? "Link unavailable"
+                  : pressing
+                    ? "Hold to copy…"
+                    : "Tap to open · hold to copy"}
                 {pressing ? <Copy className="h-3.5 w-3.5" /> : <ArrowRight className="h-3.5 w-3.5" />}
               </span>
             </a>
 
+            {CONNECT_URL_ERROR && (
+              <p
+                id="qr-error"
+                role="alert"
+                className="mx-auto mt-4 max-w-full rounded-lg bg-neutral-50 px-3 py-2 text-center text-sm font-medium text-[oklch(0.45_0.17_25)]"
+              >
+                {CONNECT_URL_ERROR}
+              </p>
+            )}
 
             <div className="mx-auto mt-4 grid max-w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg bg-neutral-50 px-3 py-2">
               <input
                 type="text"
                 readOnly
                 dir="ltr"
-                value={CONNECT_URL.replace("https://", "")}
+                value={CONNECT_URL_DISPLAY || "Link unavailable"}
                 aria-label="Digital business card link"
+                aria-invalid={CONNECT_URL ? undefined : true}
+                aria-describedby={CONNECT_URL ? undefined : "qr-error"}
                 onFocus={(e) => e.currentTarget.select()}
                 onClick={(e) => e.currentTarget.select()}
-                className="min-w-0 select-all truncate rounded-md bg-transparent px-1 py-2 text-sm font-medium text-black outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+                className={`min-w-0 select-all truncate rounded-md bg-transparent px-1 py-2 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] ${
+                  CONNECT_URL ? "text-black" : "text-muted-foreground"
+                }`}
               />
               <button
                 type="button"
                 onClick={copyLink}
+                disabled={!CONNECT_URL}
                 aria-label="Copy link to this digital business card"
-                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-md bg-black px-3.5 text-xs font-semibold uppercase tracking-wider text-white outline-none transition-colors hover:bg-accent hover:text-white focus-visible:bg-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-md bg-black px-3.5 text-xs font-semibold uppercase tracking-wider text-white outline-none transition-colors hover:bg-accent hover:text-white focus-visible:bg-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-black"
               >
                 {copied ? (
                   <Check className="h-4 w-4" aria-hidden="true" />
