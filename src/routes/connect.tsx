@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Check, ChevronRight, Copy, Globe, Loader2, Mail, MapPin } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Copy, Download, Globe, Loader2, Mail, MapPin } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -133,7 +133,7 @@ const QrImage = memo(function QrImage({ value }: { value: string }) {
   );
 
   return (
-    <div className="relative rounded-xl bg-white p-3" aria-busy={generating || undefined}>
+    <div id="nevo-qr-frame" className="relative rounded-xl bg-white p-3" aria-busy={generating || undefined}>
       <div className={generating ? "opacity-40 transition-opacity duration-200" : "transition-opacity duration-200"}>
         {qr}
       </div>
@@ -196,6 +196,56 @@ function ConnectCard() {
     } catch {
       setCopied(false);
       toast.error("Couldn't copy the link", { description: "Select the address and copy it manually." });
+    }
+  }, []);
+
+  const [downloading, setDownloading] = useState(false);
+
+  const downloadQr = useCallback(async () => {
+    if (!CONNECT_URL) {
+      toast.error("Link unavailable", { description: CONNECT_URL_ERROR ?? undefined });
+      return;
+    }
+    const svg = document.querySelector("#nevo-qr-frame svg");
+    if (!svg) {
+      toast.error("Couldn't prepare the QR code", { description: "Please reload the page and try again." });
+      return;
+    }
+    setDownloading(true);
+    try {
+      const SIZE = 1024;
+      const PAD = 64;
+      const source = new XMLSerializer().serializeToString(svg);
+      const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error("decode failed"));
+        img.src = url;
+      });
+      const canvas = document.createElement("canvas");
+      canvas.width = SIZE + PAD * 2;
+      canvas.height = SIZE + PAD * 2;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("no canvas context");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, PAD, PAD, SIZE, SIZE);
+      URL.revokeObjectURL(url);
+      const png = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = png;
+      a.download = "nevo-arsalan-manesh-qr.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast.success("QR code downloaded", { description: "nevo-arsalan-manesh-qr.png" });
+    } catch {
+      toast.error("Couldn't download the QR code", { description: "Try taking a screenshot instead." });
+    } finally {
+      setDownloading(false);
     }
   }, []);
 
@@ -445,6 +495,22 @@ function ConnectCard() {
                 {copied ? "Copied" : "Copy"}
               </button>
             </div>
+
+            <button
+              type="button"
+              onClick={downloadQr}
+              disabled={!CONNECT_URL || downloading}
+              aria-label="Download this QR code as a PNG image"
+              className="mx-auto mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-border bg-white px-4 text-xs font-semibold uppercase tracking-wider text-black outline-none transition-colors hover:border-accent hover:text-accent focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {downloading ? (
+                <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+              ) : (
+                <Download className="h-4 w-4" aria-hidden="true" />
+              )}
+              {downloading ? "Preparing PNG…" : "Download QR (PNG)"}
+            </button>
+
 
             <p aria-live="polite" role="status" className="sr-only">
               {copied ? "Link copied to clipboard" : ""}
