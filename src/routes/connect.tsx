@@ -81,7 +81,9 @@ function ConnectCard() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-neutral-100 flex flex-col items-center">
+    <main
+      className="min-h-dvh bg-neutral-100 flex flex-col items-center [--accent:oklch(0.45_0.13_158)] [--border:oklch(0.88_0.004_260)] [--muted-foreground:oklch(0.43_0.012_260)] [--ring:oklch(0.45_0.13_158)]"
+    >
       <div className="w-full max-w-md flex-1 bg-white shadow-[0_2px_40px_rgba(0,0,0,0.06)] flex flex-col">
         {/* Brand header */}
         <header className="bg-black px-5 pt-9 pb-7 text-center sm:px-8 sm:pt-10 sm:pb-8">
@@ -91,11 +93,12 @@ function ConnectCard() {
             className="mx-auto h-8 w-auto max-w-[70%] object-contain sm:h-10"
             decoding="async"
           />
-          <div className="mx-auto mt-6 h-px w-16 bg-accent" />
-          <p className="mt-5 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-white/60">
+          <div className="mx-auto mt-6 h-px w-16 bg-[oklch(0.72_0.155_158)]" />
+          <p className="mt-5 text-xs font-semibold uppercase tracking-[0.3em] text-white/85">
             Digital Business Card
           </p>
         </header>
+
 
         <div className="flex-1 px-7 pt-9 pb-10">
           {/* Person */}
