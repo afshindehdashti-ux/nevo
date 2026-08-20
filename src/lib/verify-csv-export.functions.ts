@@ -39,8 +39,8 @@ export function shouldOpenAfterVerify(result: VerifyResult): boolean {
  */
 export interface VerifierSupabaseClient {
   rpc(
-    fn: "has_any_role",
-    params: { _user_id: string; _roles: AppRole[] },
+    fn: "current_user_has_any_role",
+    params: { _roles: AppRole[] },
   ): Promise<{ data: boolean | null; error: { message: string } | null }>;
   from(table: "csv_export_audit"): {
     select(cols: string): {
