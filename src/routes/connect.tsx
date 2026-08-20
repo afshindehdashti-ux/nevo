@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronRight, Globe, Mail, MapPin } from "lucide-react";
+import { Check, ChevronRight, Copy, Globe, Mail, MapPin } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { useCallback, useState } from "react";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
 
@@ -64,7 +66,20 @@ const CONTACTS = [
   },
 ] as const;
 
+const CONNECT_URL = "https://www.nevoindustrial.com/connect";
+
 function ConnectCard() {
+  const [copied, setCopied] = useState(false);
+  const copyLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(CONNECT_URL);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  }, []);
+
   return (
     <main className="min-h-screen bg-neutral-100 flex flex-col items-center">
       <div className="w-full max-w-md flex-1 bg-white shadow-[0_2px_40px_rgba(0,0,0,0.06)] flex flex-col">
