@@ -121,6 +121,42 @@ function ConnectCard() {
     }
   }, []);
 
+  // Long-press on the QR: copy the destination without leaving the page.
+  const pressTimer = useRef<number | null>(null);
+  const longPressed = useRef(false);
+  const [pressing, setPressing] = useState(false);
+
+  const clearPress = useCallback(() => {
+    if (pressTimer.current) window.clearTimeout(pressTimer.current);
+    pressTimer.current = null;
+    setPressing(false);
+  }, []);
+
+  useEffect(() => clearPress, [clearPress]);
+
+  const startPress = useCallback(() => {
+    longPressed.current = false;
+    setPressing(true);
+    if (pressTimer.current) window.clearTimeout(pressTimer.current);
+    pressTimer.current = window.setTimeout(() => {
+      longPressed.current = true;
+      setPressing(false);
+      void copyLink();
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(15);
+    }, 500);
+  }, [copyLink]);
+
+  const handleQrClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      // A long-press already copied the link — don't also navigate.
+      if (longPressed.current) {
+        e.preventDefault();
+        longPressed.current = false;
+      }
+    },
+    [],
+  );
+
   return (
     <main
       className="min-h-dvh bg-neutral-100 flex flex-col items-center [--accent:oklch(0.45_0.13_158)] [--border:oklch(0.88_0.004_260)] [--muted-foreground:oklch(0.43_0.012_260)] [--ring:oklch(0.45_0.13_158)]"
