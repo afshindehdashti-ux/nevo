@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Check, ChevronRight, Copy, ExternalLink, Globe, Loader2, Mail, MapPin } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
 
@@ -112,9 +113,11 @@ function ConnectCard() {
     try {
       await navigator.clipboard.writeText(CONNECT_URL);
       setCopied(true);
+      toast.success("Link copied", { description: CONNECT_URL.replace("https://", "") });
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
+      toast.error("Couldn't copy the link", { description: "Select the address and copy it manually." });
     }
   }, []);
 
