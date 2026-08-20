@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronRight, Globe, Mail, MapPin } from "lucide-react";
+import { Check, ChevronRight, Copy, Globe, Mail, MapPin } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { useCallback, useState } from "react";
 import nevoLogoLight from "@/assets/nevo-logo-light.png";
 
 
@@ -64,16 +66,29 @@ const CONTACTS = [
   },
 ] as const;
 
+const CONNECT_URL = "https://www.nevoindustrial.com/connect";
+
 function ConnectCard() {
+  const [copied, setCopied] = useState(false);
+  const copyLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(CONNECT_URL);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  }, []);
+
   return (
     <main className="min-h-screen bg-neutral-100 flex flex-col items-center">
       <div className="w-full max-w-md flex-1 bg-white shadow-[0_2px_40px_rgba(0,0,0,0.06)] flex flex-col">
         {/* Brand header */}
-        <header className="bg-black px-8 pt-10 pb-8 text-center">
+        <header className="bg-black px-5 pt-9 pb-7 text-center sm:px-8 sm:pt-10 sm:pb-8">
           <img
             src={nevoLogoLight}
             alt="NEVO Industrial"
-            className="mx-auto h-10 w-auto"
+            className="mx-auto h-8 w-auto max-w-[70%] object-contain sm:h-10"
             decoding="async"
           />
           <div className="mx-auto mt-6 h-px w-16 bg-accent" />
@@ -133,6 +148,52 @@ function ConnectCard() {
             ))}
           </nav>
 
+          {/* QR code */}
+          <section aria-labelledby="qr-heading" className="mt-8 border-t border-border pt-8">
+            <h2
+              id="qr-heading"
+              className="text-center text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground"
+            >
+              Scan to connect
+            </h2>
+
+            <div className="mx-auto mt-5 w-fit max-w-full rounded-2xl border border-border bg-white p-4 shadow-[0_6px_24px_rgba(0,0,0,0.08)]">
+              <div className="rounded-xl bg-white p-3">
+                <QRCodeSVG
+                  value={CONNECT_URL}
+                  size={168}
+                  level="M"
+                  marginSize={0}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  className="h-[168px] w-[168px] max-w-full"
+                  title="QR code linking to nevoindustrial.com/connect"
+                />
+              </div>
+            </div>
+
+            <div className="mx-auto mt-4 grid max-w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg bg-neutral-50 px-3 py-2.5">
+              <span className="min-w-0 truncate text-xs font-medium text-black" dir="ltr">
+                {CONNECT_URL.replace("https://", "")}
+              </span>
+              <button
+                type="button"
+                onClick={copyLink}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-black px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-accent hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {copied ? (
+                  <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+                )}
+                {copied ? "Copied" : "Copy"}
+              </button>
+            </div>
+            <p aria-live="polite" className="sr-only">
+              {copied ? "Link copied to clipboard" : ""}
+            </p>
+          </section>
+
           {/* Location */}
           <div className="mt-8 border-t border-border pt-6">
             <p className="flex items-center justify-center gap-2 text-sm text-black">
@@ -140,6 +201,7 @@ function ConnectCard() {
               Meydan Freezone, Dubai, UAE
             </p>
           </div>
+
         </div>
 
         {/* Footer */}
