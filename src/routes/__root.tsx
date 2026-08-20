@@ -285,10 +285,14 @@ function RootComponent() {
         {/* Public marketing chrome — hidden on all admin/CRM/backoffice
             routes. Each component also self-gates via useIsBackend() so
             they cannot leak if a future parent forgets this wrapper. */}
-        {!isBackend && !isConnect && (
+        {!isBackend && (
           <>
-            <AIAssistantLauncher />
-            <StickyMobileCTA />
+            {!isConnect && (
+              <>
+                <AIAssistantLauncher />
+                <StickyMobileCTA />
+              </>
+            )}
             <CookieConsent />
             <Analytics />
           </>
