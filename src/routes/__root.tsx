@@ -271,6 +271,11 @@ function RootComponent() {
   // every client-side navigation. Layout-level components must use this
   // helper (not a local regex) to keep public/backend gating consistent.
   const isBackend = useIsBackend();
+  // /connect is the QR-code digital business card — intentionally free of any
+  // marketing chrome (Ask AI launcher, sticky mobile CTA).
+  const isConnect = useRouterState({
+    select: (s) => s.location.pathname.replace(/\/+$/, "") === "/connect",
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -282,8 +287,12 @@ function RootComponent() {
             they cannot leak if a future parent forgets this wrapper. */}
         {!isBackend && (
           <>
-            <AIAssistantLauncher />
-            <StickyMobileCTA />
+            {!isConnect && (
+              <>
+                <AIAssistantLauncher />
+                <StickyMobileCTA />
+              </>
+            )}
             <CookieConsent />
             <Analytics />
           </>
