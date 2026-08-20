@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Link } from "@/components/site/LocalizedLink";
 import { useLanguage } from "@/i18n/LanguageProvider";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { localizeNavLabel } from "@/i18n/nav-labels";
 import {
@@ -381,6 +381,40 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelClose = useCallback(() => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  }, []);
+
+  const openMenu = useCallback(
+    (label: string | null) => {
+      cancelClose();
+      setActiveMenu(label);
+    },
+    [cancelClose],
+  );
+
+  // Delay closing so the pointer can travel from the trigger into the panel.
+  const scheduleClose = useCallback(() => {
+    cancelClose();
+    closeTimer.current = setTimeout(() => setActiveMenu(null), 220);
+  }, [cancelClose]);
+
+  useEffect(() => cancelClose, [cancelClose]);
+
+  useEffect(() => {
+    if (!activeMenu) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setActiveMenu(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activeMenu]);
+
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -426,7 +460,8 @@ export function SiteHeader() {
             ? "border-b border-border bg-background/90 shadow-[0_1px_0_0_rgba(0,0,0,0.4),0_8px_28px_-18px_rgba(0,0,0,0.6)] backdrop-blur-xl"
             : "border-b border-transparent bg-transparent",
         )}
-        onMouseLeave={() => setActiveMenu(null)}
+        onMouseEnter={cancelClose}
+        onMouseLeave={scheduleClose}
       >
         <UtilityBar solid={solid} />
 
@@ -558,13 +593,13 @@ export function SiteHeader() {
             <nav
               className="hidden items-center gap-0.5 lg:flex"
               aria-label="Primary"
-              onMouseLeave={() => setActiveMenu(null)}
+              onMouseEnter={cancelClose}
             >
               <TopLink
                 label={t("nav.home")}
                 href="/"
                 onLight={!solid}
-                onEnter={() => setActiveMenu(null)}
+                onEnter={() => openMenu(null)}
               />
               {NAV.map((group) => (
                 <MegaTrigger
@@ -573,7 +608,7 @@ export function SiteHeader() {
                   displayLabel={t(NAV_KEY[group.label] ?? group.label, group.label)}
                   onLight={!solid}
                   active={activeMenu === group.label}
-                  onEnter={() => setActiveMenu(group.label)}
+                  onEnter={() => openMenu(group.label)}
                 />
               ))}
             </nav>
@@ -632,13 +667,15 @@ export function SiteHeader() {
               "pointer-events-none absolute inset-x-0 top-full hidden lg:block",
               activeMenu ? "pointer-events-auto" : "",
             )}
+            onMouseEnter={cancelClose}
+            onMouseLeave={scheduleClose}
           >
             {NAV.map((group) => (
               <MegaPanel
                 key={group.label}
                 group={group}
                 open={activeMenu === group.label}
-                onClose={() => setActiveMenu(null)}
+                onClose={scheduleClose}
               />
             ))}
           </div>
@@ -814,11 +851,14 @@ function MegaPanel({
   return (
     <div
       className={cn(
-        "border-b border-border bg-background shadow-[0_20px_40px_-24px_rgba(0,0,0,0.6)] transition-all duration-[220ms] ease-[var(--ease-out-quart)]",
-        open ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
+        "absolute inset-x-0 top-0 border-b border-border bg-background shadow-[0_20px_40px_-24px_rgba(0,0,0,0.6)] transition-all duration-[220ms] ease-[var(--ease-out-quart)]",
+        open
+          ? "translate-y-0 opacity-100"
+          : "pointer-events-none invisible -translate-y-1 opacity-0",
       )}
       onMouseLeave={onClose}
     >
+
       <div className="container-wide px-6 py-10 lg:px-8">
         {group.layout === "cards" && <CardsLayout group={group} />}
         {group.layout === "grid" && <GridLayout group={group} />}
