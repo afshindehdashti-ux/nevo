@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronRight, Globe, Mail, MapPin } from "lucide-react";
+import nevoLogoDark from "@/assets/nevo-logo-dark.png";
+
 
 export const Route = createFileRoute("/connect")({
   head: () => ({
