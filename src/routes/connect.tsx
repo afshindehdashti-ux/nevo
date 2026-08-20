@@ -133,7 +133,7 @@ const QrImage = memo(function QrImage({ value }: { value: string }) {
   );
 
   return (
-    <div className="relative rounded-xl bg-white p-3" aria-busy={generating || undefined}>
+    <div id="nevo-qr-frame" className="relative rounded-xl bg-white p-3" aria-busy={generating || undefined}>
       <div className={generating ? "opacity-40 transition-opacity duration-200" : "transition-opacity duration-200"}>
         {qr}
       </div>
