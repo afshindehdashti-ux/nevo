@@ -148,7 +148,7 @@ function ConnectCard() {
                   <span className="block text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors duration-200 group-hover:text-black">
                     {c.label}
                   </span>
-                  <span className="mt-1 block truncate text-[0.95rem] font-semibold leading-tight text-black" dir="ltr">
+                  <span className="mt-1 block truncate text-[0.82rem] font-semibold leading-tight tracking-tight text-black min-[400px]:text-[0.95rem] min-[400px]:tracking-normal" dir="ltr">
                     {c.value}
                   </span>
                 </span>
