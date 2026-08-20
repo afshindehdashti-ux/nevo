@@ -77,10 +77,7 @@ export async function verifyCsvExportForAudit(
   userId: string,
   data: VerifyInput,
 ): Promise<ServerVerifyResponse> {
-  const { data: allowed, error: roleErr } = await supabase.rpc("has_any_role", {
-    _user_id: userId,
-    _roles: ALLOWED_ROLES,
-  });
+  const { data: allowed, error: roleErr } = await supabase.rpc("current_user_has_any_role", { _roles: ALLOWED_ROLES });
   if (roleErr) throw new Error(roleErr.message);
   if (!allowed) throw new Error("Not authorised to verify CSV exports.");
 

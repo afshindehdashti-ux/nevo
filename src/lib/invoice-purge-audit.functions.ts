@@ -21,10 +21,7 @@ async function assertCanPurge(context: {
   supabase: import("@supabase/supabase-js").SupabaseClient;
   userId: string;
 }) {
-  const { data: allowed, error } = await context.supabase.rpc("has_any_role", {
-    _user_id: context.userId,
-    _roles: PURGE_ROLES as unknown as string[],
-  });
+  const { data: allowed, error } = await context.supabase.rpc("current_user_has_any_role", { _roles: PURGE_ROLES as unknown as string[] });
   if (error) throw new Error(error.message);
   if (!allowed) {
     throw new Error(

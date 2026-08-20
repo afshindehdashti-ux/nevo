@@ -225,7 +225,7 @@ async function userHasAnyRole(
   roles: string[],
 ): Promise<boolean> {
   for (const role of roles) {
-    const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: role });
+    const { data } = await supabase.rpc("current_user_has_role", { _role: role });
     if (data === true) return true;
   }
   return false;

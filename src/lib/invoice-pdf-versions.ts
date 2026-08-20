@@ -85,10 +85,7 @@ export async function purgeOlderInvoicePdfVersions(
   if (!uid) {
     throw new Error("You must be signed in to purge PDF versions.");
   }
-  const { data: allowed, error: roleErr } = await supabase.rpc("has_any_role", {
-    _user_id: uid,
-    _roles: ["super_admin", "management", "finance"],
-  });
+  const { data: allowed, error: roleErr } = await supabase.rpc("current_user_has_any_role", { _roles: ["super_admin", "management", "finance"] });
   if (roleErr) throw roleErr;
   if (!allowed) {
     throw new Error(

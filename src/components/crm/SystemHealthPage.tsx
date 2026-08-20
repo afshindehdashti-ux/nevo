@@ -959,10 +959,7 @@ export function SystemHealthPage() {
       mark("rls");
       // 17. RLS Health — verify has_role RPC exists
       try {
-        const { data, error } = await supabase.rpc("has_role", {
-          _user_id: (await supabase.auth.getUser()).data.user!.id,
-          _role: "super_admin",
-        });
+        const { data, error } = await supabase.rpc("current_user_has_role", { _role: "super_admin" });
         if (error) throw error;
         update("rls", {
           status: "pass",

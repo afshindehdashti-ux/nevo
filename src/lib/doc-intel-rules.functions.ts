@@ -19,10 +19,7 @@ async function assertRole(
   userId: string,
   roles: readonly string[],
 ) {
-  const { data, error } = await supabase.rpc("has_any_role", {
-    _user_id: userId,
-    _roles: roles as unknown as string[],
-  });
+  const { data, error } = await supabase.rpc("current_user_has_any_role", { _roles: roles as unknown as string[] });
   if (error) throw new Error(error.message);
   if (!data) throw new Error("Forbidden");
 }

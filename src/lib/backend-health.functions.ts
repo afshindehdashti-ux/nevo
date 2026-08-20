@@ -9,10 +9,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const getBackendHealth = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "super_admin",
-    });
+    const { data: isAdmin } = await context.supabase.rpc("current_user_has_role", { _role: "super_admin" });
     if (!isAdmin) throw new Error("Forbidden");
 
     const { supabaseAdmin } = await import(
