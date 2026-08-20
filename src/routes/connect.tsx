@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Check, ChevronRight, Copy, Globe, Loader2, Mail, MapPin } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Copy, Download, Globe, Loader2, Mail, MapPin } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
