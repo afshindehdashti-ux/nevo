@@ -273,13 +273,8 @@ function ConnectCard() {
       ctx.drawImage(img, PAD, PAD, SIZE, SIZE);
       URL.revokeObjectURL(url);
       const png = canvas.toDataURL("image/png");
-      const a = document.createElement("a");
-      a.href = png;
-      a.download = "nevo-arsalan-manesh-qr.png";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      toast.success("QR code downloaded", { description: "nevo-arsalan-manesh-qr.png" });
+      QR_PNG_CACHE.set(CONNECT_URL, png);
+      savePng(png);
     } catch {
       toast.error("Couldn't download the QR code", { description: "Try taking a screenshot instead." });
     } finally {
